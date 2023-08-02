@@ -1,0 +1,570 @@
+test_name: Upload and run a JSONv7 protocol.
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+stages:
+  - name: Upload simple JSONv7 protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simpleV7.json'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+      json:
+        data:
+          id: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          status: idle
+          current: True
+          actions: []
+          errors: []
+          pipettes: []
+          modules: []
+          labware:
+            - id: !anystr
+              loadName: !anystr
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location: !anydict
+          labwareOffsets: []
+          liquids:
+            - id: waterId
+              displayName: Water
+              description: Liquid H2O
+              displayColor: '#7332a8'
+          protocolId: '{protocol_id}'
+
+  - name: Execute a setup command
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: home
+          params: {}
+          intent: setup
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          setup_command_id: data.id
+          setup_command_key: data.key
+          setup_command_created_at: data.createdAt
+          setup_command_started_at: data.startedAt
+          setup_command_completed_at: data.completedAt
+
+  - name: Fetch run commands
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current:
+            href: '/runs/{run_id}/commands/{setup_command_id}'
+            meta:
+              runId: '{run_id}'
+              commandId: '{setup_command_id}'
+              key: '{setup_command_key}'
+              createdAt: '{setup_command_created_at}'
+              index: 14
+        meta:
+          cursor: 0
+          totalLength: 15
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: loadPipette
+            createdAt: !anystr
+            status: queued
+            params:
+              pipetteName: p10_single
+              mount: left
+              pipetteId: pipetteId
+          - id: !anystr
+            key: !anystr
+            commandType: loadModule
+            createdAt: !anystr
+            status: queued
+            params:
+              model: magneticModuleV1
+              location:
+                slotName: '3'
+              moduleId: magneticModuleId
+          - id: !anystr
+            key: !anystr
+            commandType: loadModule
+            createdAt: !anystr
+            status: queued
+            params:
+              model: temperatureModuleV2
+              location:
+                slotName: '1'
+              moduleId: temperatureModuleId
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            status: queued
+            params:
+              location:
+                moduleId: temperatureModuleId
+              loadName: foo_8_plate_33ul
+              namespace: example
+              version: 1
+              labwareId: sourcePlateId
+              displayName: Source Plate
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            status: queued
+            params:
+              location:
+                moduleId: magneticModuleId
+              loadName: foo_8_plate_33ul
+              namespace: example
+              version: 1
+              labwareId: destPlateId
+              displayName: Sample Collection Plate
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            status: queued
+            params:
+              location:
+                slotName: '8'
+              loadName: opentrons_96_tiprack_10ul
+              namespace: opentrons
+              version: 1
+              labwareId: tipRackId
+              displayName: Opentrons 96 Tip Rack 10 µL
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            status: queued
+            params:
+              location:
+                slotName: '12'
+              loadName: opentrons_1_trash_1100ml_fixed
+              namespace: opentrons
+              version: 1
+              labwareId: fixedTrash
+              displayName: Trash
+          - id: !anystr
+            createdAt: !anystr
+            commandType: loadLiquid
+            key: !anystr
+            status: queued
+            params:
+              liquidId: 'waterId'
+              labwareId: 'sourcePlateId'
+              volumeByWell:
+                A1: 100
+                B1: 100
+          - id: !anystr
+            key: !anystr
+            commandType: pickUpTip
+            createdAt: !anystr
+            status: queued
+            params:
+              pipetteId: pipetteId
+              labwareId: tipRackId
+              wellName: B1
+              wellLocation:
+                origin: top
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 0
+          - id: !anystr
+            key: !anystr
+            commandType: aspirate
+            createdAt: !anystr
+            status: queued
+            params:
+              pipetteId: pipetteId
+              labwareId: sourcePlateId
+              wellName: A1
+              wellLocation:
+                origin: bottom
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 2
+              volume: 5
+              flowRate: 3
+          - id: !anystr
+            key: !anystr
+            commandType: dispense
+            createdAt: !anystr
+            status: queued
+            params:
+              pipetteId: pipetteId
+              labwareId: destPlateId
+              wellName: B1
+              wellLocation:
+                origin: bottom
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 1
+              volume: 4.5
+              flowRate: 2.5
+          - id: !anystr
+            key: !anystr
+            commandType: moveToWell
+            createdAt: !anystr
+            status: queued
+            params:
+              pipetteId: pipetteId
+              labwareId: destPlateId
+              wellName: B2
+              wellLocation:
+                origin: top
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 0
+              forceDirect: false
+          - id: !anystr
+            key: !anystr
+            commandType: moveToWell
+            createdAt: !anystr
+            status: queued
+            params:
+              pipetteId: pipetteId
+              labwareId: destPlateId
+              wellName: B2
+              wellLocation:
+                origin: bottom
+                offset:
+                  x: 2
+                  y: 3
+                  z: 10
+              minimumZHeight: 35
+              forceDirect: true
+              speed: 12.3
+          - id: !anystr
+            key: !anystr
+            commandType: dropTip
+            createdAt: !anystr
+            status: queued
+            params:
+              pipetteId: pipetteId
+              labwareId: fixedTrash
+              wellName: A1
+              wellLocation:
+                origin: default
+                offset:
+                  x: 0
+                  y: 0
+                  z: 0
+              alternateDropLocation: false
+          - id: '{setup_command_id}'
+            key: '{setup_command_key}'
+            intent: setup
+            commandType: home
+            createdAt: '{setup_command_created_at}'
+            startedAt: '{setup_command_started_at}'
+            completedAt: '{setup_command_completed_at}'
+            status: succeeded
+            params: {}
+
+  - name: Play the run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          actionType: play
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - name: Verify commands succeeded with the expected results
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current: !anydict
+        meta:
+          cursor: 0
+          totalLength: 15
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: loadPipette
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteName: p10_single
+              mount: left
+              pipetteId: pipetteId
+          - id: !anystr
+            key: !anystr
+            commandType: loadModule
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              model: magneticModuleV1
+              location:
+                slotName: '3'
+              moduleId: magneticModuleId
+          - id: !anystr
+            key: !anystr
+            commandType: loadModule
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              model: temperatureModuleV2
+              location:
+                slotName: '1'
+              moduleId: temperatureModuleId
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                moduleId: temperatureModuleId
+              loadName: foo_8_plate_33ul
+              namespace: example
+              version: 1
+              labwareId: sourcePlateId
+              displayName: Source Plate
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                moduleId: magneticModuleId
+              loadName: foo_8_plate_33ul
+              namespace: example
+              version: 1
+              labwareId: destPlateId
+              displayName: Sample Collection Plate
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                slotName: '8'
+              loadName: opentrons_96_tiprack_10ul
+              namespace: opentrons
+              version: 1
+              labwareId: tipRackId
+              displayName: Opentrons 96 Tip Rack 10 µL
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                slotName: '12'
+              loadName: opentrons_1_trash_1100ml_fixed
+              namespace: opentrons
+              version: 1
+              labwareId: fixedTrash
+              displayName: Trash
+          - id: !anystr
+            key: !anystr
+            commandType: loadLiquid
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              labwareId: sourcePlateId
+              liquidId: waterId
+              volumeByWell:
+                A1: 100
+                B1: 100
+          - id: !anystr
+            key: !anystr
+            commandType: pickUpTip
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteId: pipetteId
+              labwareId: tipRackId
+              wellName: B1
+              wellLocation:
+                origin: top
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 0
+          - id: !anystr
+            key: !anystr
+            commandType: aspirate
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteId: pipetteId
+              labwareId: sourcePlateId
+              wellName: A1
+              wellLocation:
+                origin: bottom
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 2
+              volume: 5
+              flowRate: 3
+          - id: !anystr
+            key: !anystr
+            commandType: dispense
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteId: pipetteId
+              labwareId: destPlateId
+              wellName: B1
+              wellLocation:
+                origin: bottom
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 1
+              volume: 4.5
+              flowRate: 2.5
+          - id: !anystr
+            key: !anystr
+            commandType: moveToWell
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteId: pipetteId
+              labwareId: destPlateId
+              wellName: B2
+              wellLocation:
+                origin: top
+                offset:
+                  x: 0
+                  'y': 0
+                  z: 0
+              forceDirect: false
+          - id: !anystr
+            key: !anystr
+            commandType: moveToWell
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteId: pipetteId
+              labwareId: destPlateId
+              wellName: B2
+              wellLocation:
+                origin: bottom
+                offset:
+                  x: 2
+                  y: 3
+                  z: 10
+              minimumZHeight: 35
+              forceDirect: true
+              speed: 12.3
+          - id: !anystr
+            key: !anystr
+            commandType: dropTip
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteId: pipetteId
+              labwareId: fixedTrash
+              wellName: A1
+              wellLocation:
+                origin: default
+                offset:
+                  x: 0
+                  y: 0
+                  z: 0
+              alternateDropLocation: false
+          - id: '{setup_command_id}'
+            key: '{setup_command_key}'
+            intent: setup
+            commandType: home
+            createdAt: '{setup_command_created_at}'
+            startedAt: '{setup_command_started_at}'
+            completedAt: '{setup_command_completed_at}'
+            status: succeeded
+            params: { }

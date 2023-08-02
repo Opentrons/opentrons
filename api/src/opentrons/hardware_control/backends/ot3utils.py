@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence, cast
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
 from typing_extensions import Literal
 from logging import getLogger
 from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
@@ -239,13 +239,16 @@ def get_system_constraints(
 ) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
-    for axis_kind in [
+    axis_kind_list = [
         OT3AxisKind.P,
         OT3AxisKind.X,
         OT3AxisKind.Y,
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
-    ]:
+    ]
+    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        axis_kind_list.append(OT3AxisKind.Q)
+    for axis_kind in axis_kind_list:
         for axis in Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
@@ -408,38 +411,53 @@ def create_home_groups(
     return [home_group, backoff_group]
 
 
-def create_tip_action_home_group(
-    axes: Sequence[Axis], distance: float, velocity: float
-) -> List[MoveGroup]:
-    current_nodes = [axis_to_node(ax) for ax in axes]
-    home_group = [
-        create_tip_action_step(
-            velocity={node_id: np.float64(velocity) for node_id in current_nodes},
-            distance={node_id: np.float64(distance) for node_id in current_nodes},
-            present_nodes=current_nodes,
-            action=PipetteTipActionType.home,
-        )
-    ]
-
-    backoff_group = [
-        create_tip_action_backoff_step(
-            velocity={node_id: np.float64(velocity / 2) for node_id in current_nodes}
-        )
-    ]
-    return [home_group, backoff_group]
-
-
 def create_tip_action_group(
-    axes: Sequence[Axis], distance: float, velocity: float, action: PipetteAction
+    moves: Sequence[Move[Axis]],
+    present_nodes: Iterable[NodeId],
+    action: str,
 ) -> MoveGroup:
-    current_nodes = [axis_to_node(ax) for ax in axes]
-    step = create_tip_action_step(
-        velocity={node_id: np.float64(velocity) for node_id in current_nodes},
-        distance={node_id: np.float64(distance) for node_id in current_nodes},
-        present_nodes=current_nodes,
-        action=PipetteTipActionType[action],
+    move_group: MoveGroup = []
+    for move in moves:
+        unit_vector = move.unit_vector
+        for block in move.blocks:
+            if block.time < (3.0 / interrupts_per_sec):
+                continue
+            velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
+            accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
+            step = create_tip_action_step(
+                velocity=_convert_to_node_id_dict(velocities),
+                acceleration=_convert_to_node_id_dict(accelerations),
+                duration=block.time,
+                present_nodes=present_nodes,
+                action=PipetteTipActionType[action],
+            )
+            move_group.append(step)
+    return move_group
+
+
+def create_gear_motor_home_group(
+    distance: float,
+    velocity: float,
+    backoff: Optional[bool] = False,
+) -> MoveGroup:
+    move_group: MoveGroup = []
+    home_step = create_tip_action_step(
+        velocity={NodeId.pipette_left: np.float64(-1 * velocity)},
+        acceleration={NodeId.pipette_left: np.float64(0)},
+        duration=np.float64(distance / velocity),
+        present_nodes=[NodeId.pipette_left],
+        action=PipetteTipActionType.home,
     )
-    return [step]
+    move_group.append(home_step)
+
+    if backoff:
+        backoff_group = create_tip_action_backoff_step(
+            velocity={
+                node_id: np.float64(velocity / 2) for node_id in [NodeId.pipette_left]
+            }
+        )
+        move_group.append(backoff_group)
+    return move_group
 
 
 def create_gripper_jaw_grip_group(

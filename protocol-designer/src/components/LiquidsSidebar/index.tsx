@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
-import { DeprecatedPrimaryButton, SidePanel } from '@opentrons/components'
+import {
+  DeprecatedPrimaryButton,
+  SidePanel,
+  truncateString,
+} from '@opentrons/components'
 import { PDTitledList } from '../lists'
 import { swatchColors } from '../swatchColors'
 import listButtonStyles from '../listButtons.css'
@@ -43,7 +47,10 @@ function LiquidsSidebarComponent(props: Props): JSX.Element {
               className: styles.liquid_icon_container,
             },
           }}
-          title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
+          title={
+            truncateString(name ?? '', 25) ??
+            `Unnamed Ingredient ${ingredientId}`
+          } // fallback, should not happen
         />
       ))}
       <div className={listButtonStyles.list_item_button}>

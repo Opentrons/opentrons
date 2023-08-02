@@ -56,7 +56,7 @@ def test_filter_zero_duration_step() -> None:
         moves=moves,
         present_nodes=present_nodes,
     )
-    assert len(move_group) == 2
+    assert len(move_group) == 3
     for step in move_group:
         assert set(present_nodes) == set(step.keys())
 

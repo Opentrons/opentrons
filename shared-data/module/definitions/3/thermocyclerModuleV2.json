@@ -34,6 +34,20 @@
     "minBlockVolume": 0,
     "maxBlockVolume": 100
   },
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 4.6
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 4.6
+      }
+    }
+  },
   "displayName": "Thermocycler Module GEN2",
   "quirks": [],
   "slotTransforms": {

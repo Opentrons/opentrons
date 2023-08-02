@@ -2,7 +2,15 @@ import json
 import pytest
 from typing import Any, Dict
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.protocol.models import protocol_schema_v6
+from opentrons_shared_data.protocol.models import (
+    protocol_schema_v6,
+    Robot,
+    Metadata,
+    Liquid,
+    Module,
+    Pipette,
+    Labware,
+)
 
 from . import list_fixtures
 
@@ -75,16 +83,12 @@ def test_schema_validators(
 ) -> None:
     """Should raise an error the keys do not match."""
     labware = {
-        "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
-        "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
+        "labware-id-1": Labware(definitionId="definition-1"),
+        "labware-id-2": Labware(definitionId="definition-2"),
     }
-    pipettes = {"pipette-id-1": protocol_schema_v6.Pipette(name="pipette-1")}
-    liquids = {
-        "liquid-id-1": protocol_schema_v6.Liquid(
-            displayName="liquid-1", description="liquid desc"
-        )
-    }
-    modules = {"module-id-1": protocol_schema_v6.Module(model="model-1")}
+    pipettes = {"pipette-id-1": Pipette(name="pipette-1")}
+    liquids = {"liquid-id-1": Liquid(displayName="liquid-1", description="liquid desc")}
+    modules = {"module-id-1": Module(model="model-1")}
     with pytest.raises(
         ValueError,
         match=f"{load_command} command at index 0 references ID {missing_id}, which doesn't exist.",
@@ -92,8 +96,8 @@ def test_schema_validators(
         protocol_schema_v6.ProtocolSchemaV6(
             otSharedSchema="#/protocol/schemas/6",
             schemaVersion=6,
-            metadata=protocol_schema_v6.Metadata(),
-            robot=protocol_schema_v6.Robot(model="OT-2 Standard", deckId=""),
+            metadata=Metadata(),
+            robot=Robot(model="OT-2 Standard", deckId=""),
             labware=labware,
             pipettes=pipettes,
             liquids=liquids,

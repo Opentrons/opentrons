@@ -1,5 +1,5 @@
 import { CommandsData, RunCommandSummary } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 
 export const mockAnonLoadCommand: CreateCommand = {
   commandType: 'loadLabware',
@@ -8,6 +8,9 @@ export const mockAnonLoadCommand: CreateCommand = {
     location: {
       slotName: '1',
     },
+    version: 1,
+    loadName: 'mockLoadname',
+    namespace: 'mockNamespace',
   },
 }
 
@@ -20,11 +23,15 @@ export const mockLoadLabwareRunCommandSummary: RunCommandSummary = {
     location: {
       slotName: '1',
     },
+    version: 1,
+    loadName: 'mockLoadname',
+    namespace: 'mockNamespace',
   },
   status: 'running',
   createdAt: 'fake_created_at_timestamp',
   startedAt: 'fake_created_at_timestamp',
   completedAt: 'fake_created_at_timestamp',
+  error: null,
 }
 
 export const mockLoadPipetteRunCommandSummary: RunCommandSummary = {
@@ -40,6 +47,7 @@ export const mockLoadPipetteRunCommandSummary: RunCommandSummary = {
   createdAt: 'fake_created_at_timestamp',
   startedAt: 'fake_created_at_timestamp',
   completedAt: 'fake_created_at_timestamp',
+  error: null,
 }
 
 export const mockCommandsResponse: CommandsData = {

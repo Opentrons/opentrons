@@ -177,6 +177,10 @@
     "4002": {
       "detail": "API Removed",
       "category": "generalError"
+    },
+    "4003": {
+      "detail": "Not supported on this robot type",
+      "category": "generalError"
     }
   }
 }

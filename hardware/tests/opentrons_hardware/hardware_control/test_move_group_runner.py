@@ -115,8 +115,26 @@ def move_group_single() -> MoveGroups:
 
 
 @pytest.fixture
-def move_group_tip_action() -> MoveGroups:
+def move_group_tip_action_single() -> MoveGroups:
     """Move group with one move."""
+    return [
+        [
+            {
+                NodeId.pipette_left: MoveGroupTipActionStep(
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(1),
+                    action=PipetteTipActionType.home,
+                    stop_condition=MoveStopCondition.none,
+                    acceleration_mm_sec_sq=float64(0),
+                )
+            }
+        ]
+    ]
+
+
+@pytest.fixture
+def move_group_tip_action_multiple() -> MoveGroups:
+    """Move group with multiple moves."""
     return [
         [
             {
@@ -125,8 +143,27 @@ def move_group_tip_action() -> MoveGroups:
                     duration_sec=float64(1),
                     action=PipetteTipActionType.clamp,
                     stop_condition=MoveStopCondition.none,
+                    acceleration_mm_sec_sq=float64(1),
                 )
-            }
+            },
+            {
+                NodeId.pipette_left: MoveGroupTipActionStep(
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(1),
+                    action=PipetteTipActionType.clamp,
+                    stop_condition=MoveStopCondition.none,
+                    acceleration_mm_sec_sq=float64(1),
+                )
+            },
+            {
+                NodeId.pipette_left: MoveGroupTipActionStep(
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(1),
+                    action=PipetteTipActionType.clamp,
+                    stop_condition=MoveStopCondition.none,
+                    acceleration_mm_sec_sq=float64(1),
+                )
+            },
         ]
     ]
 
@@ -770,49 +807,70 @@ async def test_home_timeout(
         await subject.run(can_messenger=mock_can_messenger)
 
 
+@pytest.mark.parametrize(
+    "move_group_tip_action",
+    [
+        "move_group_tip_action_single",
+        "move_group_tip_action_multiple",
+    ],
+)
 async def test_tip_action_move_runner_receives_two_responses(
-    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
+    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, request: Any
 ) -> None:
     """The magic call function should receive two responses for a tip action."""
     with patch.object(MoveScheduler, "_handle_move_completed") as mock_move_complete:
+        move_group_tip_action = request.getfixturevalue(move_group_tip_action)
         subject = MoveScheduler(move_groups=move_group_tip_action)
         mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
         mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
         mock_can_messenger.send.side_effect = mock_sender.mock_send
         await subject.run(can_messenger=mock_can_messenger)
-
-        assert isinstance(
-            mock_move_complete.call_args_list[0][0][0], md.TipActionResponse
-        )
-        assert mock_move_complete.call_args_list[0][0][
-            0
-        ].payload.gear_motor_id == GearMotorIdField(1)
-
-        assert isinstance(
-            mock_move_complete.call_args_list[1][0][0], md.TipActionResponse
-        )
-        assert mock_move_complete.call_args_list[1][0][
-            0
-        ].payload.gear_motor_id == GearMotorIdField(0)
+        for i in range(len(move_group_tip_action[0])):
+            assert isinstance(
+                mock_move_complete.call_args_list[i][0][0], md.TipActionResponse
+            )
+            assert mock_move_complete.call_args_list[i][0][
+                0
+            ].payload.gear_motor_id == GearMotorIdField(0)
 
 
+@pytest.mark.parametrize(
+    "move_group_tip_action",
+    [
+        "move_group_tip_action_single",
+        "move_group_tip_action_multiple",
+    ],
+)
 async def test_tip_action_move_runner_position_updated(
-    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
+    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, request: Any
 ) -> None:
     """Two responses from a tip action move are properly handled."""
+    move_group_tip_action = request.getfixturevalue(move_group_tip_action)
     subject = MoveScheduler(move_groups=move_group_tip_action)
     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     completion_message = await subject.run(can_messenger=mock_can_messenger)
-    assert len(completion_message) == 1
-    assert completion_message[0][1].payload.current_position_um.value == 2000
+    assert len(completion_message) == len(move_group_tip_action[0])
+    for i in range(len(completion_message)):
+        assert completion_message[i][1].payload.current_position_um.value == 2000
 
 
+@pytest.mark.parametrize(
+    "move_group_tip_action",
+    [
+        "move_group_tip_action_single",
+        "move_group_tip_action_multiple",
+    ],
+)
 async def test_tip_action_move_runner_fail_receives_one_response(
-    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, caplog: Any
+    mock_can_messenger: AsyncMock,
+    move_group_tip_action: MoveGroups,
+    caplog: Any,
+    request: Any,
 ) -> None:
     """Tip action move should fail if one or less responses received."""
+    move_group_tip_action = request.getfixturevalue(move_group_tip_action)
     subject = MoveScheduler(move_groups=move_group_tip_action)
     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
@@ -1046,7 +1104,6 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
             },
         ),
         (
-            # tip action response, should not update position
             [
                 (
                     _build_arb(NodeId.pipette_left),
@@ -1065,7 +1122,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {},
+            {NodeId.pipette_left: (10, 0, False, False)},
         ),
         (
             # empty base case
