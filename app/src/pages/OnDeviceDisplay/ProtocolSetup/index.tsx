@@ -497,7 +497,7 @@ function PrepareToRun({
                 mostRecentAnalysis == null ||
                 attachedInstruments == null ||
                 (protocolHasModules && attachedModules.length === 0) ||
-                allPipettesCalibrationData.data.length === 0
+                allPipettesCalibrationData == null
               }
               onPlay={onPlay}
               ready={isReadyToRun}
