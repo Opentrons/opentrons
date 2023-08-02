@@ -360,6 +360,14 @@
         }
       },
       "required": ["default"]
+    },
+    "gripForce": {
+      "type": "number",
+      "description": "Force, in Newtons, with which the gripper should grip the labware."
+    },
+    "gripHeightFromLabwareBottom": {
+      "type": "number",
+      "description": "Z-height, from the labware bottom, where the gripper should grip the labware."
     }
   }
 }
