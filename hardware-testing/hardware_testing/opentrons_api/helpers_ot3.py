@@ -17,7 +17,11 @@ from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.advanced_settings import set_adv_setting
-from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
+from opentrons.hardware_control.types import SubSystem
+from opentrons.hardware_control.backends.ot3utils import (
+    sensor_node_for_mount,
+    axis_convert,
+)
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -37,6 +41,8 @@ from .types import (
 # TODO: use values from shared data, so we don't need to update here again
 TIP_LENGTH_OVERLAP = 10.5
 TIP_LENGTH_LOOKUP = {50: 57.9, 200: 58.35, 1000: 95.6}
+
+RESET_DELAY_SECONDS = 2
 
 
 @dataclass
@@ -121,6 +127,46 @@ def _create_attached_instruments_dict(
     }
 
 
+async def update_firmware(
+    api: OT3API, force: bool = False, subsystems: Optional[List[SubSystem]] = None
+) -> None:
+    """Update firmware of OT3."""
+    if not api.is_simulator:
+        await asyncio.sleep(RESET_DELAY_SECONDS)
+    subsystems_on_boot = api.attached_subsystems
+    progress_tracker: Dict[SubSystem, List[int]] = {}
+
+    def _print_update_progress() -> None:
+        msg = ""
+        for _sub_sys, (_ver, _prog) in progress_tracker.items():
+            if msg:
+                msg += ", "
+            msg += f"{_sub_sys.name}: v{_ver} ({_prog}%)"
+        print(msg)
+
+    if not subsystems:
+        subsystems = []
+    is_updating = False
+    async for update in api.update_firmware(set(subsystems), force=force):
+        is_updating = True
+        fw_version = subsystems_on_boot[update.subsystem].next_fw_version
+        if update.subsystem not in progress_tracker:
+            progress_tracker[update.subsystem] = [fw_version, 0]
+        if update.progress != progress_tracker[update.subsystem][1]:
+            progress_tracker[update.subsystem][1] = update.progress
+            _print_update_progress()
+    if is_updating and not api.is_simulator:
+        await asyncio.sleep(2)
+
+
+async def reset_api(api: OT3API) -> None:
+    """Reset OT3API."""
+    if not api.is_simulator:
+        await asyncio.sleep(RESET_DELAY_SECONDS)
+    await api.cache_instruments()
+    await api.refresh_positions()
+
+
 async def build_async_ot3_hardware_api(
     is_simulating: Optional[bool] = False,
     use_defaults: Optional[bool] = True,
@@ -164,10 +210,9 @@ async def build_async_ot3_hardware_api(
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     if not is_simulating:
-        await asyncio.sleep(0.5)
-        await api.cache_instruments()
-        async for update in api.update_firmware():
-            print(f"Update: {update.subsystem.name}: {update.progress}%")
+        await update_firmware(api)
+    print(f"Firmware: v{api.fw_version}")
+    await reset_api(api)
     return api
 
 
@@ -417,6 +462,7 @@ async def move_plunger_absolute_ot3(
     position: float,
     motor_current: Optional[float] = None,
     speed: Optional[float] = None,
+    expect_stalls: bool = False,
 ) -> None:
     """Move OT3 plunger position to an absolute position."""
     if not api.hardware_pipettes[mount.to_mount()]:
@@ -425,6 +471,7 @@ async def move_plunger_absolute_ot3(
     _move_coro = api._move(
         target_position={plunger_axis: position},  # type: ignore[arg-type]
         speed=speed,
+        expect_stalls=expect_stalls,
     )
     if motor_current is None:
         await _move_coro
@@ -445,15 +492,21 @@ async def move_tip_motor_relative_ot3(
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
-    if distance < 0:
-        action = "home"
-    else:
-        action = "clamp"
+
+    current_gear_pos_float = axis_convert(api._backend.gear_motor_position, 0.0)[
+        Axis.P_L
+    ]
+    current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
+    target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
+
+    if speed is not None and distance < 0:
+        speed *= -1
+
+    tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict)
+
     _move_coro = api._backend.tip_action(
-        axes=[Axis.Q],
-        distance=distance,
-        speed=speed if speed else 5,
-        tip_action=action,
+        moves=tip_motor_move[0],
+        tip_action="clamp",
     )
     if motor_current is None:
         await _move_coro
@@ -934,6 +987,16 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     else:
         id = pipette.pipette_id
     return f"P{volume}{channels}V{version}{id}"
+
+
+def get_robot_serial_ot3(api: OT3API) -> str:
+    """Get robot serial number."""
+    if api.is_simulator:
+        return "FLXA1000000000000"
+    robot_id = api._backend.eeprom_data.serial_number
+    if not robot_id:
+        robot_id = "None"
+    return robot_id
 
 
 def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:

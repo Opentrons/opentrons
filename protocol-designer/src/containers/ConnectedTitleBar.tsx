@@ -51,14 +51,13 @@ function TitleWithIcon(props: TitleWithIconProps): JSX.Element {
   )
 }
 
-interface TitleWithBetaTagProps {
+interface TitleProps {
   text: string | null | undefined
 }
 
-const TitleWithBetaTag = (props: TitleWithBetaTagProps): JSX.Element => (
+const Title = (props: TitleProps): JSX.Element => (
   <div className={styles.title_wrapper}>
     <div className={styles.icon_inline_text}>{props.text}</div>
-    <div className={styles.beta_tag}>{i18n.t('application.beta')}</div>
   </div>
 )
 
@@ -98,9 +97,7 @@ function mapStateToProps(state: BaseState): SP {
     case 'settings-app':
       return {
         _page,
-        title: (
-          <TitleWithBetaTag text={i18n.t([`nav.title.${_page}`, fileName])} />
-        ),
+        title: <Title text={i18n.t([`nav.title.${_page}`, fileName])} />,
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
       }
     case 'steplist':

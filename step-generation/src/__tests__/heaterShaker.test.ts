@@ -71,7 +71,7 @@ describe('heaterShaker compound command creator', () => {
       type: 'MISSING_MODULE',
     })
   })
-  it('should delay and deactivate the heater shaker when a user specificies a timer', () => {
+  it('should waitForDuration and deactivate the heater shaker when a user specificies a timer', () => {
     heaterShakerArgs = {
       ...heaterShakerArgs,
       rpm: 444,
@@ -105,7 +105,7 @@ describe('heaterShaker compound command creator', () => {
         },
       },
       {
-        commandType: 'delay',
+        commandType: 'waitForDuration',
         key: expect.any(String),
         params: {
           seconds: 30,

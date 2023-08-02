@@ -9,6 +9,10 @@ import {
   getModuleDef2,
 } from '@opentrons/shared-data'
 
+import { COLORS } from '../../ui-style-constants'
+import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
+import { StyledDeck } from './StyledDeck'
+
 import type {
   Coordinates,
   LabwareDefinition2,
@@ -17,10 +21,8 @@ import type {
   DeckSlot,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
-import { DeckFromData } from './DeckFromData'
-import { StyleProps } from '../../primitives'
-import { COLORS } from '../../ui-style-constants'
+import type { StyleProps } from '../../primitives'
+import type { TrashSlotName } from './FlexTrash'
 
 function getLabwareCoordinates({
   orderedSlots,
@@ -74,6 +76,8 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
   backgroundItems?: React.ReactNode
+  deckFill?: string
+  trashSlotName?: TrashSlotName
 }
 export function MoveLabwareOnDeck(
   props: MoveLabwareOnDeckProps
@@ -85,6 +89,8 @@ export function MoveLabwareOnDeck(
     finalLabwareLocation,
     loadedModules,
     backgroundItems = null,
+    deckFill = '#e6e6e6',
+    trashSlotName,
     ...styleProps
   } = props
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
@@ -146,7 +152,14 @@ export function MoveLabwareOnDeck(
       transform="scale(1, -1)" // reflect horizontally about the center
       {...styleProps}
     >
-      {deckDef != null && <DeckFromData def={deckDef} layerBlocklist={[]} />}
+      {deckDef != null && (
+        <StyledDeck
+          def={deckDef}
+          deckFill={deckFill}
+          layerBlocklist={[]}
+          trashSlotName={trashSlotName}
+        />
+      )}
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g

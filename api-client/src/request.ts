@@ -17,6 +17,7 @@ export const GET = 'GET'
 export const POST = 'POST'
 export const PATCH = 'PATCH'
 export const DELETE = 'DELETE'
+export const PUT = 'PUT'
 
 export function request<ResData, ReqData = null>(
   method: Method,

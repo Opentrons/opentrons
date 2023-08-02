@@ -1,22 +1,30 @@
 import { uuid } from '../../utils'
-// TODO(mc, 2022-06-21): replace with `waitForResume` and `waitForDuration`
 import type { PauseArgs, CommandCreator } from '../../types'
+import type {
+  WaitForDurationCreateCommand,
+  WaitForResumeCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7'
 export const delay: CommandCreator<PauseArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const messageParam = args.message == null ? {} : { message: args.message }
-  const waitForParam: { waitForResume: true } | { seconds: number } =
-    args.wait === true ? { waitForResume: true } : { seconds: args.wait }
-
+  //  delay is deprecated and now is either waitForResume or waitForDuration
+  let command: WaitForResumeCreateCommand | WaitForDurationCreateCommand
+  if (args.wait === true) {
+    command = {
+      commandType: 'waitForResume',
+      key: uuid(),
+      params: { message: args.message },
+    }
+  } else {
+    command = {
+      commandType: 'waitForDuration',
+      key: uuid(),
+      params: { seconds: args.wait, message: args.message },
+    }
+  }
   return {
-    commands: [
-      {
-        commandType: 'delay',
-        key: uuid(),
-        params: { ...messageParam, ...waitForParam },
-      },
-    ],
+    commands: [command],
   }
 }

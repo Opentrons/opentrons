@@ -113,6 +113,9 @@ export interface CommandData {
 export interface RunError {
   id: string
   errorType: string
+  errorInfo: { [key: string]: string }
+  wrappedErrors: RunError[]
+  errorCode: string
   createdAt: string
   detail: string
 }

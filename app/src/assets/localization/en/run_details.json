@@ -35,6 +35,7 @@
   "end_step_time": "End",
   "end": "End",
   "error_type": "Error: {{errorType}}",
+  "error_info": "Error {{errorCode}}: {{errorType}}",
   "failed_step": "Failed step",
   "ignore_stored_data": "Ignore stored data",
   "labware_offset_data": "labware offset data",

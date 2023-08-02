@@ -7,6 +7,7 @@ from typing import cast, List, Tuple, Union, Optional, NamedTuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName, MountType
@@ -31,13 +32,14 @@ from opentrons.protocol_engine.types import (
     OverlapOffset,
     DeckType,
     CurrentWell,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.pipettes import PipetteView, StaticPipetteConfig
-from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 
 
 @pytest.fixture
@@ -1354,6 +1356,7 @@ def test_get_next_drop_tip_location(
     pipette_channels: int,
     pipette_mount: MountType,
     expected_locations: List[DropTipWellLocation],
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should provide the next location to drop tips into within a labware."""
     decoy.when(labware_view.is_fixed_trash(labware_id="abc")).then_return(True)
@@ -1368,7 +1371,7 @@ def test_get_next_drop_tip_location(
             model="blah",
             display_name="bleh",
             serial_number="",
-            return_tip_scale=0,
+            tip_configuration_lookup_table={9001: supported_tip_fixture},
             nominal_tip_overlap={},
             home_position=0,
             nozzle_offset_z=0,
@@ -1409,3 +1412,182 @@ def test_get_next_drop_tip_location_in_non_trash_labware(
         origin=DropTipWellOrigin.DEFAULT,
         offset=WellOffset(x=0, y=0, z=0),
     )
+
+
+def test_get_final_labware_movement_offset_vectors(
+    decoy: Decoy,
+    module_view: ModuleView,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should provide the final labware movement offset data based on locations."""
+    decoy.when(labware_view.get_deck_default_gripper_offsets()).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+            dropOffset=LabwareOffsetVector(x=3, y=2, z=1),
+        )
+    )
+    decoy.when(module_view.get_default_gripper_offsets("module-id")).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
+            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
+        )
+    )
+
+    final_offsets = subject.get_final_labware_movement_offset_vectors(
+        from_location=DeckSlotLocation(slotName=DeckSlotName("D2")),
+        to_location=ModuleLocation(moduleId="module-id"),
+        additional_offset_vector=LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
+            dropOffset=LabwareOffsetVector(x=400, y=500, z=600),
+        ),
+    )
+    assert final_offsets == LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=101, y=202, z=303),
+        dropOffset=LabwareOffsetVector(x=433, y=522, z=611),
+    )
+
+
+def test_ensure_valid_gripper_location(subject: GeometryView) -> None:
+    """It should raise error if it's not a valid labware movement location for gripper."""
+    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    module_location = ModuleLocation(moduleId="dummy-module")
+    on_labware_location = OnLabwareLocation(labwareId="adapter-id")
+    off_deck_location = OFF_DECK_LOCATION
+
+    assert subject.ensure_valid_gripper_location(slot_location) == slot_location
+    assert subject.ensure_valid_gripper_location(module_location) == module_location
+    assert (
+        subject.ensure_valid_gripper_location(on_labware_location)
+        == on_labware_location
+    )
+
+    with pytest.raises(errors.LabwareMovementNotAllowedError):
+        subject.ensure_valid_gripper_location(off_deck_location)
+
+
+def test_get_total_nominal_gripper_offset(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should calculate the correct gripper offsets given the location and move type.."""
+    decoy.when(labware_view.get_deck_default_gripper_offsets()).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+            dropOffset=LabwareOffsetVector(x=3, y=2, z=1),
+        )
+    )
+
+    decoy.when(module_view.get_default_gripper_offsets("module-id")).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
+            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
+        )
+    )
+
+    # Case 1: labware on deck
+    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        move_type=_GripperMoveType.PICK_UP_LABWARE,
+    )
+    assert result1 == LabwareOffsetVector(x=1, y=2, z=3)
+
+    # Case 2: labware on module
+    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=ModuleLocation(moduleId="module-id"),
+        move_type=_GripperMoveType.DROP_LABWARE,
+    )
+    assert result2 == LabwareOffsetVector(x=33, y=22, z=11)
+
+
+def test_get_stacked_labware_total_nominal_offset_slot_specific(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """Get nominal offset for stacked labware."""
+    # Case: labware on adapter on module, adapter has slot-specific offsets
+    decoy.when(module_view.get_default_gripper_offsets("module-id")).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
+            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
+        )
+    )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
+    )
+    decoy.when(
+        labware_view.get_labware_gripper_offsets(
+            labware_id="adapter-id", slot_name=DeckSlotName.SLOT_C1
+        )
+    ).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
+            dropOffset=LabwareOffsetVector(x=300, y=200, z=100),
+        )
+    )
+    decoy.when(labware_view.get_parent_location("adapter-id")).then_return(
+        ModuleLocation(moduleId="module-id")
+    )
+    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        move_type=_GripperMoveType.PICK_UP_LABWARE,
+    )
+    assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
+
+    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        move_type=_GripperMoveType.DROP_LABWARE,
+    )
+    assert result2 == LabwareOffsetVector(x=333, y=222, z=111)
+
+
+def test_get_stacked_labware_total_nominal_offset_default(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """Get nominal offset for stacked labware."""
+    # Case: labware on adapter on module, adapter has only default offsets
+    decoy.when(module_view.get_default_gripper_offsets("module-id")).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
+            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
+        )
+    )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    )
+    decoy.when(
+        labware_view.get_labware_gripper_offsets(
+            labware_id="adapter-id", slot_name=DeckSlotName.SLOT_C1
+        )
+    ).then_return(None)
+    decoy.when(
+        labware_view.get_labware_gripper_offsets(
+            labware_id="adapter-id", slot_name=None
+        )
+    ).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
+            dropOffset=LabwareOffsetVector(x=300, y=200, z=100),
+        )
+    )
+    decoy.when(labware_view.get_parent_location("adapter-id")).then_return(
+        ModuleLocation(moduleId="module-id")
+    )
+    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        move_type=_GripperMoveType.PICK_UP_LABWARE,
+    )
+    assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
+
+    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        move_type=_GripperMoveType.DROP_LABWARE,
+    )
+    assert result2 == LabwareOffsetVector(x=333, y=222, z=111)

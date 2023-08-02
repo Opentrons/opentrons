@@ -1,5 +1,5 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { Coordinates, MotorAxes } from '../../../../js/types'
+import type { Coordinates, MotorAxes, MotorAxis } from '../../../../js/types'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
@@ -61,6 +61,17 @@ export interface HomeRunTimeCommand
     HomeCreateCommand {
   result?: {}
 }
+
+export interface RetractAxisCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'retractAxis'
+  params: RetractAxisParams
+}
+export interface RetractAxisRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    RetractAxisCreateCommand {
+  result?: {}
+}
+
 export type GantryRunTimeCommand =
   | MoveToSlotRunTimeCommand
   | MoveToWellRunTimeCommand
@@ -68,6 +79,8 @@ export type GantryRunTimeCommand =
   | MoveRelativeRunTimeCommand
   | SavePositionRunTimeCommand
   | HomeRunTimeCommand
+  | RetractAxisRunTimeCommand
+
 export type GantryCreateCommand =
   | MoveToSlotCreateCommand
   | MoveToWellCreateCommand
@@ -75,7 +88,7 @@ export type GantryCreateCommand =
   | MoveRelativeCreateCommand
   | SavePositionCreateCommand
   | HomeCreateCommand
-
+  | RetractAxisCreateCommand
 interface MoveToSlotParams {
   pipetteId: string
   slotName: string
@@ -128,4 +141,8 @@ interface SavePositionParams {
 
 interface HomeParams {
   axes?: MotorAxes
+}
+
+interface RetractAxisParams {
+  axis: MotorAxis
 }
