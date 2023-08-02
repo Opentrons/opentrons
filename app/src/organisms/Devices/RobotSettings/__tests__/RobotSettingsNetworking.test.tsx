@@ -8,6 +8,7 @@ import { i18n } from '../../../../i18n'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
+  HEALTH_STATUS_NOT_OK,
   OPENTRONS_USB,
 } from '../../../../redux/discovery'
 import * as Networking from '../../../../redux/networking'
@@ -92,7 +93,16 @@ describe('RobotSettingsNetworking', () => {
   beforeEach(() => {
     when(mockGetRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue([])
+      .mockReturnValue([
+        {
+          ip: initialMockWifi.ipAddress,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+        {
+          ip: initialMockEthernet.ipAddress,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+      ])
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
       .mockReturnValue({
@@ -197,7 +207,14 @@ describe('RobotSettingsNetworking', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
       .mockReturnValue({ wifi: mockWiFi, ethernet: null })
-
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue([
+        {
+          ip: mockWiFi.ipAddress,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+      ])
     const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
     getByText('Wireless IP')
@@ -231,6 +248,14 @@ describe('RobotSettingsNetworking', () => {
         wifi: null,
         ethernet: mockWiredUSB,
       })
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue([
+        {
+          ip: mockWiredUSB.ipAddress,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+      ])
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
 
@@ -304,5 +329,44 @@ describe('RobotSettingsNetworking', () => {
     const [{ queryByRole }] = render()
 
     expect(queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
+  })
+
+  it('should not render Wi-Fi mock data and ethernet mock data when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue([
+        {
+          ip: 'some-other-ip',
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+        {
+          ip: initialMockEthernet.ipAddress,
+          healthStatus: HEALTH_STATUS_NOT_OK,
+        } as DiscoveryClientRobotAddress,
+      ])
+    const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
+    getByText('Wi-Fi - foo')
+    getByText('Wired USB')
+    expect(queryByText('Wireless IP')).toBeNull()
+    expect(queryByText('Wireless Subnet Mask')).toBeNull()
+    expect(queryByText('Wireless MAC Address')).toBeNull()
+    expect(queryByText('127.0.0.100')).toBeNull()
+    expect(queryByText('255.255.255.230')).toBeNull()
+    expect(queryByText('WI:FI:00:00:00:00')).toBeNull()
+    expect(queryByText('Wired IP')).toBeNull()
+    expect(queryByText('Wired Subnet Mask')).toBeNull()
+    expect(queryByText('Wired MAC Address')).toBeNull()
+    expect(queryByText('127.0.0.101')).toBeNull()
+    expect(queryByText('255.255.255.231')).toBeNull()
+    expect(queryByText('US:B0:00:00:00:00')).toBeNull()
+    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
+    expect(
+      getByTestId('RobotSettings_Networking_wifi_icon')
+    ).toBeInTheDocument()
+    expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
+    expect(
+      queryAllByTestId('RobotSettings_Networking_check_circle')
+    ).toHaveLength(0)
   })
 })
