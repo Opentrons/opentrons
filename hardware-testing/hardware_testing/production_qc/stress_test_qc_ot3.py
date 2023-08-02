@@ -698,8 +698,7 @@ async def _run_xy_motion(
                 pass_count += 1
             else:
                 fail_count += 1
-            print_cycle_results("XY", i + 1, res_b and res_hg,
-                                pass_count, fail_count)
+            print_cycle_results("XY", i + 1, res_b and res_hg, pass_count, fail_count)
             _record_motion_check_data(
                 "x_motion",
                 write_cb,
