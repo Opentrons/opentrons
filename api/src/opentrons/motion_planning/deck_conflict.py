@@ -241,7 +241,6 @@ def _create_ot2_restrictions(
         # A Heater-Shaker can't safely be placed just south of the fixed trash,
         # because the fixed trash blocks access to the screw that locks the
         # Heater-Shaker onto the deck.
-        print(location)
         location_south_of_fixed_trash = get_south_slot(location.as_int())
         if location_south_of_fixed_trash is not None:
             restrictions.append(
