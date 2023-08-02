@@ -222,7 +222,7 @@ def check(
             )
 
 
-def _create_ot2_restrictions(
+def _create_ot2_restrictions(  # noqa: C901
     item: DeckItem, location: DeckSlotName
 ) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
@@ -252,13 +252,18 @@ def _create_ot2_restrictions(
             )
 
     if isinstance(item, ThermocyclerModule):
-        for covered_location in _slots_covered_by_thermocycler(item):
-            restrictions.append(
-                _NothingAllowed(
-                    location=covered_location,
-                    source_item=item,
-                    source_location=location,
+        if location in _slots_covered_by_thermocycler(item):
+            for covered_location in _slots_covered_by_thermocycler(item):
+                restrictions.append(
+                    _NothingAllowed(
+                        location=covered_location,
+                        source_item=item,
+                        source_location=location,
+                    )
                 )
+        else:
+            raise DeckConflictError(
+                f"{item.name_for_errors} is not allowed in slot {location}"
             )
 
     if isinstance(item, HeaterShakerModule):
@@ -291,13 +296,18 @@ def _create_flex_restrictions(
     restrictions: List[_DeckRestriction] = []
 
     if isinstance(item, ThermocyclerModule):
-        for covered_location in _flex_slots_covered_by_thermocycler():
-            restrictions.append(
-                _NothingAllowed(
-                    location=covered_location,
-                    source_item=item,
-                    source_location=location,
+        if location in _flex_slots_covered_by_thermocycler():
+            for covered_location in _flex_slots_covered_by_thermocycler():
+                restrictions.append(
+                    _NothingAllowed(
+                        location=covered_location,
+                        source_item=item,
+                        source_location=location,
+                    )
                 )
+        else:
+            raise DeckConflictError(
+                f"{item.name_for_errors} is not allowed in slot {location}"
             )
 
     elif isinstance(item, (HeaterShakerModule, TemperatureModule)):

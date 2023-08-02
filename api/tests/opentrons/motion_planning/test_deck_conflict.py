@@ -573,6 +573,13 @@ def test_no_heater_shaker_south_of_trash() -> None:
                 name_for_errors="some_temp_deck",
             )
         ),
+        (
+            deck_conflict.ThermocyclerModule(
+                highest_z_including_labware=123,
+                name_for_errors="some_thermo_module",
+                is_semi_configuration=False,
+            )
+        ),
     ],
 )
 def test_flex_raises_module_in_wrong_location(
@@ -588,4 +595,45 @@ def test_flex_raises_module_in_wrong_location(
             new_location=DeckSlotName.SLOT_A2,
             new_item=deck_item,
             robot_type="OT-3 Standard",
+        )
+
+
+@pytest.mark.parametrize(
+    "slot_name, is_allowed, robot_type",
+    [
+        (DeckSlotName.SLOT_1, False, "OT-2 Standard"),
+        (DeckSlotName.SLOT_2, False, "OT-2 Standard"),
+        (DeckSlotName.SLOT_7, True, "OT-2 Standard"),
+        (DeckSlotName.SLOT_10, True, "OT-2 Standard"),
+        (DeckSlotName.SLOT_B2, False, "OT-3 Standard"),
+        (DeckSlotName.SLOT_B3, False, "OT-3 Standard"),
+        (DeckSlotName.SLOT_A1, True, "OT-3 Standard"),
+        (DeckSlotName.SLOT_B1, True, "OT-3 Standard"),
+    ],
+)
+def test_thermocycler_allowed(
+    slot_name: DeckSlotName, is_allowed: bool, robot_type: str
+) -> None:
+    """Should raise when trying to load a thermocycler in a location that is not allowed."""
+    thermocycler = deck_conflict.ThermocyclerModule(
+        name_for_errors="some_thermocycler",
+        highest_z_including_labware=123,
+        is_semi_configuration=False,
+    )
+
+    maybe_raises: ContextManager[object]
+    if is_allowed:
+        maybe_raises = nullcontext()  # Expecct no exception.
+    else:
+        maybe_raises = pytest.raises(  # Expect an exception..
+            deck_conflict.DeckConflictError,
+            match=(f"some_thermocycler is not allowed in slot {slot_name}"),
+        )
+
+    with maybe_raises:
+        deck_conflict.check(
+            existing_items={},
+            new_location=slot_name,
+            new_item=thermocycler,
+            robot_type=robot_type,
         )
