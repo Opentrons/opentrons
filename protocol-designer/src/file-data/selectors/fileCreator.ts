@@ -255,7 +255,10 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const isAdapter = def.metadata.displayCategory === 'adapter'
         if (labwareId === FIXED_TRASH_ID || isAdapter) return [...acc]
         const isOnTopOfModule = labware.slot in initialRobotState.modules
-        const isOnAdapter = labware.slot in loadAdapterCommands
+        const isOnAdapter =
+          loadAdapterCommands.find(
+            command => command.adapterId === labware.slot
+          ) != null
         const namespace = def.namespace
         const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
         const version = def.version

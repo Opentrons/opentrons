@@ -27,7 +27,6 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'corning_384_wellplate_112ul_flat',
     'biorad_96_wellplate_200ul_pcr',
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
-    'opentrons_96_aluminumblock_biorad_wellplate_200ul',
     'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
     'usascientific_12_reservoir_22ml', // 'biotix_1_well_reservoir_?ml', // TODO: Ian 2019-10-29 this is in the doc but doesn't exist
     'usascientific_96_wellplate_2.4ml_deep',
@@ -40,27 +39,26 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
-    'opentrons_96_aluminumblock_nest_wellplate_100ul',
+    'opentrons_96_aluminumblock',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
     'usascientific_96_wellplate_2.4ml_deep',
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
-    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
     'nest_96_wellplate_100ul_pcr_full_skirt',
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
-    'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
-    'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
-    'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
-    'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+    'opentrons_96_deep_well_adapter',
+    'opentrons_96_flat_bottom_adapter',
+    'opentrons_96_pcr_adapter',
+    'opentrons_universal_flat_adapter',
   ],
   [MAGNETIC_BLOCK_TYPE]: [
-    'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
@@ -78,6 +76,37 @@ export const getLabwareIsCompatible = (
     COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType] || []
   return allowlist.includes(def.parameters.loadName)
 }
+
+const DEEP_WELL_ADAPTER_LOADNAME = 'opentrons_96_deep_well_adapter'
+const FLAT_BOTTOM_ADAPTER_LOADNAME = 'opentrons_96_flat_bottom_adapter'
+const PCR_ADAPTER_LOADNAME = 'opentrons_96_pcr_adapter'
+const UNIVERSAL_FLAT_ADAPTER_LOADNAME = 'opentrons_universal_flat_adapter'
+const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_aluminumblock'
+
+const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<string, string[]> = {
+  [DEEP_WELL_ADAPTER_LOADNAME]: [
+    'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
+  ],
+  [FLAT_BOTTOM_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_200ul_flat/2'],
+  [PCR_ADAPTER_LOADNAME]: [
+    'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
+  ],
+  [UNIVERSAL_FLAT_ADAPTER_LOADNAME]: [
+    'opentrons/corning_384_wellplate_112ul_flat/2',
+  ],
+  [ALUMINUM_BLOCK_96_LOADNAME]: [
+    'opentrons/biorad_96_wellplate_200ul/1',
+    'opentrons/nest_96_wellplate_100ul/1',
+  ],
+}
+
+export const getLabwareCompatibleWithAdapter = (
+  adapterLoadName?: string
+): string[] =>
+  adapterLoadName != null
+    ? COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterLoadName]
+    : []
+
 export const getLabwareIsCustom = (
   customLabwares: LabwareDefByDefURI,
   labwareOnDeck: LabwareOnDeck

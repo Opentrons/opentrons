@@ -22,7 +22,10 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
-import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  getLabwareIsCompatible as _getLabwareIsCompatible,
+  getLabwareCompatibleWithAdapter,
+} from '../../utils/labwareModuleCompatibility'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
@@ -48,6 +51,7 @@ export interface Props {
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
   isNextToHeaterShaker: boolean
+  adapterLoadName?: string
 }
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
@@ -58,6 +62,7 @@ const orderedCategories: string[] = [
   'tubeRack',
   'wellPlate',
   'reservoir',
+  'aluminumBlock',
   'adapter',
   // 'trash', // NOTE: trash intentionally hidden
 ]
@@ -65,29 +70,27 @@ const orderedCategories: string[] = [
 const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
-    'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+    'opentrons_96_aluminumblock',
     'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
     'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
     'opentrons_24_aluminumblock_nest_1.5ml_snapcap',
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
-    'opentrons_96_aluminumblock_nest_wellplate_100ul',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
-    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   [HEATERSHAKER_MODULE_TYPE]: [
-    'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
-    'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
-    'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
-    'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+    'opentrons_96_deep_well_adapter',
+    'opentrons_96_flat_bottom_adapter',
+    'opentrons_96_pcr_adapter',
+    'opentrons_universal_flat_adapter',
   ],
   [MAGNETIC_BLOCK_TYPE]: [
-    'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
@@ -104,6 +107,19 @@ export const getLabwareIsRecommended = (
       )
     : false
 
+const getSlotOnPermittedAdapterLocation = (slot?: DeckSlot | null): boolean => {
+  if (
+    slot?.includes(MAGNETIC_MODULE_TYPE) ||
+    slot?.includes(
+      THERMOCYCLER_MODULE_TYPE || slot?.includes(MAGNETIC_BLOCK_TYPE)
+    )
+  ) {
+    return false
+  } else {
+    return true
+  }
+}
+
 export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
@@ -115,11 +131,12 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     moduleType,
     selectLabware,
     isNextToHeaterShaker,
+    adapterLoadName,
   } = props
-
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
+  console.log('slot', slot)
   const [previewedLabware, setPreviewedLabware] = React.useState<
     LabwareDefinition2 | null | undefined
   >(null)
@@ -217,6 +234,10 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       defs,
       (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
+        const smallXDimension = def.dimensions.xDimension < 127.75
+        const smallYDimension = def.dimensions.yDimension < 85.48
+        const irregularSize = smallXDimension && smallYDimension
+        const allowAdapter = getSlotOnPermittedAdapterLocation(slot)
         // filter out non-permitted tipracks
         if (
           category === 'tipRack' &&
@@ -353,42 +374,79 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               ))}
             </PDTitledList>
           ) : null}
-          {orderedCategories.map(category => {
-            const isPopulated = populatedCategories[category]
-            if (isPopulated) {
-              return (
-                <PDTitledList
-                  key={category}
-                  title={startCase(category)}
-                  collapsed={selectedCategory !== category}
-                  onCollapseToggle={makeToggleCategory(category)}
-                  onClick={makeToggleCategory(category)}
-                  inert={!isPopulated}
-                >
-                  {labwareByCategory[category]?.map((labwareDef, index) => {
-                    const isFiltered = getIsLabwareFiltered(labwareDef)
-                    if (!isFiltered) {
-                      return (
-                        <LabwareItem
-                          key={index}
-                          icon={
-                            getLabwareIsRecommended(labwareDef, moduleType)
-                              ? 'check-decagram'
-                              : null
-                          }
-                          labwareDef={labwareDef}
-                          selectLabware={selectLabware}
-                          onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                          // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-                          onMouseLeave={() => setPreviewedLabware()}
-                        />
-                      )
-                    }
-                  })}
-                </PDTitledList>
-              )
-            }
-          })}
+          {adapterLoadName == null ? (
+            orderedCategories.map(category => {
+              const isPopulated = populatedCategories[category]
+              if (isPopulated) {
+                return (
+                  <PDTitledList
+                    key={category}
+                    title={startCase(category)}
+                    collapsed={selectedCategory !== category}
+                    onCollapseToggle={makeToggleCategory(category)}
+                    onClick={makeToggleCategory(category)}
+                    inert={!isPopulated}
+                  >
+                    {labwareByCategory[category]?.map((labwareDef, index) => {
+                      const isFiltered = getIsLabwareFiltered(labwareDef)
+                      if (!isFiltered) {
+                        return (
+                          <LabwareItem
+                            key={index}
+                            icon={
+                              getLabwareIsRecommended(labwareDef, moduleType)
+                                ? 'check-decagram'
+                                : null
+                            }
+                            labwareDef={labwareDef}
+                            selectLabware={selectLabware}
+                            onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                            // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+                            onMouseLeave={() => setPreviewedLabware()}
+                          />
+                        )
+                      }
+                    })}
+                  </PDTitledList>
+                )
+              }
+            })
+          ) : (
+            <PDTitledList
+              key="adapter compatible labware"
+              title="adapter compatible labware"
+              collapsed={selectedCategory !== 'adapter compatible labware'}
+              onCollapseToggle={makeToggleCategory(
+                'adapter compatible labware'
+              )}
+              onClick={makeToggleCategory('adapter compatible labware')}
+              inert={false}
+            >
+              {getLabwareCompatibleWithAdapter(adapterLoadName).map(
+                (adapterDefUri, index) => {
+                  const Uris = Object.keys(getOnlyLatestDefs())
+                  const labwareDefUri = Uris.find(
+                    defUri => defUri === adapterDefUri
+                  )
+                  const labwareDef = labwareDefUri
+                    ? getOnlyLatestDefs()[labwareDefUri]
+                    : null
+
+                  return labwareDef != null ? (
+                    <LabwareItem
+                      key={index}
+                      icon="check-decagram"
+                      labwareDef={labwareDef}
+                      selectLabware={selectLabware}
+                      onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                      // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+                      onMouseLeave={() => setPreviewedLabware()}
+                    />
+                  ) : null
+                }
+              )}
+            </PDTitledList>
+          )}
         </ul>
 
         <OutlineButton Component="label" className={styles.upload_button}>

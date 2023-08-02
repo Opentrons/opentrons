@@ -16,7 +16,7 @@ import type {
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration removes pipettes, labware, and modules as top level keys and adds necessary
-// params to the load commands.
+// params to the load commands. Also, this introduces loadAdapter commands
 const PD_VERSION = '7.0.0'
 const SCHEMA_VERSION = 7
 
@@ -63,7 +63,7 @@ export const migrateFile = (
         command.commandType === 'loadLabware' &&
         getIsAdapter(command.params.labwareId)
     )
-    .map(command => {
+    .flatMap(command => {
       const {
         adapterLoadname,
         labwareLoadname,

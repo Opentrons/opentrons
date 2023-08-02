@@ -32,8 +32,6 @@ import {
   DeckDefinition,
   RobotType,
   FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -66,6 +64,7 @@ import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
+import { AdapterControls } from './LabwareOverlays/AdapterControls'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
 import { SlotLabels } from './SlotLabels'
 import styles from './DeckSetup.css'
@@ -284,9 +283,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           moduleOnDeck.slot
         )
 
-        const adapterSupportModule =
-          moduleOnDeck.moduleState.type === HEATERSHAKER_MODULE_TYPE ||
-          moduleOnDeck.moduleState.type === TEMPERATURE_MODULE_TYPE
+        const isAdapter =
+          labwareLoadedOnModule?.def.metadata.displayCategory === 'adapter'
 
         return (
           <Module
@@ -308,21 +306,35 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   y={0}
                   labwareOnDeck={labwareLoadedOnModule}
                 />
-                <LabwareControls
-                  slot={labwareInterfaceSlotDef}
-                  setHoveredLabware={setHoveredLabware}
-                  setDraggedLabware={setDraggedLabware}
-                  swapBlocked={
-                    swapBlocked &&
-                    (labwareLoadedOnModule.id === hoveredLabware?.id ||
-                      labwareLoadedOnModule.id === draggedLabware?.id)
-                  }
-                  labwareOnDeck={labwareLoadedOnModule}
-                  selectedTerminalItemId={props.selectedTerminalItemId}
-                />
+                {isAdapter ? (
+                  //  @ts-expect-error
+                  <AdapterControls
+                    adapter={labwareLoadedOnModule}
+                    key={slot.id}
+                    slot={slot}
+                    selectedTerminalItemId={props.selectedTerminalItemId}
+                    handleDragHover={handleHoverEmptySlot}
+                  />
+                ) : (
+                  <LabwareControls
+                    slot={labwareInterfaceSlotDef}
+                    setHoveredLabware={setHoveredLabware}
+                    setDraggedLabware={setDraggedLabware}
+                    swapBlocked={
+                      swapBlocked &&
+                      (labwareLoadedOnModule.id === hoveredLabware?.id ||
+                        labwareLoadedOnModule.id === draggedLabware?.id)
+                    }
+                    labwareOnDeck={labwareLoadedOnModule}
+                    selectedTerminalItemId={props.selectedTerminalItemId}
+                  />
+                )}
               </>
             ) : null}
-            {labwareLoadedOnModule == null && !shouldHideChildren ? (
+
+            {labwareLoadedOnModule == null &&
+            !shouldHideChildren &&
+            !isAdapter ? (
               // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
               <SlotControls
                 key={slot.id}
@@ -393,6 +405,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
+        const labwareIsAdapter =
+          labware.def.metadata.displayCategory === 'adapter'
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
@@ -401,18 +415,31 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <g>
-              <LabwareControls
-                slot={slot}
-                setHoveredLabware={setHoveredLabware}
-                setDraggedLabware={setDraggedLabware}
-                swapBlocked={
-                  swapBlocked &&
-                  (labware.id === hoveredLabware?.id ||
-                    labware.id === draggedLabware?.id)
-                }
-                labwareOnDeck={labware}
-                selectedTerminalItemId={props.selectedTerminalItemId}
-              />
+              {labwareIsAdapter ? (
+                <>
+                  {/* @ts-expect-error */}
+                  <AdapterControls
+                    adapter={labware}
+                    key={slot.id}
+                    slot={slot}
+                    selectedTerminalItemId={props.selectedTerminalItemId}
+                    handleDragHover={handleHoverEmptySlot}
+                  />
+                </>
+              ) : (
+                <LabwareControls
+                  slot={slot}
+                  setHoveredLabware={setHoveredLabware}
+                  setDraggedLabware={setDraggedLabware}
+                  swapBlocked={
+                    swapBlocked &&
+                    (labware.id === hoveredLabware?.id ||
+                      labware.id === draggedLabware?.id)
+                  }
+                  labwareOnDeck={labware}
+                  selectedTerminalItemId={props.selectedTerminalItemId}
+                />
+              )}
             </g>
           </React.Fragment>
         )
