@@ -79,6 +79,7 @@ from .types import (
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
+    HardwareEvent,
     HardwareEventHandler,
     HardwareAction,
     MotionChecks,
@@ -99,6 +100,8 @@ from .types import (
     TipStateType,
     EstopOverallStatus,
     EstopAttachLocation,
+    EstopStateNotification,
+    EstopState,
 )
 from .errors import (
     MustHomeError,
@@ -203,6 +206,8 @@ class OT3API(
         self._backend = backend
         self._loop = loop
 
+        backend.estop_state_machine.add_listener(self._update_estop_state)
+
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: OT3AxisMap[float] = {}
@@ -282,6 +287,27 @@ class OT3API(
                 cb(hw_event)
             except Exception:
                 mod_log.exception("Errored during door state event callback")
+
+    def _update_estop_state(self, event: HardwareEvent) -> None:
+        if not isinstance(event, EstopStateNotification):
+            return
+        mod_log.info(
+            f"Updating the estop status from {event.old_state} to {event.new_state}"
+        )
+        if (
+            event.new_state == EstopState.PHYSICALLY_ENGAGED
+            and event.old_state != EstopState.PHYSICALLY_ENGAGED
+        ):
+            # If the estop was just pressed, turn off every module.
+            for mod in self._backend.module_controls.available_modules:
+                asyncio.run_coroutine_threadsafe(
+                    modules.utils.disable_module(mod), self._loop
+                )
+        for cb in self._callbacks:
+            try:
+                cb(event)
+            except Exception:
+                mod_log.exception("Errored during estop state event callback")
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
