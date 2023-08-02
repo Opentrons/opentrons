@@ -127,6 +127,7 @@ Also note the ``hs_mod.open_labware_latch()`` command in the above example. To m
     
 If the labware is inaccessible, the API will raise an error. 
 
+.. _off-deck-location:
 
 The Off-Deck Location
 =====================

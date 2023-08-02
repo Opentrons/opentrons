@@ -532,7 +532,7 @@ class ProtocolContext(CommandPublisher):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
-        """Move a loaded labware to a new location.
+        """Move a loaded labware to a new location. See :ref:`moving-labware` for more details.
 
         :param labware: The labware to move. It should be a labware already loaded
                         using :py:meth:`load_labware`.
