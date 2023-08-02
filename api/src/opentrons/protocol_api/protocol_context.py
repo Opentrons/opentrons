@@ -534,8 +534,8 @@ class ProtocolContext(CommandPublisher):
     ) -> None:
         """Move a loaded labware to a new location.
 
-        :param labware: The labware to move. Should be a labware already loaded
-                        using :py:meth:`load_labware`
+        :param labware: The labware to move. It should be a labware already loaded
+                        using :py:meth:`load_labware`.
 
         :param new_location: Where to move the labware to. This is either:
 
@@ -547,18 +547,19 @@ class ProtocolContext(CommandPublisher):
                 * The special constant :py:obj:`OFF_DECK`.
 
         :param use_gripper: Whether to use the Flex Gripper for this movement.
-                            If ``True``, will use the gripper to perform an automatic
-                            movement. This will raise an error on an OT-2 protocol.
-                            If False, will pause protocol execution until the user
-                            performs the movement. Protocol execution remains paused until
-                            the user presses **Confirm and resume**.
+
+                * If ``True``, will use the gripper to perform an automatic
+                  movement. This will raise an error on an OT-2 protocol.
+                * If ``False``, will pause protocol execution until the user
+                  performs the movement. Protocol execution remains paused until
+                  the user presses **Confirm and resume**.
 
         Gripper-only parameters:
 
         :param pick_up_offset: Optional x, y, z vector offset to use when picking up labware.
         :param drop_offset: Optional x, y, z vector offset to use when dropping off labware.
 
-        Before moving a labware from or to a hardware module, make sure that the labware's
+        Before moving a labware to or from a hardware module, make sure that the labware's
         current and new locations are accessible, i.e., open the Thermocycler lid or
         open the Heater-Shaker's labware latch.
         """
