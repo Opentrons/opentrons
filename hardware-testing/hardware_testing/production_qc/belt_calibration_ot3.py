@@ -3,6 +3,7 @@ import argparse
 import asyncio
 from dataclasses import dataclass
 from typing import Optional, Dict, Tuple
+from pprint import pprint
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -87,15 +88,17 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> AttitudeMatrix
     assert pip, "no pipette found"
     await api.home()
     try:
-        attitude = await calibrate_belts(api, mount, pip.pipette_id)  # type: ignore[arg-type]
+        pip_id = pip.pipette_id if pip and pip.pipette_id else "unknown"
+        attitude, details = await calibrate_belts(api, mount, pip_id)
     except CalibrationStructureNotFoundError as e:
         if not api.is_simulator:
             raise e
         attitude = DEFAULT_MACHINE_TRANSFORM
+        details = {}
     print("new attitude:")
-    print(f"\t{attitude[0]}")
-    print(f"\t{attitude[1]}")
-    print(f"\t{attitude[2]}")
+    pprint(attitude)
+    print("details")
+    pprint(details)
     return attitude
 
 

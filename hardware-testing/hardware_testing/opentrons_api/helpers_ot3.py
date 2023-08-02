@@ -146,13 +146,17 @@ async def update_firmware(
 
     if not subsystems:
         subsystems = []
+    is_updating = False
     async for update in api.update_firmware(set(subsystems), force=force):
+        is_updating = True
         fw_version = subsystems_on_boot[update.subsystem].next_fw_version
         if update.subsystem not in progress_tracker:
             progress_tracker[update.subsystem] = [fw_version, 0]
         if update.progress != progress_tracker[update.subsystem][1]:
             progress_tracker[update.subsystem][1] = update.progress
             _print_update_progress()
+    if is_updating and not api.is_simulator:
+        await asyncio.sleep(2)
 
 
 async def reset_api(api: OT3API) -> None:
