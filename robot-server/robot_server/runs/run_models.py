@@ -77,7 +77,11 @@ class Run(ResourceModel):
     )
     errors: List[ErrorOccurrence] = Field(
         ...,
-        description="Any errors that have occurred during the run.",
+        description=(
+            "The run's fatal error, if there was one."
+            " For historical reasons, this is an array,"
+            " but it won't have more than one element."
+        ),
     )
     pipettes: List[LoadedPipette] = Field(
         ...,

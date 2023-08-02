@@ -1,4 +1,4 @@
-import type { MoveLabwareParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { MoveLabwareParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forMoveLabware(

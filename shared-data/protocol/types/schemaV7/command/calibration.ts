@@ -31,7 +31,8 @@ export interface CalibrateGripperRunTimeCommand
   result?: CalibrateGripperResult
 }
 export interface MoveToMaintenancePositionRunTimeCommand
-  extends MoveToMaintenancePositionCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    MoveToMaintenancePositionCreateCommand {
   result?: {}
 }
 

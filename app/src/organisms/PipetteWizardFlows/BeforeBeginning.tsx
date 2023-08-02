@@ -1,6 +1,12 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
-import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SIZE_1,
+  SPACING,
+} from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -152,15 +158,13 @@ export const BeforeBeginning = (
       {
         commandType: 'loadPipette' as const,
         params: {
-          // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipettes[mount]?.instrumentName,
-          pipetteId: pipetteId,
+          pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+          pipetteId: pipetteId ?? '',
           mount: mount,
         },
       },
       { commandType: 'home' as const, params: {} },
       {
-        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
           mount: mount,
@@ -180,7 +184,6 @@ export const BeforeBeginning = (
   const SingleMountAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: mount,
@@ -191,7 +194,6 @@ export const BeforeBeginning = (
   const NinetySixChannelAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,
@@ -242,13 +244,15 @@ export const BeforeBeginning = (
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
             </Banner>
           ) : null}
-          <Trans
-            t={t}
-            i18nKey={bodyTranslationKey}
-            components={{
-              block: <StyledText css={BODY_STYLE} />,
-            }}
-          />
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
+            <Trans
+              t={t}
+              i18nKey={bodyTranslationKey}
+              components={{
+                block: <StyledText css={BODY_STYLE} />,
+              }}
+            />
+          </Flex>
         </>
       }
       proceedButtonText={proceedButtonText}

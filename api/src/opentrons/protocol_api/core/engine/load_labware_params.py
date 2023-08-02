@@ -7,7 +7,8 @@ from opentrons.protocol_engine.state.labware import LabwareLoadParams
 # Default versions of Opentrons standard labware definitions in Python Protocol API
 # v2.14 and above. Labware not explicitly listed here default to 1.
 #
-# This will need to be extended t
+# TODO(jbl 2023-08-01) this needs to be done more holistically, both to find the version and make sure that
+#   it corresponds to the API level is was released with
 _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     # v1 of many labware definitions have wrong `zDimension`s. (Jira RSS-202.)
     # For "opentrons_96_aluminumblock_generic_pcr_strip_200ul" and
@@ -22,6 +23,8 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     "nest_96_wellplate_100ul_pcr_full_skirt": 2,
     "nest_96_wellplate_200ul_flat": 2,
     "nest_96_wellplate_2ml_deep": 2,
+    "opentrons_96_wellplate_200ul_pcr_full_skirt": 2,
+    "biorad_96_wellplate_200ul_pcr": 2,
 }
 
 

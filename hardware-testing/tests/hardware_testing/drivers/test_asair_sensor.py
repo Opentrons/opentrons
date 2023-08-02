@@ -2,8 +2,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from hardware_testing.drivers import AsairSensor
-from hardware_testing.drivers.asair_sensor import Reading
+from hardware_testing.drivers.asair_sensor import Reading, AsairSensor
 
 
 @pytest.fixture

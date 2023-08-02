@@ -74,7 +74,11 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
     'opentrons_96_aluminumblock_nest_wellplate_100ul',
   ],
-  [MAGNETIC_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [MAGNETIC_MODULE_TYPE]: [
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  ],
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   [HEATERSHAKER_MODULE_TYPE]: [
     'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
@@ -85,6 +89,8 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [MAGNETIC_BLOCK_TYPE]: [
     'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
 }
 
@@ -183,7 +189,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       !getLabwareCompatible(labwareDef),
     [filterRecommended, filterHeight, getLabwareCompatible, moduleType]
   )
-
   const getTitleText = (): string => {
     if (isNextToHeaterShaker) {
       return `Slot ${slot}, Labware to the side of ${i18n.t(
@@ -288,11 +293,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               )}{' '}
               <KnowledgeBaseLink
                 className={styles.link}
-                to={
-                  isNextToHeaterShaker
-                    ? 'heaterShakerLabware'
-                    : 'recommendedLabware'
-                }
+                to={'recommendedLabware'}
               >
                 here
               </KnowledgeBaseLink>

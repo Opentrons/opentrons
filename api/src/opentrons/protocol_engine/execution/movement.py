@@ -78,10 +78,6 @@ class MovementHandler:
             self._state_store.modules.get_heater_shaker_movement_restrictors()
         )
 
-        # TODO (spp, 2022-12-14): remove once we understand why sometimes moveLabware
-        #  fails saying that h/s latch is closed even when it is not.
-        log.info(f"H/S movement restrictors: {hs_movement_restrictors}")
-
         dest_slot_int = self._state_store.geometry.get_ancestor_slot_name(
             labware_id
         ).as_int()

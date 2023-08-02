@@ -298,4 +298,5 @@ export interface ThermocyclerSetTargetBlockTemperatureParams {
   moduleId: string
   celsius: number
   volume?: number
+  holdTimeSeconds?: number
 }

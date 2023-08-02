@@ -41,10 +41,10 @@
         }
       },
       "ingredLocations": {
-        "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1": {
+        "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1": {
           "A1": {
             "0": {
-              "volume": 1000
+              "volume": 100
             }
           }
         },
@@ -177,7 +177,7 @@
           "labwareLocationUpdate": {
             "trashId": "12",
             "3e047fb0-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_tiprack_1000ul/1": "2",
-            "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1": "4",
+            "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1": "4",
             "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1": "5",
             "aac5d680-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1": "3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType",
             "ada13110-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1": "3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType",
@@ -252,7 +252,7 @@
           "path": "single",
           "aspirate_wells_grouped": false,
           "aspirate_flowRate": null,
-          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
           "aspirate_wells": ["A1"],
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -300,7 +300,7 @@
           "path": "single",
           "aspirate_wells_grouped": false,
           "aspirate_flowRate": null,
-          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
           "aspirate_wells": ["A1"],
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -348,7 +348,7 @@
           "path": "single",
           "aspirate_wells_grouped": false,
           "aspirate_flowRate": null,
-          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
           "aspirate_wells": ["A1"],
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -396,7 +396,7 @@
           "path": "single",
           "aspirate_wells_grouped": false,
           "aspirate_flowRate": null,
-          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
           "aspirate_wells": ["A1"],
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -448,7 +448,7 @@
           "path": "single",
           "aspirate_wells_grouped": false,
           "aspirate_flowRate": null,
-          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+          "aspirate_labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
           "aspirate_wells": ["A1"],
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -520,10 +520,10 @@
       "displayName": "Opentrons 96 Tip Rack 1000 µL",
       "definitionId": "opentrons/opentrons_96_tiprack_1000ul/1"
     },
-    "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1": {
+    "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1": {
       "slot": "4",
-      "displayName": "NEST 1 Well Reservoir 195 mL",
-      "definitionId": "opentrons/nest_1_reservoir_195ml/1"
+      "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
+      "definitionId": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1"
     },
     "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1": {
       "slot": "5",
@@ -2643,62 +2643,6 @@
           "metadata": {}
         }
       ],
-      "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-      }
-    },
-    "opentrons/nest_1_reservoir_195ml/1": {
-      "ordering": [["A1"]],
-      "brand": {
-        "brand": "NEST",
-        "brandId": ["360103"],
-        "links": [
-          "https://www.nest-biotech.com/reagent-reserviors/59178414.html"
-        ]
-      },
-      "metadata": {
-        "displayName": "NEST 1 Well Reservoir 195 mL",
-        "displayCategory": "reservoir",
-        "displayVolumeUnits": "mL",
-        "tags": []
-      },
-      "dimensions": {
-        "xDimension": 127.76,
-        "yDimension": 85.48,
-        "zDimension": 31.4
-      },
-      "wells": {
-        "A1": {
-          "depth": 25,
-          "shape": "rectangular",
-          "xDimension": 106.8,
-          "yDimension": 71.2,
-          "totalLiquidVolume": 195000,
-          "x": 63.88,
-          "y": 42.74,
-          "z": 4.55
-        }
-      },
-      "groups": [
-        {
-          "metadata": {
-            "wellBottomShape": "v"
-          },
-          "wells": ["A1"]
-        }
-      ],
-      "parameters": {
-        "format": "trough",
-        "isTiprack": false,
-        "isMagneticModuleCompatible": false,
-        "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
-        "loadName": "nest_1_reservoir_195ml"
-      },
-      "namespace": "opentrons",
-      "version": 1,
-      "schemaVersion": 2,
       "cornerOffsetFromSlot": {
         "x": 0,
         "y": 0,
@@ -5301,7 +5245,7 @@
       "params": {
         "pipette": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
         "volume": 100,
-        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
         "well": "A1",
         "offsetFromBottomMm": 1,
         "flowRate": 137.35
@@ -5339,7 +5283,7 @@
       "params": {
         "pipette": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
         "volume": 100,
-        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:oopentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
         "well": "A1",
         "offsetFromBottomMm": 1,
         "flowRate": 137.35
@@ -5377,7 +5321,7 @@
       "params": {
         "pipette": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
         "volume": 100,
-        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
         "well": "A1",
         "offsetFromBottomMm": 1,
         "flowRate": 137.35
@@ -5415,7 +5359,7 @@
       "params": {
         "pipette": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
         "volume": 100,
-        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
         "well": "A1",
         "offsetFromBottomMm": 1,
         "flowRate": 137.35
@@ -5453,7 +5397,7 @@
       "params": {
         "pipette": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
         "volume": 20,
-        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
+        "labware": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
         "well": "A1",
         "offsetFromBottomMm": 1,
         "flowRate": 7.6

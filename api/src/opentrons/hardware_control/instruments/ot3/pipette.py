@@ -101,9 +101,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             )
         )
         self.ready_to_aspirate = False
+
         #: True if ready to aspirate
         self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._working_volume)
+            pip_types.PipetteTipType(self._config.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
@@ -116,6 +117,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blowout_flow_rates_lookup = (
             self._active_tip_settings.default_blowout_flowrate.values_by_api_level
         )
+
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
         )
@@ -125,6 +127,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blow_out_flow_rate = (
             self._active_tip_settings.default_blowout_flowrate.default
         )
+        self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
@@ -216,7 +219,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._working_volume)
+            pip_types.PipetteTipType(self._config.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
@@ -229,6 +232,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blow_out_flow_rate = (
             self._active_tip_settings.default_blowout_flowrate.default
         )
+        self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
@@ -402,6 +406,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blow_out_flow_rate = new_flow_rate
 
     @property
+    def flow_acceleration(self) -> float:
+        """Current active flow acceleration (not config value)"""
+        return self._flow_acceleration
+
+    @flow_acceleration.setter
+    def flow_acceleration(self, new_flow_acceleration: float) -> None:
+        assert new_flow_acceleration > 0
+        self._flow_acceleration = new_flow_acceleration
+
+    @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
         return self._aspirate_flow_rates_lookup
 
@@ -422,9 +436,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
         self._working_volume = min(self.config.max_volume, tip_volume)
-        self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(int(self._working_volume))
-        ]
+        tip_size_type = pip_types.PipetteTipType.check_and_return_type(
+            int(self._working_volume), self.config.max_volume
+        )
+        self._active_tip_settings = self._config.supported_tips[tip_size_type]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
@@ -525,13 +540,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
+                "flow_acceleration": self.flow_acceleration,
                 "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate.values_by_api_level,
                 "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate.values_by_api_level,
                 "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate.values_by_api_level,
+                "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
+                "supported_tips": self._config.supported_tips,
             }
         )
         return self._config_as_dict

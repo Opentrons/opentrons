@@ -75,6 +75,7 @@ import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -90,7 +91,7 @@ interface ProtocolSetupStepProps {
   disabledReason?: string | null
 }
 
-function ProtocolSetupStep({
+export function ProtocolSetupStep({
   onClickSetupStep,
   status,
   title,
@@ -448,6 +449,10 @@ function PrepareToRun({
       ? t('additional_labware', { count: additionalLabwareCount })
       : null
 
+  const latestCurrentOffsets = getLatestCurrentOffsets(
+    runRecord?.data?.labwareOffsets ?? []
+  )
+
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
@@ -529,6 +534,11 @@ function PrepareToRun({
           detail={t(
             lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
           )}
+          subDetail={
+            latestCurrentOffsets.length > 0
+              ? t('offsets_applied', { count: latestCurrentOffsets.length })
+              : null
+          }
           status="general"
           disabled={lpcDisabledReason != null}
           disabledReason={lpcDisabledReason}

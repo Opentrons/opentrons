@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS } from '../../ui-style-constants'
+import { BORDERS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
@@ -25,6 +25,7 @@ export type TrashSlotName =
 interface FlexTrashProps {
   robotType: RobotType
   trashIconColor: string
+  backgroundColor: string
   trashSlotName?: TrashSlotName
 }
 
@@ -35,6 +36,7 @@ interface FlexTrashProps {
 export const FlexTrash = ({
   robotType,
   trashIconColor,
+  backgroundColor,
   // default Flex trash slot position A3
   trashSlotName = 'A3',
 }: FlexTrashProps): JSX.Element | null => {
@@ -80,7 +82,7 @@ export const FlexTrash = ({
       >
         <Flex
           alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.darkGreyEnabled}
+          backgroundColor={backgroundColor}
           borderRadius={BORDERS.radiusSoftCorners}
           justifyContent={JUSTIFY_CENTER}
           width="100%"

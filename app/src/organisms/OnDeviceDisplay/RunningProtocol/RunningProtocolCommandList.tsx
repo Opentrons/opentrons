@@ -96,7 +96,6 @@ export function RunningProtocolCommandList({
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const ref = React.useRef<ViewportListRef>(null)
   const currentRunStatus = t(`status_${runStatus}`)
-
   const onStop = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)

@@ -129,7 +129,7 @@ stages:
                 slotName: '1'
               loadName: biorad_96_wellplate_200ul_pcr
               namespace: opentrons
-              version: 1
+              version: 2
           - id: !anystr
             key: !anystr
             commandType: loadModule

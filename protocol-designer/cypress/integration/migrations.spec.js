@@ -13,54 +13,60 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
   const testCases = [
     {
-      title:
-        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 6.2.x, schema 6',
-      importFixture:
-        '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
-      expectedExportFixture:
-        '../../fixtures/protocol/6/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
-      unusedPipettes: false,
-      migrationModal: 'newLabwareDefs',
-    },
-    {
-      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 6.2.x, schema 6',
+      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 7.0.x, schema 7',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
-        '../../fixtures/protocol/6/example_1_1_0MigratedFromV1_0_0.json',
+        '../../fixtures/protocol/7/example_1_1_0MigratedFromV1_0_0.json',
       unusedPipettes: true,
       migrationModal: 'newLabwareDefs',
     },
     {
-      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 6.2.x, schema 6',
+      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 7.0.x, schema 7',
       importFixture: '../../fixtures/protocol/4/doItAllV3.json',
       expectedExportFixture:
-        '../../fixtures/protocol/6/doItAllV3MigratedToV6.json',
+        '../../fixtures/protocol/7/doItAllV3MigratedToV7.json',
       unusedPipettes: false,
       migrationModal: 'noBehaviorChange',
     },
     {
-      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 6.2.x, schema 6',
+      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 7.0.x, schema 7',
       importFixture: '../../fixtures/protocol/4/doItAllV4.json',
       expectedExportFixture:
-        '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+        '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
+      unusedPipettes: false,
+      migrationModal: 'noBehaviorChange',
+    },
+    {
+      title: 'doItAllV6 (schema 6, PD version 6.1.0) -> PD 7.0.x, schema 7',
+      importFixture: '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
       unusedPipettes: false,
       migrationModal: 'noBehaviorChange',
     },
     {
       title:
-        'doItAllV6 (schema 6, PD version 6.1.0) -> import and re-export should preserve data',
-      importFixture: '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+        'doItAllV7 (schema 7, PD version 7.0.0) -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
       expectedExportFixture:
-        '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+        '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
       unusedPipettes: false,
       migrationModal: null,
     },
     {
       title:
-        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 6.2.x, schema v6',
+        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 7.0.x, schema 7',
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
-      expectedExportFixture: '../../fixtures/protocol/6/mix_6_0_0.json',
+      expectedExportFixture: '../../fixtures/protocol/7/mix_7_0_0.json',
       migrationModal: 'noBehaviorChange',
+      unusedPipettes: false,
+    },
+    {
+      title:
+        'doItAllV7 Flex robot (schema 7, PD version 7.0.0) -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/7/doItAllV7.json',
+      expectedExportFixture: '../../fixtures/protocol/7/doItAllV7.json',
+      migrationModal: false,
       unusedPipettes: false,
     },
   ]
