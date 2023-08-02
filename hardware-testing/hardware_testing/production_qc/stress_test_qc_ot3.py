@@ -26,8 +26,12 @@ import logging
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.CRITICAL)
-# logging.getLogger('opentrons.hardware_control.ot3api.OT3API').setLevel(logging.INFO) #tells all movement settings
-# logging.getLogger('opentrons_hardware.hardware_control').setLevel(logging.INFO) #confirms speeds
+
+# tells all movement settings
+logging.getLogger("opentrons.hardware_control.ot3api.OT3API").setLevel(logging.CRITICAL)
+
+# confirms speeds
+logging.getLogger("opentrons_hardware.hardware_control").setLevel(logging.CRITICAL)
 
 
 GANTRY_AXES = [
@@ -122,7 +126,6 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
     run_id = data.create_run_id()
     test_name = data.create_test_name_from_file(__file__)
     folder_path = data.create_folder_for_test_data(test_name)
-    ##pipid???
     file_name = data.create_file_name(test_name=test_name, run_id=run_id, tag=sn)
     csv_display_name = os.path.join(folder_path, file_name)
     print(f"CSV: {csv_display_name}")
@@ -257,10 +260,10 @@ async def _move_and_check(
     """Move and check accuracy with encoder."""
     if not is_simulating:
         await api.move_to(mount, position)
-        estimate = {ax: api._current_position[ax] for ax in GANTRY_AXES}
-        encoder = {ax: api._encoder_position[ax] for ax in GANTRY_AXES}
     else:
         pass
+    estimate = {ax: api._current_position[ax] for ax in GANTRY_AXES}
+    encoder = {ax: api._encoder_position[ax] for ax in GANTRY_AXES}
     aligned = True
     all_aligned_axes = [
         ax for ax in GANTRY_AXES if abs(estimate[ax] - encoder[ax]) <= THRESHOLD_MM
@@ -392,7 +395,8 @@ def _get_accelerations_from_user() -> List:
     accelerations = []
     while condition:
         accelerations_input = input(
-            f"WAIT: please input the acceleration and split with ',' like: 100,200,300 then press ENTER when ready: "
+            """WAIT: please input the acceleration and split with ','
+            like: 100,200,300 then press ENTER when ready: """
         )
         try:
             accelerations = [
@@ -411,7 +415,8 @@ def _get_speeds_from_user() -> List:
     speeds = []
     while condition:
         speeds_input = input(
-            f"WAIT: please input the speeds and split with ',' like: 100,200,300 then press ENTER when ready: "
+            """WAIT: please input the speeds and split with ','
+            like: 100,200,300 then press ENTER when ready: """
         )
         try:
             speeds = [
@@ -429,7 +434,8 @@ def _get_currents_from_user() -> List:
     currents = []
     while condition:
         currents_input = input(
-            f"WAIT: please input the currents and split with ',' like: 100,200,300 then press ENTER when ready: "
+            """WAIT: please input the currents and split with ','
+            like: 100,200,300 then press ENTER when ready: """
         )
         try:
             currents = [
@@ -540,6 +546,18 @@ def _creat_xy_axis_settings(arguments: argparse.Namespace) -> List:
     return XY_AXIS_SETTINGS
 
 
+def print_motion_settings(
+    axis: str, speed: float, accel: float, current: float
+) -> None:
+    """Prints the motion settings."""
+    print(f"{axis}: Run speed={speed}, acceleration={accel}, current={current}")
+
+
+def print_cycle_results(a: str, c: int, r: int, p: int, f: int) -> None:
+    """Prints the cycle results."""
+    print(f"Run {a} cycle: {c}, results: {r}, pass count: {p}, fail count: {f}")
+
+
 async def _run_z_motion(
     arguments: argparse.Namespace,
     api: OT3API,
@@ -548,12 +566,20 @@ async def _run_z_motion(
     write_cb: Callable,
 ) -> bool:
     """Test Z at different settings."""
+    if arguments.skip_z_motion:
+        return True
+
+    write_cb(["--------"])
+    write_cb(["z_motion"])
     ui.print_header("Run z motion check...")
     Z_AXIS_SETTINGS = _creat_z_axis_settings(arguments)
     LOG.info(Z_AXIS_SETTINGS)
     for setting in Z_AXIS_SETTINGS:
-        print(
-            f"Z: Run speed={setting[Axis.Z].max_speed}, acceleration={setting[Axis.Z].acceleration}, current={setting[Axis.Z].run_current}"
+        print_motion_settings(
+            "Z",
+            setting[Axis.Z].max_speed,
+            setting[Axis.Z].acceleration,
+            setting[Axis.Z].run_current,
         )
         z_ax = Axis.Z_L if mount == OT3Mount.LEFT else Axis.Z_R
         await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
@@ -587,9 +613,7 @@ async def _run_z_motion(
                     pass_count += 1
                 else:
                     fail_count += 1
-                print(
-                    f"Run Z motion cycle: {i+1}, results: {res}, pass count: {pass_count}, fail count: {fail_count}"
-                )
+                print_cycle_results("Z", i + 1, res, pass_count, fail_count)
             _record_motion_check_data(
                 "z_motion",
                 write_cb,
@@ -615,15 +639,26 @@ async def _run_xy_motion(
     write_cb: Callable,
 ) -> bool:
     """Test XY at different settings."""
+    if arguments.skip_xy_motion:
+        return True
+
+    write_cb(["--------"])
+    write_cb(["xy_motion"])
     ui.print_header("Run xy motion check...")
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     LOG.info(XY_AXIS_SETTINGS)
     for setting in XY_AXIS_SETTINGS:
-        print(
-            f"X: Run speed={setting[Axis.X].max_speed}, acceleration={setting[Axis.X].acceleration}, current={setting[Axis.X].run_current}"
+        print_motion_settings(
+            "X",
+            setting[Axis.X].max_speed,
+            setting[Axis.X].acceleration,
+            setting[Axis.X].run_current,
         )
-        print(
-            f"Y: Run speed={setting[Axis.Y].max_speed}, acceleration={setting[Axis.Y].acceleration}, current={setting[Axis.Y].run_current}"
+        print_motion_settings(
+            "Y",
+            setting[Axis.Y].max_speed,
+            setting[Axis.Y].acceleration,
+            setting[Axis.Y].run_current,
         )
         for ax in [Axis.X, Axis.Y]:
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
@@ -663,9 +698,8 @@ async def _run_xy_motion(
                 pass_count += 1
             else:
                 fail_count += 1
-            print(
-                f"Run XY cycle: {i+1}, results: {res_b and res_hg}, pass count: {pass_count}, fail count: {fail_count}"
-            )
+            print_cycle_results("XY", i + 1, res_b and res_hg,
+                                pass_count, fail_count)
             _record_motion_check_data(
                 "x_motion",
                 write_cb,
@@ -693,6 +727,95 @@ async def _run_xy_motion(
     return True
 
 
+async def _run_gantry_cycles(
+    arguments: argparse.Namespace,
+    api: OT3API,
+    mount: OT3Mount,
+    bowtie_points: List[types.Point],
+    hour_glass_points: List[types.Point],
+    mount_up_down_points: Dict[OT3Mount, List[types.Point]],
+    csv_cb: CSVCallbacks,
+) -> bool:
+    """Cycle the gantry at nominal settings."""
+    qc_pass = True
+    for i in range(arguments.cycles):
+        csv_cb.write(["--------"])
+        csv_cb.write(["run-cycle", i + 1])
+        print(f"Cycle {i + 1}/{arguments.cycles}")
+        if not arguments.skip_bowtie:
+            qc_pass = await _run_bowtie(
+                api,
+                arguments.simulate,
+                mount,
+                bowtie_points,
+                csv_cb.write,
+                arguments.record_error,
+            )
+            if not qc_pass:
+                return qc_pass
+            if not arguments.skip_mount:
+                for z_mount in MOUNT_AXES:
+                    qc_pass = await _run_mount_up_down(
+                        api,
+                        arguments.simulate,
+                        z_mount,
+                        mount_up_down_points[z_mount],
+                        csv_cb.write,
+                        arguments.record_error,
+                    )
+                    if not qc_pass:
+                        return qc_pass
+        if not arguments.skip_hourglass:
+            qc_pass = await _run_hour_glass(
+                api,
+                arguments.simulate,
+                mount,
+                hour_glass_points,
+                csv_cb.write,
+                arguments.record_error,
+            )
+            if not qc_pass:
+                return qc_pass
+            if not arguments.skip_mount:
+                for z_mount in MOUNT_AXES:
+                    qc_pass = await _run_mount_up_down(
+                        api,
+                        arguments.simulate,
+                        z_mount,
+                        mount_up_down_points[z_mount],
+                        csv_cb.write,
+                        arguments.record_error,
+                    )
+                    if not qc_pass:
+                        return qc_pass
+
+    return qc_pass
+
+
+async def get_test_metadata(
+    api: OT3API, arguments: argparse.Namespace
+) -> Tuple[str, str]:
+    """Get the operator name and robot serial number."""
+    if arguments.no_input:
+        _operator = "None"
+        _robot_id = api._backend.eeprom_data.serial_number
+        if not _robot_id:
+            ui.print_error("no serial number saved on this robot")
+            _robot_id = "None"
+    else:
+        if arguments.simulate:
+            _robot_id = "ot3-simulated-A01"
+            _operator = "simulation"
+        else:
+            _robot_id = api._backend.eeprom_data.serial_number
+            if not _robot_id:
+                ui.print_error("no serial number saved on this robot")
+                _robot_id = input("enter ROBOT SERIAL number: ").strip()
+            _operator = input("enter OPERATOR name: ")
+
+    return (_operator, _robot_id)
+
+
 async def enforce_pipette_attached(
     api: OT3API, mount: OT3Mount, attach_pos: Point
 ) -> None:
@@ -713,22 +836,7 @@ async def _main(arguments: argparse.Namespace) -> None:
         is_simulating=arguments.simulate
     )
 
-    if arguments.no_input:
-        _operator = "None"
-        _robot_id = api._backend.eeprom_data.serial_number
-        if not _robot_id:
-            ui.print_error("no serial number saved on this robot")
-            _robot_id = "None"
-    else:
-        if arguments.simulate:
-            _robot_id = "ot3-simulated-A01"
-            _operator = "simulation"
-        else:
-            _robot_id = api._backend.eeprom_data.serial_number
-            if not _robot_id:
-                ui.print_error("no serial number saved on this robot")
-                _robot_id = input("enter ROBOT SERIAL number: ").strip()
-            _operator = input("enter OPERATOR name: ")
+    _operator, _robot_id = await get_test_metadata(api, arguments)
 
     # callback function for writing new data to CSV file
     csv_props, csv_cb = _create_csv_and_get_callbacks(_robot_id)
@@ -784,73 +892,29 @@ async def _main(arguments: argparse.Namespace) -> None:
         LOG.info(DEFAULT_Z_CURRENT)
         LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
 
-        for i in range(arguments.cycles):
-            csv_cb.write(["--------"])
-            csv_cb.write(["run-cycle", i + 1])
-            print(f"Cycle {i + 1}/{arguments.cycles}")
-            if not arguments.skip_bowtie:
-                qc_pass = await _run_bowtie(
-                    api,
-                    arguments.simulate,
-                    mount,
-                    bowtie_points,
-                    csv_cb.write,
-                    arguments.record_error,
-                )
-                if not qc_pass:
-                    return
-                if not arguments.skip_mount:
-                    for z_mount in MOUNT_AXES:
-                        qc_pass = await _run_mount_up_down(
-                            api,
-                            arguments.simulate,
-                            z_mount,
-                            mount_up_down_points[z_mount],
-                            csv_cb.write,
-                            arguments.record_error,
-                        )
-                        if not qc_pass:
-                            return
-            if not arguments.skip_hourglass:
-                qc_pass = await _run_hour_glass(
-                    api,
-                    arguments.simulate,
-                    mount,
-                    hour_glass_points,
-                    csv_cb.write,
-                    arguments.record_error,
-                )
-                if not qc_pass:
-                    return
-                if not arguments.skip_mount:
-                    for z_mount in MOUNT_AXES:
-                        qc_pass = await _run_mount_up_down(
-                            api,
-                            arguments.simulate,
-                            z_mount,
-                            mount_up_down_points[z_mount],
-                            csv_cb.write,
-                            arguments.record_error,
-                        )
-                        if not qc_pass:
-                            return
+        qc_pass = await _run_gantry_cycles(
+            arguments,
+            api,
+            mount,
+            bowtie_points,
+            hour_glass_points,
+            mount_up_down_points,
+            csv_cb,
+        )
+        if not qc_pass:
+            return
 
-        if not arguments.skip_xy_motion:
-            csv_cb.write(["--------"])
-            csv_cb.write(["xy_motion"])
-            qc_pass = await _run_xy_motion(
-                arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
-            )
-            if not qc_pass:
-                return
-        if not arguments.skip_z_motion:
-            csv_cb.write(["--------"])
-            csv_cb.write(["z_motion"])
-            qc_pass = await _run_z_motion(
-                arguments, api, mount, mount_up_down_points, csv_cb.write
-            )
-            if not qc_pass:
-                return
+        qc_pass = await _run_xy_motion(
+            arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
+        )
+        if not qc_pass:
+            return
+
+        qc_pass = await _run_z_motion(
+            arguments, api, mount, mount_up_down_points, csv_cb.write
+        )
+        if not qc_pass:
+            return
 
     except KeyboardInterrupt:
         print("Cancelled")
