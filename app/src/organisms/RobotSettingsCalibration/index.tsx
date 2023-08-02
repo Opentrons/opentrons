@@ -6,6 +6,7 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
   useCalibrationStatusQuery,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
@@ -16,7 +17,6 @@ import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../organisms/CheckCalibration'
 import {
   useRobot,
-  useAttachedPipettes,
   useRunStatuses,
   useIsOT3,
   useAttachedPipettesFromInstrumentsQuery,
@@ -33,6 +33,7 @@ import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibrati
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
 
+import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { RequestState } from '../../redux/robot-api/types'
 import type {
@@ -118,17 +119,23 @@ export function RobotSettingsCalibration({
     }
   )
 
-  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
-    ?.data
-  const attachedPipettesFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipettes = useAttachedPipettes()
+  // Note: following fetch need to reflect the latest state of calibrations
+  // when a user does calibration or rename a robot.
+  useCalibrationStatusQuery({ refetchInterval: CALS_FETCH_MS })
+  useAllTipLengthCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
+      .data?.data ?? []
+  const attachedInstruments =
+    useInstrumentsQuery({ refetchInterval: CALS_FETCH_MS }).data?.data ?? []
+  const attachedGripper =
+    (attachedInstruments ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+    ) ?? null
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const { isRunRunning: isRunning } = useRunStatuses()
-  const pipettePresentOt2 =
+  const pipettePresent =
     !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
-  const pipettePresentOt3 =
-    !(attachedPipettesFromInstrumentQuery.left == null) ||
-    !(attachedPipettesFromInstrumentQuery.right == null)
-  const pipettePresent = isOT3 ? pipettePresentOt3 : pipettePresentOt2
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
@@ -186,49 +193,47 @@ export function RobotSettingsCalibration({
 
   if (!isOT3 && attachedPipettes != null) {
     formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.left?.modelSpecs?.displayName,
-      serialNumber: attachedPipettes.left?.id,
+      modelName: attachedPipettes.left?.displayName,
+      serialNumber: attachedPipettes.left?.serialNumber,
       mount: 'left' as Mount,
       tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
+        p => p.pipette === attachedPipettes.left?.serialNumber
       )?.tiprackUri,
       lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
+        p => p.pipette === attachedPipettes.left?.serialNumber
       )?.lastModified,
       markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
+        p => p.pipette === attachedPipettes.left?.serialNumber
       )?.status.markedBad,
     })
     formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.right?.modelSpecs?.displayName,
-      serialNumber: attachedPipettes.right?.id,
+      modelName: attachedPipettes.right?.displayName,
+      serialNumber: attachedPipettes.right?.serialNumber,
       mount: 'right' as Mount,
       tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
+        p => p.pipette === attachedPipettes.right?.serialNumber
       )?.tiprackUri,
       lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
+        p => p.pipette === attachedPipettes.right?.serialNumber
       )?.lastModified,
       markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
+        p => p.pipette === attachedPipettes.right?.serialNumber
       )?.status.markedBad,
     })
   } else {
     formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettesFromInstrumentQuery.left?.displayName,
-      serialNumber: attachedPipettesFromInstrumentQuery.left?.serialNumber,
+      modelName: attachedPipettes.left?.displayName,
+      serialNumber: attachedPipettes.left?.serialNumber,
       mount: 'left' as Mount,
       lastCalibrated:
-        attachedPipettesFromInstrumentQuery.left?.data.calibratedOffset
-          ?.last_modified,
+        attachedPipettes.left?.data.calibratedOffset?.last_modified,
     })
     formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettesFromInstrumentQuery.right?.displayName,
-      serialNumber: attachedPipettesFromInstrumentQuery.right?.serialNumber,
+      modelName: attachedPipettes.right?.displayName,
+      serialNumber: attachedPipettes.right?.serialNumber,
       mount: 'right' as Mount,
       lastCalibrated:
-        attachedPipettesFromInstrumentQuery.right?.data.calibratedOffset
-          ?.last_modified,
+        attachedPipettes.right?.data.calibratedOffset?.last_modified,
     })
   }
 
@@ -237,12 +242,6 @@ export function RobotSettingsCalibration({
       createRequestId.current = null
     }
   }, [createStatus])
-
-  // Note: following fetch need to reflect the latest state of calibrations
-  // when a user does calibration or rename a robot.
-  useCalibrationStatusQuery({ refetchInterval: CALS_FETCH_MS })
-  useAllPipetteOffsetCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
-  useAllTipLengthCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
 
   return (
     <>
@@ -317,7 +316,9 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
           <Line />
-          <RobotSettingsGripperCalibration />
+          {attachedGripper != null && (
+            <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          )}
         </>
       ) : (
         <>

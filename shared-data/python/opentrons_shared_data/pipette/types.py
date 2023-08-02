@@ -26,6 +26,15 @@ class PipetteTipType(enum.Enum):
     t300 = 300
     t1000 = 1000
 
+    @classmethod
+    def check_and_return_type(
+        cls, working_volume: int, maximum_volume: int
+    ) -> "PipetteTipType":
+        try:
+            return cls(working_volume)
+        except ValueError:
+            return cls(maximum_volume)
+
 
 class PipetteChannelType(int, enum.Enum):
     SINGLE_CHANNEL = 1

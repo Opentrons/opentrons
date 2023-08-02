@@ -25,6 +25,7 @@ export const MOCK_LABWARE_ID = '71e1664f-3e69-400a-931b-1ddfa3bff5c8'
 export const MOCK_MODULE_ID = 'f806ff9f-3b17-4692-aa63-f77c57fe18d1'
 
 export const mockPauseCommandWithStartTime = {
+  key: 'mockPauseCommandKey',
   commandType: 'waitForResume',
   startedAt: new Date(),
   params: {
@@ -57,6 +58,7 @@ export const mockPauseCommandWithNoMessage = {
 } as any
 
 export const mockMoveLabwareCommandFromSlot = {
+  key: 'mockMoveLabwareCommandKey',
   commandType: 'moveLabware',
   params: {
     labwareId: 'mockLabwareID2',

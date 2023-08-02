@@ -94,7 +94,7 @@ describe('ReturnTip', () => {
             pipetteId: 'pipetteId1',
             labwareId: 'labwareId1',
             wellName: 'A1',
-            wellLocation: { origin: 'default', offset: undefined },
+            wellLocation: { origin: 'top', offset: undefined },
           },
         },
         {
@@ -145,7 +145,7 @@ describe('ReturnTip', () => {
             labwareId: 'labwareId1',
             wellName: 'A1',
             wellLocation: {
-              origin: 'default',
+              origin: 'top',
               offset: { x: 10, y: 11, z: 12 },
             },
           },
@@ -223,7 +223,7 @@ describe('ReturnTip', () => {
             labwareId: 'labwareId1',
             wellName: 'A1',
             wellLocation: {
-              origin: 'default',
+              origin: 'top',
               offset: { x: 10, y: 11, z: 12 },
             },
           },

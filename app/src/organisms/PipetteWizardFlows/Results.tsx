@@ -145,9 +145,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
           {
             commandType: 'loadPipette' as const,
             params: {
-              // @ts-expect-error pipetteName is required but missing in schema v6 type
-              pipetteName: attachedPipettes[mount]?.instrumentName,
-              pipetteId: attachedPipettes[mount]?.serialNumber,
+              pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+              pipetteId: attachedPipettes[mount]?.serialNumber ?? '',
               mount: mount,
             },
           },
@@ -174,7 +173,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
       chainRunCommands(
         [
           {
-            // @ts-expect-error calibration type not yet supported
             commandType: 'calibration/moveToMaintenancePosition' as const,
             params: {
               mount: mount,

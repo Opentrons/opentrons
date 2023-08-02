@@ -177,9 +177,10 @@ export function NameRobot(): JSX.Element {
             >
               <Flex position={POSITION_ABSOLUTE} left="0">
                 <Btn
+                  data-testid="name_back_button"
                   onClick={() => {
                     if (isInitialSetup) {
-                      history.push('/robot-settings/update-robot')
+                      history.push('/emergency-stop')
                     } else {
                       history.push('/robot-settings')
                     }
