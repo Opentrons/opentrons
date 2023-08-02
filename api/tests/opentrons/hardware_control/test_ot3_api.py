@@ -5,7 +5,9 @@ from typing_extensions import Literal
 from math import copysign
 import pytest
 from mock import AsyncMock, patch, Mock, call, PropertyMock
+from decoy import Decoy
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
+import asyncio
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
@@ -46,6 +48,8 @@ from opentrons.hardware_control.types import (
     SubSystem,
     GripperJawState,
     StatusBarState,
+    EstopState,
+    EstopStateNotification,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -71,7 +75,14 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
 )
-
+from opentrons.hardware_control.modules import (
+    Thermocycler,
+    TempDeck,
+    MagDeck,
+    HeaterShaker,
+    SpeedStatus,
+)
+from opentrons.hardware_control.module_control import AttachedModulesControl
 
 @pytest.fixture
 def fake_settings() -> CapacitivePassSettings:
@@ -1666,3 +1677,49 @@ async def test_tip_presence_disabled_ninety_six_channel(
         await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)
 
         tip_present.assert_not_called()
+
+@pytest.mark.parametrize(
+    argnames=["old_state", "new_state", "should_trigger"],
+    argvalues=[
+        [EstopState.DISENGAGED, EstopState.NOT_PRESENT, False],
+        [EstopState.DISENGAGED, EstopState.PHYSICALLY_ENGAGED, True],
+        [EstopState.LOGICALLY_ENGAGED, EstopState.PHYSICALLY_ENGAGED, True],
+        [EstopState.NOT_PRESENT, EstopState.PHYSICALLY_ENGAGED, True],
+        [EstopState.PHYSICALLY_ENGAGED, EstopState.LOGICALLY_ENGAGED, False],
+        [EstopState.PHYSICALLY_ENGAGED, EstopState.PHYSICALLY_ENGAGED, False],
+    ]
+)
+async def test_estop_event_deactivate_module(
+        ot3_hardware: ThreadManager[OT3API], 
+        decoy: Decoy,
+        old_state: EstopState,
+        new_state: EstopState,
+        should_trigger: bool) -> None:
+    """Test the helper to deactivate modules."""
+    api = ot3_hardware.wrapped()
+    api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
+    tc = decoy.mock(cls=Thermocycler)
+    hs = decoy.mock(cls=HeaterShaker)
+    md = decoy.mock(cls=MagDeck)
+    td = decoy.mock(cls=TempDeck)
+
+    decoy.when(hs.speed_status).then_return(SpeedStatus.HOLDING)
+
+    decoy.when(api._backend.module_controls.available_modules).then_return(
+        [tc, hs, md, td]
+    )
+
+    estop_event = EstopStateNotification(old_state=old_state, new_state=new_state)
+
+    api._update_estop_state(estop_event)
+
+    await asyncio.sleep(0.1)
+
+    if should_trigger:
+        decoy.verify(
+            await tc.deactivate(must_be_running=False),
+            await hs.deactivate_heater(must_be_running=False),
+            await hs.deactivate_shaker(must_be_running=False),
+            await md.deactivate(must_be_running=False),
+            await td.deactivate(must_be_running=False),
+        )
