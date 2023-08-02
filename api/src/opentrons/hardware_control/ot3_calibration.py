@@ -659,7 +659,7 @@ async def find_slot_center_binary_from_nominal_center(
 async def _determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> types.AttitudeMatrix:
+) -> Tuple[types.AttitudeMatrix, Dict[str, Any]]:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
     actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
@@ -685,8 +685,9 @@ async def _determine_transform_matrix(
     front_right = await _find_slot(SLOT_FRONT_RIGHT)
     rear_left = await _find_slot(SLOT_REAR_LEFT)
     belt_cal = BeltCalibrationData(front_left, front_right, rear_left)
-    belt_cal.check_alignment()  # raises error if misaligned
-    return solve_attitude(*belt_cal.get_solve_points())
+    details = belt_cal.check_alignment()  # raises error if misaligned
+    attitude = solve_attitude(*belt_cal.get_solve_points())
+    return attitude, details
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -855,7 +856,7 @@ async def calibrate_belts(
     hcapi: OT3API,
     mount: OT3Mount,
     pipette_id: str,
-) -> types.AttitudeMatrix:
+) -> Tuple[types.AttitudeMatrix, Dict[str, Any]]:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
 
@@ -873,9 +874,11 @@ async def calibrate_belts(
     try:
         hcapi.reset_deck_calibration()
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        belt_attitude = await _determine_transform_matrix(hcapi, mount)
+        belt_attitude, alignment_details = await _determine_transform_matrix(
+            hcapi, mount
+        )
         save_robot_belt_attitude(belt_attitude, pipette_id)
-        return belt_attitude
+        return belt_attitude, alignment_details
     finally:
         hcapi.load_deck_calibration()
         await hcapi.remove_tip(mount)
@@ -1045,7 +1048,7 @@ class BeltCalibrationData:
         self._front_right = slot_front_right
         self._rear_left = slot_rear_left
 
-    def check_alignment(self) -> None:
+    def check_alignment(self) -> Dict[str, Any]:
         shift_details = {
             shift.value: {
                 "spec": MAX_SHIFT[shift],
@@ -1065,6 +1068,7 @@ class BeltCalibrationData:
         ]
         if failures:
             raise MisalignedGantryError(shift_details)
+        return shift_details
 
     def get_solve_points(self) -> Tuple[SolvePoints, SolvePoints]:
         def _point_to_tuple(_p: Point) -> Tuple[float, float, float]:

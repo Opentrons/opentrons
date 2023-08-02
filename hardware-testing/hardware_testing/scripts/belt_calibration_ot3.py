@@ -1,6 +1,7 @@
 """Belt Calibration OT3."""
 import argparse
 import asyncio
+from pprint import pprint
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -60,14 +61,17 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
     # if not api.is_simulator:
     #     ui.get_user_ready("about to probe deck slots #3, #10, and #12")
     try:
-        attitude = await calibrate_belts(api, mount, pip.pipette_id)  # type: ignore[arg-type]
+        attitude, details = await calibrate_belts(api, mount, pip.pipette_id)  # type: ignore[arg-type]
     except CalibrationStructureNotFoundError as e:
         if not api.is_simulator:
             raise e
         attitude = DEFAULT_MACHINE_TRANSFORM
+        details = {}
     await api.home_z(mount)
     print("attitude:")
-    print(attitude)
+    pprint(attitude)
+    print("details:")
+    pprint(details)
 
 
 async def _main(is_simulating: bool, mount: types.OT3Mount, test: bool) -> None:
