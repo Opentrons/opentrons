@@ -113,8 +113,7 @@ class RunArgs:
     test_report: report.CSVReport
 
     @classmethod
-    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
-        """Build."""
+    def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
         if not args.simulate and not args.skip_labware_offsets:
             # getting labware offsets must be done before creating the protocol context
             # because it requires the robot-server to be running
@@ -149,6 +148,12 @@ class RunArgs:
             deck_version="2",
             extra_labware=custom_defs,
         )
+        return _ctx
+
+    @classmethod
+    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
+        """Build."""
+        _ctx = RunArgs._get_protocol_context(args)
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
         robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
         run_id, start_time = create_run_id_and_start_time()
@@ -187,39 +192,43 @@ class RunArgs:
 
         volumes: List[Tuple[int, List[float]]] = []
         for tip in tip_volumes:
-            volumes.append(
-                (
-                    tip,
-                    helpers._get_volumes(
-                        _ctx,
-                        args.increment,
-                        args.pipette,
-                        tip,
-                        args.user_volumes,
-                        kind,
-                        False,  # set extra to false so we always do the normal tests first
-                        args.channels,
-                    ),
-                )
+            vls = helpers._get_volumes(
+                _ctx,
+                args.increment,
+                args.pipette,
+                tip,
+                args.user_volumes,
+                kind,
+                False,  # set extra to false so we always do the normal tests first
+                args.channels,
             )
-        if args.extra:
-            # if we use extra, add those tests after
-            for tip in tip_volumes:
+            if len(vls) > 0:
                 volumes.append(
                     (
                         tip,
-                        helpers._get_volumes(
-                            _ctx,
-                            args.increment,
-                            args.pipette,
-                            tip,
-                            args.user_volumes,
-                            kind,
-                            True,
-                            args.channels,
-                        ),
+                        vls,
                     )
                 )
+        if args.extra:
+            # if we use extra, add those tests after
+            for tip in tip_volumes:
+                vls = helpers._get_volumes(
+                    _ctx,
+                    args.increment,
+                    args.pipette,
+                    tip,
+                    args.user_volumes,
+                    kind,
+                    True,
+                    args.channels,
+                )
+                if len(vls) > 0:
+                    volumes.append(
+                        (
+                            tip,
+                            vls,
+                        )
+                    )
         if not volumes:
             raise ValueError("no volumes to test, check the configuration")
         volumes_list: List[float] = []
@@ -470,18 +479,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     try:
-        if not resources.ctx.is_simulating():
+        if not run_args.ctx.is_simulating():
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         for tip, volumes in run_args.volumes:
             hw = run_args.ctx._core.get_hardware()
             if not run_args.ctx.is_simulating():
                 ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
             _main(args, run_args, tip, volumes)
+    finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
             run_args.recorder.stop()
             run_args.recorder.deactivate()
-    except Exception:
-        pass
-    finally:
         _change_pipettes(run_args.ctx, run_args.pipette)
+    print("done\n\n")

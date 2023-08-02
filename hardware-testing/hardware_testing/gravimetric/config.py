@@ -166,16 +166,18 @@ def get_tip_volumes_for_qc(
 ) -> List[int]:
     """Build the default testing volumes for qc."""
     config: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {}
+    tip_volumes: List[int] = []
     if photometric:
         config = QC_VOLUMES_P
     else:
-        tip_volumes: List[int] = []
-        for t, vls in QC_VOLUMES_G[pipette_channels][pipette_volume]:
+        config = QC_VOLUMES_G
+    for t, vls in config[pipette_channels][pipette_volume]:
+        if len(vls) > 0 and t not in tip_volumes:
+            tip_volumes.append(t)
+    if extra:
+        for t, vls in QC_VOLUMES_EXTRA_G[pipette_channels][pipette_volume]:
             if len(vls) > 0 and t not in tip_volumes:
                 tip_volumes.append(t)
-        if extra:
-            for t, vls in QC_VOLUMES_EXTRA_G[pipette_channels][pipette_volume]:
-                if len(vls) > 0 and t not in tip_volumes:
-                    tip_volumes.append(t)
+
     assert len(tip_volumes) > 0
     return tip_volumes

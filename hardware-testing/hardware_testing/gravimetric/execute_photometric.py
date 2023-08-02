@@ -142,6 +142,7 @@ def _run_trial(trial: PhotometricTrial) -> None:
         #       what volumes need to be added between trials.
         ui.get_user_ready("check DYE is enough")
 
+    ui.print_info(f"aspirating from {trial.source}")
     _record_measurement_and_store(MeasurementType.INIT)
     trial.pipette.move_to(location=trial.source.top(), minimum_z_height=133)
     # RUN ASPIRATE
@@ -167,7 +168,7 @@ def _run_trial(trial: PhotometricTrial) -> None:
         for w in trial.dest.wells():
             trial.liquid_tracker.set_start_volume(w, photoplate_preped_vol)
         trial.pipette.move_to(trial.dest["A1"].top())
-
+        ui.print_info(f"dispensing to {trial.dest}")
         # RUN DISPENSE
         dispense_with_liquid_class(
             trial.ctx,

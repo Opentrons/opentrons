@@ -44,16 +44,6 @@ CHANNEL_TO_TIP_ROW_LOOKUP = {  # zero indexed
     6: "B",
     7: "A",
 }
-VOLUME_TO_SLOT_LOOKUP = {
-    50: {
-        50: [5, 6, 8, 9],
-    },
-    1000: {
-        50: [2, 3],
-        200: [10, 8],
-        1000: [11, 9],
-    },
-}
 
 
 def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
@@ -64,30 +54,35 @@ def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
     }
 
 
+def get_unused_tips(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
+    """Use the labware's tip tracker to get a list of all unused tips for a given tip volume."""
+    racks = [
+        r for r in _get_racks(ctx).values() if r.wells()[0].max_volume == tip_volume
+    ]
+    wells: List[Well] = []
+    rows = "ABCDEFGH"
+    for rack in racks:
+        for col in range(1, 13):
+            for row in rows:
+                wellname = f"{row}{col}"
+                next_well = rack.next_tip(1, rack[wellname])
+                if next_well is not None and wellname == next_well.well_name:
+                    wells.append(rack[wellname])
+    return wells
+
+
 def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
     """Get tips for single channel."""
-    racks = _get_racks(ctx)
-    return [
-        tip
-        for rack in racks.values()
-        for tip in rack.wells()
-        if tip.max_volume == tip_volume
-    ]
+    return get_unused_tips(ctx, tip_volume)
 
 
 def get_tips_for_individual_channel_on_multi(
     ctx: ProtocolContext, channel: int, tip_volume: int, pipette_volume: int
 ) -> List[Well]:
     """Get tips for a multi's channel."""
-    racks = _get_racks(ctx)
+    unused_tips = get_unused_tips(ctx, tip_volume)
     tip_row = CHANNEL_TO_TIP_ROW_LOOKUP[channel]
-    slots = VOLUME_TO_SLOT_LOOKUP[pipette_volume][tip_volume]
-    tips = [
-        tip
-        for slot in slots
-        for tip in racks[slot].wells()
-        if tip.well_name[0] == tip_row
-    ]
+    tips = [tip for tip in unused_tips if tip.well_name[0] == tip_row]
     return tips
 
 
