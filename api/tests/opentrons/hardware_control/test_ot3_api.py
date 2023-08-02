@@ -83,6 +83,7 @@ from opentrons.hardware_control.modules import (
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
 
+
 @pytest.fixture
 def fake_settings() -> CapacitivePassSettings:
     return CapacitivePassSettings(
@@ -1683,6 +1684,7 @@ async def test_tip_presence_disabled_ninety_six_channel(
 
         tip_present.assert_not_called()
 
+
 @pytest.mark.parametrize(
     argnames=["old_state", "new_state", "should_trigger"],
     argvalues=[
@@ -1692,14 +1694,15 @@ async def test_tip_presence_disabled_ninety_six_channel(
         [EstopState.NOT_PRESENT, EstopState.PHYSICALLY_ENGAGED, True],
         [EstopState.PHYSICALLY_ENGAGED, EstopState.LOGICALLY_ENGAGED, False],
         [EstopState.PHYSICALLY_ENGAGED, EstopState.PHYSICALLY_ENGAGED, False],
-    ]
+    ],
 )
 async def test_estop_event_deactivate_module(
-        ot3_hardware: ThreadManager[OT3API], 
-        decoy: Decoy,
-        old_state: EstopState,
-        new_state: EstopState,
-        should_trigger: bool) -> None:
+    ot3_hardware: ThreadManager[OT3API],
+    decoy: Decoy,
+    old_state: EstopState,
+    new_state: EstopState,
+    should_trigger: bool,
+) -> None:
     """Test the helper to deactivate modules."""
     api = ot3_hardware.wrapped()
     api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
