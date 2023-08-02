@@ -1049,7 +1049,7 @@ class BeltCalibrationData:
         shift_details = {
             shift.value: {
                 "spec": MAX_SHIFT[shift],
-                "pass": abs(self._get_shift_mm(shift)) > MAX_SHIFT[shift],
+                "pass": abs(self._get_shift_mm(shift)) < MAX_SHIFT[shift],
                 "shift": round(self._get_shift_mm(shift), 3),
                 "slots": {
                     "front_left": str(self._front_left.actual),
