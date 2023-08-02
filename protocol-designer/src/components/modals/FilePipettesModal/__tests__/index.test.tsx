@@ -177,7 +177,12 @@ describe('FilePipettesModal', () => {
             slot: initialModuleValues[MAGNETIC_MODULE_TYPE].slot,
           },
         ],
-        newProtocolFields: { name: '' },
+        newProtocolFields: {
+          name: '',
+          robotType: 'OT-2 Standard',
+          description: '',
+          organizationOrAuthor: '',
+        },
         pipettes: [
           {
             mount: 'left',
@@ -222,7 +227,12 @@ describe('FilePipettesModal', () => {
             slot: '9',
           },
         ],
-        newProtocolFields: { name: '' },
+        newProtocolFields: {
+          name: '',
+          robotType: 'OT-2 Standard',
+          description: '',
+          organizationOrAuthor: '',
+        },
         pipettes: [
           {
             mount: 'left',

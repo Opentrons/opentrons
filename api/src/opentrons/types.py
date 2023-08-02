@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from .protocol_api.labware import Labware, Well
     from .protocol_api.core.legacy.module_geometry import ModuleGeometry
     from .protocol_api.module_contexts import ModuleContext
+    from .protocol_api._types import OffDeckType
 
 
 class PipetteNotAttachedError(KeyError):
@@ -66,7 +67,14 @@ class Point(NamedTuple):
 
 
 LocationLabware = Union[
-    "Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"
+    "Labware",
+    "Well",
+    str,
+    "ModuleGeometry",
+    LabwareLike,
+    None,
+    "OffDeckType",
+    "ModuleContext",
 ]
 
 
@@ -96,8 +104,21 @@ class Location:
        of each item.
     """
 
-    def __init__(self, point: Point, labware: LocationLabware):
+    def __init__(
+        self,
+        point: Point,
+        labware: Union[
+            "Labware",
+            "Well",
+            str,
+            "ModuleGeometry",
+            LabwareLike,
+            None,
+            "ModuleContext",
+        ],
+    ):
         self._point = point
+        self._given_labware = labware
         self._labware = LabwareLike(labware)
 
     # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
@@ -146,7 +167,8 @@ class Location:
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """
-        return Location(point=self.point + point, labware=self._labware.object)
+
+        return Location(point=self.point + point, labware=self._given_labware)
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware})"
@@ -316,22 +338,20 @@ class DeckSlotName(enum.Enum):
         return self.id
 
 
-# fmt: off
 _slot_equivalencies = [
-    (DeckSlotName.SLOT_1,      DeckSlotName.SLOT_D1),
-    (DeckSlotName.SLOT_2,      DeckSlotName.SLOT_D2),
-    (DeckSlotName.SLOT_3,      DeckSlotName.SLOT_D3),
-    (DeckSlotName.SLOT_4,      DeckSlotName.SLOT_C1),
-    (DeckSlotName.SLOT_5,      DeckSlotName.SLOT_C2),
-    (DeckSlotName.SLOT_6,      DeckSlotName.SLOT_C3),
-    (DeckSlotName.SLOT_7,      DeckSlotName.SLOT_B1),
-    (DeckSlotName.SLOT_8,      DeckSlotName.SLOT_B2),
-    (DeckSlotName.SLOT_9,      DeckSlotName.SLOT_B3),
-    (DeckSlotName.SLOT_10,     DeckSlotName.SLOT_A1),
-    (DeckSlotName.SLOT_11,     DeckSlotName.SLOT_A2),
+    (DeckSlotName.SLOT_1, DeckSlotName.SLOT_D1),
+    (DeckSlotName.SLOT_2, DeckSlotName.SLOT_D2),
+    (DeckSlotName.SLOT_3, DeckSlotName.SLOT_D3),
+    (DeckSlotName.SLOT_4, DeckSlotName.SLOT_C1),
+    (DeckSlotName.SLOT_5, DeckSlotName.SLOT_C2),
+    (DeckSlotName.SLOT_6, DeckSlotName.SLOT_C3),
+    (DeckSlotName.SLOT_7, DeckSlotName.SLOT_B1),
+    (DeckSlotName.SLOT_8, DeckSlotName.SLOT_B2),
+    (DeckSlotName.SLOT_9, DeckSlotName.SLOT_B3),
+    (DeckSlotName.SLOT_10, DeckSlotName.SLOT_A1),
+    (DeckSlotName.SLOT_11, DeckSlotName.SLOT_A2),
     (DeckSlotName.FIXED_TRASH, DeckSlotName.SLOT_A3),
 ]
-# fmt: on
 
 _ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
 _ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}

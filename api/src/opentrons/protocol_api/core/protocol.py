@@ -60,7 +60,7 @@ class AbstractProtocol(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCoreType],
+        location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -181,5 +181,5 @@ class AbstractProtocol(
     @abstractmethod
     def get_labware_location(
         self, labware_core: LabwareCoreType
-    ) -> Union[str, ModuleCoreType, None]:
+    ) -> Union[str, ModuleCoreType, OffDeckType]:
         """Get labware parent location."""

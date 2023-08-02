@@ -5,6 +5,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
   CreateCommand,
@@ -109,6 +110,13 @@ export interface NormalizedPipetteById {
   }
 }
 
+export interface NormalizedAdditionalEquipmentById {
+  [additionalEquipmentId: string]: {
+    name: 'gripper'
+    id: string
+  }
+}
+
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
@@ -122,7 +130,6 @@ export type PipetteEntity = NormalizedPipette & {
 export interface PipetteEntities {
   [pipetteId: string]: PipetteEntity
 }
-
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
   | 'always'
@@ -384,6 +391,13 @@ export interface ThermocyclerStateStepArgs {
   message?: string
 }
 
+export interface MoveLabwareArgs extends CommonArgs {
+  commandCreatorFnName: 'moveLabware'
+  labware: string
+  useGripper: boolean
+  newLocation: LabwareLocation
+}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -398,6 +412,7 @@ export type CommandCreatorArgs =
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
   | HeaterShakerArgs
+  | MoveLabwareArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }

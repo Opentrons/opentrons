@@ -32,6 +32,8 @@ import {
 } from '@opentrons/react-api-client'
 import {
   OT2_STANDARD_MODEL,
+  getDeckDefFromRobotType,
+  getLoadedLabwareDefinitionsByUri,
   getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 
@@ -44,20 +46,20 @@ import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { getLoadedLabware } from '../CommandText/utils/accessors'
-import {
-  useDownloadRunLog,
-  useLabwareRenderInfoForRunById,
-  useModuleRenderInfoForProtocolById,
-} from '../Devices/hooks'
+import { useDownloadRunLog } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import {
   isInterventionCommand,
   getLabwareDisplayLocationFromRunData,
   getLabwareNameFromRunData,
+  getCurrentRunModulesRenderInfo,
+  RunLabwareInfo,
+  getCurrentRunLabwareRenderInfo,
 } from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { LabwareLocation } from '@opentrons/shared-data'
+import type { RunModuleInfo } from '../InterventionModal/utils/getCurrentRunModulesRenderInfo'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -187,12 +189,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     downloadRunLog()
   }
 
-  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
-    robotName,
-    runId
-  )
-  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-
   let oldLabwareLocation: LabwareLocation | null = null
   if (lastRunCommand?.commandType === 'moveLabware' && runData != null) {
     oldLabwareLocation =
@@ -204,26 +200,52 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       ? getRobotTypeFromLoadedLabware(runData.labware)
       : OT2_STANDARD_MODEL
 
+  const deckDef = getDeckDefFromRobotType(robotType)
+
+  let moduleRunRenderInfo: RunModuleInfo[] | null = null
+  let labwareRunRenderInfo: RunLabwareInfo[] | null = null
+  if (
+    lastRunCommand?.commandType === 'moveLabware' &&
+    runData != null &&
+    analysisCommands != null
+  ) {
+    const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
+    moduleRunRenderInfo = getCurrentRunModulesRenderInfo(
+      runData,
+      deckDef,
+      labwareDefsByUri
+    )
+    labwareRunRenderInfo = getCurrentRunLabwareRenderInfo(
+      runData,
+      labwareDefsByUri,
+      deckDef
+    )
+  }
+
   return (
     <>
       {showInterventionModal &&
-      analysis != null &&
+      lastRunCommand != null &&
+      isInterventionCommand(lastRunCommand) &&
+      analysisCommands != null &&
       runStatus != null &&
       runData != null &&
-      lastRunCommand != null &&
-      !TERMINAL_RUN_STATUSES.includes(runStatus) &&
-      isInterventionCommand(lastRunCommand) ? (
+      !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
         <Portal level="top">
           <InterventionModal
             robotName={robotName}
             command={lastRunCommand}
-            moduleRenderInfo={moduleRenderInfoById}
-            labwareRenderInfo={labwareRenderInfoById}
-            labwareName={getLabwareNameFromRunData(
-              runData,
-              lastRunCommand.params.labwareId,
-              analysis.commands
-            )}
+            moduleRenderInfo={moduleRunRenderInfo}
+            labwareRenderInfo={labwareRunRenderInfo}
+            labwareName={
+              'labwareId' in lastRunCommand.params
+                ? getLabwareNameFromRunData(
+                    runData,
+                    lastRunCommand.params.labwareId,
+                    analysisCommands
+                  )
+                : ''
+            }
             oldDisplayLocation={
               oldLabwareLocation != null
                 ? getLabwareDisplayLocationFromRunData(
@@ -245,6 +267,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
                 : ''
             }
             robotType={robotType}
+            deckDef={deckDef}
             onResume={() => {
               setShowInterventionModal(false)
               resumeRunHandler()

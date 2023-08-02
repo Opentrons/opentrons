@@ -15,20 +15,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  JUSTIFY_FLEX_START,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../redux/config'
 
 import type { Dispatch } from '../../redux/types'
-import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 const BUTTON_STYLE = css`
   &:focus-visible {
@@ -59,7 +57,7 @@ const LOWEST_BRIGHTNESS = 6
 const HIGHEST_BRIGHTNESS = 1
 
 interface TouchscreenBrightnessProps {
-  setCurrentOption: (currentOption: SettingOption | null) => void
+  setCurrentOption: SetSettingOption
 }
 
 export function TouchscreenBrightness({
@@ -85,26 +83,18 @@ export function TouchscreenBrightness({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
-      <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
-        <Btn
-          onClick={() => setCurrentOption(null)}
-          data-testid="TouchscreenBrightness_back_button"
-        >
-          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
-        </Btn>
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {t('touchscreen_brightness')}
-        </StyledText>
-      </Flex>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <ChildNavigation
+        header={t('touchscreen_brightness')}
+        onClickBack={() => setCurrentOption(null)}
+      />
       <Flex
         flexDirection={DIRECTION_ROW}
-        width="56.5rem"
-        height="8.75rem"
-        marginTop="7.625rem"
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing24}
+        paddingX={SPACING.spacing60}
+        paddingY={SPACING.spacing120}
       >
         <Btn
           disabled={brightness === LOWEST_BRIGHTNESS}

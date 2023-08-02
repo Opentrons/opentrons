@@ -19,7 +19,7 @@ import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
@@ -33,7 +33,7 @@ export function HowCalibrationWorksModal({
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
-      <Modal
+      <LegacyModal
         title={t('robot_cal_help_title')}
         onClose={onCloseClick}
         maxHeight="28.125rem"
@@ -109,7 +109,7 @@ export function HowCalibrationWorksModal({
             {t('shared:close')}
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }

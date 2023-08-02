@@ -45,7 +45,7 @@ import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -344,12 +344,12 @@ export function ProtocolDetails(
     <>
       <Portal level="top">
         {showDeckViewModal ? (
-          <Modal
+          <LegacyModal
             title={t('deck_view')}
             onClose={() => setShowDeckViewModal(false)}
           >
             {deckThumbnail}
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
       <Flex

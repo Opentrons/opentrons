@@ -17,7 +17,7 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 
@@ -113,7 +113,7 @@ export function CalibratePipetteOffset(
       : null
   return (
     <Portal level="top">
-      <ModalShell
+      <LegacyModalShell
         width="47rem"
         header={
           <WizardHeader
@@ -154,7 +154,7 @@ export function CalibratePipetteOffset(
             defaultTipracks={instrument?.defaultTipracks}
           />
         )}
-      </ModalShell>
+      </LegacyModalShell>
     </Portal>
   )
 }

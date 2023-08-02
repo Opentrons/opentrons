@@ -1,6 +1,7 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
+from logging import getLogger
 from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
@@ -33,7 +34,10 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     CoordinateValue,
 )
-from opentrons_hardware.hardware_control.tool_sensors import ProbeTarget
+from opentrons_hardware.hardware_control.tool_sensors import (
+    InstrumentProbeTarget,
+    PipetteProbeTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     unit_vector_multiplication,
 )
@@ -42,12 +46,14 @@ from opentrons_hardware.hardware_control.motion import (
     NodeIdMotionValues,
     create_home_step,
     create_backoff_step,
+    create_tip_action_backoff_step,
     MoveGroup,
     MoveType,
     MoveStopCondition,
     create_gripper_jaw_step,
     create_tip_action_step,
 )
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
@@ -78,6 +84,8 @@ NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.item
 SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {SubSystem.rear_panel: USBTarget.rear_panel}
 
 USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
+
+LOG = getLogger(__name__)
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -327,6 +335,11 @@ def create_move_group(
     for move in moves:
         unit_vector = move.unit_vector
         for block in move.blocks:
+            if block.time < (3.0 / interrupts_per_sec):
+                LOG.info(
+                    f"Skipping move block with time {block.time} (<{3.0/interrupts_per_sec})"
+                )
+                continue
             distances = unit_vector_multiplication(unit_vector, block.distance)
             node_id_distances = _convert_to_node_id_dict(distances)
             velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
@@ -345,21 +358,39 @@ def create_move_group(
     return move_group, {k: float(v) for k, v in pos.items()}
 
 
-def create_home_group(
+def create_home_groups(
     distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
-) -> MoveGroup:
+) -> List[MoveGroup]:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
-    home = create_home_step(
-        distance=node_id_distances,
-        velocity=node_id_velocities,
-    )
+    home_group = [
+        create_home_step(distance=node_id_distances, velocity=node_id_velocities)
+    ]
     # halve the homing speed for backoff
     backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
-    backoff = create_backoff_step(backoff_velocities)
+    backoff_group = [create_backoff_step(backoff_velocities)]
+    return [home_group, backoff_group]
 
-    move_group: MoveGroup = [home, backoff]
-    return move_group
+
+def create_tip_action_home_group(
+    axes: Sequence[OT3Axis], distance: float, velocity: float
+) -> List[MoveGroup]:
+    current_nodes = [axis_to_node(ax) for ax in axes]
+    home_group = [
+        create_tip_action_step(
+            velocity={node_id: np.float64(velocity) for node_id in current_nodes},
+            distance={node_id: np.float64(distance) for node_id in current_nodes},
+            present_nodes=current_nodes,
+            action=PipetteTipActionType.home,
+        )
+    ]
+
+    backoff_group = [
+        create_tip_action_backoff_step(
+            velocity={node_id: np.float64(velocity / 2) for node_id in current_nodes}
+        )
+    ]
+    return [home_group, backoff_group]
 
 
 def create_tip_action_group(
@@ -425,15 +456,24 @@ def axis_convert(
     return ret
 
 
-_sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
+_sensor_node_lookup: Dict[OT3Mount, InstrumentProbeTarget] = {
     OT3Mount.LEFT: NodeId.pipette_left,
     OT3Mount.RIGHT: NodeId.pipette_right,
     OT3Mount.GRIPPER: NodeId.gripper,
 }
 
+_sensor_node_lookup_pipettes_only: Dict[OT3Mount, PipetteProbeTarget] = {
+    OT3Mount.LEFT: NodeId.pipette_left,
+    OT3Mount.RIGHT: NodeId.pipette_right,
+}
 
-def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
+
+def sensor_node_for_mount(mount: OT3Mount) -> InstrumentProbeTarget:
     return _sensor_node_lookup[mount]
+
+
+def sensor_node_for_pipette(mount: OT3Mount) -> PipetteProbeTarget:
+    return _sensor_node_lookup_pipettes_only[mount]
 
 
 _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {

@@ -8,6 +8,7 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -16,7 +17,7 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import type { GripperData } from '@opentrons/api-client'
 
 export const UnmountGripper = (
   props: GripperWizardStepProps
@@ -29,7 +30,7 @@ export const UnmountGripper = (
     refetchInterval: 3000,
   })
   const isGripperStillAttached = (instrumentsQueryData?.data ?? []).some(
-    i => i.mount === 'extension'
+    (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
   )
 
   const [
@@ -77,12 +78,7 @@ export const UnmountGripper = (
         >
           {t('shared:go_back')}
         </Link>
-        <PrimaryButton
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={handleContinue}
-        >
-          {t('shared:try_again')}
-        </PrimaryButton>
+        <PrimaryButton onClick={handleContinue}>{t('try_again')}</PrimaryButton>
       </Flex>
     </SimpleWizardBody>
   ) : (

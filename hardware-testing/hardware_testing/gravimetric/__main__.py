@@ -6,34 +6,39 @@ from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import ui
 from hardware_testing.protocols import (
-    gravimetric_ot3_p50,
+    gravimetric_ot3_p50_single,
     gravimetric_ot3_p50_multi_50ul_tip,
-    gravimetric_ot3_p1000,
+    gravimetric_ot3_p1000_single,
     gravimetric_ot3_p1000_multi_50ul_tip,
     gravimetric_ot3_p1000_multi_200ul_tip,
     gravimetric_ot3_p1000_multi_1000ul_tip,
+    gravimetric_ot3_p1000_96_50ul_tip,
+    gravimetric_ot3_p1000_96_200ul_tip,
+    gravimetric_ot3_p1000_96_1000ul_tip,
     photometric_ot3_p1000_96_50ul_tip,
     photometric_ot3_p1000_96_200ul_tip,
-    photometric_ot3_p1000_96_1000ul_tip,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
 from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig
 from .measurement import DELAY_FOR_MEASUREMENT
 
+# FIXME: bump to v2.15 to utilize protocol engine
+API_LEVEL = "2.13"
+
 LABWARE_OFFSETS: List[dict] = []
 
 # Keyed by pipette volume, channel count, and tip volume in that order
-PROTOCOL_CFG = {
+GRAVIMETRIC_CFG = {
     50: {
-        1: {50: gravimetric_ot3_p50},
+        1: {50: gravimetric_ot3_p50_single},
         8: {50: gravimetric_ot3_p50_multi_50ul_tip},
     },
     1000: {
         1: {
-            50: gravimetric_ot3_p1000,
-            200: gravimetric_ot3_p1000,
-            1000: gravimetric_ot3_p1000,
+            50: gravimetric_ot3_p1000_single,
+            200: gravimetric_ot3_p1000_single,
+            1000: gravimetric_ot3_p1000_single,
         },
         8: {
             50: gravimetric_ot3_p1000_multi_50ul_tip,
@@ -41,15 +46,20 @@ PROTOCOL_CFG = {
             1000: gravimetric_ot3_p1000_multi_1000ul_tip,
         },
         96: {
-            50: photometric_ot3_p1000_96_50ul_tip,
-            200: photometric_ot3_p1000_96_200ul_tip,
-            1000: photometric_ot3_p1000_96_1000ul_tip,
+            50: gravimetric_ot3_p1000_96_50ul_tip,
+            200: gravimetric_ot3_p1000_96_200ul_tip,
+            1000: gravimetric_ot3_p1000_96_1000ul_tip,
         },
     },
 }
 
+PHOTOMETRIC_CFG = {
+    50: photometric_ot3_p1000_96_50ul_tip,
+    200: photometric_ot3_p1000_96_200ul_tip,
+}
 
-def run(
+
+def run_gravimetric(
     protocol: ProtocolContext,
     pipette_volume: int,
     pipette_channels: int,
@@ -65,7 +75,7 @@ def run(
     scale_delay: int,
 ) -> None:
     """Run."""
-    protocol_cfg = PROTOCOL_CFG[pipette_volume][pipette_channels][tip_volume]
+    protocol_cfg = GRAVIMETRIC_CFG[pipette_volume][pipette_channels][tip_volume]
     execute.run(
         protocol,
         GravimetricConfig(
@@ -91,21 +101,21 @@ def run(
     )
 
 
-def run_pm(
+def run_photometric(
     protocol: ProtocolContext,
     pipette_volume: int,
     tip_volume: int,
     trials: int,
     return_tip: bool,
-    blank: bool,
     mix: bool,
     inspect: bool,
     user_volumes: bool,
     gantry_speed: int,
     touch_tip: bool,
+    refill: bool,
 ) -> None:
     """Run."""
-    protocol_cfg = PROTOCOL_CFG[pipette_volume][96][tip_volume]
+    protocol_cfg = PHOTOMETRIC_CFG[tip_volume]
     execute_photometric.run(
         protocol,
         PhotometricConfig(
@@ -126,6 +136,7 @@ def run_pm(
             user_volumes=user_volumes,
             gantry_speed=gantry_speed,
             touch_tip=touch_tip,
+            refill=refill,
         ),
     )
 
@@ -148,6 +159,7 @@ if __name__ == "__main__":
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
     parser.add_argument("--photometric", action="store_true")
     parser.add_argument("--touch-tip", action="store_true")
+    parser.add_argument("--refill", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -161,36 +173,28 @@ if __name__ == "__main__":
             print(f"\t\t{offset['definitionUri']}")
             print(f"\t\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
-    _protocol = PROTOCOL_CFG[args.pipette][args.channels][args.tip]
+    _protocol = GRAVIMETRIC_CFG[args.pipette][args.channels][args.tip]
     _ctx = helpers.get_api_context(
-        _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
+        API_LEVEL,  # type: ignore[attr-defined]
         is_simulating=args.simulate,
+        deck_version="2",
     )
     if args.photometric:
-        _ctx = helpers.get_api_context(
-            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
-            is_simulating=args.simulate,
-            deck_version="2",
-        )
-        run_pm(
+        run_photometric(
             _ctx,
             args.pipette,
             args.tip,
             args.trials,
             args.return_tip,
-            args.blank,
             args.mix,
             args.inspect,
             args.user_volumes,
             args.gantry_speed,
             args.touch_tip,
+            args.refill,
         )
     else:
-        _ctx = helpers.get_api_context(
-            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
-            is_simulating=args.simulate,
-        )
-        run(
+        run_gravimetric(
             _ctx,
             args.pipette,
             args.channels,

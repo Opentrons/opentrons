@@ -1,5 +1,5 @@
 import * as React from 'react'
-import cx from 'classnames'
+import { FlattenSimpleInterpolation } from 'styled-components'
 import { Box } from '..'
 import singleSrc from '@opentrons/components/src/instrument/single_channel_GEN1_800px.png'
 import multiSrc from '@opentrons/components/src/instrument/multi-channel_GEN1_800px.png'
@@ -8,20 +8,20 @@ import multiGEN2Src from '@opentrons/components/src/instrument/multi-channel_GEN
 import singleFlexSrc from '@opentrons/components/src/instrument/single-channel-gen3.png'
 import eightChannelFlexSrc from '@opentrons/components/src/instrument/eight-channel-gen3.png'
 import ninetySixSrc from '@opentrons/components/src/instrument/ninety-six-channel-gen1.png'
-import styles from './instrument.css'
 
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { Mount } from '../robot-types'
 import type { StyleProps } from '..'
 
 export interface InstrumentDiagramProps extends StyleProps {
+  mount: Mount
   pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
   className?: string
-  mount: Mount
+  imageStyle?: FlattenSimpleInterpolation
 }
 
 export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
-  const { pipetteSpecs, mount, className, ...styleProps } = props
+  const { mount, pipetteSpecs, className, imageStyle, ...styleProps } = props
   const { displayCategory, channels } = pipetteSpecs || {}
 
   let imgSrc
@@ -41,11 +41,13 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
   }
 
   return (
-    <Box className={className} {...styleProps}>
-      <img
-        className={cx({ [styles.flipped_image]: mount === 'right' })}
-        src={channels === 96 ? ninetySixSrc : imgSrc}
-      />
+    <Box
+      className={className}
+      transform={mount === 'right' ? 'scaleX(-1)' : ''}
+      filter={mount === 'right' ? 'FlipH' : ''}
+      {...styleProps}
+    >
+      <img src={channels === 96 ? ninetySixSrc : imgSrc} css={imageStyle} />
     </Box>
   )
 }

@@ -18,6 +18,7 @@ import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
 import { useTrackEvent } from '../../../redux/analytics'
+import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
@@ -39,22 +40,30 @@ interface RecentRunProtocolCardProps {
 export function RecentRunProtocolCard({
   runData,
 }: RecentRunProtocolCardProps): JSX.Element | null {
-  const protocolData =
-    useProtocolQuery(runData.protocolId ?? null).data?.data ?? null
-
+  const { data, isFetching, isLoading } = useProtocolQuery(
+    runData.protocolId ?? null
+  )
+  const protocolData = data?.data ?? null
+  const isProtocolFetching = isFetching || isLoading
   return protocolData == null ? null : (
-    <ProtocolWithLastRun protocolData={protocolData} runData={runData} />
+    <ProtocolWithLastRun
+      protocolData={protocolData}
+      runData={runData}
+      isProtocolFetching={isProtocolFetching}
+    />
   )
 }
 
 interface ProtocolWithLastRunProps {
   runData: RunData
   protocolData: ProtocolResource
+  isProtocolFetching: boolean
 }
 
 export function ProtocolWithLastRun({
   runData,
   protocolData,
+  isProtocolFetching,
 }: ProtocolWithLastRunProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
   const missingProtocolHardware = useMissingProtocolHardware(protocolData.id)
@@ -114,7 +123,14 @@ export function ProtocolWithLastRun({
     }
   ).replace('about ', '')
 
-  return (
+  return isProtocolFetching ? (
+    <Skeleton
+      height="27.25rem"
+      width="25.8125rem"
+      backgroundSize="64rem"
+      borderRadius={BORDERS.borderRadiusSize3}
+    />
+  ) : (
     <Flex
       aria-label="RecentRunProtocolCard"
       css={PROTOCOL_CARD_STYLE}

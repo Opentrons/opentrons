@@ -18,6 +18,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
+import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces } from '../../redux/networking'
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
@@ -65,40 +66,32 @@ export function WifiConnectionDetails({
           securityType={authType}
         />
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <TitleHeader />
-        <DisplayConnectionStatus ssid={ssid} />
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-          <MediumButton
-            flex="1"
-            buttonType="secondary"
-            buttonText={t('view_network_details')}
-            onClick={() => setShowNetworkDetailsModal(true)}
-          />
-          <MediumButton
-            flex="1"
-            buttonText={i18n.format(t('continue'), 'capitalize')}
-            onClick={() => history.push('/robot-settings/update-robot')}
-          />
+      <Flex flexDirection={DIRECTION_COLUMN} flex="1">
+        <RobotSetupHeader header={t('wifi')} />
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing32}
+          padding={SPACING.spacing40}
+          paddingTop={SPACING.spacing32}
+        >
+          <DisplayConnectionStatus ssid={ssid} />
+          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+            <MediumButton
+              flex="1"
+              buttonType="secondary"
+              buttonText={t('view_network_details')}
+              onClick={() => setShowNetworkDetailsModal(true)}
+            />
+            <MediumButton
+              flex="1"
+              buttonText={i18n.format(t('continue'), 'capitalize')}
+              onClick={() => history.push('/robot-settings/update-robot')}
+            />
+          </Flex>
         </Flex>
       </Flex>
     </>
-  )
-}
-
-const TitleHeader = (): JSX.Element => {
-  const { t } = useTranslation('device_settings')
-  return (
-    <Flex
-      flexDirection={DIRECTION_ROW}
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-      marginBottom={SPACING.spacing32}
-    >
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-        {t('wifi')}
-      </StyledText>
-    </Flex>
   )
 }
 
@@ -112,12 +105,11 @@ const DisplayConnectionStatus = ({
   const { t } = useTranslation('device_settings')
   return (
     <Flex
+      flex="1"
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing32}
-      padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
       backgroundColor={COLORS.green3}
       borderRadius={BORDERS.borderRadiusSize3}
-      height="18.5rem"
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
     >

@@ -169,6 +169,7 @@ class AbstractCommandImpl(
         tip_handler: execution.TipHandler,
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
+        status_bar: execution.StatusBarHandler,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass

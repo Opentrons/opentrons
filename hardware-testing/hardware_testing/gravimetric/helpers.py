@@ -52,6 +52,7 @@ def get_api_context(
     gripper: Optional[str] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     deck_version: str = guess_deck_type_from_global_config(),
+    stall_detection_enable: Optional[bool] = None,
 ) -> protocol_api.ProtocolContext:
     """Get api context."""
 
@@ -64,6 +65,7 @@ def get_api_context(
             pipette_right=pipette_right,
             gripper=gripper,
             loop=loop,
+            stall_detection_enable=stall_detection_enable,
         )
 
     return protocol_api.create_protocol_context(

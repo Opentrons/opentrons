@@ -1,19 +1,19 @@
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-import { Flex } from '../primitives'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
   GEN1,
   GEN2,
+  GEN3,
 } from '@opentrons/shared-data'
+import { Flex } from '../primitives'
 import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
 
-import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
-
+import type { SelectOption } from '../forms'
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
   pipetteName?: string | null
@@ -68,10 +68,12 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
   }
+  const gen3Options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
+    ...(gen3Options.length > 0 ? [{ options: gen3Options }] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
     ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
   ]
@@ -127,7 +129,6 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
   } else if (channels === 8) {
     displayChannels = '8-Channel'
   }
-
   return (
     <Flex
       data-test={dataIdFormat(

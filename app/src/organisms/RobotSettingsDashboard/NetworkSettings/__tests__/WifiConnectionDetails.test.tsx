@@ -15,6 +15,15 @@ jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/networking')
 jest.mock('../NetworkDetailsModal')
 
+const mockPush = jest.fn()
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
+
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
@@ -44,9 +53,10 @@ describe('WifiConnectionDetails', () => {
   let props: React.ComponentProps<typeof WifiConnectionDetails>
   beforeEach(() => {
     props = {
-      ssid: 'mock wifi ssid',
-      authType: 'WPA-2',
-      setShowInterfaceTitle: jest.fn(),
+      activeSsid: 'mock wifi ssid',
+      connectedWifiAuthType: 'none',
+      handleNetworkPress: jest.fn(),
+      handleJoinAnotherNetwork: jest.fn(),
     }
     mockGetLocalRobot.mockReturnValue({
       name: ROBOT_NAME,
@@ -82,9 +92,7 @@ describe('WifiConnectionDetails', () => {
   })
 
   it('should not render text and button when not connected to a network', () => {
-    props = {
-      setShowInterfaceTitle: jest.fn(),
-    }
+    props.activeSsid = undefined
     const [{ queryByText }] = render(props)
     expect(queryByText('Connected Network')).not.toBeInTheDocument()
     expect(queryByText('mock wifi ssid')).not.toBeInTheDocument()

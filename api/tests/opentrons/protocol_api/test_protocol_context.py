@@ -251,6 +251,65 @@ def test_load_labware(
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
+def test_load_labware_off_deck(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
+) -> None:
+    """It should load labware off-deck."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=OFF_DECK,
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        label="some_display_name",
+        namespace="some_namespace",
+        version=1337,
+        location=OFF_DECK,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_labware_off_deck_raises(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
+) -> None:
+    """It should raise and api error."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="UPPERCASE_LABWARE",
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+            location=OFF_DECK,
+        )
+
+
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_core: ProtocolCore,

@@ -56,7 +56,7 @@ describe('MountGripper', () => {
       data: instrumentsResponseFixture,
     } as any)
     const { getByRole } = render()[0]
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
     expect(mockProceed).toHaveBeenCalled()
   })
 
@@ -66,13 +66,13 @@ describe('MountGripper', () => {
       data: null,
     } as any)
     const { getByRole, getByText } = render()[0]
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
     expect(mockProceed).not.toHaveBeenCalled()
     await getByText('Unable to detect Gripper')
-    const tryAgainButton = getByRole('button', { name: 'try again' })
+    const tryAgainButton = getByRole('button', { name: 'Try again' })
     tryAgainButton.click()
     expect(mockProceed).not.toHaveBeenCalled()
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
     expect(mockProceed).not.toHaveBeenCalled()
     const goBackButton = await getByRole('button', { name: 'Go back' })
     goBackButton.click()

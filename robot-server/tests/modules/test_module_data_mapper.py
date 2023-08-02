@@ -3,7 +3,7 @@ import pytest
 
 from opentrons.protocol_engine import ModuleModel
 from opentrons.protocol_engine.types import Vec3f
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort, PortGroup
 from opentrons.hardware_control.modules import (
     LiveData,
     ModuleType,
@@ -87,7 +87,9 @@ def test_maps_magnetic_module_data(
     hardware_usb_port = HardwareUSBPort(
         name="abc",
         port_number=101,
-        hub=202,
+        port_group=PortGroup.UNKNOWN,
+        hub=False,
+        hub_port=None,
         device_path="/dev/null",
     )
 
@@ -111,7 +113,13 @@ def test_maps_magnetic_module_data(
         hasAvailableUpdate=True,
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
-        usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
+        usbPort=UsbPort(
+            port=101,
+            portGroup=PortGroup.UNKNOWN,
+            hub=False,
+            hubPort=None,
+            path="/dev/null",
+        ),
         data=expected_output_data,
         moduleOffset=ModuleCalibrationData(offset=Vec3f(x=0.0, y=0.0, z=0.0)),
     )
@@ -143,7 +151,9 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
     hardware_usb_port = HardwareUSBPort(
         name="abc",
         port_number=101,
-        hub=202,
+        port_group=PortGroup.UNKNOWN,
+        hub=False,
+        hub_port=None,
         device_path="/dev/null",
     )
 
@@ -167,7 +177,13 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
         hasAvailableUpdate=True,
         moduleType=ModuleType.TEMPERATURE,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
-        usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
+        usbPort=UsbPort(
+            port=101,
+            portGroup=PortGroup.UNKNOWN,
+            hub=False,
+            hubPort=None,
+            path="/dev/null",
+        ),
         moduleOffset=ModuleCalibrationData(offset=Vec3f(x=0.0, y=0.0, z=0.0)),
         data=TemperatureModuleData(
             status=TemperatureStatus(input_data["status"]),
@@ -232,7 +248,9 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
     hardware_usb_port = HardwareUSBPort(
         name="abc",
         port_number=101,
-        hub=202,
+        port_group=PortGroup.UNKNOWN,
+        hub=False,
+        hub_port=None,
         device_path="/dev/null",
     )
 
@@ -256,7 +274,13 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
         hasAvailableUpdate=True,
         moduleType=ModuleType.THERMOCYCLER,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
-        usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
+        usbPort=UsbPort(
+            port=101,
+            portGroup=PortGroup.UNKNOWN,
+            hub=False,
+            hubPort=None,
+            path="/dev/null",
+        ),
         moduleOffset=ModuleCalibrationData(offset=Vec3f(x=0.0, y=0.0, z=0.0)),
         data=ThermocyclerModuleData(
             status=TemperatureStatus(input_data["status"]),
@@ -323,7 +347,9 @@ def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) 
     hardware_usb_port = HardwareUSBPort(
         name="abc",
         port_number=101,
-        hub=202,
+        port_group=PortGroup.UNKNOWN,
+        hub=False,
+        hub_port=None,
         device_path="/dev/null",
     )
 
@@ -347,7 +373,13 @@ def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) 
         hasAvailableUpdate=True,
         moduleType=ModuleType.HEATER_SHAKER,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
-        usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
+        usbPort=UsbPort(
+            port=101,
+            portGroup=PortGroup.UNKNOWN,
+            hub=False,
+            hubPort=None,
+            path="/dev/null",
+        ),
         moduleOffset=ModuleCalibrationData(offset=Vec3f(x=0.0, y=0.0, z=0.0)),
         data=HeaterShakerModuleData(
             status=HeaterShakerStatus(input_data["status"]),

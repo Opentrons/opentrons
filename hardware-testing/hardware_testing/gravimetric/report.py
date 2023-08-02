@@ -83,6 +83,17 @@ def create_csv_test_report_photometric(
 ) -> CSVReport:
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
+    meas_vols: List[Tuple[int, int, int]] = []
+
+    for vol in volumes:
+        meas_vols += [
+            (
+                vol,  # type: ignore[misc]
+                0,
+                trial,
+            )
+            for trial in range(cfg.trials)
+        ]
 
     report = CSVReport(
         test_name=cfg.name,
@@ -93,6 +104,7 @@ def create_csv_test_report_photometric(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
                 ],
@@ -108,11 +120,15 @@ def create_csv_test_report_photometric(
             CSVSection(
                 title="MEASUREMENTS",
                 lines=[
-                    CSVLine(f"trial-{t + 1}-{m}-{round(v, 2)}-ul-{e}", [float])
-                    for v in volumes
-                    for t in range(cfg.trials)
-                    for m in ["aspirate", "dispense"]
+                    CSVLine(
+                        create_measurement_tag(measurement, volume, channel, trial)
+                        + f"-{e}",
+                        [float],
+                    )
+                    for volume, channel, trial in meas_vols
+                    for measurement in MeasurementType
                     for e in env_info
+                    if volume is not None or trial < config.NUM_BLANK_TRIALS
                 ],
             ),
         ],
@@ -171,6 +187,7 @@ def create_csv_test_report(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
@@ -255,30 +272,34 @@ def store_serial_numbers_pm(
     report: CSVReport,
     robot: str,
     pipette: str,
+    tips: str,
     environment: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])
 
 
 def store_measurements_pm(
     report: CSVReport,
+    tag: str,
     data: EnvironmentData,
 ) -> None:
     """Report measurement."""
     for field in fields(EnvironmentData):
         f_tag = field.name.replace("_", "-")
-        report("MEASUREMENTS", f"{f_tag}", [getattr(data, field.name)])
+        report("MEASUREMENTS", f"{tag}-{f_tag}", [getattr(data, field.name)])
 
 
 def store_serial_numbers(
     report: CSVReport,
     robot: str,
     pipette: str,
+    tips: str,
     scale: str,
     environment: str,
     liquid: str,
@@ -286,6 +307,7 @@ def store_serial_numbers(
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
     report("SERIAL-NUMBERS", "scale", [scale])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])

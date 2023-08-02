@@ -14,10 +14,11 @@ import {
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
@@ -269,6 +270,14 @@ export const PipetteWizardFlows = (
         setFetching={setIsFetchingPipettes}
       />
     )
+  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
+    modalContent = (
+      <FirmwareUpdateModal
+        proceed={proceed}
+        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        description={t('firmware_updating')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
     modalContent = (
@@ -335,12 +344,12 @@ export const PipetteWizardFlows = (
   return (
     <Portal level="top">
       {isOnDevice ? (
-        <ModalShell>
+        <LegacyModalShell>
           {wizardHeader}
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
-        <ModalShell
+        <LegacyModalShell
           width="47rem"
           height={
             //  changing modal height for now on BeforeBeginning 96 channel attach flow
@@ -354,7 +363,7 @@ export const PipetteWizardFlows = (
           header={wizardHeader}
         >
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

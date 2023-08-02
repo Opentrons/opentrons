@@ -14,7 +14,7 @@ import {
   OT2_STANDARD_MODEL,
   OT3_STANDARD_DECKID,
   OT3_STANDARD_MODEL,
-  THERMOCYCLER_MODULE_TYPE,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -254,16 +254,14 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         module: typeof initialRobotState.modules[keyof typeof initialRobotState.modules],
         moduleId: string
       ): LoadModuleCreateCommand => {
-        // translate the magic TC location string to 7 so PE can read it
-        if (module.moduleState.type === THERMOCYCLER_MODULE_TYPE) {
-          module.slot = '7'
-        }
         const loadModuleCommand = {
           key: uuid(),
           commandType: 'loadModule' as const,
           params: {
             moduleId: moduleId,
-            location: { slotName: module.slot },
+            location: {
+              slotName: module.slot === SPAN7_8_10_11_SLOT ? '7' : module.slot,
+            },
           },
         }
         return loadModuleCommand
@@ -293,6 +291,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       [pipetteId: string]: { name: PipetteName }
     }
 
+    //  TODO(jr 6/22/23):  entire method should be replaced with the contents of robotType key
+    //  on the protocol file instead of inferring it from pipette types.
     const getRobotModelFromPipettes = (
       pipettes: RobotModel
     ): {
@@ -301,7 +301,9 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     } => {
       const loadedPipettes = Object.values(pipettes)
       const pipetteGEN = loadedPipettes.some(
-        pipette => getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3
+        pipette =>
+          getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3 ||
+          getPipetteNameSpecs(pipette.name)?.channels === 96
       )
         ? GEN3
         : GEN2

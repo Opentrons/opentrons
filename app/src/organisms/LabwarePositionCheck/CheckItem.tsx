@@ -181,7 +181,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       .then(responses => {
         const finalResponse = responses[responses.length - 1]
         if (finalResponse.data.commandType === 'savePosition') {
-          const { position } = finalResponse.data.result
+          const { position } = finalResponse.data?.result ?? { position: null }
           registerPosition({
             type: 'initialPosition',
             labwareId,
@@ -245,7 +245,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       .then(responses => {
         const firstResponse = responses[0]
         if (firstResponse.data.commandType === 'savePosition') {
-          const { position } = firstResponse.data.result
+          const { position } = firstResponse.data?.result ?? { position: null }
           registerPosition({
             type: 'finalPosition',
             labwareId,

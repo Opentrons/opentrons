@@ -106,6 +106,7 @@ export const StepCreationButton = (): JSX.Element => {
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
   > => [
+    'moveLabware',
     'moveLiquid',
     'mix',
     'pause',
@@ -127,6 +128,7 @@ export const StepCreationButton = (): JSX.Element => {
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
+    moveLabware: true,
     moveLiquid: true,
     mix: true,
     pause: true,

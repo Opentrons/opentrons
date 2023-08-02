@@ -4,7 +4,6 @@ from __future__ import annotations
 import enum
 from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
-import logging
 
 from pydantic import BaseModel, Field
 
@@ -20,8 +19,6 @@ from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardwa
 if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
     from ...state import StateView
-
-logger = logging.getLogger(__name__)
 
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=110)
@@ -109,21 +106,23 @@ class MoveToMaintenancePositionImplementation(
                 critical_point=CriticalPoint.MOUNT,
             )
 
-        if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
-            mount_to_axis = OT3Axis.by_mount(params.mount.to_hw_mount())
-            await ot3_api.move_axes(
-                {
-                    mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
-                }
-            )
-        else:
-            max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
-            await ot3_api.move_axes(
-                {
-                    OT3Axis.Z_L: max_motion_range + _LEFT_MOUNT_Z_MARGIN,
-                    OT3Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
-                }
-            )
+        if params.mount != MountType.EXTENSION:
+            if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
+                mount_to_axis = OT3Axis.by_mount(params.mount.to_hw_mount())
+                await ot3_api.move_axes(
+                    {
+                        mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
+                    }
+                )
+                await ot3_api.disengage_axes([mount_to_axis])
+            else:
+                max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
+                await ot3_api.move_axes(
+                    {
+                        OT3Axis.Z_L: max_motion_range + _LEFT_MOUNT_Z_MARGIN,
+                        OT3Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
+                    }
+                )
 
         return MoveToMaintenancePositionResult()
 

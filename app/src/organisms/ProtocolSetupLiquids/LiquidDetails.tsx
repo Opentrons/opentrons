@@ -106,7 +106,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                       borderRadius={BORDERS.borderRadiusSize3}
                       border={`3px solid ${COLORS.darkBlackEnabled}`}
                       fontSize={TYPOGRAPHY.fontSize20}
-                      fontWeight="700"
+                      fontWeight={TYPOGRAPHY.fontWeightBold}
                     >
                       {slotName}
                     </Flex>

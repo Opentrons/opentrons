@@ -12,7 +12,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
 import { StyledText } from '../../../../atoms/text'
 
@@ -29,7 +29,7 @@ export const MultipleModulesModal = (
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
-      <Modal
+      <LegacyModal
         title={t('multiple_modules_modal')}
         onClose={props.onCloseClick}
         width="44.75rem"
@@ -79,7 +79,7 @@ export const MultipleModulesModal = (
             {t('shared:close')}
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }

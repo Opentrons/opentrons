@@ -54,7 +54,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
 ) => {
   const { pipette } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
-
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
@@ -62,6 +61,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const isFlexPipette =
+    (pipetteSpec?.displayCategory === 'GEN3' || pipetteSpec?.channels === 96) ??
+    false
+
   if (!pipetteSpec)
     return {
       errors: [
@@ -103,26 +106,28 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     prevRobotState.modules
   )
 
-  if (
-    pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
-  ) {
-    return { errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()] }
-  }
-  if (
-    getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
-  ) {
-    return { errors: [errorCreators.heaterShakerEastWestWithLatchOpen()] }
-  }
+  if (!isFlexPipette) {
+    if (
+      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
+    ) {
+      return { errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()] }
+    }
+    if (
+      getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
+    ) {
+      return { errors: [errorCreators.heaterShakerEastWestWithLatchOpen()] }
+    }
 
-  if (
-    getIsHeaterShakerEastWestMultiChannelPipette(
-      prevRobotState.modules,
-      slotName,
-      pipetteSpec
-    )
-  ) {
-    return {
-      errors: [errorCreators.heaterShakerEastWestOfMultiChannelPipette()],
+    if (
+      getIsHeaterShakerEastWestMultiChannelPipette(
+        prevRobotState.modules,
+        slotName,
+        pipetteSpec
+      )
+    ) {
+      return {
+        errors: [errorCreators.heaterShakerEastWestOfMultiChannelPipette()],
+      }
     }
   }
 

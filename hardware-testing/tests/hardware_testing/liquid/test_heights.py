@@ -9,7 +9,9 @@ from hardware_testing.gravimetric.liquid_height.height import (
     initialize_liquid_from_deck,
 )
 from hardware_testing.gravimetric.helpers import get_api_context
-from hardware_testing.gravimetric.radwag_pipette_calibration_vial import VIAL_DEFINITION
+from hardware_testing.gravimetric.labware.radwag_pipette_calibration_vial import (
+    VIAL_DEFINITION,
+)
 
 CUSTOM_LABWARE_DEFINITION_DIR = (
     Path(__file__).parent.parent.parent.parent / "protocols" / "definitions"

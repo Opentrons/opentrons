@@ -35,6 +35,7 @@
   "detach": "Detaching Pipette",
   "error_encountered": "Error encountered",
   "exit_cal": "Exit calibration",
+  "firmware_updating": "A firmware update is required, instrument is updating...",
   "gantry_empty_for_96_channel_success": "Now that both mounts are empty, you can begin the 96-Channel Pipette attachment process.",
   "get_started_detach": "<block>To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.</block>",
   "grab_screwdriver": "While continuing to hold in place, grab your 2.5mm driver and tighten screws as shown in the animation. Test the pipette attachment by giving it a wiggle before pressing continue",

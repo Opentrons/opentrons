@@ -2,8 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
+  ModuleIcon,
   SPACING,
   TYPOGRAPHY,
   WRAP,
@@ -12,9 +15,11 @@ import {
   GRIPPER_V1,
   getGripperDisplayName,
   getModuleDisplayName,
+  getModuleType,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
+import { LocationIcon } from '../../../molecules/LocationIcon'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
@@ -25,7 +30,7 @@ const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing4};
+  border-spacing: 0 ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
@@ -113,22 +118,39 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           return (
             <TableRow key={id}>
               <TableDatum>
-                <StyledText
-                  as="p"
-                  color={COLORS.darkBlack100}
-                  paddingLeft={SPACING.spacing24}
-                >
-                  {i18n.format(getHardwareLocation(hardware, t), 'capitalize')}
-                </StyledText>
+                <Flex paddingLeft={SPACING.spacing24}>
+                  {hardware.hardwareType === 'module' ? (
+                    <LocationIcon slotName={hardware.slot} />
+                  ) : (
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {i18n.format(
+                        getHardwareLocation(hardware, t),
+                        'titleCase'
+                      )}
+                    </StyledText>
+                  )}
+                </Flex>
               </TableDatum>
               <TableDatum>
-                <StyledText
-                  as="p"
-                  color={COLORS.darkBlack100}
-                  paddingLeft={SPACING.spacing24}
-                >
-                  {getHardwareName(hardware)}
-                </StyledText>
+                <Flex paddingLeft={SPACING.spacing24}>
+                  {hardware.hardwareType === 'module' && (
+                    <Flex
+                      alignItems={ALIGN_CENTER}
+                      height="2rem"
+                      paddingBottom={SPACING.spacing4}
+                      paddingRight={SPACING.spacing8}
+                    >
+                      <ModuleIcon
+                        moduleType={getModuleType(hardware.moduleModel)}
+                        size="1.75rem"
+                      />
+                    </Flex>
+                  )}
+                  <StyledText as="p">{getHardwareName(hardware)}</StyledText>
+                </Flex>
               </TableDatum>
             </TableRow>
           )

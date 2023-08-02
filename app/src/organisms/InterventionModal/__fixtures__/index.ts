@@ -1,5 +1,11 @@
+import { SPAN7_8_10_11_SLOT } from '@opentrons/shared-data'
+
 import type { RunData } from '@opentrons/api-client'
-import type { LoadedLabware, LoadedModule } from '@opentrons/shared-data'
+import type {
+  LabwareDefinitionsByUri,
+  LoadedLabware,
+  LoadedModule,
+} from '@opentrons/shared-data'
 
 export const longCommandMessage =
   'This is a user generated message that gives details about the pause command. This text is truncated to 220 characters. semper risus in hendrerit gravida rutrum quisque non tellus orci ac auctor augue mauris augue neque gravida in fermentum et sollicitudin ac orci phasellus egestas tellus rutrum tellus pellentesque'
@@ -56,7 +62,7 @@ export const mockMoveLabwareCommand = {
   },
 } as any
 
-export const mockLabware: LoadedLabware = {
+export const mockLabwareOnModule: LoadedLabware = {
   id: 'mockLabwareID',
   loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
   definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
@@ -65,6 +71,23 @@ export const mockLabware: LoadedLabware = {
   },
 }
 
+export const mockLabwareOnSlot: LoadedLabware = {
+  id: 'mockLabwareID2',
+  loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+  definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+  location: {
+    slotName: '1',
+  },
+}
+
+export const mockLabwareDefinitions = ({
+  'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
+    metadata: {
+      displayName: 'mock labware display name',
+    },
+  },
+} as unknown) as LabwareDefinitionsByUri
+
 export const mockModule: LoadedModule = {
   id: 'mockModuleID',
   model: 'heaterShakerModuleV1',
@@ -72,6 +95,15 @@ export const mockModule: LoadedModule = {
     slotName: '3',
   },
   serialNumber: 'dummySerialHS',
+}
+
+export const mockThermocyclerModule: LoadedModule = {
+  id: 'mockTCModuleID',
+  model: 'thermocyclerModuleV1',
+  location: {
+    slotName: SPAN7_8_10_11_SLOT,
+  },
+  serialNumber: 'dummySerialTC',
 }
 
 export const mockRunData: RunData = {
@@ -84,6 +116,6 @@ export const mockRunData: RunData = {
   actions: [],
   errors: [],
   pipettes: [],
-  labware: [mockLabware],
+  labware: [mockLabwareOnModule, mockLabwareOnSlot],
   modules: [mockModule],
 }

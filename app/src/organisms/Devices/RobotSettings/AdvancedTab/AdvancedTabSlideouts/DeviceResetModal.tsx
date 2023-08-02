@@ -16,7 +16,7 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { Modal } from '../../../../../molecules/Modal'
+import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
   useDispatchApiRequest,
   getRequestById,
@@ -65,7 +65,7 @@ export function DeviceResetModal({
   return (
     <>
       {isRobotReachable ? (
-        <Modal
+        <LegacyModal
           type="warning"
           title={t('reset_to_factory_settings')}
           onClose={closeModal}
@@ -93,9 +93,9 @@ export function DeviceResetModal({
               </AlertPrimaryButton>
             </Flex>
           </Flex>
-        </Modal>
+        </LegacyModal>
       ) : (
-        <Modal
+        <LegacyModal
           type="warning"
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
@@ -115,7 +115,7 @@ export function DeviceResetModal({
               {t('shared:close')}
             </PrimaryButton>
           </Flex>
-        </Modal>
+        </LegacyModal>
       )}
     </>
   )

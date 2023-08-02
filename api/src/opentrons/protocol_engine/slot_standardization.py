@@ -24,8 +24,10 @@ from .types import (
     OFF_DECK_LOCATION,
     DeckSlotLocation,
     LabwareLocation,
+    NonStackedLocation,
     LabwareOffsetCreate,
     ModuleLocation,
+    OnLabwareLocation,
 )
 
 
@@ -91,6 +93,19 @@ def _standardize_load_module(
     return original.copy(update={"params": params})
 
 
+def _standardize_load_adapter(
+    original: commands.LoadAdapterCreate, robot_type: RobotType
+) -> commands.LoadAdapterCreate:
+    params = original.params.copy(
+        update={
+            "location": _standardize_adapter_location(
+                original.params.location, robot_type
+            )
+        }
+    )
+    return original.copy(update={"params": params})
+
+
 def _standardize_move_labware(
     original: commands.MoveLabwareCreate, robot_type: RobotType
 ) -> commands.MoveLabwareCreate:
@@ -109,6 +124,7 @@ _standardize_command_functions: Dict[
 ] = {
     commands.LoadLabwareCreate: _standardize_load_labware,
     commands.LoadModuleCreate: _standardize_load_module,
+    commands.LoadAdapterCreate: _standardize_load_adapter,
     commands.MoveLabwareCreate: _standardize_move_labware,
 }
 
@@ -119,6 +135,18 @@ _standardize_command_functions: Dict[
 def _standardize_labware_location(
     original: LabwareLocation, robot_type: RobotType
 ) -> LabwareLocation:
+    if isinstance(original, DeckSlotLocation):
+        return _standardize_deck_slot_location(original, robot_type)
+    elif (
+        isinstance(original, (ModuleLocation, OnLabwareLocation))
+        or original == OFF_DECK_LOCATION
+    ):
+        return original
+
+
+def _standardize_adapter_location(
+    original: NonStackedLocation, robot_type: RobotType
+) -> NonStackedLocation:
     if isinstance(original, DeckSlotLocation):
         return _standardize_deck_slot_location(original, robot_type)
     elif isinstance(original, ModuleLocation) or original == OFF_DECK_LOCATION:

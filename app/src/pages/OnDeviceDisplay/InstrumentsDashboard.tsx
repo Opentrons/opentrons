@@ -6,9 +6,14 @@ import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { Navigation } from '../../organisms/Navigation'
 import { AttachedInstrumentMountItem } from '../../organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
+
+const FETCH_PIPETTE_CAL_POLL = 10000
 
 export const InstrumentsDashboard = (): JSX.Element => {
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: FETCH_PIPETTE_CAL_POLL,
+  })
   const [wizardProps, setWizardProps] = React.useState<
     | React.ComponentProps<typeof GripperWizardFlows>
     | React.ComponentProps<typeof PipetteWizardFlows>
@@ -16,8 +21,9 @@ export const InstrumentsDashboard = (): JSX.Element => {
   >(null)
 
   const leftInstrument =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ?? null
-  // @ts-expect-error mount is a type narrower that ensures channels will exist
+    (attachedInstruments?.data ?? []).find(
+      (i): i is PipetteData => i.ok && i.mount === 'left'
+    ) ?? null
   const isNinetySixChannel = leftInstrument?.data?.channels === 96
 
   return (
@@ -27,28 +33,21 @@ export const InstrumentsDashboard = (): JSX.Element => {
         {isNinetySixChannel ? (
           <AttachedInstrumentMountItem
             mount="left"
-            attachedInstrument={
-              (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ??
-              null
-            }
+            attachedInstrument={leftInstrument}
             setWizardProps={setWizardProps}
           />
         ) : (
           <>
             <AttachedInstrumentMountItem
               mount="left"
-              attachedInstrument={
-                (attachedInstruments?.data ?? []).find(
-                  i => i.mount === 'left'
-                ) ?? null
-              }
+              attachedInstrument={leftInstrument}
               setWizardProps={setWizardProps}
             />
             <AttachedInstrumentMountItem
               mount="right"
               attachedInstrument={
                 (attachedInstruments?.data ?? []).find(
-                  i => i.mount === 'right'
+                  (i): i is PipetteData => i.ok && i.mount === 'right'
                 ) ?? null
               }
               setWizardProps={setWizardProps}
@@ -59,7 +58,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
           mount="extension"
           attachedInstrument={
             (attachedInstruments?.data ?? []).find(
-              i => i.mount === 'extension'
+              (i): i is GripperData => i.ok && i.mount === 'extension'
             ) ?? null
           }
           setWizardProps={setWizardProps}

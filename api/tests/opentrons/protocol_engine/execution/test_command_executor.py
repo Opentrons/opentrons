@@ -35,6 +35,7 @@ from opentrons.protocol_engine.execution import (
     TipHandler,
     RunControlHandler,
     RailLightsHandler,
+    StatusBarHandler,
 )
 
 
@@ -111,6 +112,12 @@ def rail_lights(decoy: Decoy) -> RailLightsHandler:
 
 
 @pytest.fixture
+def status_bar(decoy: Decoy) -> StatusBarHandler:
+    """Get a mocked out StatusBarHandler."""
+    return decoy.mock(cls=StatusBarHandler)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -123,6 +130,7 @@ def subject(
     mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
@@ -139,6 +147,7 @@ def subject(
         run_control=run_control,
         model_utils=model_utils,
         rail_lights=rail_lights,
+        status_bar=status_bar,
     )
 
 
@@ -168,6 +177,7 @@ async def test_execute(
     mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
 ) -> None:
@@ -240,6 +250,7 @@ async def test_execute(
             tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            status_bar=status_bar,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -264,7 +275,7 @@ async def test_execute(
     ["command_error", "expected_error"],
     [
         (
-            errors.ProtocolEngineError("oh no"),
+            errors.ProtocolEngineError(message="oh no"),
             matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
         ),
         (
@@ -290,6 +301,7 @@ async def test_execute_raises_protocol_engine_error(
     mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
     command_error: Exception,
@@ -349,6 +361,7 @@ async def test_execute_raises_protocol_engine_error(
             tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            status_bar=status_bar,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]

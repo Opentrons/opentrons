@@ -41,6 +41,10 @@ def stall_detection_enabled() -> bool:
     return not advs.get_setting_with_env_overload("disableStallDetection")
 
 
+def overpressure_detection_enabled() -> bool:
+    return not advs.get_setting_with_env_overload("disableOverpressureDetection")
+
+
 def status_bar_enabled() -> bool:
     """Whether the status bar is enabled."""
     return not advs.get_setting_with_env_overload("disableStatusBar")

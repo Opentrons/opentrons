@@ -17,7 +17,3 @@ class InvalidModuleLocationError(ValueError):
 
 class InvalidMagnetEngageHeightError(ValueError):
     """Error raised if a Magnetic Module engage height is invalid."""
-
-
-class UnknownLocationError(ValueError):
-    """Raised when attempting to place labware in a unknown location."""

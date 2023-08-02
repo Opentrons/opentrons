@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { OT2_STANDARD_MODEL } from '@opentrons/shared-data'
+import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+
 import { i18n } from '../../../i18n'
 import { InterventionModal } from '..'
 import {
@@ -61,11 +63,12 @@ describe('InterventionModal', () => {
       ...props,
       command: mockMoveLabwareCommand,
       robotType: OT2_STANDARD_MODEL,
-      moduleRenderInfo: {},
-      labwareRenderInfo: {},
+      moduleRenderInfo: [],
+      labwareRenderInfo: [],
       labwareName: LABWARE_NAME,
       oldDisplayLocation: 'Slot 1',
       newDisplayLocation: 'Slot 2',
+      deckDef: ot2StandardDeckDef as any,
     }
     const { getByText } = render(props)
     getByText('Move Labware')

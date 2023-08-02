@@ -133,7 +133,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       .then(responses => {
         const finalResponse = responses[responses.length - 1]
         if (finalResponse.data.commandType === 'savePosition') {
-          const { position } = finalResponse.data.result
+          const { position } = finalResponse.data?.result ?? { position: null }
           registerPosition({
             type: 'initialPosition',
             labwareId,
@@ -159,18 +159,18 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     )
       .then(responses => {
         if (responses[0].data.commandType === 'savePosition') {
-          const { position } = responses[0].data.result
+          const { position } = responses[0].data?.result ?? { position: null }
           const offset =
-            initialPosition != null
+            initialPosition != null && position != null
               ? getVectorDifference(position, initialPosition)
-              : position
+              : undefined
           registerPosition({
             type: 'finalPosition',
             labwareId,
             location,
             position,
           })
-          registerPosition({ type: 'tipPickUpOffset', offset })
+          registerPosition({ type: 'tipPickUpOffset', offset: offset ?? null })
           chainRunCommands(
             [
               {

@@ -88,6 +88,8 @@ export function ProtocolInstrumentMountItem(
   }
   const is96ChannelPipette = speccedName === 'p1000_96'
   const isAttachedWithCal =
+    attachedInstrument != null &&
+    attachedInstrument.ok &&
     attachedInstrument?.data?.calibratedOffset?.last_modified != null
   return (
     <>

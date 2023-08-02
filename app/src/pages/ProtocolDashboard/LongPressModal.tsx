@@ -9,7 +9,7 @@ import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { StyledText } from '../../atoms/text'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { SmallModalChildren } from '../../molecules/Modal/OnDeviceDisplay'
+import { SmallModalChildren } from '../../molecules/Modal'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../redux/config'
 
@@ -112,7 +112,7 @@ export function LongPressModal({
           </MenuItem>
           <MenuItem onClick={handlePinClick} key="pin">
             <Flex>
-              <Icon name="pin" size="1.875rem" />
+              <Icon name="pin" size="2.5rem" />
               <StyledText marginLeft={SPACING.spacing24}>
                 {pinned ? t('unpin_protocol') : t('pin_protocol')}
               </StyledText>
@@ -120,7 +120,7 @@ export function LongPressModal({
           </MenuItem>
           <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
             <Flex>
-              <Icon name="trash" size="1.875rem" />
+              <Icon name="trash" size="2.5rem" />
               <StyledText marginLeft={SPACING.spacing24}>
                 {t('delete_protocol')}
               </StyledText>

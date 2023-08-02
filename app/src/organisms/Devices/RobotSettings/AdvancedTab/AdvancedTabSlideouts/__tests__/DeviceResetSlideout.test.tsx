@@ -38,6 +38,11 @@ const mockResetConfigOptions = [
     description: 'pipette calibration fooBar description',
   },
   {
+    id: 'gripperOffsetCalibrations',
+    name: 'gripper calibration FooBar',
+    description: 'gripper calibration fooBar description',
+  },
+  {
     id: 'runsHistory',
     name: 'RunsHistory FooBar',
     description: 'runsHistory fooBar description',

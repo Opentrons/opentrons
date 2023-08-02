@@ -57,6 +57,7 @@ export interface LabwareRenderProps {
   // adds blue border with drop shadow to labware
   hover?: boolean
   onLabwareClick?: () => void
+  highlightLabware?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -75,6 +76,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         selectableWellClass={props.selectableWellClass}
         hover={props.hover}
         onLabwareClick={props.onLabwareClick}
+        highlightLabware={props.highlightLabware}
       />
       {props.wellStroke && (
         <StrokedWells

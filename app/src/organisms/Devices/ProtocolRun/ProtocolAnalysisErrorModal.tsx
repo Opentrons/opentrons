@@ -11,7 +11,7 @@ import {
 
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
-import { Modal } from '../../../molecules/Modal'
+import { LegacyModal } from '../../../molecules/LegacyModal'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 
@@ -32,7 +32,7 @@ export function ProtocolAnalysisErrorModal({
 
   return (
     <Portal level="top">
-      <Modal
+      <LegacyModal
         data-testid="ProtocolRunDetails_analysisErrorModal"
         type="error"
         title="Protocol analysis failure"
@@ -65,7 +65,7 @@ export function ProtocolAnalysisErrorModal({
             </StyledText>
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }

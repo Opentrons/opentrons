@@ -49,6 +49,7 @@ class PhotometricConfig:
     user_volumes: bool
     gantry_speed: int
     touch_tip: bool
+    refill: bool
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
@@ -58,6 +59,8 @@ NUM_BLANK_TRIALS: Final = 3
 NUM_MIXES_BEFORE_ASPIRATE = 5
 
 LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
+
+TOUCH_TIP_SPEED = 30
 
 GANTRY_MAX_SPEED = 40
 TIP_SPEED_WHILE_SUBMERGING_ASPIRATE = 50

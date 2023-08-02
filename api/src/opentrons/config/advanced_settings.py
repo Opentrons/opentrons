@@ -577,6 +577,16 @@ def _migrate25to26(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate26to27(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 27 of the feature flags file.
+
+    - Adds the disableOverpressureDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableOverpressureDetection"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -604,6 +614,7 @@ _MIGRATIONS = [
     _migrate23to24,
     _migrate24to25,
     _migrate25to26,
+    _migrate26to27,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

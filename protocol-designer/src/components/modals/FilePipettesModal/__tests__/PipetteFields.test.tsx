@@ -73,6 +73,7 @@ describe('PipetteFields', () => {
       },
       errors: null,
       touched: null,
+      robotType: 'OT-2 Standard',
     }
 
     getOnlyLatestDefsMock.mockReturnValue({

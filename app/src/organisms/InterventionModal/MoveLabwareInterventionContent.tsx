@@ -18,7 +18,6 @@ import {
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
-  getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 
@@ -26,29 +25,32 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
-import type { RobotType } from '@opentrons/shared-data'
-import type { ModuleRenderInfoById } from '../Devices/hooks'
-import type { LabwareRenderInfoById } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
+import type { RunLabwareInfo, RunModuleInfo } from './utils'
+import { LabwareDisabledOverlay } from './LabwareDisabledOverlay'
 
 export interface MoveLabwareInterventionProps {
   robotType: RobotType
-  moduleRenderInfo: ModuleRenderInfoById
-  labwareRenderInfo: LabwareRenderInfoById
+  moduleRenderInfo: RunModuleInfo[]
+  labwareRenderInfo: RunLabwareInfo[]
   labwareName: string
+  movedLabwareId: string
   oldDisplayLocation: string
   newDisplayLocation: string
+  deckDef: DeckDefinition
 }
 
 export function MoveLabwareInterventionContent({
   robotType,
   labwareName,
+  movedLabwareId,
   moduleRenderInfo,
   labwareRenderInfo,
   oldDisplayLocation,
   newDisplayLocation,
+  deckDef,
 }: MoveLabwareInterventionProps): JSX.Element {
   const { t: protocolSetupTranslator } = useTranslation('protocol_setup')
-  const deckDef = getDeckDefFromRobotType(robotType)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem" width="100%">
@@ -120,13 +122,23 @@ export function MoveLabwareInterventionContent({
                               nestedLabwareDef.metadata.displayName
                             )}_${x}${y}`}
                           >
-                            <LabwareRender definition={nestedLabwareDef} />
+                            <LabwareRender
+                              definition={nestedLabwareDef}
+                              highlightLabware={
+                                movedLabwareId === nestedLabwareId
+                              }
+                            />
+                            {movedLabwareId !== nestedLabwareId ? (
+                              <LabwareDisabledOverlay
+                                definition={nestedLabwareDef}
+                              />
+                            ) : null}
                           </React.Fragment>
                         ) : null}
                       </Module>
                     )
                   )}
-                  {map(labwareRenderInfo, ({ x, y, labwareDef }) => {
+                  {map(labwareRenderInfo, ({ x, y, labwareDef, labwareId }) => {
                     return (
                       <React.Fragment
                         key={`InterventionModal_Labware_${String(
@@ -134,7 +146,13 @@ export function MoveLabwareInterventionContent({
                         )}_${x}${y}`}
                       >
                         <g transform={`translate(${x},${y})`}>
-                          <LabwareRender definition={labwareDef} />
+                          <LabwareRender
+                            definition={labwareDef}
+                            highlightLabware={movedLabwareId === labwareId}
+                          />
+                          {movedLabwareId !== labwareId ? (
+                            <LabwareDisabledOverlay definition={labwareDef} />
+                          ) : null}
                         </g>
                       </React.Fragment>
                     )

@@ -13,7 +13,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../../molecules/Modal'
 import { updateConfigValue } from '../../../redux/config'
 
 import welcomeModalImage from '../../../assets/images/on-device-display/welcome_dashboard_modal.png'
