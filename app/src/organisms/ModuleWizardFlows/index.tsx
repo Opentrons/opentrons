@@ -19,18 +19,20 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
+import { Success } from './Success'
 
 import type { AttachedModule } from '@opentrons/api-client'
+import { FirmwareUpdate } from './FirmwareUpdate'
 
-interface ModuleCalWizardFlowsProps {
+interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   slotName: string
   closeFlow: () => void
   onComplete?: () => void
 }
 
-export const ModuleCalWizardFlows = (
-  props: ModuleCalWizardFlowsProps
+export const ModuleWizardFlows = (
+  props: ModuleWizardFlowsProps
 ): JSX.Element | null => {
   const { attachedModule, slotName, closeFlow, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
@@ -139,7 +141,7 @@ export const ModuleCalWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    // TODO: create firmware update step
+    modalContent = <FirmwareUpdate {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = <SelectLocation {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
@@ -147,7 +149,7 @@ export const ModuleCalWizardFlows = (
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
     modalContent = <AttachProbe {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SUCCESS) {
-    // TODO: create success step and error handling
+    modalContent = <Success {...currentStep} {...calibrateBaseProps} />
   }
 
   const wizardHeader = (

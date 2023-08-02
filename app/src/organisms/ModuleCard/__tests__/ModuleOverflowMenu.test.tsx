@@ -187,7 +187,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
   })
@@ -209,7 +209,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -229,7 +229,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -255,7 +255,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -280,13 +280,13 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Show attachment instructions' })
     fireEvent.click(btn)
-    expect(props.handleWizardClick).toHaveBeenCalled()
+    expect(props.handleInstructionsClick).toHaveBeenCalled()
   })
 
   it('renders heater shaker labware latch button and is disabled when status is not idle', () => {
@@ -296,7 +296,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -314,7 +314,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -334,7 +334,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -353,7 +353,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -373,7 +373,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -393,7 +393,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -413,7 +413,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -440,7 +440,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: true,
       runId: 'id',
     }
@@ -461,7 +461,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: true,
       runId: 'id',
     }
@@ -497,7 +497,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -524,7 +524,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -559,7 +559,7 @@ describe('ModuleOverflowMenu', () => {
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
+      handleInstructionsClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)

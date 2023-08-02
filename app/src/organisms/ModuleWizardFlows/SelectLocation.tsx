@@ -7,11 +7,11 @@ import {
   TYPOGRAPHY,
   SPACING,
   SIZE_1,
+  Flex,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import pipetteProbe1 from 'app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
@@ -27,7 +27,7 @@ export const SelectLocation = (
   props: ModuleCalibrationWizardStepProps
 ): JSX.Element | null => {
   const { proceed, goBack, attachedModule } = props
-  const { t } = useTranslation('pipette_wizard_flows')
+  const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   // TODO: keep track of the selected slot in a state variable that can be
   // used in calibration step
@@ -49,7 +49,7 @@ export const SelectLocation = (
       header={t('select_location')}
       // TODO: swap this out with the deck map
       // if slot != null it will be pre-selected
-      rightHandBody={pipetteProbe1}
+      rightHandBody={<Flex>TODO: DECK LOCATION SELECT</Flex>}
       bodyText={bodyText}
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}

@@ -1,7 +1,7 @@
 {
   "attach_probe": "Attach probe to pipette",
   "begin_calibration": "Begin automated calibration",
-  "calibtaion_probe": "Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.",
+  "calibration_probe": "Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.",
   "calibration": "{{module}} Calibration",
   "cal_adapter": "Calibration Adapter",
   "checking_firmware": "Checking {{module}} firmware",

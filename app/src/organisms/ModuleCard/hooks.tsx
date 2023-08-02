@@ -105,7 +105,7 @@ export function useModuleOverflowMenu(
   module: AttachedModule,
   handleAboutClick: () => void,
   handleTestShakeClick: () => void,
-  handleWizardClick: () => void,
+  handleInstructionsClick: () => void,
   handleSlideoutClick: (isSecondary: boolean) => void,
   isDisabled: boolean,
   isIncompatibleWithOT3: boolean
@@ -159,7 +159,7 @@ export function useModuleOverflowMenu(
     <MenuItem
       key={`hs_attach_to_deck_${String(module.moduleModel)}`}
       data-testid={`hs_attach_to_deck_${String(module.moduleModel)}`}
-      onClick={() => handleWizardClick()}
+      onClick={() => handleInstructionsClick()}
       whiteSpace="nowrap"
     >
       {t('heater_shaker:show_attachment_instructions')}

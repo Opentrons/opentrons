@@ -17,7 +17,8 @@ interface ModuleOverflowMenuProps {
   handleSlideoutClick: () => void
   handleAboutClick: () => void
   handleTestShakeClick: () => void
-  handleWizardClick: () => void
+  handleInstructionsClick: () => void
+  handleCalibrateClick: () => void
   isLoadedInRun: boolean
   robotName: string
   runId?: string
@@ -33,7 +34,8 @@ export const ModuleOverflowMenu = (
     handleSlideoutClick,
     handleAboutClick,
     handleTestShakeClick,
-    handleWizardClick,
+    handleInstructionsClick,
+    handleCalibrateClick,
     isLoadedInRun,
   } = props
 
@@ -59,7 +61,7 @@ export const ModuleOverflowMenu = (
     module,
     handleAboutClick,
     handleTestShakeClick,
-    handleWizardClick,
+    handleInstructionsClick,
     handleSlideoutClick,
     isDisabled,
     isIncompatibleWithOT3
@@ -68,14 +70,15 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
+        <MenuItem onClick={() => handleCalibrateClick()}>
+          Calibrate
+        </MenuItem>
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
               <React.Fragment key={`${index}_${String(module.moduleType)}`}>
                 <MenuItem
-                  key={`${index}_${String(module.moduleModel)}`}
                   onClick={() => item.onClick(item.isSecondary)}
-                  data-testid={`module_setting_${String(module.moduleModel)}`}
                   disabled={item.disabledReason || isDisabled}
                   whiteSpace="nowrap"
                 >
