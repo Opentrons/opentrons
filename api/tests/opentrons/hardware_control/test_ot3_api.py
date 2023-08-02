@@ -4,7 +4,7 @@ from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict, Optiona
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock, PropertyMock
+from mock import AsyncMock, patch, Mock, PropertyMock, MagicMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
