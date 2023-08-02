@@ -22,7 +22,7 @@ Use the :py:meth:`.ProtocolContext.move_labware` method to initiate a move, rega
         
 .. versionadded:: 2.15
 
-The required arguments of ``move_labware()`` are the ``labware`` you want to move and its ``new_location``. You don't need to specify where the move begins, since that information is already stored in the :py:class:`~opentrons.protocol_api.labware.Labware` object — ``plate`` in this example. The destination of the move can be any empty deck slot, or a module that's ready to have labware added to it (see :ref:`movement-modules` below). Movement to an occupied location — including the labware's current location — will raise a ``LocationIsOccupiedError``.
+The required arguments of ``move_labware()`` are the ``labware`` you want to move and its ``new_location``. You don't need to specify where the move begins, since that information is already stored in the :py:class:`~opentrons.protocol_api.labware.Labware` object — ``plate`` in this example. The destination of the move can be any empty deck slot, or a module that's ready to have labware added to it (see :ref:`movement-modules` below). Movement to an occupied location, including the labware's current location, will raise an error.
 
 When the move step is complete, the API updates the labware's location, so you can move the plate multiple times::
 
@@ -63,7 +63,7 @@ The ``use_gripper`` parameter of :py:meth:`~.ProtocolContext.move_labware` deter
 
 The above example is a complete and valid ``run()`` function. You don't have to load the gripper as an instrument, and there is no ``InstrumentContext`` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one ``move_labware()`` command with ``use_labware=True``.
 
-If you attempt to use the gripper to move labware in an OT-2 protocol, the API will raise a ``NotSupportedOnRobotType`` error.
+If you attempt to use the gripper to move labware in an OT-2 protocol, the API will raise an error.
 
 
 Supported Labware
@@ -118,14 +118,14 @@ When moving labware anywhere that isn't an empty deck slot, consider what physic
 
 .. versionadded:: 2.15
 
-If you try to move the plate to slot C1 or the Heater-Shaker module, you will get a ``LocationIsOccupiedError`` — C1 is occupied by the Heater-Shaker, and the Heater-Shaker is occupied by the adapter. Only the adapter, as the topmost item in that stack, is unoccupied.
+If you try to move the plate to slot C1 or the Heater-Shaker module, the API will raise an error, because C1 is occupied by the Heater-Shaker, and the Heater-Shaker is occupied by the adapter. Only the adapter, as the topmost item in that stack, is unoccupied.
 
 Also note the ``hs_mod.open_labware_latch()`` command in the above example. To move labware onto or off of a module, you have to make sure that it's physically accessible:
 
     - For the Heater-Shaker, use :py:meth:`~.HeaterShakerContext.open_labware_latch`.
     - For the Thermocycler, use :py:meth:`~.ThermocyclerContext.open_lid`.
     
-If the labware is inaccessible, the API will raise a ``LabwareMovementNotAllowedError``. 
+If the labware is inaccessible, the API will raise an error. 
 
 
 The Off-Deck Location
@@ -139,7 +139,7 @@ Remove labware from the deck to perform tasks like retrieving samples or discard
     
 .. versionadded:: 2.15
 
-Moving labware off-deck always requires user intervention, because the gripper can't reach outside of the robot. Omit the ``use_gripper`` parameter or explicitly set it to ``False``. If you try to move labware off-deck with ``use_gripper=True``, the API will raise a ``LabwareMovementNotAllowedError``.
+Moving labware off-deck always requires user intervention, because the gripper can't reach outside of the robot. Omit the ``use_gripper`` parameter or explicitly set it to ``False``. If you try to move labware off-deck with ``use_gripper=True``, the API will raise an error.
 
 You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it `onto` the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one::
 
