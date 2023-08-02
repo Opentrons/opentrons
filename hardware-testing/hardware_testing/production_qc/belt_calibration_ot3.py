@@ -8,13 +8,12 @@ from pprint import pprint
 from opentrons.hardware_control.ot3api import OT3API
 
 from opentrons.config.defaults_ot3 import DEFAULT_MACHINE_TRANSFORM
-from opentrons_shared_data.deck import get_calibration_square_position_in_slot
 from opentrons.calibration_storage.types import AttitudeMatrix
 from opentrons.hardware_control.ot3_calibration import (
     CalibrationStructureNotFoundError,
     calibrate_belts,
     calibrate_pipette,
-    find_calibration_structure_position,
+    find_pipette_offset,
 )
 
 from hardware_testing.data import ui
@@ -37,7 +36,7 @@ async def _calibrate_pipette(
     ui.print_header("CALIBRATE PIPETTE")
     await api.home()
     try:
-        offset = await calibrate_pipette(api, mount, slot=5)  # type: ignore[arg-type]
+        offset = await calibrate_pipette(api, mount)  # type: ignore[arg-type]
     except CalibrationStructureNotFoundError as e:
         if not api.is_simulator:
             raise e
@@ -56,10 +55,9 @@ async def _check_belt_accuracy(
     for slot in TEST_SLOTS:
         await api.home()
         await api.add_tip(mount, api.config.calibration.probe_length)
-        nominal_pos = types.Point(*get_calibration_square_position_in_slot(slot))
         try:
-            slot_offset = await find_calibration_structure_position(
-                api, mount, nominal_pos
+            slot_offset = await find_pipette_offset(
+                api, mount, slot=slot
             )
             ret[slot] = slot_offset
             print(f"Slot #{slot}: {slot_offset}")
@@ -71,13 +69,21 @@ async def _check_belt_accuracy(
         await api.remove_tip(mount)
         await api.home_z(mount)
 
-    def _p_str(_p: types.Point) -> str:
-        return f"(x={round(_p.x, 2)}, y={round(_p.y, 2)}, z={round(_p.z, 2)})"
+    def _short(num: float, decimals: int = 2) -> str:
+        _short_num = str(round(num, decimals))
+        _append = {1: ".00", 2: "00", 3: "0"}[len(_short_num)]
+        return _short_num + _append
 
-    print(f"Deck Row A: {_p_str(ret[10])} | {_p_str(ret[11])} | trash")
-    print(f"Deck Row B: {_p_str(ret[7])} | {_p_str(ret[8])} | {_p_str(ret[9])}")
-    print(f"Deck Row C: {_p_str(ret[4])} | {_p_str(ret[5])} | {_p_str(ret[6])}")
-    print(f"Deck Row D: {_p_str(ret[1])} | {_p_str(ret[2])} | {_p_str(ret[3])}")
+    def _p_str(_s: int) -> str:
+        _p = ret.get(_s)
+        if not _p:
+            return "(                )"
+        return f"({_short(_p.x)}, {_short(_p.y)}, {_short(_p.z)})"
+
+    print(f"Deck Row A: {_p_str(10)} | {_p_str(11)} | trash")
+    print(f"Deck Row B: {_p_str(7)} | {_p_str(8)} | {_p_str(9)}")
+    print(f"Deck Row C: {_p_str(4)} | {_p_str(5)} | {_p_str(6)}")
+    print(f"Deck Row D: {_p_str(1)} | {_p_str(2)} | {_p_str(3)}")
     return ret
 
 
