@@ -210,7 +210,7 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
 OT-2 Pipette Generations
 ========================
 
-The OT-2 works with two different sets of pipettes. These are the GEN1 and GEN2 models. The newer GEN2 pipettes have different volume ranges than the older GEN1 pipettes. However, with some exceptions, the volume ranges for GEN2 pipettes overlap those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table lists the volume compatibility between the GEN2 and GEN1 pipettes.
+The OT-2 works with the GEN1 and GEN2 pipette models. The newer GEN2 pipettes have different volume ranges than the older GEN1 pipettes. With some exceptions, the volume ranges for GEN2 pipettes overlap those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table lists the volume compatibility between the GEN2 and GEN1 pipettes.
 
 .. list-table::
     :header-rows: 1
@@ -289,24 +289,20 @@ Pipettes aspirate or dispense at different rates measured in units of µL/second
 
 You can change each attribute without affecting the others.
 
+.. From original, uses OT-2. No Flex flow rate info.
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware(
-            load_name='opentrons_96_tiprack_300ul',
-            location='D1')
+        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
         pipette = protocol.load_instrument(
-            instrument_name='flex_1channel_1000',
-            mount='right', tip_racks=[tiprack])
-        plate = protocol.load_labware(
-            load_name='corning_384_wellplate_112ul_flat',
-            location= 'D3')
+            'p300_single', 'right', tip_racks=[tiprack])
+        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 3)
         pipette.pick_up_tip()
 
-        # Aspirate at the default flow rate of 150 ul/s
-        pipette.aspirate(volume=50, plate['A1'])
+        # Aspirate at the default flowrate of 150 ul/s
+        pipette.aspirate(50, plate['A1'])
         # Dispense at the default flowrate of 300 ul/s
-        pipette.dispense(volume=50, plate['A1'])
+        pipette.dispense(50, plate['A1'])
 
         # Change default aspirate speed to 50ul/s, 1/3 of the default
         pipette.flow_rate.aspirate = 50
@@ -322,7 +318,7 @@ You can change each attribute without affecting the others.
         # This is now at 50 ul/s as well
         pipette.dispense(50, plate['A1'])
 
-        # Also slow down the blow out flow rate from its default
+        # Also slow down the blow out flowrate from its default
         pipette.flow_rate.blow_out = 100
         pipette.aspirate(50, plate['A1'])
         # This will be much slower
@@ -330,138 +326,92 @@ You can change each attribute without affecting the others.
 
         pipette.drop_tip()
 
-.. Docs note this property removed in 2.14
+.. Docs notes this property was removed in 2.14. If removed, why keep?
 :py:obj:`.InstrumentContext.speed` offers the same functionality, but controlled in
 units of mm/s of plunger speed. This does not have a linear transfer to flow rate and
 should only be used if you have a specific need.
 
-For other ways of controlling pipette movement, see :ref:`gantry_speed` and :ref:`axis_speed_limits`.
+See :ref:`gantry_speed` and :ref:`axis_speed_limits` for information about other ways of controlling pipette movement.
 
 .. versionadded:: 2.0
 
 
 .. _defaults:
 
-Defaults
---------
+Flex Pipette Flow Rates
+-----------------------
 
-**Head Speed**: 400 mm/s
+The following section provides data on the default aspirate, dispense, and blow-out flow rates for Flex pipettes.
 
-**Well Bottom Clearances**
+INFORMATION TBD 
 
-- Aspirate default: 1mm above the bottom
-- Dispense default: 1mm above the bottom
+.. we're checking
 
-**p20_single_gen2**
+OT-2 Pipette Flow Rates
+-----------------------
 
-- Aspirate Default:
-    - On API Version 2.5 and previous: 3.78 µL/s
-    - On API Version 2.6 and subsequent: 7.56 µL/s
-- Dispense Default:
-    - On API Version 2.5 and previous: 3.78 µL/s
-    - On API Version 2.6 and subsequent: 7.56 µL/s
-- Blow Out Default:
-    - On API Version 2.5 and previous: 3.78 µL/s
-    - On API Version 2.6 and subsequent: 7.56 µL/s
-- Minimum Volume: 1 µL
-- Maximum Volume: 20 µL
+The following section provides data on the default aspirate, dispense, and blow-out flow rates for OT-2 GEN2 pipettes.
 
-**p300_single_gen2**
+.. what is head speed, applies to gantry movement or pipette?
+Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/second and a well bottom clearance of 1mm for aspirate and dispense actions.
 
-- Aspirate Default:
-    - On API Version 2.5 and previous: 46.43 µL/s
-    - On API Version 2.6 and subsequent: 92.86 µL/s
-- Dispense Default:
-    - On API Version 2.5 and previous: 46.43 µL/s
-    - On API Version 2.6 and subsequent: 92.86 µL/s
-- Blow Out Default:
-    - On API Version 2.5 and previous: 46.43 µL/s
-    - On API Version 2.6 and subsequent: 92.86 µL/s
-- Minimum Volume: 20 µL
-- Maximum Volume: 300 µL
+**P20 Single GEN2 Pipette (1-20 µL)**
 
-**p1000_single_gen2**
++----------+---------------------------------+
+| Action   | Default Flow Rate               |
++==========+=================================+
+| Aspirate | * API v2.6 or higher: 7.56 µL/s |
++----------+ * API v2.5 or lower: 3.78 µL/s  |
+| Dispense |                                 |
++----------+                                 |
+| Blow-out |                                 |
++----------+---------------------------------+
 
-- Aspirate Default:
-    - On API Version 2.5 and previous: 137.35 µL/s
-    - On API Version 2.6 and subsequent: 274.7 µL/s
-- Dispense Default:
-    - On API Version 2.5 and previous: 137.35 µL/s
-    - On API Version 2.6 and subsequent: 274.7 µL/s
-- Blow Out Default:
-    - On API Version 2.5 and previous: 137.35 µL/s
-    - On API Version 2.6 and subsequent: 274.7 µL/s
-- Minimum Volume: 100 µL
-- Maximum Volume: 1000 µL
+**P20 Multi-Channel GEN2 (1-20 µL)**
 
-**p20_multi_gen2**
++----------+-----------------------------------+
+| Action   | Default Flow Rate                 |
++==========+===================================+
+| Aspirate | 7.6 µL/s                          |
++----------+                                   |
+| Dispense |                                   |
++----------+                                   |
+| Blow-out |                                   |
++----------+-----------------------------------+
 
-- Aspirate Default: 7.6 µL/s
-- Dispense Default: 7.6 µL/s
-- Blow Out Default: 7.6 µL/s
-- Minimum Volume: 1 µL
-- Maximum Volume: 20 µL
+**P300 Single GEN2 Pipette (20-300 µL)**
 
-**p300_multi_gen2**
++----------+----------------------------------+
+| Action   | Default Flow Rate                |
++==========+==================================+
+| Aspirate | * API v2.6 or higher: 92.86 µL/s |
++----------+ * API v2.5 or lower: 46.43 µL/s  |
+| Dispense |                                  |
++----------+                                  |
+| Blow-out |                                  |
++----------+----------------------------------+
 
-- Aspirate Default: 94 µL/s
-- Dispense Default: 94 µL/s
-- Blow Out Default: 94 µL/s
-- Minimum Volume: 20 µL
-- Maximum Volume: 300 µL
+**P300 Multi-Channel GEN2 (20-300 µL/s)**
 
-**p10_single**
++----------+-----------------------------------+
+| Action   | Default Flow Rate                 |
++==========+===================================+
+| Aspirate | 94 µL/s                           |
++----------+                                   |
+| Dispense |                                   |
++----------+                                   |
+| Blow-out |                                   |
++----------+-----------------------------------+
 
-- Aspirate Default: 5 µL/s
-- Dispense Default: 10 µL/s
-- Blow Out Default: 1000 µL/s
-- Minimum Volume: 1 µL
-- Maximum Volume: 10 µL
+**P1000 Single GEN2 (100-1000 µL)**
 
-**p10_multi**
-
-- Aspirate Default: 5 µL/s
-- Dispense Default: 10 µL/s
-- Blow Out Default: 1000 µL/s
-- Minimum Volume: 1 µL
-- Maximum Volume: 10 µL
-
-**p50_single**
-
-- Aspirate Default: 25 µL/s
-- Dispense Default: 50 µL/s
-- Blow Out Default: 1000 µL/s
-- Minimum Volume: 5 µL
-- Maximum Volume: 50 µL
-
-**p50_multi**
-
-- Aspirate Default: 25 µL/s
-- Dispense Default: 50 µL/s
-- Blow Out Default: 1000 µL/s
-- Minimum Volume: 5 µL
-- Maximum Volume: 50 µL
-
-**p300_single**
-
-- Aspirate Default: 150 µL/s
-- Dispense Default: 300 µL/s
-- Blow Out Default: 1000 µL/s
-- Minimum Volume: 30 µL
-- Maximum Volume: 300 µL
-
-**p300_multi**
-
-- Aspirate Default: 150 µL/s
-- Dispense Default: 300 µL/s
-- Blow Out Default: 1000 µL/s
-- Minimum Volume: 30 µL
-- Maximum Volume: 300 µL
-
-**p1000_single**
-
-- Aspirate Default: 500 µL/s
-- Dispense Default: 1000 µL/s
-- Blow Out Default: 1000 µL/s
-- Minimum Volume: 100 µL
-- Maximum Volume: 1000 µL
++----------+-----------------------------------+
+| Action   | Default Flow Rate                 |
++==========+===================================+
+| Aspirate | * API v2.6 or higher: 274.7 µL/s  |
++----------+ * API v2.5 or lower: 137.35 µL/s  |
+| Dispense |                                   |
++----------+                                   |
+| Blow-out |                                   |
++----------+-----------------------------------+
+.. removed and saved GEN1 specs. Can restore if needed.
