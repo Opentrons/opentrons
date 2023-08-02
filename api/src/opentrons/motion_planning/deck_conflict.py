@@ -197,8 +197,7 @@ def check(
         restrictions += _create_restrictions(
             item=item, location=location, robot_type=robot_type
         )
-    print("after first restrictions")
-    print(restrictions)
+
     # check new item against existing restrictions
     for r in restrictions:
         if r.location == new_location and not r.is_allowed(new_item):
@@ -211,8 +210,6 @@ def check(
     new_restrictions = _create_restrictions(
         item=new_item, location=new_location, robot_type=robot_type
     )
-    print("after new restrictions")
-    print(new_restrictions)
 
     for r in new_restrictions:
         existing_item = existing_items.get(r.location)
@@ -244,6 +241,7 @@ def _create_ot2_restrictions(
         # A Heater-Shaker can't safely be placed just south of the fixed trash,
         # because the fixed trash blocks access to the screw that locks the
         # Heater-Shaker onto the deck.
+        print(location)
         location_south_of_fixed_trash = get_south_slot(location.as_int())
         if location_south_of_fixed_trash is not None:
             restrictions.append(

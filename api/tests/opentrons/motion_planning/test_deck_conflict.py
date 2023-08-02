@@ -291,7 +291,7 @@ def test_flex_labware_when_thermocycler(
         (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
         (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
         (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
-        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_8),
         (DeckSlotName.SLOT_8, DeckSlotName.SLOT_7),
         (DeckSlotName.SLOT_8, DeckSlotName.SLOT_9),
         (DeckSlotName.SLOT_9, DeckSlotName.SLOT_8),

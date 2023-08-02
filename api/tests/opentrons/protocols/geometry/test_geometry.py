@@ -43,6 +43,7 @@ P300M_GEN2_MAX_HEIGHT = 155.75
     params=[STANDARD_OT2_DECK, SHORT_TRASH_DECK]
 )
 def deck(request) -> Deck:
+    print(request.param)
     return Deck(deck_type=request.param)
 
 

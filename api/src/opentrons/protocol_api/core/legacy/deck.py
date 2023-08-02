@@ -167,15 +167,15 @@ class Deck(UserDict):  # type: ignore[type-arg]
     def __setitem__(self, key: DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
         existing_items = {
-            slot: self._map_to_conflict_checker_item(item)
+            DeckSlotName.from_primitive(slot): self._map_to_conflict_checker_item(item)
             for slot, item in self.data.items()
             if item is not None
         }
 
         # will raise DeckConflictError if items conflict
         deck_conflict.check(
-            existing_items=existing_items,  # type: ignore[arg-type]
-            new_location=DeckSlotName(slot_key_int),
+            existing_items=existing_items,
+            new_location=DeckSlotName.from_primitive(slot_key_int),
             new_item=self._map_to_conflict_checker_item(val),
         )
 
