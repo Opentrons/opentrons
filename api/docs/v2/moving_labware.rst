@@ -22,10 +22,7 @@ Use the :py:meth:`.ProtocolContext.move_labware` method to initiate a move, rega
         
 .. versionadded:: 2.15
 
-The required arguments of ``move_labware()`` are the ``labware`` you want to move and its ``new_location``. You don't need to specify where the move begins, since that information is already stored in the :py:class:`~opentrons.protocol_api.labware.Labware` object — ``plate`` in this example. The destination of the move can be any empty deck slot, or a module that's ready to have labware added to it (see :ref:`movement-modules` below). Attempting to move to an occupied location will raise a ``LocationIsOccupiedError``.
-
-.. note::
-    The slot that a labware currently occupies is considered an occupied destination. This prevents you from creating trivial moves, e.g., from slot D2 to slot D2.
+The required arguments of ``move_labware()`` are the ``labware`` you want to move and its ``new_location``. You don't need to specify where the move begins, since that information is already stored in the :py:class:`~opentrons.protocol_api.labware.Labware` object — ``plate`` in this example. The destination of the move can be any empty deck slot, or a module that's ready to have labware added to it (see :ref:`movement-modules` below). Movement to an occupied location — including the labware's current location — will raise a ``LocationIsOccupiedError``.
 
 When the move step is complete, the API updates the labware's location, so you can move the plate multiple times::
 
@@ -43,7 +40,7 @@ There are two ways to move labware:
 - Automatically, with the Opentrons Flex Gripper.
 - Manually, by pausing the protocol until a user confirms that they've moved the labware.
 
-The ``use_gripper`` parameter of :py:meth:`~.ProtocolContext.move_labware` determines which way a particular movement should happen. Set its value to ``True`` for an automatic move. The default value is ``False``, so if you don't specify a value, the protocol will pause for a manual move.
+The ``use_gripper`` parameter of :py:meth:`~.ProtocolContext.move_labware` determines whether a movement is automatic or manual. Set its value to ``True`` for an automatic move. The default value is ``False``, so if you don't specify a value, the protocol will pause for a manual move.
 
 .. code-block:: python
 
@@ -142,7 +139,7 @@ Remove labware from the deck to perform tasks like retrieving samples or discard
     
 .. versionadded:: 2.15
 
-Moving labware off-deck always requires user intervention, since the gripper can't reach outside of the robot. Omit the ``use_gripper`` parameter or explicitly set it to ``False``. If you try to move labware off-deck with ``use_gripper=True``, the API will raise a ``LabwareMovementNotAllowedError``.
+Moving labware off-deck always requires user intervention, because the gripper can't reach outside of the robot. Omit the ``use_gripper`` parameter or explicitly set it to ``False``. If you try to move labware off-deck with ``use_gripper=True``, the API will raise a ``LabwareMovementNotAllowedError``.
 
 You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it `onto` the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one::
 
