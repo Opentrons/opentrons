@@ -290,7 +290,7 @@ def test_other_module_conflict_checking(
             },
             new_location=DeckSlotName.SLOT_4,
             new_item=deck_conflict.OtherModule(
-                highest_z_including_labware=42,
+                highest_z_including_lab12ware=42,
                 name_for_errors="module_load_name",
             ),
         ),

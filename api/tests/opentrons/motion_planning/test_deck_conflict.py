@@ -451,12 +451,12 @@ def test_no_modules_when_heater_shaker(
         (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
         (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
         (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
-        (7, 8),
-        (8, 7),
-        (8, 9),
-        (9, 8),
-        (10, 11),
-        (11, 10),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_10),
     ],
 )
 def test_tip_rack_when_heater_shaker(

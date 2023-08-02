@@ -197,7 +197,8 @@ def check(
         restrictions += _create_restrictions(
             item=item, location=location, robot_type=robot_type
         )
-
+    print("after first restrictions")
+    print(restrictions)
     # check new item against existing restrictions
     for r in restrictions:
         if r.location == new_location and not r.is_allowed(new_item):
@@ -210,6 +211,8 @@ def check(
     new_restrictions = _create_restrictions(
         item=new_item, location=new_location, robot_type=robot_type
     )
+    print("after new restrictions")
+    print(new_restrictions)
 
     for r in new_restrictions:
         existing_item = existing_items.get(r.location)
@@ -245,7 +248,7 @@ def _create_ot2_restrictions(
         if location_south_of_fixed_trash is not None:
             restrictions.append(
                 _NoHeaterShakerModule(
-                    location=DeckSlotName(location_south_of_fixed_trash),
+                    location=DeckSlotName.from_primitive(location_south_of_fixed_trash),
                     source_item=item,
                     source_location=location,
                 )
@@ -265,7 +268,7 @@ def _create_ot2_restrictions(
         for hs_covered_location in get_adjacent_slots(location.as_int()):
             restrictions.append(
                 _NoModule(
-                    location=DeckSlotName(hs_covered_location),
+                    location=DeckSlotName.from_primitive(hs_covered_location),
                     source_item=item,
                     source_location=location,
                 )
@@ -274,7 +277,7 @@ def _create_ot2_restrictions(
         for hs_covered_location in get_east_west_slots(location.as_int()):
             restrictions.append(
                 _MaxHeight(
-                    location=DeckSlotName(hs_covered_location),
+                    location=DeckSlotName.from_primitive(hs_covered_location),
                     source_item=item,
                     source_location=location,
                     max_height=HS_MAX_X_ADJACENT_ITEM_HEIGHT,
