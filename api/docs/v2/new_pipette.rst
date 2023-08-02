@@ -204,7 +204,7 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
         | P1000 GEN2 (single channel) | 100-1000 µL        | ``p1000_single_gen2`` |
         +-----------------------------+--------------------+-----------------------+
 
-        See the pipette compatibility section below if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single chanel model.
+        See the OT-2 Pipette Generations section below if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-chanel model.
 
 
 OT-2 Pipette Generations
