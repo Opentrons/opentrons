@@ -61,7 +61,6 @@ export const getInitialRobotState: (
         slot: l.slot,
       })
     )
-    console.log('labware from getIntitialRobotState', labware)
     const pipettes: Record<string, PipetteTemporalProperties> = mapValues(
       initialDeckSetup.pipettes,
       (p: PipetteOnDeck): PipetteTemporalProperties => ({
