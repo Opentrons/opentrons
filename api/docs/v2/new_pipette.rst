@@ -216,7 +216,7 @@ The OT-2 works with the GEN1 and GEN2 pipette models. The newer GEN2 pipettes ha
     :header-rows: 1
     
     * - GEN2 Pipette
-      - Covers/Replaces GEN1 Pipette
+      - GEN1 Pipette
     * - P20 Single GEN2 (1-20 µL)
       - P10 Single GEN1 (1-10 µL)
     * - P20 Multi-Channel GEN2 (1-20 µL)
