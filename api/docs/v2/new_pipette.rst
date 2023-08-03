@@ -84,6 +84,10 @@ This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a sin
 
 .. versionadded:: 2.0
 
+When you load a pipette in this way, you are declaring that you want the specified pipette to be attached to the robot. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App or the touchscreen on Flex will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached.
+
+If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your gripper requires a protocol is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
+
 .. _new-multichannel-pipettes:
 
 Multi-Channel Pipettes
