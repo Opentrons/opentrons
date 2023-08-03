@@ -4321,7 +4321,7 @@
     "loadName": "biorad_384_wellplate_50ul"
   },
   "namespace": "opentrons",
-  "version": 1,
+  "version": 2,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,

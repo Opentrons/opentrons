@@ -1046,6 +1046,6 @@
     "loadName": "corning_96_wellplate_360ul_flat"
   },
   "namespace": "opentrons",
-  "version": 1,
+  "version": 2,
   "schemaVersion": 2
 }
