@@ -352,6 +352,7 @@ OT-2 Pipette Flow Rates
 
 The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes.
 .. removed and saved GEN1 info
+
 +---------------------------------+---------------+---------------+---------------+
 | Pipette                         | Aspirate      | Dispense      | Blow-out      |
 +=================================+===============+===============+===============+ 
