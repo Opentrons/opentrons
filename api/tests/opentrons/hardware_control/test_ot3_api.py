@@ -7,7 +7,6 @@ import pytest
 from decoy import Decoy
 from mock import AsyncMock, patch, Mock, PropertyMock, MagicMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
-import asyncio
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
@@ -1719,11 +1718,14 @@ async def test_estop_event_deactivate_module(
 
     estop_event = EstopStateNotification(old_state=old_state, new_state=new_state)
 
-    api._update_estop_state(estop_event)
-
-    await asyncio.sleep(0.1)
+    futures = api._update_estop_state(estop_event)
 
     if should_trigger:
+        assert len(futures) != 0
+
+        for fut in futures:
+            fut.result()
+
         decoy.verify(
             await tc.deactivate(must_be_running=False),
             await hs.deactivate_heater(must_be_running=False),
@@ -1731,3 +1733,5 @@ async def test_estop_event_deactivate_module(
             await md.deactivate(must_be_running=False),
             await td.deactivate(must_be_running=False),
         )
+    else:
+        assert len(futures) == 0

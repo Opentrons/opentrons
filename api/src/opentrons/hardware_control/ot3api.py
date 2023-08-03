@@ -1,4 +1,5 @@
 import asyncio
+from concurrent.futures import Future
 import contextlib
 from functools import partial, lru_cache
 from dataclasses import replace
@@ -206,7 +207,10 @@ class OT3API(
         self._backend = backend
         self._loop = loop
 
-        backend.estop_state_machine.add_listener(self._update_estop_state)
+        def estop_cb(event: HardwareEvent) -> None:
+            self._update_estop_state(event)
+
+        backend.estop_state_machine.add_listener(estop_cb)
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -296,26 +300,31 @@ class OT3API(
             except Exception:
                 mod_log.exception("Errored during door state event callback")
 
-    def _update_estop_state(self, event: HardwareEvent) -> None:
+    def _update_estop_state(self, event: HardwareEvent) -> "List[Future[None]]":
         if not isinstance(event, EstopStateNotification):
-            return
+            return []
         mod_log.info(
             f"Updating the estop status from {event.old_state} to {event.new_state}"
         )
+        futures: "List[Future[None]]" = []
         if (
             event.new_state == EstopState.PHYSICALLY_ENGAGED
             and event.old_state != EstopState.PHYSICALLY_ENGAGED
         ):
             # If the estop was just pressed, turn off every module.
             for mod in self._backend.module_controls.available_modules:
-                asyncio.run_coroutine_threadsafe(
-                    modules.utils.disable_module(mod), self._loop
+                futures.append(
+                    asyncio.run_coroutine_threadsafe(
+                        modules.utils.disable_module(mod), self._loop
+                    )
                 )
         for cb in self._callbacks:
             try:
                 cb(event)
             except Exception:
                 mod_log.exception("Errored during estop state event callback")
+
+        return futures
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
