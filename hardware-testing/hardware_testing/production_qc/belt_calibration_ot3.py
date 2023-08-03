@@ -56,9 +56,7 @@ async def _check_belt_accuracy(
         await api.home()
         await api.add_tip(mount, api.config.calibration.probe_length)
         try:
-            slot_offset = await find_pipette_offset(
-                api, mount, slot=slot
-            )
+            slot_offset = await find_pipette_offset(api, mount, slot=slot)
             ret[slot] = slot_offset
             print(f"Slot #{slot}: {slot_offset}")
         except CalibrationStructureNotFoundError as e:
