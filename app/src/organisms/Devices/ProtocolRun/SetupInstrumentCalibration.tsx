@@ -34,7 +34,9 @@ export function SetupInstrumentCalibration({
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
 
-  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({refetchInterval: EQUIPMENT_POLL_MS})
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const usesGripper = isGripperInCommands(
