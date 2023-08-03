@@ -3,9 +3,25 @@ import re
 from typing import Tuple
 import struct
 
+from opentrons_shared_data.errors.exceptions import (
+    InvalidInstrumentData,
+    PythonException,
+)
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
-SERIAL_RE = re.compile("^(?:GRPV)(?P<model>[0-9]{2,2})(?P<code>.{,12})$")
+# Separate string into 2 groups
+#  - model
+#  - code
+
+GRIPPER_REGEX_STRING = (
+    "^"  # start of string
+    "GRPV"  # The characters GRPV
+    r"(?P<model>\d{2})"  # "model" group contains exactly 2 digits
+    r"(?P<code>[\w\d]{0,12})"  # "code" group contains 0 to 12 inclusive alphanumeric characters
+    "$"  # end of string
+)
+
+SERIAL_RE = re.compile(GRIPPER_REGEX_STRING)
 
 SERIAL_FORMAT_MSG = (
     "Serial numbers must have the format GRPVMMXXXXXX... where"
@@ -25,8 +41,9 @@ def gripper_info_from_serial_string(serialval: str) -> Tuple[int, bytes]:
     """
     matches = SERIAL_RE.match(serialval.strip())
     if not matches:
-        raise ValueError(
-            f"The serial number {serialval.strip()} is not valid. {SERIAL_FORMAT_MSG}"
+        raise InvalidInstrumentData(
+            message=f"The serial number {serialval.strip()} is not valid. {SERIAL_FORMAT_MSG}",
+            detail={"serial": serialval},
         )
     model = int(matches.group("model"))
 
@@ -48,4 +65,11 @@ def gripper_serial_val_from_parts(model: int, serialval: bytes) -> bytes:
 
     you will not get what you put in.
     """
-    return struct.pack(">H16s", model, ensure_serial_length(serialval))
+    try:
+        return struct.pack(">H16s", model, ensure_serial_length(serialval))
+    except struct.error as e:
+        raise InvalidInstrumentData(
+            message="Invalid serial data",
+            detail={"model": model, "serial": serialval},
+            wrapping=[PythonException(e)],
+        )

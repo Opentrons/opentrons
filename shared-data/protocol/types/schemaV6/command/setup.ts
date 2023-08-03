@@ -102,7 +102,7 @@ interface LoadLabwareResult {
   definition: LabwareDefinition2
   offset: LabwareOffset
 }
-interface MoveLabwareParams {
+export interface MoveLabwareParams {
   labwareId: string
   newLocation: LabwareLocation
   strategy: LabwareMovementStrategy

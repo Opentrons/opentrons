@@ -78,7 +78,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size4}
+      borderRadius={BORDERS.borderRadiusSize4}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
@@ -92,12 +92,11 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex
-          borderRadius={BORDERS.size2}
+          borderRadius={BORDERS.borderRadiusSize2}
           padding={SPACING.spacing16}
           backgroundColor={COLORS.white}
           height="3.75rem"
           width="3.75rem"
-          marginRight={SPACING.spacing16}
         >
           <Icon
             name="circle"
@@ -110,11 +109,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <StyledText
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {liquid.displayName}
           </StyledText>
         </Flex>

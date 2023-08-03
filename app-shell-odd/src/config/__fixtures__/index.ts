@@ -8,6 +8,7 @@ import type {
   ConfigV14,
   ConfigV15,
   ConfigV16,
+  ConfigV17,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V12: ConfigV12 = {
@@ -91,5 +92,14 @@ export const MOCK_CONFIG_V16: ConfigV16 = {
   onDeviceDisplaySettings: {
     ...MOCK_CONFIG_V15.onDeviceDisplaySettings,
     unfinishedUnboxingFlowRoute: '/welcome',
+  },
+}
+
+export const MOCK_CONFIG_V17: ConfigV17 = {
+  ...MOCK_CONFIG_V16,
+  version: 17,
+  protocols: {
+    ...MOCK_CONFIG_V16.protocols,
+    applyHistoricOffsets: true,
   },
 }

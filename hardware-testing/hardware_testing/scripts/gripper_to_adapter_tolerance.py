@@ -8,7 +8,7 @@ from opentrons_hardware.hardware_control.gripper_settings import set_error_toler
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
+from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 
@@ -69,7 +69,7 @@ async def _run_test_sequence(
     api: OT3API,
     center: Point,
     action: str,
-    axis: OT3Axis,
+    axis: Axis,
     trials: int,
     max_error_pick_up: float,
     max_error_drop: float,
@@ -81,7 +81,7 @@ async def _run_test_sequence(
     check_pick_up = action == "pick-up"
     check_drop = action == "drop"
     max_error = max_error_pick_up if check_pick_up else max_error_drop
-    if axis == OT3Axis.X:
+    if axis == Axis.X:
         step_pnt = Point(x=step)
     else:
         step_pnt = Point(y=step)
@@ -107,7 +107,7 @@ async def _run_test_sequence(
                     dropped_off = False
                     await api.hold_jaw_width(UNGRIP_WIDTH)
                 else:
-                    if check_pick_up and axis == OT3Axis.Y:
+                    if check_pick_up and axis == Axis.Y:
                         # if pick-up is off along X, we don't want to re-center for drop
                         offset_for_this_drop = Point()
                     else:
@@ -121,10 +121,10 @@ async def _run_test_sequence(
                 result = picked_up if check_pick_up else dropped_off
                 if not result:
                     await api.hold_jaw_width(UNGRIP_WIDTH)
-                    await api.home([OT3Axis.Z_G])
+                    await api.home([Axis.Z_G])
                     break
                 elif t + 1 == trials:
-                    good_offsets.append(offset.x if axis == OT3Axis.X else offset.y)
+                    good_offsets.append(offset.x if axis == Axis.X else offset.y)
             if not result and not ui.get_user_answer("test remaining offsets"):
                 break
             offset += step_pnt * direction
@@ -165,9 +165,9 @@ async def _main(
     labware_center = await _find_labware_center(api, force)
     print(f"labware center: {labware_center}")
 
-    await api.home([OT3Axis.Z_G])
+    await api.home([Axis.Z_G])
 
-    async def _test(action: str, axis: OT3Axis) -> List[float]:
+    async def _test(action: str, axis: Axis) -> List[float]:
         return await _run_test_sequence(
             api,
             center=labware_center,
@@ -186,11 +186,11 @@ async def _main(
     good_pick_up_x = []
     good_pick_up_y = []
     if test_drop:
-        good_drop_y = await _test("drop", OT3Axis.Y)
-        good_drop_x = await _test("drop", OT3Axis.X)
+        good_drop_y = await _test("drop", Axis.Y)
+        good_drop_x = await _test("drop", Axis.X)
     if test_pick_up:
-        good_pick_up_y = await _test("pick-up", OT3Axis.Y)
-        good_pick_up_x = await _test("pick-up", OT3Axis.X)
+        good_pick_up_y = await _test("pick-up", Axis.Y)
+        good_pick_up_x = await _test("pick-up", Axis.X)
     ui.print_title("RESULTS")
     if test_drop:
         ui.print_header("DROP-Y")

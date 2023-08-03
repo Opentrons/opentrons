@@ -17,9 +17,11 @@ import {
 } from '../../../../../../redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
+import { useIsOT3 } from '../../../../hooks'
 
 jest.mock('../../../../../../redux/discovery/selectors')
 jest.mock('../../../../../../redux/analytics')
+jest.mock('../../../../hooks')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -30,6 +32,7 @@ const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const mockOnCloseClick = jest.fn()
 let mockTrackEvent: jest.Mock
@@ -55,6 +58,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     mockReachableRobot.name = 'reachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
+    mockUseIsOT3.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -66,7 +70,30 @@ describe('RobotSettings RenameRobotSlideout', () => {
 
     getByText('Rename Robot')
     getByText(
-      'Please enter 17 characters max using valid inputs: letters and numbers'
+      'To ensure reliable renaming of your robot, please connect to it via USB.'
+    )
+    getByText(
+      'Please enter 17 characters max using valid inputs: letters and numbers.'
+    )
+    getByText('Robot Name')
+    getByText('17 characters max')
+    getByRole('textbox')
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    expect(renameButton).toBeInTheDocument()
+    expect(renameButton).toBeDisabled()
+  })
+
+  it('should render title, description, label, input, and button for flex', () => {
+    mockUseIsOT3.mockReturnValue(true)
+    const [{ getByText, getByRole, queryByText }] = render()
+    getByText('Rename Robot')
+    expect(
+      queryByText(
+        'To ensure reliable renaming of your robot, please connect to it via USB.'
+      )
+    ).not.toBeInTheDocument()
+    getByText(
+      'Please enter 17 characters max using valid inputs: letters and numbers.'
     )
     getByText('Robot Name')
     getByText('17 characters max')

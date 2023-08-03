@@ -2,6 +2,8 @@ from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
 
+from opentrons_shared_data.errors import ErrorCodes
+
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
@@ -26,6 +28,8 @@ router = APIRouter()
 async def get_engaged_motors(
     hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> model.EngagedMotors:
+    # TODO (spp, 2023-07-06): Implement fetching Flex's engaged motors
+    #  https://opentrons.atlassian.net/browse/RET-1371
     try:
         engaged_axes = hardware.engaged_axes
         axes_dict = {
@@ -34,8 +38,10 @@ async def get_engaged_motors(
         }
         return model.EngagedMotors(**axes_dict)
     except ValidationError as e:
-        raise LegacyErrorResponse(message=str(e)).as_error(
-            status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise LegacyErrorResponse(
+            message=str(e), errorCode=ErrorCodes.GENERAL_ERROR.value.code
+        ).as_error(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -48,7 +54,6 @@ async def post_disengage_motors(
     axes: model.Axes, hardware: HardwareControlAPI = Depends(get_hardware)
 ) -> V1BasicResponse:
     input_axes = [Axis[ax.upper()] for ax in axes.axes]
-    # Do we want this endpoint to run on OT3?
     try:
         hardware = ensure_ot3_hardware(hardware)
     except HardwareNotSupportedError:

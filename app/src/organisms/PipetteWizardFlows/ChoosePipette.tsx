@@ -34,9 +34,10 @@ import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Portal } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
+import ninetySixChannel from '../../assets/images/change-pip/ninety-six-channel.png'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
@@ -67,7 +68,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.mediumBlueEnabled};
     border-width: 0; 
-    border-radius: ${BORDERS.size4};
+    border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;
@@ -141,7 +142,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   return (
     <Portal level="top">
       {isOnDevice ? (
-        <ModalShell height="100%" header={wizardHeader}>
+        <LegacyModalShell height="100%" header={wizardHeader}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             width="100%"
@@ -201,15 +202,14 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     onClick={proceed}
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                     buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-                    buttonType="primary"
                   />
                 </Flex>
               </Flex>
             )}
           </Flex>
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
-        <ModalShell width="47rem" height="30rem" header={wizardHeader}>
+        <LegacyModalShell width="47rem" height="30rem" header={wizardHeader}>
           {showExitConfirmation ? (
             <ExitModal
               goBack={() => setShowExitConfirmation(false)}
@@ -252,8 +252,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
                   >
                     <img
-                      //  TODO(jr, 11/2/22): change this image to the correct 96 channel pipette image
-                      src={singleChannelAndEightChannel}
+                      src={ninetySixChannel}
                       width="138.78px"
                       height="160px"
                       alt={bothMounts}
@@ -273,7 +272,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               </PrimaryButton>
             </Flex>
           )}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

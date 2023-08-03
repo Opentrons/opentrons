@@ -29,6 +29,7 @@ package_entries = {
     'shared-data': PackageEntry('shared_data'),
     'notify-server': PackageEntry('notify_server'),
     'hardware': PackageEntry('opentrons_hardware'),
+    'hardware-testing': PackageEntry('hardware_testing'),
     'usb-bridge': PackageEntry('usb_bridge'),
     'system-server': PackageEntry('system_server'),
     'server-utils': PackageEntry('server_utils'),
@@ -79,9 +80,9 @@ def _latest_tag_for_prefix(prefix, git_dir):
             'Could not find tag in {check_dir} matching {prefix} '.format(
                 check_dir=check_dir, prefix=prefix)
             + '- build before release or no tags. Using 0.0.0-dev\n')
-        tags_result = prefix.encode() + b'0.0.0-dev'
+        tags_result = prefix.encode('utf-8') + b'0.0.0-dev'
     tags_matching = tags_result.strip().split(b'\n')
-    return tags_matching[-1].decode()
+    return tags_matching[-1].decode('utf-8')
 
 def _latest_version_for_project(project, git_dir):
     prefix = project_entries[project].tag_prefix
@@ -90,11 +91,15 @@ def _latest_version_for_project(project, git_dir):
 
 def _ref_from_sha(sha):
     # codebuild leaves us in detached HEAD, so we need to pull some
-    # gymnastics to get a nice branch name. First, get all the tag and head
-    # refs
+    # gymnastics to get a nice branch name. First, get the branch ref if
+    # it exists. Then all the tag and head refs
+    branch_name = subprocess.check_output(
+        ['git', 'rev-parse', '--symbolic-full-name', '--verify', '--quiet', 'HEAD'],
+        cwd=CWD).strip().decode('utf-8').split('\n')
+
     allrefs = subprocess.check_output(
         ['git', 'show-ref', '--tags', '--heads'],
-        cwd=CWD).strip().decode().split('\n')
+        cwd=CWD).strip().decode('utf-8').split('\n')
     # Keep...
     matching = [
         this_ref for this_sha, this_ref in   # the refs
@@ -107,6 +112,10 @@ def _ref_from_sha(sha):
     # tags are the best
     for match in matching:
         if 'tags' in match:
+            return match.split('/')[-1]
+    # if we have a local branch name just use that
+    for match in matching:
+        if branch_name and branch_name[0] in match:
             return match.split('/')[-1]
     # local branches are next best
     for match in matching:
@@ -128,7 +137,7 @@ def dump_br_version(package, project, extra_tag='', git_dir=None):
     """
     normalized = get_version(package, project, extra_tag, git_dir)
     sha = subprocess.check_output(
-        ['git', 'rev-parse', 'HEAD'], cwd=CWD).strip().decode()
+        ['git', 'rev-parse', 'HEAD'], cwd=CWD).strip().decode('utf-8')
     branch = _ref_from_sha(sha)
     pref = package_entries[package].br_version_prefix
     return json.dumps({pref+'_version': normalized,

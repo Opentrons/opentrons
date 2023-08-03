@@ -9,12 +9,17 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { getNetworkInterfaces } from '../../../redux/networking'
 
 import { RobotStatusHeader } from '../RobotStatusHeader'
+
+import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
+import type { State } from '../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../redux/networking')
 jest.mock('../hooks')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
@@ -27,6 +32,9 @@ const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
+  typeof getNetworkInterfaces
+>
 
 const render = (props: React.ComponentProps<typeof RobotStatusHeader>) => {
   return renderWithProviders(
@@ -71,6 +79,9 @@ describe('RobotStatusHeader', () => {
           },
         },
       } as any)
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue({ wifi: null, ethernet: null })
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -85,6 +96,9 @@ describe('RobotStatusHeader', () => {
   it('renders the model of robot and robot name - OT-3', () => {
     props.name = 'buzz'
     props.robotModel = 'Opentrons Flex'
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'buzz')
+      .mockReturnValue({ wifi: null, ethernet: null })
     const [{ getByText }] = render(props)
     getByText('Opentrons Flex')
     getByText('buzz')
@@ -111,5 +125,37 @@ describe('RobotStatusHeader', () => {
     expect(runLink.getAttribute('href')).toEqual(
       '/devices/otie/protocol-runs/fakeRunId/run-preview'
     )
+  })
+
+  it('renders a wifi icon when connected by wifi and ethernet', () => {
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue({
+        wifi: { ipAddress: 'wifi-ip' } as SimpleInterfaceStatus,
+        ethernet: { ipAddress: 'ethernet-ip' } as SimpleInterfaceStatus,
+      })
+
+    const [{ getByLabelText }] = render(props)
+
+    getByLabelText('wifi')
+  })
+
+  it('renders an ethernet icon when only connected by ethernet', () => {
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue({
+        wifi: null,
+        ethernet: { ipAddress: 'ethernet-ip' } as SimpleInterfaceStatus,
+      })
+
+    const [{ getByLabelText }] = render(props)
+
+    getByLabelText('ethernet')
+  })
+
+  it('renders a usb icon when only connected locally', () => {
+    const [{ getByLabelText }] = render(props)
+
+    getByLabelText('usb')
   })
 })

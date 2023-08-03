@@ -16,7 +16,7 @@ for liquid handling commands from the :py:class:`.InstrumentContext` class.
 Loading A Pipette
 ------------------
 
-Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext.load_instrument`. This method requires the model of the instrument to load, the mount to load it in, and (optionally) a list of associated tipracks:
+Specify pipettes in your protocol using the :py:meth:`.ProtocolContext.load_instrument` method. This method requires the model of the instrument to load, the mount to load it in, and (optionally) a list of associated tip racks:
 
 .. code-block:: python
     :substitutions:
@@ -26,9 +26,10 @@ Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        # Load a P50 multi on the left slot
+        # Load a P50 8-Channel Pipette on the left mount
         left = protocol.load_instrument('p50_multi', 'left')
-        # Load a P1000 Single on the right slot, with two racks of tips
+        # Load a P1000 Single-Channel Pipette on the right mount
+        # with two racks of tips
         tiprack1 = protocol.load_labware('opentrons_96_tiprack_1000ul', 1)
         tiprack2 = protocol.load_labware('opentrons_96_tiprack_1000ul', 2)
         right = protocol.load_instrument('p1000_single', 'right',
@@ -36,9 +37,9 @@ Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext
 
 .. versionadded:: 2.0
 
-.. note::
+When you load a pipette in this way, you are declaring that you want the specified pipette to be attached to the robot. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App or the touchscreen on Flex will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached.
 
-    When you load a pipette in a protocol, you inform the OT-2 that you want the specified pipette to be present. Even if you do not use the pipette anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached to the OT-2.
+If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your gripper requires a protocol is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
 
 .. _new-multichannel-pipettes:
 

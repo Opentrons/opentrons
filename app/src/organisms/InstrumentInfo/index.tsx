@@ -20,13 +20,13 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
-
 interface InstrumentInfoProps {
   // NOTE: instrument will only be null while
   // in the middle of detach wizard which occludes
@@ -34,7 +34,8 @@ interface InstrumentInfoProps {
   instrument: InstrumentData | null
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
-  const { t } = useTranslation('instruments_dashboard')
+  const { t, i18n } = useTranslation('instruments_dashboard')
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
@@ -42,6 +43,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
+
   const sharedGripperWizardProps: Pick<
     React.ComponentProps<typeof GripperWizardFlows>,
     'attachedGripper' | 'closeFlow'
@@ -51,11 +53,25 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(null)
     },
   }
+  const is96Channel =
+    instrument != null &&
+    instrument.ok &&
+    instrument.mount !== 'extension' &&
+    // @ts-expect-error the mount acts as a type narrower here
+    instrument.data?.channels === 96
+
   const handleDetach: React.MouseEventHandler = () => {
-    if (instrument != null) {
+    setODDMaintenanceFlowInProgress()
+    if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
-          ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
+          ? {
+              ...sharedGripperWizardProps,
+              flowType: GRIPPER_FLOW_TYPES.DETACH,
+              onComplete: () => {
+                history.goBack()
+              },
+            }
           : {
               closeFlow: () => {
                 setWizardProps(null)
@@ -64,17 +80,17 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 history.goBack()
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.DETACH,
             }
       )
     }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
-    if (instrument != null) {
+    setODDMaintenanceFlowInProgress()
+    if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
           ? {
@@ -86,10 +102,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 setWizardProps(null)
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.CALIBRATE,
             }
       )
@@ -102,47 +117,57 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      {instrument != null ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          marginTop={SPACING.spacing24}
-        >
-          <InfoItem
-            label={t('last_calibrated')}
-            value={
-              instrument.data.calibratedOffset?.last_modified != null
-                ? formatTimestamp(
-                    instrument.data.calibratedOffset?.last_modified
-                  )
-                : t('no_cal_data')
-            }
-          />
-          <InfoItem label={t('firmware_version')} value="TODO" />
-          <InfoItem
-            label={t('serial_number')}
-            value={instrument.serialNumber}
-          />
-        </Flex>
+      {instrument != null && instrument.ok ? (
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            marginTop={SPACING.spacing24}
+          >
+            <InfoItem
+              label={t('last_calibrated')}
+              value={
+                instrument.data.calibratedOffset?.last_modified != null
+                  ? formatTimestamp(
+                      instrument.data.calibratedOffset?.last_modified
+                    )
+                  : i18n.format(t('no_cal_data'), 'capitalize')
+              }
+            />
+            {instrument.firmwareVersion != null && (
+              <InfoItem
+                label={t('firmware_version')}
+                value={instrument.firmwareVersion}
+              />
+            )}
+            <InfoItem
+              label={t('serial_number')}
+              value={instrument.serialNumber}
+            />
+          </Flex>
+          <Flex gridGap={SPACING.spacing8}>
+            <MediumButton
+              buttonType="secondary"
+              flex="1"
+              onClick={handleDetach}
+              buttonText={t('detach')}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+            <MediumButton
+              flex="1"
+              onClick={handleRecalibrate}
+              buttonText={
+                instrument.data.calibratedOffset?.last_modified == null
+                  ? t('calibrate')
+                  : t('recalibrate')
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+          </Flex>
+        </>
       ) : null}
-      <Flex gridGap={SPACING.spacing8}>
-        <MediumButton
-          buttonType="secondary"
-          flex="1"
-          onClick={handleDetach}
-          buttonText={t('detach')}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          justifyContent={JUSTIFY_CENTER}
-        />
-        <MediumButton
-          buttonType="primary"
-          flex="1"
-          onClick={handleRecalibrate}
-          buttonText={t('recalibrate')}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          justifyContent={JUSTIFY_CENTER}
-        />
-      </Flex>
       {wizardProps != null && 'mount' in wizardProps ? (
         <PipetteWizardFlows {...wizardProps} />
       ) : null}
@@ -160,7 +185,7 @@ interface InfoItemProps extends StyleProps {
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <Flex
-      borderRadius={BORDERS.size3}
+      borderRadius={BORDERS.borderRadiusSize3}
       backgroundColor={COLORS.lightGreyPressed}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

@@ -3,18 +3,49 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, PrimaryButton } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import type { CreateCommand, PipetteMount } from '@opentrons/shared-data'
 
 interface CalibrationErrorModalProps {
   proceed: () => void
   isOnDevice: boolean | null
   errorMessage: string
+  chainRunCommands: (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ) => Promise<any>
+  mount: PipetteMount
+  setShowErrorMessage: (message: string) => void
 }
 
 export function CalibrationErrorModal(
   props: CalibrationErrorModalProps
 ): JSX.Element {
-  const { proceed, isOnDevice, errorMessage } = props
+  const {
+    proceed,
+    isOnDevice,
+    errorMessage,
+    chainRunCommands,
+    mount,
+    setShowErrorMessage,
+  } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const handleProceed = (): void => {
+    chainRunCommands(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: mount,
+          },
+        },
+      ],
+      false
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(error => setShowErrorMessage(error.message))
+  }
   return (
     <SimpleWizardBody
       iconColor={COLORS.errorEnabled}
@@ -24,12 +55,11 @@ export function CalibrationErrorModal(
     >
       {isOnDevice ? (
         <SmallButton
-          onClick={proceed}
+          onClick={handleProceed}
           buttonText={i18n.format(t('next'), 'capitalize')}
-          buttonType="primary"
         />
       ) : (
-        <PrimaryButton onClick={proceed}>
+        <PrimaryButton onClick={handleProceed}>
           {i18n.format(t('next'), 'capitalize')}
         </PrimaryButton>
       )}

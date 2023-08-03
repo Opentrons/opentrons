@@ -1,41 +1,75 @@
+import { useSelector } from 'react-redux'
 import {
   Flex,
+  Btn,
   TYPOGRAPHY,
-  COLOR_ERROR,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  ALIGN_CENTER,
   SPACING,
+  COLORS,
+  RESPONSIVENESS,
   PrimaryButton,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import type { BadGripper, GripperData } from '@opentrons/api-client'
 
-const CAPITALIZE_FIRST_LETTER_STYLE = css`
-  &:first-letter {
-    text-transform: uppercase;
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    font-size: ${TYPOGRAPHY.fontSize22};
+
+    &:hover {
+      opacity: 100%;
+    }
   }
 `
+
 export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
-  const { proceed, attachedGripper, isRobotMoving, goBack } = props
+  const { proceed, isRobotMoving, goBack } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
-  const handleOnClick = (): void => {
-    attachedGripper == null ? setShowUnableToDetect(true) : proceed()
-  }
+  const [isPending, setIsPending] = React.useState(false)
   // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
-  useInstrumentsQuery({ refetchInterval: 3000 })
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    refetchInterval: 3000,
+  })
+  const isGripperAttached = (instrumentsQueryData?.data ?? []).some(
+    (i): i is GripperData | BadGripper => i.instrumentType === 'gripper'
+  )
+  const handleOnClick = (): void => {
+    setIsPending(true)
+    refetch()
+      .then(() => {
+        isGripperAttached ? proceed() : setShowUnableToDetect(true)
+        setIsPending(false)
+      })
+      .catch(() => {
+        setShowUnableToDetect(true)
+        setIsPending(false)
+      })
+  }
 
   if (isRobotMoving)
     return (
@@ -46,28 +80,31 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={COLOR_ERROR}
+      iconColor={COLORS.errorEnabled}
       isSuccess={false}
     >
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
+        alignItems={ALIGN_FLEX_END}
         gridGap={SPACING.spacing8}
       >
-        <Link
-          role="button"
-          css={TYPOGRAPHY.darkLinkH4SemiBold}
-          onClick={goBack}
-        >
-          {t('shared:go_back')}
-        </Link>
-        <PrimaryButton
-          css={CAPITALIZE_FIRST_LETTER_STYLE}
-          onClick={() => setShowUnableToDetect(false)}
-        >
-          {t('shared:try_again')}
-        </PrimaryButton>
+        <Btn onClick={() => setShowUnableToDetect(false)}>
+          <StyledText css={GO_BACK_BUTTON_STYLE}>
+            {t('shared:go_back')}
+          </StyledText>
+        </Btn>
+        {isOnDevice ? (
+          <SmallButton
+            buttonText={t('try_again')}
+            disabled={isPending}
+            onClick={handleOnClick}
+          />
+        ) : (
+          <PrimaryButton disabled={isPending} onClick={handleOnClick}>
+            {t('try_again')}
+          </PrimaryButton>
+        )}
       </Flex>
     </SimpleWizardBody>
   ) : (
@@ -90,7 +127,8 @@ export const MountGripper = (
       bodyText={
         <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
       }
-      proceedButtonText={t('shared:continue')}
+      proceedButtonText={t('continue')}
+      proceedIsDisabled={isPending}
       proceed={handleOnClick}
       back={goBack}
     />

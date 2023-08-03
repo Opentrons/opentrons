@@ -39,6 +39,8 @@ async def test_labware_hash_match() -> None:
     )
 
     labware_model = LabwareDefinition.parse_obj(labware_dict)
-    labware_model_dict = cast(LabwareDefDict, labware_model.dict(exclude_none=True))
+    labware_model_dict = cast(
+        LabwareDefDict, labware_model.dict(exclude_none=True, exclude_unset=True)
+    )
 
     assert hash_labware_def(labware_dict) == hash_labware_def(labware_model_dict)

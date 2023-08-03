@@ -18,7 +18,7 @@ interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (
     isExpanded: boolean,
-    type: 'factoryReset' | 'renameRobot'
+    type: 'deviceReset' | 'renameRobot'
   ) => void
   isRobotBusy: boolean
 }

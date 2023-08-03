@@ -28,7 +28,7 @@ export type ButtonCategory = 'default' | 'rounded'
 type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
   onClick: React.MouseEventHandler
-  buttonType: SmallButtonTypes
+  buttonType?: SmallButtonTypes
   buttonText: React.ReactNode
   iconPlacement?: IconPlacement
   iconName?: IconName
@@ -38,7 +38,7 @@ interface SmallButtonProps extends StyleProps {
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
   const {
-    buttonType,
+    buttonType = 'primary',
     buttonText,
     buttonCategory = 'default',
     disabled,
@@ -100,10 +100,9 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       .defaultBackgroundColor};
     cursor: default;
     border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.size5
-      : BORDERS.size4};
+      ? BORDERS.borderRadiusSize5
+      : BORDERS.borderRadiusSize4};
     box-shadow: none;
-    padding: ${SPACING.spacing16} ${SPACING.spacing24};
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
@@ -141,6 +140,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       css={SMALL_BUTTON_STYLE}
       aria-label={`SmallButton_${buttonType}`}
       disabled={disabled}
+      padding={
+        iconPlacement != null
+          ? SPACING.spacing16
+          : `${SPACING.spacing16} ${SPACING.spacing24}`
+      }
       {...buttonProps}
     >
       <Flex
@@ -154,6 +158,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
               size="1.75rem"
               marginRight={SPACING.spacing8}
               name={iconName}
+              spin={iconName === 'ot-spinner'}
             />
           </Flex>
         ) : null}
@@ -171,6 +176,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
               size="1.75rem"
               marginLeft={SPACING.spacing8}
               name={iconName}
+              spin={iconName === 'ot-spinner'}
             />
           </Flex>
         ) : null}

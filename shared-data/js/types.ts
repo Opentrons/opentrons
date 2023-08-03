@@ -16,17 +16,19 @@ import {
   MAGNETIC_BLOCK_TYPE,
   GEN1,
   GEN2,
-  GEN3,
+  FLEX,
   LEFT,
   RIGHT,
   GRIPPER_V1,
   GRIPPER_V1_1,
+  GRIPPER_V1_2,
+  EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
-import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
+import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -211,7 +213,10 @@ export type ModuleModel =
   | HeaterShakerModuleModel
   | MagneticBlockModel
 
-export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
+export type GripperModel =
+  | typeof GRIPPER_V1
+  | typeof GRIPPER_V1_1
+  | typeof GRIPPER_V1_2
 
 export type ModuleModelWithLegacy =
   | ModuleModel
@@ -232,7 +237,7 @@ export interface Dimensions {
 }
 
 export interface DeckRobot {
-  model: string
+  model: RobotType
 }
 
 export interface DeckFixture {
@@ -324,11 +329,7 @@ export interface ModuleDefinition {
   twoDimensionalRendering: INode
 }
 
-export type AffineTransformMatrix = [
-  [number, number, number],
-  [number, number, number],
-  [number, number, number]
-]
+export type AffineTransformMatrix = number[][]
 
 export interface SlotTransforms {
   [deckOtId: string]: {
@@ -342,10 +343,10 @@ export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8 | 96
 
-export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof GEN3
+export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 
 export type PipetteMount = typeof LEFT | typeof RIGHT
-
+export type GantryMount = typeof LEFT | typeof RIGHT | typeof EXTENSION
 export interface FlowRateSpec {
   value: number
   min: number
@@ -454,6 +455,7 @@ export interface ProtocolResource {
   id: string
   createdAt: string
   protocolType: 'json' | 'python'
+  robotType: RobotType
   metadata: ProtocolMetadata
   analysisSummaries: ProtocolAnalysisSummary[]
   files: ResourceFile[]
@@ -463,10 +465,15 @@ export interface ProtocolResource {
 export interface ProtocolAnalysesResource {
   analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
 }
+export type MotorAxis =
+  | 'x'
+  | 'y'
+  | 'leftZ'
+  | 'rightZ'
+  | 'leftPlunger'
+  | 'rightPlunger'
 
-export type MotorAxis = Array<
-  'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
->
+export type MotorAxes = MotorAxis[]
 
 export type ThermalAdapterName =
   | 'PCR Adapter'

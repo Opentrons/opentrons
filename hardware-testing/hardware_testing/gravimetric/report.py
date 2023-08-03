@@ -1,9 +1,10 @@
 """Report."""
 from dataclasses import fields
 from enum import Enum
-from typing import List, Tuple
+from typing import List, Tuple, Any
 
 from hardware_testing.data.csv_report import (
+    CSVResult,
     CSVReport,
     CSVSection,
     CSVLine,
@@ -78,6 +79,69 @@ class EnvironmentReportState(str, Enum):
     MAX = "environment-max"
 
 
+def create_csv_test_report_photometric(
+    volumes: List[float], cfg: config.PhotometricConfig, run_id: str
+) -> CSVReport:
+    """Create CSV test report."""
+    env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
+    meas_vols: List[Tuple[int, int, int]] = []
+
+    for vol in volumes:
+        meas_vols += [
+            (
+                vol,  # type: ignore[misc]
+                0,
+                trial,
+            )
+            for trial in range(cfg.trials)
+        ]
+
+    report = CSVReport(
+        test_name=cfg.name,
+        run_id=run_id,
+        sections=[
+            CSVSection(
+                title="SERIAL-NUMBERS",
+                lines=[
+                    CSVLine("robot", [str]),
+                    CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
+                    CSVLine("environment", [str]),
+                    CSVLine("liquid", [str]),
+                ],
+            ),
+            CSVSection(
+                title="CONFIG",
+                lines=[
+                    CSVLine(field.name, [field.type])
+                    for field in fields(config.PhotometricConfig)
+                    if field.name not in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT
+                ],
+            ),
+            CSVSection(
+                title="MEASUREMENTS",
+                lines=[
+                    CSVLine(
+                        create_measurement_tag(measurement, volume, channel, trial)
+                        + f"-{e}",
+                        [float],
+                    )
+                    for volume, channel, trial in meas_vols
+                    for measurement in MeasurementType
+                    for e in env_info
+                    if volume is not None or trial < config.NUM_BLANK_TRIALS
+                ],
+            ),
+        ],
+    )
+    # might as well set the configuration values now
+    for field in fields(config.PhotometricConfig):
+        if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
+            continue
+        report("CONFIG", field.name, [getattr(cfg, field.name)])
+    return report
+
+
 def create_csv_test_report(
     volumes: List[float], cfg: config.GravimetricConfig, run_id: str
 ) -> CSVReport:
@@ -115,6 +179,11 @@ def create_csv_test_report(
         + [f"trial_{t+1}" for t in range(cfg.trials)]
     )
 
+    def _field_type_not_using_typing(t: Any) -> Any:
+        if t == List[int]:
+            return list
+        return t
+
     report = CSVReport(
         test_name=cfg.name,
         run_id=run_id,
@@ -124,6 +193,7 @@ def create_csv_test_report(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
@@ -132,7 +202,7 @@ def create_csv_test_report(
             CSVSection(
                 title="CONFIG",
                 lines=[
-                    CSVLine(field.name, [field.type])
+                    CSVLine(field.name, [_field_type_not_using_typing(field.type)])
                     for field in fields(config.GravimetricConfig)
                     if field.name not in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT
                 ],
@@ -204,17 +274,48 @@ def create_csv_test_report(
     return report
 
 
-def store_serial_numbers(
+def store_serial_numbers_pm(
     report: CSVReport,
     robot: str,
     pipette: str,
-    scale: str,
+    tips: str,
     environment: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
+    report("SERIAL-NUMBERS", "environment", [environment])
+    report("SERIAL-NUMBERS", "liquid", [liquid])
+
+
+def store_measurements_pm(
+    report: CSVReport,
+    tag: str,
+    data: EnvironmentData,
+) -> None:
+    """Report measurement."""
+    for field in fields(EnvironmentData):
+        f_tag = field.name.replace("_", "-")
+        report("MEASUREMENTS", f"{tag}-{f_tag}", [getattr(data, field.name)])
+
+
+def store_serial_numbers(
+    report: CSVReport,
+    robot: str,
+    pipette: str,
+    tips: str,
+    scale: str,
+    environment: str,
+    liquid: str,
+) -> None:
+    """Report serial numbers."""
+    report.set_robot_id(robot)
+    report.set_device_id(pipette, CSVResult.PASS)
+    report("SERIAL-NUMBERS", "robot", [robot])
+    report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
     report("SERIAL-NUMBERS", "scale", [scale])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])

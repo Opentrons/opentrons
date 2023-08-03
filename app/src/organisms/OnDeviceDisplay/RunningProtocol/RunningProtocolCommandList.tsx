@@ -4,17 +4,18 @@ import { css } from 'styled-components'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import {
-  Flex,
-  DIRECTION_ROW,
-  COLORS,
-  SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
-  POSITION_RELATIVE,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  POSITION_RELATIVE,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -36,19 +37,20 @@ import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.darkBlack70};
-  font-size: 1.75rem;
+  font-size: ${TYPOGRAPHY.fontSize28};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  line-height: 2.25rem;
+  line-height: ${TYPOGRAPHY.lineHeight36};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  height: max-content;
 `
 
 const COMMAND_ROW_STYLE = css`
-  font-size: 1.375rem;
-  line-height: 1.75rem;
+  font-size: ${TYPOGRAPHY.fontSize22};
+  line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -94,7 +96,6 @@ export function RunningProtocolCommandList({
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const ref = React.useRef<ViewportListRef>(null)
   const currentRunStatus = t(`status_${runStatus}`)
-
   const onStop = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
@@ -120,20 +121,26 @@ export function RunningProtocolCommandList({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing40}
+      height="29.5rem"
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_FLEX_START}
         gridGap={SPACING.spacing40}
+        height="6.75rem"
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-          <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {currentRunStatus}
           </StyledText>
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
-        <Flex gridGap="1.5rem">
-          <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="5rem" />
+        <Flex height="100%" gridGap="1.5rem" alignItems={ALIGN_CENTER}>
+          <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="2.5rem" />
           <PlayPauseButton
             onTogglePlayPause={onTogglePlayPause}
             buttonSize="6.25rem"
@@ -156,6 +163,7 @@ export function RunningProtocolCommandList({
             ref={ref}
             items={robotSideAnalysis?.commands}
             initialIndex={currentRunCommandIndex}
+            margin={0}
           >
             {(command, index) => {
               const backgroundColor =
@@ -176,7 +184,7 @@ export function RunningProtocolCommandList({
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.size2}
+                    borderRadius={BORDERS.borderRadiusSize2}
                   >
                     <CommandIcon command={command} />
                     <CommandText

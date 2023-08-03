@@ -2,7 +2,7 @@ test_name: loadModule command success
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
   - parametrize:
       key: model
       vals:
@@ -15,13 +15,13 @@ marks:
 stages:
   - name: Get modules
     request:
-      url: '{host:s}:{port:d}/modules'
+      url: '{ot2_server_base_url}/modules'
       method: GET
     response:
       status_code: 200
   - name: Create Empty Run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -39,7 +39,7 @@ stages:
           run_id: data.id
   - name: Create loadModule Command
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: POST
       params:
         waitUntilComplete: true

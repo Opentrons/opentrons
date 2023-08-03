@@ -118,6 +118,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .load_adapter import (
+    LoadAdapter,
+    LoadAdapterParams,
+    LoadAdapterCreate,
+    LoadAdapterResult,
+    LoadAdapterCommandType,
+)
+
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -239,6 +247,23 @@ from .blow_out_in_place import (
     BlowOutInPlace,
 )
 
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarImplementation,
+    SetStatusBarCommandType,
+)
+
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -310,12 +335,24 @@ __all__ = [
     "HomeCreate",
     "HomeResult",
     "HomeCommandType",
+    # retract axis command models
+    "RetractAxis",
+    "RetractAxisCreate",
+    "RetractAxisParams",
+    "RetractAxisResult",
+    "RetractAxisCommandType",
     # load labware command models
     "LoadLabware",
     "LoadLabwareCreate",
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # load adapter command models
+    "LoadAdapter",
+    "LoadAdapterCreate",
+    "LoadAdapterParams",
+    "LoadAdapterResult",
+    "LoadAdapterCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
@@ -400,6 +437,13 @@ __all__ = [
     "BlowOutInPlaceCreate",
     "BlowOutInPlaceImplementation",
     "BlowOutInPlace",
+    # set status bar command models
+    "SetStatusBar",
+    "SetStatusBarParams",
+    "SetStatusBarCreate",
+    "SetStatusBarResult",
+    "SetStatusBarImplementation",
+    "SetStatusBarCommandType",
     # load liquid command models
     "LoadLiquid",
     "LoadLiquidCreate",

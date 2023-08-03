@@ -30,7 +30,7 @@ export interface SlideoutProps {
 
 const SHARED_STYLE = css`
   z-index: 2;
-  overflow-x: hidden;
+  overflow: hidden;
   @keyframes slidein {
     from {
       transform: translateX(100%);
@@ -196,7 +196,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"
-            overflowY="scroll"
+            overflowY="auto"
             data-testid={`Slideout_body_${
               typeof title === 'string' ? title : ''
             }`}

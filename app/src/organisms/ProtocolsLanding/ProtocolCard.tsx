@@ -9,6 +9,7 @@ import {
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
   OT3_STANDARD_MODEL,
+  getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -47,6 +48,7 @@ import {
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
@@ -181,6 +183,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid={`ProtocolCard_${protocolDisplayName}`}
+            overflowWrap="anywhere"
           >
             {protocolDisplayName}
           </StyledText>
@@ -241,7 +244,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                             }
                           />
                         ) : null}
-                        {/* TODO(bh, 2022-10-14): insert gripper if found */}
+                        {mostRecentAnalysis != null &&
+                        getProtocolUsesGripper(mostRecentAnalysis) ? (
+                          <InstrumentContainer
+                            displayName={getGripperDisplayName('gripperV1')}
+                          />
+                        ) : null}
                       </Flex>
                     ),
                   }[analysisStatus]

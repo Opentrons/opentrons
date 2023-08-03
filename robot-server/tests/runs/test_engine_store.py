@@ -8,7 +8,7 @@ from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, API
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import (
     RunResult,
@@ -19,16 +19,6 @@ from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
-
-
-@pytest.fixture
-def hardware_api(
-    decoy: Decoy,
-) -> HardwareControlAPI:
-    """Return a mock in the shape of a HardwareControlAPI."""
-    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
-    # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -98,7 +88,7 @@ async def test_create_engine_uses_robot_type(
     """It should create ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=HardwareControlAPI)
+    hardware_api = decoy.mock(cls=API)
     subject = EngineStore(
         hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
     )
@@ -202,7 +192,7 @@ async def test_get_default_engine_robot_type(
     """It should create default ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=HardwareControlAPI)
+    hardware_api = decoy.mock(cls=API)
     subject = EngineStore(
         hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
     )

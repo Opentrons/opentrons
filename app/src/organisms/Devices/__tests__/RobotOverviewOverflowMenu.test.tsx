@@ -190,7 +190,7 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
-  it('clicking home gantry should home the gantry', () => {
+  it('clicking home gantry should home the robot arm', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button')

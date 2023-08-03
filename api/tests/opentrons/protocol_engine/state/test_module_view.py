@@ -18,6 +18,7 @@ from opentrons.protocol_engine.types import (
     DeckType,
     ModuleOffsetVector,
     HeaterShakerLatchStatus,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -333,27 +334,27 @@ def test_get_module_offset_for_ot2_standard(
     argvalues=[
         (
             lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_1,
+            DeckSlotName.SLOT_1.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_3,
+            DeckSlotName.SLOT_3.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
-            DeckSlotName.SLOT_7,
+            DeckSlotName.SLOT_7.to_ot3_equivalent(),
             LabwareOffsetVector(x=-20.005, y=67.96, z=0.26),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_1,
+            DeckSlotName.SLOT_1.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_3,
+            DeckSlotName.SLOT_3.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
         (
@@ -715,6 +716,13 @@ def test_thermocycler_dodging_by_slots(
 
 
 @pytest.mark.parametrize(
+    argnames=["from_slot", "to_slot"],
+    argvalues=[
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_B2, DeckSlotName.SLOT_D1),
+    ],
+)
+@pytest.mark.parametrize(
     argnames=["module_definition", "should_dodge"],
     argvalues=[
         (lazy_fixture("tempdeck_v1_def"), False),
@@ -727,6 +735,8 @@ def test_thermocycler_dodging_by_slots(
     ],
 )
 def test_thermocycler_dodging_by_modules(
+    from_slot: DeckSlotName,
+    to_slot: DeckSlotName,
     module_definition: ModuleDefinition,
     should_dodge: bool,
 ) -> None:
@@ -741,9 +751,7 @@ def test_thermocycler_dodging_by_modules(
         },
     )
     assert (
-        subject.should_dodge_thermocycler(
-            from_slot=DeckSlotName.SLOT_8, to_slot=DeckSlotName.SLOT_1
-        )
+        subject.should_dodge_thermocycler(from_slot=from_slot, to_slot=to_slot)
         is should_dodge
     )
 
@@ -1443,6 +1451,38 @@ def test_thermocycler_validate_target_block_temperature(
     assert result == input_temperature
 
 
+@pytest.mark.parametrize(
+    argnames=["input_time", "validated_time"],
+    argvalues=[(0.0, 0.0), (0.123, 0.123), (123.456, 123.456), (1234567, 1234567)],
+)
+def test_thermocycler_validate_hold_time(
+    module_view_with_thermocycler: ModuleView,
+    input_time: float,
+    validated_time: float,
+) -> None:
+    """It should return a valid hold time."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    result = subject.validate_hold_time(input_time)
+
+    assert result == validated_time
+
+
+@pytest.mark.parametrize("input_time", [-0.1, -123])
+def test_thermocycler_validate_hold_time_raises(
+    module_view_with_thermocycler: ModuleView,
+    input_time: float,
+) -> None:
+    """It should raise on invalid hold time."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+
+    with pytest.raises(errors.InvalidHoldTimeError):
+        subject.validate_hold_time(input_time)
+
+
 @pytest.mark.parametrize("input_temperature", [-0.001, 99.001])
 def test_thermocycler_validate_target_block_temperature_raises(
     module_view_with_thermocycler: ModuleView,
@@ -1704,3 +1744,48 @@ def test_is_edge_move_unsafe(
     result = subject.is_edge_move_unsafe(mount=mount, target_slot=target_slot)
 
     assert result is expected_result
+
+
+@pytest.mark.parametrize(
+    argnames=["module_def", "expected_offset_data"],
+    argvalues=[
+        (
+            lazy_fixture("thermocycler_v2_def"),
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
+            ),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=0.5),
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            None,
+        ),
+    ],
+)
+def test_get_default_gripper_offsets(
+    module_def: ModuleDefinition,
+    expected_offset_data: Optional[LabwareMovementOffsetData],
+) -> None:
+    """It should return the correct gripper offsets, if present."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+        },
+        requested_model_by_module_id={
+            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,  # Does not matter
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                definition=module_def,
+            ),
+        },
+    )
+    assert subject.get_default_gripper_offsets("module-1") == expected_offset_data

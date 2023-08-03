@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { Portal } from '../../../../App/portal'
-import { ModalShell } from '../../../../molecules/Modal'
+import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibrateDeck } from '../../../../organisms/CalibrateDeck'
 import { LoadingState } from '../../../../organisms/CalibrationPanels'
@@ -105,12 +105,12 @@ export function useDashboardCalibrateDeck(
   let Wizard: JSX.Element | null = (
     <Portal level="top">
       {startingSession ? (
-        <ModalShell
+        <LegacyModalShell
           width="47rem"
           header={<WizardHeader title={t('deck_calibration')} />}
         >
           <LoadingState />
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
         <CalibrateDeck
           session={deckCalSession}

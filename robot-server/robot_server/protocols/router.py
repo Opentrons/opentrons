@@ -16,7 +16,6 @@ from opentrons.protocol_reader import (
     FileHasher,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
@@ -303,6 +302,28 @@ async def get_protocols(
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(data=data, meta=meta),
         status_code=status.HTTP_200_OK,
+    )
+
+
+@protocols_router.get(
+    path="/protocols/ids",
+    summary="Get uploaded protocol ids",
+    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
+)
+async def get_protocol_ids(
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> PydanticResponse[SimpleMultiBody[str]]:
+    """Get a list of all protocol ids stored on the server.
+
+    Args:
+        protocol_store: In-memory database of protocol resources.
+    """
+    protocol_ids = protocol_store.get_all_ids()
+
+    meta = MultiBodyMeta(cursor=0, totalLength=len(protocol_ids))
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(data=protocol_ids, meta=meta)
     )
 
 

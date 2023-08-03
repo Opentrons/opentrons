@@ -42,7 +42,7 @@ async def test_calibrate_module_implementation(
     """Test Calibration command execution."""
     subject = CalibrateModuleImplementation(state_view, ot3_hardware_api)
 
-    location = DeckSlotLocation(slotName=DeckSlotName("3"))
+    location = DeckSlotLocation(slotName=DeckSlotName("D3"))
     module_id = "module123"
     labware_id = "labware123"
     module_serial = "TC1234abcd"
@@ -71,7 +71,7 @@ async def test_calibrate_module_implementation(
         await calibration.calibrate_module(
             hcapi=ot3_hardware_api,
             mount=OT3Mount.LEFT,
-            slot=location.slotName.as_int(),
+            slot=location.slotName.id,
             module_id=module_serial,
             nominal_position=Point(x=3, y=2, z=1),
         )

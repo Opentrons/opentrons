@@ -1,8 +1,9 @@
 import net from 'net'
 import fetch from 'node-fetch'
 import intersectionBy from 'lodash/intersectionBy'
+import isEqual from 'lodash/isEqual'
 import unionBy from 'lodash/unionBy'
-import xorBy from 'lodash/xorBy'
+import xorWith from 'lodash/xorWith'
 
 import {
   ROBOT_SERVER_HEALTH_PATH,
@@ -91,11 +92,12 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
     // if xor (symmetric difference) returns values, then elements exist in
     // one list and not the other and need to be added to and/or removed from the queue
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (nextList && xorBy(pollQueue, nextList, 'ip').length > 0) {
+    if (nextList && xorWith(pollQueue, nextList, isEqual).length > 0) {
       // keeping the order of `pollQueue`, remove all elements that aren't
       // in the new list via `intersection`, then add new elements via `union`
       pollQueue = unionBy(
-        intersectionBy(pollQueue, nextList, 'ip'),
+        // prefer reference from nextList
+        intersectionBy(nextList, pollQueue, 'ip'),
         nextList,
         'ip'
       )

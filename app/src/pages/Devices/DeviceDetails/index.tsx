@@ -7,7 +7,6 @@ import {
   Flex,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  OVERFLOW_SCROLL,
   SPACING,
   COLORS,
 } from '@opentrons/components'
@@ -32,6 +31,7 @@ export function DeviceDetails(): JSX.Element | null {
   if (robot == null && isScanning) return null
 
   return robot != null ? (
+    // TODO(bh, 2023-05-31): substitute wrapped AppApiHostProvider that registers/authorizes
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
@@ -39,8 +39,7 @@ export function DeviceDetails(): JSX.Element | null {
     >
       <Box
         minWidth="36rem"
-        height="100%"
-        overflow={OVERFLOW_SCROLL}
+        height="max-content"
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
         paddingBottom={SPACING.spacing48}

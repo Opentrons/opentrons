@@ -30,7 +30,7 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid="UnMatchedModuleWarning_title"
           >
-            {t('module_mismatch_title')}
+            {t('extra_module_attached')}
           </StyledText>
 
           <StyledText as="p" data-testid="UnMatchedModuleWarning_body">

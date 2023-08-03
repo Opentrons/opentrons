@@ -17,6 +17,8 @@ from typing_extensions import TypeGuard
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -30,6 +32,23 @@ from opentrons.hardware_control.modules.types import (
 
 if TYPE_CHECKING:
     from .labware import Well
+
+
+# The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
+_COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
+
+# Mapping of user-facing pipette names to names used by the internal Opentrons system
+_FLEX_PIPETTE_NAMES_MAP = {
+    "p50_single_gen3": "p50_single_flex",
+    "flex_1channel_50": "p50_single_flex",
+    "p50_multi_gen3": "p50_multi_flex",
+    "flex_8channel_50": "p50_multi_flex",
+    "p1000_single_gen3": "p1000_single_flex",
+    "flex_1channel_1000": "p1000_single_flex",
+    "p1000_multi_gen3": "p1000_multi_flex",
+    "flex_8channel_1000": "p1000_multi_flex",
+    "flex_96channel_1000": "p1000_96",
+}
 
 
 class InvalidPipetteMountError(ValueError):
@@ -80,30 +99,59 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     pipette_name = ensure_lowercase_name(pipette_name)
 
     try:
-        return PipetteNameType(pipette_name)
+        if pipette_name in _FLEX_PIPETTE_NAMES_MAP.keys():
+            # TODO (spp: 2023-07-11): !!! VERY IMPORTANT!!!
+            #  We DO NOT want to support the old 'gen3' suffixed names for Flex launch.
+            #  This provision to accept the old names is added only for maintaining
+            #  backwards compatibility during internal testing and should be phased out.
+            #  So remove this name mapping and conversion at an appropriate time before launch
+            checked_name = PipetteNameType(_FLEX_PIPETTE_NAMES_MAP[pipette_name])
+        else:
+            checked_name = PipetteNameType(pipette_name)
+        return checked_name
     except ValueError as e:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
         ) from e
 
 
-def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
-    """Ensure that a primitive value matches a named deck slot."""
+def ensure_deck_slot(
+    deck_slot: Union[int, str], api_version: APIVersion
+) -> DeckSlotName:
+    """Ensure that a primitive value matches a named deck slot.
+
+    Params:
+        deck_slot: The primitive value to validate. Valid values are like `5`, `"5"`, or `"C2"`.
+        api_version: The Python Protocol API version whose rules to use to validate the value.
+            Values like `"C2"` are only supported in newer versions.
+
+    Raises:
+        TypeError: If you provide something that's not an `int` or `str`.
+        ValueError: If the value does not match a known deck slot.
+        APIVersionError: If you provide a value like `"C2"`, but `api_version` is too old.
+    """
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
     try:
-        # TODO(jbl 2023-04-25) this should raise an error when below version 2.15 and using deck coordinates
-        return DeckSlotName.from_primitive(deck_slot)
+        parsed_slot = DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
 
+    is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
+    if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
+        alternative = parsed_slot.to_ot2_equivalent().id
+        raise APIVersionError(
+            f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
+            f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
+            f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
+        )
+
+    return parsed_slot
+
 
 def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
-    if robot_type == "OT-2 Standard":
-        return str(slot_name)
-    else:
-        return slot_name.as_coordinate()
+    return slot_name.to_equivalent_for_robot_type(robot_type).id
 
 
 def ensure_lowercase_name(name: str) -> str:

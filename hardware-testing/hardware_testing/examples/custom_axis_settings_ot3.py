@@ -6,7 +6,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 
 CUSTOM_AXIS_SETTINGS = {
-    types.OT3Axis.X: helpers_ot3.GantryLoadSettings(
+    types.Axis.X: helpers_ot3.GantryLoadSettings(
         max_speed=300,
         acceleration=500,
         max_start_stop_speed=1,
@@ -14,7 +14,7 @@ CUSTOM_AXIS_SETTINGS = {
         hold_current=0.1,
         run_current=1.4,
     ),
-    types.OT3Axis.Y: helpers_ot3.GantryLoadSettings(
+    types.Axis.Y: helpers_ot3.GantryLoadSettings(
         max_speed=300,
         acceleration=500,
         max_start_stop_speed=1,
@@ -22,7 +22,7 @@ CUSTOM_AXIS_SETTINGS = {
         hold_current=0.1,
         run_current=1.4,
     ),
-    types.OT3Axis.Z_L: helpers_ot3.GantryLoadSettings(
+    types.Axis.Z_L: helpers_ot3.GantryLoadSettings(
         max_speed=60,
         acceleration=200,
         max_start_stop_speed=1,
@@ -30,7 +30,7 @@ CUSTOM_AXIS_SETTINGS = {
         hold_current=0.1,
         run_current=1.4,
     ),
-    types.OT3Axis.Z_R: helpers_ot3.GantryLoadSettings(
+    types.Axis.Z_R: helpers_ot3.GantryLoadSettings(
         max_speed=60,
         acceleration=200,
         max_start_stop_speed=1,

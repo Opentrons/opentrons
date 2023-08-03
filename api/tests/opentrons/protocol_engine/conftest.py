@@ -9,6 +9,7 @@ from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
@@ -17,7 +18,7 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons.protocol_engine.types import ModuleDefinition
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
 
 if TYPE_CHECKING:
@@ -27,7 +28,7 @@ if TYPE_CHECKING:
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out HardwareControlAPI of unspecified robot type."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
@@ -100,6 +101,14 @@ def well_plate_def() -> LabwareDefinition:
 
 
 @pytest.fixture(scope="session")
+def adapter_plate_def() -> LabwareDefinition:
+    """Get the definition of a h/s adapter plate."""
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_universal_flat_adapter", 1)
+    )
+
+
+@pytest.fixture(scope="session")
 def reservoir_def() -> LabwareDefinition:
     """Get the definition of single-row reservoir."""
     return LabwareDefinition.parse_obj(load_definition("nest_12_reservoir_15ml", 1))
@@ -109,6 +118,12 @@ def reservoir_def() -> LabwareDefinition:
 def tip_rack_def() -> LabwareDefinition:
     """Get the definition of Opentrons 300 uL tip rack."""
     return LabwareDefinition.parse_obj(load_definition("opentrons_96_tiprack_300ul", 1))
+
+
+@pytest.fixture(scope="session")
+def adapter_def() -> LabwareDefinition:
+    """Get the definition of Opentrons 96 PCR adapter."""
+    return LabwareDefinition.parse_obj(load_definition("opentrons_96_pcr_adapter", 1))
 
 
 @pytest.fixture(scope="session")
@@ -181,3 +196,24 @@ def mag_block_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 Mag Block."""
     definition = load_shared_data("module/definitions/3/magneticBlockV1.json")
     return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def supported_tip_fixture() -> pipette_definition.SupportedTipsDefinition:
+    """Get a mock supported tip definition."""
+    return pipette_definition.SupportedTipsDefinition(
+        defaultAspirateFlowRate=pipette_definition.FlowRateDefinition(
+            default=10, valuesByApiLevel={}
+        ),
+        defaultDispenseFlowRate=pipette_definition.FlowRateDefinition(
+            default=10, valuesByApiLevel={}
+        ),
+        defaultBlowOutFlowRate=pipette_definition.FlowRateDefinition(
+            default=10, valuesByApiLevel={}
+        ),
+        defaultTipLength=40,
+        defaultReturnTipHeight=0.5,
+        aspirate=pipette_definition.ulPerMMDefinition(default={"1": [(0, 0, 0)]}),
+        dispense=pipette_definition.ulPerMMDefinition(default={"1": [(0, 0, 0)]}),
+        defaultBlowoutVolume=5,
+    )

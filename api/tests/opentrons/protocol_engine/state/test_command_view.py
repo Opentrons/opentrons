@@ -24,6 +24,7 @@ from opentrons.protocol_engine.state.commands import (
     RunResult,
     QueueStatus,
 )
+from opentrons.protocol_engine.errors import ProtocolCommandFailedError
 
 from .command_fixtures import (
     create_queued_command,
@@ -244,6 +245,7 @@ def test_get_all_complete_fatal_command_failure() -> None:
             errorType="PrettyBadError",
             createdAt=datetime(year=2021, month=1, day=1),
             detail="Oh no",
+            errorCode="4321",
         ),
     )
 
@@ -253,7 +255,7 @@ def test_get_all_complete_fatal_command_failure() -> None:
         commands=[completed_command, failed_command],
     )
 
-    with pytest.raises(errors.ProtocolCommandFailedError, match="Oh no"):
+    with pytest.raises(ProtocolCommandFailedError):
         subject.get_all_commands_final()
 
 
@@ -268,6 +270,7 @@ def test_get_all_complete_setup_not_fatal() -> None:
             errorType="PrettyBadError",
             createdAt=datetime(year=2021, month=1, day=1),
             detail="Oh no",
+            errorCode="4321",
         ),
     )
 
@@ -452,12 +455,14 @@ def test_get_errors() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         errorType="ReallyBadError",
         detail="things could not get worse",
+        errorCode="4321",
     )
     error_2 = errors.ErrorOccurrence(
         id="error-2",
         createdAt=datetime(year=2022, month=2, day=2),
         errorType="EvenWorseError",
         detail="things got worse",
+        errorCode="1234",
     )
 
     subject = get_command_view(errors_by_id={"error-1": error_1, "error-2": error_2})

@@ -67,8 +67,6 @@ dev-shell:
 
 .PHONY: dev-shell-odd
 dev-shell-odd: export OT_APP_IS_ON_DEVICE := 1
-dev-shell-odd: export OT_APP_UI__WIDTH := 1024
-dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd: export OT_APP_ON_DEVICE_DISPLAY_SETTINGS__UNFINISHED_UNBOXING_FLOW_ROUTE := /dashboard
 dev-shell-odd: export OT_APP_UI__WIDTH := 1024
 dev-shell-odd: export OT_APP_UI__HEIGHT := 600

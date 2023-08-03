@@ -1,11 +1,19 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
-import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SIZE_1,
+  SPACING,
+} from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
+  LoadedPipette,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
@@ -40,6 +48,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  requiredPipette?: LoadedPipette
 }
 export const BeforeBeginning = (
   props: BeforeBeginningProps
@@ -57,8 +66,9 @@ export const BeforeBeginning = (
     setShowErrorMessage,
     selectedPipette,
     isOnDevice,
+    requiredPipette,
   } = props
-  const { t } = useTranslation('pipette_wizard_flows')
+  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   React.useEffect(() => {
     createMaintenanceRun({})
   }, [])
@@ -86,11 +96,24 @@ export const BeforeBeginning = (
     }
     case FLOWS.ATTACH: {
       bodyTranslationKey = 'remove_labware'
+      let displayName: string | undefined
+      if (requiredPipette != null) {
+        displayName =
+          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
+          requiredPipette.pipetteName
+      }
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
+        equipmentList = [
+          { ...PIPETTE, displayName: displayName ?? PIPETTE.displayName },
+          CALIBRATION_PROBE,
+          HEX_SCREWDRIVER,
+        ]
       } else {
         equipmentList = [
-          NINETY_SIX_CHANNEL_PIPETTE,
+          {
+            ...NINETY_SIX_CHANNEL_PIPETTE,
+            displayName: displayName ?? NINETY_SIX_CHANNEL_PIPETTE.displayName,
+          },
           CALIBRATION_PROBE,
           HEX_SCREWDRIVER,
           NINETY_SIX_CHANNEL_MOUNTING_PLATE,
@@ -99,8 +122,30 @@ export const BeforeBeginning = (
       break
     }
     case FLOWS.DETACH: {
-      bodyTranslationKey = 'get_started_detach'
-      equipmentList = [HEX_SCREWDRIVER]
+      if (requiredPipette != null) {
+        const displayName =
+          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
+          requiredPipette.pipetteName
+        bodyTranslationKey = 'remove_labware'
+
+        if (requiredPipette.pipetteName === 'p1000_96') {
+          equipmentList = [
+            { ...NINETY_SIX_CHANNEL_PIPETTE, displayName: displayName },
+            CALIBRATION_PROBE,
+            HEX_SCREWDRIVER,
+            NINETY_SIX_CHANNEL_MOUNTING_PLATE,
+          ]
+        } else {
+          equipmentList = [
+            { ...PIPETTE, displayName: displayName },
+            CALIBRATION_PROBE,
+            HEX_SCREWDRIVER,
+          ]
+        }
+      } else {
+        bodyTranslationKey = 'get_started_detach'
+        equipmentList = [HEX_SCREWDRIVER]
+      }
       break
     }
   }
@@ -113,15 +158,13 @@ export const BeforeBeginning = (
       {
         commandType: 'loadPipette' as const,
         params: {
-          // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipettes[mount]?.instrumentName,
-          pipetteId: pipetteId,
+          pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+          pipetteId: pipetteId ?? '',
           mount: mount,
         },
       },
       { commandType: 'home' as const, params: {} },
       {
-        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
           mount: mount,
@@ -141,7 +184,6 @@ export const BeforeBeginning = (
   const SingleMountAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: mount,
@@ -152,10 +194,10 @@ export const BeforeBeginning = (
   const NinetySixChannelAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,
+        maintenancePosition: 'attachPlate',
       },
     },
   ]
@@ -181,7 +223,7 @@ export const BeforeBeginning = (
     <SimpleWizardBody
       isSuccess={false}
       iconColor={COLORS.errorEnabled}
-      header={t('error_encountered')}
+      header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />
   ) : (
@@ -202,13 +244,15 @@ export const BeforeBeginning = (
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
             </Banner>
           ) : null}
-          <Trans
-            t={t}
-            i18nKey={bodyTranslationKey}
-            components={{
-              block: <StyledText css={BODY_STYLE} />,
-            }}
-          />
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
+            <Trans
+              t={t}
+              i18nKey={bodyTranslationKey}
+              components={{
+                block: <StyledText css={BODY_STYLE} />,
+              }}
+            />
+          </Flex>
         </>
       }
       proceedButtonText={proceedButtonText}

@@ -80,13 +80,13 @@ describe('useMissingHardwareText', () => {
         useMissingHardwareText([
           {
             hardwareType: 'pipette',
-            pipetteName: 'p50_multi_gen3',
+            pipetteName: 'p50_multi_flex',
             mount: 'left',
             connected: false,
           },
           {
             hardwareType: 'pipette',
-            pipetteName: 'p1000_multi_gen3',
+            pipetteName: 'p1000_multi_flex',
             mount: 'right',
             connected: false,
           },
@@ -103,7 +103,7 @@ describe('useMissingHardwareText', () => {
         useMissingHardwareText([
           {
             hardwareType: 'pipette',
-            pipetteName: 'p50_multi_gen3',
+            pipetteName: 'p50_multi_flex',
             mount: 'left',
             connected: false,
           },

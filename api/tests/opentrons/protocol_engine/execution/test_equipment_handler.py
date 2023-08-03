@@ -3,9 +3,10 @@ import pytest
 import inspect
 from datetime import datetime
 from decoy import Decoy, matchers
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -26,6 +27,8 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     DeckType,
     ModuleLocation,
+    OnLabwareLocation,
+    NonStackedLocation,
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
@@ -80,12 +83,6 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out HardwareControlAPI instance."""
-    return decoy.mock(cls=HardwareControlAPI)
-
-
-@pytest.fixture
 def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
     """Get a mocked out ActionDispatcher instance."""
     return decoy.mock(cls=ActionDispatcher)
@@ -130,7 +127,9 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
 
 
 @pytest.fixture
-def loaded_static_pipette_data() -> LoadedStaticPipetteData:
+def loaded_static_pipette_data(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> LoadedStaticPipetteData:
     """Get a pipette config data value object."""
     return LoadedStaticPipetteData(
         model="pipette_model",
@@ -143,7 +142,7 @@ def loaded_static_pipette_data() -> LoadedStaticPipetteData:
             default_aspirate={"b": 4.56},
             default_dispense={"c": 7.89},
         ),
-        return_tip_scale=0.5,
+        tip_configuration_lookup_table={4.56: supported_tip_fixture},
         nominal_tip_overlap={"default": 9.87},
         home_position=10.11,
         nozzle_offset_z=12.13,
@@ -475,6 +474,112 @@ def test_find_offset_id_of_labware_on_module(
     result = subject.find_applicable_labware_offset_id(
         labware_definition_uri="opentrons-test/load-name/1",
         labware_location=ModuleLocation(moduleId="input-module-id"),
+    )
+
+    assert result == "labware-offset-id"
+
+
+@pytest.mark.parametrize(
+    argnames=["parent_location", "expected_result"],
+    argvalues=[
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), "labware-offset-id"),
+        (OFF_DECK_LOCATION, None),
+    ],
+)
+def test_find_offset_id_of_labware_on_labware(
+    decoy: Decoy,
+    parent_location: NonStackedLocation,
+    expected_result: Optional[str],
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should find an offset for a labware on a labware."""
+    decoy.when(state_store.labware.get_definition_uri("labware-id")).then_return(
+        LabwareUri("opentrons-test/load-name-2/1")
+    )
+
+    decoy.when(state_store.labware.get_parent_location("labware-id")).then_return(
+        parent_location
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name-1/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_1,
+                moduleModel=None,
+                definitionUri="opentrons-test/load-name-2/1",
+            ),
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_1,
+                definitionUri="opentrons-test/load-name-2/1",
+            ),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name-1/1",
+        labware_location=OnLabwareLocation(labwareId="labware-id"),
+    )
+
+    assert result == expected_result
+
+
+def test_find_offset_id_of_labware_on_labware_on_modules(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should find an offset for a labware on a labware on a module."""
+    decoy.when(state_store.labware.get_definition_uri("labware-id")).then_return(
+        LabwareUri("opentrons-test/load-name-2/1")
+    )
+
+    decoy.when(state_store.labware.get_parent_location("labware-id")).then_return(
+        ModuleLocation(moduleId="module-id"),
+    )
+
+    decoy.when(state_store.modules.get_requested_model("module-id")).then_return(
+        ModuleModel.HEATER_SHAKER_MODULE_V1
+    )
+
+    decoy.when(state_store.modules.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name-1/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_1,
+                moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1,
+                definitionUri="opentrons-test/load-name-2/1",
+            ),
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_1,
+                moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1,
+                definitionUri="opentrons-test/load-name-2/1",
+            ),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name-1/1",
+        labware_location=OnLabwareLocation(labwareId="labware-id"),
     )
 
     assert result == "labware-offset-id"

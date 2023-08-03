@@ -39,7 +39,7 @@ export function FloatingActionButton(
   const contentColor = disabled ? COLORS.darkBlack60 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
     background-color: ${COLORS.highlightPurple1};
-    border-radius: ${BORDERS.size5};
+    border-radius: ${BORDERS.borderRadiusSize5};
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
     cursor: default;

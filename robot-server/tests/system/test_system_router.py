@@ -49,6 +49,7 @@ def test_raise_system_synchronized_error(
                 "detail": "Cannot set system time; already synchronized with NTP "
                 "or RTC",
                 "title": "Action Forbidden",
+                "errorCode": "4000",
             }
         ]
     }
@@ -75,6 +76,7 @@ def test_raise_system_exception(
                 "id": "UncategorizedError",
                 "detail": "Something went wrong",
                 "title": "Internal Server Error",
+                "errorCode": "4000",
             }
         ]
     }

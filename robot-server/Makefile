@@ -25,6 +25,9 @@ wheel_file = dist/$(call python_get_wheelname,robot-server,$(project_rs_default)
 # used to create the sdist.
 sdist_file = dist/$(call python_get_sdistname,robot-server,$(project_ot3_default),robot_server)
 
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,robot-server,$(project_ot3_default),robot_server)
+
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
@@ -153,7 +156,7 @@ push: wheel
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server",,,$(version_file))
 
 .PHONY: install-key
 install-key:

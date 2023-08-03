@@ -50,7 +50,7 @@ describe('MountPipette', () => {
     const { getByText, getByTestId, getByLabelText } = render(props)
     getByText('Connect and secure pipette')
     getByText(
-      'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
+      'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
     )
     getByTestId('Pipette_Attach_1_8_L.webm')
     const backBtn = getByLabelText('back')
@@ -64,7 +64,7 @@ describe('MountPipette', () => {
       ...props,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
-    const { getByText, getByAltText, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByLabelText } = render(props)
     getByText('Connect and attach 96-channel pipette')
     getByText(
       'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -72,7 +72,7 @@ describe('MountPipette', () => {
     getByText(
       'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
     )
-    getByAltText('Attach 96 channel pipette')
+    getByTestId('Pipette_Attach_96.webm')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()

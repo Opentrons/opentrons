@@ -3,9 +3,11 @@
 #  dataclass fields interpretation.
 #  from __future__ import annotations
 from dataclasses import dataclass, field, asdict
-from . import message_definitions
 from typing import Iterator, List
 
+from opentrons_shared_data.errors.exceptions import InternalMessageFormatError
+
+from . import message_definitions
 from .fields import (
     FirmwareShortSHADataField,
     VersionFlagsField,
@@ -184,8 +186,8 @@ class AddToMoveGroupRequestPayload(MoveGroupRequestPayload):
 class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
     """Add a linear move request to a message group."""
 
-    acceleration: utils.Int32Field
-    velocity: utils.Int32Field
+    acceleration_um: utils.Int32Field
+    velocity_mm: utils.Int32Field
     request_stop_condition: MoveStopConditionField
 
 
@@ -193,7 +195,7 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 class HomeRequestPayload(AddToMoveGroupRequestPayload):
     """Request to home."""
 
-    velocity: utils.Int32Field
+    velocity_mm: utils.Int32Field
 
 
 @dataclass(eq=False)
@@ -314,14 +316,16 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
         data_length = len(self.data.value)
         address = self.address.value
         if address % 8 != 0:
-            raise ValueError(
-                f"Data address needs to be doubleword aligned."
-                f" {address} mod 8 equals {address % 8} and should be 0"
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data address needs to be doubleword aligned."
+                f" {address} mod 8 equals {address % 8} and should be 0",
+                detail={"address": address},
             )
         if data_length > FirmwareUpdateDataField.NUM_BYTES:
-            raise ValueError(
-                f"Data cannot be more than"
-                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}."
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data cannot be more than"
+                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}.",
+                detail={"size": data_length},
             )
 
     @classmethod
@@ -546,6 +550,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
     request_stop_condition: MoveStopConditionField
+    acceleration: utils.Int32Field
 
 
 @dataclass(eq=False)

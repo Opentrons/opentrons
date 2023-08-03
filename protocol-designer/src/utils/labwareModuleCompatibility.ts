@@ -47,6 +47,7 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'usascientific_96_wellplate_2.4ml_deep',
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
@@ -61,6 +62,8 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   [MAGNETIC_BLOCK_TYPE]: [
     'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
 }
 export const getLabwareIsCompatible = (

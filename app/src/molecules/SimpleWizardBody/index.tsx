@@ -15,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import SuccessIcon from '../../assets/images/icon_success.png'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
@@ -24,7 +25,7 @@ interface Props extends StyleProps {
   header: string
   isSuccess: boolean
   children?: React.ReactNode
-  subHeader?: string
+  subHeader?: string | JSX.Element
   isPending?: boolean
 }
 const BACKGROUND_SIZE = '47rem'
@@ -37,6 +38,7 @@ const HEADER_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 2rem;
     font-weight: 700;
+    line-height: ${SPACING.spacing40};
   }
 `
 const SUBHEADER_STYLE = css`
@@ -54,19 +56,22 @@ const SUBHEADER_STYLE = css`
   }
 `
 const BUTTON_STYLE = css`
+  width: 100%;
   justify-content: ${JUSTIFY_FLEX_END};
   padding-right: ${SPACING.spacing32};
   padding-bottom: ${SPACING.spacing32};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    justify-content: ${JUSTIFY_SPACE_BETWEEN};
     padding-bottom: ${SPACING.spacing32};
+    padding-left: ${SPACING.spacing32};
   }
 `
 const WIZARD_CONTAINER_STYLE = css`
   min-height: 394px;
-  flex-direction: ${DIRECTION_COLUMN}
-  justify-content: ${JUSTIFY_SPACE_BETWEEN}
-  height: 'auto'
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  height: 'auto';
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 472px;
   }
@@ -93,6 +98,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
   return (
     <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
       <Flex
+        width="100%"
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         flexDirection={DIRECTION_COLUMN}
@@ -117,12 +123,21 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           </Flex>
         ) : (
           <>
-            <Icon
-              name={isSuccess ? 'ot-check' : 'ot-alert'}
-              size={isOnDevice ? '3.75rem' : '2.5rem'}
-              color={iconColor}
-              aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
-            />
+            {isSuccess ? (
+              <img
+                width="250px"
+                height="208px"
+                src={SuccessIcon}
+                alt="Success Icon"
+              />
+            ) : (
+              <Icon
+                name="ot-alert"
+                size={isOnDevice ? '3.75rem' : '2.5rem'}
+                color={iconColor}
+                aria-label="ot-alert"
+              />
+            )}
             <StyledText css={HEADER_STYLE}>{header}</StyledText>
             {subHeader != null ? (
               <StyledText css={SUBHEADER_STYLE}>{subHeader}</StyledText>

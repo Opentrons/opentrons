@@ -28,15 +28,20 @@ import {
 import {
   useAllCommandsQuery,
   useCommandQuery,
+  useRunQuery,
 } from '@opentrons/react-api-client'
+
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
+import { isInterventionCommand } from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -51,14 +56,21 @@ interface RunProgressMeterProps {
   runId: string
   robotName: string
   makeHandleJumpToStep: (index: number) => () => void
+  resumeRunHandler: () => void
 }
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
-  const { runId, robotName, makeHandleJumpToStep } = props
+  const { runId, robotName, makeHandleJumpToStep, resumeRunHandler } = props
+  const [
+    interventionModalCommandKey,
+    setInterventionModalCommandKey,
+  ] = React.useState<string | null>(null)
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
+  const { data: runRecord } = useRunQuery(runId)
+  const runData = runRecord?.data ?? null
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
     cursor: null,
@@ -88,7 +100,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     analysisCommands.findIndex(c => c.key === lastRunCommand?.key) ?? 0
   const { data: runCommandDetails } = useCommandQuery(
     runId,
-    lastRunCommand?.id ?? null
+    lastRunCommand?.key ?? null
   )
   let countOfTotalText = ''
   if (
@@ -145,30 +157,69 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     )
   }
 
+  React.useEffect(() => {
+    if (
+      lastRunCommand != null &&
+      interventionModalCommandKey != null &&
+      lastRunCommand.key !== interventionModalCommandKey
+    ) {
+      // set intervention modal command key to null if different from current command key
+      setInterventionModalCommandKey(null)
+    } else if (
+      lastRunCommand?.key != null &&
+      isInterventionCommand(lastRunCommand) &&
+      interventionModalCommandKey === null
+    ) {
+      setInterventionModalCommandKey(lastRunCommand.key)
+    }
+  }, [lastRunCommand, interventionModalCommandKey])
+
   const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
     if (downloadIsDisabled) return false
     e.preventDefault()
     e.stopPropagation()
     downloadRunLog()
   }
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex gridGap={SPACING.spacing8}>
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
-            'current_step'
-          )}${
-            runStatus === RUN_STATUS_IDLE
-              ? ':'
-              : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''}`
-          }`}</StyledText>
 
-          {currentStepContents}
-        </Flex>
-        <Link
-          {...targetProps}
-          role="button"
-          css={css`
+  return (
+    <>
+      {interventionModalCommandKey != null &&
+      lastRunCommand != null &&
+      isInterventionCommand(lastRunCommand) &&
+      analysisCommands != null &&
+      runStatus != null &&
+      runData != null &&
+      !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
+        <Portal level="top">
+          <InterventionModal
+            robotName={robotName}
+            command={lastRunCommand}
+            onResume={resumeRunHandler}
+            run={runData}
+            analysis={analysis}
+          />
+        </Portal>
+      ) : null}
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Flex gridGap={SPACING.spacing8}>
+            <StyledText
+              as="h2"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >{`${t('current_step')}${
+              runStatus === RUN_STATUS_IDLE
+                ? ':'
+                : ` ${countOfTotalText}${
+                    currentStepContents != null ? ': ' : ''
+                  }`
+            }`}</StyledText>
+
+            {currentStepContents}
+          </Flex>
+          <Link
+            {...targetProps}
+            role="button"
+            css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
               color: ${
@@ -180,44 +231,48 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
           }
           `}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={onDownloadClick}
-        >
-          <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-            <Icon name="download" size={SIZE_1} />
-            {t('download_run_log')}
-          </Flex>
-        </Link>
-        {downloadIsDisabled ? (
-          <Tooltip tooltipProps={tooltipProps}>
-            {t('complete_protocol_to_download')}
-          </Tooltip>
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={onDownloadClick}
+          >
+            <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+              <Icon name="download" size={SIZE_1} />
+              {t('download_run_log')}
+            </Flex>
+          </Link>
+          {downloadIsDisabled ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('complete_protocol_to_download')}
+            </Tooltip>
+          ) : null}
+        </Flex>
+        {analysis != null && lastRunAnalysisCommandIndex >= 0 ? (
+          <ProgressBar
+            percentComplete={
+              runHasNotBeenStarted
+                ? 0
+                : ((lastRunAnalysisCommandIndex + 1) /
+                    analysisCommands.length) *
+                  100
+            }
+            outerStyles={css`
+              height: 0.375rem;
+              background-color: ${COLORS.medGreyEnabled};
+              border-radius: ${BORDERS.radiusSoftCorners};
+              position: relative;
+              overflow: initial;
+            `}
+            innerStyles={css`
+              height: 0.375rem;
+              background-color: ${COLORS.darkGreyEnabled};
+              border-radius: ${BORDERS.radiusSoftCorners};
+            `}
+          >
+            <InterventionTicks
+              {...{ makeHandleJumpToStep, analysisCommands }}
+            />
+          </ProgressBar>
         ) : null}
       </Flex>
-      {analysis != null && lastRunAnalysisCommandIndex >= 0 ? (
-        <ProgressBar
-          percentComplete={
-            runHasNotBeenStarted
-              ? 0
-              : ((lastRunAnalysisCommandIndex + 1) / analysisCommands.length) *
-                100
-          }
-          outerStyles={css`
-            height: 0.375rem;
-            background-color: ${COLORS.medGreyEnabled};
-            border-radius: ${BORDERS.radiusSoftCorners};
-            position: relative;
-            overflow: initial;
-          `}
-          innerStyles={css`
-            height: 0.375rem;
-            background-color: ${COLORS.darkGreyEnabled};
-            border-radius: ${BORDERS.radiusSoftCorners};
-          `}
-        >
-          <InterventionTicks {...{ makeHandleJumpToStep, analysisCommands }} />
-        </ProgressBar>
-      ) : null}
-    </Flex>
+    </>
   )
 }

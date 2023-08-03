@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 from typing_extensions import Protocol
-from ..types import DoorState, StatusBarState
+from ..types import DoorState, StatusBarState, EstopState
 from .event_sourcer import EventSourcer
 
 
@@ -48,4 +48,23 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         state: The state to set the robot to. Some states are transient
         and will implicitly revert back to the previous state after a short
         action, while others"""
+        ...
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        """Enable or disable the status bar entirely.
+
+        enabled: True to turn the status bar on, false to turn it off."""
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """Get the current status bar state.
+
+        :returns: The current status bar state enumeration."""
+        ...
+
+    def get_estop_state(self) -> EstopState:
+        """Get the current Estop state.
+
+        If the Estop is not supported on this robot, this will always return Disengaged.
+
+        :returns: The current Estop state."""
         ...

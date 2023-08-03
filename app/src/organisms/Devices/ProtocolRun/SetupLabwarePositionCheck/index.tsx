@@ -37,7 +37,7 @@ export function SetupLabwarePositionCheck(
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const currentOffsets = runRecord?.data?.labwareOffsets ?? []
-  const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
+  const lpcDisabledReason = useLPCDisabledReason({ robotName, runId })
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis

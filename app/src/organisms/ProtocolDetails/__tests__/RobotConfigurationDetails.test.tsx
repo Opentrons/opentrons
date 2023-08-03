@@ -5,7 +5,7 @@ import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
-import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 jest.mock('../../../redux/config')
 
@@ -86,6 +86,7 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
@@ -99,6 +100,7 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
       robotType: OT3_STANDARD_MODEL,
     }
@@ -112,6 +114,7 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
@@ -127,6 +130,7 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
@@ -150,6 +154,7 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
+      extensionInstrumentName: null,
       requiredModuleDetails: mockRequiredModuleDetails,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
@@ -165,6 +170,7 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: true,
       robotType: OT2_STANDARD_MODEL,
     }

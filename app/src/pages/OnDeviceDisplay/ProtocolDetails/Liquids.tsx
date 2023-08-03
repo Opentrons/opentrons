@@ -28,7 +28,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
-  border-spacing: 0 ${BORDERS.size2};
+  border-spacing: 0 ${BORDERS.borderRadiusSize2};
   margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
@@ -49,13 +49,13 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.size3};
-    border-bottom-left-radius: ${BORDERS.size3};
+    border-top-left-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
     width: 80%;
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.size3};
-    border-bottom-right-radius: ${BORDERS.size3};
+    border-top-right-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-right-radius: ${BORDERS.borderRadiusSize3};
   }
 `
 
@@ -99,7 +99,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                   alignItems={TYPOGRAPHY.textAlignCenter}
                 >
                   <Flex
-                    borderRadius={BORDERS.size2}
+                    borderRadius={BORDERS.borderRadiusSize2}
                     padding={SPACING.spacing16}
                     backgroundColor={COLORS.white}
                     height="3.75rem"

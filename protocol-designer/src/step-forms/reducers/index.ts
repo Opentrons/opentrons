@@ -7,11 +7,17 @@ import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 import {
+  FLEX_ROBOT_TYPE,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+  MoveLabwareCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  PipetteName,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
@@ -47,7 +53,10 @@ import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import { Reducer } from 'redux'
-import { NormalizedPipetteById } from '@opentrons/step-generation'
+import {
+  NormalizedAdditionalEquipmentById,
+  NormalizedPipetteById,
+} from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
 import {
   CreateContainerAction,
@@ -64,11 +73,6 @@ import type {
   ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
-import {
-  FileLabware,
-  FilePipette,
-  FileModule,
-} from '@opentrons/shared-data/protocol/types/schemaV4'
 import {
   CancelStepFormAction,
   ChangeFormInputAction,
@@ -111,6 +115,7 @@ import {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
+import { ToggleIsGripperRequiredAction } from '../actions/additionalItems'
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -134,6 +139,7 @@ export type UnsavedFormActions =
   | EditProfileCycleAction
   | EditProfileStepAction
   | SelectMultipleStepsAction
+  | ToggleIsGripperRequiredAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -193,6 +199,7 @@ export const unsavedForm = (
     case 'CANCEL_STEP_FORM':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
+    case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -453,9 +460,7 @@ export type SavedStepFormState = Record<StepIdType, FormData>
 export const initialDeckSetupStepForm: FormData = {
   stepType: 'manualIntervention',
   id: INITIAL_DECK_SETUP_STEP_ID,
-  labwareLocationUpdate: {
-    [FIXED_TRASH_ID]: '12',
-  },
+  labwareLocationUpdate: {},
   pipetteLocationUpdate: {},
   moduleLocationUpdate: {},
 }
@@ -481,6 +486,7 @@ export type SavedStepFormsActions =
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
   | EditModuleAction
+  | ToggleIsGripperRequiredAction
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
@@ -983,7 +989,6 @@ export const savedStepForms = (
         { ...savedStepForms }
       )
     }
-
     case 'REPLACE_CUSTOM_LABWARE_DEF': {
       // no mismatch, it's safe to keep all steps as they are
       if (!action.payload.isOverwriteMismatched) return savedStepForms
@@ -1136,12 +1141,32 @@ export const labwareInvariantProperties: Reducer<
       action: LoadFileAction
     ): NormalizedLabwareById => {
       const { file } = action.payload
-      return mapValues(
-        file.labware,
-        (fileLabware: FileLabware, id: string) => ({
-          labwareDefURI: fileLabware.definitionId,
-        })
+      const loadLabwareCommands = Object.values(file.commands).filter(
+        (command): command is LoadLabwareCreateCommand =>
+          command.commandType === 'loadLabware'
       )
+      const FIXED_TRASH_ID = 'fixedTrash'
+      const labware = {
+        ...loadLabwareCommands.reduce(
+          (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
+            const { labwareId, loadName } = command.params
+            const defUri = labwareId?.split(':')[1]
+            const id = labwareId ?? ''
+            return {
+              ...acc,
+              [id]: {
+                labwareDefURI: loadName.includes('/') ? loadName : defUri ?? '',
+              },
+            }
+          },
+          {}
+        ),
+        [FIXED_TRASH_ID]: {
+          labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+        },
+      }
+
+      return Object.keys(labware).length > 0 ? labware : state
     },
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,
@@ -1197,16 +1222,25 @@ export const moduleInvariantProperties: Reducer<
       action: LoadFileAction
     ): ModuleEntities => {
       const { file } = action.payload
-      // @ts-expect-error(sa, 2021-6-10): falling back to {} will not create a valid `ModuleEntity`, as per TODO below it is theoritically unnecessary anyways
-      return mapValues(
-        // @ts-expect-error(sa, 2021-6-10): type narrow modules, they do not exist on the v3 schema
-        file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
-        (fileModule: FileModule, id: string) => ({
-          id,
-          type: getModuleType(fileModule.model),
-          model: fileModule.model,
-        })
+      const loadModuleCommands = Object.values(file.commands).filter(
+        (command): command is LoadModuleCreateCommand =>
+          command.commandType === 'loadModule'
       )
+      const modules = loadModuleCommands.reduce(
+        (acc: ModuleEntities, command: LoadModuleCreateCommand) => {
+          const { moduleId, model } = command.params
+          return {
+            ...acc,
+            [moduleId]: {
+              id: moduleId,
+              type: getModuleType(model),
+              model,
+            },
+          }
+        },
+        {}
+      )
+      return Object.keys(modules).length > 0 ? modules : state
     },
   },
   {}
@@ -1225,24 +1259,27 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      return mapValues(
-        file.pipettes,
-        (
-          filePipette: FilePipette,
-          pipetteId: string
-        ): NormalizedPipetteById[keyof NormalizedPipetteById] => {
-          const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
-          assert(
-            tiprackDefURI,
-            `expected tiprackDefURI in file metadata for pipette ${pipetteId}`
-          )
-          return {
-            id: pipetteId,
-            name: filePipette.name,
-            tiprackDefURI,
-          }
-        }
+      const loadPipetteCommands = Object.values(file.commands).filter(
+        (command): command is LoadPipetteCreateCommand =>
+          command.commandType === 'loadPipette'
       )
+      const pipettes = loadPipetteCommands.reduce(
+        (acc: NormalizedPipetteById, command) => {
+          const { pipetteName, pipetteId } = command.params
+          const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
+
+          return {
+            ...acc,
+            [pipetteId]: {
+              id: pipetteId,
+              name: pipetteName as PipetteName,
+              tiprackDefURI,
+            },
+          }
+        },
+        {}
+      )
+      return Object.keys(pipettes).length > 0 ? pipettes : state
     },
     CREATE_PIPETTES: (
       state: NormalizedPipetteById,
@@ -1259,6 +1296,64 @@ export const pipetteInvariantProperties: Reducer<
   },
   initialPipetteState
 )
+
+const initialAdditionalEquipmentState = {}
+
+export const additionalEquipmentInvariantProperties = handleActions<NormalizedAdditionalEquipmentById>(
+  {
+    //  @ts-expect-error
+    LOAD_FILE: (
+      state,
+      action: LoadFileAction
+    ): NormalizedAdditionalEquipmentById => {
+      const { file } = action.payload
+      const gripper = Object.values(file.commands).filter(
+        (command): command is MoveLabwareCreateCommand =>
+          command.commandType === 'moveLabware' &&
+          command.params.strategy === 'usingGripper'
+      )
+      const hasGripper = gripper.length > 0
+      const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
+      const additionalEquipmentId = uuid()
+      const updatedEquipment = {
+        [additionalEquipmentId]: {
+          name: 'gripper' as const,
+          id: additionalEquipmentId,
+        },
+      }
+      if (hasGripper && isOt3) {
+        return { ...state, ...updatedEquipment }
+      } else {
+        return { ...state }
+      }
+    },
+    TOGGLE_IS_GRIPPER_REQUIRED: (
+      state: NormalizedAdditionalEquipmentById
+    ): NormalizedAdditionalEquipmentById => {
+      const additionalEquipmentId = Object.keys(state)[0]
+      const existingEquipment = state[additionalEquipmentId]
+
+      let updatedEquipment
+
+      if (existingEquipment && existingEquipment.name === 'gripper') {
+        updatedEquipment = {}
+      } else {
+        const newAdditionalEquipmentId = uuid()
+        updatedEquipment = {
+          [newAdditionalEquipmentId]: {
+            name: 'gripper' as const,
+            id: newAdditionalEquipmentId,
+          },
+        }
+      }
+
+      return updatedEquipment
+    },
+    DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
+  },
+  initialAdditionalEquipmentState
+)
+
 export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState: string[] = []
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
@@ -1379,6 +1474,7 @@ export interface RootState {
   labwareInvariantProperties: NormalizedLabwareById
   pipetteInvariantProperties: NormalizedPipetteById
   moduleInvariantProperties: ModuleEntities
+  additionalEquipmentInvariantProperties: NormalizedAdditionalEquipmentById
   presavedStepForm: PresavedStepFormState
   savedStepForms: SavedStepFormState
   unsavedForm: FormState
@@ -1400,6 +1496,10 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     moduleInvariantProperties: moduleInvariantProperties(
       prevStateFallback.moduleInvariantProperties,
+      action
+    ),
+    additionalEquipmentInvariantProperties: additionalEquipmentInvariantProperties(
+      prevStateFallback.additionalEquipmentInvariantProperties,
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),

@@ -197,9 +197,9 @@ async def create_run_command(
         command = protocol_engine.add_command(command_create)
 
     except pe_errors.SetupCommandNotAllowedError as e:
-        raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+        raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
     except pe_errors.RunStoppedError as e:
-        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+        raise RunStopped.from_exc(e).as_error(status.HTTP_409_CONFLICT)
 
     if waitUntilComplete:
         timeout_sec = None if timeout is None else timeout / 1000.0
@@ -261,7 +261,7 @@ async def get_run_commands(
             length=pageLength,
         )
     except RunNotFoundError as e:
-        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
 
@@ -335,9 +335,9 @@ async def get_run_command(
     try:
         command = run_data_manager.get_command(run_id=runId, command_id=commandId)
     except RunNotFoundError as e:
-        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
     except CommandNotFoundError as e:
-        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise CommandNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=command),

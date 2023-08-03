@@ -18,7 +18,7 @@ import {
 } from '../../../redux/analytics'
 import { useIsOT3, useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
-import { SetupPipetteCalibration } from './SetupPipetteCalibration'
+import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
 
 import type { ProtocolCalibrationStatus } from '../../../redux/calibration/types'
@@ -68,7 +68,7 @@ export function SetupRobotCalibration({
         {!isOT3 ? (
           <SetupDeckCalibration robotName={robotName} runId={runId} />
         ) : null}
-        <SetupPipetteCalibration robotName={robotName} runId={runId} />
+        <SetupInstrumentCalibration robotName={robotName} runId={runId} />
         {!isOT3 ? (
           <SetupTipLengthCalibration robotName={robotName} runId={runId} />
         ) : null}

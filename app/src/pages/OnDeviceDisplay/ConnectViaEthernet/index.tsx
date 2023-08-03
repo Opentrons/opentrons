@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 
 import { StepMeter } from '../../../atoms/StepMeter'
-import { NetworkDetailsModal } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
+import { NetworkDetailsModal } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
 import { TitleHeader } from './TitleHeader'
@@ -47,7 +47,7 @@ export function ConnectViaEthernet(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} />
+      <StepMeter totalSteps={6} currentStep={2} />
       <Flex
         margin={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}

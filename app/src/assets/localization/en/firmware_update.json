@@ -1,0 +1,10 @@
+{
+  "download_logs": "Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.",
+  "firmware_out_of_date": "The firmware for <bold>{{mount}} {{instrument}}</bold> is out of date. You need to update it before running protocols that use this instrument.",
+  "ready_to_use": "Your <bold>{{instrument}}</bold> is ready to use!",
+  "successful_update": "Successful update!",
+  "update_failed": "Update failed",
+  "update_firmware": "Update firmware",
+  "update_needed": "Instrument firmware update needed",
+  "updating_firmware": "Updating firmware..."
+}

@@ -18,6 +18,8 @@ from .service.pipette_offset.router import router as pip_os_router
 from .service.labware.router import router as labware_router
 from .service.tip_length.router import router as tl_router
 from .service.notifications.router import router as notifications_router
+from .subsystems.router import subsystems_router
+from .robot.router import robot_router
 
 router = APIRouter()
 
@@ -113,4 +115,14 @@ router.include_router(
     router=system_router,
     tags=["System Control"],
     dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
+    router=subsystems_router,
+    tags=["Subsystem Management"],
+    dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
+    router=robot_router, tags=["Robot"], dependencies=[Depends(check_version_header)]
 )

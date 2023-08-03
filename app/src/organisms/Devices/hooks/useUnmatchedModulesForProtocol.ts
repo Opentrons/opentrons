@@ -8,12 +8,9 @@ import {
   useRobot,
 } from '.'
 import {
-  MAGNETIC_BLOCK_TYPE,
-  ModuleType,
+  NON_CONNECTING_MODULE_TYPES,
   getModuleType,
 } from '@opentrons/shared-data'
-
-const NON_CONNECTING_MODULE_TYPES: ModuleType[] = [MAGNETIC_BLOCK_TYPE]
 
 interface UnmatchedModuleResults {
   missingModuleIds: string[]

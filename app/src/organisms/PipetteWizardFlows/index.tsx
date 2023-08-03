@@ -14,10 +14,11 @@ import {
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
@@ -56,26 +57,23 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = React.useMemo(
     () =>
-      props.pipetteInfo == null
-        ? getPipetteWizardSteps(
-            flowType,
-            mount,
-            selectedPipette,
-            isGantryEmpty,
-            attachedPipettes
-          )
+      memoizedPipetteInfo == null
+        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
-            props.pipetteInfo,
+            memoizedPipetteInfo,
             mount
           ),
     []
   )
-
+  const requiredPipette = memoizedPipetteInfo?.find(
+    pipette => pipette.mount === mount
+  )
   const host = useHost()
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -86,15 +84,15 @@ export const PipetteWizardFlows = (
   )
   const hasCalData =
     attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
-
+  const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
     selectedPipette,
     hasCalData,
     isGantryEmpty,
-    attachedPipettes,
-    pipetteInfo: props.pipetteInfo ?? null,
+    attachedPipettes: memoizedAttachedPipettes,
+    pipetteInfo: memoizedPipetteInfo,
   })
 
   const goBack = (): void => {
@@ -135,23 +133,26 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
-    if (currentStepIndex === totalStepCount && onComplete != null) onComplete()
+    if (onComplete != null) onComplete()
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => handleClose(),
+    onError: () => handleClose(),
   })
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      chainRunCommands(
-        [{ commandType: 'home' as const, params: {} }],
-        true
-      ).then(() => {
-        deleteMaintenanceRun(maintenanceRunId)
-      })
+      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+        .then(() => {
+          deleteMaintenanceRun(maintenanceRunId)
+        })
+        .catch(error => {
+          console.error(error.message)
+          handleClose()
+        })
     }
   }
   const {
@@ -215,6 +216,7 @@ export const PipetteWizardFlows = (
         {...calibrateBaseProps}
         createMaintenanceRun={createMaintenanceRun}
         isCreateLoading={isCreateLoading}
+        requiredPipette={requiredPipette}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
@@ -253,6 +255,7 @@ export const PipetteWizardFlows = (
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
         hasCalData={hasCalData}
+        requiredPipette={requiredPipette}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
@@ -265,6 +268,14 @@ export const PipetteWizardFlows = (
         {...calibrateBaseProps}
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
+    modalContent = (
+      <FirmwareUpdateModal
+        proceed={proceed}
+        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        description={t('firmware_updating')}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
@@ -333,12 +344,12 @@ export const PipetteWizardFlows = (
   return (
     <Portal level="top">
       {isOnDevice ? (
-        <ModalShell>
+        <LegacyModalShell>
           {wizardHeader}
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
-        <ModalShell
+        <LegacyModalShell
           width="47rem"
           height={
             //  changing modal height for now on BeforeBeginning 96 channel attach flow
@@ -352,7 +363,7 @@ export const PipetteWizardFlows = (
           header={wizardHeader}
         >
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

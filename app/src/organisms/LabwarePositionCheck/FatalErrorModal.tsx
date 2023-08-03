@@ -18,7 +18,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
 import { i18n } from '../../i18n'
@@ -33,7 +33,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   return (
     <Portal level="top">
-      <ModalShell
+      <LegacyModalShell
         width="47rem"
         header={
           <WizardHeader
@@ -76,7 +76,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
             {t('shared:exit')}
           </PrimaryButton>
         </Flex>
-      </ModalShell>
+      </LegacyModalShell>
     </Portal>
   )
 }

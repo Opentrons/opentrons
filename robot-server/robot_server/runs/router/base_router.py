@@ -6,10 +6,12 @@ import logging
 from datetime import datetime
 from textwrap import dedent
 from typing import Optional, Union
-from typing_extensions import Literal, Final
+from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
+
+from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -42,14 +44,13 @@ from ..dependencies import get_run_data_manager, get_run_auto_deleter
 log = logging.getLogger(__name__)
 base_router = APIRouter()
 
-_DEFAULT_RUNS_LIST_LENGTH: Final = 20
-
 
 class RunNotFound(ErrorDetails):
     """An error if a given run is not found."""
 
     id: Literal["RunNotFound"] = "RunNotFound"
     title: str = "Run Not Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 class RunAlreadyActive(ErrorDetails):
@@ -57,6 +58,7 @@ class RunAlreadyActive(ErrorDetails):
 
     id: Literal["RunAlreadyActive"] = "RunAlreadyActive"
     title: str = "Run Already Active"
+    errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
 class RunNotIdle(ErrorDetails):
@@ -68,6 +70,7 @@ class RunNotIdle(ErrorDetails):
         "Run is currently active. Allow the run to finish or"
         " stop it with a `stop` action before attempting to modify it."
     )
+    errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
 class RunStopped(ErrorDetails):
@@ -75,6 +78,7 @@ class RunStopped(ErrorDetails):
 
     id: Literal["RunStopped"] = "RunStopped"
     title: str = "Run Stopped"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 class AllRunsLinks(BaseModel):

@@ -10,6 +10,7 @@ import {
   WRAP,
   Icon,
   DIRECTION_ROW,
+  LocationIcon,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
@@ -22,7 +23,7 @@ import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
-  border-spacing: 0 ${BORDERS.size2};
+  border-spacing: 0 ${BORDERS.borderRadiusSize2};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   color: ${COLORS.darkBlack90};
 `
@@ -45,13 +46,13 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.size3};
-    border-bottom-left-radius: ${BORDERS.size3};
+    border-top-left-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
     width: 20%;
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.size3};
-    border-bottom-right-radius: ${BORDERS.size3};
+    border-top-right-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-right-radius: ${BORDERS.borderRadiusSize3};
   }
 `
 
@@ -100,16 +101,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
               >
                 <TableDatum>
                   <Flex>
-                    <Flex
-                      padding="0.375rem"
-                      textAlign={TYPOGRAPHY.textAlignLeft}
-                      borderRadius={BORDERS.size3}
-                      border={`3px solid ${COLORS.darkBlackEnabled}`}
-                      fontSize={TYPOGRAPHY.fontSize20}
-                      fontWeight="700"
-                    >
-                      {slotName}
-                    </Flex>
+                    <LocationIcon slotName={slotName} />
                   </Flex>
                 </TableDatum>
                 <TableDatum>

@@ -18,7 +18,7 @@ import { UsageSettings } from './AdvancedTab/UsageSettings'
 import {
   DisableHoming,
   DisplayRobotName,
-  FactoryReset,
+  DeviceReset,
   LegacySettings,
   OpenJupyterControl,
   RobotInformation,
@@ -35,8 +35,8 @@ import {
   fetchSettings,
 } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
-import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
-import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
+import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
+import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { UpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { Portal } from '../../../App/portal'
@@ -62,12 +62,12 @@ export function RobotSettingsAdvanced({
     setShowRenameRobotSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showFactoryResetSlideout,
-    setShowFactoryResetSlideout,
+    showDeviceResetSlideout,
+    setShowDeviceResetSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showFactoryResetModal,
-    setShowFactoryResetModal,
+    showDeviceResetModal,
+    setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
   const [
     showSoftwareUpdateModal,
@@ -93,10 +93,10 @@ export function RobotSettingsAdvanced({
 
   const updateIsExpanded = (
     isExpanded: boolean,
-    type: 'factoryReset' | 'renameRobot'
+    type: 'deviceReset' | 'renameRobot'
   ): void => {
-    if (type === 'factoryReset') {
-      setShowFactoryResetSlideout(isExpanded)
+    if (type === 'deviceReset') {
+      setShowDeviceResetSlideout(isExpanded)
     } else {
       setShowRenameRobotSlideout(isExpanded)
     }
@@ -107,7 +107,7 @@ export function RobotSettingsAdvanced({
     options?: ResetConfigRequest
   ): void => {
     if (options != null) setResetOptions(options)
-    setShowFactoryResetModal(true)
+    setShowDeviceResetModal(true)
     setIsRobotReachable(isReachable ?? false)
   }
 
@@ -139,18 +139,18 @@ export function RobotSettingsAdvanced({
             robotName={robotName}
           />
         )}
-        {showFactoryResetSlideout && (
-          <FactoryResetSlideout
-            isExpanded={showFactoryResetSlideout}
-            onCloseClick={() => setShowFactoryResetSlideout(false)}
+        {showDeviceResetSlideout && (
+          <DeviceResetSlideout
+            isExpanded={showDeviceResetSlideout}
+            onCloseClick={() => setShowDeviceResetSlideout(false)}
             robotName={robotName}
             updateResetStatus={updateResetStatus}
           />
         )}
-        {showFactoryResetModal && (
+        {showDeviceResetModal && (
           <Portal level="top">
-            <FactoryResetModal
-              closeModal={() => setShowFactoryResetModal(false)}
+            <DeviceResetModal
+              closeModal={() => setShowDeviceResetModal(false)}
               isRobotReachable={isRobotReachable}
               robotName={robotName}
               resetOptions={resetOptions}
@@ -188,7 +188,7 @@ export function RobotSettingsAdvanced({
         />
         <Troubleshooting robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
-        <FactoryReset
+        <DeviceReset
           updateIsExpanded={updateIsExpanded}
           isRobotBusy={isRobotBusy}
         />

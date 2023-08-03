@@ -1,11 +1,7 @@
 import * as React from 'react'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  LEFT,
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -39,9 +35,9 @@ describe('Carriage', () => {
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByTestId, getByRole } = render(props)
     getByText('Unscrew z-axis carriage')
-    getByAltText('Unscrew gantry')
+    getByTestId('Pipette_Zaxis_Attach_96.webm')
     getByRole('button', { name: 'Continue' })
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
@@ -58,7 +54,7 @@ describe('Carriage', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByTestId, getByText, getByRole, getByLabelText } = render(props)
     getByText('Reattach z-axis carriage')
     getByText(
       'Push the right pipette mount up to the top of the z-axis. Then tighten the captive screw at the top right of the gantry carriage.'
@@ -66,48 +62,15 @@ describe('Carriage', () => {
     getByText(
       'When reattached, the right mount should no longer freely move up and down.'
     )
-    getByAltText('Reattach carriage')
+    getByTestId('Pipette_Zaxis_Detach_96.webm')
     getByRole('button', { name: 'Continue' })
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
   })
-  it('renders null if a single mount pipette is attached', () => {
-    props = {
-      ...props,
-      selectedPipette: SINGLE_MOUNT_PIPETTES,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
-  })
-  it('renders null if flow is calibrate is attached', () => {
-    props = {
-      ...props,
-      flowType: FLOWS.CALIBRATE,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
-  })
-  it('clicking on continue button executes the commands correctly', async () => {
+  it('clicking on continue button executes the commands correctly', () => {
     const { getByRole } = render(props)
     const contBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(contBtn)
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'home',
-          params: {
-            axes: ['rightZ'],
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: { mount: LEFT },
-        },
-      ],
-      false
-    )
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
-    })
+    expect(props.proceed).toHaveBeenCalled()
   })
 })

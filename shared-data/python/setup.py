@@ -21,7 +21,16 @@ if os.name == "posix":
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 DATA_ROOT = ".."
-DATA_SUBDIRS = ["deck", "labware", "module", "pipette", "protocol", "gripper", "robot"]
+DATA_SUBDIRS = [
+    "deck",
+    "labware",
+    "module",
+    "pipette",
+    "protocol",
+    "gripper",
+    "robot",
+    "errors",
+]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
 

@@ -5,8 +5,6 @@ import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'
 import type { State } from '../../types'
 
-jest.mock('../../protocol/selectors')
-
 interface SelectorSpec {
   name: string
   selector: (state: State, ...rest: any[]) => unknown

@@ -16,16 +16,21 @@ from typing import (
     Set,
     Any,
     TypeVar,
+    Mapping,
+    cast,
 )
 
-from opentrons_shared_data.pipette import name_config
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
-from .util import use_or_initialize_loop, check_motion_bounds
+from .util import use_or_initialize_loop, check_motion_bounds, ot2_axis_to_string
 from .instruments.ot2.pipette import (
     generate_hardware_configs,
     load_from_config_and_check_skip,
@@ -45,6 +50,7 @@ from .types import (
     MotionChecks,
     PauseType,
     StatusBarState,
+    EstopState,
 )
 from .errors import (
     MustHomeError,
@@ -55,7 +61,7 @@ from .robot_calibration import (
     RobotCalibrationProvider,
     RobotCalibration,
 )
-from .protocols import HardwareControlAPI
+from .protocols import HardwareControlInterface
 from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
@@ -79,7 +85,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
+    HardwareControlInterface[RobotCalibration],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -347,9 +353,17 @@ class API(
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
-    async def set_status_bar_state(self, _: StatusBarState) -> None:
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
         """The status bar does not exist on OT-2!"""
         return None
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        """The status bar does not exist on OT-2!"""
+        return None
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """There is no status bar on OT-2, return IDLE at all times."""
+        return StatusBarState.IDLE
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -398,11 +412,10 @@ class API(
         self._log.info("Updating instrument model cache")
         checked_require = require or {}
         for mount, name in checked_require.items():
-            if name not in name_config():
+            if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
             found = await self._backend.get_attached_instruments(checked_require)
-
         for mount, instrument_data in found.items():
             config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)
@@ -417,7 +430,10 @@ class API(
             )
             self._attached_instruments[mount] = p
             if req_instr and p:
-                p.act_as(req_instr)
+                converted_name = pipette_load_name.convert_to_pipette_name_type(
+                    req_instr
+                )
+                p.act_as(converted_name)
 
             if may_skip:
                 self._log.info(f"Skipping configuration on {mount.name}")
@@ -534,7 +550,7 @@ class API(
         assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
         if axis:
             checked_axis = axis
-            checked_mount = Axis.to_mount(checked_axis)
+            checked_mount = Axis.to_ot2_mount(checked_axis)
         if mount:
             checked_mount = mount
             checked_axis = Axis.of_plunger(checked_mount)
@@ -546,14 +562,16 @@ class API(
                 await stack.enter_async_context(self._motion_lock)
             with self._backend.save_current():
                 self._backend.set_active_current(
-                    {checked_axis: instr.config.plunger_current}
+                    {checked_axis: instr.plunger_motor_current.run}
                 )
-                await self._backend.home([checked_axis.name.upper()])
+                await self._backend.home([ot2_axis_to_string(checked_axis)])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
                 target_pos = target_position_from_plunger(
-                    checked_mount, instr.config.bottom, self._current_position
+                    checked_mount,
+                    instr.plunger_positions.bottom,
+                    self._current_position,
                 )
                 await self._move(
                     target_pos,
@@ -584,7 +602,7 @@ class API(
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis.ot2_axes()]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
-        smoothie_gantry = [ax.name.upper() for ax in gantry]
+        smoothie_gantry = [ot2_axis_to_string(ax) for ax in gantry]
         smoothie_pos = {}
         plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
 
@@ -592,9 +610,10 @@ class API(
             if smoothie_gantry:
                 smoothie_pos.update(await self._backend.home(smoothie_gantry))
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
@@ -616,7 +635,7 @@ class API(
         position_axes = [Axis.X, Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.is_homed([str(a) for a in position_axes])
+            not self._backend.is_homed([ot2_axis_to_string(a) for a in position_axes])
             or not self._current_position
         ):
             raise MustHomeError(
@@ -629,9 +648,10 @@ class API(
             if refresh:
                 smoothie_pos = await self._backend.update_position()
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -693,6 +713,18 @@ class API(
         await self._cache_and_maybe_retract_mount(mount)
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
+    async def move_axes(
+        self,
+        position: Mapping[Axis, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
+        """
+        raise NotSupportedByHardware("move_axes is not supported on the OT-2.")
+
     async def move_rel(
         self,
         mount: top_types.Mount,
@@ -723,7 +755,7 @@ class API(
         )
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
         if fail_on_not_homed and not self._backend.is_homed(
-            [axis.name for axis in axes_moving if axis is not None]
+            [ot2_axis_to_string(axis) for axis in axes_moving if axis is not None]
         ):
             raise mhe
         await self._cache_and_maybe_retract_mount(mount)
@@ -769,22 +801,23 @@ class API(
         """
         machine_pos = self._string_map_from_axis_map(
             machine_from_deck(
-                target_position,
-                self._robot_calibration.deck_calibration.attitude,
-                top_types.Point(0, 0, 0),
+                deck_pos=target_position,
+                attitude=self._robot_calibration.deck_calibration.attitude,
+                offset=top_types.Point(0, 0, 0),
+                robot_type=cast(RobotType, "OT-2 Standard"),
             )
         )
 
         bounds = self._backend.axis_bounds
         to_check = {
-            ax: machine_pos[ax.name]
+            ax: machine_pos[ot2_axis_to_string(ax)]
             for idx, ax in enumerate(target_position.keys())
             if ax in Axis.gantry_axes()
         }
 
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
         checked_maxes = max_speeds or {}
-        str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
+        str_maxes = {ot2_axis_to_string(ax): val for ax, val in checked_maxes.items()}
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
@@ -811,7 +844,7 @@ class API(
         return self.get_engaged_axes()
 
     async def disengage_axes(self, which: List[Axis]) -> None:
-        await self._backend.disengage_axes([ax.name for ax in which])
+        await self._backend.disengage_axes([ot2_axis_to_string(ax) for ax in which])
 
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
         converted_axes = "".join(axes)
@@ -823,14 +856,23 @@ class API(
 
         Works regardless of critical point or home status.
         """
-        smoothie_ax = (Axis.by_mount(mount).name.upper(),)
+        await self.retract_axis(Axis.by_mount(mount), margin)
+
+    @ExecutionManagerProvider.wait_for_running
+    async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
+        """Pull the specified axis up to its home position.
+
+        Works regardless of critical point or home status.
+        """
+        smoothie_ax = (ot2_axis_to_string(axis),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
             self._current_position = deck_from_machine(
-                self._axis_map_from_string_map(smoothie_pos),
-                self._robot_calibration.deck_calibration.attitude,
-                top_types.Point(0, 0, 0),
+                machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                attitude=self._robot_calibration.deck_calibration.attitude,
+                offset=top_types.Point(0, 0, 0),
+                robot_type=cast(RobotType, "OT-2 Standard"),
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -894,7 +936,7 @@ class API(
             speed = self.plunger_speed(
                 instrument, instrument.blow_out_flow_rate, "aspirate"
             )
-            bottom = instrument.config.bottom
+            bottom = instrument.plunger_positions.bottom
             target = target_position_from_plunger(mount, bottom, self._current_position)
             await self._move(
                 target,
@@ -1062,13 +1104,14 @@ class API(
             )
             if move.home_after:
                 smoothie_pos = await self._backend.fast_home(
-                    [ax.name.upper() for ax in move.home_axes],
+                    [ot2_axis_to_string(ax) for ax in move.home_axes],
                     move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
 
         for shake in spec.shake_moves:
@@ -1088,7 +1131,7 @@ class API(
 
         return await self._backend.module_controls.build_module(
             port="",
-            usb_port=USBPort(name="", port_number=0),
+            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.MAIN),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
@@ -1112,8 +1155,10 @@ class API(
     ) -> Dict[Axis, "API.MapPayload"]:
         return {Axis[k]: v for k, v in input_map.items()}
 
-    @staticmethod
     def _string_map_from_axis_map(
-        input_map: Dict[Axis, "API.MapPayload"]
+        self, input_map: Dict[Axis, "API.MapPayload"]
     ) -> Dict[str, "API.MapPayload"]:
-        return {k.name: v for k, v in input_map.items()}
+        return {ot2_axis_to_string(k): v for k, v in input_map.items()}
+
+    def get_estop_state(self) -> EstopState:
+        return EstopState.DISENGAGED

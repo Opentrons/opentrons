@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  LEFT,
-  NINETY_SIX_CHANNEL,
-  RIGHT,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -39,15 +34,30 @@ describe('MountingPlate', () => {
       isOnDevice: false,
     }
   })
-  it('returns the correct information, buttons work as expected for attach flow', () => {
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+  it('returns the correct information, buttons work as expected for attach flow', async () => {
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach Mounting Plate')
     getByText(
       'Attach the mounting plate by aligning the pins on the plate to the slots on the gantry carriage. You may need to adjust the position of the right pipette mount to achieve proper alignment.'
     )
-    getByAltText('Attach mounting plate')
+    getByTestId('Pipette_Attach_Plate_96.webm')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: { axes: ['rightZ'] },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+    })
     expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
@@ -59,47 +69,17 @@ describe('MountingPlate', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Loosen Screws and Detach Mounting Plate')
     getByText(
       'Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.'
     )
-    getByAltText('Detach mounting plate')
+    getByTestId('Pipette_Detach_Plate_96.webm')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'calibration/moveToMaintenancePosition',
-          params: {
-            mount: RIGHT,
-          },
-        },
-      ],
-      false
-    )
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
-    })
+    expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
-  })
-  it('renders null if a single mount pipette is attached', () => {
-    props = {
-      ...props,
-      selectedPipette: SINGLE_MOUNT_PIPETTES,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
-  })
-
-  it('renders null if flow is calibrate is attached', () => {
-    props = {
-      ...props,
-      flowType: FLOWS.CALIBRATE,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
   })
 })

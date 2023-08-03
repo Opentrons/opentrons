@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
@@ -22,69 +23,78 @@ import {
 import {
   useCreateRunMutation,
   useHost,
+  useProtocolAnalysesQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { ProtocolResource } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  ProtocolResource,
+} from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { useMissingHardwareText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import {
-  Modal,
-  SmallModalChildren,
-} from '../../../molecules/Modal/OnDeviceDisplay'
+import { Modal, SmallModalChildren } from '../../../molecules/Modal'
 import { useToaster } from '../../../organisms/ToasterOven'
-import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
+import {
+  getApplyHistoricOffsets,
+  getPinnedProtocolIds,
+  updateConfigValue,
+} from '../../../redux/config'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 const ProtocolHeader = (props: {
   title: string
   handleRunProtocol: () => void
   chipText: string
+  isScrolled: boolean
 }): JSX.Element => {
   const history = useHistory()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
-  const { title, handleRunProtocol, chipText } = props
+  const { title, handleRunProtocol, chipText, isScrolled } = props
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const toggleTruncate = (): void => setTruncate(value => !value)
 
   let displayedTitle = title
   if (title.length > 92 && truncate) {
-    displayedTitle = truncateString(title, 92, 69)
+    displayedTitle = truncateString(title, 80, 60)
   }
 
   return (
     <Flex
       alignItems={ALIGN_CENTER}
+      boxShadow={isScrolled ? BORDERS.shadowBig : undefined}
+      gridGap={SPACING.spacing40}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginX={SPACING.spacing16}
-      paddingY={SPACING.spacing32}
+      padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
       position={POSITION_STICKY}
       top="0"
       backgroundColor={COLORS.white}
+      marginX={`-${SPACING.spacing32}`}
+      zIndex={1} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        marginBottom={SPACING.spacing8}
         width="42.125rem"
       >
         <Btn
           paddingLeft="0rem"
-          paddingRight={SPACING.spacing20}
+          paddingRight={SPACING.spacing24}
           onClick={() => history.goBack()}
-          width="2.5rem"
+          width="3rem"
         >
-          <Icon name="back" width="2.5rem" color={COLORS.darkBlack100} />
+          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -111,7 +121,6 @@ const ProtocolHeader = (props: {
         buttonCategory="rounded"
         onClick={handleRunProtocol}
         buttonText={t('protocol_details:start_setup')}
-        buttonType="primary"
       />
     </Flex>
   )
@@ -163,25 +172,30 @@ const Summary = (props: {
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
       >
-        <StyledText as="p">{`${i18n.format(
-          t('author'),
-          'capitalize'
-        )}: `}</StyledText>
-        <StyledText as="p">{author}</StyledText>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >{`${i18n.format(t('author'), 'capitalize')}: `}</StyledText>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {author}
+        </StyledText>
       </Flex>
-      <StyledText as="p">
+      <StyledText
+        as="p"
+        color={description === null ? COLORS.darkBlack70 : undefined}
+      >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
       </StyledText>
       <Flex
         backgroundColor={COLORS.darkBlack20}
-        borderRadius={BORDERS.size1}
+        borderRadius={BORDERS.borderRadiusSize1}
         marginTop={SPACING.spacing24}
-        maxWidth="22rem"
+        width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
         <StyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null
-            ? format(new Date(date), 'MM/dd/yyyy k:mm')
+            ? format(new Date(date), 'MM/dd/yy k:mm')
             : t('shared:no_data')
         }`}</StyledText>
       </Flex>
@@ -238,6 +252,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const history = useHistory()
   const host = useHost()
   const { makeSnackbar } = useToaster()
+  const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -246,13 +261,47 @@ export function ProtocolDetails(): JSX.Element | null {
     staleTime: Infinity,
   })
 
+  // Watch for scrolling to toggle dropshadow
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+  const observer = new IntersectionObserver(([entry]) => {
+    setIsScrolled(!entry.isIntersecting)
+  })
+  if (scrollRef.current) {
+    observer.observe(scrollRef.current)
+  }
+
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
+  const mostRecentAnalysis =
+    (protocolAnalyses?.data ?? [])
+      .reverse()
+      .find(
+        (analysis): analysis is CompletedProtocolAnalysis =>
+          analysis.status === 'completed'
+      ) ?? null
+  const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
+  // I'd love to skip scraping altogether if we aren't applying
+  // conditional offsets, but React won't let us use hooks conditionally.
+  // So, we'll scrape regardless and just toss them if we don't need them.
+  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
+    mostRecentAnalysis
+  ).map(({ vector, location, definitionUri }) => ({
+    vector,
+    location,
+    definitionUri,
+  }))
+  const labwareOffsets = shouldApplyOffsets ? scrapedLabwareOffsets : []
+
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      const runId: string = data.data.id
-      history.push(`/runs/${runId}/setup`)
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        )
     },
   })
 
@@ -274,7 +323,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const handleRunProtocol = (): void => {
-    createRun({ protocolId })
+    createRun({ protocolId, labwareOffsets })
   }
   const [
     showConfirmDeleteProtocol,
@@ -336,7 +385,6 @@ export function ProtocolDetails(): JSX.Element | null {
                 <SmallButton
                   onClick={() => setShowConfirmationDeleteProtocol(false)}
                   buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
-                  buttonType="primary"
                   width="50%"
                 />
                 <SmallButton
@@ -359,14 +407,17 @@ export function ProtocolDetails(): JSX.Element | null {
           <SmallModalChildren
             header={t('too_many_pins_header')}
             subText={t('too_many_pins_body')}
-            buttonText={t('shared:close')}
+            buttonText={i18n.format(t('shared:close'), 'capitalize')}
             handleCloseMaxPinsAlert={() => setShowMaxPinsAlert(false)}
           />
         )}
+        {/* Empty box to detect scrolling */}
+        <Flex ref={scrollRef} />
         <ProtocolHeader
           title={displayName}
           handleRunProtocol={handleRunProtocol}
           chipText={chipText}
+          isScrolled={isScrolled}
         />
         <Flex flexDirection={DIRECTION_COLUMN}>
           <ProtocolSectionTabs
@@ -382,7 +433,8 @@ export function ProtocolDetails(): JSX.Element | null {
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing8}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            margin={SPACING.spacing16}
+            paddingTop={SPACING.spacing60}
+            marginX={SPACING.spacing16}
           >
             <MediumButton
               buttonText={

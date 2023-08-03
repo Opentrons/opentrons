@@ -21,27 +21,19 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { toggleDevtools } from '../../../redux/config'
+import { InlineNotification } from '../../../atoms/InlineNotification'
+import { toggleDevtools, toggleHistoricOffsets } from '../../../redux/config'
 
 import type { IconName } from '@opentrons/components'
 import type { Dispatch } from '../../../redux/types'
-
-export type SettingOption =
-  | 'NetworkSettings'
-  | 'RobotName'
-  | 'RobotSystemVersion'
-  | 'TouchscreenSleep'
-  | 'TouchscreenBrightness'
-  | 'TextSize'
-  | 'DeviceReset'
-  | 'UpdateChannel'
+import type { SettingOption, SetSettingOption } from '../RobotSettingsDashboard'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   margin-bottom: ${SPACING.spacing8};
-  background-color: ${COLORS.medGreyEnabled};
+  background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
-  border-radius: ${BORDERS.size4};
+  border-radius: ${BORDERS.borderRadiusSize4};
 `
 
 interface RobotSettingButtonProps {
@@ -49,11 +41,13 @@ interface RobotSettingButtonProps {
   iconName: IconName
   settingInfo?: string
   currentOption?: SettingOption
-  setCurrentOption?: (currentOption: SettingOption) => void
+  setCurrentOption?: SetSettingOption
   robotName?: string
   isUpdateAvailable?: boolean
   enabledDevTools?: boolean
+  enabledHistoricOffests?: boolean
   devToolsOn?: boolean
+  historicOffsetsOn?: boolean
   ledLights?: boolean
   lightsOn?: boolean
   toggleLights?: () => void
@@ -67,12 +61,14 @@ export function RobotSettingButton({
   isUpdateAvailable,
   iconName,
   enabledDevTools,
+  enabledHistoricOffests,
   devToolsOn,
+  historicOffsetsOn,
   ledLights,
   lightsOn,
   toggleLights,
 }: RobotSettingButtonProps): JSX.Element {
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t, i18n } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
   const handleClick = (): void => {
@@ -80,6 +76,8 @@ export function RobotSettingButton({
       setCurrentOption(currentOption)
     } else if (Boolean(enabledDevTools)) {
       dispatch(toggleDevtools())
+    } else if (Boolean(enabledHistoricOffests)) {
+      dispatch(toggleHistoricOffsets())
     } else if (Boolean(ledLights)) {
       if (toggleLights != null) toggleLights()
     }
@@ -100,19 +98,20 @@ export function RobotSettingButton({
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
       >
-        <Icon name={iconName} size="3rem" />
+        <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
+          width="46.25rem"
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {settingName}
           </StyledText>
           {settingInfo != null ? (
             <StyledText
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.darkBlack70}
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignLeft}
@@ -122,22 +121,6 @@ export function RobotSettingButton({
           ) : null}
         </Flex>
       </Flex>
-      {isUpdateAvailable ?? false ? (
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing12}
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.warningBackgroundMed}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size4}
-        >
-          <Icon name="ot-alert" size="1.75rem" color={COLORS.warningEnabled} />
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('update_available')}
-          </StyledText>
-        </Flex>
-      ) : null}
-
       {enabledDevTools != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -145,14 +128,27 @@ export function RobotSettingButton({
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
           padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size4}
+          borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {Boolean(devToolsOn) ? t('shared:on') : t('shared:off')}
           </StyledText>
         </Flex>
       ) : null}
-
+      {enabledHistoricOffests != null ? (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing12}
+          alignItems={ALIGN_CENTER}
+          backgroundColor={COLORS.transparent}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          borderRadius={BORDERS.borderRadiusSize4}
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {Boolean(historicOffsetsOn) ? t('shared:on') : t('shared:off')}
+          </StyledText>
+        </Flex>
+      ) : null}
       {ledLights != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -160,17 +156,27 @@ export function RobotSettingButton({
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
           padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size4}
+          borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {Boolean(lightsOn) ? t('shared:on') : t('shared:off')}
           </StyledText>
         </Flex>
       ) : null}
-
-      {enabledDevTools == null && ledLights == null ? (
-        <Icon name="chevron-right" size="3rem" />
-      ) : null}
+      <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+        {isUpdateAvailable ?? false ? (
+          <InlineNotification
+            type="alert"
+            heading={i18n.format(t('update_available'), 'capitalize')}
+            hug={true}
+          />
+        ) : null}
+        {enabledDevTools == null &&
+        enabledHistoricOffests == null &&
+        ledLights == null ? (
+          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
+        ) : null}
+      </Flex>
     </Btn>
   )
 }

@@ -35,14 +35,14 @@ export function DisplayConnectionStatus({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={isConnected ? COLORS.green3 : COLORS.darkBlack20}
-        borderRadius={BORDERS.size3}
+        borderRadius={BORDERS.borderRadiusSize3}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
         justifyContent={JUSTIFY_CENTER}
         padding={
           isConnected
             ? '4.4375rem 3.75rem'
-            : `${SPACING.spacing48} ${SPACING.spacing80}`
+            : `${SPACING.spacing40} ${SPACING.spacing80}`
         }
       >
         <Icon
@@ -69,8 +69,9 @@ export function DisplayConnectionStatus({
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignCenter}
               color={COLORS.darkBlack70}
+              margin="0 2rem"
             >
-              {t('no_network_found_description')}
+              {t('ethernet_connection_description')}
             </StyledText>
           )}
         </Flex>

@@ -148,15 +148,6 @@ AUX_CAN_TESTS = [
     "aux-1-pcan",
     "aux-2-pcan",
 ]
-COLORS_BY_SIGNAL = {
-    "none": {"1": "BLUE", "2": "BLUE"},  # shared
-    "door": {"1": "WHITE", "2": "WHITE"},  # shared
-    "estop-signal": {"1": "RED", "2": "RED"},  # shared
-    "sync": {"1": "Status is OFF", "2": "Status is OFF"},  # shared
-    "estop-detect": {"1": "YELLOW", "2": "CYAN"},
-    "presence": {"1": "PURPLE", "2": "ORANGE"},
-    "id": {"1": "GREEN", "2": "Deck-Lights OFF"},
-}
 
 ALLOWED_SECURITY_TYPES = {
     nmcli.SECURITY_TYPES.NONE.value: nmcli.SECURITY_TYPES.NONE,
@@ -298,6 +289,7 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
                 csv_result = CSVResult.from_bool(test_result[0])
                 report(section, test_name, [test_result[1], csv_result])
 
+    # PCAN
     if not api.is_simulator:
         ui.get_user_ready("UNPLUG ALL AUX CABLES")
 

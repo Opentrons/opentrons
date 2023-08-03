@@ -375,6 +375,48 @@ async def test_home_on_ot3(
     )
 
 
+async def test_retract_axis(
+    decoy: Decoy,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwareGantryMover,
+    mock_state_view: StateView,
+) -> None:
+    """It should send a hardware control retract axis command with specified axis."""
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
+    await hardware_subject.retract_axis(axis=MotorAxis.RIGHT_Z)
+    decoy.verify(
+        await mock_hardware_api.retract_axis(axis=HardwareAxis.A),
+        times=1,
+    )
+
+
+async def test_retract_axis_with_invalid_axis_for_ot2(
+    decoy: Decoy,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwareGantryMover,
+    mock_state_view: StateView,
+) -> None:
+    """It should raise error when trying to retract an axis that's not valid on OT2."""
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
+    with pytest.raises(InvalidAxisForRobotType):
+        await hardware_subject.retract_axis(axis=MotorAxis.EXTENSION_Z)
+
+
+@pytest.mark.ot3_only
+async def test_retract_axis_on_ot3(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+    mock_state_view: StateView,
+) -> None:
+    """It should call OT3 hardware API's retract axis with specified axis."""
+    subject = HardwareGantryMover(
+        state_view=mock_state_view, hardware_api=ot3_hardware_api
+    )
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-3 Standard")
+    await subject.retract_axis(MotorAxis.EXTENSION_Z)
+    decoy.verify(await ot3_hardware_api.retract_axis(axis=HardwareAxis.Z_G), times=1)
+
+
 # TODO(mc, 2022-12-01): this is overly complicated
 # https://opentrons.atlassian.net/browse/RET-1287
 async def test_home_z(

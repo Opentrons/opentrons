@@ -2,16 +2,17 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
+  BORDERS,
+  COLOR_WARNING_DARK,
   COLORS,
   DIRECTION_COLUMN,
-  TEXT_ALIGN_RIGHT,
   DISPLAY_INLINE_BLOCK,
+  Flex,
+  RESPONSIVENESS,
   SPACING,
-  BORDERS,
+  TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
-  COLOR_WARNING_DARK,
 } from '@opentrons/components'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
@@ -91,6 +92,10 @@ function Input(props: InputFieldProps): JSX.Element {
     border: 1px ${BORDERS.styleSolid}
       ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: 0;
+    }
 
     &:active {
       border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};

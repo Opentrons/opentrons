@@ -114,6 +114,9 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           position="absolute"
           bottom={SPACING.spacing40}
           zIndex={1000}
+          onClick={() => {
+            eatSnackbar()
+          }}
         >
           <Snackbar
             {...snackbar}

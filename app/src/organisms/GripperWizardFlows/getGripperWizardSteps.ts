@@ -34,6 +34,7 @@ export const getGripperWizardSteps = (
       return [
         { section: SECTIONS.BEFORE_BEGINNING },
         { section: SECTIONS.MOUNT_GRIPPER },
+        { section: SECTIONS.FIRMWARE_UPDATE },
         { section: SECTIONS.SUCCESS, successfulAction: SUCCESSFULLY_ATTACHED },
         { section: SECTIONS.MOVE_PIN, movement: MOVE_PIN_TO_FRONT_JAW },
         {

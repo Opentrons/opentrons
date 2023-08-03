@@ -4,6 +4,8 @@ import { RootState as DismissRoot } from './dismiss'
 import { ProtocolFile as ProtocolFileV3 } from '@opentrons/shared-data/protocol/types/schemaV3'
 import { ProtocolFile as ProtocolFileV4 } from '@opentrons/shared-data/protocol/types/schemaV4'
 import { ProtocolFile as ProtocolFileV5 } from '@opentrons/shared-data/protocol/types/schemaV5'
+import { ProtocolFile as ProtocolFileV6 } from '@opentrons/shared-data/protocol/types/schemaV6'
+
 export interface PDMetadata {
   // pipetteId to tiprackModel
   pipetteTiprackAssignments: Record<string, string>
@@ -24,6 +26,8 @@ export type PDProtocolFile =
   | ProtocolFileV3<PDMetadata>
   | ProtocolFileV4<PDMetadata>
   | ProtocolFileV5<PDMetadata>
+  | ProtocolFileV6<PDMetadata>
+
 export function getPDMetadata(file: PDProtocolFile): PDMetadata {
   const metadata = file.designerApplication?.data
 

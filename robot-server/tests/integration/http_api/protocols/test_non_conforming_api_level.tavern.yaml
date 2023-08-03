@@ -2,12 +2,11 @@ test_name: Upload, analyze, and validate protocol analysis failure for api level
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 stages:
   - name: Upload a python protocol with non-conforming api level 
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/non_conforming_api_level.py'

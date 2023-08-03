@@ -17,7 +17,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { Dispatch } from '../../redux/types'
 import { analyzeProtocol } from '../../redux/protocol-storage'
@@ -87,7 +87,7 @@ export function ProtocolAnalysisFailure(
       </Flex>
       {showErrorDetails ? (
         <Portal level="top">
-          <Modal
+          <LegacyModal
             type="error"
             title={t('protocol_analysis_failure')}
             onClose={handleClickHideDetails}
@@ -106,7 +106,7 @@ export function ProtocolAnalysisFailure(
                 {t('shared:close')}
               </PrimaryButton>
             </Flex>
-          </Modal>
+          </LegacyModal>
         </Portal>
       ) : null}
     </Banner>

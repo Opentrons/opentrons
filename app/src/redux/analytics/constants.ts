@@ -41,3 +41,4 @@ export const ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED =
 export const ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST =
   'openLabwareCreatorFromBottomOfLabwareLibraryList'
 export const ANALYTICS_SENT_TO_OT3 = 'sendToOT-3' // This would be changed
+export const ANALYTICS_ODD_APP_ERROR = 'oddError'

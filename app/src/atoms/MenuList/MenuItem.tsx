@@ -38,8 +38,8 @@ export const MenuItem = styled.button<ButtonProps>`
       isAlert ? COLORS.errorEnabled : COLORS.transparent};
     color: ${({ isAlert }) =>
       isAlert ? COLORS.white : COLORS.darkBlackEnabled};
-    padding: 1.625rem 1.5rem;
-    height: 4.875rem;
+    padding: ${SPACING.spacing24};
+    height: 5.5rem;
     line-height: ${TYPOGRAPHY.lineHeight36};
     &:hover,
     &:active {

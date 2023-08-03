@@ -17,7 +17,7 @@
     "increment": 0.0,
     "distance": 0.0
   },
-  "plungerMotorConfigurations": { "idle": 1.0, "run": 1.0 },
+  "plungerMotorConfigurations": { "idle": 0.05, "run": 1.0 },
   "plungerPositionsConfigurations": {
     "top": 19.5,
     "bottom": -14.5,
@@ -32,5 +32,7 @@
   "channels": 1,
   "shaftDiameter": 3.5,
   "shaftULperMM": 9.621,
-  "backCompatNames": ["p300_single"]
+  "backCompatNames": ["p300_single"],
+  "backlashDistance": 0.0,
+  "quirks": []
 }

@@ -37,7 +37,21 @@ class EngineStatus(str, Enum):
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
 
-    slotName: DeckSlotName
+    slotName: DeckSlotName = Field(
+        ...,
+        description=(
+            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            "A slot on the robot's deck."
+            "\n\n"
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the coordinates like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
+        ),
+    )
 
 
 class ModuleLocation(BaseModel):
@@ -49,30 +63,27 @@ class ModuleLocation(BaseModel):
     )
 
 
+class OnLabwareLocation(BaseModel):
+    """The location of something placed atop another labware."""
+
+    labwareId: str = Field(
+        ...,
+        description="The ID of a loaded Labware from a prior `loadLabware` command.",
+    )
+
+
 _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
-LabwareLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+LabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+]
 """Union of all locations where it's legal to keep a labware."""
 
+OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
 
-class LabwareMovementStrategy(str, Enum):
-    """Strategy to use for labware movement."""
-
-    USING_GRIPPER = "usingGripper"
-    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
-    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
-
-
-# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
-@dataclass(frozen=True)
-class ExperimentalOffsetData(BaseModel):
-    """The result of a load module procedure."""
-
-    usePickUpLocationLpcOffset: bool
-    useDropLocationLpcOffset: bool
-    pickUpOffset: Optional[LabwareOffsetVector]
-    dropOffset: Optional[LabwareOffsetVector]
+NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+"""Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
 class WellOrigin(str, Enum):
@@ -334,6 +345,22 @@ class LabwareOffsetVector(BaseModel):
     y: float
     z: float
 
+    def __add__(self, other: Any) -> LabwareOffsetVector:
+        """Adds two vectors together."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
+        )
+
+    def __sub__(self, other: Any) -> LabwareOffsetVector:
+        """Subtracts two vectors."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
+        )
+
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class InstrumentOffsetVector(BaseModel):
@@ -351,6 +378,17 @@ class ModuleOffsetVector(BaseModel):
     x: float
     y: float
     z: float
+
+
+class OverlapOffset(Vec3f):
+    """Offset representing overlap space of one labware on top of another labware or module."""
+
+
+class LabwareMovementOffsetData(BaseModel):
+    """Offsets to be used during labware movement."""
+
+    pickUpOffset: LabwareOffsetVector
+    dropOffset: LabwareOffsetVector
 
 
 # TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON
@@ -411,6 +449,10 @@ class ModuleDefinition(BaseModel):
         ...,
         description="List of module models this model is compatible with.",
     )
+    gripperOffsets: Optional[Dict[str, LabwareMovementOffsetData]] = Field(
+        default_factory=dict,
+        description="Offsets to use for labware movement using gripper",
+    )
 
 
 class LoadedModule(BaseModel):
@@ -431,6 +473,15 @@ class LabwareOffsetLocation(BaseModel):
             "The deck slot where the protocol will load the labware."
             " Or, if the protocol will load the labware on a module,"
             " the deck slot where the protocol will load that module."
+            "\n\n"
+            # This description should be kept in sync with DeckSlotLocation.slotName.
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the coordinates like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
         ),
     )
     moduleModel: Optional[ModuleModel] = Field(
@@ -446,6 +497,16 @@ class LabwareOffsetLocation(BaseModel):
             " this field must be the *requested* model, not the connected one."
             " You can retrieve this from a `loadModule` command's `params.model`"
             " in the protocol's analysis."
+        ),
+    )
+    definitionUri: Optional[str] = Field(
+        None,
+        description=(
+            "The definition URI of a labware that a labware can be loaded onto,"
+            " if applicable."
+            "\n\n"
+            "This can be combined with moduleModel if the labware is loaded on top of"
+            " an adapter that is loaded on a module."
         ),
     )
 
@@ -560,3 +621,11 @@ class HeaterShakerMovementRestrictors:
     plate_shaking: bool
     latch_status: HeaterShakerLatchStatus
     deck_slot: int
+
+
+class LabwareMovementStrategy(str, Enum):
+    """Strategy to use for labware movement."""
+
+    USING_GRIPPER = "usingGripper"
+    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
+    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"

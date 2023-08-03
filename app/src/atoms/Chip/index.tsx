@@ -15,7 +15,7 @@ import { StyledText } from '../text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 
-export type ChipType = 'basic' | 'success' | 'warning' | 'neutral'
+export type ChipType = 'basic' | 'error' | 'neutral' | 'success' | 'warning'
 
 interface ChipProps extends StyleProps {
   /** Display background color? */
@@ -40,31 +40,36 @@ const CHIP_PROPS_BY_TYPE: Record<
 > = {
   basic: {
     backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.size1,
+    borderRadius: BORDERS.borderRadiusSize1,
     textColor: COLORS.darkBlack90,
+  },
+  error: {
+    backgroundColor: COLORS.red3,
+    borderRadius: BORDERS.borderRadiusSize5,
+    iconColor: COLORS.red1,
+    textColor: COLORS.red1,
   },
   neutral: {
     backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.size6,
+    borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.darkBlack90,
     textColor: COLORS.darkBlack70,
   },
   success: {
     backgroundColor: COLORS.green3,
-    borderRadius: BORDERS.size6,
+    borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.green1,
     iconName: 'ot-check',
     textColor: COLORS.green1,
   },
   warning: {
     backgroundColor: COLORS.yellow3,
-    borderRadius: BORDERS.size6,
+    borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.yellow1,
     textColor: COLORS.yellow1,
   },
 }
 
-// ToDo (kj:02/09/2023) replace hard-coded values when the DS is out
 export function Chip({
   background,
   iconName,
@@ -83,7 +88,9 @@ export function Chip({
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+      padding={`${SPACING.spacing8} ${
+        background === false ? 0 : SPACING.spacing16
+      }`}
       gridGap={SPACING.spacing8}
       data-testid={`Chip_${type}`}
       {...styleProps}

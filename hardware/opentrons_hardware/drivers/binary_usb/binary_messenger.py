@@ -2,9 +2,16 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import Optional, Callable, Tuple, Dict, Type
+from typing import Optional, Callable, Tuple, Dict, Type, TypeVar
+from traceback import format_exception
 
 import logging
+
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    InternalUSBCommunicationError,
+    PythonException,
+)
 
 from opentrons_hardware.drivers.binary_usb.bin_serial import SerialUsbDriver
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
@@ -71,6 +78,9 @@ class SendAndReceiveListener:
         return self._response
 
 
+E = TypeVar("E", bound=BaseException)
+
+
 class BinaryMessenger:
     """High level can messaging class wrapping a binary usb driver.
 
@@ -97,7 +107,18 @@ class BinaryMessenger:
 
     async def send(self, message: BinaryMessageDefinition) -> bool:
         """Send a message."""
-        return bool((await self._drive.write(message=message)) == message.get_size())
+        try:
+            return bool(
+                (await self._drive.write(message=message)) == message.get_size()
+            )
+        except EnumeratedError:
+            raise
+        except BaseException as exc:
+            raise InternalUSBCommunicationError(
+                message="Error in USB send",
+                detail={"message": str(message)},
+                wrapping=[PythonException(exc)],
+            )
 
     async def __aenter__(self) -> BinaryMessenger:
         """Start messenger."""
@@ -105,10 +126,16 @@ class BinaryMessenger:
         return self
 
     async def __aexit__(
-        self, exc_type: type, exc_val: BaseException, exc_tb: Traceback
+        self, exc_type: Optional[Type[E]], exc_val: E, exc_tb: Optional[Traceback]
     ) -> None:
         """Stop messenger."""
         await self.stop()
+        if exc_val:
+            # type ignore because it's unclear what the type of exc_tb should be
+            log.error(format_exception(exc_type, exc_val, exc_tb))  # type: ignore
+            if isinstance(exc_val, EnumeratedError):
+                raise exc_val
+            raise PythonException(exc_val)
 
     def start(self) -> None:
         """Start the reader task."""
@@ -147,13 +174,18 @@ class BinaryMessenger:
             self._listeners.pop(listener)
 
     async def _read_task_shield(self) -> None:
-        try:
-            await self._read_task()
-        except asyncio.CancelledError:
-            pass
-        except Exception:
-            log.exception("Exception in read")
-            raise
+        while True:
+            try:
+                await self._read_task()
+            except (asyncio.CancelledError, StopAsyncIteration):
+                return
+            except (InternalUSBCommunicationError) as e:
+                log.exception(f"Nonfatal error in USB read task: {e}")
+                continue
+            except BaseException as e:
+                # Log this separately if it's some unknown error
+                log.exception(f"Unexpected error in USB read task: {e}")
+                continue
 
     async def _read_task(self) -> None:
         """Read task."""
@@ -192,7 +224,17 @@ class BinaryMessenger:
     ) -> Optional[BinaryMessageDefinition]:
         """Send a message and await a specific response message."""
         listener = SendAndReceiveListener(self, response_type, timeout)
-        return await listener.send_and_receive(message)
+        try:
+            return await listener.send_and_receive(message)
+        except EnumeratedError:
+            raise
+        except BaseException as exc:
+            log.exception("Exception in send_and_receive")
+            raise InternalUSBCommunicationError(
+                message="Exception in internal USB send_and_receive",
+                detail={"message": str(message)},
+                wrapping=[PythonException(exc=exc)],
+            )
 
 
 class BinaryWaitableCallback:

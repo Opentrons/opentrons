@@ -12,7 +12,7 @@ import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
+import { ProtocolDashboard } from '../../pages/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { ProtocolDetails } from '../../pages/OnDeviceDisplay/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
@@ -21,9 +21,10 @@ import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
 import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
+import { EmergencyStop } from '../../pages/EmergencyStop'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
-import { useCurrentRunRoute } from '../hooks'
+import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
@@ -34,7 +35,7 @@ jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
-jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
+jest.mock('../../pages/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDetails')
 jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
@@ -42,6 +43,7 @@ jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../pages/OnDeviceDisplay/RunSummary')
 jest.mock('../../pages/OnDeviceDisplay/NameRobot')
 jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
+jest.mock('../../pages/EmergencyStop')
 jest.mock('../../redux/config')
 jest.mock('../../redux/shell')
 jest.mock('../hooks')
@@ -92,6 +94,9 @@ const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
 >
 const mockRunSummary = RunSummary as jest.MockedFunction<typeof RunSummary>
 const mockNameRobot = NameRobot as jest.MockedFunction<typeof NameRobot>
+const mockEmergencyStop = EmergencyStop as jest.MockedFunction<
+  typeof EmergencyStop
+>
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings
 >
@@ -100,6 +105,9 @@ const mockgetIsShellReady = getIsShellReady as jest.MockedFunction<
 >
 const mockUseCurrentRunRoute = useCurrentRunRoute as jest.MockedFunction<
   typeof useCurrentRunRoute
+>
+const mockUseProtocolReceiptToasts = useProtocolReceiptToast as jest.MockedFunction<
+  typeof useProtocolReceiptToast
 >
 
 const render = (path = '/') => {
@@ -134,6 +142,7 @@ describe('OnDeviceDisplayApp', () => {
     mockgetIsShellReady.mockReturnValue(false)
     mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
     mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
+    mockEmergencyStop.mockReturnValue(<div>Mock EmergencyStop</div>)
     mockUseCurrentRunRoute.mockReturnValue(null)
   })
   afterEach(() => {
@@ -210,5 +219,14 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/')
     mockgetIsShellReady.mockReturnValue(true)
     getByText('Mock Loading')
+  })
+  it('renders EmergencyStop component from /emergency-stop', () => {
+    mockUseCurrentRunRoute.mockReturnValue('/emergency-stop')
+    const [{ getByText }] = render('/emergency-stop')
+    getByText('Mock EmergencyStop')
+  })
+  it('renders protocol receipt toasts', () => {
+    render('/')
+    expect(mockUseProtocolReceiptToasts).toHaveBeenCalled()
   })
 })

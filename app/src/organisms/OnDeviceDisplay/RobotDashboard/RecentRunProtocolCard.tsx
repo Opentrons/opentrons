@@ -12,44 +12,75 @@ import {
   DIRECTION_COLUMN,
   BORDERS,
 } from '@opentrons/components'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
 import { useTrackEvent } from '../../../redux/analytics'
+import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingHardwareText } from './hooks'
-import type { Run } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+  Run,
+  RunData,
+  RunStatus,
+} from '@opentrons/api-client'
+import type { ProtocolResource } from '@opentrons/shared-data'
+
 interface RecentRunProtocolCardProps {
-  /** protocol name that was run recently */
-  protocolName: string
-  /** protocol id that was run recently  */
-  protocolId: string
-  /** the time that this recent run was created  */
-  lastRun: string
-  runId: string
+  runData: RunData
 }
 
 export function RecentRunProtocolCard({
-  protocolName,
-  protocolId,
-  lastRun,
-  runId,
-}: RecentRunProtocolCardProps): JSX.Element {
+  runData,
+}: RecentRunProtocolCardProps): JSX.Element | null {
+  const { data, isFetching, isLoading } = useProtocolQuery(
+    runData.protocolId ?? null
+  )
+  const protocolData = data?.data ?? null
+  const isProtocolFetching = isFetching || isLoading
+  return protocolData == null ? null : (
+    <ProtocolWithLastRun
+      protocolData={protocolData}
+      runData={runData}
+      isProtocolFetching={isProtocolFetching}
+    />
+  )
+}
+
+interface ProtocolWithLastRunProps {
+  runData: RunData
+  protocolData: ProtocolResource
+  isProtocolFetching: boolean
+}
+
+export function ProtocolWithLastRun({
+  runData,
+  protocolData,
+  isProtocolFetching,
+}: ProtocolWithLastRunProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
-  const missingProtocolHardware = useMissingProtocolHardware(protocolId)
+  const missingProtocolHardware = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
   const chipText = useMissingHardwareText(missingProtocolHardware)
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(`protocols/${createRunResponse.data.id}/setup`)
-  const { cloneRun } = useCloneRun(runId, onResetSuccess)
+  const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
+
+  const protocolName =
+    protocolData.metadata.protocolName ?? protocolData.files[0].name
 
   const PROTOCOL_CARD_STYLE = css`
+    flex: 1 0 0;
     &:active {
       background-color: ${isReadyToBeReRun
         ? COLORS.green3Pressed
@@ -78,7 +109,28 @@ export function RecentRunProtocolCard({
     trackProtocolRunEvent({ name: 'runAgain' })
   }
 
-  return (
+  const terminationTypeMap: { [runStatus in RunStatus]?: string } = {
+    [RUN_STATUS_STOPPED]: t('canceled'),
+    [RUN_STATUS_SUCCEEDED]: t('completed'),
+    [RUN_STATUS_FAILED]: t('failed'),
+  }
+  // TODO(BC, 2023-06-05): see if addSuffix false allow can remove usage of .replace here
+  const formattedLastRunTime = formatDistance(
+    new Date(runData.createdAt),
+    new Date(),
+    {
+      addSuffix: true,
+    }
+  ).replace('about ', '')
+
+  return isProtocolFetching ? (
+    <Skeleton
+      height="24.5rem"
+      width="25.8125rem"
+      backgroundSize="64rem"
+      borderRadius={BORDERS.borderRadiusSize3}
+    />
+  ) : (
     <Flex
       aria-label="RecentRunProtocolCard"
       css={PROTOCOL_CARD_STYLE}
@@ -87,7 +139,8 @@ export function RecentRunProtocolCard({
       gridGap={SPACING.spacing24}
       backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
-      borderRadius={BORDERS.size4}
+      height="24.5rem"
+      borderRadius={BORDERS.borderRadiusSize4}
       onClick={handleCardClick}
     >
       <Flex>
@@ -114,12 +167,10 @@ export function RecentRunProtocolCard({
         lineHeight={TYPOGRAPHY.lineHeight28}
         color={COLORS.darkBlack70}
       >
-        {i18n.format(t('last_run_time'), 'capitalize')}{' '}
-        {lastRun != null
-          ? formatDistance(new Date(lastRun), new Date(), {
-              addSuffix: true,
-            }).replace('about ', '')
-          : ''}
+        {i18n.format(
+          `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,
+          'capitalize'
+        )}
       </StyledText>
     </Flex>
   )

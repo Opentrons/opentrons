@@ -21,11 +21,13 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-
+import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
+import { InterventionModal } from '../../organisms/InterventionModal'
+import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -39,11 +41,14 @@ import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
 } from '../../organisms/Devices/hooks'
+import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
 
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 
+const RUN_STATUS_REFETCH_INTERVAL = 5000
 interface BulletProps {
   isActive: boolean
 }
@@ -71,6 +76,11 @@ export function RunningProtocol(): JSX.Element {
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
+  const [
+    interventionModalCommandKey,
+    setInterventionModalCommandKey,
+  ] = React.useState<string | null>(null)
+  const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
@@ -78,7 +88,9 @@ export function RunningProtocol(): JSX.Element {
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === currentRunCommandKey
   )
-  const runStatus = useRunStatus(runId)
+  const runStatus = useRunStatus(runId, {
+    refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
+  })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
@@ -93,7 +105,6 @@ export function RunningProtocol(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
-
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
@@ -112,8 +123,31 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
+  const currentCommand = robotSideAnalysis?.commands.find(
+    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+  )
+
+  React.useEffect(() => {
+    if (
+      currentCommand != null &&
+      interventionModalCommandKey != null &&
+      currentCommand.key !== interventionModalCommandKey
+    ) {
+      // set intervention modal command key to null if different from current command key
+      setInterventionModalCommandKey(null)
+    } else if (
+      currentCommand?.key != null &&
+      isInterventionCommand(currentCommand) &&
+      interventionModalCommandKey === null
+    ) {
+      setInterventionModalCommandKey(currentCommand.key)
+    }
+  }, [currentCommand, interventionModalCommandKey])
+
   return (
     <>
+      {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
+
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
@@ -136,6 +170,17 @@ export function RunningProtocol(): JSX.Element {
             isActiveRun={true}
           />
         ) : null}
+        {interventionModalCommandKey != null &&
+        runRecord?.data != null &&
+        currentCommand != null ? (
+          <InterventionModal
+            robotName={robotName}
+            command={currentCommand}
+            onResume={playRun}
+            run={runRecord.data}
+            analysis={robotSideAnalysis}
+          />
+        ) : null}
         <Flex
           ref={swipe.ref}
           padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
@@ -154,6 +199,10 @@ export function RunningProtocol(): JSX.Element {
                 currentRunCommandIndex={currentRunCommandIndex}
                 robotSideAnalysis={robotSideAnalysis}
                 runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
+                lastAnimatedCommand={lastAnimatedCommand.current}
+                updateLastAnimatedCommand={(newCommandKey: string) =>
+                  (lastAnimatedCommand.current = newCommandKey)
+                }
               />
             ) : (
               <RunningProtocolCommandList

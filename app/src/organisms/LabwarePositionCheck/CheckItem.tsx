@@ -8,7 +8,6 @@ import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import {
   CreateCommand,
-  FIXED_TRASH_ID,
   getIsTiprack,
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -62,8 +61,12 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const labwareDef = getLabwareDef(labwareId, protocolData)
-  const pipetteName =
-    protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
+  const pipette = protocolData.pipettes.find(
+    pipette => pipette.id === pipetteId
+  )
+
+  const pipetteMount = pipette?.mount
+  const pipetteName = pipette?.pipetteName
   let modulePrepCommands: CreateCommand[] = []
   const moduleType =
     (moduleId != null &&
@@ -113,7 +116,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     }
   }, [moduleId])
 
-  if (pipetteName == null || labwareDef == null) return null
+  if (pipetteName == null || labwareDef == null || pipetteMount == null)
+    return null
+  const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
+    pipetteMount === 'left' ? 'leftZ' : 'rightZ'
   const isTiprack = getIsTiprack(labwareDef)
   const displayLocation = getDisplayLocation(location, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
@@ -181,7 +187,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       .then(responses => {
         const finalResponse = responses[responses.length - 1]
         if (finalResponse.data.commandType === 'savePosition') {
-          const { position } = finalResponse.data.result
+          const { position } = finalResponse.data?.result ?? { position: null }
           registerPosition({
             type: 'initialPosition',
             labwareId,
@@ -204,13 +210,18 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const handleConfirmPosition = (): void => {
     let confirmPositionCommands: CreateCommand[] = [
       {
-        commandType: 'moveToWell' as const,
+        commandType: 'retractAxis' as const,
         params: {
-          pipetteId: pipetteId,
-          labwareId: FIXED_TRASH_ID,
-          wellName: 'A1',
-          wellLocation: { origin: 'top' as const },
+          axis: pipetteZMotorAxis,
         },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'x' },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'y' },
       },
       {
         commandType: 'moveLabware' as const,
@@ -245,7 +256,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       .then(responses => {
         const firstResponse = responses[0]
         if (firstResponse.data.commandType === 'savePosition') {
-          const { position } = firstResponse.data.result
+          const { position } = firstResponse.data?.result ?? { position: null }
           registerPosition({
             type: 'finalPosition',
             labwareId,

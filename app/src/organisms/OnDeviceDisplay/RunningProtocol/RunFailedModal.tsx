@@ -1,45 +1,37 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import isEmpty from 'lodash/isEmpty'
+import { css } from 'styled-components'
 
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
+  ALIGN_FLEX_START,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  OVERFLOW_AUTO,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
-import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
-
-interface RunError {
-  id: string
-  errorType: string
-  createdAt: string
-  detail: string
-}
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
+import type { RunError } from '@opentrons/api-client'
 
 interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
-  failedStep?: number
-  failedCommand?: RunTimeCommand
   errors?: RunError[]
 }
 
-// ToDo (kj:05/03/2023) This component is needed to refactor to handle error messages
 export function RunFailedModal({
   runId,
   setShowRunFailedModal,
-  failedStep,
-  failedCommand,
   errors,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared'])
@@ -47,18 +39,12 @@ export function RunFailedModal({
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
-  if (errors == null) return null
+  if (errors == null || errors.length === 0) return null
   const modalHeader: ModalHeaderBaseProps = {
     title: t('run_failed_modal_title'),
-    iconName: 'ot-alert',
-    iconColor: COLORS.white,
   }
 
-  // Note (kj:04/12/2023) Error code hasn't been defined yet
-  // for now we use run's errors data
-  const errorName = errors[0].errorType
-  const errorCode = 'error-1000'
-  const errorMessages = errors.map((error: RunError) => error.detail)
+  const highestPriorityError = getHighestPriorityError(errors)
 
   const handleClose = (): void => {
     setIsCanceling(true)
@@ -78,77 +64,131 @@ export function RunFailedModal({
   return (
     <Modal
       header={modalHeader}
-      modalSize="large"
-      isError
       onOutsideClick={() => setShowRunFailedModal(false)}
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        marginTop={SPACING.spacing32}
-      >
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
-          {t('run_failed_modal_header', {
-            errorName: errorName,
-            errorCode: errorCode,
-            count: failedStep,
-          })}
-        </StyledText>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
-          {/* This will be added when we get a new error system */}
-          {'Error message'}
-        </StyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.light1}
-          borderRadius={BORDERS.size3}
-          gridGap={SPACING.spacing8}
-          padding={SPACING.spacing16}
-          overflowY="scroll"
-          maxHeight="7.75rem"
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_FLEX_START}
         >
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize20}
-            lineHeight={TYPOGRAPHY.lineHeight24}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {t('run_failed_modal_body', {
-              command: failedCommand,
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+            {t('error_info', {
+              errorType: highestPriorityError.errorType,
+              errorCode: highestPriorityError.errorCode,
             })}
           </StyledText>
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize20}
-            lineHeight={TYPOGRAPHY.lineHeight24}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          <Flex
+            width="100%"
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            maxHeight="11rem"
+            backgroundColor={COLORS.light1}
+            borderRadius={BORDERS.borderRadiusSize3}
+            padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
           >
-            {errorMessages}
+            <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
+              <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+                {highestPriorityError.detail}
+              </StyledText>
+              {!isEmpty(highestPriorityError.errorInfo) && (
+                <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+                  {JSON.stringify(highestPriorityError.errorInfo)}
+                </StyledText>
+              )}
+            </Flex>
+          </Flex>
+          <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+            {t('contact_information')}
           </StyledText>
         </Flex>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
-          {t('run_failed_modal_description')}
-        </StyledText>
-        <Flex marginTop="1.75rem">
-          <SmallButton
-            width="100%"
-            buttonType="alert"
-            buttonText={i18n.format(t('shared:close'), 'titleCase')}
-            onClick={handleClose}
-            disabled={isCanceling}
-          />
-        </Flex>
+        <SmallButton
+          width="100%"
+          buttonType="alert"
+          buttonText={i18n.format(t('shared:close'), 'capitalize')}
+          onClick={handleClose}
+          disabled={isCanceling}
+        />
       </Flex>
     </Modal>
   )
+}
+
+const SCROLL_BAR_STYLE = css`
+  overflow-y: ${OVERFLOW_AUTO};
+
+  &::-webkit-scrollbar {
+    width: 0.75rem;
+    background-color: ${COLORS.light1};
+  }
+
+  &::-webkit-scrollbar-track {
+    margin-top: ${SPACING.spacing16};
+    margin-bottom: ${SPACING.spacing16};
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${COLORS.darkBlack40};
+    border-radius: 11px;
+  }
+`
+
+const _getHighestPriorityError = (error: RunError): RunError => {
+  if (error.wrappedErrors.length === 0) {
+    return error
+  }
+
+  let highestPriorityError = error
+
+  error.wrappedErrors.forEach(wrappedError => {
+    const e = _getHighestPriorityError(wrappedError)
+    const isHigherPriority = _getIsHigherPriority(
+      e.errorCode,
+      highestPriorityError.errorCode
+    )
+    if (isHigherPriority) {
+      highestPriorityError = e
+    }
+  })
+  return highestPriorityError
+}
+
+/**
+ * returns true if the first error code is higher priority than the second, false otherwise
+ */
+const _getIsHigherPriority = (
+  errorCode1: string,
+  errorCode2: string
+): boolean => {
+  const errorNumber1 = Number(errorCode1)
+  const errorNumber2 = Number(errorCode2)
+
+  const isSameCategory =
+    Math.floor(errorNumber1 / 1000) === Math.floor(errorNumber2 / 1000)
+  const isCode1GenericError = errorNumber1 % 1000 === 0
+
+  let isHigherPriority = null
+
+  if (
+    (isSameCategory && !isCode1GenericError) ||
+    (!isSameCategory && errorNumber1 < errorNumber2)
+  ) {
+    isHigherPriority = true
+  } else {
+    isHigherPriority = false
+  }
+
+  return isHigherPriority
+}
+
+export const getHighestPriorityError = (errors: RunError[]): RunError => {
+  const highestFirstWrappedError = _getHighestPriorityError(errors[0])
+  return [highestFirstWrappedError, ...errors.slice(1)].reduce((acc, val) => {
+    const e = _getHighestPriorityError(val)
+    const isHigherPriority = _getIsHigherPriority(e.errorCode, acc.errorCode)
+    if (isHigherPriority) {
+      return e
+    }
+    return acc
+  })
 }

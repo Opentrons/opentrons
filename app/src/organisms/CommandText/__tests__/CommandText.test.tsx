@@ -4,12 +4,12 @@ import { i18n } from '../../../i18n'
 import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
 
-import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-import type { BlowoutRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/gantry'
+import type { BlowoutRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import { RunTimeCommand } from '@opentrons/shared-data'
 
 describe('CommandText', () => {
@@ -316,7 +316,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )[0]
-    getByText('Setting Thermocycler block temperature to 20°C')
+    getByText(
+      'Setting Thermocycler block temperature to 20°C with hold time of 0 seconds after target reached'
+    )
   })
   it('renders correct text for thermocycler/setTargetLidTemperature', () => {
     const mockTemp = 20
@@ -495,7 +497,7 @@ describe('CommandText', () => {
       'magneticModule/disengage': 'Disengaging Magnetic Module',
       'temperatureModule/deactivate': 'Deactivating Temperature Module',
       'thermocycler/waitForBlockTemperature':
-        'Waiting for Thermocycler block to reach target temperature',
+        'Waiting for Thermocycler block to reach target temperature and holding for specified time',
       'thermocycler/waitForLidTemperature':
         'Waiting for Thermocycler lid to reach target temperature',
       'thermocycler/openLid': 'Opening Thermocycler lid',

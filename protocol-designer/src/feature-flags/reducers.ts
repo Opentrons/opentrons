@@ -20,6 +20,8 @@ const initialFlags: Flags = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
   OT_PD_ENABLE_OT_3: process.env.OT_PD_ENABLE_OT_3 === '1' || false,
+  OT_PD_ALLOW_ALL_TIPRACKS:
+    process.env.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

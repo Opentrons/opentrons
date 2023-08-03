@@ -5,6 +5,7 @@ import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
+  mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -52,13 +53,17 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
         {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },
@@ -90,12 +95,12 @@ describe('AttachProbe', () => {
     const { getByText } = render(props)
     getByText(
       nestedTextMatcher(
-        'backmost pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+        'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the backmost pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
       )
     )
   })
 
-  it('returns the correct information when robot is in motion', () => {
+  it('returns the correct information when robot is in motion for single channel', () => {
     props = {
       ...props,
       isRobotMoving: true,
@@ -106,6 +111,23 @@ describe('AttachProbe', () => {
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
     )
     getByTestId('Pipette_Probing_1.webm')
+  })
+
+  it('returns the correct information when robot is in motion for 96 channel', () => {
+    props = {
+      ...props,
+      attachedPipettes: {
+        left: mock96ChannelAttachedPipetteInformation,
+        right: null,
+      },
+      isRobotMoving: true,
+    }
+    const { getByText, getByTestId } = render(props)
+    getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
+    getByText(
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+    )
+    getByTestId('Pipette_Probing_96.webm')
   })
 
   it('returns the correct information when robot is in motion during exiting', () => {
@@ -140,12 +162,16 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     getByRole('button', { name: 'Begin calibration' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
         {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },

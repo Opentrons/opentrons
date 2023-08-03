@@ -73,6 +73,9 @@ class GantryMover(TypingProtocol):
         """Home the gantry."""
         ...
 
+    async def retract_axis(self, axis: MotorAxis) -> None:
+        """Retract the specified axis to its home position."""
+
 
 class HardwareGantryMover(GantryMover):
     """Hardware API based gantry movement handler."""
@@ -196,6 +199,18 @@ class HardwareGantryMover(GantryMover):
             # Hardware API will raise error if invalid axes are passed for the type of robot
             await self._hardware_api.home(axes=hardware_axes)
 
+    async def retract_axis(self, axis: MotorAxis) -> None:
+        """Retract specified axis."""
+        hardware_axis = _MOTOR_AXIS_TO_HARDWARE_AXIS[axis]
+        if (
+            self._state_view.config.robot_type == "OT-2 Standard"
+            and hardware_axis not in HardwareAxis.ot2_axes()
+        ):
+            raise InvalidAxisForRobotType(
+                f"{axis} is not valid for OT-2 Standard robot type"
+            )
+        await self._hardware_api.retract_axis(axis=hardware_axis)
+
 
 class VirtualGantryMover(GantryMover):
     """State store based gantry movement handler for simulation/analysis."""
@@ -265,6 +280,10 @@ class VirtualGantryMover(GantryMover):
 
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Home the gantry. No-op in virtual implementation."""
+        pass
+
+    async def retract_axis(self, axis: MotorAxis) -> None:
+        """Retract the specified axis. No-op in virtual implementation."""
         pass
 
 

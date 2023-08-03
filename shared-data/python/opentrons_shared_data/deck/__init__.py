@@ -57,11 +57,21 @@ def load_schema(version: int) -> "DeckSchema":
 
 
 def get_calibration_square_position_in_slot(slot: int) -> Offset:
-    """Get slot top-left position."""
+    """Get the position of an OT-3 deck slot's calibration square.
+
+    Params:
+        slot: The slot whose calibration square to retrieve, specified as an OT-2-style slot number.
+            For example, specify 5 to get slot C2.
+    """
     deck = load("ot3_standard", version=3)
     slots = deck["locations"]["orderedSlots"]
+
+    # Assume that the OT-3 deck definition has the same number of slots, and in the same order,
+    # as the OT-2.
+    # TODO(mm, 2023-05-22): This assumption will break down when the OT-3 has staging area slots.
+    # https://opentrons.atlassian.net/browse/RLAB-345
     s = slots[slot - 1]
-    assert s["id"] == str(slot)
+
     bottom_left = s["position"]
     slot_size_x = s["boundingBox"]["xDimension"]
     slot_size_y = s["boundingBox"]["yDimension"]

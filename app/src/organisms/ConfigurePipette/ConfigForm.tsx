@@ -7,7 +7,7 @@ import forOwn from 'lodash/forOwn'
 import keys from 'lodash/keys'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
-import { Box } from '@opentrons/components'
+import { Box, OVERFLOW_AUTO } from '@opentrons/components'
 import { ConfigFormResetButton } from './ConfigFormResetButton'
 import {
   ConfigFormGroup,
@@ -209,7 +209,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
             formProps.resetForm({ values: newValues })
           }
           return (
-            <Box overflowY="scroll">
+            <Box overflowY={OVERFLOW_AUTO}>
               <Form id={formId}>
                 <ConfigFormResetButton
                   onClick={handleReset}

@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, add
+from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -44,6 +44,7 @@ from ..types import (
     HeaterShakerMovementRestrictors,
     ModuleLocation,
     DeckType,
+    LabwareMovementOffsetData,
 )
 from .. import errors
 from ..commands import (
@@ -80,7 +81,7 @@ class SlotTransit(NamedTuple):
     end: DeckSlotName
 
 
-_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+_OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
     SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
@@ -95,7 +96,16 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
-]
+}
+
+_OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
+    SlotTransit(start=t.start.to_ot3_equivalent(), end=t.end.to_ot3_equivalent())
+    for t in _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+}
+
+_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = (
+    _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE | _OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+)
 
 
 @dataclass(frozen=True)
@@ -600,8 +610,12 @@ class ModuleView(HasState[ModuleState]):
         except KeyError as e:
             raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
+    # TODO(jbl 2023-06-20) rename this method to better reflect it's not just "connected" modules
     def get_connected_model(self, module_id: str) -> ModuleModel:
         """Return the model of the connected module.
+
+        NOTE: This method will return the name for any module loaded, not just electronically connected ones.
+            This includes the Magnetic Block.
 
         This can differ from `get_requested_model()` because of module compatibility.
         For example, a ``loadModule`` command might request a ``temperatureModuleV1``
@@ -669,16 +683,6 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
-
-        # add the calibrated module offset if there is one
-        module = self.get(module_id)
-        offset: Optional[ModuleOffsetVector] = None
-        if module.serialNumber is not None:
-            offset = self._state.module_offset_by_serial.get(module.serialNumber)
-
-        if offset is not None:
-            module_offset = array((offset.x, offset.y, offset.z, 1))
-            xformed = add(xformed, module_offset)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
@@ -942,3 +946,10 @@ class ModuleView(HasState[ModuleState]):
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
+
+    def get_default_gripper_offsets(
+        self, module_id: str
+    ) -> Optional[LabwareMovementOffsetData]:
+        """Get the deck's default gripper offsets."""
+        offsets = self.get_definition(module_id).gripperOffsets
+        return offsets.get("default") if offsets else None

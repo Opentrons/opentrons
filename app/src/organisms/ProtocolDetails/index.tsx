@@ -36,13 +36,13 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
-import { protocolHasLiquids } from '@opentrons/shared-data'
+import { getGripperDisplayName } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -58,6 +58,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
@@ -140,7 +141,7 @@ interface ReadMoreContentProps {
 
 const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   const { metadata, protocolType } = props
-  const { t } = useTranslation('protocol_details')
+  const { t, i18n } = useTranslation('protocol_details')
   const [isReadMore, setIsReadMore] = React.useState(true)
 
   const description = isEmpty(metadata.description)
@@ -163,10 +164,11 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing8}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={() => setIsReadMore(!isReadMore)}
         >
-          {isReadMore ? t('read_more') : t('read_less')}
+          {isReadMore
+            ? i18n.format(t('read_more'), 'capitalize')
+            : i18n.format(t('read_less'), 'capitalize')}
         </Link>
       )}
     </Flex>
@@ -181,7 +183,7 @@ export function ProtocolDetails(
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids'
   >('robot_config')
@@ -211,6 +213,11 @@ export function ProtocolDetails(
     mostRecentAnalysis != null
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
+
+  const requiredExtensionInstrumentName =
+    mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis)
+      ? getGripperDisplayName('gripperV1')
+      : null
 
   const requiredModuleDetails =
     mostRecentAnalysis != null
@@ -282,6 +289,7 @@ export function ProtocolDetails(
       <RobotConfigurationDetails
         leftMountPipetteName={leftMountPipetteName}
         rightMountPipetteName={rightMountPipetteName}
+        extensionInstrumentName={requiredExtensionInstrumentName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
         robotType={robotType}
@@ -334,12 +342,12 @@ export function ProtocolDetails(
     <>
       <Portal level="top">
         {showDeckViewModal ? (
-          <Modal
+          <LegacyModal
             title={t('deck_view')}
             onClose={() => setShowDeckViewModal(false)}
           >
             {deckThumbnail}
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
       <Flex
@@ -384,6 +392,7 @@ export function ProtocolDetails(
               css={TYPOGRAPHY.h2SemiBold}
               marginBottom={SPACING.spacing16}
               data-testid={`ProtocolDetails_${protocolDisplayName}`}
+              overflowWrap="anywhere"
             >
               {protocolDisplayName}
             </StyledText>
@@ -546,8 +555,8 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'robot_config'}
                 onClick={() => setCurrentTab('robot_config')}
               >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('robot_configuration')}
+                <StyledText>
+                  {i18n.format(t('robot_configuration'), 'capitalize')}
                 </StyledText>
               </RoundTab>
               <RoundTab
@@ -555,24 +564,21 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'labware'}
                 onClick={() => setCurrentTab('labware')}
               >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('labware')}
+                <StyledText>
+                  {i18n.format(t('labware'), 'capitalize')}
                 </StyledText>
               </RoundTab>
-              {mostRecentAnalysis != null &&
-                protocolHasLiquids(mostRecentAnalysis) && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_liquids"
-                    isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
-                  >
-                    <StyledText
-                      textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    >
-                      {t('liquids')}
-                    </StyledText>
-                  </RoundTab>
-                )}
+              {mostRecentAnalysis != null && (
+                <RoundTab
+                  data-testid="ProtocolDetails_liquids"
+                  isCurrent={currentTab === 'liquids'}
+                  onClick={() => setCurrentTab('liquids')}
+                >
+                  <StyledText>
+                    {i18n.format(t('liquids'), 'capitalize')}
+                  </StyledText>
+                </RoundTab>
+              )}
             </Flex>
             <Box
               backgroundColor={COLORS.white}

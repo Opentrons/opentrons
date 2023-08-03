@@ -51,6 +51,7 @@ from robot_server.protocols.router import (
     ProtocolLinks,
     create_protocol,
     get_protocols,
+    get_protocol_ids,
     get_protocol_by_id,
     delete_protocol_by_id,
     get_protocol_analyses,
@@ -196,6 +197,38 @@ async def test_get_protocols(
     )
 
     assert result.content.data == [expected_protocol_1, expected_protocol_2]
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
+    assert result.status_code == 200
+
+
+async def test_get_protocol_ids_no_protocols(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should return an empty collection response with no protocols loaded."""
+    decoy.when(protocol_store.get_all_ids()).then_return([])
+
+    result = await get_protocol_ids(protocol_store=protocol_store)
+
+    assert result.content.data == []
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=0)
+    assert result.status_code == 200
+
+
+async def test_get_protocol_ids(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should return stored protocol ids."""
+    decoy.when(protocol_store.get_all_ids()).then_return(
+        ["protocol_id_1", "protocol_id_2"]
+    )
+
+    result = await get_protocol_ids(
+        protocol_store=protocol_store,
+    )
+
+    assert result.content.data == ["protocol_id_1", "protocol_id_2"]
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
 

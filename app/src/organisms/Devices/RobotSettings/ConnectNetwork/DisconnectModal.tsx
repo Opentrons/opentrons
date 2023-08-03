@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import { postWifiDisconnect } from '../../../../redux/networking'
@@ -104,7 +104,7 @@ export const DisconnectModal = ({
   }
 
   return (
-    <Modal
+    <LegacyModal
       type="warning"
       title={
         isDisconnected
@@ -166,6 +166,6 @@ export const DisconnectModal = ({
           )}
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

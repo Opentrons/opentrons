@@ -13,10 +13,10 @@ const mockPipetteInfo = [
 ] as LoadedPipette[]
 
 const mockPipettesInProtocolNotEmpty = [
-  { id: '123', pipetteName: 'p1000_single_gen3', mount: 'left' },
+  { id: '123', pipetteName: 'p1000_single_flex', mount: 'left' },
 ]
 const mockPipettesInProtocolMulti = [
-  { id: '123', pipetteName: 'p1000_multi_gen3', mount: 'left' },
+  { id: '123', pipetteName: 'p1000_multi_flex', mount: 'left' },
 ]
 const mockSingleMountPipetteAttached = {
   left: mockAttachedPipetteInformation,
@@ -32,7 +32,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         [
           {
             id: '123',
-            pipetteName: 'p1000_single_gen3',
+            pipetteName: 'p1000_single_flex',
             mount: 'left',
           },
         ],
@@ -74,7 +74,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
             data: { calibratedOffset: undefined as any },
           } as any,
         },
-        [{ id: '123', pipetteName: 'p1000_single_gen3', mount: 'right' }],
+        [{ id: '123', pipetteName: 'p1000_single_flex', mount: 'right' }],
         RIGHT
       )
     ).toStrictEqual(mockFlowSteps)
@@ -93,12 +93,12 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
+        section: SECTIONS.MOUNT_PIPETTE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.MOUNT_PIPETTE,
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -151,12 +151,12 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
+        section: SECTIONS.MOUNT_PIPETTE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.MOUNT_PIPETTE,
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -199,11 +199,6 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -215,6 +210,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -257,11 +257,6 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -273,6 +268,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -315,21 +315,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.DETACH_PIPETTE,
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -342,6 +332,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -382,6 +377,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -429,6 +429,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },

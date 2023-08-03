@@ -7,6 +7,7 @@ import {
   LabwareRender,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
@@ -53,6 +54,8 @@ export function SetupLabwareMap({
           <RobotWorkSpace
             deckDef={deckDef}
             deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+            deckFill="#e6e6e6"
+            trashSlotName="A3"
             id="LabwareSetup_deckMap"
           >
             {() => (
@@ -121,6 +124,7 @@ export function SetupLabwareMap({
                     )
                   }
                 )}
+                <SlotLabels robotType={robotType} />
               </>
             )}
           </RobotWorkSpace>

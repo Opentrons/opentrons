@@ -5,6 +5,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+## OT-2 Software Changes in 6.3.1
+
+Welcome to the v6.3.1 release of the OT-2 software! This hotfix release addresses a few problems.
+
+### Improved Features
+- Changed the Thermocycler GEN2 plate ejection behavior to prevent plates from getting stuck after PCR cycles or being ejected too forcefully.
+
+### Bug Fixes
+
+- Specifying Python API version 2.14 no longer prevents ``set_block_temperature`` from executing a hold time.
+
+
+---
 
 ## OT-2 Software Changes in 6.3.0
 

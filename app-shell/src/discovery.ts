@@ -145,21 +145,6 @@ export function registerDiscovery(
     client.stop()
   })
 
-  function removeCachedUsbRobot(): void {
-    const cachedUsbRobotName = client
-      .getRobots()
-      .find(robot =>
-        robot.addresses.some(address => address.ip === OPENTRONS_USB)
-      )?.name
-
-    if (cachedUsbRobotName != null) {
-      log.debug(
-        `deleting old opentrons-usb entry with name ${cachedUsbRobotName}`
-      )
-      client.removeRobot(cachedUsbRobotName)
-    }
-  }
-
   return function handleIncomingAction(action: Action) {
     log.debug('handling action in discovery', { action })
 
@@ -185,8 +170,6 @@ export function registerDiscovery(
         return clearCache()
       }
       case USB_HTTP_REQUESTS_START: {
-        removeCachedUsbRobot()
-
         const usbHttpAgent = getSerialPortHttpAgent()
 
         client.start({
@@ -202,12 +185,14 @@ export function registerDiscovery(
         break
       }
       case USB_HTTP_REQUESTS_STOP: {
-        // TODO(bh, 2023-05-05): we actually still want this robot to show up in the not available list
-        removeCachedUsbRobot()
-
         client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
-          manualAddresses: [],
+          manualAddresses: [
+            {
+              ip: OPENTRONS_USB,
+              port: DEFAULT_PORT,
+            },
+          ],
         })
         break
       }

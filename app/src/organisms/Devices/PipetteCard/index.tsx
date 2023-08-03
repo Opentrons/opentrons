@@ -166,6 +166,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <AboutPipetteSlideout
           pipetteId={pipetteId}
           pipetteName={pipetteInfo.displayName}
+          mount={mount}
           onCloseClick={() => setShowAboutSlideout(false)}
           isExpanded={true}
         />
@@ -177,9 +178,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               <InstrumentDiagram
                 pipetteSpecs={pipetteInfo}
                 mount={mount}
-                transform="scale(0.3)"
+                //  pipette images for Flex are slightly smaller so need to be scaled accordingly
+                transform={isOt3 ? 'scale(0.4)' : 'scale(0.3)'}
                 size="3.125rem"
-                transformOrigin="20% -10%"
+                transformOrigin={isOt3 ? '-50% -10%' : '20% -10%'}
               />
             )}
           </Flex>
