@@ -3,7 +3,7 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, NewType, Union
+from typing import Dict, List, NewType, Union, Optional
 from typing_extensions import Literal, TypedDict
 
 

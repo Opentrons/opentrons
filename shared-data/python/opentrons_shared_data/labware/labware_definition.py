@@ -318,11 +318,11 @@ class LabwareDefinition(BaseModel):
         description="Offsets use when calculating coordinates for gripping labware "
         "during labware movement.",
     )
-    gripHeightFromLabwareBottom: float = Field(
+    gripHeightFromLabwareBottom: Optional[float] = Field(
         default_factory=None,
         description="The Z-height, from labware bottom, where the gripper should grip the labware.",
     )
-    gripForce: float = Field(
+    gripForce: Optional[float] = Field(
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
