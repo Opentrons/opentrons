@@ -350,70 +350,24 @@ INFORMATION TBD
 OT-2 Pipette Flow Rates
 -----------------------
 
-The following section provides data on the default aspirate, dispense, and blow-out flow rates for OT-2 GEN2 pipettes.
+The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes.
 
-.. what is head speed, applies to gantry movement or pipette?
++---------------------------------+---------------+---------------+---------------+
+| Pipette                         | Aspirate      | Dispense      | Blow-out      |
++=================================+===============+===============+===============+ 
+| P20 Single GEN2 (1-20 µL)       | * API v2.6 or higher: 7.56 µL/s               |
+|                                 | * API v2.5 or lower: 3.78 µL/s                |
++---------------------------------+-----------------------------------------------+
+| P300 Single GEN2 (20-300 µL)    | * API v2.6 or higher: 92.86 µL/s              |
+|                                 | * API v2.5 or lower: 46.43 µL/s               |
++---------------------------------+-----------------------------------------------+
+| P1000 Single GEN2 (100-1000 µL) | * API v2.6 or higher: 274.7 µL/s              |
+|                                 | * API v2.5 or lower: 137.35 µL/s              |
++---------------------------------+-----------------------------------------------+
+| P20 Multi GEN2 (1-20 µL)        |    7.6 µL/s                                   |
++---------------------------------+-----------------------------------------------+
+| P300 Multi GEN2 (20-300 µL)     |    94 µL/s                                    |
++---------------------------------+-----------------------------------------------+
+
+.. what is head speed, is it important/significant? applies to gantry movement or pipette? need to find out.
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/second and a well bottom clearance of 1mm for aspirate and dispense actions.
-
-.. tables are aligned center of page. can we left justify? they're slightly different sizes.
-
-**P20 Single GEN2 Pipette (1-20 µL)**
-
-+----------+---------------------------------+
-| Action   | Default Flow Rate               |
-+==========+=================================+
-| Aspirate | * API v2.6 or higher: 7.56 µL/s |
-+----------+ * API v2.5 or lower: 3.78 µL/s  |
-| Dispense |                                 |
-+----------+                                 |
-| Blow-out |                                 |
-+----------+---------------------------------+
-
-**P20 Multi-Channel GEN2 (1-20 µL)**
-
-+----------+-----------------------------------+
-| Action   | Default Flow Rate                 |
-+==========+===================================+
-| Aspirate | 7.6 µL/s                          |
-+----------+                                   |
-| Dispense |                                   |
-+----------+                                   |
-| Blow-out |                                   |
-+----------+-----------------------------------+
-
-**P300 Single GEN2 Pipette (20-300 µL)**
-
-+----------+----------------------------------+
-| Action   | Default Flow Rate                |
-+==========+==================================+
-| Aspirate | * API v2.6 or higher: 92.86 µL/s |
-+----------+ * API v2.5 or lower: 46.43 µL/s  |
-| Dispense |                                  |
-+----------+                                  |
-| Blow-out |                                  |
-+----------+----------------------------------+
-
-**P300 Multi-Channel GEN2 (20-300 µL/s)**
-
-+----------+-----------------------------------+
-| Action   | Default Flow Rate                 |
-+==========+===================================+
-| Aspirate | 94 µL/s                           |
-+----------+                                   |
-| Dispense |                                   |
-+----------+                                   |
-| Blow-out |                                   |
-+----------+-----------------------------------+
-
-**P1000 Single GEN2 (100-1000 µL)**
-
-+----------+-----------------------------------+
-| Action   | Default Flow Rate                 |
-+==========+===================================+
-| Aspirate | * API v2.6 or higher: 274.7 µL/s  |
-+----------+ * API v2.5 or lower: 137.35 µL/s  |
-| Dispense |                                   |
-+----------+                                   |
-| Blow-out |                                   |
-+----------+-----------------------------------+
-.. removed and saved GEN1 specs. Can restore if needed.
