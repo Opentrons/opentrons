@@ -327,9 +327,7 @@ class ProtocolCore(
             else:
                 raise InvalidModuleLocationError(deck_slot, model.name)
 
-        # should we add this as allowed in the deck definition?
-        if module_type != ModuleType.MAGNETIC_BLOCK:
-            self._ensure_module_location(deck_slot, module_type)
+        self._ensure_module_location(deck_slot, module_type)
 
         result = self._engine_client.load_module(
             model=EngineModuleModel(model),

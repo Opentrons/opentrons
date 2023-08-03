@@ -1054,14 +1054,19 @@ def test_load_mag_block(
     mock_engine_client: EngineClient,
     mock_sync_hardware_api: SyncHardwareAPI,
     subject: ProtocolCore,
+    ot3_standard_deck_def: DeckDefinitionV3,
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
 
+    decoy.when(subject.get_slot_definition(DeckSlotName.SLOT_A2)).then_return(
+        _get_slot_def(deck_def=ot3_standard_deck_def, slot_name=DeckSlotName.SLOT_A2)  # type: ignore[arg-type]
+    )
+
     decoy.when(
         mock_engine_client.load_module(
             model=EngineModuleModel.MAGNETIC_BLOCK_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -1074,7 +1079,7 @@ def test_load_mag_block(
 
     result = subject.load_module(
         model=MagneticBlockModel.MAGNETIC_BLOCK_V1,
-        deck_slot=DeckSlotName.SLOT_1,
+        deck_slot=DeckSlotName.SLOT_A2,
         configuration=None,
     )
 
