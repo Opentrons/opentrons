@@ -42,13 +42,25 @@ const brReadyRobot = {
   },
 } as any
 
-const brRobot = {
+const brRobotOt2 = {
   ...robot,
   serverHealth: {
     capabilities: {
       buildrootUpdate: '/server/update/begin',
       restart: '/server/restart',
     },
+    robotModel: 'OT-2 Standard',
+  },
+} as any
+
+const brRobotFlex = {
+  ...robot,
+  serverHealth: {
+    capabilities: {
+      buildrootUpdate: '/server/update/begin',
+      restart: '/server/restart',
+    },
+    robotModel: 'OT-3 Standard',
   },
 } as any
 
@@ -68,9 +80,9 @@ describe('robot update epics', () => {
   })
 
   describe('startUpdateEpic', () => {
-    it('with BR robot sends CREATE_SESSION', () => {
+    it('with ot2 system update robot and built-in system update sends read system file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValueOnce(brRobot)
+        getRobotUpdateRobot.mockReturnValueOnce(brRobotOt2)
 
         const action$ = hot<Action>('-a', {
           a: actions.startRobotUpdate(robot.name),
@@ -79,12 +91,60 @@ describe('robot update epics', () => {
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
-          a: actions.createSession(brRobot, '/server/update/begin'),
+          a: actions.readSystemRobotUpdateFile('ot2'),
         })
       })
     })
 
-    it('with BR-ready robot sends CREATE_SESSION', () => {
+    it('with flex system update robot and built-in system update sends read system file', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        getRobotUpdateRobot.mockReturnValueOnce(brRobotFlex)
+
+        const action$ = hot<Action>('-a', {
+          a: actions.startRobotUpdate(robot.name),
+        })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.startUpdateEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readSystemRobotUpdateFile('flex'),
+        })
+      })
+    })
+
+    it('with ot2 system update robot and user system update sends read user file', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        getRobotUpdateRobot.mockReturnValueOnce(brRobotOt2)
+
+        const action$ = hot<Action>('-a', {
+          a: actions.startRobotUpdate(robot.name, '/my/special/system/file'),
+        })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.startUpdateEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readUserRobotUpdateFile('/my/special/system/file'),
+        })
+      })
+    })
+
+    it('with flex system update robot and user system update sends read user file', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        getRobotUpdateRobot.mockReturnValueOnce(brRobotFlex)
+
+        const action$ = hot<Action>('-a', {
+          a: actions.startRobotUpdate(robot.name, '/my/special/file'),
+        })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.startUpdateEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readUserRobotUpdateFile('/my/special/file'),
+        })
+      })
+    })
+
+    it('with ready-to-migrate robot sends read system file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
         getRobotUpdateRobot.mockReturnValueOnce(brReadyRobot)
 
@@ -95,10 +155,23 @@ describe('robot update epics', () => {
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
-          a: actions.createSession(
-            brReadyRobot,
-            '/server/update/migrate/begin'
-          ),
+          a: actions.readSystemRobotUpdateFile('ot2'),
+        })
+      })
+    })
+
+    it('with ready-to-migrate robot and user system update sends read user file', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        getRobotUpdateRobot.mockReturnValueOnce(brReadyRobot)
+
+        const action$ = hot<Action>('-a', {
+          a: actions.startRobotUpdate(robot.name, '/my/special/system/file'),
+        })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.startUpdateEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readUserRobotUpdateFile('/my/special/system/file'),
         })
       })
     })
@@ -119,11 +192,11 @@ describe('robot update epics', () => {
       })
     })
 
-    it('with systemFile in payload sends READ_USER_FILE', () => {
+    it('with balena robot and specified file fails', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const action = actions.startRobotUpdate(
           robot.name,
-          '/path/to/system.zip'
+          '/my/special/system/file'
         )
 
         getRobotUpdateRobot.mockReturnValueOnce(balenaRobot)
@@ -133,7 +206,9 @@ describe('robot update epics', () => {
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
-          a: actions.readUserRobotUpdateFile('/path/to/system.zip'),
+          a: actions.unexpectedRobotUpdateError(
+            'This robot must be updated by the system before a custom update can occur.'
+          ),
         })
       })
     })
@@ -280,7 +355,7 @@ describe('robot update epics', () => {
         const action = {
           type: 'robotUpdate:CREATE_SESSION_SUCCESS',
           payload: {
-            host: brRobot,
+            host: brRobotOt2,
             token: 'foobar',
             pathPrefix: '/server/update',
           },
@@ -314,19 +389,32 @@ describe('robot update epics', () => {
         flush()
 
         const request = { method: 'GET', path: '/server/update/foobar/status' }
-        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(1, brRobot, request)
-        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(2, brRobot, request)
+        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(
+          1,
+          brRobotOt2,
+          request
+        )
+        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(
+          2,
+          brRobotOt2,
+          request
+        )
       }
     )
   })
 
-  it('uploadFileEpic', () => {
+  it('uploadFileEpic should work with migration', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const session: ReturnType<typeof getRobotUpdateSession> = {
         pathPrefix: '/server/update/migration',
         token: 'tok',
         stage: 'awaiting-file',
         step: 'getToken',
+        fileInfo: {
+          systemFile: '/some/file/path',
+          version: '1.0.0',
+          releaseNotes: 'hello',
+        },
       } as any
 
       getRobotUpdateRobot.mockReturnValue(brReadyRobot)
@@ -340,7 +428,69 @@ describe('robot update epics', () => {
         a: actions.uploadRobotUpdateFile(
           brReadyRobot,
           '/server/update/migration/tok/file',
-          null
+          '/some/file/path'
+        ),
+      })
+    })
+  })
+
+  it('uploadFileEpic should work with ot2 normal updates', () => {
+    testScheduler.run(({ hot, expectObservable }) => {
+      const session: ReturnType<typeof getRobotUpdateSession> = {
+        pathPrefix: '/server/update',
+        token: 'tok',
+        stage: 'awaiting-file',
+        step: 'getToken',
+        fileInfo: {
+          systemFile: '/some/file/path',
+          version: '1.0.0',
+          releaseNotes: 'hello',
+        },
+      } as any
+
+      getRobotUpdateRobot.mockReturnValue(brRobotOt2)
+      getRobotUpdateSession.mockReturnValue(session)
+
+      const action$ = null as any
+      const state$ = hot<State>('-a', { a: state })
+      const output$ = epics.uploadFileEpic(action$, state$)
+
+      expectObservable(output$).toBe('-a', {
+        a: actions.uploadRobotUpdateFile(
+          brRobotOt2,
+          '/server/update/tok/file',
+          '/some/file/path'
+        ),
+      })
+    })
+  })
+
+  it('uploadFileEpic should work with flex normal updates', () => {
+    testScheduler.run(({ hot, expectObservable }) => {
+      const session: ReturnType<typeof getRobotUpdateSession> = {
+        pathPrefix: '/server/update',
+        token: 'tok',
+        stage: 'awaiting-file',
+        step: 'getToken',
+        fileInfo: {
+          systemFile: '/some/file/path',
+          version: '1.0.0',
+          releaseNotes: 'hello',
+        },
+      } as any
+
+      getRobotUpdateRobot.mockReturnValue(brRobotFlex)
+      getRobotUpdateSession.mockReturnValue(session)
+
+      const action$ = null as any
+      const state$ = hot<State>('-a', { a: state })
+      const output$ = epics.uploadFileEpic(action$, state$)
+
+      expectObservable(output$).toBe('-a', {
+        a: actions.uploadRobotUpdateFile(
+          brRobotFlex,
+          '/server/update/tok/file',
+          '/some/file/path'
         ),
       })
     })
@@ -356,7 +506,7 @@ describe('robot update epics', () => {
 
     it('commit request success', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobot)
+        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
         getRobotUpdateSession.mockReturnValue(session)
 
         mockFetchRobotApi.mockReturnValue(
@@ -372,7 +522,7 @@ describe('robot update epics', () => {
         })
 
         flush()
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobot, {
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobotOt2, {
           method: 'POST',
           path: '/server/update/foobar/commit',
         })
@@ -381,7 +531,7 @@ describe('robot update epics', () => {
 
     it('commit request failure', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobot)
+        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
         getRobotUpdateSession.mockReturnValue(session)
 
         mockFetchRobotApi.mockReturnValue(
@@ -410,7 +560,7 @@ describe('robot update epics', () => {
 
     it('restart request success', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobot)
+        getRobotUpdateRobot.mockReturnValue(brRobotFlex)
         getRobotUpdateSession.mockReturnValue(session)
 
         mockFetchRobotApi.mockReturnValue(
@@ -428,7 +578,7 @@ describe('robot update epics', () => {
         })
 
         flush()
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobot, {
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobotFlex, {
           method: 'POST',
           path: '/server/restart',
         })
@@ -437,7 +587,7 @@ describe('robot update epics', () => {
 
     it('restart request failure', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobot)
+        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
         getRobotUpdateSession.mockReturnValue(session)
 
         mockFetchRobotApi.mockReturnValue(
@@ -451,51 +601,6 @@ describe('robot update epics', () => {
         expectObservable(output$).toBe('-ab', {
           a: actions.setRobotUpdateSessionStep('restart'),
           b: actions.unexpectedRobotUpdateError('Unable to restart robot: AH'),
-        })
-      })
-    })
-  })
-
-  describe('user file upload epics', () => {
-    it('retryAfterUserFileInfoEpic', () => {
-      testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateSessionRobotName.mockReturnValue(balenaRobot.name)
-
-        const action$ = hot<Action>('-a', {
-          a: { type: 'robotUpdate:USER_FILE_INFO' },
-        } as any)
-        const state$ = hot<State>('a-', { a: state } as any)
-        const output$ = epics.retryAfterUserFileInfoEpic(action$, state$)
-
-        expectObservable(output$).toBe('-a', {
-          a: actions.startRobotUpdate(balenaRobot.name),
-        })
-      })
-    })
-
-    it('uploadFileEpic sends systemFile if it exists in session', () => {
-      testScheduler.run(({ hot, expectObservable }) => {
-        const session = {
-          pathPrefix: '/server/update/migration',
-          token: 'tok',
-          stage: 'awaiting-file',
-          step: 'getToken',
-          userFileInfo: { systemFile: '/path/to/system.zip' },
-        } as any
-
-        getRobotUpdateRobot.mockReturnValue(brReadyRobot)
-        getRobotUpdateSession.mockReturnValue(session)
-
-        const action$ = null as any
-        const state$ = hot<State>('-a', { a: state })
-        const output$ = epics.uploadFileEpic(action$, state$)
-
-        expectObservable(output$).toBe('-a', {
-          a: actions.uploadRobotUpdateFile(
-            brReadyRobot,
-            '/server/update/migration/tok/file',
-            '/path/to/system.zip'
-          ),
         })
       })
     })

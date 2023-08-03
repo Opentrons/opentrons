@@ -1,6 +1,7 @@
 // system update files
 import path from 'path'
 import { ensureDir } from 'fs-extra'
+import { readFile } from 'fs/promises'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
 import {
@@ -25,6 +26,24 @@ const log = createLogger('systemUpdate/index')
 
 let isGettingLatestSystemFiles = false
 let updateSet: ReleaseSetFilepaths | null = null
+
+const readFileInfoAndDispatch = (
+  dispatch: Dispatch,
+  fileName: string
+): Promise<void> =>
+  readUserFileInfo(fileName)
+    .then(fileInfo => ({
+      type: 'robotUpdate:FILE_INFO' as const,
+      payload: {
+        systemFile: fileInfo.systemFile,
+        version: fileInfo.versionInfo.opentrons_api_version,
+      },
+    }))
+    .catch((error: Error) => ({
+      type: 'robotUpdate:UNEXPECTED_ERROR' as const,
+      payload: { message: error.message },
+    }))
+    .then(dispatch)
 
 export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
   return function handleAction(action: Action) {
@@ -52,22 +71,18 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
 
       case 'robotUpdate:UPLOAD_FILE': {
         const { host, path, systemFile } = action.payload
-        const file = systemFile !== null ? systemFile : updateSet?.system
-        if (file == null) {
-          return dispatch({
-            type: 'robotUpdate:UNEXPECTED_ERROR',
-            payload: { message: 'Buildroot update file not downloaded' },
-          })
-        }
-
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, file)
+        uploadSystemFile(host, path, systemFile)
           .then(() => ({
             type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
           }))
           .catch((error: Error) => {
-            log.warn('Error uploading update to robot', { path, file, error })
+            log.warn('Error uploading update to robot', {
+              path,
+              systemFile,
+              error,
+            })
 
             return {
               type: 'robotUpdate:UNEXPECTED_ERROR' as const,
@@ -83,23 +98,20 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
 
       case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
-
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        readUserFileInfo(systemFile)
-          .then(userFile => ({
-            type: 'robotUpdate:USER_FILE_INFO' as const,
-            payload: {
-              systemFile: userFile.systemFile,
-              version: userFile.versionInfo.opentrons_api_version,
-            },
-          }))
-          .catch((error: Error) => ({
-            type: 'robotUpdate:UNEXPECTED_ERROR' as const,
-            payload: { message: error.message },
-          }))
-          .then(dispatch)
-
+        readFileInfoAndDispatch(dispatch, systemFile)
         break
+      }
+      case 'robotUpdate:READ_SYSTEM_FILE': {
+        const systemFile = updateSet?.system
+        if (systemFile == null) {
+          return dispatch({
+            type: 'robotUpdate:UNEXPECTED_ERROR',
+            payload: { message: 'System update file not downloaded' },
+          })
+        }
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        readFileInfoAndDispatch(dispatch, systemFile)
       }
     }
   }
@@ -140,7 +152,7 @@ export function getLatestSystemUpdateFiles(
             dispatch({
               // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
               type: 'robotUpdate:DOWNLOAD_PROGRESS',
-              payload: percentDone,
+              payload: { progress: percentDone, target: 'flex' },
             })
             prevPercentDone = percentDone
           }
@@ -154,14 +166,17 @@ export function getLatestSystemUpdateFiles(
         .then(({ version, releaseNotes }) => {
           dispatch({
             type: 'robotUpdate:UPDATE_INFO',
-            payload: { releaseNotes },
+            payload: { releaseNotes, version, target: 'flex' },
           })
-          dispatch({ type: 'robotUpdate:UPDATE_VERSION', payload: version })
+          dispatch({
+            type: 'robotUpdate:UPDATE_VERSION',
+            payload: { version, target: 'flex' },
+          })
         })
         .catch((error: Error) => {
           return dispatch({
             type: 'robotUpdate:DOWNLOAD_ERROR',
-            payload: error.message,
+            payload: { error: error.message, target: 'flex' },
           })
         })
         .then(() =>
@@ -177,13 +192,8 @@ function cacheUpdateSet(
   filepaths: ReleaseSetFilepaths
 ): Promise<{ version: string; releaseNotes: string }> {
   updateSet = filepaths
-  return Promise.resolve({
-    releaseNotes: 'Todo: update manifest to have release notes',
+  return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({
     version: getLatestVersion(),
-  })
-  // uncomment the lines below when the OT-3 manifest points to valid release notes
-  // return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({
-  //   version: getLatestVersion(),
-  //   releaseNotes,
-  // }))
+    releaseNotes,
+  }))
 }

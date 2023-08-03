@@ -6,7 +6,7 @@ import { Flex, useMountEffect, PrimaryButton } from '@opentrons/components'
 
 import { TertiaryButton } from '../../../atoms/buttons'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
-import { Dispatch } from '../../../redux/types'
+import { State, Dispatch } from '../../../redux/types'
 import { checkShellUpdate } from '../../../redux/shell'
 import {
   getRobotUpdateVersion,
@@ -24,7 +24,9 @@ export function TempODDMenu(): JSX.Element {
   })
 
   const localRobot = useSelector(getLocalRobot)
-  const latestRobotSystemVersion = useSelector(getRobotUpdateVersion)
+  const latestRobotSystemVersion = useSelector((state: State) =>
+    localRobot ? getRobotUpdateVersion(state, localRobot.name) : null
+  )
 
   return (
     <>

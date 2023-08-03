@@ -1,11 +1,7 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import {
-  CONFIG_VERSION_LATEST,
-  OT2_MANIFEST_URL,
-  OT3_MANIFEST_URL,
-} from '@opentrons/app/src/redux/config'
+import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -63,8 +59,8 @@ export const DEFAULTS_V12: ConfigV12 = {
   protocols: { sendAllProtocolsToOT3: false, protocolsStoredSortKey: null },
   robotSystemUpdate: {
     manifestUrls: {
-      OT2: OT2_MANIFEST_URL,
-      OT3: OT3_MANIFEST_URL,
+      OT2: 'dummy-ot2-manifest',
+      OT3: 'dummy-ot3-manifest',
     },
   },
 }

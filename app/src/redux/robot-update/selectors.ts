@@ -16,6 +16,7 @@ import type {
   RobotUpdateSession,
   RobotUpdateType,
   RobotSystemType,
+  RobotUpdateTarget,
 } from './types'
 
 // TODO(mc, 2020-08-02): i18n
@@ -27,20 +28,53 @@ const NO_UPDATE_FILES =
   'Unable to retrieve update for this robot. Ensure your computer is connected to the internet and try again later.'
 const UNAVAILABLE = 'Update unavailable'
 
-export function getRobotUpdateVersion(state: State): string | null {
-  return state.robotUpdate.version || null
+export function getRobotUpdateTarget(
+  state: State,
+  robotName: string
+): RobotUpdateTarget | null {
+  const robot = getRobotByName(state, robotName)
+  if (robot === null) {
+    return null
+  }
+  const model = robot?.serverHealth?.robotModel ?? null
+  if (model === null) {
+    return 'ot2'
+  }
+  if (model.includes('OT-2')) {
+    return 'ot2'
+  }
+  return 'flex'
 }
 
-export function getRobotUpdateInfo(state: State): RobotUpdateInfo | null {
-  return state.robotUpdate.info || null
+export function getRobotUpdateVersion(
+  state: State,
+  robotName: string
+): string | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  return target ? state.robotUpdate[target]?.version ?? null : null
 }
 
-export function getRobotUpdateTargetVersion(state: State): string | null {
-  return (
-    state.robotUpdate.session?.userFileInfo?.version ||
-    state.robotUpdate.version ||
-    null
-  )
+export function getRobotUpdateInfo(
+  state: State,
+  robotName: string
+): RobotUpdateInfo | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  const robotInfo = target ? state.robotUpdate[target] : null
+  if (target === null || robotInfo === null) {
+    return null
+  }
+  const { version, releaseNotes } = robotInfo
+  return version ? { target, version, releaseNotes } : null
+}
+
+export function getRobotUpdateTargetVersion(
+  state: State,
+  robotName: string
+): string | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  const sessionVersion = state.robotUpdate.session?.fileInfo?.version
+  const systemVersion = target ? state.robotUpdate[target]?.version : null
+  return sessionVersion || systemVersion || null
 }
 
 export function getRobotUpdateInProgress(
@@ -57,12 +91,20 @@ export function getRobotUpdateInProgress(
   )
 }
 
-export function getRobotUpdateDownloadProgress(state: State): number | null {
-  return state.robotUpdate.downloadProgress
+export function getRobotUpdateDownloadProgress(
+  state: State,
+  robotName: string
+): number | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  return target ? state.robotUpdate[target].downloadProgress : null
 }
 
-export function getRobotUpdateDownloadError(state: State): string | null {
-  return state.robotUpdate.downloadError
+export function getRobotUpdateDownloadError(
+  state: State,
+  robotName: string
+): string | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  return target ? state.robotUpdate[target].downloadError : null
 }
 
 export function getRobotUpdateSession(state: State): RobotUpdateSession | null {
@@ -121,7 +163,7 @@ export function getRobotUpdateAvailable(
   robot: ViewableRobot
 ): RobotUpdateType | null {
   const currentVersion = getRobotApiVersion(robot)
-  const updateVersion = getRobotUpdateVersion(state)
+  const updateVersion = getRobotUpdateVersion(state, robot.name)
 
   return getRobotUpdateType(currentVersion, updateVersion)
 }
@@ -136,7 +178,7 @@ export const getRobotUpdateDisplayInfo: (
 } = createSelector(
   getRobotByName,
   state => getRobotUpdateRobot(state),
-  state => getRobotUpdateVersion(state),
+  (state, robotName) => getRobotUpdateVersion(state, robotName),
   (robot, currentUpdatingRobot, updateVersion) => {
     const robotVersion = robot ? getRobotApiVersion(robot) : null
     const autoUpdateType = getRobotUpdateType(robotVersion, updateVersion)

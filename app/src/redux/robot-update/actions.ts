@@ -10,10 +10,6 @@ import type {
   RobotUpdateTarget,
 } from './types'
 
-export function setRobotUpdateSeen(robotName: string): RobotUpdateAction {
-  return { type: Constants.ROBOTUPDATE_SET_UPDATE_SEEN, meta: { robotName } }
-}
-
 // analytics tracking action; not consumed by any reducer
 export function robotUpdateChangelogSeen(robotName: string): RobotUpdateAction {
   return { type: Constants.ROBOTUPDATE_CHANGELOG_SEEN, meta: { robotName } }
@@ -36,35 +32,32 @@ export function startBuildrootPremigration(
 
 export function startRobotUpdate(
   robotName: string,
-  robotType: RobotUpdateTarget,
   systemFile: string | null = null
 ): RobotUpdateAction {
   return {
     type: Constants.ROBOTUPDATE_START_UPDATE,
-    payload: { robotName, systemFile, robotType },
+    payload: { robotName, systemFile },
   }
 }
 
 export function createSession(
   host: RobotHost,
-  sessionPath: string,
-  robotType: RobotUpdateTarget
+  sessionPath: string
 ): RobotUpdateAction {
   return {
     type: Constants.ROBOTUPDATE_CREATE_SESSION,
-    payload: { host, sessionPath, robotType },
+    payload: { host, sessionPath },
   }
 }
 
 export function createSessionSuccess(
   host: RobotHost,
   token: string,
-  pathPrefix: string,
-  robotType: RobotUpdateTarget
+  pathPrefix: string
 ): RobotUpdateAction {
   return {
     type: Constants.ROBOTUPDATE_CREATE_SESSION_SUCCESS,
-    payload: { host, token, pathPrefix, robotType },
+    payload: { host, token, pathPrefix },
   }
 }
 
@@ -87,10 +80,20 @@ export function readUserRobotUpdateFile(systemFile: string): RobotUpdateAction {
   }
 }
 
+export function readSystemRobotUpdateFile(
+  target: RobotUpdateTarget
+): RobotUpdateAction {
+  return {
+    type: Constants.ROBOTUPDATE_READ_SYSTEM_FILE,
+    payload: { target },
+    meta: { shell: true },
+  }
+}
+
 export function uploadRobotUpdateFile(
   host: ViewableRobot,
   path: string,
-  systemFile: string | null
+  systemFile: string
 ): RobotUpdateAction {
   return {
     type: Constants.ROBOTUPDATE_UPLOAD_FILE,
@@ -112,4 +115,8 @@ export function clearRobotUpdateSession(): RobotUpdateAction {
 // TODO(mc, 2019-07-21): flesh this action out
 export function unexpectedRobotUpdateError(message: string): RobotUpdateAction {
   return { type: Constants.ROBOTUPDATE_UNEXPECTED_ERROR, payload: { message } }
+}
+
+export function setRobotUpdateSeen(robotName: string): RobotUpdateAction {
+  return { type: Constants.ROBOTUPDATE_SET_UPDATE_SEEN, meta: { robotName } }
 }

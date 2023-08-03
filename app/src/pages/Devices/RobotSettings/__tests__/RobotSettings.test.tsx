@@ -40,7 +40,7 @@ const mockRobotSettingsPrivacy = RobotSettingsPrivacy as jest.MockedFunction<
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
-const mockGetBuildrootSession = getRobotUpdateSession as jest.MockedFunction<
+const mockGetRobotUpdateSession = getRobotUpdateSession as jest.MockedFunction<
   typeof getRobotUpdateSession
 >
 
@@ -103,9 +103,9 @@ describe('RobotSettings', () => {
 
   it('does NOT redirect to device details if robot is null but a robot update session is active', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(null)
-    mockGetBuildrootSession.mockReturnValue({
+    mockGetRobotUpdateSession.mockReturnValue({
       robotName: 'some robot',
-      userFileInfo: null,
+      fileInfo: null,
       token: null,
       pathPrefix: null,
       step: null,

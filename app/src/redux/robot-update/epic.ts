@@ -40,6 +40,7 @@ import {
   startRobotUpdate,
   startBuildrootPremigration,
   readUserRobotUpdateFile,
+  readSystemRobotUpdateFile,
   createSession,
   createSessionSuccess,
   robotUpdateStatus,
@@ -59,7 +60,7 @@ import {
   DONE,
   READY_FOR_RESTART,
   ROBOTUPDATE_START_UPDATE,
-  ROBOTUPDATE_USER_FILE_INFO,
+  ROBOTUPDATE_FILE_INFO,
   ROBOTUPDATE_CREATE_SESSION,
   ROBOTUPDATE_CREATE_SESSION_SUCCESS,
 } from './constants'
@@ -77,6 +78,7 @@ import type {
   CreateSessionSuccessAction,
   RobotUpdateSession,
   RobotUpdateStatusAction,
+  RobotUpdateFileInfoAction,
 } from './types'
 
 export const POLL_INTERVAL_MS = 2000
@@ -96,6 +98,9 @@ const BUT_WE_EXPECTED = 'but we expected'
 const UNKNOWN = 'unknown'
 const CHECK_TO_VERIFY_UPDATE =
   "Check your robot's settings page to verify whether or not the update was successful."
+const UNABLE_TO_FIND_SYSTEM_FILE = 'Unable to find system file for update.'
+const ROBOT_REQUIRES_PREMIGRATION =
+  'This robot must be updated by the system before a custom update can occur.'
 
 // listen for the kickoff action and:
 //   if not ready for buildroot, kickoff premigration
@@ -122,30 +127,22 @@ export const startUpdateEpic: Epic = (action$, state$) =>
 
       // if action passed a system file, we need to read that file
       if (systemFile !== null) {
-        return readUserRobotUpdateFile(systemFile)
+        if (capabilities === null) {
+          return unexpectedRobotUpdateError(ROBOT_REQUIRES_PREMIGRATION)
+        } else {
+          return readUserRobotUpdateFile(systemFile)
+        }
+      } else {
+        // if capabilities is empty, the robot requires premigration
+        if (capabilities === null) {
+          // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
+          return startBuildrootPremigration(host)
+        } else {
+          return readSystemRobotUpdateFile(
+            serverHealth?.robotModel === 'OT-3 Standard' ? 'flex' : 'ot2'
+          )
+        }
       }
-
-      // if capabilities is empty, the robot requires premigration
-      if (capabilities === null) {
-        // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
-        return startBuildrootPremigration(host)
-      }
-
-      // otherwise robot is ready for migration or update, so get token
-      // capabilities response has the correct request path to use
-      const sessionPath =
-        capabilities.buildrootUpdate ||
-        capabilities.buildrootMigration ||
-        capabilities.systemUpdate
-
-      if (sessionPath == null) {
-        return unexpectedRobotUpdateError(
-          `${ROBOT_HAS_BAD_CAPABILITIES}: ${JSON.stringify(capabilities)}`
-        )
-      }
-
-      // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
-      return createSession(host, sessionPath)
     })
   )
 
@@ -165,12 +162,30 @@ export const retryAfterPremigrationEpic: Epic = (_, state$) => {
   )
 }
 
-export const retryAfterUserFileInfoEpic: Epic = (action$, state$) => {
+export const startSessionAfterFileInfoEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(ROBOTUPDATE_USER_FILE_INFO),
-    withLatestFrom(state$, (_, state) => getRobotUpdateSessionRobotName(state)),
-    filter((robotName): robotName is string => robotName !== null),
-    map<string, any>(robotName => startRobotUpdate(robotName))
+    ofType<Action, RobotUpdateFileInfoAction>(ROBOTUPDATE_FILE_INFO),
+    withLatestFrom(state$),
+    map<[RobotUpdateFileInfoAction, State], any>(([action, state]) => {
+      const host = getRobotUpdateRobot(state)
+      const serverHealth = host?.serverHealth || null
+      const capabilities = serverHealth?.capabilities || null
+      // otherwise robot is ready for migration or update, so get token
+      // capabilities response has the correct request path to use
+      const sessionPath =
+        capabilities?.buildrootUpdate ||
+        capabilities?.buildrootMigration ||
+        capabilities?.systemUpdate
+
+      if (sessionPath == null) {
+        return unexpectedRobotUpdateError(
+          `${ROBOT_HAS_BAD_CAPABILITIES}: ${JSON.stringify(capabilities)}`
+        )
+      }
+
+      // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
+      return createSession(host, sessionPath)
+    })
   )
 }
 
@@ -275,18 +290,21 @@ const passActiveSession = (props: Partial<RobotUpdateSession>) => (
 export const uploadFileEpic: Epic = (_, state$) => {
   return state$.pipe(
     filter(passActiveSession({ stage: AWAITING_FILE, step: GET_TOKEN })),
-    map<State, ReturnType<typeof uploadRobotUpdateFile>>(stateWithSession => {
+    map<
+      State,
+      ReturnType<
+        typeof uploadRobotUpdateFile | typeof unexpectedRobotUpdateError
+      >
+    >(stateWithSession => {
       const host: ViewableRobot = getRobotUpdateRobot(stateWithSession) as any
       const session = getRobotUpdateSession(stateWithSession)
       const pathPrefix: string = session?.pathPrefix as any
       const token: string = session?.token as any
-      const systemFile = session?.userFileInfo?.systemFile || null
+      const systemFile = session?.fileInfo?.systemFile
 
-      return uploadRobotUpdateFile(
-        host,
-        `${pathPrefix}/${token}/file`,
-        systemFile
-      )
+      return systemFile
+        ? uploadRobotUpdateFile(host, `${pathPrefix}/${token}/file`, systemFile)
+        : unexpectedRobotUpdateError(UNABLE_TO_FIND_SYSTEM_FILE)
     })
   )
 }
@@ -368,8 +386,12 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
       )
     }),
     switchMap(([action, stateWithRobot]) => {
-      const targetVersion = getRobotUpdateTargetVersion(stateWithRobot)
       const robot: ViewableRobot = getRobotUpdateRobot(stateWithRobot) as any
+      const targetVersion = getRobotUpdateTargetVersion(
+        stateWithRobot,
+        robot.name
+      )
+
       const robotVersion = getRobotApiVersion(robot)
       const timedOut = action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
       const actual = robotVersion ?? UNKNOWN
@@ -427,7 +449,7 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
 export const robotUpdateEpic = combineEpics<Epic>(
   startUpdateEpic,
   retryAfterPremigrationEpic,
-  retryAfterUserFileInfoEpic,
+  startSessionAfterFileInfoEpic,
   createSessionEpic,
   statusPollEpic,
   uploadFileEpic,

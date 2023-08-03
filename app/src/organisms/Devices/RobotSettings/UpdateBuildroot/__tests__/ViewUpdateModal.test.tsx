@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { mountWithStore } from '@opentrons/components'
-import * as Buildroot from '../../../../../redux/robot-update'
+import * as RobotUpdate from '../../../../../redux/robot-update'
 
 import { DownloadUpdateModal } from '../DownloadUpdateModal'
 import { ReleaseNotesModal } from '../ReleaseNotesModal'
@@ -12,14 +12,14 @@ import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/robot-update')
 
-const getRobotUpdateInfo = Buildroot.getRobotUpdateInfo as jest.MockedFunction<
-  typeof Buildroot.getRobotUpdateInfo
+const getRobotUpdateInfo = RobotUpdate.getRobotUpdateInfo as jest.MockedFunction<
+  typeof RobotUpdate.getRobotUpdateInfo
 >
-const getRobotUpdateDownloadProgress = Buildroot.getRobotUpdateDownloadProgress as jest.MockedFunction<
-  typeof Buildroot.getRobotUpdateDownloadProgress
+const getRobotUpdateDownloadProgress = RobotUpdate.getRobotUpdateDownloadProgress as jest.MockedFunction<
+  typeof RobotUpdate.getRobotUpdateDownloadProgress
 >
-const getRobotUpdateDownloadError = Buildroot.getRobotUpdateDownloadError as jest.MockedFunction<
-  typeof Buildroot.getRobotUpdateDownloadError
+const getRobotUpdateDownloadError = RobotUpdate.getRobotUpdateDownloadError as jest.MockedFunction<
+  typeof RobotUpdate.getRobotUpdateDownloadError
 >
 
 const MOCK_STATE: State = { mockState: true } as any
@@ -33,10 +33,10 @@ describe('ViewUpdateModal', () => {
   const render = (
     robotUpdateType: React.ComponentProps<
       typeof ViewUpdateModal
-    >['robotUpdateType'] = Buildroot.UPGRADE,
+    >['robotUpdateType'] = RobotUpdate.UPGRADE,
     robotSystemType: React.ComponentProps<
       typeof ViewUpdateModal
-    >['robotSystemType'] = Buildroot.BUILDROOT
+    >['robotSystemType'] = RobotUpdate.OT2_BUILDROOT
   ) => {
     return mountWithStore<React.ComponentProps<typeof ViewUpdateModal>>(
       <QueryClientProvider client={queryClient}>
@@ -67,7 +67,10 @@ describe('ViewUpdateModal', () => {
 
     expect(downloadUpdateModal.prop('error')).toEqual(null)
     expect(downloadUpdateModal.prop('progress')).toEqual(50)
-    expect(getRobotUpdateDownloadProgress).toHaveBeenCalledWith(MOCK_STATE)
+    expect(getRobotUpdateDownloadProgress).toHaveBeenCalledWith(
+      MOCK_STATE,
+      'robot-name'
+    )
 
     const closeButtonProps = downloadUpdateModal.prop('notNowButton')
 
@@ -84,7 +87,10 @@ describe('ViewUpdateModal', () => {
     const downloadUpdateModal = wrapper.find(DownloadUpdateModal)
 
     expect(downloadUpdateModal.prop('error')).toEqual('oh no!')
-    expect(getRobotUpdateDownloadError).toHaveBeenCalledWith(MOCK_STATE)
+    expect(getRobotUpdateDownloadError).toHaveBeenCalledWith(
+      MOCK_STATE,
+      'robot-name'
+    )
 
     const closeButtonProps = downloadUpdateModal.prop('notNowButton')
 
@@ -96,6 +102,8 @@ describe('ViewUpdateModal', () => {
 
   it('should show a ReleaseNotesModal if the update is an upgrade', () => {
     getRobotUpdateInfo.mockReturnValue({
+      version: '1.0.0',
+      target: 'ot2',
       releaseNotes: 'hey look a release',
     })
 
@@ -104,8 +112,8 @@ describe('ViewUpdateModal', () => {
 
     expect(releaseNotesModal.prop('robotName')).toBe(MOCK_ROBOT_NAME)
     expect(releaseNotesModal.prop('releaseNotes')).toBe('hey look a release')
-    expect(releaseNotesModal.prop('systemType')).toBe(Buildroot.BUILDROOT)
-    expect(getRobotUpdateInfo).toHaveBeenCalledWith(MOCK_STATE)
+    expect(releaseNotesModal.prop('systemType')).toBe(RobotUpdate.OT2_BUILDROOT)
+    expect(getRobotUpdateInfo).toHaveBeenCalledWith(MOCK_STATE, 'robot-name')
 
     const closeButtonProps = releaseNotesModal.prop('notNowButton')
 
@@ -120,10 +128,10 @@ describe('ViewUpdateModal', () => {
   })
 
   it('should show a MigrationWarningModal if the robot is on Balena', () => {
-    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.OT2_BALENA)
+    const { wrapper } = render(RobotUpdate.UPGRADE, RobotUpdate.OT2_BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)
 
-    expect(migrationWarning.prop('updateType')).toBe(Buildroot.UPGRADE)
+    expect(migrationWarning.prop('updateType')).toBe(RobotUpdate.UPGRADE)
 
     const closeButtonProps = migrationWarning.prop('notNowButton')
 
@@ -135,21 +143,23 @@ describe('ViewUpdateModal', () => {
 
   it('should proceed from MigrationWarningModal to release notes if upgrade', () => {
     getRobotUpdateInfo.mockReturnValue({
+      version: '1.0.0',
+      target: 'ot2',
       releaseNotes: 'hey look a release',
     })
 
-    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.OT2_BALENA)
+    const { wrapper } = render(RobotUpdate.UPGRADE, RobotUpdate.OT2_BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)
 
     migrationWarning.invoke('proceed')?.()
 
     expect(wrapper.find(ReleaseNotesModal).prop('systemType')).toBe(
-      Buildroot.OT2_BALENA
+      RobotUpdate.OT2_BALENA
     )
   })
 
   it('should proceed from MigrationWarningModal to DownloadUpdateModal if still downloading', () => {
-    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.OT2_BALENA)
+    const { wrapper } = render(RobotUpdate.UPGRADE, RobotUpdate.OT2_BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)
 
     migrationWarning.invoke('proceed')?.()

@@ -42,7 +42,6 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
 
   return (
     <AlertModal
-      // @ts-expect-error use commented code above
       heading={heading}
       buttons={buttons}
       restrictOuterScroll={false}

@@ -1,7 +1,3 @@
-import {
-  OT2_MANIFEST_URL,
-  OT3_MANIFEST_URL,
-} from '@opentrons/app/src/redux/config'
 import type {
   ConfigV0,
   ConfigV1,
@@ -184,8 +180,8 @@ export const MOCK_CONFIG_V12: ConfigV12 = (() => {
     version: 12 as const,
     robotSystemUpdate: {
       manifestUrls: {
-        OT2: OT2_MANIFEST_URL,
-        OT3: OT3_MANIFEST_URL,
+        OT2: 'some-fake-manifest',
+        OT3: 'some-fake-manifest-ot3',
       },
     },
   }

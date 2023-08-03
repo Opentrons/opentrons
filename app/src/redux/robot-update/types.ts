@@ -9,11 +9,11 @@ export type RobotUpdateTarget = 'ot2' | 'flex'
 
 export interface RobotUpdateInfo {
   version: string
-  releaseNotes: string
   target: RobotUpdateTarget
+  releaseNotes: string | null
 }
 
-export interface RobotUpdateUserFileInfo {
+export interface RobotUpdateFileInfo {
   systemFile: string
   version: string
 }
@@ -42,7 +42,7 @@ export type UpdateSessionStep =
 
 export interface RobotUpdateSession {
   robotName: string
-  userFileInfo: RobotUpdateUserFileInfo | null
+  fileInfo: RobotUpdateFileInfo | null
   token: string | null
   pathPrefix: string | null
   step: UpdateSessionStep | null
@@ -126,6 +126,11 @@ export interface RobotUpdateAvailableAction {
   }
 }
 
+export interface RobotUpdateFileInfoAction {
+  type: 'robotUpdate:FILE_INFO'
+  payload: RobotUpdateFileInfo
+}
+
 export type RobotUpdateAction =
   | StartRobotUpdateAction
   | CreateSessionAction
@@ -136,8 +141,7 @@ export type RobotUpdateAction =
   | RobotUpdateDownloadErrorAction
   | RobotUpdateAvailableAction
   | { type: 'robotUpdate:UPDATE_INFO'; payload: RobotUpdateInfo }
-  | { type: 'robotUpdate:USER_FILE_INFO'; payload: RobotUpdateUserFileInfo }
-  | { type: 'robotUpdate:SET_UPDATE_SEEN'; meta: { robotName: string } }
+  | RobotUpdateFileInfoAction
   | { type: 'robotUpdate:CHANGELOG_SEEN'; meta: { robotName: string } }
   | { type: 'robotUpdate:UPDATE_IGNORED'; meta: { robotName: string } }
   | {
@@ -153,10 +157,16 @@ export type RobotUpdateAction =
       meta: { shell: true }
     }
   | {
+      type: 'robotUpdate:READ_SYSTEM_FILE'
+      payload: { target: RobotUpdateTarget }
+      meta: { shell: true }
+    }
+  | {
       type: 'robotUpdate:UPLOAD_FILE'
-      payload: { host: ViewableRobot; path: string; systemFile: string | null; robotType: RobotUpdateTarget }
+      payload: { host: ViewableRobot; path: string; systemFile: string }
       meta: { shell: true }
     }
   | { type: 'robotUpdate:FILE_UPLOAD_DONE'; payload: string }
   | { type: 'robotUpdate:SET_SESSION_STEP'; payload: UpdateSessionStep }
   | { type: 'robotUpdate:CLEAR_SESSION' }
+  | { type: 'robotUpdate:SET_UPDATE_SEEN'; meta: { robotName: string } }

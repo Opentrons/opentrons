@@ -29,59 +29,145 @@ describe('robot update selectors', () => {
     jest.resetAllMocks()
   })
 
-  it('should get robot update info', () => {
+  it('should get robot update info for an ot2', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
     const state: State = {
-      robotUpdate: { info: { releaseNotes: 'some release notes' } },
+      robotUpdate: {
+        ot2: { releaseNotes: 'some release notes', version: '1.0.0' },
+      },
     } as any
-    const result = selectors.getRobotUpdateInfo(state)
+    const result = selectors.getRobotUpdateInfo(state, 'some-ot2')
 
-    expect(result).toEqual({ releaseNotes: 'some release notes' })
+    expect(result).toEqual({
+      releaseNotes: 'some release notes',
+      version: '1.0.0',
+      target: 'ot2',
+    })
   })
 
-  it('should get the update version from the auto-downloaded file', () => {
-    const state: State = { robotUpdate: { version: '1.0.0' } } as any
-    const result = selectors.getRobotUpdateTargetVersion(state)
+  it('should get robot update info for an flex', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const state: State = {
+      robotUpdate: {
+        flex: { releaseNotes: 'some release notes', version: '1.0.0' },
+      },
+    } as any
+    const result = selectors.getRobotUpdateInfo(state, 'some-flex')
+
+    expect(result).toEqual({
+      releaseNotes: 'some release notes',
+      version: '1.0.0',
+      target: 'flex',
+    })
+  })
+
+  it('should get the update version from the auto-downloaded file for a flex', () => {
+    const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateTargetVersion(state, 'some-flex')
 
     expect(result).toBe('1.0.0')
   })
 
-  it('should get the update version from the user-provided file', () => {
+  it('should get the update version from the auto-downloaded file for an ot2', () => {
+    const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateTargetVersion(state, 'some-ot2')
+
+    expect(result).toBe('1.0.0')
+  })
+
+  it('should get the update version from the user-provided file for flex', () => {
     const state: State = {
       robotUpdate: {
-        version: '1.0.0',
-        session: { userFileInfo: { version: '1.0.1' } },
+        flex: { version: '1.0.0' },
+        session: { fileInfo: { version: '1.0.1' } },
       },
     } as any
-    const result = selectors.getRobotUpdateTargetVersion(state)
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateTargetVersion(state, 'some-flex')
 
     expect(result).toBe('1.0.1')
   })
 
-  it('should get the update download error', () => {
+  it('should get the update version from the user-provided file for ot2', () => {
     const state: State = {
-      robotUpdate: { downloadError: 'error with download' },
+      robotUpdate: {
+        version: { ot2: { version: '1.0.0' } },
+        session: { fileInfo: { version: '1.0.1' } },
+      },
     } as any
-    const result = selectors.getRobotUpdateDownloadError(state)
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateTargetVersion(state, 'some-ot2')
+
+    expect(result).toBe('1.0.1')
+  })
+
+  it('should get the update download error for an flex', () => {
+    const state: State = {
+      robotUpdate: { flex: { downloadError: 'error with download' } },
+    } as any
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateDownloadError(state, 'some-flex')
 
     expect(result).toBe('error with download')
   })
 
-  it('should get the update download progress', () => {
-    const state: State = { robotUpdate: { downloadProgress: 10 } } as any
-    const result = selectors.getRobotUpdateDownloadProgress(state)
+  it('should get the update download error for an ot2', () => {
+    const state: State = {
+      robotUpdate: { ot2: { downloadError: 'error with download' } },
+    } as any
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateDownloadError(state, 'some-ot2')
+
+    expect(result).toBe('error with download')
+  })
+
+  it('should get the update download progress for an ot2', () => {
+    const state: State = {
+      robotUpdate: { ot2: { downloadProgress: 10 } },
+    } as any
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateDownloadProgress(state, 'some-ot2')
 
     expect(result).toBe(10)
   })
 
-  it('should get the update seen flag', () => {
-    const state: State = { robotUpdate: { seen: false } } as any
-    const result = selectors.getRobotUpdateSeen(state)
+  it('should get the update download progress for a flex', () => {
+    const state: State = {
+      robotUpdate: { flex: { downloadProgress: 10 } },
+    } as any
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const result = selectors.getRobotUpdateDownloadProgress(state, 'flex')
 
-    expect(result).toBe(false)
+    expect(result).toBe(10)
   })
 
-  it('should return "upgrade" update type when robot is behind the update', () => {
-    const state: State = { robotUpdate: { version: '1.0.0' } } as any
+  it('should return "upgrade" update type when an ot2 is behind the update', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockImplementation(inputRobot => {
@@ -94,8 +180,28 @@ describe('robot update selectors', () => {
     expect(result).toBe('upgrade')
   })
 
-  it('should return "downgrade" update type when robot is ahead of the update', () => {
-    const state: State = { robotUpdate: { version: '1.0.0' } } as any
+  it('should return "upgrade" update type when a flex is behind the update', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
+    const robot = { name: 'robot-name' } as any
+
+    getRobotApiVersion.mockImplementation(inputRobot => {
+      expect(inputRobot).toBe(robot)
+      return '0.9.9'
+    })
+
+    const result = selectors.getRobotUpdateAvailable(state, robot)
+
+    expect(result).toBe('upgrade')
+  })
+
+  it('should return "downgrade" update type when an ot2 is ahead of the update', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue('1.0.1')
@@ -105,8 +211,25 @@ describe('robot update selectors', () => {
     expect(result).toBe('downgrade')
   })
 
-  it('should get "reinstall" update type when robot matches the update', () => {
-    const state: State = { robotUpdate: { version: '1.0.0' } } as any
+  it('should return "downgrade" update type when a flex is ahead of the update', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
+    const robot = { name: 'robot-name' } as any
+
+    getRobotApiVersion.mockReturnValue('1.0.1')
+
+    const result = selectors.getRobotUpdateAvailable(state, robot)
+
+    expect(result).toBe('downgrade')
+  })
+
+  it('should get "reinstall" update type when ot-2 matches the update', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue('1.0.0')
@@ -116,8 +239,25 @@ describe('robot update selectors', () => {
     expect(result).toBe('reinstall')
   })
 
-  it('should return null update type when no update available', () => {
-    const state: State = { robotUpdate: { version: null } } as any
+  it('should get "reinstall" update type when flex matches the update', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
+    const robot = { name: 'robot-name' } as any
+
+    getRobotApiVersion.mockReturnValue('1.0.0')
+
+    const result = selectors.getRobotUpdateAvailable(state, robot)
+
+    expect(result).toBe('reinstall')
+  })
+
+  it('should return null update type when no update available for an ot2', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { ot2: { version: null } } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue('1.0.0')
@@ -127,8 +267,39 @@ describe('robot update selectors', () => {
     expect(result).toBe(null)
   })
 
-  it('should return null update type when no robot version available', () => {
-    const state: State = { robotUpdate: { version: '1.0.0' } } as any
+  it('should return null update type when no update available for a flex', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { flex: { version: null } } } as any
+    const robot = { name: 'robot-name' } as any
+
+    getRobotApiVersion.mockReturnValue('1.0.0')
+
+    const result = selectors.getRobotUpdateAvailable(state, robot)
+
+    expect(result).toBe(null)
+  })
+
+  it('should return null update type when no robot version available for ot2', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-2 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
+    const robot = { name: 'robot-name' } as any
+
+    getRobotApiVersion.mockReturnValue(null)
+
+    const result = selectors.getRobotUpdateAvailable(state, robot)
+
+    expect(result).toBe(null)
+  })
+
+  it('should return null update type when no robot version available for flex', () => {
+    getRobotByName.mockReturnValue({
+      serverHealth: { robotModel: 'OT-3 Standard' },
+    } as any)
+    const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue(null)
@@ -371,12 +542,43 @@ describe('robot update selectors', () => {
     })
   })
 
-  it('should return all updates allowed if update files exist and robot is healthy', () => {
-    const state: State = { robotUpdate: { version: '1.0.0' } } as any
+  it('should return all updates allowed if update files exist and ot-2 is healthy', () => {
+    const state: State = { robotUpdate: { ot2: { version: '1.0.0' } } } as any
     const robotName = 'robot-name'
-    const robot = { ...mockReachableRobot, name: robotName }
+    const robot = {
+      ...mockReachableRobot,
+      name: robotName,
+      serverHealth: {
+        ...mockReachableRobot.serverHealth,
+        robotModel: 'OT-2 Standard',
+      },
+    } as any
 
     getRobotByName.mockReturnValue(robot)
+    getRobotApiVersion.mockReturnValue('0.9.9')
+
+    const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
+
+    expect(result).toEqual({
+      autoUpdateAction: expect.stringMatching(/upgrade/i),
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+  })
+
+  it('should return all updates allowed if update files exist and flex is healthy', () => {
+    const state: State = { robotUpdate: { flex: { version: '1.0.0' } } } as any
+    const robotName = 'robot-name'
+    const robot = {
+      ...mockReachableRobot,
+      name: robotName,
+      serverHealth: {
+        ...mockReachableRobot.serverHealth,
+        robotModel: 'OT-3 Standard',
+      },
+    }
+
+    getRobotByName.mockReturnValue(robot as any)
     getRobotApiVersion.mockReturnValue('0.9.9')
 
     const result = selectors.getRobotUpdateDisplayInfo(state, robotName)

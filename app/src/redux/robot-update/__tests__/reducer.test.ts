@@ -5,7 +5,7 @@ import type { RobotUpdateState } from '../types'
 
 const BASE_SESSION = {
   robotName: mockRobot.name,
-  userFileInfo: null,
+  fileInfo: null,
   step: null,
   token: null,
   pathPrefix: null,
@@ -17,25 +17,60 @@ const BASE_SESSION = {
 describe('robot update reducer', () => {
   const SPECS = [
     {
-      name: 'handles robotUpdate:UPDATE_INFO',
+      name: 'handles robotUpdate:UPDATE_INFO for flex',
       action: {
         type: 'robotUpdate:UPDATE_INFO',
-        payload: { version: '1.0.0', releaseNotes: 'release notes' },
+        payload: {
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+          target: 'flex',
+        },
       },
-      initialState: { ...INITIAL_STATE, info: null },
+      initialState: {
+        ...INITIAL_STATE,
+        ...{
+          flex: { ...INITIAL_STATE.flex, releaseNotes: null, version: null },
+        },
+      },
       expected: {
         ...INITIAL_STATE,
-        info: { version: '1.0.0', releaseNotes: 'release notes' },
+        flex: {
+          ...INITIAL_STATE.flex,
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+        },
       },
     },
     {
-      name: 'handles robotUpdate:USER_FILE_INFO',
+      name: 'handles robotUpdate:UPDATE_INFO for ot2',
       action: {
-        type: 'robotUpdate:USER_FILE_INFO',
+        type: 'robotUpdate:UPDATE_INFO',
+        payload: {
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+          target: 'ot2',
+        },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        ...{ ot2: { ...INITIAL_STATE.ot2, releaseNotes: null, version: null } },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        ot2: {
+          ...INITIAL_STATE.ot2,
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+        },
+      },
+    },
+    {
+      name: 'handles robotUpdate:FILE_INFO',
+      action: {
+        type: 'robotUpdate:FILE_INFO',
         payload: {
           systemFile: '/path/to/system.zip',
           version: '1.0.0',
-          releaseNotes: 'release notes',
         },
       },
       initialState: {
@@ -46,31 +81,84 @@ describe('robot update reducer', () => {
         ...INITIAL_STATE,
         session: {
           robotName: mockRobot.name,
-          userFileInfo: {
+          fileInfo: {
             systemFile: '/path/to/system.zip',
             version: '1.0.0',
-            releaseNotes: 'release notes',
           },
         },
       },
     },
     {
-      name: 'handles robotUpdate:SET_UPDATE_SEEN',
-      action: { type: 'robotUpdate:SET_UPDATE_SEEN' },
-      initialState: { ...INITIAL_STATE, seen: false },
-      expected: { ...INITIAL_STATE, seen: true },
+      name: 'handles robotUpdate:DOWNLOAD_PROGRESS for flex',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_PROGRESS',
+        payload: { progress: 42, target: 'flex' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        flex: {
+          ...INITIAL_STATE.flex,
+          downloadProgress: null,
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        flex: {
+          ...INITIAL_STATE.flex,
+          downloadProgress: 42,
+        },
+      },
     },
     {
-      name: 'handles robotUpdate:DOWNLOAD_PROGRESS',
-      action: { type: 'robotUpdate:DOWNLOAD_PROGRESS', payload: 42 },
-      initialState: { ...INITIAL_STATE, downloadProgress: null },
-      expected: { ...INITIAL_STATE, downloadProgress: 42 },
+      name: 'handles robotUpdate:DOWNLOAD_PROGRESS for ot2',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_PROGRESS',
+        payload: { progress: 42, target: 'ot2' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        ot2: {
+          ...INITIAL_STATE.ot2,
+          downloadProgress: null,
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        ot2: {
+          ...INITIAL_STATE.ot2,
+          downloadProgress: 42,
+        },
+      },
     },
     {
-      name: 'handles robotUpdate:DOWNLOAD_ERROR',
-      action: { type: 'robotUpdate:DOWNLOAD_ERROR', payload: 'AH' },
-      initialState: { ...INITIAL_STATE, downloadError: null },
-      expected: { ...INITIAL_STATE, downloadError: 'AH' },
+      name: 'handles robotUpdate:DOWNLOAD_ERROR for flex',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_ERROR',
+        payload: { error: 'AH', target: 'flex' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: null },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: 'AH' },
+      },
+    },
+    {
+      name: 'handles robotUpdate:DOWNLOAD_ERROR for flex',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_ERROR',
+        payload: { error: 'AH', target: 'flex' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: null },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: 'AH' },
+      },
     },
     {
       name: 'handles robotUpdate:START_UPDATE',
@@ -82,7 +170,7 @@ describe('robot update reducer', () => {
       expected: { ...INITIAL_STATE, session: BASE_SESSION },
     },
     {
-      name: 'robotUpdate:START_UPDATE preserves user file info',
+      name: 'robotUpdate:START_UPDATE preserves file info',
       action: {
         type: 'robotUpdate:START_UPDATE',
         payload: { robotName: mockRobot.name },
@@ -92,7 +180,10 @@ describe('robot update reducer', () => {
         session: {
           ...BASE_SESSION,
           robotName: mockRobot.name,
-          userFileInfo: { systemFile: 'system.zip' },
+          fileInfo: {
+            systemFile: 'system.zip',
+            version: '1.0.0',
+          },
         },
       },
       expected: {
@@ -100,7 +191,10 @@ describe('robot update reducer', () => {
         session: {
           ...BASE_SESSION,
           robotName: mockRobot.name,
-          userFileInfo: { systemFile: 'system.zip' },
+          fileInfo: {
+            systemFile: 'system.zip',
+            version: '1.0.0',
+          },
         },
       },
     },
@@ -198,6 +292,7 @@ describe('robot update reducer', () => {
         payload: {
           host: { name: mockRobot.name },
           path: '/server/update/a-token/file',
+          systemFile: '/some/system/file/somewhere',
         },
         meta: { shell: true },
       },
@@ -264,7 +359,7 @@ describe('robot update reducer', () => {
     const { name, action, initialState, expected } = spec
     it(name, () =>
       expect(
-        robotUpdateReducer(initialState as RobotUpdatesState, action as Action)
+        robotUpdateReducer(initialState as RobotUpdateState, action as Action)
       ).toEqual(expected)
     )
   })

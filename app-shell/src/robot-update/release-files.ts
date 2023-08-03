@@ -82,7 +82,7 @@ export function downloadReleaseFiles(
   })
 }
 
-export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
+export function readUpdateFileInfo(systemFile: string): Promise<UserFileInfo> {
   const openZip = new Promise<StreamZip>((resolve, reject) => {
     const zip = new StreamZip({ file: systemFile, storeEntries: true })
       .once('ready', handleReady)

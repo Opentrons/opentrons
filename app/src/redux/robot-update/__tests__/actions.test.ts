@@ -13,15 +13,6 @@ interface ActionSpec {
 describe('robot update action creators', () => {
   const SPECS: ActionSpec[] = [
     {
-      name: 'robotUpdate:SET_UPDATE_SEEN',
-      creator: actions.setRobotUpdateSeen,
-      args: ['robot-name'],
-      expected: {
-        type: 'robotUpdate:SET_UPDATE_SEEN',
-        meta: { robotName: 'robot-name' },
-      },
-    },
-    {
       name: 'robotUpdate:UPDATE_IGNORED',
       creator: actions.robotUpdateIgnored,
       args: ['robot-name'],
@@ -123,23 +114,43 @@ describe('robot update action creators', () => {
     {
       name: 'robotUpdate:READ_USER_FILE',
       creator: actions.readUserRobotUpdateFile,
-      args: ['/server/update/token/file'],
+      args: ['/some/path/to/ot2-system.zip'],
       expected: {
         type: 'robotUpdate:READ_USER_FILE',
-        payload: { systemFile: '/server/update/token/file' },
+        payload: { systemFile: '/some/path/to/ot2-system.zip' },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'robotUpdate:READ_SYSTEM_FILE',
+      creator: actions.readSystemRobotUpdateFile,
+      args: ['ot2'],
+      expected: {
+        type: 'robotUpdate:READ_SYSTEM_FILE',
+        payload: { target: 'ot2' },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'robotUpdate:READ_SYSTEM_FILE',
+      creator: actions.readSystemRobotUpdateFile,
+      args: ['flex'],
+      expected: {
+        type: 'robotUpdate:READ_SYSTEM_FILE',
+        payload: { target: 'flex' },
         meta: { shell: true },
       },
     },
     {
       name: 'robotUpdate:UPLOAD_FILE',
       creator: actions.uploadRobotUpdateFile,
-      args: [mockRobot, '/server/update/token/file', null],
+      args: [mockRobot, '/server/update/token/file', '/path/to/some/file'],
       expected: {
         type: 'robotUpdate:UPLOAD_FILE',
         payload: {
           host: mockRobot,
           path: '/server/update/token/file',
-          systemFile: null,
+          systemFile: '/path/to/some/file',
         },
         meta: { shell: true },
       },

@@ -38,8 +38,8 @@ export const ROBOTUPDATE_UPDATE_VERSION: 'robotUpdate:UPDATE_VERSION' =
 export const ROBOTUPDATE_UPDATE_INFO: 'robotUpdate:UPDATE_INFO' =
   'robotUpdate:UPDATE_INFO'
 
-export const ROBOTUPDATE_USER_FILE_INFO: 'robotUpdate:USER_FILE_INFO' =
-  'robotUpdate:USER_FILE_INFO'
+export const ROBOTUPDATE_FILE_INFO: 'robotUpdate:FILE_INFO' =
+  'robotUpdate:FILE_INFO'
 
 export const ROBOTUPDATE_DOWNLOAD_PROGRESS: 'robotUpdate:DOWNLOAD_PROGRESS' =
   'robotUpdate:DOWNLOAD_PROGRESS'
@@ -78,6 +78,9 @@ export const ROBOTUPDATE_STATUS: 'robotUpdate:STATUS' = 'robotUpdate:STATUS'
 
 export const ROBOTUPDATE_READ_USER_FILE: 'robotUpdate:READ_USER_FILE' =
   'robotUpdate:READ_USER_FILE'
+
+export const ROBOTUPDATE_READ_SYSTEM_FILE: 'robotUpdate:READ_SYSTEM_FILE' =
+  'robotUpdate:READ_SYSTEM_FILE'
 
 export const ROBOTUPDATE_UPLOAD_FILE: 'robotUpdate:UPLOAD_FILE' =
   'robotUpdate:UPLOAD_FILE'

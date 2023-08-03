@@ -18,6 +18,8 @@ import type {
   RobotSystemType,
 } from '../../../../redux/robot-update/types'
 
+import type { State } from '../../../../redux/types'
+
 export interface ViewUpdateModalProps {
   robotName: string
   robotUpdateType: RobotUpdateType | null
@@ -30,9 +32,15 @@ export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
-  const updateInfo = useSelector(getRobotUpdateInfo)
-  const downloadProgress = useSelector(getRobotUpdateDownloadProgress)
-  const downloadError = useSelector(getRobotUpdateDownloadError)
+  const updateInfo = useSelector((state: State) =>
+    getRobotUpdateInfo(state, robotName)
+  )
+  const downloadProgress = useSelector((state: State) =>
+    getRobotUpdateDownloadProgress(state, robotName)
+  )
+  const downloadError = useSelector((state: State) =>
+    getRobotUpdateDownloadError(state, robotName)
+  )
 
   const [
     showMigrationWarning,
@@ -70,7 +78,7 @@ export function ViewUpdateModal(
       <ReleaseNotesModal
         robotName={robotName}
         notNowButton={notNowButton}
-        releaseNotes={updateInfo.releaseNotes}
+        releaseNotes={updateInfo.releaseNotes ?? ''}
         systemType={robotSystemType}
         proceed={proceed}
       />

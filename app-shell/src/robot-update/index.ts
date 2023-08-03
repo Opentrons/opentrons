@@ -6,31 +6,56 @@ import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
 
 import { downloadManifest, getReleaseSet } from './release-manifest'
-import { UPDATE_MANIFEST_URLS, CACHE_DIR_FOR_MACHINE, CACHE_DIR_FOR_MACHINE_FILES, CURRENT_VERSION } from './constants'
+import {
+  UPDATE_MANIFEST_URLS,
+  CACHE_DIR_FOR_MACHINE,
+  CACHE_DIR_FOR_MACHINE_FILES,
+} from './constants'
+import { CURRENT_VERSION } from '../update'
 import {
   getReleaseFiles,
-  readUserFileInfo,
+  readUpdateFileInfo,
   cleanupReleaseFiles,
 } from './release-files'
 import { startPremigration, uploadSystemFile } from './update'
 
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
-import type {
-  ReleaseSetUrls,
-  ReleaseSetFilepaths,
-} from './types'
+import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import type {
   RobotUpdateInfo,
   RobotUpdateAction,
-  RobotUpdateTarget
+  RobotUpdateTarget,
 } from '@opentrons/app/src/redux/robot-update/types'
 import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 
 const log = createLogger('robot-update/index')
 
 let checkingForUpdates = false
-let updateSet: Record<RobotUpdateTarget, ReleaseSetFilepaths | null> = { ot2: null, flex: null }
+// note: this is a container whose records are reassigned and is a global cache, don't
+// be fooled by the const
+const updateSet: Record<RobotUpdateTarget, ReleaseSetFilepaths | null> = {
+  ot2: null,
+  flex: null,
+}
+
+const readFileAndDispatchInfo = (
+  dispatch: Dispatch,
+  filename: string
+): Promise<void> =>
+  readUpdateFileInfo(filename)
+    .then(fileInfo => ({
+      type: 'robotUpdate:FILE_INFO' as const,
+      payload: {
+        systemFile: fileInfo.systemFile,
+        version: fileInfo.versionInfo.opentrons_api_version,
+      },
+    }))
+    .catch((error: Error) => ({
+      type: 'robotUpdate:UNEXPECTED_ERROR' as const,
+      payload: { message: error.message },
+    }))
+    .then(dispatch)
 
 export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
   return function handleAction(action: Action) {
@@ -69,24 +94,27 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
       }
 
       case 'robotUpdate:UPLOAD_FILE': {
-        const { host, path, systemFile, robotType } = action.payload
-        const file = systemFile !== null ? systemFile : updateSet[robotType]?.system
+        const { host, path, systemFile } = action.payload
 
-        if (file == null) {
+        if (systemFile == null) {
           return dispatch({
             type: 'robotUpdate:UNEXPECTED_ERROR',
-            payload: { message: 'Robot update file not downloaded' },
+            payload: { message: 'Robot update file missing' },
           })
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, file)
+        uploadSystemFile(host, path, systemFile)
           .then(() => ({
             type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
           }))
           .catch((error: Error) => {
-            log.warn('Error uploading update to robot', { path, file, error })
+            log.warn('Error uploading update to robot', {
+              path,
+              systemFile,
+              error,
+            })
 
             return {
               type: 'robotUpdate:UNEXPECTED_ERROR' as const,
@@ -102,23 +130,21 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
 
       case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        readUserFileInfo(systemFile)
-          .then(userFile => ({
-            type: 'robotUpdate:USER_FILE_INFO' as const,
-            payload: {
-              systemFile: userFile.systemFile,
-              version: userFile.versionInfo.opentrons_api_version,
-            },
-          }))
-          .catch((error: Error) => ({
-            type: 'robotUpdate:UNEXPECTED_ERROR' as const,
-            payload: { message: error.message },
-          }))
-          .then(dispatch)
-
+        readFileAndDispatchInfo(dispatch, systemFile)
         break
+      }
+
+      case 'robotUpdate:READ_SYSTEM_FILE': {
+        const { target } = action.payload
+        const filename = updateSet[target]?.system
+        if (filename == null) {
+          return dispatch({
+            type: 'robotUpdate:UNEXPECTED_ERROR',
+            payload: { message: 'Robot update file not downloaded' },
+          })
+        } else {
+          readFileAndDispatchInfo(dispatch, filename)
+        }
       }
     }
   }
@@ -129,7 +155,10 @@ export function getRobotSystemUpdateUrls(
 ): Promise<ReleaseSetUrls | null> {
   const manifestUrls = UPDATE_MANIFEST_URLS()
 
-  return downloadManifest(manifestUrls[robot], path.join(CACHE_DIR_FOR_MACHINE(robot), 'releases.json'))
+  return downloadManifest(
+    manifestUrls[robot],
+    path.join(CACHE_DIR_FOR_MACHINE(robot), 'releases.json')
+  )
     .then(manifest => {
       const urls = getReleaseSet(manifest, CURRENT_VERSION)
 
@@ -162,19 +191,23 @@ export function getRobotSystemUpdateUrls(
 export function checkForRobotUpdate(
   dispatch: Dispatch
 ): Promise<[unknown, unknown]> {
-
-  const fetchFilesFromManifest = (urls: ReleaseSetUrls, target: RobotUpdateTarget): Promise<unknown> => {
-    dispatch({ type: 'robotUpdate:UPDATE_VERSION', payload: CURRENT_VERSION })
+  const fetchFilesFromManifest = (
+    urls: ReleaseSetUrls,
+    target: RobotUpdateTarget
+  ): Promise<unknown> => {
+    dispatch({
+      type: 'robotUpdate:UPDATE_VERSION',
+      payload: { version: CURRENT_VERSION, target },
+    })
     let prevPercentDone = 0
     const handleProgress = (progress: DownloadProgress): void => {
       const { downloaded, size } = progress
       if (size !== null) {
-        const percentDone =
-          Math.round(downloaded / size) * 100
-        if ((percentDone - prevPercentDone) > 0) {
+        const percentDone = Math.round(downloaded / size) * 100
+        if (percentDone - prevPercentDone > 0) {
           dispatch({
             type: 'robotUpdate:DOWNLOAD_PROGRESS',
-            payload: {progress: percentDone, target: target}
+            payload: { progress: percentDone, target },
           })
         }
         prevPercentDone = percentDone
@@ -183,28 +216,35 @@ export function checkForRobotUpdate(
 
     const targetDownloadDir = CACHE_DIR_FOR_MACHINE_FILES(target)
 
-    return ensureDir(targetDownloadDir).then(
-      () => getReleaseFiles(urls, targetDownloadDir, handleProgress))
+    return ensureDir(targetDownloadDir)
+      .then(() => getReleaseFiles(urls, targetDownloadDir, handleProgress))
       .then(filepaths => cacheUpdateSet(filepaths, target))
       .then(updateInfo =>
         dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })
       )
       .catch((error: Error) =>
-        dispatch({ type: 'robotUpdate:DOWNLOAD_ERROR', payload: {error: error.message, target: target}})
+        dispatch({
+          type: 'robotUpdate:DOWNLOAD_ERROR',
+          payload: { error: error.message, target: target },
+        })
       )
-      .then(() => cleanupReleaseFiles(DIRECTORY, CURRENT_VERSION))
+      .then(() =>
+        cleanupReleaseFiles(CACHE_DIR_FOR_MACHINE(target), CURRENT_VERSION)
+      )
   }
 
   return Promise.all([
-      getRobotSystemUpdateUrls('ot2').then(urls =>
-        urls === null ? Promise.resolve() : fetchFilesFromManifest(urls, 'ot2')
-      ),
-      getRobotSystemUpdateUrls('flex').then(urls =>
-        urls === null ? Promise.resolve() : fetchFilesFromManifest(urls, 'flex')
-      ),
-    ]).catch((error: Error) => {
+    getRobotSystemUpdateUrls('ot2').then(urls =>
+      urls === null ? Promise.resolve() : fetchFilesFromManifest(urls, 'ot2')
+    ),
+    getRobotSystemUpdateUrls('flex').then(urls =>
+      urls === null ? Promise.resolve() : fetchFilesFromManifest(urls, 'flex')
+    ),
+  ])
+    .catch((error: Error) => {
       log.warn('Failure during release file download', { error })
-    }).then()
+    })
+    .then()
 }
 
 function cacheUpdateSet(
@@ -216,6 +256,6 @@ function cacheUpdateSet(
   return readFile(filepaths.releaseNotes, 'utf8').then(releaseNotes => ({
     version: CURRENT_VERSION,
     releaseNotes,
-    target
+    target,
   }))
 }

@@ -2,23 +2,18 @@ import * as Constants from './constants'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type {
-  RobotUpdateTarget,
-  RobotUpdateState,
-  RobotUpdateSession,
-} from './types'
-
+import type { RobotUpdateState, RobotUpdateSession } from './types'
 
 export const INITIAL_STATE: RobotUpdateState = {
   flex: {
     version: null,
-    info: null,
+    releaseNotes: null,
     downloadProgress: null,
     downloadError: null,
   },
   ot2: {
     version: null,
-    info: null,
+    releaseNotes: null,
     downloadProgress: null,
     downloadError: null,
   },
@@ -30,7 +25,7 @@ export const initialSession = (
   session: RobotUpdateSession | null
 ): RobotUpdateSession => ({
   robotName,
-  userFileInfo: session?.userFileInfo || null,
+  fileInfo: session?.fileInfo || null,
   step: null,
   token: null,
   pathPrefix: null,
@@ -47,7 +42,12 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
     case Constants.ROBOTUPDATE_UPDATE_VERSION: {
       return {
         ...state,
-        ...{ [action.payload.target]: { version: action.payload.version } },
+        ...{
+          [action.payload.target]: {
+            ...state[action.payload.target],
+            version: action.payload.version,
+          },
+        },
       }
     }
 
@@ -56,7 +56,9 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
         ...state,
         ...{
           [action.payload.target]: {
-            info: { releaseNotes: action.payload.releaseNotes },
+            ...state[action.payload.target],
+            version: action.payload.version,
+            releaseNotes: action.payload.releaseNotes,
           },
         },
       }
@@ -67,6 +69,7 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
         ...state,
         ...{
           [action.payload.target]: {
+            ...state[action.payload.target],
             downloadProgress: action.payload.progress,
           },
         },
@@ -76,24 +79,25 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
     case Constants.ROBOTUPDATE_DOWNLOAD_ERROR: {
       return {
         ...state,
-        ...{ [action.payload.target]: { downloadError: action.payload.error } },
+        ...{
+          [action.payload.target]: {
+            ...state[action.payload.target],
+            downloadError: action.payload.error,
+          },
+        },
       }
     }
 
     case Constants.ROBOTUPDATE_START_UPDATE: {
       return {
         ...state,
-        session: initialSession(
-          action.payload.robotName,
-          state.session
-        ),
+        session: initialSession(action.payload.robotName, state.session),
       }
     }
 
     case Constants.ROBOTUPDATE_CREATE_SESSION: {
-      const { host, } = action.payload
-      const session =
-        state.session || initialSession(host.name, null)
+      const { host } = action.payload
+      const session = state.session || initialSession(host.name, null)
 
       return {
         ...state,
@@ -102,9 +106,8 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
     }
 
     case Constants.ROBOTUPDATE_CREATE_SESSION_SUCCESS: {
-      const { host, pathPrefix, token, } = action.payload
-      const session =
-        state.session || initialSession(host.name, null)
+      const { host, pathPrefix, token } = action.payload
+      const session = state.session || initialSession(host.name, null)
 
       return {
         ...state,
@@ -129,11 +132,11 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
       }
     }
 
-    case Constants.ROBOTUPDATE_USER_FILE_INFO: {
+    case Constants.ROBOTUPDATE_FILE_INFO: {
       return state.session
         ? {
             ...state,
-            session: { ...state.session, userFileInfo: action.payload },
+            session: { ...state.session, fileInfo: action.payload },
           }
         : state
     }
