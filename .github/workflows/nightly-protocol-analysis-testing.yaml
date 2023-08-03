@@ -1,9 +1,6 @@
 name: Nightly Protocol Analysis Testing 
 on:
   push:
-    branches:
-      - nightly-protocol-analysis-testing
-
 jobs:
   build:
     runs-on: ubuntu-latest
