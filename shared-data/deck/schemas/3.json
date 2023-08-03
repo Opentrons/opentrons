@@ -167,7 +167,8 @@
                     "magneticModuleType",
                     "temperatureModuleType",
                     "thermocyclerModuleType",
-                    "heaterShakerModuleType"
+                    "heaterShakerModuleType",
+                    "magneticBlockType"
                   ]
                 }
               }

@@ -39,9 +39,7 @@
           "zDimension": 0
         },
         "displayName": "Slot D2",
-        "compatibleModuleTypes": [
-          "magneticBlockType"
-        ]
+        "compatibleModuleTypes": ["magneticBlockType"]
       },
       {
         "id": "D3",
@@ -87,9 +85,7 @@
           "zDimension": 0
         },
         "displayName": "Slot C2",
-        "compatibleModuleTypes": [
-          "magneticBlockType"
-        ]
+        "compatibleModuleTypes": ["magneticBlockType"]
       },
       {
         "id": "C3",
@@ -136,9 +132,7 @@
           "zDimension": 0
         },
         "displayName": "Slot B2",
-        "compatibleModuleTypes": [
-          "magneticBlockType"
-        ]
+        "compatibleModuleTypes": ["magneticBlockType"]
       },
       {
         "id": "B3",
@@ -185,9 +179,7 @@
           "zDimension": 0
         },
         "displayName": "Slot A2",
-        "compatibleModuleTypes": [
-          "magneticBlockType"
-        ]
+        "compatibleModuleTypes": ["magneticBlockType"]
       },
       {
         "id": "A3",
