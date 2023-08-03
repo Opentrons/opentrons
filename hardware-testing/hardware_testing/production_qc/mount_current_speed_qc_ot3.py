@@ -23,6 +23,8 @@ from hardware_testing.data import ui
 
 TEST_TAG = "CURRENTS-SPEEDS"
 
+MAX_TRAVEL_MM = 215
+
 DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.Z]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.Z]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.Z]
@@ -43,8 +45,10 @@ MAX_CURRENT = max(max(list(TEST_CURRENTS_SPEED.keys())), 1.0)
 MAX_SPEED = max(TEST_SPEEDS)
 
 
-def _get_test_tag(current: float, speed: float, direction: str, pos: str) -> str:
-    return f"current-{current}-speed-{speed}-{direction}-{pos}"
+def _get_test_tag(
+    mount: types.OT3Mount, current: float, speed: float, direction: str, pos: str
+) -> str:
+    return f"{mount.name.lower()}-current-{current}-speed-{speed}-{direction}-{pos}"
 
 
 def _build_csv_report() -> CSVReport:
@@ -52,15 +56,20 @@ def _build_csv_report() -> CSVReport:
         test_name="mount-current-speed-qc-ot3",
         sections=[
             CSVSection(
-                title="OVERALL", lines=[CSVLine("failing-current", [float, CSVResult])]
+                title="OVERALL",
+                lines=[
+                    CSVLine("failing-current-left", [float, CSVResult]),
+                    CSVLine("failing-current-right", [float, CSVResult]),
+                ],
             ),
             CSVSection(
                 title=TEST_TAG,
                 lines=[
                     CSVLine(
-                        _get_test_tag(current, speed, direction, pos),
+                        _get_test_tag(mount, current, speed, direction, pos),
                         [float, float, float, float, CSVResult],
                     )
+                    for mount in [types.OT3Mount.LEFT, types.OT3Mount.RIGHT]
                     for current, speeds in TEST_CURRENTS_SPEED.items()
                     for speed in speeds
                     for direction in ["down", "up"]
@@ -87,26 +96,22 @@ async def _home_mount(api: OT3API, mount: types.OT3Mount) -> None:
 async def _move_mount(
     api: OT3API,
     mount: types.OT3Mount,
-    p: float,
-    s: float,
-    c: float,
-    d: float,
+    distance: float,
+    speed: float,
+    current: float,
 ) -> None:
-    # set max currents/speeds, to make sure we're not accidentally limiting ourselves
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-        api, pipette_ax, run_current=MAX_CURRENT
+        api, pipette_ax, run_current=current
     )
     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
         api,
         pipette_ax,
-        default_max_speed=MAX_SPEED,
-        max_speed_discontinuity=d,
+        default_max_speed=speed,
+        max_speed_discontinuity=TEST_DISCONTINUITY,
     )
     # move
-    await helpers_ot3.move_plunger_absolute_ot3(
-        api, mount, p, speed=s, motor_current=c, expect_stalls=True
-    )
+    await api.move_rel(mount, types.Point(x=0, y=0, z=distance), speed=speed)
 
 
 async def _record_mount_alignment(
@@ -129,7 +134,7 @@ async def _record_mount_alignment(
     _stalled_mm = est - enc
     print(f"{position}: motor={est}, encoder={enc}")
     _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
-    _tag = _get_test_tag(current, speed, direction, position)
+    _tag = _get_test_tag(mount, current, speed, direction, position)
     report(
         TEST_TAG,
         _tag,
@@ -146,20 +151,16 @@ async def _test_direction(
     speed: float,
     direction: str,
 ) -> bool:
-    plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    top, bottom, blowout, drop_tip = plunger_poses
     # check that encoder/motor align
     aligned = await _record_mount_alignment(
         api, mount, report, current, speed, direction, "start"
     )
     if not aligned:
         return False
-    # move the plunger
-    _plunger_target = {"down": blowout, "up": top}[direction]
+    # move the mount
+    distance = {"down": -MAX_TRAVEL_MM, "up": MAX_TRAVEL_MM}[direction]
     try:
-        await _move_mount(
-            api, mount, _plunger_target, speed, current, TEST_DISCONTINUITY
-        )
+        await _move_mount(api, mount, distance, speed, current)
         # check that encoder/motor still align
         aligned = await _record_mount_alignment(
             api, mount, report, current, speed, direction, "end"
