@@ -491,9 +491,7 @@ class ProtocolCore(
         slot_def = self.get_slot_definition(slot)
         compatible_modules = slot_def["compatibleModuleTypes"]
         if module_type.value not in compatible_modules:
-            raise ValueError(
-                f"A {ModuleType.value} cannot be loaded" f" into slot {slot}"
-            )
+            raise ValueError(f"A {module_type.value} cannot be loaded into slot {slot}")
 
     def get_slot_item(
         self, slot_name: DeckSlotName

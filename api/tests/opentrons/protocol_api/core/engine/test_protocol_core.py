@@ -18,9 +18,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import DeckSlotName, Mount, MountType, Point
 from opentrons.protocol_api import OFF_DECK
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-)
+from opentrons.hardware_control.modules import AbstractModule, ModuleType
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     TemperatureModuleModel,
@@ -79,7 +77,6 @@ from opentrons.protocol_api import validation, MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
-    SHORT_TRASH_DECK,
     STANDARD_OT3_DECK,
 )
 
@@ -922,7 +919,9 @@ def test_load_module(
         [mock_hw_mod_1, mock_hw_mod_2]
     )
 
-    decoy.when(subject.get_slot_definition(slot_name)).then_return(_get_slot_def(deck_def=deck_def, slot_name=slot_name))
+    decoy.when(subject.get_slot_definition(slot_name)).then_return(
+        _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
+    )
 
     decoy.when(
         mock_engine_client.load_module(
@@ -972,6 +971,82 @@ def test_load_module(
 
     assert subject.get_slot_item(slot_name) is result
     assert subject.get_labware_on_module(result) is None
+
+
+@pytest.mark.parametrize(
+    ("requested_model", "engine_model", "expected_core_cls", "deck_def", "slot_name"),
+    [
+        (
+            TemperatureModuleModel.TEMPERATURE_V2,
+            EngineModuleModel.TEMPERATURE_MODULE_V2,
+            TemperatureModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_D2,
+        ),
+        (
+            MagneticModuleModel.MAGNETIC_V2,
+            EngineModuleModel.MAGNETIC_MODULE_V2,
+            MagneticModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A2,
+        ),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            EngineModuleModel.THERMOCYCLER_MODULE_V1,
+            ThermocyclerModuleCore,
+            lazy_fixture("ot2_standard_deck_def"),
+            DeckSlotName.SLOT_1,
+        ),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V2,
+            EngineModuleModel.THERMOCYCLER_MODULE_V2,
+            ThermocyclerModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A2,
+        ),
+        (
+            HeaterShakerModuleModel.HEATER_SHAKER_V1,
+            EngineModuleModel.HEATER_SHAKER_MODULE_V1,
+            HeaterShakerModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A2,
+        ),
+    ],
+)
+def test_load_module_raises_wrong_location(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware_api: SyncHardwareAPI,
+    requested_model: ModuleModel,
+    engine_model: EngineModuleModel,
+    expected_core_cls: Type[ModuleCore],
+    subject: ProtocolCore,
+    deck_def: DeckDefinitionV3,
+    slot_name: DeckSlotName,
+) -> None:
+    """It should issue a load module engine command."""
+    mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
+    mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
+
+    decoy.when(mock_hw_mod_1.device_info).then_return({"serial": "abc123"})
+    decoy.when(mock_hw_mod_2.device_info).then_return({"serial": "xyz789"})
+    decoy.when(mock_sync_hardware_api.attached_modules).then_return(
+        [mock_hw_mod_1, mock_hw_mod_2]
+    )
+
+    decoy.when(subject.get_slot_definition(slot_name)).then_return(
+        _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=f"A {ModuleType.from_model(requested_model).value} cannot be loaded into slot {slot_name}",
+    ):
+        subject.load_module(
+            model=requested_model,
+            deck_slot=slot_name,
+            configuration=None,
+        )
 
 
 def test_load_mag_block(
@@ -1068,7 +1143,7 @@ def test_load_module_thermocycler_with_no_location(
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
 
     decoy.when(subject.get_slot_definition(expected_slot)).then_return(
-        _get_slot_def(deck_def=deck_def, slot_name=expected_slot)
+        _get_slot_def(deck_def=deck_def, slot_name=expected_slot)  # type: ignore[arg-type]
     )
 
     decoy.when(
