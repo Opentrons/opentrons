@@ -109,139 +109,6 @@ This table lists the correspondence between Protocol API versions and robot soft
 Changes in API Versions
 -----------------------
 
-Version 2.0
-+++++++++++
-
-Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow this `migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
-
-We've also published a `more in-depth discussion <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_ of why we developed version 2 of the API and how it differs from version 1.
-
-
-Version 2.1
-+++++++++++
-
-- When loading labware onto a module, you can now specify a label with the ``label`` parameter of
-  :py:meth:`.MagneticModuleContext.load_labware`,
-  :py:meth:`.TemperatureModuleContext.load_labware`, or
-  :py:meth:`.ThermocyclerContext.load_labware`,
-  just like you can when loading labware onto the deck with :py:meth:`.ProtocolContext.load_labware`.
-
-
-Version 2.2
-+++++++++++
-
-- You should now specify Magnetic Module engage height using the
-  ``height_from_base`` parameter, which specifies the height of the top of the
-  magnet from the base of the labware. For more, see :ref:`magnetic-module-engage`.
-- Return tip will now use pre-defined heights from hardware testing. For more information, see :ref:`pipette-return-tip`.
-- When using the return tip function, tips are no longer added back into the tip tracker. For more information, see :ref:`pipette-return-tip`.
-
-
-Version 2.3
-+++++++++++
-
-- Magnetic Module GEN2 and Temperature Module GEN2 are now supported; you can load them with the names ``"magnetic
-  module gen2"`` and ``"temperature module gen2"``, respectively.
-- All pipettes will return tips to tip racks from a higher position to avoid
-  possible collisions.
-- During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
-  between every dispense and following aspirate.
-- You can now access the Temperature Module's status via :py:obj:`.TemperatureModuleContext.status`.
-
-
-Version 2.4
-+++++++++++
-
-- The following improvements were made to the ``touch_tip`` command:
-
-  - The speed for ``touch_tip`` can now be lowered down to 1 mm/s
-  - ``touch_tip`` no longer moves diagonally from the X direction -> Y direction
-  - Takes into account geometry of the deck and modules
-
-
-Version 2.5
-+++++++++++
-
-- New :ref:`new-utility-commands` were added:
-
-  - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
-  - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
-  - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed
-
-
-Version 2.6
-+++++++++++
-
-- GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger
-  speeds
-
-  - Protocols that manually configure pipette flow rates will be unaffected
-
-  - For a comparison between API Versions, see :ref:`defaults`
-
-
-Version 2.7
-+++++++++++
-
-- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously.
-
-  .. note::
-
-      This feature has been removed from the Python Protocol API.
-
-- Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
-  has a tip attached or not.
-
-
-Version 2.8
-+++++++++++
-
-- You can now pass in a list of volumes to distribute and consolidate. See :ref:`distribute-consolidate-volume-list` for more information.
-
-  - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
-
-- :py:meth:`.Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.
-
-  - Note that you will need to create a location object to use this function in a protocol. See :ref:`protocol-api-labware` for more information.
-
-- You can now pass in a blowout location to transfer, distribute, and consolidate
-  with the ``blowout_location`` parameter. See :py:meth:`.InstrumentContext.transfer` for more detail!
-
-
-Version 2.9
-+++++++++++
-
-- You can now access certain geometry data regarding a labware's well via a Well Object. See :ref:`new-labware-well-properties` for more information.
-
-
-Version 2.10
-++++++++++++
-
-- Moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
-
-
-Version 2.11
-++++++++++++
-
-- Attempting to aspirate from or dispense to tip racks will raise an error.
-
-
-Version 2.12
-++++++++++++
-
-- :py:meth:`.ProtocolContext.resume` has been deprecated.
-- :py:meth:`.Labware.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons App (Jupyter Notebook and SSH).
-
-
-Version 2.13
-++++++++++++
-
-- Adds :py:class:`.HeaterShakerContext` to support the Heater-Shaker Module. You can use the load name ``heaterShakerModuleV1`` with :py:meth:`.ProtocolContext.load_module` to add a Heater-Shaker to a protocol.
-- :py:meth:`.InstrumentContext.drop_tip` now has a ``prep_after`` parameter.
-- :py:meth:`.InstrumentContext.home` may home *both* pipettes as needed to avoid collision risks.
-- :py:meth:`.InstrumentContext.aspirate` and :py:meth:`.InstrumentContext.dispense` will avoid interacting directly with modules.
-
-
 Version 2.14
 ++++++++++++
 
@@ -323,3 +190,136 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
 
   - :py:attr:`.ProtocolContext.max_speeds` is not yet supported on the API version.
     Use :py:attr:`.InstrumentContext.default_speed` or the per-method `speed` argument, instead.
+
+
+Version 2.13
+++++++++++++
+
+- Adds :py:class:`.HeaterShakerContext` to support the Heater-Shaker Module. You can use the load name ``heaterShakerModuleV1`` with :py:meth:`.ProtocolContext.load_module` to add a Heater-Shaker to a protocol.
+- :py:meth:`.InstrumentContext.drop_tip` now has a ``prep_after`` parameter.
+- :py:meth:`.InstrumentContext.home` may home *both* pipettes as needed to avoid collision risks.
+- :py:meth:`.InstrumentContext.aspirate` and :py:meth:`.InstrumentContext.dispense` will avoid interacting directly with modules.
+
+
+Version 2.12
+++++++++++++
+
+- :py:meth:`.ProtocolContext.resume` has been deprecated.
+- :py:meth:`.Labware.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons App (Jupyter Notebook and SSH).
+
+
+Version 2.11
+++++++++++++
+
+- Attempting to aspirate from or dispense to tip racks will raise an error.
+
+
+Version 2.10
+++++++++++++
+
+- Moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
+
+
+Version 2.9
++++++++++++
+
+- You can now access certain geometry data regarding a labware's well via a Well Object. See :ref:`new-labware-well-properties` for more information.
+
+
+Version 2.8
++++++++++++
+
+- You can now pass in a list of volumes to distribute and consolidate. See :ref:`distribute-consolidate-volume-list` for more information.
+
+  - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
+
+- :py:meth:`.Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.
+
+  - Note that you will need to create a location object to use this function in a protocol. See :ref:`protocol-api-labware` for more information.
+
+- You can now pass in a blowout location to transfer, distribute, and consolidate
+  with the ``blowout_location`` parameter. See :py:meth:`.InstrumentContext.transfer` for more detail!
+
+
+Version 2.7
++++++++++++
+
+- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously.
+
+  .. note::
+
+      This feature has been removed from the Python Protocol API.
+
+- Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
+  has a tip attached or not.
+
+
+Version 2.6
++++++++++++
+
+- GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger
+  speeds
+
+  - Protocols that manually configure pipette flow rates will be unaffected
+
+  - For a comparison between API Versions, see :ref:`defaults`
+
+
+Version 2.5
++++++++++++
+
+- New :ref:`new-utility-commands` were added:
+
+  - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
+  - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
+  - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed
+
+
+Version 2.4
++++++++++++
+
+- The following improvements were made to the ``touch_tip`` command:
+
+  - The speed for ``touch_tip`` can now be lowered down to 1 mm/s
+  - ``touch_tip`` no longer moves diagonally from the X direction -> Y direction
+  - Takes into account geometry of the deck and modules
+
+
+Version 2.3
++++++++++++
+
+- Magnetic Module GEN2 and Temperature Module GEN2 are now supported; you can load them with the names ``"magnetic
+  module gen2"`` and ``"temperature module gen2"``, respectively.
+- All pipettes will return tips to tip racks from a higher position to avoid
+  possible collisions.
+- During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
+  between every dispense and following aspirate.
+- You can now access the Temperature Module's status via :py:obj:`.TemperatureModuleContext.status`.
+
+
+Version 2.2
++++++++++++
+
+- You should now specify Magnetic Module engage height using the
+  ``height_from_base`` parameter, which specifies the height of the top of the
+  magnet from the base of the labware. For more, see :ref:`magnetic-module-engage`.
+- Return tip will now use pre-defined heights from hardware testing. For more information, see :ref:`pipette-return-tip`.
+- When using the return tip function, tips are no longer added back into the tip tracker. For more information, see :ref:`pipette-return-tip`.
+
+
+Version 2.1
++++++++++++
+
+- When loading labware onto a module, you can now specify a label with the ``label`` parameter of
+  :py:meth:`.MagneticModuleContext.load_labware`,
+  :py:meth:`.TemperatureModuleContext.load_labware`, or
+  :py:meth:`.ThermocyclerContext.load_labware`,
+  just like you can when loading labware onto the deck with :py:meth:`.ProtocolContext.load_labware`.
+
+
+Version 2.0
++++++++++++
+
+Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow this `migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
+
+We've also published a `more in-depth discussion <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_ of why we developed version 2 of the API and how it differs from version 1.
