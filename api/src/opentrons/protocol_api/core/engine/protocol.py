@@ -3,7 +3,7 @@ from typing_extensions import Literal
 from typing import Dict, Optional, Type, Union, List, Tuple
 
 from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -314,13 +314,22 @@ class ProtocolCore(
         """Load a module into the protocol."""
         assert configuration is None, "Module `configuration` is deprecated"
 
+        module_type = ModuleType.from_model(model)
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
-            if ModuleType.from_model(model) == ModuleType.THERMOCYCLER:
-                deck_slot = DeckSlotName.SLOT_7
+            if module_type == ModuleType.THERMOCYCLER:
+                deck_slot = (
+                    DeckSlotName.SLOT_7
+                    if self._engine_client.state.config.robot_type == "OT-2 Standard"
+                    else DeckSlotName.SLOT_B1
+                )
             else:
                 raise InvalidModuleLocationError(deck_slot, model.name)
+
+        # should we add this as allowed in the deck definition?
+        if module_type != ModuleType.MAGNETIC_BLOCK:
+            self._ensure_module_location(deck_slot, module_type)
 
         result = self._engine_client.load_module(
             model=EngineModuleModel(model),
@@ -472,6 +481,19 @@ class ProtocolCore(
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
+
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+        return self._engine_client.state.labware.get_slot_definition(slot)
+
+    def _ensure_module_location(
+        self, slot: DeckSlotName, module_type: ModuleType
+    ) -> None:
+        slot_def = self.get_slot_definition(slot)
+        compatible_modules = slot_def["compatibleModuleTypes"]
+        if module_type.value not in compatible_modules:
+            raise ValueError(
+                f"A {ModuleType.value} cannot be loaded" f" into slot {slot}"
+            )
 
     def get_slot_item(
         self, slot_name: DeckSlotName

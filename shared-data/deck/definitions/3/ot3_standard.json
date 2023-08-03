@@ -39,9 +39,6 @@
         },
         "displayName": "Slot D2",
         "compatibleModuleTypes": [
-          "magneticModuleType",
-          "temperatureModuleType",
-          "heaterShakerModuleType"
         ]
       },
       {
@@ -87,9 +84,6 @@
         },
         "displayName": "Slot C2",
         "compatibleModuleTypes": [
-          "magneticModuleType",
-          "temperatureModuleType",
-          "heaterShakerModuleType"
         ]
       },
       {
@@ -136,9 +130,6 @@
         },
         "displayName": "Slot B2",
         "compatibleModuleTypes": [
-          "magneticModuleType",
-          "temperatureModuleType",
-          "heaterShakerModuleType"
         ]
       },
       {
@@ -170,7 +161,8 @@
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
-          "heaterShakerModuleType"
+          "heaterShakerModuleType",
+          "thermocyclerModuleType"
         ]
       },
       {
@@ -184,9 +176,6 @@
         },
         "displayName": "Slot A2",
         "compatibleModuleTypes": [
-          "magneticModuleType",
-          "temperatureModuleType",
-          "heaterShakerModuleType"
         ]
       },
       {
@@ -198,7 +187,11 @@
           "zDimension": 0
         },
         "displayName": "Slot A3",
-        "compatibleModuleTypes": []
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "heaterShakerModuleType"
+        ]
       }
     ],
     "calibrationPoints": [],
