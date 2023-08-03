@@ -34,11 +34,10 @@ jobs:
 
       - name: Setup Code
         run: |
-          env
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make setup
-# make -C app-shell setup
-# make -C app-shell dist-linux
-# mv app-shell/dist/*.AppImage ./
+          OT_PYTHON=${{ env.PYTHON_3_11_EXEC }} make -C app-shell setup
+          OT_PYTHON=${{ env.PYTHON_3_11_EXEC }} make -C app-shell dist-linux
+          mv app-shell/dist/*.AppImage ./
 
       # - name: Get Opentrons AppImage and set env.EXECUTABLE_PATH
       #   run: |
