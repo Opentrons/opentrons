@@ -25,6 +25,10 @@ jobs:
           echo "PYTHON_3_11_EXEC=${{ steps.python-3-11.outputs.python-path }}" >> $GITHUB_ENV
           echo "PYTHON_3_7_EXEC=${{ steps.python-3-7.outputs.python-path }}" >> $GITHUB_ENV
 
+      - name: Install Dependenvies
+        run: |
+          apt-get install libudev-dev libusb-1.0-0-dev
+
       - name: Install pipenv
         run: pip install pipenv
 
