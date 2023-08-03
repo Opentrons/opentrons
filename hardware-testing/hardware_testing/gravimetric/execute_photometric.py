@@ -190,6 +190,9 @@ def _run_trial(trial: PhotometricTrial) -> None:
         )  # retract to top of gantry
         if (i + 1) == num_dispenses:
             _drop_tip(trial.pipette, trial.cfg.return_tip)
+            trial.ctx._core.get_hardware().retract(
+                OT3Mount.LEFT
+            )  # retract to top of gantry
         if not trial.ctx.is_simulating():
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
@@ -359,7 +362,7 @@ def _find_liquid_height(
         raise RuntimeError(
             f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
         )
-    trial.ctx._core.get_hardware().retract(
+    resources.ctx._core.get_hardware().retract(
             OT3Mount.LEFT
     )  # retract to top of gantry
     resources.pipette.drop_tip(home_after=False)  # always trash setup tips
@@ -370,7 +373,7 @@ def _find_liquid_height(
 def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
     trial_total = len(resources.test_volumes) * cfg.trials
-
+    resources.ctx._core.get_hardware().home()
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
@@ -387,7 +390,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
 
     _display_dye_information(cfg, resources)
     _find_liquid_height(cfg, resources, liquid_tracker, reservoir["A1"])
-
+    print("building trials")
     trials = build_photometric_trials(
         resources.ctx,
         test_report,

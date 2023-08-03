@@ -190,7 +190,7 @@ def _get_robot_serial(is_simulating: bool) -> str:
 
 def _get_operator_name(is_simulating: bool) -> str:
     if not is_simulating:
-        return input("OPERATOR name:").strip()
+        return input("\nOPERATOR name:").strip()
     else:
         return "simulation"
 

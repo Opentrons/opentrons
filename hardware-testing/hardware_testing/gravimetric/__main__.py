@@ -5,7 +5,7 @@ import argparse
 from typing import List, Union
 import subprocess
 from opentrons.protocol_api import ProtocolContext
-
+from time import sleep
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.protocols import (
     gravimetric_ot3_p50_single,
@@ -323,6 +323,7 @@ if __name__ == "__main__":
         ],
         shell=True,
     )
+    sleep(1)
     try:
         if args.tip == 0:
             for tip in get_tip_volumes_for_qc(
@@ -335,8 +336,6 @@ if __name__ == "__main__":
                 _main(args, _ctx)
         else:
             _main(args, _ctx)
-    except Exception:
-        pass
     finally:
         serial_logger.terminate()
         _ctx._core.get_hardware()._backend.eeprom_driver._gpio.__del__()
