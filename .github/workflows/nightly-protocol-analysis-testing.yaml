@@ -12,6 +12,8 @@ jobs:
 
       - name: Check out repository code.
         uses: actions/checkout@v2
+        with:
+          path: opentrons
 
       - name: Setup Code
         working-directory: ./opentrons
