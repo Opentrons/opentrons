@@ -4,7 +4,7 @@ from anyio import Path as AsyncPath
 
 
 # The on-device display process knows to look for this file here.
-_RESET_MARKER_PATH: Final = AsyncPath("/data/odd/_TO_BE_DELETED_ON_REBOOT")
+_RESET_MARKER_PATH: Final = AsyncPath("/data/ODD/_CONFIG_TO_BE_DELETED_ON_REBOOT")
 
 _RESET_MARKER_FILE_CONTENTS: Final = """\
 This file was placed here by robot-server.
