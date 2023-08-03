@@ -222,7 +222,7 @@ def check(
             )
 
 
-def _create_ot2_restrictions(  # noqa: C901
+def _create_ot2_restrictions(
     item: DeckItem, location: DeckSlotName
 ) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
@@ -252,18 +252,13 @@ def _create_ot2_restrictions(  # noqa: C901
             )
 
     if isinstance(item, ThermocyclerModule):
-        if location in _slots_covered_by_thermocycler(item):
-            for covered_location in _slots_covered_by_thermocycler(item):
-                restrictions.append(
-                    _NothingAllowed(
-                        location=covered_location,
-                        source_item=item,
-                        source_location=location,
-                    )
+        for covered_location in _slots_covered_by_thermocycler(item):
+            restrictions.append(
+                _NothingAllowed(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
                 )
-        else:
-            raise DeckConflictError(
-                f"{item.name_for_errors} is not allowed in slot {location}"
             )
 
     if isinstance(item, HeaterShakerModule):
@@ -296,34 +291,14 @@ def _create_flex_restrictions(
     restrictions: List[_DeckRestriction] = []
 
     if isinstance(item, ThermocyclerModule):
-        if location in _flex_slots_covered_by_thermocycler():
-            for covered_location in _flex_slots_covered_by_thermocycler():
-                restrictions.append(
-                    _NothingAllowed(
-                        location=covered_location,
-                        source_item=item,
-                        source_location=location,
-                    )
-                )
-        else:
-            raise DeckConflictError(
-                f"{item.name_for_errors} is not allowed in slot {location}"
-            )
-
-    elif isinstance(item, (HeaterShakerModule, TemperatureModule)):
-        if location in _flex_right_left_hand_slots():
+        for covered_location in _flex_slots_covered_by_thermocycler():
             restrictions.append(
-                _NoModule(
-                    location=location,
+                _NothingAllowed(
+                    location=covered_location,
                     source_item=item,
                     source_location=location,
                 )
             )
-        else:
-            raise DeckConflictError(
-                f"{item.name_for_errors} is not allowed in slot {location}"
-            )
-
     else:
         restrictions.append(
             _NothingAllowed(
@@ -391,28 +366,6 @@ def _slots_covered_by_thermocycler(
 
 def _flex_slots_covered_by_thermocycler() -> Set[DeckSlotName]:
     return {DeckSlotName.SLOT_B1, DeckSlotName.SLOT_A1}
-
-
-def _flex_right_left_hand_slots() -> List[DeckSlotName]:
-    return _flex_left_hand_slots() + _flex_left_hand_slots()
-
-
-def _flex_left_hand_slots() -> List[DeckSlotName]:
-    return [
-        DeckSlotName.SLOT_A1,
-        DeckSlotName.SLOT_B1,
-        DeckSlotName.SLOT_C1,
-        DeckSlotName.SLOT_D1,
-    ]
-
-
-def _flex_right_hand_slots() -> List[DeckSlotName]:
-    return [
-        DeckSlotName.SLOT_A3,
-        DeckSlotName.SLOT_B3,
-        DeckSlotName.SLOT_C3,
-        DeckSlotName.SLOT_D3,
-    ]
 
 
 def _is_fixed_trash(item: DeckItem) -> bool:
