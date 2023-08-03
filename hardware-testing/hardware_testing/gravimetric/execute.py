@@ -392,6 +392,7 @@ def _calculate_evaporation(
     actual_disp_list_evap: List[float] = []
     for b_trial in blank_trials[resources.test_volumes[-1]][0]:
         ui.print_header(f"BLANK {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}")
+        resources.pipette.dispense()
         evap_aspirate, _, evap_dispense, _ = _run_trial(b_trial)
         ui.print_info(
             f"blank {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
