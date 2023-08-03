@@ -5,6 +5,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository code.
+        uses: actions/checkout@v2
+
       - name: Set up Python 3.7
         id: python-3-7
         uses: actions/setup-python@v4
@@ -16,13 +19,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
             python-version: 3.11
+
       - name: Store Python executable names
         run: |
           echo "PYTHON_3_11_EXEC=${{ steps.python-3-11.outputs.python-path }}" >> $GITHUB_ENV
           echo "PYTHON_3_7_EXEC=${{ steps.python-3-7.outputs.python-path }}" >> $GITHUB_ENV
-          
-      - name: Check out repository code.
-        uses: actions/checkout@v2
 
       - name: Install pipenv
         run: pip install pipenv
@@ -35,8 +36,8 @@ jobs:
       - name: Setup Code
         run: |
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make setup
-          OT_PYTHON=${{ env.PYTHON_3_11_EXEC }} make -C app-shell setup
-          OT_PYTHON=${{ env.PYTHON_3_11_EXEC }} make -C app-shell dist-linux
+          OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell setup
+          OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell dist-linux
           mv app-shell/dist/*.AppImage ./
 
       # - name: Get Opentrons AppImage and set env.EXECUTABLE_PATH
