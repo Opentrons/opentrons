@@ -15,7 +15,7 @@ jobs:
 
       - name: Setup Code
         run: |
-          make setup
+          make -C app-shell setup
           make -C app-shell dist-linux
           mv app-shell/dist/*.AppImage ./
 
