@@ -29,7 +29,10 @@ import {
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
 } from '../actions'
-import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
+import type {
+  LoadAdapterCreateCommand,
+  LoadLabwareCreateCommand,
+} from '@opentrons/shared-data'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
@@ -216,6 +219,10 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
+      const loadAdapterCommands = Object.values(file.commands).filter(
+        (command): command is LoadAdapterCreateCommand =>
+          command.commandType === 'loadAdapter'
+      )
       const labware = loadLabwareCommands.reduce(
         (
           acc: Record<
@@ -235,8 +242,8 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
             slot = 'offDeck'
           } else if ('moduleId' in location) {
             slot = location.moduleId
-          } else if ('adapterId' in location) {
-            slot = location.adapterId
+          } else if ('labwareId' in location) {
+            slot = location.labwareId
           } else {
             slot = location.slotName
           }

@@ -56,6 +56,7 @@ export interface Props {
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
 const CUSTOM_CATEGORY = 'custom'
+const adapterCompatibleLabware = 'adapterCompatibleLabware'
 
 const orderedCategories: string[] = [
   'tipRack',
@@ -70,7 +71,7 @@ const orderedCategories: string[] = [
 const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
-    'opentrons_96_aluminumblock',
+    'opentrons_96_well_aluminum_block',
     'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
     'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
     'opentrons_24_aluminumblock_nest_1.5ml_snapcap',
@@ -107,19 +108,6 @@ export const getLabwareIsRecommended = (
       )
     : false
 
-const getSlotOnPermittedAdapterLocation = (slot?: DeckSlot | null): boolean => {
-  if (
-    slot?.includes(MAGNETIC_MODULE_TYPE) ||
-    slot?.includes(
-      THERMOCYCLER_MODULE_TYPE || slot?.includes(MAGNETIC_BLOCK_TYPE)
-    )
-  ) {
-    return false
-  } else {
-    return true
-  }
-}
-
 export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
@@ -136,7 +124,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
-  console.log('slot', slot)
   const [previewedLabware, setPreviewedLabware] = React.useState<
     LabwareDefinition2 | null | undefined
   >(null)
@@ -196,15 +183,25 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   )
 
   const getIsLabwareFiltered = React.useCallback(
-    (labwareDef: LabwareDefinition2) =>
-      (filterRecommended && !getLabwareIsRecommended(labwareDef, moduleType)) ||
-      (filterHeight &&
-        getIsLabwareAboveHeight(
-          labwareDef,
-          MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
-        )) ||
-      !getLabwareCompatible(labwareDef),
-    [filterRecommended, filterHeight, getLabwareCompatible, moduleType]
+    (labwareDef: LabwareDefinition2) => {
+      const smallXDimension = labwareDef.dimensions.xDimension < 127.75
+      const smallYDimension = labwareDef.dimensions.yDimension < 85.48
+      const irregularSize = smallXDimension && smallYDimension
+      const adapter = labwareDef.metadata.displayCategory === 'adapter'
+
+      return (
+        (filterRecommended &&
+          !getLabwareIsRecommended(labwareDef, moduleType)) ||
+        (filterHeight &&
+          getIsLabwareAboveHeight(
+            labwareDef,
+            MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+          )) ||
+        !getLabwareCompatible(labwareDef) ||
+        (adapter && irregularSize && !slot?.includes(HEATERSHAKER_MODULE_TYPE))
+      )
+    },
+    [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
   )
   const getTitleText = (): string => {
     if (isNextToHeaterShaker) {
@@ -234,10 +231,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       defs,
       (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
-        const smallXDimension = def.dimensions.xDimension < 127.75
-        const smallYDimension = def.dimensions.yDimension < 85.48
-        const irregularSize = smallXDimension && smallYDimension
-        const allowAdapter = getSlotOnPermittedAdapterLocation(slot)
+
         // filter out non-permitted tipracks
         if (
           category === 'tipRack' &&
@@ -339,7 +333,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       moduleCompatibility = 'notCompatible'
     }
   }
-
   return (
     <>
       <Portal>
@@ -413,23 +406,22 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
             })
           ) : (
             <PDTitledList
-              key="adapter compatible labware"
+              key={adapterCompatibleLabware}
               title="adapter compatible labware"
-              collapsed={selectedCategory !== 'adapter compatible labware'}
-              onCollapseToggle={makeToggleCategory(
-                'adapter compatible labware'
-              )}
-              onClick={makeToggleCategory('adapter compatible labware')}
+              collapsed={selectedCategory !== adapterCompatibleLabware}
+              onCollapseToggle={makeToggleCategory(adapterCompatibleLabware)}
+              onClick={makeToggleCategory(adapterCompatibleLabware)}
               inert={false}
             >
               {getLabwareCompatibleWithAdapter(adapterLoadName).map(
                 (adapterDefUri, index) => {
-                  const Uris = Object.keys(getOnlyLatestDefs())
+                  const latestDefs = getOnlyLatestDefs()
+                  const Uris = Object.keys(latestDefs)
                   const labwareDefUri = Uris.find(
                     defUri => defUri === adapterDefUri
                   )
                   const labwareDef = labwareDefUri
-                    ? getOnlyLatestDefs()[labwareDefUri]
+                    ? latestDefs[labwareDefUri]
                     : null
 
                   return labwareDef != null ? (

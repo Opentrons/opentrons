@@ -399,6 +399,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
+        console.log('labware from decksetup', labware)
         if (allModules.some(m => m.id === labware.slot)) return null
         const slot = deckSlots.find(slot => slot.id === labware.slot)
         if (slot == null) {

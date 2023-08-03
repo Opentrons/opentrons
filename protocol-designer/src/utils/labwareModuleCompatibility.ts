@@ -39,7 +39,7 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
-    'opentrons_96_aluminumblock',
+    'opentrons_96_well_aluminum_block',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
@@ -81,7 +81,7 @@ const DEEP_WELL_ADAPTER_LOADNAME = 'opentrons_96_deep_well_adapter'
 const FLAT_BOTTOM_ADAPTER_LOADNAME = 'opentrons_96_flat_bottom_adapter'
 const PCR_ADAPTER_LOADNAME = 'opentrons_96_pcr_adapter'
 const UNIVERSAL_FLAT_ADAPTER_LOADNAME = 'opentrons_universal_flat_adapter'
-const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_aluminumblock'
+const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_well_aluminum_block'
 
 const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<string, string[]> = {
   [DEEP_WELL_ADAPTER_LOADNAME]: [
@@ -95,8 +95,8 @@ const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<string, string[]> = {
     'opentrons/corning_384_wellplate_112ul_flat/2',
   ],
   [ALUMINUM_BLOCK_96_LOADNAME]: [
-    'opentrons/biorad_96_wellplate_200ul/1',
-    'opentrons/nest_96_wellplate_100ul/1',
+    'opentrons/biorad_96_wellplate_200ul_pcr/2',
+    'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
   ],
 }
 

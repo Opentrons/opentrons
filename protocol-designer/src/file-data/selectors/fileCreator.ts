@@ -48,6 +48,7 @@ import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
+  LoadAdapterCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -204,8 +205,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     )
     const loadAdapterCommands = reduce<
       RobotState['labware'],
-      // change this type to LoadAdapterCreateCommand when it exists!
-      any
+      LoadAdapterCreateCommand[]
     >(
       initialRobotState.labware,
       (
@@ -243,7 +243,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const loadLabwareCommands = reduce<
       RobotState['labware'],
-      LoadLabwareCreateCommand[] | any
+      LoadLabwareCreateCommand[]
     >(
       initialRobotState.labware,
       (
@@ -257,7 +257,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const isOnAdapter =
           loadAdapterCommands.find(
-            command => command.adapterId === labware.slot
+            command => command.params.adapterId === labware.slot
           ) != null
         const namespace = def.namespace
         const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
@@ -274,7 +274,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             location: isOnTopOfModule
               ? { moduleId: labware.slot }
               : isOnAdapter
-              ? { adapterId: labware.slot }
+              ? { labwareId: labware.slot }
               : { slotName: labware.slot },
           },
         }

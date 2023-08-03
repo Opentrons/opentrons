@@ -1,10 +1,16 @@
 import { uuid } from '../../utils'
+import { getOnlyLatestDefs } from '../../labware-defs'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
-import { ProtocolFileV6 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinitionsByUri,
+  ProtocolFileV6,
+} from '@opentrons/shared-data'
 import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,
   LoadLabwareCreateCommand,
+  LoadAdapterCreateCommand,
   LabwareLocation,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV7'
@@ -16,15 +22,34 @@ import type {
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration removes pipettes, labware, and modules as top level keys and adds necessary
-// params to the load commands. Also, this introduces loadAdapter commands
+// params to the load commands. Also, this introduces loadAdapter commands and migrates previous combined
+//  adapter + labware commands and definitions to their commands/definitions split up
 const PD_VERSION = '7.0.0'
 const SCHEMA_VERSION = 7
+
+type LabwareLocationUpdate = { [id: string]: string }
+
+//  might need better way to filter this???
+const getIsAdapter = (id: string): boolean =>
+  id.includes('opentrons_96_aluminumblock_biorad_wellplate_200ul') ||
+  id.includes('adapter') ||
+  id.includes('opentrons_96_aluminumblock_nest_wellplate_100ul')
 
 export const migrateFile = (
   appData: ProtocolFileV6<DesignerApplicationData>
 ): ProtocolFile => {
   const { commands, labwareDefinitions } = appData
   const { pipettes, labware, modules, ...rest } = appData
+  const labwareLocationUpdate: LabwareLocationUpdate =
+    appData.designerApplication?.data?.savedStepForms[
+      INITIAL_DECK_SETUP_STEP_ID
+    ].labwareLocationUpdate
+  const ingredLocations: DesignerApplicationData['ingredLocations'] =
+    appData.designerApplication?.data?.savedStepForms[
+      INITIAL_DECK_SETUP_STEP_ID
+    ].ingredLocations
+
+  const allLatestDefs = getOnlyLatestDefs()
 
   const loadPipetteCommands: LoadPipetteCreateCommand[] = commands
     .filter(
@@ -52,12 +77,10 @@ export const migrateFile = (
       },
     }))
 
-  //  need better way to filter this since the strip tubes in 96 well alum block are allowed!
-  const getIsAdapter = (labwareId: string): boolean =>
-    labwareId.includes('96_aluminumblock') || labwareId.includes('adapter')
-
-  //  todo: update this type to LoadAdapterCreateCommand[]
-  const loadAdapterAndLabwareCommands: any = commands
+  const loadAdapterAndLabwareCommands: (
+    | LoadAdapterCreateCommand
+    | LoadLabwareCreateCommand
+  )[] = commands
     .filter(
       (command): command is LoadLabwareCommandV6 =>
         command.commandType === 'loadLabware' &&
@@ -65,11 +88,12 @@ export const migrateFile = (
     )
     .flatMap(command => {
       const {
-        adapterLoadname,
-        labwareLoadname,
+        adapterUri,
+        labwareUri,
         adapterDisplayName,
         labwareDisplayName,
       } = getAdapterAndLabwareSplitInfo(command.params.labwareId)
+      const previousLabwareIdUuid = command.params.labwareId.split(':')[0]
       const labwareLocation = command.params.location
       let adapterLocation: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -79,9 +103,14 @@ export const migrateFile = (
       } else if ('slotName' in labwareLocation) {
         adapterLocation = { slotName: labwareLocation.slotName }
       }
-      const adapterId = `${uuid()}:opentrons/${adapterLoadname}/1`
+      const defUris = Object.keys(allLatestDefs)
+      const adapterDefUri = defUris.find(defUri => defUri === adapterUri) ?? ''
+      const labwareDefUri = defUris.find(defUri => defUri === labwareUri) ?? ''
+      const adapterLoadname = allLatestDefs[adapterDefUri].parameters.loadName
+      const labwareLoadname = allLatestDefs[labwareDefUri].parameters.loadName
+      const adapterId = `${uuid()}:${adapterUri}`
 
-      const loadAdapterCommand = {
+      const loadAdapterCommand: LoadAdapterCreateCommand = {
         key: uuid(),
         commandType: 'loadAdapter',
         params: {
@@ -98,17 +127,38 @@ export const migrateFile = (
         key: uuid(),
         commandType: 'loadLabware',
         params: {
-          labwareId: `${uuid()}:opentrons/${labwareLoadname}/1`,
+          //  keeping same Uuid as previous id for ingredLocation mapping
+          labwareId: `${previousLabwareIdUuid}:${labwareUri}`,
           loadName: labwareLoadname,
           namespace: 'opentrons',
           version: 1,
-          location: { adapterId: adapterId },
+          location: { labwareId: adapterId },
           displayName: labwareDisplayName,
         },
       }
 
       return [loadAdapterCommand, loadLabwareCommand]
     })
+
+  const newLabwareDefinitions: LabwareDefinitionsByUri = Object.keys(
+    labwareDefinitions
+  ).reduce((acc: LabwareDefinitionsByUri, defId: string) => {
+    if (!getIsAdapter(defId)) {
+      acc[defId] = labwareDefinitions[defId]
+    } else {
+      const { adapterUri, labwareUri } = getAdapterAndLabwareSplitInfo(defId)
+      const defUris = Object.keys(allLatestDefs)
+      const adapterDefUri = defUris.find(defUri => defUri === adapterUri) ?? ''
+      const labwareDefUri = defUris.find(defUri => defUri === labwareUri) ?? ''
+
+      const adapterLabwareDef = allLatestDefs[adapterDefUri]
+      const labwareDef = allLatestDefs[labwareDefUri]
+
+      acc[adapterDefUri] = adapterLabwareDef
+      acc[labwareDefUri] = labwareDef
+    }
+    return acc
+  }, {})
 
   const loadLabwareCommands: LoadLabwareCreateCommand[] = commands
     .filter(
@@ -142,15 +192,105 @@ export const migrateFile = (
         },
       }
     })
+  const newLabwareLocationUpdate: LabwareLocationUpdate = Object.keys(
+    labwareLocationUpdate
+  ).reduce((acc: LabwareLocationUpdate, labwareId: string) => {
+    if (!getIsAdapter(labwareId)) {
+      acc[labwareId] = labwareLocationUpdate[labwareId]
+    } else {
+      const adapterAndLabwareLocationUpdate: LabwareLocationUpdate = Object.entries(
+        loadAdapterAndLabwareCommands
+      ).reduce(
+        (
+          adapterAndLabwareAcc: LabwareLocationUpdate,
+          [id, command]: [
+            string,
+            LoadAdapterCreateCommand | LoadLabwareCreateCommand
+          ]
+        ) => {
+          const { location } = command.params
+          let labId: string = ''
+          if ('adapterId' in command.params)
+            labId = command.params.adapterId ?? ''
+          else if ('labwareId' in command.params)
+            labId = command.params.labwareId ?? ''
+
+          let locationString = ''
+          if (location === 'offDeck') {
+            locationString = 'offDeck'
+          } else if ('moduleId' in location) {
+            locationString = location.moduleId
+          } else if ('slotName' in location) {
+            locationString = location.slotName
+          } else if ('labwareId' in location) {
+            locationString = location.labwareId
+          }
+          adapterAndLabwareAcc[labId] = locationString
+          return adapterAndLabwareAcc
+        },
+        {}
+      )
+      Object.assign(acc, adapterAndLabwareLocationUpdate)
+    }
+    return acc
+  }, {})
+
+  const getNewLabwareIngreds = (
+    ingredLocations?: DesignerApplicationData['ingredLocations']
+  ): DesignerApplicationData['ingredLocations'] => {
+    const updatedIngredLocations: DesignerApplicationData['ingredLocations'] = {}
+    if (ingredLocations == null) return {}
+    for (const [labwareId, wellData] of Object.entries(ingredLocations)) {
+      if (getIsAdapter(labwareId)) {
+        const labwareIdUuid = labwareId.split(':')[0]
+        const matchingCommand = loadAdapterAndLabwareCommands
+          .filter(
+            (command): command is LoadLabwareCreateCommand =>
+              command.commandType === 'loadLabware'
+          )
+          .find(
+            command => command.params.labwareId?.split(':')[0] === labwareIdUuid
+          )
+        const updatedLabwareId =
+          matchingCommand != null ? matchingCommand.params.labwareId ?? '' : ''
+        updatedIngredLocations[updatedLabwareId] = wellData
+      } else {
+        updatedIngredLocations[labwareId] = wellData
+      }
+    }
+    return updatedIngredLocations
+  }
+
+  const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
 
   return {
     ...rest,
     designerApplication: {
       ...appData.designerApplication,
       version: PD_VERSION,
+      data: {
+        ...appData.designerApplication?.data,
+        savedStepForms: {
+          ...appData.designerApplication?.data?.savedStepForms,
+          [INITIAL_DECK_SETUP_STEP_ID]: {
+            ...appData.designerApplication?.data?.savedStepForms[
+              INITIAL_DECK_SETUP_STEP_ID
+            ],
+            labwareLocationUpdate: {
+              ...newLabwareLocationUpdate,
+            },
+            ingredLocations: {
+              ...newLabwareIngreds,
+            },
+          },
+        },
+      },
     },
     schemaVersion: SCHEMA_VERSION,
     $otSharedSchema: '#/protocol/schemas/7',
+    labwareDefinitions: {
+      ...newLabwareDefinitions,
+    },
     commands: [
       ...loadPipetteCommands,
       ...loadModuleCommands,

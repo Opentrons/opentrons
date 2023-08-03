@@ -1,6 +1,6 @@
 export type AdapterAndLabware = {
-  labwareLoadname: string
-  adapterLoadname: string
+  labwareUri: string
+  adapterUri: string
   labwareDisplayName: string
   adapterDisplayName: string
 }
@@ -8,13 +8,12 @@ export type AdapterAndLabware = {
 export const getAdapterAndLabwareSplitInfo = (
   labwareId: string
 ): AdapterAndLabware => {
-  console.log('labwareId', labwareId)
   if (
     labwareId.includes('opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep')
   ) {
     return {
-      labwareLoadname: 'nest__96_wellplate_2ml_deep',
-      adapterLoadname: 'opentrons_96_deep_well_adapter',
+      labwareUri: 'opentrons/nest_96_wellplate_2ml_deep/2',
+      adapterUri: 'opentrons/opentrons_96_deep_well_adapter/1',
       labwareDisplayName: 'NEST 96 Deep Well Plate 2mL',
       adapterDisplayName: 'Opentrons 96 Deep Well Adapter',
     }
@@ -24,8 +23,8 @@ export const getAdapterAndLabwareSplitInfo = (
     )
   ) {
     return {
-      labwareLoadname: 'nest_96_wellplate_200ul_flat',
-      adapterLoadname: 'opentrons_96_flat_bottom_adapter',
+      labwareUri: 'opentrons/nest_96_wellplate_200ul_flat/2',
+      adapterUri: 'opentrons/opentrons_96_flat_bottom_adapter/1',
       labwareDisplayName: 'NEST 96 Well Plate 200 µL Flat',
       adapterDisplayName: 'Opentrons 96 Flat Bottom Adapter',
     }
@@ -35,8 +34,8 @@ export const getAdapterAndLabwareSplitInfo = (
     )
   ) {
     return {
-      labwareLoadname: 'nest_96_wellplate_100ul_pcr_full_skirt',
-      adapterLoadname: 'opentrons_96_pcr_adapter',
+      labwareUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
+      adapterUri: 'opentrons/opentrons_96_pcr_adapter/1',
       labwareDisplayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
       adapterDisplayName: 'Opentrons 96 PCR Adapter',
     }
@@ -46,8 +45,8 @@ export const getAdapterAndLabwareSplitInfo = (
     )
   ) {
     return {
-      labwareLoadname: 'corning_384_wellplate_112ul_flat',
-      adapterLoadname: 'opentrons_universal_flat_adapter',
+      labwareUri: 'opentrons/corning_384_wellplate_112ul_flat/2',
+      adapterUri: 'opentrons/opentrons_universal_flat_adapter/1',
       labwareDisplayName: 'Corning 384 Well Plate 112 µL Flat',
       adapterDisplayName: 'Opentrons Universal Flat Adapter',
     }
@@ -55,8 +54,8 @@ export const getAdapterAndLabwareSplitInfo = (
     labwareId.includes('opentrons_96_aluminumblock_biorad_wellplate_200ul')
   ) {
     return {
-      labwareLoadname: 'opentrons_96_aluminumblock',
-      adapterLoadname: 'biorad_wellplate_200ul',
+      labwareUri: 'opentrons/opentrons_96_well_aluminum_block/1',
+      adapterUri: 'opentrons/biorad_96_wellplate_200ul_pcr/2',
       labwareDisplayName: 'Bio-Rad 96 Well Plate 200 µL PCR',
       adapterDisplayName: 'Opentrons 96 Well Aluminum Block',
     }
@@ -64,16 +63,16 @@ export const getAdapterAndLabwareSplitInfo = (
     labwareId.includes('opentrons_96_aluminumblock_nest_wellplate_100ul')
   ) {
     return {
-      labwareLoadname: 'opentrons_96_aluminumblock',
-      adapterLoadname: 'nest_wellplate_100ul',
+      adapterUri: 'opentrons/opentrons_96_well_aluminum_block/1',
+      labwareUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
       labwareDisplayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
       adapterDisplayName: 'Opentrons 96 Well Aluminum Block',
     }
   } else {
-    //  default
+    //  default - shouldn't reach this!
     return {
-      labwareLoadname: '',
-      adapterLoadname: '',
+      labwareUri: '',
+      adapterUri: '',
       labwareDisplayName: '',
       adapterDisplayName: '',
     }
