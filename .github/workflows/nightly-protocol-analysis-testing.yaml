@@ -5,11 +5,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.7
+        id: python-3-7
+        uses: actions/setup-python@v4
         with:
-            python-version: "3.11"
-
+            python-version: 3.7
+      
+      - name: Set up Python 3.11
+        id: python-3-11
+        uses: actions/setup-python@v4
+        with:
+            python-version: 3.11
+      - name: Store Python executable names
+        run: |
+          echo "PYTHON_3_11_EXEC=${{ steps.python-3-11.outputs.python-version }}" >> $GITHUB_ENV
+          echo "PYTHON_3_7_EXEC=${{ steps.python-3-7.outputs.python-version }}" >> $GITHUB_ENV
+          
       - name: Check out repository code.
         uses: actions/checkout@v2
 
@@ -23,17 +34,19 @@ jobs:
 
       - name: Setup Code
         run: |
-          make -C app-shell setup
-          make -C app-shell dist-linux
-          mv app-shell/dist/*.AppImage ./
+          env
+# make setup
+# make -C app-shell setup
+# make -C app-shell dist-linux
+# mv app-shell/dist/*.AppImage ./
 
-    #   - name: Get Opentrons AppImage and set env.EXECUTABLE_PATH
-    #     run: |
-    #       wget ${{ github.event.inputs.appimage-url }}
-    #       filename=$(basename ${{ github.event.inputs.appimage-url }})
-    #       chmod +x $filename
-    #       filepath=$(pwd)/$filename
-    #       echo "EXECUTABLE_PATH=$filepath" >> $GITHUB_ENV
+      # - name: Get Opentrons AppImage and set env.EXECUTABLE_PATH
+      #   run: |
+      #     wget ${{ github.event.inputs.appimage-url }}
+      #     filename=$(basename ${{ github.event.inputs.appimage-url }})
+      #     chmod +x $filename
+      #     filepath=$(pwd)/$filename
+      #     echo "EXECUTABLE_PATH=$filepath" >> $GITHUB_ENV
 
     #   - name: Install Chromedriver on the path.
     #     run: |
