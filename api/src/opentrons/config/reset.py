@@ -85,7 +85,7 @@ _settings_reset_options = {
     ),
     ResetOptionId.on_device_display: CommonResetOption(
         name="On-Device Display Configuration",
-        description="Clear the configuration of the touchscreen.",
+        description="Clear the configuration of the on-device display (touchscreen)",
     ),
 }
 
