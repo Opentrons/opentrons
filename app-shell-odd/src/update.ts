@@ -1,5 +1,8 @@
 import semver from 'semver'
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import {
+  UI_INITIALIZED,
+  UPDATE_BRIGHTNESS,
+} from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
 import {
@@ -7,6 +10,7 @@ import {
   getCachedReleaseManifest,
   getReleaseSet,
 } from './system-update/release-manifest'
+import systemd from './systemd'
 
 import type { Action, Dispatch } from './types'
 import type { ReleaseSetUrls } from './system-update/types'
@@ -78,6 +82,21 @@ export function registerUpdate(
       case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         return updateLatestVersion()
+    }
+  }
+}
+
+export function registerUpdateBrightness(): (action: Action) => unknown {
+  return function handleAction(action: Action) {
+    switch (action.type) {
+      case UPDATE_BRIGHTNESS:
+        console.log('update the brightness')
+        systemd
+          .updateBrightness(action.payload.message)
+          .catch(err =>
+            log.debug('Something wrong when updating the brightness', err)
+          )
+        break
     }
   }
 }
