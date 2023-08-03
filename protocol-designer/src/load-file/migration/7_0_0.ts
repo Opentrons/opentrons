@@ -25,9 +25,8 @@ import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 //  adapter + labware commands to all labware commands and definitions to their commands/definitions split up
 const PD_VERSION = '7.0.0'
 const SCHEMA_VERSION = 7
-interface LabwareLocationUpdate {
-  [id: string]: string
-}
+
+type LabwareLocationUpdate = { [id: string]: string }
 
 //  might need better way to filter this???
 const getIsAdapter = (id: string): boolean =>

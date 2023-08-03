@@ -108,19 +108,6 @@ export const getLabwareIsRecommended = (
       )
     : false
 
-const getSlotOnPermittedAdapterLocation = (slot?: DeckSlot | null): boolean => {
-  if (
-    slot?.includes(MAGNETIC_MODULE_TYPE) ||
-    slot?.includes(
-      THERMOCYCLER_MODULE_TYPE || slot?.includes(MAGNETIC_BLOCK_TYPE)
-    )
-  ) {
-    return false
-  } else {
-    return true
-  }
-}
-
 export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
