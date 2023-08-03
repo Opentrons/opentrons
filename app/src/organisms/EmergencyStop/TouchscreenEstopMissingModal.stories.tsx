@@ -9,7 +9,7 @@ import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/organisms/EstopMissingModal',
+  title: 'ODD/Organisms/EstopMissingModal',
   component: EstopMissingModal,
 } as Meta
 

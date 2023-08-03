@@ -55,14 +55,18 @@ class CalibratePipetteImplementation(
             self._hardware_api,
         )
         ot3_mount = OT3Mount.from_mount(params.mount)
-        assert ot3_mount is not OT3Mount.GRIPPER
+        assert (
+            ot3_mount is not OT3Mount.GRIPPER
+        ), "Expected a Pipette mount but Gripper mount was provided."
 
-        pipette_offset = await calibration.calibrate_pipette(
+        pipette_offset = await calibration.find_pipette_offset(
             hcapi=ot3_api, mount=ot3_mount, slot=5
         )
 
-        return CalibratePipetteResult(
-            pipetteOffset=InstrumentOffsetVector(
+        await ot3_api.save_instrument_offset(mount=ot3_mount, delta=pipette_offset)
+
+        return CalibratePipetteResult.construct(
+            pipetteOffset=InstrumentOffsetVector.construct(
                 x=pipette_offset.x, y=pipette_offset.y, z=pipette_offset.z
             )
         )

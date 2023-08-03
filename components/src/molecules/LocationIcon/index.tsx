@@ -32,11 +32,12 @@ type LocationIconProps = SlotLocationProps | HardwareIconProps
 
 const LOCATION_ICON_STYLE = css<{
   slotName?: string
+  color?: string
   height?: string
   width?: string
 }>`
   align-items: ${ALIGN_CENTER};
-  border: 2px solid ${COLORS.darkBlack100};
+  border: 2px solid ${props => props.color ?? COLORS.darkBlack100};
   border-radius: ${BORDERS.borderRadiusSize3};
   height: ${props => props.height ?? SPACING.spacing32};
   padding: ${SPACING.spacing2} 0.375rem;
@@ -57,6 +58,7 @@ const SLOT_NAME_TEXT_STYLE = css`
 export function LocationIcon({
   slotName,
   iconName,
+  color,
   ...styleProps
 }: LocationIconProps): JSX.Element {
   return (
@@ -73,7 +75,7 @@ export function LocationIcon({
         <Icon
           name={iconName}
           size="1.25rem"
-          color={COLORS.darkBlack100}
+          color={color ?? COLORS.darkBlack100}
           aria-label={iconName}
         />
       ) : (

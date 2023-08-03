@@ -31,6 +31,20 @@
     "minTemperature": 9,
     "maxTemperature": 99
   },
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0.5
+      }
+    }
+  },
   "displayName": "Temperature Module GEN2",
   "quirks": [],
   "slotTransforms": {

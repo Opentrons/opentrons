@@ -137,6 +137,27 @@
         "maxBlockVolume": { "type": "number" }
       }
     },
+    "gripperOffsets": {
+      "type": "object",
+      "description": "Offsets to be added when calculating the coordinates a gripper should go to when picking up or dropping a labware on a module.",
+      "properties": {
+        "default": {
+          "type": "object",
+          "properties": {
+            "pickUpOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate pick-up coordinates of a labware placed on this module."
+            },
+            "dropOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate drop coordinates of a labware placed on this module."
+            }
+          },
+          "required": ["pickUpOffset", "dropOffset"]
+        }
+      },
+      "required": ["default"]
+    },
     "displayName": { "type": "string" },
     "quirks": {
       "type": "array",

@@ -40,8 +40,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
-    create_tip_action_home_group,
-    PipetteAction,
+    create_gear_motor_home_group,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
@@ -259,6 +258,7 @@ class OT3Controller:
         self._estop_detector: Optional[EstopDetector] = None
         self._estop_state_machine = EstopStateMachine(detector=None)
         self._position = self._get_home_position()
+        self._gear_motor_position: Dict[NodeId, float] = {}
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._check_updates = check_updates
@@ -329,6 +329,10 @@ class OT3Controller:
             eeprom_driver,
             usb_messenger=usb_messenger,
         )
+
+    @property
+    def gear_motor_position(self) -> Dict[NodeId, float]:
+        return self._gear_motor_position
 
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
@@ -593,42 +597,63 @@ class OT3Controller:
         ]
         async with self._monitor_overpressure(moving_pipettes):
             positions = await asyncio.gather(*coros)
+        # TODO(CM): default gear motor homing routine to have some acceleration
         if Axis.Q in checked_axes:
             await self.tip_action(
-                [Axis.Q],
-                self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-                self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
+                distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
+                velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     Axis.to_kind(Axis.Q)
                 ],
+                tip_action="home",
             )
         for position in positions:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
 
+    def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
+        new_group: MoveGroup = []
+        for step in move_group:
+            new_group.append(
+                {
+                    node: axis_step
+                    for node, axis_step in step.items()
+                    if node in self._motor_nodes()
+                }
+            )
+        return new_group
+
     async def tip_action(
         self,
-        axes: Sequence[Axis],
-        distance: float,
-        speed: float,
+        moves: Optional[List[Move[Axis]]] = None,
+        distance: Optional[float] = None,
+        velocity: Optional[float] = None,
         tip_action: str = "home",
+        back_off: Optional[bool] = False,
     ) -> None:
-        if tip_action == "home":
-            speed = speed * -1
-            runner = MoveGroupRunner(
-                move_groups=create_tip_action_home_group(axes, distance, speed)
+        # TODO: split this into two functions for homing and 'clamp'
+        move_group = []
+        # make sure either moves or distance and velocity is not None
+        assert bool(moves) ^ (bool(distance) and bool(velocity))
+        if moves is not None:
+            move_group = create_tip_action_group(
+                moves, [NodeId.pipette_left], tip_action
             )
-        else:
-            runner = MoveGroupRunner(
-                move_groups=[
-                    create_tip_action_group(
-                        axes, distance, speed, cast(PipetteAction, tip_action)
-                    )
-                ]
+        elif distance is not None and velocity is not None:
+            move_group = create_gear_motor_home_group(
+                float(distance), float(velocity), back_off
             )
+
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+        )
         positions = await runner.run(can_messenger=self._messenger)
-        for axis, point in positions.items():
-            self._position.update({axis: point[0]})
-            self._encoder_position.update({axis: point[1]})
+        if NodeId.pipette_left in positions:
+            self._gear_motor_position = {
+                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+            }
+        else:
+            log.debug("no position returned from NodeId.pipette_left")
 
     @requires_update
     async def gripper_grip_jaw(
