@@ -1,6 +1,5 @@
 name: Nightly Protocol Analysis Testing 
 on:
-  workflow_dispatch:
   push:
     branches:
       - nightly-protocol-analysis-testing  # Remove this line before merging to edge
