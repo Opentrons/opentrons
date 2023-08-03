@@ -13,6 +13,13 @@ jobs:
       - name: Check out repository code.
         uses: actions/checkout@v2
 
+      - name: Setup Code
+        working-directory: ./opentrons
+        run: |
+          make setup
+          make -C app-shell dist-linux
+          mv app-shell/dist/*.AppImage ./
+
     #   - name: Get Opentrons AppImage and set env.EXECUTABLE_PATH
     #     run: |
     #       wget ${{ github.event.inputs.appimage-url }}
