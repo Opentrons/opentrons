@@ -126,6 +126,7 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.gripper_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.ninety_six_assembly_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.stress_test_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.firmware_check --simulate
 	$(python) -m hardware_testing.production_qc.belt_calibration_ot3 --simulate
 
@@ -309,4 +310,3 @@ setup-usb-module: sdist Pipfile.lock
 
 	# Lets extract the usb package to the usb device if given
 	$(if $(usb_dir), tar -xvf $(usb_file) -C $(usb_dir))
-
