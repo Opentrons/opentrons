@@ -2,7 +2,7 @@ name: Nightly Protocol Analysis Testing
 on:
   push:
     branches:
-      - nightly-protocol-analysis-testing  # Remove this line before merging to edge
+      - nightly-protocol-analysis-testing
 
 jobs:
   build:
