@@ -123,6 +123,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
 
 
 async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> None:
+    # FIXME: add check for which hub is on which side
     if not api.is_simulator:
         ui.get_user_ready("insert USB drives into all x9 USB-A ports")
         print("pausing 2 seconds before reading USB data")

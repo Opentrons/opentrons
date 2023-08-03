@@ -75,10 +75,15 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
     if api.is_simulator:
         # test that the required functionality exists
         assert runner.run
-        # TODO: add estop/nsync functionality once implemented
     else:
         backend: OT3Controller = api._backend  # type: ignore[assignment]
         messenger = backend._messenger
+        if sig_name == "nsync":
+            engage = api._backend.engage_sync()
+            release = api._backend.release_sync()
+        elif sig_name == "estop":
+            engage = api._backend.engage_estop()
+            release = api._backend.release_estop()
 
         async def _sleep_then_active_stop_signal() -> None:
             if "external" in sig_name:
@@ -90,11 +95,11 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
             )
             await asyncio.sleep(pause_seconds)
             print(f"activating {sig_name}")
-            # TODO: add estop/nsync functionality once implemented
+            await engage
             print(f"pausing 1 second before deactivating {sig_name}")
             await asyncio.sleep(1)
             print(f"deactivating {sig_name}")
-            # TODO: add estop/nsync functionality once implemented
+            await release
 
         async def _do_the_moving() -> None:
             if sig_name == "nsync":
@@ -105,7 +110,6 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
                 except RuntimeError:
                     print("caught runtime error from estop")
 
-        # TODO: add estop/nsync functionality once implemented
         await asyncio.sleep(0.5)
         move_coro = _do_the_moving()
         stop_coro = _sleep_then_active_stop_signal()
@@ -139,10 +143,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             f"{sig_name}-target-pos",
             [float(target_pos.x), float(target_pos.y), float(target_pos.z)],
         )
-        if sig_name == "nsync" or sig_name == "estop":
-            print("FIXME: enable once implemented in firmware")
-            report(section, f"{sig_name}-result", [CSVResult.PASS])
-            continue
         # External E-Stop
         if not api.is_simulator and "external" in sig_name:
             ui.get_user_ready(f"connect {sig_name.upper()}")
