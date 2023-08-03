@@ -277,11 +277,10 @@ See also, :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
 
 .. _new-plunger-flow-rates:
 
-Plunger Flow Rates
+Pipette Flow Rates
 ==================
 
-Pipettes aspirate or dispense at different rates measured in units of µL/second. You can change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the
-:py:obj:`~.InstrumentContext.flow_rate` properties listed below:
+Pipettes aspirate or dispense at different rates measured in units of µL/second. You can change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`~.InstrumentContext.flow_rate` properties listed below:
 
 * ``InstrumentContext.flow_rate.aspirate``
 * ``InstrumentContext.flow_rate.dispense``
@@ -289,7 +288,8 @@ Pipettes aspirate or dispense at different rates measured in units of µL/second
 
 You can change each attribute without affecting the others.
 
-.. From original, uses OT-2. No Flex flow rate info.
+.. From original, uses OT-2. No Flex flow rate info. Working on that.
+
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
@@ -351,7 +351,7 @@ OT-2 Pipette Flow Rates
 -----------------------
 
 The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes.
-
+.. removed and saved GEN1 info
 +---------------------------------+---------------+---------------+---------------+
 | Pipette                         | Aspirate      | Dispense      | Blow-out      |
 +=================================+===============+===============+===============+ 
