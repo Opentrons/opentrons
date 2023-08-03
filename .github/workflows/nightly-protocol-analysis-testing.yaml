@@ -27,7 +27,7 @@ jobs:
 
       - name: Install Dependenvies
         run: |
-          sudo apt-get install libudev-dev libusb-1.0-0-dev
+          sudo apt-get install libudev-dev libusb-1.0-0-dev libsystemd-dev
 
       - name: Install pipenv
         run: pip install pipenv
