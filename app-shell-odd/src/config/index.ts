@@ -23,7 +23,7 @@ import type { Config, Overrides } from './types'
 
 export * from './types'
 
-const ODD_DIR = '/data/ODD'
+export const ODD_DIR = '/data/ODD'
 
 // Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
 const BRIGHTNESS_FILE =
@@ -149,4 +149,7 @@ export function handleConfigChange(
   changeHandler: (newValue: any, oldValue: any) => unknown
 ): void {
   store().onDidChange(path, changeHandler)
+}
+export function clearStore(): void {
+  store().clear()
 }

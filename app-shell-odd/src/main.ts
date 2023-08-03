@@ -1,5 +1,7 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
+import fse from 'fs-extra'
+import path from 'path'
 import { createUi } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
@@ -7,7 +9,14 @@ import { registerRobotLogs } from './robot-logs'
 import { registerUpdate, updateLatestVersion } from './update'
 import { registerRobotSystemUpdate } from './system-update'
 import { registerAppRestart } from './restart'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import {
+  getConfig,
+  getStore,
+  getOverrides,
+  registerConfig,
+  clearStore,
+  ODD_DIR,
+} from './config'
 import systemd from './systemd'
 
 import type { BrowserWindow } from 'electron'
@@ -41,6 +50,12 @@ app.once('window-all-closed', () => {
 
 function startUp(): void {
   log.info('Starting App')
+  const storeNeedsReset = fse.existsSync(
+    path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
+  )
+  if (storeNeedsReset) {
+    clearStore()
+  }
   systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
