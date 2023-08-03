@@ -1,4 +1,8 @@
 """Robot assembly QC OT3."""
+from os import environ
+if "OT_SYSTEM_VERSION" not in environ:
+    environ["OT_SYSTEM_VERSION"] = "0.0.0"
+
 import argparse
 import asyncio
 from pathlib import Path
@@ -34,6 +38,9 @@ async def _main(cfg: TestConfig) -> None:
 
     # GET ROBOT SERIAL NUMBER
     robot_id = helpers_ot3.get_robot_serial_ot3(api)
+    print(f"robot SN: {robot_id}")
+    if not robot_id:
+        ui.print_error("no robot serial number found")
     report.set_tag(robot_id)
     report.set_robot_id(robot_id)
     if not api.is_simulator:

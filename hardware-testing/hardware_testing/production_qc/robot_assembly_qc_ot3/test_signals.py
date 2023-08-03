@@ -4,6 +4,8 @@ from math import copysign
 from numpy import float64
 from typing import List, Union
 
+from opentrons_shared_data.errors.exceptions import MotionFailedError
+
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_step,
@@ -79,13 +81,13 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
         backend: OT3Controller = api._backend  # type: ignore[assignment]
         messenger = backend._messenger
         if sig_name == "nsync":
-            engage = api._backend.engage_sync()
-            release = api._backend.release_sync()
+            engage = api._backend.release_sync  # FIXME: i think fw is backwards
+            release = api._backend.engage_sync  # FIXME: i think fw is backwards
         elif sig_name == "estop":
-            engage = api._backend.engage_estop()
-            release = api._backend.release_estop()
+            engage = api._backend.engage_estop
+            release = api._backend.release_estop
 
-        async def _sleep_then_active_stop_signal() -> None:
+        async def _sleep_then_activate_stop_signal() -> None:
             if "external" in sig_name:
                 print("waiting for EXTERNAL E-Stop button")
                 return
@@ -94,26 +96,26 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
                 f"pausing {round(pause_seconds, 1)} second before activating {sig_name}"
             )
             await asyncio.sleep(pause_seconds)
-            print(f"activating {sig_name}")
-            await engage
-            print(f"pausing 1 second before deactivating {sig_name}")
-            await asyncio.sleep(1)
-            print(f"deactivating {sig_name}")
-            await release
+            try:
+                print(f"activating {sig_name}")
+                await engage()
+                print(f"pausing 1 second before deactivating {sig_name}")
+                await asyncio.sleep(1)
+            finally:
+                print(f"deactivating {sig_name}")
+                await release()
+                await asyncio.sleep(0.5)
 
         async def _do_the_moving() -> None:
-            if sig_name == "nsync":
+            print(f"moving {MOVING_DISTANCE} at speed {MOVING_SPEED}")
+            try:
                 await runner.run(can_messenger=messenger)
-            else:
-                try:
-                    await runner.run(can_messenger=messenger)
-                except RuntimeError:
-                    print("caught runtime error from estop")
+            except MotionFailedError:
+                print("caught MotionFailedError from estop")
 
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.25)  # what is this doing?
         move_coro = _do_the_moving()
-        stop_coro = _sleep_then_active_stop_signal()
-        print(f"moving {MOVING_DISTANCE} at speed {MOVING_SPEED}")
+        stop_coro = _sleep_then_activate_stop_signal()
         await asyncio.gather(stop_coro, move_coro)
     await api.refresh_positions()
 

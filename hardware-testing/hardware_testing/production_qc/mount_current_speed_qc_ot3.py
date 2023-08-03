@@ -7,11 +7,13 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_RUN_CURRENT,
     DEFAULT_MAX_SPEEDS,
     DEFAULT_ACCELERATIONS,
+    DEFAULT_MAX_SPEED_DISCONTINUITY,
 )
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
 from hardware_testing.data import get_git_description
 from hardware_testing.data.csv_report import (
+    RESULTS_OVERVIEW_TITLE,
     CSVReport,
     CSVResult,
     CSVSection,
@@ -25,21 +27,24 @@ TEST_TAG = "CURRENTS-SPEEDS"
 
 MAX_TRAVEL_MM = 215
 
-DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.Z]
-DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.Z]
-DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.Z]
+axis_kind = types.OT3AxisKind.Z
+DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[axis_kind]
+DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[axis_kind]
+DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[axis_kind]
+DEFAULT_DISCONTINUITY = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[axis_kind]
 
 MUST_PASS_CURRENT = DEFAULT_CURRENT * 0.6  # the target spec (must pass here)
 STALL_THRESHOLD_MM = 0.1
 TEST_SPEEDS = [DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.Z]]
 TEST_CURRENTS_SPEED = {
+    0.1: TEST_SPEEDS,
     round(MUST_PASS_CURRENT - 0.3, 1): TEST_SPEEDS,
     round(MUST_PASS_CURRENT - 0.2, 1): TEST_SPEEDS,
     round(MUST_PASS_CURRENT - 0.1, 1): TEST_SPEEDS,
     round(MUST_PASS_CURRENT, 1): TEST_SPEEDS,
     DEFAULT_CURRENT: TEST_SPEEDS,
 }
-TEST_DISCONTINUITY = 20  # used during gravimetric tests
+TEST_DISCONTINUITY = 15  # used during gravimetric tests
 
 MAX_CURRENT = max(max(list(TEST_CURRENTS_SPEED.keys())), 1.0)
 MAX_SPEED = max(TEST_SPEEDS)
@@ -83,14 +88,14 @@ def _build_csv_report() -> CSVReport:
 
 async def _home_mount(api: OT3API, mount: types.OT3Mount) -> None:
     # restore default current/speed before homing
-    pipette_ax = types.Axis.of_main_tool_actuator(mount)
+    z_ax = types.Axis.by_mount(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-        api, pipette_ax, run_current=DEFAULT_CURRENT
+        api, z_ax, run_current=DEFAULT_CURRENT
     )
     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-        api, pipette_ax, default_max_speed=DEFAULT_SPEED
+        api, z_ax, default_max_speed=DEFAULT_SPEED, max_speed_discontinuity=DEFAULT_DISCONTINUITY,
     )
-    await api.home([pipette_ax])
+    await api.home([z_ax])
 
 
 async def _move_mount(
@@ -100,18 +105,19 @@ async def _move_mount(
     speed: float,
     current: float,
 ) -> None:
-    pipette_ax = types.Axis.of_main_tool_actuator(mount)
-    await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-        api, pipette_ax, run_current=current
-    )
-    await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-        api,
-        pipette_ax,
-        default_max_speed=speed,
-        max_speed_discontinuity=TEST_DISCONTINUITY,
-    )
-    # move
-    await api.move_rel(mount, types.Point(x=0, y=0, z=distance), speed=speed)
+    z_ax = types.Axis.by_mount(mount)
+    async with api.restore_system_constrants():
+        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            api, z_ax, run_current=current
+        )
+        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+            api,
+            z_ax,
+            default_max_speed=speed,
+            max_speed_discontinuity=TEST_DISCONTINUITY,
+        )
+        # move
+        await api.move_rel(mount, types.Point(x=0, y=0, z=distance), speed=speed)
 
 
 async def _record_mount_alignment(
@@ -199,9 +205,9 @@ async def _reset_gantry(api: OT3API) -> None:
     await _home_mount(api, types.OT3Mount.LEFT)
     await _home_mount(api, types.OT3Mount.RIGHT)
     # TODO: move XY motors at all?
-    home_pos = await api.gantry_position(
-        types.OT3Mount.RIGHT, types.CriticalPoint.MOUNT
-    )
+    # home_pos = await api.gantry_position(
+    #     types.OT3Mount.RIGHT, types.CriticalPoint.MOUNT
+    # )
     # test_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     # test_pos = test_pos._replace(z=home_pos.z)
     # await api.move_to(
@@ -217,32 +223,40 @@ async def _main(is_simulating: bool) -> None:
         operator = input("enter OPERATOR name: ")
     else:
         operator = "simulation"
-    # home and move to a safe position
-    await _reset_gantry(api)
 
-    # test each attached pipette
-    while True:
-        if not api.is_simulator and not ui.get_user_answer("QC this pipette"):
-            continue
-        report = _build_csv_report()
-        report.set_version(get_git_description())
-        report.set_operator(operator)
-        robot_sn = helpers_ot3.get_robot_serial_ot3(api)
-        report.set_robot_id(robot_sn)
-        report.set_tag(robot_sn)
-        report.set_device_id(robot_sn, CSVResult.PASS)
-        for mount in [types.OT3Mount.LEFT, types.OT3Mount.RIGHT]:
-            failing_current = await _test_mount(api, mount, report)
-            report(
-                "OVERALL",
-                f"failing-current-{mount.name.lower()}",
-                [
-                    failing_current,
-                    CSVResult.from_bool(failing_current < MUST_PASS_CURRENT),
-                ],
-            )
-        if api.is_simulator:
-            break
+    report = _build_csv_report()
+    report.set_version(get_git_description())
+    report.set_operator(operator)
+    robot_sn = helpers_ot3.get_robot_serial_ot3(api)
+    report.set_robot_id(robot_sn)
+    report.set_tag(robot_sn)
+    report.set_device_id(robot_sn, CSVResult.PASS)
+
+    for mount in [types.OT3Mount.LEFT, types.OT3Mount.RIGHT]:
+        ui.print_header(mount.name)
+        # home and move to a safe position
+        await _reset_gantry(api)
+        # make sure no instruments are attached
+        has_pips = bool([pip for pip in api.hardware_pipettes.values() if pip])
+        if api.has_gripper() or has_pips:
+            raise RuntimeError("remove all pipettes and grippers from robot")
+        failing_current = await _test_mount(api, mount, report)
+        report(
+            "OVERALL",
+            f"failing-current-{mount.name.lower()}",
+            [
+                failing_current,
+                CSVResult.from_bool(failing_current < MUST_PASS_CURRENT),
+            ],
+        )
+
+    # SAVE REPORT
+    report_path = report.save_to_disk()
+    complete_msg = "complete" if report.completed else "incomplete"
+    print(f"done, {complete_msg} report -> {report_path}")
+    print("Overall Results:")
+    for line in report[RESULTS_OVERVIEW_TITLE].lines:
+        print(f" - {line.tag}: {line.result}")
 
 
 if __name__ == "__main__":

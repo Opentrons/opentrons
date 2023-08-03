@@ -156,13 +156,17 @@ async def update_firmware(
             progress_tracker[update.subsystem][1] = update.progress
             _print_update_progress()
     if is_updating and not api.is_simulator:
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
 
 
 async def reset_api(api: OT3API) -> None:
     """Reset OT3API."""
+    print(f"Firmware: v{api.fw_version}")
     if not api.is_simulator:
-        await asyncio.sleep(RESET_DELAY_SECONDS)
+        await api._backend.engage_sync()  # FIXME: i think fw is backwards
+        await api._backend.release_estop()
+        await update_firmware(api)
+        await api._backend.probe_network()
     await api.cache_instruments()
     await api.refresh_positions()
 
@@ -209,9 +213,6 @@ async def build_async_ot3_hardware_api(
         print(e)
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
-    if not is_simulating:
-        await update_firmware(api)
-    print(f"Firmware: v{api.fw_version}")
     await reset_api(api)
     return api
 
@@ -995,7 +996,7 @@ def get_robot_serial_ot3(api: OT3API) -> str:
         return "FLXA1000000000000"
     robot_id = api._backend.eeprom_data.serial_number
     if not robot_id:
-        robot_id = "None"
+        robot_id = ""
     return robot_id
 
 

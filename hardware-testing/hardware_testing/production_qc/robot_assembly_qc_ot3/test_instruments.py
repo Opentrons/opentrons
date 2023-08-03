@@ -258,8 +258,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # GRIPPER
     ui.print_header("GRIPPER")
-    if not api.is_simulator:
-        ui.get_user_ready("attach a gripper")
     if await wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=True):
         await _test_gripper(api, report, section)
         await wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=False)

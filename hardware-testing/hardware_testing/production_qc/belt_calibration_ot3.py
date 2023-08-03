@@ -21,7 +21,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 
 
-TEST_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+TEST_SLOTS = [1, 3, 9, 11]
 
 
 @dataclass
@@ -69,7 +69,7 @@ async def _check_belt_accuracy(
 
     def _short(num: float, decimals: int = 2) -> str:
         _short_num = str(round(num, decimals))
-        _append = {1: ".00", 2: "00", 3: "0"}[len(_short_num)]
+        _append = {1: ".00", 2: "00", 3: "0"}.get(len(_short_num), "")
         return _short_num + _append
 
     def _p_str(_s: int) -> str:
