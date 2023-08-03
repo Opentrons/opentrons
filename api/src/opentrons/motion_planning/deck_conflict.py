@@ -68,11 +68,6 @@ class HeaterShakerModule(_Module):
 
 
 @dataclass
-class TemperatureModule(_Module):
-    """A Temperature module."""
-
-
-@dataclass
 class ThermocyclerModule(_Module):
     """A Thermocycler module."""
 
@@ -85,14 +80,13 @@ class ThermocyclerModule(_Module):
 
 @dataclass
 class OtherModule(_Module):
-    """A module that's not a Heater-Shaker or Thermocycler or Temperature."""
+    """A module that's not a Heater-Shaker or Thermocycler."""
 
 
 DeckItem = Union[
     Labware,
     HeaterShakerModule,
     ThermocyclerModule,
-    TemperatureModule,
     OtherModule,
 ]
 

@@ -226,14 +226,6 @@ def test_maps_different_module_models(
                 highest_z_including_labware=3.14159,
                 is_semi_configuration=False,
             )
-        elif (
-            module_model is ModuleModel.TEMPERATURE_MODULE_V1
-            or module_model is ModuleModel.TEMPERATURE_MODULE_V2
-        ):
-            return wrapped_deck_conflict.TemperatureModule(
-                name_for_errors=expected_name_for_errors,
-                highest_z_including_labware=3.14159,
-            )
         else:
             return wrapped_deck_conflict.OtherModule(
                 name_for_errors=expected_name_for_errors,
