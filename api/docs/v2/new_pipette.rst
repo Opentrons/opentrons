@@ -341,17 +341,14 @@ See :ref:`gantry_speed` and :ref:`axis_speed_limits` for information about other
 Flex Pipette Flow Rates
 -----------------------
 
-The following section provides data on the default aspirate, dispense, and blow-out flow rates for Flex pipettes.
+The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for Flex pipettes.
 
 INFORMATION TBD 
-
-.. we're checking
 
 OT-2 Pipette Flow Rates
 -----------------------
 
 The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes.
-.. removed and saved GEN1 info
 
 +---------------------------------+---------------+---------------+---------------+
 | Pipette                         | Aspirate      | Dispense      | Blow-out      |
