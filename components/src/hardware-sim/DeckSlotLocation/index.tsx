@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { DeckDefinition, DeckSlot, ModuleType } from '@opentrons/shared-data'
 
+// TODO(BC, 8/2/2023): as soon as the deck definitions have a concept of base locations, use their 
+// identity to key this mapping instead of slotNames 
 interface DeckSlotLocationProps extends React.SVGProps<SVGGElement> {
   slotName: DeckSlot['id']
   deckDefinition: DeckDefinition
@@ -10,9 +12,9 @@ interface DeckSlotLocationProps extends React.SVGProps<SVGGElement> {
 }
 
 export function DeckSlotLocation(
-  props: DeckSlotLocationProps
+  props: DeckSlotLocationProps,
 ): JSX.Element | null {
-  const { slotName, deckDefinition, slotBaseColor, slotClipColor } = props
+  const { slotName, deckDefinition, slotBaseColor, slotClipColor, ...restProps } = props
 
   const slotDef = deckDefinition?.locations.orderedSlots.find(
     s => s.id === slotName
@@ -175,7 +177,7 @@ export function DeckSlotLocation(
     ),
   }
 
-  return <g>{contentsBySlotName[slotName]}</g>
+  return <g {...restProps}>{contentsBySlotName[slotName]}</g>
 }
 
 function SlotBase(props: React.SVGProps<SVGPathElement>): JSX.Element {
