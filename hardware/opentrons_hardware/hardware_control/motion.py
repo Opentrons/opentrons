@@ -51,6 +51,9 @@ class MoveGroupSingleAxisStep:
     stop_condition: MoveStopCondition = MoveStopCondition.none
     move_type: MoveType = MoveType.linear
 
+    def is_moving_step(self) -> bool:
+        return self.velocity_mm_sec != np.float64(0) or self.acceleration_mm_sec_sq != np.float64(0)
+
 
 @dataclass(frozen=True)
 class MoveGroupTipActionStep:
@@ -61,6 +64,9 @@ class MoveGroupTipActionStep:
     action: PipetteTipActionType
     stop_condition: MoveStopCondition
     acceleration_mm_sec_sq: np.float64
+
+    def is_moving_step(self) -> bool:
+        return self.velocity_mm_sec != np.float64(0) or self.acceleration_mm_sec_sq != np.float64(0)
 
 
 @dataclass(frozen=True)
@@ -74,6 +80,9 @@ class MoveGroupSingleGripperStep:
     stay_engaged: bool = False
     stop_condition: MoveStopCondition = MoveStopCondition.gripper_force
     move_type: MoveType = MoveType.grip
+
+    def is_moving_step(self) -> bool:
+        return self.pwm_duty_cycle != np.float32(0) or self.encoder_position_um != np.int32(0)
 
 
 SingleMoveStep = Union[
