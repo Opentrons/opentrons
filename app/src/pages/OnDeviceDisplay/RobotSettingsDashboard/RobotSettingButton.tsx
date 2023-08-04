@@ -166,14 +166,11 @@ export function RobotSettingButton({
 
       {enabledDevTools == null &&
       enabledHistoricOffsets == null &&
-      ledLights == null ? (
+      ledLights == null &&
+      !isUpdateAvailable ? (
         <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
       ) : isUpdateAvailable ?? false ? (
-        <Flex
-          gridGap={SPACING.spacing24}
-          alignItems={ALIGN_CENTER}
-          marginLeft={isUpdateAvailable ? '-18rem' : undefined}
-        >
+        <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
           <InlineNotification
             type="alert"
             heading={i18n.format(t('update_available'), 'capitalize')}
