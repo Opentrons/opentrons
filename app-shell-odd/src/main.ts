@@ -57,6 +57,7 @@ function startUp(): void {
   if (storeNeedsReset) {
     log.debug('store marked to be reset, resetting store')
     resetStore()
+    fse.removeSync(path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`))
   }
   systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
