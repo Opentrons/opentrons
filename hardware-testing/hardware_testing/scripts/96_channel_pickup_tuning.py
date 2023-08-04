@@ -262,8 +262,10 @@ async def calibrate_tiprack(api, home_position, mount):
     drop_tip_loc = Point(drop_tip_loc[Axis.X],
                         drop_tip_loc[Axis.Y],
                         drop_tip_loc[Axis.by_mount(mount)])
-    # await update_pick_up_current(hw_api, mount, 1.5)
-    # await update_pick_up_speed(hw_api, mount, pick_up_speed)
+    # await update_pick_up_current(api, mount, 1.5)
+    # await update_pick_up_speed(api, mount, pick_up_speed)
+    # drop_tip_speed = float(input("Drop tip speed: "))
+    # await update_drop_tip_speed(api, mount, drop_tip_speed)
     # input("Press Enter to drop tip")
     # await api.drop_tip(mount)
     # input(" Press enter ")
@@ -330,13 +332,13 @@ async def _main() -> None:
     home_w_tip = await hw_api.current_position_ot3(mount, cp)
     # Calibrate Dial Indicator with single tip
     if args.dial_indicator:
-        cp = CriticalPoint.TIP
-        dial_loc = Point(
+        # cp = CriticalPoint.TIP
+        initial_dial_loc = Point(
                         slot_loc[args.dial_slot][0],
                         slot_loc[args.dial_slot][1],
                         home_w_tip[Axis.by_mount(mount)])
         print("Move to Dial Indicator")
-        await move_to_point(hw_api, mount, dial_loc, cp)
+        await move_to_point(hw_api, mount, initial_dial_loc, cp)
         current_position = await hw_api.current_position_ot3(mount, cp)
         dial_loc = await jog(hw_api, current_position, cp)
         dial_loc = Point(dial_loc[Axis.X],
@@ -402,7 +404,7 @@ async def _main() -> None:
                 await hw_api.home_z(Mount.LEFT)
                 #await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
             hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
-            await update_drop_tip_speed(hw_api, mount, pick_up_speed)
+            await update_drop_tip_speed(hw_api, mount, hw_api.clamp_drop_tip_speed )
             cp = CriticalPoint.TIP
             await move_to_point(hw_api, mount, droptip_loc, cp)
             await hw_api.drop_tip(mount)
@@ -416,11 +418,14 @@ async def _main() -> None:
             await update_pick_up_current(hw_api, mount, m_current)
             await update_pick_up_speed(hw_api, mount, pick_up_speed)
             await update_pick_up_distance(hw_api, mount, pick_up_distance)
-            print("Clamp pick-up speed: ", api.clamp_tip_speed)
+            print("Clamp pick-up speed: ", hw_api.clamp_tip_speed)
             cp = CriticalPoint.NOZZLE
             await move_to_point(hw_api, mount, pickup_loc, cp)
             await hw_api.pick_up_tip(mount, tip_length=tip_length[args.tip_size])
             await hw_api.home_z(mount.LEFT)
+            cp = CriticalPoint.TIP
+            current_position = await hw_api.current_position_ot3(mount, cp)
+            this_position = await jog(hw_api, current_position, cp)
             input("Press Enter to continue")
 
     except KeyboardInterrupt:

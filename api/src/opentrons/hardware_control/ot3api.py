@@ -226,7 +226,7 @@ class OT3API(
         self._status_bar_controller = StatusBarStateController(
             self._backend.status_bar_interface()
         )
-        self.clamp_speed = 5.5
+        self.clamp_tip_speed = 5.5
         self.clamp_drop_tip_speed = 5.5
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -1701,7 +1701,7 @@ class OT3API(
             gear_origin_dict = {Axis.Q: pipette_spec.pick_up_distance -9}
             gear_target_dict = {Axis.Q: pipette_spec.pick_up_distance}
             clamp_moves = self._build_moves(
-                gear_origin_dict, gear_target_dict, speed = self.clamp_speed
+                gear_origin_dict, gear_target_dict, speed = self.clamp_tip_speed
             )
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 
