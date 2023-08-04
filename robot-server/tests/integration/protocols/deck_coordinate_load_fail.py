@@ -14,10 +14,5 @@ def run(context):
     thermocycler = context.load_module("thermocyclerModuleV2")
     assert thermocycler.parent == "B1"
 
+    # This should fail because the Thermocycler is in the way.
     module = context.load_module("temperatureModuleV2", "A1")
-    assert module.parent == "A1"
-
-    pipette.move_to(labware.wells()[0].top())
-    module_labware = module.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt")
-
-    pipette.move_to(module_labware.wells()[0].top())
