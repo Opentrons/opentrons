@@ -52,7 +52,7 @@ export function InstallModalContents(
     title = `Robot ${
       robotSystemType === 'balena' ? 'system ' : ''
     } update in progress…`
-    restartMessage = 'Your OT-2 will restart once the update is complete.'
+    restartMessage = 'Your robot will restart once the update is complete.'
   }
 
   if (
