@@ -163,24 +163,24 @@ export function RobotSettingButton({
           </StyledText>
         </Flex>
       ) : null}
-      <Flex
-        gridGap={SPACING.spacing24}
-        alignItems={ALIGN_CENTER}
-        marginLeft={isUpdateAvailable ? '-18rem' : undefined}
-      >
-        {isUpdateAvailable ?? false ? (
+
+      {enabledDevTools == null &&
+      enabledHistoricOffsets == null &&
+      ledLights == null ? (
+        <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
+      ) : isUpdateAvailable ?? false ? (
+        <Flex
+          gridGap={SPACING.spacing24}
+          alignItems={ALIGN_CENTER}
+          marginLeft={isUpdateAvailable ? '-18rem' : undefined}
+        >
           <InlineNotification
             type="alert"
             heading={i18n.format(t('update_available'), 'capitalize')}
             hug={true}
           />
-        ) : null}
-        {enabledDevTools == null &&
-        enabledHistoricOffsets == null &&
-        ledLights == null ? (
-          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
-        ) : null}
-      </Flex>
+        </Flex>
+      ) : null}
     </Btn>
   )
 }
