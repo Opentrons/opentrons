@@ -37,7 +37,10 @@ async def _main(cfg: TestConfig) -> None:
     report.set_tag(robot_id)
     report.set_robot_id(robot_id)
     if not api.is_simulator:
-        barcode = input("scan robot barcode: ").strip()
+        barcode = api._backend.eeprom_data.serial_number
+        if not barcode:
+            ui.print_error("no serial number saved on this robot")
+            barcode = input("enter ROBOT SERIAL number: ").strip()
         report.set_device_id(robot_id, CSVResult.from_bool(barcode == robot_id))
     else:
         report.set_device_id(robot_id, CSVResult.PASS)

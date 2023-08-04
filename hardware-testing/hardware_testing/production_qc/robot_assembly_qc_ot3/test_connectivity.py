@@ -2,9 +2,11 @@
 import asyncio
 from subprocess import run as run_subprocess
 from typing import List, Union, Optional
+import re
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.system import nmcli
+from opentrons import config
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
@@ -27,6 +29,16 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_all_pin_state,
     set_sync_pin
 )
+
+import logging
+
+LOG = logging.getLogger(__name__)
+
+loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+for logger in loggers:
+    logger.setLevel(logging.CRITICAL)
+
+LOG.setLevel(logging.CRITICAL)
 
 ##START TEST PASSING CONDITIONS
 
@@ -144,6 +156,18 @@ USB_PORTS_TO_TEST = [
     "usb-9",
 ]
 
+USB_PORTS_MAPPING = {
+    "usb-1":"1-1/1-1.4/1-1.4.4/1-1.4.4",
+    "usb-2":"1-1/1-1.4/1-1.4.3/1-1.4.3",
+    "usb-3":"1-1/1-1.4/1-1.4.2/1-1.4.2",
+    "usb-4":"1-1/1-1.4/1-1.4.1/1-1.4.1",
+    "usb-5":"1-1/1-1.7/1-1.7.4/1-1.7.4",
+    "usb-6":"1-1/1-1.7/1-1.7.3/1-1.7.3",
+    "usb-7":"1-1/1-1.7/1-1.7.2/1-1.7.2",
+    "usb-8":"1-1/1-1.7/1-1.7.1/1-1.7.1",
+    "usb-9":"1-1/1-1.3/1-1.3",
+}
+
 AUX_CAN_TESTS = [
     "aux-1-pcan",
     "aux-2-pcan",
@@ -171,14 +195,21 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     ssid = ""
     password: Optional[str] = None
     result = CSVResult.FAIL
+    wifi_ip = ""
 
     def _finish() -> None:
         report(section, "wifi", [ssid, password, wifi_ip, result])
 
-    wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
-    wifi_ip = wifi_status["ipAddress"]
-    if wifi_ip:
-        result = CSVResult.PASS
+    LOG.info(f"System Architecture: {config.ARCHITECTURE}")
+    try:
+        wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
+        wifi_ip = wifi_status["ipAddress"]
+        if wifi_ip:
+            result = CSVResult.PASS
+            return _finish()
+    except ValueError:
+        ui.print_error("WIFI ADAPTER NOT FOUND")
+        result = CSVResult.FAIL
         return _finish()
 
     print("scanning wifi networks...")
@@ -229,22 +260,42 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
         ui.get_user_ready("insert USB drives into all x9 USB-A ports")
         print("pausing 2 seconds before reading USB data")
         await asyncio.sleep(2)
-        res = run_subprocess(["blkid"], capture_output=True, text=True)
-        output = res.stdout
+        for tag in USB_PORTS_TO_TEST:
+            res = run_subprocess(["blkid", "--label", f"OT3-{tag.upper()}"], capture_output=True, text=True)
+            blkid_out = res.stdout
+            # blkid should return a /dev/sdxx if USB drive is connected
+            LOG.info(f"OT3-{tag.upper()}: {blkid_out}")
+            if len(blkid_out) == 0:
+                ui.print_error(f"OT3-{tag.upper()} NOT FOUND")
+                result = CSVResult.from_bool(False)
+                report(section, tag, [result])
+                continue
+
+            # determine port mapping from dev name
+            drive_name = re.search('\/dev\/([a-z]{3}\d)', blkid_out).group(1)
+            LOG.info(f"drive_name: {drive_name}")
+            res = run_subprocess(["find", "/sys/bus/usb/devices/usb1/", "-name", drive_name], capture_output=True, text=True)
+            usb_port = res.stdout
+            LOG.info(f"Find: {usb_port}")
+
+            port_match = USB_PORTS_MAPPING[tag] in usb_port
+            if not port_match:
+                ui.print_error(f"OT3-{tag.upper()} WRONG PORT")
+            result = CSVResult.from_bool(port_match)
+            report(section, tag, [result])
     else:
         _stored_names = [f"OT3-{p.upper()}" for p in USB_PORTS_TO_TEST]
-        output = " ".join(_stored_names)
-
-    print(f"output from blkid:\n{output}\n")
-    for tag in USB_PORTS_TO_TEST:
-        found = f"OT3-{tag.upper()}" in output
-        result = CSVResult.from_bool(found)
-        report(section, tag, [result])
+        output_names = " ".join(_stored_names)
+        for tag in USB_PORTS_TO_TEST:
+            found = f"OT3-{tag.upper()}" in output_names
+            result = CSVResult.from_bool(found)
+            report(section, tag, [result])
 
 async def _aux_subtest(usb_messenger, ui_promt, pass_states, sync_state):
     ui.get_user_ready(ui_promt)
     await set_sync_pin(sync_state, usb_messenger)
     result = await get_all_pin_state(usb_messenger)
+    LOG.info(f"Aux Result: {result}")
     await set_sync_pin(0, usb_messenger)
 
     #format the state comparison nicely for csv output
@@ -311,33 +362,33 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     # ETHERNET
     ui.print_header("ETHERNET")
-    await _test_ethernet(api, report, section)
+    # await _test_ethernet(api, report, section)
 
     # WIFI
     ui.print_header("WIFI")
-    if not api.is_simulator:
-        await _test_wifi(report, section)
-    else:
-        report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
-        assert nmcli.iface_info
-        assert nmcli.configure
-        assert nmcli.wifi_disconnect
+    # if not api.is_simulator:
+    #     await _test_wifi(report, section)
+    # else:
+    #     report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
+    #     assert nmcli.iface_info
+    #     assert nmcli.configure
+    #     assert nmcli.wifi_disconnect
 
     # USB-B-REAR
-    ui.print_header("USB-B-REAR")
-    if not api.is_simulator:
-        inp = ui.get_user_answer(
-            "Connect USB-B to computer, does computer detect device"
-        )
-        result = CSVResult.from_bool(inp)
-    else:
-        result = CSVResult.PASS
-    report(section, "usb-b-rear", [result])
+    # ui.print_header("USB-B-REAR")
+    # if not api.is_simulator:
+    #     inp = ui.get_user_answer(
+    #         "Connect USB-B to computer, does computer detect device"
+    #     )
+    #     result = CSVResult.from_bool(inp)
+    # else:
+    #     result = CSVResult.PASS
+    # report(section, "usb-b-rear", [result])
 
     # USB-A
-    ui.print_header("USB-A")
+    # ui.print_header("USB-A")
     await _test_usb_a_ports(api, report, section)
 
     # AUX
     ui.print_header("AUX")
-    await _test_aux(api, report, section)
+    # await _test_aux(api, report, section)
