@@ -1146,7 +1146,7 @@ def test_load_module_thermocycler_with_no_location(
     mock_hw_mod = decoy.mock(cls=AbstractModule)
     decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
-
+    decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
     decoy.when(subject.get_slot_definition(expected_slot)).then_return(
         _get_slot_def(deck_def=deck_def, slot_name=expected_slot)  # type: ignore[arg-type]
     )

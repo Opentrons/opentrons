@@ -122,6 +122,7 @@ def test_fixed_trash_conflict_checking(decoy: Decoy) -> None:
             existing_items={},
             new_location=DeckSlotName.FIXED_TRASH,
             new_item=EXPECTED_FIXED_TRASH,
+            robot_type="OT-2 Standard",
         )
     )
 
@@ -146,6 +147,7 @@ def test_fixed_trash_conflict_checking(decoy: Decoy) -> None:
                 is_fixed_trash=True,
                 name_for_errors="trash_load_name",
             ),
+            robot_type="OT-2 Standard",
         )
     )
 
@@ -181,6 +183,7 @@ def test_labware_conflict_checking(
                 is_fixed_trash=False,
                 name_for_errors="legacy_labware_core_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -209,6 +212,7 @@ def test_labware_conflict_checking(
                 is_fixed_trash=False,
                 name_for_errors="labware_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -241,6 +245,7 @@ def test_thermocycler_module_conflict_checking(
                 name_for_errors="thermocycler_load_name",
                 is_semi_configuration=is_semi_configuration,
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -267,6 +272,7 @@ def test_heater_shaker_module_conflict_checking(
                 highest_z_including_labware=42,
                 name_for_errors="heater_shaker_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -293,6 +299,7 @@ def test_other_module_conflict_checking(
                 highest_z_including_labware=42,
                 name_for_errors="module_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )

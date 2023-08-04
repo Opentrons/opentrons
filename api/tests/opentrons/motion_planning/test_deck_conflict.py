@@ -71,7 +71,10 @@ def test_only_trash_in_12() -> None:
     )
 
     deck_conflict.check(
-        existing_items={}, new_item=trash_labware, new_location=DeckSlotName.FIXED_TRASH
+        existing_items={},
+        new_item=trash_labware,
+        new_location=DeckSlotName.FIXED_TRASH,
+        robot_type="OT-2 Standard",
     )
 
     with pytest.raises(
@@ -81,6 +84,7 @@ def test_only_trash_in_12() -> None:
             existing_items={},
             new_item=not_trash_labware,
             new_location=DeckSlotName.FIXED_TRASH,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -90,6 +94,7 @@ def test_only_trash_in_12() -> None:
             existing_items={},
             new_item=not_trash_module,
             new_location=DeckSlotName.FIXED_TRASH,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -121,6 +126,7 @@ def test_trash_override() -> None:
         existing_items={DeckSlotName.FIXED_TRASH: trash_labware_1},
         new_item=trash_labware_2,
         new_location=DeckSlotName.FIXED_TRASH,
+        robot_type="OT-2 Standard",
     )
 
     with pytest.raises(
@@ -130,6 +136,7 @@ def test_trash_override() -> None:
             existing_items={DeckSlotName.FIXED_TRASH: trash_labware_1},
             new_item=not_trash_labware,
             new_location=DeckSlotName.FIXED_TRASH,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -139,6 +146,7 @@ def test_trash_override() -> None:
             existing_items={DeckSlotName.FIXED_TRASH: trash_labware_1},
             new_item=not_trash_module,
             new_location=DeckSlotName.FIXED_TRASH,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -194,6 +202,7 @@ def test_labware_when_thermocycler(
             existing_items={DeckSlotName.SLOT_7: thermocycler},
             new_location=labware_location,
             new_item=labware,
+            robot_type="OT-2 Standard",
         )
 
     if labware_should_be_allowed:
@@ -211,6 +220,7 @@ def test_labware_when_thermocycler(
             existing_items={labware_location: labware},
             new_location=DeckSlotName.SLOT_7,
             new_item=thermocycler,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -324,11 +334,13 @@ def test_labware_when_heater_shaker(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=labware_location,
         new_item=cool_labware,
+        robot_type="OT-2 Standard",
     )
     deck_conflict.check(
         existing_items={labware_location: cool_labware},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
+        robot_type="OT-2 Standard",
     )
 
     with pytest.raises(
@@ -342,6 +354,7 @@ def test_labware_when_heater_shaker(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=labware_location,
             new_item=lame_labware,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -355,6 +368,7 @@ def test_labware_when_heater_shaker(
             existing_items={labware_location: lame_labware},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -420,6 +434,7 @@ def test_no_modules_when_heater_shaker(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=other_module_location,
             new_item=other_module,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -433,6 +448,7 @@ def test_no_modules_when_heater_shaker(
             existing_items={other_module_location: other_module},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -490,11 +506,13 @@ def test_tip_rack_when_heater_shaker(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=tip_rack_location,
         new_item=cool_tip_rack,
+        robot_type="OT-2 Standard",
     )
     deck_conflict.check(
         existing_items={tip_rack_location: cool_tip_rack},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
+        robot_type="OT-2 Standard",
     )
 
     with pytest.raises(
@@ -508,6 +526,7 @@ def test_tip_rack_when_heater_shaker(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=tip_rack_location,
             new_item=lame_tip_rack,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -521,6 +540,7 @@ def test_tip_rack_when_heater_shaker(
             existing_items={tip_rack_location: lame_tip_rack},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -555,4 +575,5 @@ def test_no_heater_shaker_south_of_trash() -> None:
             existing_items={DeckSlotName.FIXED_TRASH: trash},
             new_item=heater_shaker,
             new_location=DeckSlotName.SLOT_9,
+            robot_type="OT-2 Standard",
         )

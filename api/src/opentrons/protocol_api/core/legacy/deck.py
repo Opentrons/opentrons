@@ -177,6 +177,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
             existing_items=existing_items,
             new_location=DeckSlotName.from_primitive(slot_key_int),
             new_item=self._map_to_conflict_checker_item(val),
+            robot_type=self._definition["robot"]["model"],
         )
 
         self.data[slot_key_int] = val

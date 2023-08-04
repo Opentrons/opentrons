@@ -318,12 +318,10 @@ class ProtocolCore(
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
+            module_type = ModuleType.from_model(model)
             if module_type == ModuleType.THERMOCYCLER:
-                deck_slot = (
-                    DeckSlotName.SLOT_7
-                    if self._engine_client.state.config.robot_type == "OT-2 Standard"
-                    else DeckSlotName.SLOT_B1
-                )
+                robot_type = self._engine_client.state.config.robot_type
+                deck_slot = DeckSlotName.SLOT_7.to_equivalent_for_robot_type(robot_type)
             else:
                 raise InvalidModuleLocationError(deck_slot, model.name)
 

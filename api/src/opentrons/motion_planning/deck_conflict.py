@@ -173,7 +173,7 @@ def check(
     existing_items: Mapping[DeckSlotName, DeckItem],
     new_item: DeckItem,
     new_location: DeckSlotName,
-    robot_type: str = "OT-2 Standard",
+    robot_type: str,
 ) -> None:
     """Check a deck layout for conflicts.
 
