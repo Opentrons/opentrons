@@ -47,7 +47,7 @@ jobs:
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make setup
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell setup
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell dist-linux
-          mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}/
+          mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}0
           chmod +x ${{ env.EXECUTABLE_PATH }}
 
       - name: Install Chromedriver on the path.
