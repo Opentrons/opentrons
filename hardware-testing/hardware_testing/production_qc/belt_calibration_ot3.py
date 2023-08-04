@@ -54,7 +54,6 @@ async def _check_belt_accuracy(
     ret = {}
     for slot in TEST_SLOTS:
         await api.home()
-        await api.add_tip(mount, api.config.calibration.probe_length)
         try:
             slot_offset = await find_pipette_offset(api, mount, slot=slot)
             ret[slot] = slot_offset
@@ -64,7 +63,6 @@ async def _check_belt_accuracy(
                 ret[slot] = types.Point(x=0, y=0, z=0)
             else:
                 raise e
-        await api.remove_tip(mount)
         await api.home_z(mount)
 
     def _short(num: float, decimals: int = 2) -> str:
