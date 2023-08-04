@@ -11,7 +11,6 @@ import type {
   CurrentSubsystemUpdates,
   CurrentSubsystemUpdate,
   HostConfig,
-  Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
 
