@@ -758,6 +758,7 @@ async def find_pipette_offset(
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
     raise_verify_error: bool = True,
+    reset_instrument_offset: bool = True,
 ) -> Point:
     """
     Run automatic calibration for pipette and only return the calibration point.
@@ -770,7 +771,8 @@ async def find_pipette_offset(
     This function should be used in the robot server only.
     """
     try:
-        await hcapi.reset_instrument_offset(mount)
+        if reset_instrument_offset:
+            await hcapi.reset_instrument_offset(mount)
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
         offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
         return offset

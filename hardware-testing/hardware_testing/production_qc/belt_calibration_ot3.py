@@ -72,7 +72,9 @@ async def _check_belt_accuracy(
     for slot in TEST_SLOTS:
         await api.home()
         try:
-            slot_offset = await find_pipette_offset(api, mount, slot=slot)  # type: ignore[arg-type]
+            slot_offset = await find_pipette_offset(  # type: ignore[arg-type]
+                api, mount, slot=slot, reset_instrument_offset=False
+            )
             ret[slot] = slot_offset
             print(f"Slot #{slot}: {slot_offset}")
         except CalibrationStructureNotFoundError as e:
@@ -104,7 +106,6 @@ async def _calibrate_belts(
     api: OT3API, mount: types.OT3Mount
 ) -> Tuple[AttitudeMatrix, Dict[str, Any]]:
     ui.print_header("PROBE the DECK")
-    await api.reset_instrument_offset(mount)
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip, "no pipette found"
     await api.home()
@@ -136,10 +137,16 @@ async def run_belt_calibration(
     print("homing")
     await api.home()
 
-    ui.print_header("ATTACH PROBE")
-    attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(2)
+    ui.print_header("ATTACH PIPETTE + PROBE")
+    attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(4)
     current_pos = await api.gantry_position(mount)
     await api.move_to(mount, attach_pos._replace(z=current_pos.z))
+    await api.move_rel(mount, types.Point(x=0, y=0, z=-20))
+    has_pipette = await helpers_ot3.wait_for_instrument_presence(
+        api, mount, presence=True
+    )
+    if not has_pipette:
+        raise RuntimeError("no pipette")
     if not api.is_simulator:
         ui.get_user_ready("ATTACH a probe to pipette")
 
@@ -149,6 +156,7 @@ async def run_belt_calibration(
     try:
         # calibrate belts
         ui.print_header("CALIBRATE BELTS")
+        await api.reset_instrument_offset(mount)
         attitude, details = await _calibrate_belts(api, mount)
 
         # test after
@@ -160,8 +168,7 @@ async def run_belt_calibration(
             )
             ui.print_header("TEST WITHOUT CALIBRATION")
             print("resetting robot calibration")
-            await api.reset_instrument_offset(mount)
-            api.reset_robot_calibration()
+            api.reset_robot_calibration()  # set NOMINAL belt calibration
             without_data = _TestBeltCalibrationData(
                 pipette_offset=await _calibrate_pipette(api, mount),
                 deck_offsets=await _check_belt_accuracy(api, mount),
@@ -264,19 +271,10 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
     else:
         report.set_device_id(robot_id, CSVResult.PASS)
 
-    # ATTACH PIPETTE
-    mount = types.OT3Mount.LEFT
-    has_pipette = await helpers_ot3.wait_for_instrument_presence(
-        api, mount, presence=True
-    )
-    if not has_pipette:
-        print("no pipette, skipping belt calibration")
-        return
-
     # RUN TEST
     try:
         before, attitude, details, after = await run_belt_calibration(
-            api, mount, test=not skip_test
+            api, types.OT3Mount.LEFT, test=not skip_test
         )
     except (
         EarlyCapacitiveSenseTrigger,
