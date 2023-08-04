@@ -177,7 +177,7 @@ describe('RobotStatusHeader', () => {
     )
   })
 
-  it('renders a wifi icon when connected by wifi and ethernet', () => {
+  it('renders an ethernet icon when connected by wifi and ethernet', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, 'otie')
       .mockReturnValue({
@@ -187,20 +187,20 @@ describe('RobotStatusHeader', () => {
 
     const [{ getByLabelText }] = render(props)
 
-    getByLabelText('wifi')
+    getByLabelText('ethernet')
   })
 
-  it('renders an ethernet icon when only connected by ethernet', () => {
+  it('renders a wifi icon when only connected by wifi', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, 'otie')
       .mockReturnValue({
-        wifi: null,
-        ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
+        wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
+        ethernet: null,
       })
 
     const [{ getByLabelText }] = render(props)
 
-    getByLabelText('ethernet')
+    getByLabelText('wifi')
   })
 
   it('renders a usb icon when only connected locally', () => {

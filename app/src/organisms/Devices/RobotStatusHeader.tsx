@@ -109,12 +109,12 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
 
   let iconName: IconName | null = null
   let tooltipTranslationKey = null
-  if (isOT3ConnectedViaWifi) {
-    iconName = 'wifi'
-    tooltipTranslationKey = 'device_settings:wifi'
-  } else if (isOT3ConnectedViaEthernet) {
+  if (isOT3ConnectedViaEthernet) {
     iconName = 'ethernet'
     tooltipTranslationKey = 'device_settings:ethernet'
+  } else if (isOT3ConnectedViaWifi) {
+    iconName = 'wifi'
+    tooltipTranslationKey = 'device_settings:wifi'
   } else if ((local != null && local) || isOT3ConnectedViaUSB) {
     iconName = 'usb'
     tooltipTranslationKey = 'device_settings:wired_usb'
