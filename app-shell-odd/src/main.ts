@@ -14,7 +14,7 @@ import {
   getStore,
   getOverrides,
   registerConfig,
-  clearStore,
+  resetStore,
   ODD_DIR,
 } from './config'
 import systemd from './systemd'
@@ -50,11 +50,13 @@ app.once('window-all-closed', () => {
 
 function startUp(): void {
   log.info('Starting App')
+  console.log('Starting App')
   const storeNeedsReset = fse.existsSync(
     path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
   if (storeNeedsReset) {
-    clearStore()
+    log.debug('store marked to be reset, resetting store')
+    resetStore()
   }
   systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))

@@ -2,6 +2,7 @@
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
 import Store from 'electron-store'
 import get from 'lodash/get'
+import forEach from 'lodash/forEach'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 import fs from 'fs-extra'
@@ -150,6 +151,11 @@ export function handleConfigChange(
 ): void {
   store().onDidChange(path, changeHandler)
 }
-export function clearStore(): void {
+export function resetStore(): void {
+  log().debug('Resetting the store')
   store().clear()
+  const migratedConfig = migrate(DEFAULTS_V12)
+  forEach(migratedConfig, (configVal, configKey) => {
+    store().set(configKey, configVal)
+  })
 }
