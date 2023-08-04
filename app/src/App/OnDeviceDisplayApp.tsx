@@ -12,10 +12,7 @@ import {
   useIdle,
   useScrolling,
 } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useCurrentSubsystemUpdateQuery,
-} from '@opentrons/react-api-client'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../atoms/SleepScreen'
