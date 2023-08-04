@@ -8,9 +8,10 @@ import { useHost } from '../../api'
 import { useCurrentSubsystemUpdateQuery } from '../useCurrentSubsystemUpdateQuery'
 
 import type {
-  CurrentSubsystemUpdates,
   CurrentSubsystemUpdate,
+  CurrentSubsystemUpdates,
   HostConfig,
+  Response,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
 
@@ -97,7 +98,7 @@ describe('useCurrentSubsystemUpdateQuery', () => {
       .calledWith(HOST_CONFIG, null)
       .mockResolvedValue({
         data: CURRENT_SUBSYSTEM_UPDATES_RESPONSE,
-      } as any)
+      } as Response<CurrentSubsystemUpdates>)
 
     const { result, waitFor } = renderHook(
       () => useCurrentSubsystemUpdateQuery(null),
@@ -117,7 +118,7 @@ describe('useCurrentSubsystemUpdateQuery', () => {
       .calledWith(HOST_CONFIG, SUBSYSTEM_TYPE)
       .mockResolvedValue({
         data: CURRENT_SUBSYSTEM_UPDATE_RESPONSE,
-      } as any)
+      } as Response<SubsystemUpdateProgressData>)
 
     const { result, waitFor } = renderHook(
       () => useCurrentSubsystemUpdateQuery(SUBSYSTEM_TYPE),
