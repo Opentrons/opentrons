@@ -178,7 +178,7 @@ async def run_belt_calibration(
 
 def _create_csv_report() -> CSVReport:
     return CSVReport(
-        test_name=Path(__file__).name.replace("_", "-"),
+        test_name=Path(__file__).name.replace("_", "-").replace(".py", ""),
         sections=[
             CSVSection(
                 title="ATTITUDE",
@@ -189,7 +189,7 @@ def _create_csv_report() -> CSVReport:
                 ],
             ),
             CSVSection(
-                title="BELT-CALIBRATION-OFFSETS",
+                title="BELT-CALIBRATION-POSITIONS",
                 lines=[
                     CSVLine("slot-front-left", [float, float, float]),
                     CSVLine("slot-front-right", [float, float, float]),
@@ -311,17 +311,17 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
 
     # STORE DETAILS
     report(
-        "BELT-CALIBRATION-OFFSETS",
+        "BELT-CALIBRATION-POSITIONS",
         "slot-front-left",
         list(details["slots"]["front_left"]),
     )
     report(
-        "BELT-CALIBRATION-OFFSETS",
+        "BELT-CALIBRATION-POSITIONS",
         "slot-front-right",
         list(details["slots"]["front_right"]),
     )
     report(
-        "BELT-CALIBRATION-OFFSETS",
+        "BELT-CALIBRATION-POSITIONS",
         "slot-rear-left",
         list(details["slots"]["rear_left"]),
     )
