@@ -31,7 +31,7 @@ export function DeckLocationSelect({
 }: DeckLocationSelectProps): JSX.Element {
   return (
     <RobotCoordinateSpace
-      height="400px"
+      height="340px"
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}>
       {deckDef.locations.orderedSlots.map(slot => {
         const slotLocation = { slotName: slot.id }

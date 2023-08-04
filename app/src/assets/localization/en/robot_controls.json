@@ -1,4 +1,6 @@
 {
+  "confirm_location": "confirm location",
+  "confirm_position": "confirm position",
   "home_button": "home",
   "home_description": "Return robot to starting position.",
   "home_label": "home all axes",
