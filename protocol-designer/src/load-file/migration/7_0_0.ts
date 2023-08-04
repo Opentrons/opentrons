@@ -45,6 +45,8 @@ export const migrateFile = (
       INITIAL_DECK_SETUP_STEP_ID
     ].labwareLocationUpdate
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
+  const orderedStepIds = appData.designerApplication?.data?.orderedStepIds
+  const savedStepForms: any = appData.designerApplication?.data?.savedStepForms
 
   const allLatestDefs = getOnlyLatestDefs()
 
@@ -244,6 +246,50 @@ export const migrateFile = (
   }
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
 
+  const liquidHandlingOrderedStepIds = orderedStepIds?.filter(
+    id =>
+      savedStepForms &&
+      (savedStepForms[id]?.stepType === 'mix' ||
+        savedStepForms[id]?.stepType === 'moveLiquid')
+  )
+  const liquidHandlingStepForms = liquidHandlingOrderedStepIds?.map(
+    id => savedStepForms[id]
+  )
+  const labwareLocationUpdateIds = Object.keys(newLabwareLocationUpdate)
+
+  const getReplaceLabwareIds = (
+    labwareLocationUpdateIds: string[],
+    stepForm: any
+  ): any => {
+    if (stepForm.stepType === 'moveLliquid') {
+      const aspirateLabwareId = stepForm.aspirate_labware.split(':')[0]
+      const dispenseLabwareId = stepForm.dispense_labware.split(':')[0]
+      for (const labwareLocationUpdateId of labwareLocationUpdateIds) {
+        const labwareUuid = labwareLocationUpdateId.split(':')[0]
+        if (labwareUuid.includes(aspirateLabwareId)) {
+          stepForm.aspirate_labware = labwareLocationUpdateId
+        }
+        if (labwareUuid.includes(dispenseLabwareId)) {
+          stepForm.dispense_labware = labwareLocationUpdateId
+        }
+      }
+    }
+    if (stepForm.stepType === 'mix') {
+      const labwareId = stepForm.labware.split(':')[0]
+      for (const labwareLocationUpdateId of labwareLocationUpdateIds) {
+        const labwareUuid = labwareLocationUpdateId.split(':')[0]
+        if (labwareUuid.includes(labwareId)) {
+          stepForm.labware = labwareLocationUpdateId
+        }
+      }
+    }
+
+    return stepForm
+  }
+  const newLiquidHandlingStepForms = liquidHandlingStepForms?.map(step =>
+    getReplaceLabwareIds(labwareLocationUpdateIds, step)
+  )
+
   return {
     ...rest,
     designerApplication: {
@@ -256,6 +302,7 @@ export const migrateFile = (
         },
         savedStepForms: {
           ...appData.designerApplication?.data?.savedStepForms,
+          ...newLiquidHandlingStepForms,
           [INITIAL_DECK_SETUP_STEP_ID]: {
             ...appData.designerApplication?.data?.savedStepForms[
               INITIAL_DECK_SETUP_STEP_ID
