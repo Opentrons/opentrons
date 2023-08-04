@@ -3,7 +3,7 @@ on:
   push:
 
 env:
-  EXECUTABLE_PATH: ${{ github.action_path }}/Opentrons.AppImage
+  EXECUTABLE_NAME: Opentrons.AppImage
   ELECTRON_VERSION: "21.3.1"
 
 jobs:
@@ -25,10 +25,11 @@ jobs:
         with:
             python-version: 3.11
 
-      - name: Store Python xecutable names as env vars
+      - name: Setup Runtime Env Vars
         run: |
           echo "PYTHON_3_11_EXEC=${{ steps.python-3-11.outputs.python-path }}" >> $GITHUB_ENV
           echo "PYTHON_3_7_EXEC=${{ steps.python-3-7.outputs.python-path }}" >> $GITHUB_ENV
+          echo "EXECUTABLE_PATH=${{ github.action_path }}/${{ env.EXECUTABLE_NAME }}" >> $GITHUB_ENV
 
       - name: Install Linux dependencies
         run: |
@@ -47,7 +48,7 @@ jobs:
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make setup
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell setup
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell dist-linux
-          mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}0
+          mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}
           chmod +x ${{ env.EXECUTABLE_PATH }}
 
       - name: Install Chromedriver on the path.
