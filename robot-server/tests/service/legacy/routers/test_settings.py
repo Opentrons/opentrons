@@ -485,6 +485,8 @@ def mock_persistence_resetter(
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
                 "runsHistory": True,
+                # TODO(mm, 2023-08-04): Figure out how to test Flex-only options,
+                # then add gripperOffsetCalibrations and onDeviceDisplay.
             },
             {
                 ResetOptionId.boot_scripts,
@@ -496,9 +498,6 @@ def mock_persistence_resetter(
                 # mark_directory_reset() being an async method, and api_client having
                 # its own event loop that interferes with making this test async.
                 ResetOptionId.runs_history,
-                # TODO(mm, 2023-08-03): Ditto the above, but for
-                # reset_odd.mark_odd_for_reset_next_boot().
-                ResetOptionId.on_device_display,
             },
         ],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],
