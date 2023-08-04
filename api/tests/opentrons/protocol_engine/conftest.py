@@ -96,7 +96,7 @@ def ot3_fixed_trash_def() -> LabwareDefinition:
 def well_plate_def() -> LabwareDefinition:
     """Get the definition of a 96 well plate."""
     return LabwareDefinition.parse_obj(
-        load_definition("corning_96_wellplate_360ul_flat", 1)
+        load_definition("corning_96_wellplate_360ul_flat", 2)
     )
 
 

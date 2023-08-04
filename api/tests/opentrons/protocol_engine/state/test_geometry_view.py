@@ -1078,11 +1078,11 @@ def test_ensure_location_not_occupied_raises(
 @pytest.mark.parametrize(
     argnames=["location", "expected_center_point"],
     argvalues=[
-        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), Point(101.0, 102.0, 119.5)),
-        (ModuleLocation(moduleId="module-id"), Point(111.0, 122.0, 149.5)),
+        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), Point(101.0, 102.0, 203)),
+        (ModuleLocation(moduleId="module-id"), Point(111.0, 122.0, 233)),
     ],
 )
-def test_get_labware_center(
+def test_get_labware_grip_point(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -1091,10 +1091,10 @@ def test_get_labware_center(
     location: Union[DeckSlotLocation, ModuleLocation],
     expected_center_point: Point,
 ) -> None:
-    """It should get the center point of the labware at the specified location."""
-    decoy.when(labware_view.get_dimensions(labware_id="labware-id")).then_return(
-        Dimensions(x=11, y=22, z=33)
-    )
+    """It should get the grip point of the labware at the specified location."""
+    decoy.when(
+        labware_view.get_grip_height_from_labware_bottom("labware-id")
+    ).then_return(100)
 
     if isinstance(location, ModuleLocation):
         decoy.when(labware_view.get_deck_definition()).then_return(
@@ -1113,21 +1113,21 @@ def test_get_labware_center(
     decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_1)).then_return(
         Point(x=101, y=102, z=103)
     )
-    labware_center = subject.get_labware_center(
+    labware_center = subject.get_labware_grip_point(
         labware_id="labware-id", location=location
     )
 
     assert labware_center == expected_center_point
 
 
-def test_get_labware_center_on_labware(
+def test_get_labware_grip_point_on_labware(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     ot2_standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
-    """It should get the center point of a labware on another labware."""
+    """It should get the grip point of a labware on another labware."""
     decoy.when(labware_view.get(labware_id="labware-id")).then_return(
         LoadedLabware(
             id="labware-id",
@@ -1159,7 +1159,7 @@ def test_get_labware_center_on_labware(
         Point(x=5, y=9, z=10)
     )
 
-    labware_center = subject.get_labware_center(
+    labware_center = subject.get_labware_grip_point(
         labware_id="labware-id", location=OnLabwareLocation(labwareId="below-id")
     )
 
