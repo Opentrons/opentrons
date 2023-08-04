@@ -215,15 +215,15 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
       action: LoadFileAction
     ): SavedLabwareState => {
       const file = action.payload.file
-      const loadLabwareCommands = Object.values(file.commands).filter(
-        (command): command is LoadLabwareCreateCommand =>
-          command.commandType === 'loadLabware'
-      )
-      const loadAdapterCommands = Object.values(file.commands).filter(
-        (command): command is LoadAdapterCreateCommand =>
+      const loadLabwareAndAdapterCommands = Object.values(file.commands).filter(
+        (
+          command
+        ): command is LoadLabwareCreateCommand | LoadAdapterCreateCommand =>
+          command.commandType === 'loadLabware' ||
           command.commandType === 'loadAdapter'
       )
-      const labware = loadLabwareCommands.reduce(
+
+      const labware = loadLabwareAndAdapterCommands.reduce(
         (
           acc: Record<
             string,
@@ -235,7 +235,13 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
           >,
           command
         ) => {
-          const { labwareId, displayName, loadName } = command.params
+          const { displayName, loadName } = command.params
+          let id
+          if ('labwareId' in command.params) {
+            id = command.params.labwareId
+          } else if ('adapterId' in command.params) {
+            id = command.params.adapterId
+          }
           const location = command.params.location
           let slot
           if (location === 'offDeck') {
@@ -252,7 +258,7 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
             ...acc,
             [loadName]: {
               slot,
-              definitionId: labwareId,
+              definitionId: id,
               displayName: displayName,
             },
           }

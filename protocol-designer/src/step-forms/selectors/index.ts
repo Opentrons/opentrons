@@ -28,6 +28,7 @@ import {
 import {
   ProfileFormError,
   getProfileFormErrors,
+  getMoveLabwareProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
@@ -220,22 +221,10 @@ const _getInitialDeckSetup = (
     labware: mapValues<{}, LabwareOnDeck>(
       labwareLocations,
       (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
-        // const {
-        //   labwareLoadname,
-        //   adapterLoadname,
-        // } = getAdapterAndLabwareSplitInfo(labwareId)
-        // const adapterId =
-        // if (labwareLoadname !== '' && adapterLoadname !== '') {
-        //   return [
-        //     { slot, ...labwareEntities[adapterId] },
-        //     { slot, ...labwareEntities[labwareId] },
-        //   ]
-        // } else {
         return {
           slot,
           ...labwareEntities[labwareId],
         }
-        // }
       }
     ),
     modules: mapValues<{}, ModuleOnDeck>(
@@ -537,6 +526,11 @@ const _dynamicFieldFormErrors = (
   return getProfileFormErrors(hydratedForm)
 }
 
+const _dynamicMoveLabwareFieldFormErrors = (
+  hydratedForm: FormData
+): ProfileFormError[] => {
+  return getMoveLabwareProfileFormErrors(hydratedForm)
+}
 // TODO type with hydrated form type
 export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
   for (const fieldName in hydratedForm) {
@@ -572,6 +566,12 @@ export const _hasFormLevelErrors = (hydratedForm: FormData): boolean => {
     return true
   }
 
+  if (
+    hydratedForm.stepType === 'moveLabware' &&
+    _dynamicMoveLabwareFieldFormErrors(hydratedForm).length > 0
+  ) {
+    return true
+  }
   return false
 }
 // TODO type with hydrated form type
@@ -658,7 +658,6 @@ export const getArgsAndErrorsByStepId: Selector<
         const hydratedForm = _getHydratedForm(stepForm, contextualState)
 
         const errors = _formHasErrors(hydratedForm)
-
         const nextStepData = !errors
           ? {
               stepArgs: stepFormToArgs(hydratedForm),

@@ -12,7 +12,7 @@ import {
 import { LabwareDefByDefURI } from '../labware-defs'
 import { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
-const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
+export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   ModuleType,
   Readonly<string[]>
 > = {
@@ -83,7 +83,10 @@ const PCR_ADAPTER_LOADNAME = 'opentrons_96_pcr_adapter'
 const UNIVERSAL_FLAT_ADAPTER_LOADNAME = 'opentrons_universal_flat_adapter'
 const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_well_aluminum_block'
 
-const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<string, string[]> = {
+export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
+  string,
+  string[]
+> = {
   [DEEP_WELL_ADAPTER_LOADNAME]: [
     'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
   ],
@@ -112,4 +115,40 @@ export const getLabwareIsCustom = (
   labwareOnDeck: LabwareOnDeck
 ): boolean => {
   return labwareOnDeck.labwareDefURI in customLabwares
+}
+
+export const getAdapterLabwareIsAMatch = (
+  labwareId: string,
+  draggedLabwareLoadname: string
+): boolean => {
+  const labwareDefUri = labwareId.split(':')[1]
+
+  const deepWellPair =
+    labwareDefUri === 'opentrons/opentrons_96_deep_well_adapter/1' &&
+    draggedLabwareLoadname === 'nest_96_wellplate_2ml_deep'
+  const flatBottomPair =
+    labwareDefUri === 'opentrons/opentrons_96_flat_bottom_adapter/1' &&
+    draggedLabwareLoadname === 'nest_96_wellplate_200ul_flat'
+  const pcrPair =
+    labwareDefUri === 'opentrons/opentrons_96_pcr_adapter/1' &&
+    draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt'
+  const universalPair =
+    labwareDefUri === 'opentrons/opentrons_universal_flat_adapter/1' &&
+    draggedLabwareLoadname === 'corning_384_wellplate_112ul_flat'
+  const aluminumBlock96Pairs =
+    labwareDefUri === 'opentrons/opentrons_96_well_aluminum_block/1' &&
+    (draggedLabwareLoadname === 'biorad_96_wellplate_200ul_pcr' ||
+      draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt')
+
+  if (
+    deepWellPair ||
+    flatBottomPair ||
+    pcrPair ||
+    universalPair ||
+    aluminumBlock96Pairs
+  ) {
+    return true
+  } else {
+    return false
+  }
 }

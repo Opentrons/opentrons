@@ -104,3 +104,8 @@ export const makeTimerText = (
     : `${targetMinutes}  ${i18n.t(
         'application.units.minutes'
       )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
+
+export const getIsAdapter = (id: string): boolean =>
+  id.includes('opentrons_96_aluminumblock_biorad_wellplate_200ul') ||
+  id.includes('adapter') ||
+  id.includes('opentrons_96_aluminumblock_nest_wellplate_100ul')

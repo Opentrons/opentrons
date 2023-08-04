@@ -35,7 +35,6 @@ function mapStateToProps(state: BaseState): SP {
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
-  console.log('slot from labwareSelectionmodal', slot)
   const labwareById = stepFormSelectors.getInitialDeckSetup(state).labware
   const parentModule =
     (slot != null &&
@@ -48,14 +47,9 @@ function mapStateToProps(state: BaseState): SP {
       hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
       getAreSlotsHorizontallyAdjacent(hardwareModule.slot, parentSlot ?? slot)
   )
-  const adapterLoadName = Object.values(labwareById)
-    .filter(
-      labwareOnDeck =>
-        slot ===
-          (modulesById[labwareOnDeck.slot]?.slot ?? labwareOnDeck.slot) &&
-        labwareOnDeck.def.metadata.displayCategory === 'adapter'
-    )
-    .map(labwareOnDeck => labwareOnDeck.def.parameters.loadName)
+  const adapterLoadNameOnDeck = Object.values(labwareById)
+    .filter(labwareOnDeck => slot === labwareOnDeck.id)
+    .map(labwareOnDeck => labwareOnDeck.def.parameters.loadName)[0]
 
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
@@ -64,7 +58,7 @@ function mapStateToProps(state: BaseState): SP {
     moduleType,
     isNextToHeaterShaker,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
-    adapterLoadName: adapterLoadName[0],
+    adapterLoadName: adapterLoadNameOnDeck,
   }
 }
 

@@ -121,6 +121,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     isNextToHeaterShaker,
     adapterLoadName,
   } = props
+  const defs = getOnlyLatestDefs()
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
@@ -209,6 +210,13 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         `modules.module_long_names.heaterShakerModuleType`
       )}`
     }
+    if (adapterLoadName != null) {
+      const adapterDisplayName =
+        Object.values(defs).find(
+          def => def.parameters.loadName === adapterLoadName
+        )?.metadata.displayName ?? ''
+      return `Labware on top of the ${adapterDisplayName}`
+    }
     if (parentSlot != null && moduleType != null) {
       return `Slot ${
         parentSlot === SPAN7_8_10_11_SLOT ? '7' : parentSlot
@@ -223,7 +231,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   )
 
   const labwareByCategory = React.useMemo(() => {
-    const defs = getOnlyLatestDefs()
     return reduce<
       LabwareDefByDefURI,
       { [category: string]: LabwareDefinition2[] }

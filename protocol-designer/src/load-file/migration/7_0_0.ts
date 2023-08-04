@@ -44,10 +44,7 @@ export const migrateFile = (
     appData.designerApplication?.data?.savedStepForms[
       INITIAL_DECK_SETUP_STEP_ID
     ].labwareLocationUpdate
-  const ingredLocations: DesignerApplicationData['ingredLocations'] =
-    appData.designerApplication?.data?.savedStepForms[
-      INITIAL_DECK_SETUP_STEP_ID
-    ].ingredLocations
+  const ingredLocations = appData.designerApplication?.data?.ingredLocations
 
   const allLatestDefs = getOnlyLatestDefs()
 
@@ -127,7 +124,7 @@ export const migrateFile = (
         key: uuid(),
         commandType: 'loadLabware',
         params: {
-          //  keeping same Uuid as previous id for ingredLocation mapping
+          //  keeping same Uuid as previous id for ingredLocation and savedStepForms mapping
           labwareId: `${previousLabwareIdUuid}:${labwareUri}`,
           loadName: labwareLoadname,
           namespace: 'opentrons',
@@ -260,7 +257,6 @@ export const migrateFile = (
     }
     return updatedIngredLocations
   }
-
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
 
   return {
@@ -270,6 +266,9 @@ export const migrateFile = (
       version: PD_VERSION,
       data: {
         ...appData.designerApplication?.data,
+        ingredLocations: {
+          ...newLabwareIngreds,
+        },
         savedStepForms: {
           ...appData.designerApplication?.data?.savedStepForms,
           [INITIAL_DECK_SETUP_STEP_ID]: {
@@ -278,9 +277,6 @@ export const migrateFile = (
             ],
             labwareLocationUpdate: {
               ...newLabwareLocationUpdate,
-            },
-            ingredLocations: {
-              ...newLabwareIngreds,
             },
           },
         },

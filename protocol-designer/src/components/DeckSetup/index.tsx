@@ -285,7 +285,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
         const isAdapter =
           labwareLoadedOnModule?.def.metadata.displayCategory === 'adapter'
-
         return (
           <Module
             key={slot.id}
@@ -309,7 +308,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 {isAdapter ? (
                   //  @ts-expect-error
                   <AdapterControls
-                    adapter={labwareLoadedOnModule}
+                    labwareId={labwareLoadedOnModule.id}
                     key={slot.id}
                     slot={slot}
                     selectedTerminalItemId={props.selectedTerminalItemId}
@@ -399,8 +398,11 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
-        console.log('labware from decksetup', labware)
-        if (allModules.some(m => m.id === labware.slot)) return null
+        if (
+          allModules.some(m => m.id === labware.slot) ||
+          allLabware.some(lab => lab.id === labware.slot)
+        )
+          return null
         const slot = deckSlots.find(slot => slot.id === labware.slot)
         if (slot == null) {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
@@ -420,7 +422,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 <>
                   {/* @ts-expect-error */}
                   <AdapterControls
-                    adapter={labware}
+                    labwareId={labware.id}
                     key={slot.id}
                     slot={slot}
                     selectedTerminalItemId={props.selectedTerminalItemId}
@@ -441,6 +443,49 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   selectedTerminalItemId={props.selectedTerminalItemId}
                 />
               )}
+            </g>
+          </React.Fragment>
+        )
+      })}
+
+      {/* all adapters on deck and not on module*/}
+      {allLabware.map(labware => {
+        if (allModules.some(m => m.id === labware.slot)) return null
+        const slotOnDeck = deckSlots.find(slot => slot.id === labware.slot)
+        if (slotOnDeck != null) {
+          return null
+        }
+        const slotForOnTheDeck = allLabware.find(lab => lab.id === labware.slot)
+          ?.slot
+        const slotForOnMod = allModules.find(mod => mod.id === slotForOnTheDeck)
+          ?.slot
+        const deckDefSlot = deckSlots.find(
+          s => s.id === (slotForOnMod ?? slotForOnTheDeck)
+        )
+        if (deckDefSlot == null) {
+          console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
+          return null
+        }
+        return (
+          <React.Fragment key={labware.id}>
+            <LabwareOnDeck
+              x={deckDefSlot.position[0]}
+              y={deckDefSlot.position[1]}
+              labwareOnDeck={labware}
+            />
+            <g>
+              <LabwareControls
+                slot={deckDefSlot}
+                setHoveredLabware={setHoveredLabware}
+                setDraggedLabware={setDraggedLabware}
+                swapBlocked={
+                  swapBlocked &&
+                  (labware.id === hoveredLabware?.id ||
+                    labware.id === draggedLabware?.id)
+                }
+                labwareOnDeck={labware}
+                selectedTerminalItemId={props.selectedTerminalItemId}
+              />
             </g>
           </React.Fragment>
         )
