@@ -767,9 +767,16 @@ class LabwareView(HasState[LabwareState]):
 
     def get_grip_force(self, labware_id: str) -> float:
         """Get the recommended grip force for gripping labware using gripper."""
-        return self.get_definition(labware_id).gripForce or LABWARE_GRIP_FORCE
+        recommended_force = self.get_definition(labware_id).gripForce
+        return (
+            recommended_force if recommended_force is not None else LABWARE_GRIP_FORCE
+        )
 
     def get_grip_height_from_labware_bottom(self, labware_id: str) -> float:
         """Get the recommended grip height from labware bottom, if present."""
         recommended_height = self.get_definition(labware_id).gripHeightFromLabwareBottom
-        return recommended_height or self.get_dimensions(labware_id).z / 2
+        return (
+            recommended_height
+            if recommended_height is not None
+            else self.get_dimensions(labware_id).z / 2
+        )

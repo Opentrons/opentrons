@@ -16,7 +16,7 @@
     "yDimension": 85.48,
     "zDimension": 31.4
   },
-  "gripForce": 9,
+  "gripForce": 15,
   "gripHeightFromLabwareBottom": 16.8,
   "wells": {
     "A1": {
