@@ -164,6 +164,7 @@ async def build_async_ot3_hardware_api(
         print(e)
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+    await api._backend.probe_network()
     await api.cache_instruments()
     return api
 
