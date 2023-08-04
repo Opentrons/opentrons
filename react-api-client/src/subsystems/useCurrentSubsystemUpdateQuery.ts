@@ -32,7 +32,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
       ),
     {
       ...options,
-      enabled: host !== null && subsystem != null && options.enabled !== false,
+      enabled: host !== null,
     }
   )
 
