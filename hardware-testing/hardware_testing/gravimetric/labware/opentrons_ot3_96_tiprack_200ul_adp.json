@@ -1004,7 +1004,7 @@
     "tipLength": 58.35,
     "tipOverlap": 10.5,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_ot3_96_tiprack_200ul_adp"
+    "loadName": "opentrons_flex_96_tiprack_200ul_adp"
   },
   "namespace": "custom_beta",
   "version": 1,

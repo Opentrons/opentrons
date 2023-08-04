@@ -24,6 +24,7 @@ interface SystemD {
   sendStatus: (text: string) => Promise<string>
   setRemoteDevToolsEnabled: (enabled: boolean) => Promise<string>
   getisRobotServerReady: () => Promise<boolean>
+  restartApp: () => Promise<string>
 }
 
 const provideExports = (): SystemD => {
@@ -43,6 +44,8 @@ const provideExports = (): SystemD => {
           '/bin/systemctl is-active opentrons-robot-server'
           // trimming string because stdout returns a new line
         ).then(state => state.trim() === 'active'),
+      restartApp: () =>
+        promisifyProcess(`/bin/systemctl restart opentrons-robot-app`),
     }
   } else {
     return {
@@ -53,6 +56,7 @@ const provideExports = (): SystemD => {
         new Promise<string>(resolve => resolve(`dev tools set to ${enabled}`)),
       getisRobotServerReady: () =>
         new Promise<boolean>(resolve => resolve(true)),
+      restartApp: () => new Promise<string>(resolve => resolve('')),
     }
   }
 }

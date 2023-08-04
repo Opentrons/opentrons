@@ -609,8 +609,12 @@ class ModuleView(HasState[ModuleState]):
         except KeyError as e:
             raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
+    # TODO(jbl 2023-06-20) rename this method to better reflect it's not just "connected" modules
     def get_connected_model(self, module_id: str) -> ModuleModel:
         """Return the model of the connected module.
+
+        NOTE: This method will return the name for any module loaded, not just electronically connected ones.
+            This includes the Magnetic Block.
 
         This can differ from `get_requested_model()` because of module compatibility.
         For example, a ``loadModule`` command might request a ``temperatureModuleV1``

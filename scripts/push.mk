@@ -3,7 +3,8 @@
 find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
-is-ot3 = $(shell ssh $(call id-file-arg,$(2)) $(3) root@$(1) systemctl status opentrons-robot-app)
+version_dict=$(shell ssh $(call id-file-arg,$(2)) $(3) root@$(1) cat /etc/VERSION.json)
+is-ot3=$(findstring OT-3, $(version_dict))
 # make version less than 4.4 do not use intcmp
 allowed-ssh-versions="1 2 3 4 5 6 7 8"
 # in order to use comma in a string we have to set it to a var
@@ -51,6 +52,7 @@ endef
 # argument 6 is the python package name
 # argument 7 is an additional subdir if necessary in the sdist
 # argument 8 is either egg or dist (default egg)
+# argument 9 is the version dict entry to update the VERSION.json file
 define push-python-sdist
 $(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
@@ -64,6 +66,8 @@ ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
  mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6)*.$(if $(8),$(8),egg)-info $(5)/$(basename $(basename $(notdir $(4)))).$(if $(8),$(8),egg)-info ; \
  cleanup \
  "
+
+$(if $(9),$(call sync-version-file,$(1),$(2),$(3),$(9)),)
 endef
 
 # restart-service: ssh to a robot and restart one of its systemd units
@@ -92,3 +96,30 @@ endef
 #
 # argument 1 is the identity file to use, if any
 id-file-arg = $(if $(1),-i $(1))
+
+# VERSION_HELPER: helper python script to update a dict with some entries
+# NOTE: This is only to be used in the context of sync-version-file function
+# Since we are using global args $(4) in this case which is only meaning there.
+define VERSION_HELPER
+import json;
+a=$(version_dict);
+a.update($(4));
+fd = open("new_version_file.json", "w");
+json.dump(a, fd, indent=2);
+fd.close()
+endef
+
+# sync-version-file: ssh to the robot and update the VERSION.json file
+#
+# argument 1 is the host to push to
+# argument 2 is the identity file to use, if any
+# argument 3 is any further ssh options, quoted
+# argument 4 is the package version dict to update the VERSION.json file with
+define sync-version-file
+	@echo package-version: $(4)
+	$(shell python -c '$(VERSION_HELPER)')
+	$(eval filepath=$(shell find . -type f -name new_version_file.json))
+	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) ${filepath} root@$(1):/data/VERSION.json
+	ssh $(call id-file-arg,$(2)) $(3) root@$(1) "mount -o remount,rw / && cp /data/VERSION.json /etc/VERSION.json && mount -o remount,ro / || mount -o remount,ro /"
+	rm -rf ${filepath}
+endef

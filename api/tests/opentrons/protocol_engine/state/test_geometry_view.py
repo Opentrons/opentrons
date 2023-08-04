@@ -3,13 +3,13 @@ import inspect
 
 import pytest
 from decoy import Decoy
-from typing import cast, List, Tuple, Union, Optional
+from typing import cast, List, Tuple, Union, Optional, NamedTuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -17,15 +17,18 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleOffsetVector,
     LoadedLabware,
     LoadedModule,
+    ModuleModel,
     WellLocation,
     WellOrigin,
     DropTipWellLocation,
     DropTipWellOrigin,
     WellOffset,
     Dimensions,
+    OverlapOffset,
     DeckType,
     CurrentWell,
 )
@@ -33,7 +36,7 @@ from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.state.pipettes import PipetteView, StaticPipetteConfig
 from opentrons.protocol_engine.state.geometry import GeometryView
 
 
@@ -148,13 +151,86 @@ def test_get_labware_parent_position_on_module(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "labware-id", ModuleModel.THERMOCYCLER_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=1, y=2, z=3))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetVector(x=0, y=0, z=0)
+        ModuleOffsetVector(x=2, y=3, z=4)
     )
 
     result = subject.get_labware_parent_position("labware-id")
 
-    assert result == Point(5, 7, 9)
+    assert result == Point(6, 8, 10)
+
+
+def test_get_labware_parent_position_on_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    subject: GeometryView,
+) -> None:
+    """It should return a labware position for labware on a labware on a module."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="bcd",
+        definitionUri=uri_from_details(namespace="a", load_name="bcd", version=1),
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        offsetId=None,
+    )
+    adapter_data = LoadedLabware(
+        id="adapter-id",
+        loadName="xyz",
+        definitionUri=uri_from_details(namespace="w", load_name="xyz", version=1),
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId=None,
+    )
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(labware_view.get("adapter-id")).then_return(adapter_data)
+    decoy.when(labware_view.get_dimensions("adapter-id")).then_return(
+        Dimensions(x=123, y=456, z=5)
+    )
+    decoy.when(
+        labware_view.get_labware_overlap_offsets("labware-id", "xyz")
+    ).then_return(OverlapOffset(x=1, y=2, z=2))
+
+    decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
+    decoy.when(
+        module_view.get_nominal_module_offset(
+            module_id="module-id", deck_type=DeckType.OT2_STANDARD
+        )
+    ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
+
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.MAGNETIC_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "adapter-id", ModuleModel.MAGNETIC_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=-3, y=-2, z=-1))
+
+    decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
+        ModuleOffsetVector(x=3, y=4, z=5)
+    )
+
+    result = subject.get_labware_parent_position("labware-id")
+
+    assert result == Point(9, 12, 15)
 
 
 def test_get_labware_origin_position(
@@ -262,6 +338,14 @@ def test_get_module_labware_highest_z(
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetVector(x=0, y=0, z=0)
     )
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.MAGNETIC_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "labware-id", ModuleModel.MAGNETIC_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
@@ -558,6 +642,14 @@ def test_get_module_labware_well_position(
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetVector(x=0, y=0, z=0)
     )
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.MAGNETIC_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "labware-id", ModuleModel.MAGNETIC_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     result = subject.get_well_position("labware-id", "B2")
     assert result == Point(
@@ -860,7 +952,7 @@ def test_get_tip_drop_location(
         )
     ).then_return(1337)
 
-    location = subject.get_tip_drop_location(
+    location = subject.get_checked_tip_drop_location(
         pipette_id="pipette-id",
         labware_id="tip-rack-id",
         well_location=DropTipWellLocation(
@@ -882,7 +974,7 @@ def test_get_tip_drop_location_with_trash(
         labware_view.get_has_quirk(labware_id="labware-id", quirk="fixedTrash")
     ).then_return(True)
 
-    location = subject.get_tip_drop_location(
+    location = subject.get_checked_tip_drop_location(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_location=DropTipWellLocation(
@@ -904,10 +996,8 @@ def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
         offset=WellOffset(x=1, y=2, z=3),
     )
 
-    result = subject.get_tip_drop_location(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_location=input_location,
+    result = subject.get_checked_tip_drop_location(
+        pipette_id="pipette-id", labware_id="labware-id", well_location=input_location
     )
 
     assert result == WellLocation(
@@ -956,7 +1046,7 @@ def test_ensure_location_not_occupied_raises(
     """It should raise error when labware is present in given location."""
     slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     # Shouldn't raise if neither labware nor module in location
-    assert subject.ensure_location_not_occupied(slot_location) == slot_location
+    assert subject.ensure_location_not_occupied(location=slot_location) == slot_location
 
     # Raise if labware in location
     decoy.when(labware_view.raise_if_labware_in_location(slot_location)).then_raise(
@@ -1026,6 +1116,52 @@ def test_get_labware_center(
     )
 
     assert labware_center == expected_center_point
+
+
+def test_get_labware_center_on_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    subject: GeometryView,
+) -> None:
+    """It should get the center point of a labware on another labware."""
+    decoy.when(labware_view.get(labware_id="labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="above-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="below-id"),
+        )
+    )
+    decoy.when(labware_view.get(labware_id="below-id")).then_return(
+        LoadedLabware(
+            id="below-id",
+            loadName="below-name",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
+    )
+
+    decoy.when(labware_view.get_dimensions("labware-id")).then_return(
+        Dimensions(x=500, y=5001, z=10)
+    )
+    decoy.when(labware_view.get_dimensions("below-id")).then_return(
+        Dimensions(x=1000, y=1001, z=11)
+    )
+    decoy.when(
+        labware_view.get_labware_overlap_offsets("labware-id", "below-name")
+    ).then_return(OverlapOffset(x=0, y=1, z=6))
+
+    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_4)).then_return(
+        Point(x=5, y=9, z=10)
+    )
+
+    labware_center = subject.get_labware_center(
+        labware_id="labware-id", location=OnLabwareLocation(labwareId="below-id")
+    )
+
+    assert labware_center == Point(5, 10, 20)
 
 
 @pytest.mark.parametrize(
@@ -1127,4 +1263,149 @@ def test_get_slot_item(
             DeckSlotName.SLOT_3, allowed_labware_ids, allowed_module_ids
         )
         == module
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["slot_name", "expected_column"],
+    argvalues=[
+        (DeckSlotName.SLOT_3, 3),
+        (DeckSlotName.SLOT_5, 2),
+        (DeckSlotName.SLOT_7, 1),
+        (DeckSlotName.SLOT_A1, 1),
+        (DeckSlotName.SLOT_B2, 2),
+        (DeckSlotName.SLOT_C3, 3),
+    ],
+)
+def test_get_slot_column(
+    subject: GeometryView,
+    slot_name: DeckSlotName,
+    expected_column: int,
+) -> None:
+    """It should return the correct column number for the slot."""
+    assert subject.get_slot_column(slot_name) == expected_column
+
+
+class DropTipLocationFinderSpec(NamedTuple):
+    """Test data for get_next_tip_drop_location."""
+
+    labware_slot: DeckSlotName
+    well_size: float
+    pipette_channels: int
+    pipette_mount: MountType
+    expected_locations: List[DropTipWellLocation]
+
+
+# TODO (spp, 2023-06-22): need to test more trash-pipette-mount combinations
+@pytest.mark.parametrize(
+    argnames=DropTipLocationFinderSpec._fields,
+    argvalues=[
+        DropTipLocationFinderSpec(
+            labware_slot=DeckSlotName.FIXED_TRASH,
+            well_size=225,
+            pipette_channels=1,
+            pipette_mount=MountType.LEFT,
+            expected_locations=[
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-22, y=0, z=0)
+                ),
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-75, y=0, z=0)
+                ),
+            ],
+        ),
+        DropTipLocationFinderSpec(
+            labware_slot=DeckSlotName.SLOT_3,
+            well_size=225,
+            pipette_channels=8,
+            pipette_mount=MountType.RIGHT,
+            expected_locations=[
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=75, y=0, z=0)
+                ),
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-75, y=0, z=0)
+                ),
+            ],
+        ),
+        DropTipLocationFinderSpec(
+            labware_slot=DeckSlotName.SLOT_B3,
+            well_size=225,
+            pipette_channels=96,
+            pipette_mount=MountType.LEFT,
+            expected_locations=[
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=32, y=0, z=0)
+                ),
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-32, y=0, z=0)
+                ),
+            ],
+        ),
+    ],
+)
+def test_get_next_drop_tip_location(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    subject: GeometryView,
+    labware_slot: DeckSlotName,
+    well_size: float,
+    pipette_channels: int,
+    pipette_mount: MountType,
+    expected_locations: List[DropTipWellLocation],
+) -> None:
+    """It should provide the next location to drop tips into within a labware."""
+    decoy.when(labware_view.is_fixed_trash(labware_id="abc")).then_return(True)
+    decoy.when(
+        labware_view.get_well_size(labware_id="abc", well_name="A1")
+    ).then_return((well_size, 0, 0))
+    decoy.when(mock_pipette_view.get_config("pip-123")).then_return(
+        StaticPipetteConfig(
+            min_volume=1,
+            max_volume=9001,
+            channels=pipette_channels,
+            model="blah",
+            display_name="bleh",
+            serial_number="",
+            return_tip_scale=0,
+            nominal_tip_overlap={},
+            home_position=0,
+            nozzle_offset_z=0,
+        )
+    )
+    decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)
+    decoy.when(labware_view.get("abc")).then_return(
+        LoadedLabware(
+            id="abc",
+            loadName="load-name2",
+            definitionUri="4567",
+            location=DeckSlotLocation(slotName=labware_slot),
+        )
+    )
+    drop_location: List[DropTipWellLocation] = []
+    for i in range(4):
+        drop_location.append(
+            subject.get_next_tip_drop_location(
+                labware_id="abc", well_name="A1", pipette_id="pip-123"
+            )
+        )
+
+    assert drop_location[0] == drop_location[2] == expected_locations[0]
+    assert drop_location[1] == drop_location[3] == expected_locations[1]
+
+
+def test_get_next_drop_tip_location_in_non_trash_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    subject: GeometryView,
+) -> None:
+    """It should provide the default drop tip location when dropping into a non-fixed-trash labware."""
+    decoy.when(labware_view.is_fixed_trash(labware_id="abc")).then_return(False)
+    assert subject.get_next_tip_drop_location(
+        labware_id="abc", well_name="A1", pipette_id="pip-123"
+    ) == DropTipWellLocation(
+        origin=DropTipWellOrigin.DEFAULT,
+        offset=WellOffset(x=0, y=0, z=0),
     )

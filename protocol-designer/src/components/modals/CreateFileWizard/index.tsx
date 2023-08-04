@@ -41,6 +41,7 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
+import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
@@ -183,6 +184,10 @@ export function CreateFileWizard(): JSX.Element | null {
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
       )
+      // add gripper
+      if (values.additionalEquipment.includes('gripper')) {
+        dispatch(toggleIsGripperRequired())
+      }
       // auto-generate tipracks for pipettes
       const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)

@@ -142,15 +142,19 @@ class ProtocolCore(
         """Load a labware using its identifying parameters."""
         load_location = self._convert_labware_location(location=location)
 
+        # TODO (lc 06-27-2023) Let's keep this around up to launch to
+        # make the user-facing name switching a bit easier for everyone.
+        mapped_load_name = load_labware_params.resolve_loadname(load_name)
+
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            mapped_load_name, namespace, version, custom_labware_params
         )
 
         load_result = self._engine_client.load_labware(
-            load_name=load_name,
+            load_name=mapped_load_name,
             location=load_location,
             namespace=namespace,
             version=version,

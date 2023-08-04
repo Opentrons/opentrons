@@ -265,7 +265,6 @@ export function RunSummary(): JSX.Element {
           </Flex>
         )}
       </Btn>
-      {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
         marginTop={SPACING.spacing24}

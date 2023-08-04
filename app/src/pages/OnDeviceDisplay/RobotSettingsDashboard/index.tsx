@@ -1,38 +1,65 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import last from 'lodash/last'
 
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
-
-import { getLocalRobot, getRobotApiVersion } from '../../../redux/discovery'
+import { EthernetConnectionDetails } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
+import {
+  DeviceReset,
+  TouchscreenBrightness,
+  TouchScreenSleep,
+  NetworkSettings,
+  RobotName,
+  RobotSettingsJoinOtherNetwork,
+  RobotSettingsSelectAuthenticationType,
+  RobotSettingsSetWifiCred,
+  RobotSettingsWifi,
+  RobotSettingsWifiConnect,
+  RobotSystemVersion,
+  UpdateChannel,
+} from '../../../organisms/RobotSettingsDashboard'
 import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
-import { getDevtoolsEnabled } from '../../../redux/config'
-import { UNREACHABLE } from '../../../redux/discovery/constants'
-import { Navigation } from '../../../organisms/Navigation'
-import { useLEDLights } from '../../../organisms/Devices/hooks'
-import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
+import {
+  getLocalRobot,
+  getRobotApiVersion,
+  UNREACHABLE,
+} from '../../../redux/discovery'
+import { fetchStatus, postWifiConfigure } from '../../../redux/networking'
+import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
+import { useWifiList } from '../../../resources/networking/hooks'
 import { useNetworkConnection } from '../hooks'
-import { RobotSettingButton } from './RobotSettingButton'
-import { RobotSettingsContent } from './RobotSettingsContent'
+import { RobotSettingsList } from './RobotSettingsList'
 
-import type { State } from '../../../redux/types'
-import type { SettingOption } from './RobotSettingButton'
+import type { WifiSecurityType } from '@opentrons/api-client'
+import type { Dispatch, State } from '../../../redux/types'
+
+/**
+ * a set of screen options for the robot settings dashboard page
+ */
+export type SettingOption =
+  | 'NetworkSettings'
+  | 'RobotName'
+  | 'RobotSystemVersion'
+  | 'TouchscreenSleep'
+  | 'TouchscreenBrightness'
+  | 'TextSize'
+  | 'DeviceReset'
+  | 'UpdateChannel'
+  | 'EthernetConnectionDetails'
+  | 'RobotSettingsSelectAuthenticationType'
+  | 'RobotSettingsJoinOtherNetwork'
+  | 'RobotSettingsSetWifiCred'
+  | 'RobotSettingsWifi'
+  | 'RobotSettingsWifiConnect'
+
+export type SetSettingOption = (option: SettingOption | null) => void
 
 export function RobotSettingsDashboard(): JSX.Element {
-  const { i18n, t } = useTranslation([
-    'device_settings',
-    'app_settings',
-    'shared',
-  ])
+  const { i18n, t } = useTranslation('shared')
+
+  // GENERAL ROBOT INFORMATION
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
-  const networkConnection = useNetworkConnection(robotName)
-  const [
-    currentOption,
-    setCurrentOption,
-  ] = React.useState<SettingOption | null>(null)
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
@@ -42,102 +69,142 @@ export function RobotSettingsDashboard(): JSX.Element {
       : null
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
-  const devToolsOn = useSelector(getDevtoolsEnabled)
 
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      columnGap={SPACING.spacing8}
-      paddingX={SPACING.spacing40}
-    >
-      {currentOption != null ? (
-        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing8}>
-          <RobotSettingsContent
-            currentOption={currentOption}
-            setCurrentOption={setCurrentOption}
-            networkConnection={networkConnection}
-            robotName={robotName}
-            robotServerVersion={
-              robotServerVersion ??
-              i18n.format(t('shared:unknown'), 'capitalize')
-            }
-            isUpdateAvailable={isUpdateAvailable}
-            devToolsOn={devToolsOn}
-          />
-        </Flex>
-      ) : (
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Navigation routes={onDeviceDisplayRoutes} />
-          <RobotSettingButton
-            settingName={t('network_settings')}
-            settingInfo={networkConnection?.connectionStatus}
-            currentOption="NetworkSettings"
-            setCurrentOption={setCurrentOption}
-            iconName="wifi"
-          />
-          <Link to="/robot-settings/rename-robot">
-            <RobotSettingButton
-              settingName={t('robot_name')}
-              settingInfo={robotName}
-              currentOption="RobotName"
-              setCurrentOption={setCurrentOption}
-              iconName="flex-robot"
-            />
-          </Link>
-          <RobotSettingButton
-            settingName={t('robot_system_version')}
-            settingInfo={
-              robotServerVersion != null
-                ? `v${robotServerVersion}`
-                : t('robot_settings_advanced_unknown')
-            }
-            currentOption="RobotSystemVersion"
-            setCurrentOption={setCurrentOption}
-            isUpdateAvailable={isUpdateAvailable}
-            iconName="update"
-          />
-          <RobotSettingButton
-            settingName={t('display_led_lights')}
-            settingInfo={t('display_led_lights_description')}
-            setCurrentOption={setCurrentOption}
-            iconName="light"
-            ledLights
-            lightsOn={lightsEnabled}
-            toggleLights={toggleLights}
-          />
-          <RobotSettingButton
-            settingName={t('touchscreen_sleep')}
-            currentOption="TouchscreenSleep"
-            setCurrentOption={setCurrentOption}
-            iconName="sleep"
-          />
-          <RobotSettingButton
-            settingName={t('touchscreen_brightness')}
-            currentOption="TouchscreenBrightness"
-            setCurrentOption={setCurrentOption}
-            iconName="brightness"
-          />
-          <RobotSettingButton
-            settingName={t('device_reset')}
-            currentOption="DeviceReset"
-            setCurrentOption={setCurrentOption}
-            iconName="reset"
-          />
-          <RobotSettingButton
-            settingName={t('app_settings:update_channel')}
-            currentOption="UpdateChannel"
-            setCurrentOption={setCurrentOption}
-            iconName="update-channel"
-          />
-          <RobotSettingButton
-            settingName={t('app_settings:enable_dev_tools')}
-            settingInfo={t('dev_tools_description')}
-            iconName="build"
-            enabledDevTools
-            devToolsOn={devToolsOn}
-          />
-        </Flex>
-      )}
-    </Flex>
-  )
+  // ACTIVE CONNECTION INFORMATION
+  const networkConnection = useNetworkConnection(robotName)
+  const { activeSsid } = networkConnection
+  const list = useWifiList(robotName)
+  const connectedWifiAuthType = list.find(wifi => wifi.ssid === activeSsid)
+    ?.securityType
+
+  // LOCAL STATE MANAGEMENT for wi-fi user input
+  const [selectedSsid, setSelectedSsid] = React.useState<string>('')
+  const [
+    selectedAuthType,
+    setSelectedAuthType,
+  ] = React.useState<WifiSecurityType>('wpa-psk')
+  const [password, setPassword] = React.useState<string>('')
+
+  // REQUESTS
+  const dispatch = useDispatch<Dispatch>()
+  const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
+  const requestState = useSelector((state: State) => {
+    const lastId = last(requestIds)
+    return lastId != null ? getRequestById(state, lastId) : null
+  })
+
+  const handleWifiConnect = (): void => {
+    const options = {
+      ssid: selectedSsid,
+      securityType: selectedAuthType,
+      hidden: selectedAuthType === 'none',
+      psk: password,
+    }
+    dispatchApiRequest(postWifiConfigure(robotName, options))
+    setCurrentOption('RobotSettingsWifiConnect')
+    setPassword('')
+  }
+
+  React.useEffect(() => {
+    dispatch(fetchStatus(robotName))
+  }, [robotName, dispatch])
+
+  // PAGE-LEVEL SWITCH MANAGEMENT
+  const [
+    currentOption,
+    setCurrentOption,
+  ] = React.useState<SettingOption | null>(null)
+
+  switch (currentOption) {
+    case 'RobotName':
+      return <RobotName setCurrentOption={setCurrentOption} />
+    case 'RobotSystemVersion':
+      return (
+        <RobotSystemVersion
+          currentVersion={
+            robotServerVersion ?? i18n.format(t('shared:unknown'), 'capitalize')
+          }
+          isUpdateAvailable={isUpdateAvailable}
+          setCurrentOption={setCurrentOption}
+        />
+      )
+    case 'NetworkSettings':
+      return (
+        <NetworkSettings
+          networkConnection={networkConnection}
+          setCurrentOption={setCurrentOption}
+        />
+      )
+    case 'TouchscreenSleep':
+      return <TouchScreenSleep setCurrentOption={setCurrentOption} />
+    case 'TouchscreenBrightness':
+      return <TouchscreenBrightness setCurrentOption={setCurrentOption} />
+    // TODO(bh, 2023-6-9): TextSize does not appear to be active in the app yet
+    // case 'TextSize':
+    //   return <TextSize setCurrentOption={setCurrentOption} />
+    case 'DeviceReset':
+      return (
+        <DeviceReset
+          robotName={robotName}
+          setCurrentOption={setCurrentOption}
+        />
+      )
+    case 'UpdateChannel':
+      return <UpdateChannel handleBackPress={() => setCurrentOption(null)} />
+
+    case 'RobotSettingsWifi':
+      return (
+        <RobotSettingsWifi
+          activeSsid={activeSsid}
+          connectedWifiAuthType={connectedWifiAuthType}
+          setSelectedSsid={setSelectedSsid}
+          setCurrentOption={setCurrentOption}
+        />
+      )
+    case 'RobotSettingsJoinOtherNetwork':
+      return (
+        <RobotSettingsJoinOtherNetwork
+          setCurrentOption={setCurrentOption}
+          setSelectedSsid={setSelectedSsid}
+        />
+      )
+    case 'RobotSettingsSelectAuthenticationType':
+      return (
+        <RobotSettingsSelectAuthenticationType
+          handleWifiConnect={handleWifiConnect}
+          selectedAuthType={selectedAuthType}
+          setCurrentOption={setCurrentOption}
+          setSelectedAuthType={setSelectedAuthType}
+        />
+      )
+    case 'RobotSettingsSetWifiCred':
+      return (
+        <RobotSettingsSetWifiCred
+          handleConnect={handleWifiConnect}
+          password={password}
+          setCurrentOption={setCurrentOption}
+          setPassword={setPassword}
+        />
+      )
+    case 'RobotSettingsWifiConnect':
+      return (
+        <RobotSettingsWifiConnect
+          handleConnect={handleWifiConnect}
+          requestState={requestState}
+          selectedSsid={selectedSsid}
+          setCurrentOption={setCurrentOption}
+        />
+      )
+
+    case 'EthernetConnectionDetails':
+      return (
+        <EthernetConnectionDetails
+          handleGoBack={() => setCurrentOption('NetworkSettings')}
+        />
+      )
+
+    // fallthrough option: render the robot settings list of buttons
+    default:
+      return <RobotSettingsList setCurrentOption={setCurrentOption} />
+  }
 }

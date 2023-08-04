@@ -136,16 +136,17 @@ def _need_type_query(attached: ToolDetectionResult) -> Set[NodeId]:
     return should_respond
 
 
-async def _resolve_tool_types(
+IntermediateResolution = Tuple[
+    Dict[NodeId, PipetteInformation], Dict[NodeId, GripperInformation]
+]
+
+
+async def _do_tool_resolve(
     messenger: CanMessenger,
     wc: WaitableCallback,
-    attached: ToolDetectionResult,
+    should_respond: Set[NodeId],
     timeout_sec: float,
-) -> ToolSummary:
-
-    should_respond = _need_type_query(attached)
-    if not should_respond:
-        return ToolSummary(left=None, right=None, gripper=None)
+) -> IntermediateResolution:
     await messenger.send(
         node_id=NodeId.broadcast,
         message=message_definitions.InstrumentInfoRequest(),
@@ -170,10 +171,66 @@ async def _resolve_tool_types(
         else:
             gripper[node] = info
 
+    return pipettes, gripper
+
+
+async def _resolve_with_stimulus_retries(
+    messenger: CanMessenger,
+    wc: WaitableCallback,
+    should_respond: Set[NodeId],
+    attempt_timeout_sec: float,
+    output_queue: "asyncio.Queue[IntermediateResolution]",
+) -> None:
+    expected_pipettes = {NodeId.pipette_left, NodeId.pipette_right}.intersection(
+        should_respond
+    )
+    expected_gripper = {NodeId.gripper}.intersection(should_respond)
+
+    while True:
+        pipettes, gripper = await _do_tool_resolve(
+            messenger, wc, should_respond, attempt_timeout_sec
+        )
+        output_queue.put_nowait((pipettes, gripper))
+        seen_pipettes = set([k.application_for() for k in pipettes.keys()])
+        seen_gripper = set([k.application_for() for k in gripper.keys()])
+        if seen_pipettes == expected_pipettes and seen_gripper == expected_gripper:
+            return
+
+
+async def _resolve_tool_types(
+    messenger: CanMessenger,
+    wc: WaitableCallback,
+    attached: ToolDetectionResult,
+    timeout_sec: float,
+) -> ToolSummary:
+
+    should_respond = _need_type_query(attached)
+    if not should_respond:
+        return ToolSummary(left=None, right=None, gripper=None)
+
+    resolve_queue: "asyncio.Queue[IntermediateResolution]" = asyncio.Queue()
+
+    try:
+        await asyncio.wait_for(
+            _resolve_with_stimulus_retries(
+                messenger, wc, should_respond, min(timeout_sec / 10, 0.5), resolve_queue
+            ),
+            timeout_sec,
+        )
+    except asyncio.TimeoutError:
+        log.warning("No response from expected tool")
+
+    last_element: IntermediateResolution = ({}, {})
+    try:
+        while True:
+            last_element = resolve_queue.get_nowait()
+    except asyncio.QueueEmpty:
+        pass
+
     return ToolSummary(
-        left=pipettes.get(NodeId.pipette_left, None),
-        right=pipettes.get(NodeId.pipette_right, None),
-        gripper=gripper.get(NodeId.gripper, None),
+        left=last_element[0].get(NodeId.pipette_left, None),
+        right=last_element[0].get(NodeId.pipette_right, None),
+        gripper=last_element[1].get(NodeId.gripper, None),
     )
 
 

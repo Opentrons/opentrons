@@ -43,6 +43,7 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from './utils'
+import { SetupInstructionsModal } from './SetupInstructionsModal'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
@@ -145,7 +146,7 @@ export function ProtocolSetupModules({
   runId,
   setSetupScreen,
 }: ProtocolSetupModulesProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -193,12 +194,9 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showSetupInstructionsModal ? (
-          <LegacyModal
-            title={t('setup_instructions')}
-            onClose={() => setShowSetupInstructionsModal(false)}
-          >
-            TODO: setup instructions modal
-          </LegacyModal>
+          <SetupInstructionsModal
+            setShowSetupInstructionsModal={setShowSetupInstructionsModal}
+          />
         ) : null}
         {showDeckMapModal ? (
           <LegacyModal
@@ -247,7 +245,7 @@ export function ProtocolSetupModules({
         />
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          buttonText={t('setup_instructions')}
+          buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
           buttonType="tertiaryLowLight"
           iconName="information"
           iconPlacement="startIcon"

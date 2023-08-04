@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect'
-import { useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import {
   THERMOCYCLER_MODULE_TYPE,
@@ -91,8 +90,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
 > = createSelector(
   getRobotStateAtActiveItem,
   getModuleEntities,
-  (robotState, moduleEntities) => {
-    const robotType = useSelector(getRobotType)
+  getRobotType,
+  (robotState, moduleEntities, robotType) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
     if (robotState == null) return null

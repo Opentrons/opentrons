@@ -19,7 +19,11 @@ from opentrons.config import (
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
-from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
+from opentrons.hardware_control.types import (
+    HardwareEvent,
+    DoorStateNotification,
+    StatusBarState,
+)
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
@@ -306,6 +310,8 @@ async def _postinit_ot3_tasks(
         await _do_updates(hardware, update_manager)
         await hardware.cache_instruments()
         await _home_on_boot(hardware)
+        update_manager.mark_initialized()
+        await hardware.set_status_bar_state(StatusBarState.ACTIVATION)
     except Exception:
         log.exception("Hardware initialization failure")
         raise

@@ -266,7 +266,10 @@ class OT3UpdateActions(UpdateActionsInterface):
 
     def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Copy the machine id over to the new partition"""
-        pass
+        mid = open(os.path.join(current_root, "etc", "machine-id")).read()
+        with open(os.path.join(new_root, "etc", "machine-id"), "w") as new_mid:
+            new_mid.write(mid)
+        LOG.info(f"Wrote machine_id {mid.strip()} to {new_root}/etc/machine-id")
 
     def write_update(
         self,

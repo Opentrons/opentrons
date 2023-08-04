@@ -104,6 +104,7 @@ def create_csv_test_report_photometric(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
                 ],
@@ -186,6 +187,7 @@ def create_csv_test_report(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
@@ -270,12 +272,14 @@ def store_serial_numbers_pm(
     report: CSVReport,
     robot: str,
     pipette: str,
+    tips: str,
     environment: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])
 
@@ -295,6 +299,7 @@ def store_serial_numbers(
     report: CSVReport,
     robot: str,
     pipette: str,
+    tips: str,
     scale: str,
     environment: str,
     liquid: str,
@@ -302,6 +307,7 @@ def store_serial_numbers(
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
     report("SERIAL-NUMBERS", "scale", [scale])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])

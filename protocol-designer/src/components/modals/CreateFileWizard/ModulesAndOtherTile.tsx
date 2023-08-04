@@ -193,7 +193,6 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   return (
     <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       <EquipmentOption
-        {...props}
         onClick={() => {
           if (values.additionalEquipment.includes('gripper')) {
             props.setFieldValue(

@@ -7,6 +7,7 @@ import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 import {
+  FLEX_ROBOT_TYPE,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -47,7 +48,10 @@ import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import { Reducer } from 'redux'
-import { NormalizedPipetteById } from '@opentrons/step-generation'
+import {
+  NormalizedAdditionalEquipmentById,
+  NormalizedPipetteById,
+} from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
 import {
   CreateContainerAction,
@@ -111,6 +115,7 @@ import {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
+import { ToggleIsGripperRequiredAction } from '../actions/additionalItems'
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -134,6 +139,7 @@ export type UnsavedFormActions =
   | EditProfileCycleAction
   | EditProfileStepAction
   | SelectMultipleStepsAction
+  | ToggleIsGripperRequiredAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -193,6 +199,7 @@ export const unsavedForm = (
     case 'CANCEL_STEP_FORM':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
+    case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -481,6 +488,7 @@ export type SavedStepFormsActions =
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
   | EditModuleAction
+  | ToggleIsGripperRequiredAction
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
@@ -983,7 +991,6 @@ export const savedStepForms = (
         { ...savedStepForms }
       )
     }
-
     case 'REPLACE_CUSTOM_LABWARE_DEF': {
       // no mismatch, it's safe to keep all steps as they are
       if (!action.payload.isOverwriteMismatched) return savedStepForms
@@ -1259,6 +1266,67 @@ export const pipetteInvariantProperties: Reducer<
   },
   initialPipetteState
 )
+
+const initialAdditionalEquipmentState = {}
+
+export const additionalEquipmentInvariantProperties = handleActions<NormalizedAdditionalEquipmentById>(
+  {
+    //  @ts-expect-error
+    LOAD_FILE: (
+      state,
+      action: LoadFileAction
+    ): NormalizedAdditionalEquipmentById => {
+      const { file } = action.payload
+      const gripper = file.commands.filter(
+        command =>
+          // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
+          command.commandType === 'moveLabware' &&
+          // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
+          command.params.strategy === 'usingGripper'
+      )
+      const hasGripper = gripper.length > 0
+      // @ts-expect-error  (jr, 6/22/23): OT-3 Standard doesn't exist on schemav6
+      const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
+      const additionalEquipmentId = uuid()
+      const updatedEquipment = {
+        [additionalEquipmentId]: {
+          name: 'gripper' as const,
+          id: additionalEquipmentId,
+        },
+      }
+      if (hasGripper && isOt3) {
+        return { ...state, ...updatedEquipment }
+      } else {
+        return { ...state }
+      }
+    },
+    TOGGLE_IS_GRIPPER_REQUIRED: (
+      state: NormalizedAdditionalEquipmentById
+    ): NormalizedAdditionalEquipmentById => {
+      const additionalEquipmentId = Object.keys(state)[0]
+      const existingEquipment = state[additionalEquipmentId]
+
+      let updatedEquipment
+
+      if (existingEquipment && existingEquipment.name === 'gripper') {
+        updatedEquipment = {}
+      } else {
+        const newAdditionalEquipmentId = uuid()
+        updatedEquipment = {
+          [newAdditionalEquipmentId]: {
+            name: 'gripper' as const,
+            id: newAdditionalEquipmentId,
+          },
+        }
+      }
+
+      return updatedEquipment
+    },
+    DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
+  },
+  initialAdditionalEquipmentState
+)
+
 export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState: string[] = []
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
@@ -1379,6 +1447,7 @@ export interface RootState {
   labwareInvariantProperties: NormalizedLabwareById
   pipetteInvariantProperties: NormalizedPipetteById
   moduleInvariantProperties: ModuleEntities
+  additionalEquipmentInvariantProperties: NormalizedAdditionalEquipmentById
   presavedStepForm: PresavedStepFormState
   savedStepForms: SavedStepFormState
   unsavedForm: FormState
@@ -1400,6 +1469,10 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     moduleInvariantProperties: moduleInvariantProperties(
       prevStateFallback.moduleInvariantProperties,
+      action
+    ),
+    additionalEquipmentInvariantProperties: additionalEquipmentInvariantProperties(
+      prevStateFallback.additionalEquipmentInvariantProperties,
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),

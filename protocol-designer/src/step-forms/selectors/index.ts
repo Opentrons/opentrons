@@ -15,7 +15,10 @@ import {
   PipetteName,
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import {
+  NormalizedAdditionalEquipmentById,
+  TEMPERATURE_DEACTIVATED,
+} from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
   getFormWarnings,
@@ -147,10 +150,21 @@ export const _getPipetteEntitiesRootState: (
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
+
 export const getPipetteEntities: Selector<
   BaseState,
   PipetteEntities
 > = createSelector(rootSelector, _getPipetteEntitiesRootState)
+
+export const _getAdditionalEquipmentRootState: (
+  arg: RootState
+) => NormalizedAdditionalEquipmentById = rs =>
+  rs.additionalEquipmentInvariantProperties
+
+export const getAdditionalEquipment: Selector<
+  BaseState,
+  NormalizedAdditionalEquipmentById
+> = createSelector(rootSelector, _getAdditionalEquipmentRootState)
 
 const _getInitialDeckSetupStepFormRootState: (
   arg: RootState

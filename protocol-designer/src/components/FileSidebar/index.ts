@@ -3,11 +3,18 @@ import { i18n } from '../../localization'
 import { actions, selectors } from '../../navigation'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { getRobotType } from '../../file-data/selectors'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
 import {
   actions as loadFileActions,
   selectors as loadFileSelectors,
 } from '../../load-file'
-import { FileSidebar as FileSidebarComponent, Props } from './FileSidebar'
+import {
+  AdditionalEquipment,
+  FileSidebar as FileSidebarComponent,
+  Props,
+} from './FileSidebar'
+import type { RobotType } from '@opentrons/shared-data'
 import type { BaseState, ThunkDispatch } from '../../types'
 import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
 
@@ -19,6 +26,8 @@ interface SP {
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
+  robotType: RobotType
+  additionalEquipment: AdditionalEquipment
 }
 export const FileSidebar = connect(
   mapStateToProps,
@@ -31,12 +40,17 @@ function mapStateToProps(state: BaseState): SP {
   const fileData = fileDataSelectors.createFile(state)
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
+  const robotType = getRobotType(state)
+  const additionalEquipment = getAdditionalEquipment(state)
+
   return {
     canDownload,
     fileData,
     pipettesOnDeck: initialDeckSetup.pipettes,
     modulesOnDeck: initialDeckSetup.modules,
     savedStepForms: stepFormSelectors.getSavedStepForms(state),
+    robotType: robotType,
+    additionalEquipment: additionalEquipment,
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
@@ -57,6 +71,8 @@ function mergeProps(
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,
+    robotType,
+    additionalEquipment,
   } = stateProps
   const { dispatch } = dispatchProps
   return {
@@ -77,5 +93,7 @@ function mergeProps(
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,
+    robotType,
+    additionalEquipment,
   }
 }

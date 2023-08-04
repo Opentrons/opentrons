@@ -11,9 +11,7 @@ import { useIsFinishedUnboxing } from '../../RobotSettingsDashboard/NetworkSetti
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
-const mockSetShowSelectAuthenticationType = jest.fn()
 const mockSetSelectedAuthType = jest.fn()
-const mockSetChangeState = jest.fn()
 
 jest.mock('../SetWifiCred')
 jest.mock('../../../redux/networking')
@@ -63,12 +61,8 @@ describe('SelectAuthenticationType', () => {
   let props: React.ComponentProps<typeof SelectAuthenticationType>
   beforeEach(() => {
     props = {
-      ssid: 'mockWifi',
-      fromWifiList: undefined,
       selectedAuthType: 'wpa-psk',
-      setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       setSelectedAuthType: mockSetSelectedAuthType,
-      setChangeState: mockSetChangeState,
     }
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
@@ -87,27 +81,12 @@ describe('SelectAuthenticationType', () => {
 
   it('should render text and buttons', () => {
     const [{ getByText }] = render(props)
-    getByText('Select a security type')
-    getByText('Continue')
     getByText('WPA2 Personal')
     getByText('Most labs use this method')
     getByText('None')
     getByText('Not recommended')
     getByText('Your MAC Address is WI:FI:00:00:00:00')
     getByText('Need another security type?')
-  })
-
-  it('when tapping back button, call a mock function - fromWifiList', () => {
-    props.fromWifiList = true
-    const [{ getAllByRole }] = render(props)
-    getAllByRole('button')[0].click()
-    expect(props.setChangeState).toHaveBeenCalled()
-  })
-
-  it('should call call a mock function - wpa when tapping continue button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Continue').click()
-    expect(mockSetShowSelectAuthenticationType).toHaveBeenCalled()
   })
 
   it('should render AlternativeSecurityTypeModal when tapping need another security type? button', () => {

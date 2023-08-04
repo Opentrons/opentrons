@@ -7,6 +7,8 @@ import {
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
+  OT2_ROBOT_TYPE,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -16,10 +18,12 @@ import {
 } from '../../../step-forms'
 import { getRobotType } from '../../../file-data/selectors'
 import { FormPipette } from '../../../step-forms/types'
+import { getAdditionalEquipment } from '../../../step-forms/selectors'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
+import { GripperRow } from '../GripperRow'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
@@ -34,7 +38,9 @@ const getPipettesForEditPipetteFormMock = stepFormSelectors.getPipettesForEditPi
 const mockGetRobotType = getRobotType as jest.MockedFunction<
   typeof getRobotType
 >
-
+const mockGetAdditionalEquipment = getAdditionalEquipment as jest.MockedFunction<
+  typeof getAdditionalEquipment
+>
 describe('EditModulesCard', () => {
   let store: any
   let crashableMagneticModule: ModuleOnDeck | undefined
@@ -72,8 +78,8 @@ describe('EditModulesCard', () => {
       pipetteName: 'p300_multi_test',
       tiprackDefURI: 'tiprack300',
     }
-
-    mockGetRobotType.mockReturnValue('OT-2 Standard')
+    mockGetAdditionalEquipment.mockReturnValue({})
+    mockGetRobotType.mockReturnValue(OT2_ROBOT_TYPE)
     getDisableModuleRestrictionsMock.mockReturnValue(false)
     getPipettesForEditPipetteFormMock.mockReturnValue({
       left: crashablePipette,
@@ -195,6 +201,7 @@ describe('EditModulesCard', () => {
     expect(
       wrapper.find(ModuleRow).filter({ type: MAGNETIC_MODULE_TYPE }).props()
     ).toEqual({
+      robotType: OT2_ROBOT_TYPE,
       type: MAGNETIC_MODULE_TYPE,
       moduleOnDeck: crashableMagneticModule,
       showCollisionWarnings: true,
@@ -218,7 +225,7 @@ describe('EditModulesCard', () => {
     })
   })
   it('displays module row with module to add when no moduleData for Flex', () => {
-    mockGetRobotType.mockReturnValue('OT-3 Standard')
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     const wrapper = render(props)
     const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
       moduleType => moduleType !== 'magneticModuleType'
@@ -232,5 +239,21 @@ describe('EditModulesCard', () => {
         openEditModuleModal: props.openEditModuleModal,
       })
     })
+  })
+  it('displays gripper row with no gripper', () => {
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
+    const wrapper = render(props)
+    expect(wrapper.find(GripperRow)).toHaveLength(1)
+    expect(wrapper.find(GripperRow).props().isGripperAdded).toEqual(false)
+  })
+  it('displays gripper row with gripper attached', () => {
+    const mockGripperId = 'gripeprId'
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
+    mockGetAdditionalEquipment.mockReturnValue({
+      [mockGripperId]: { name: 'gripper', id: mockGripperId },
+    })
+    const wrapper = render(props)
+    expect(wrapper.find(GripperRow)).toHaveLength(1)
+    expect(wrapper.find(GripperRow).props().isGripperAdded).toEqual(true)
   })
 })

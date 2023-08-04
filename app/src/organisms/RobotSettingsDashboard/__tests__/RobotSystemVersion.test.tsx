@@ -75,8 +75,8 @@ describe('RobotSystemVersion', () => {
   })
 
   it('should call a mock function when tapping Back button', () => {
-    const [{ getByTestId }] = render(props)
-    getByTestId('RobotSystemVersion_back_button').click()
+    const [{ getByRole }] = render(props)
+    getByRole('button').click()
     expect(mockBack).toHaveBeenCalled()
   })
 })

@@ -237,6 +237,7 @@ def test_get_pipette_working_volume() -> None:
             "pipette-id": StaticPipetteConfig(
                 min_volume=1,
                 max_volume=9001,
+                channels=5,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
@@ -261,6 +262,7 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
             "pipette-id": StaticPipetteConfig(
                 min_volume=1,
                 max_volume=9001,
+                channels=5,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
@@ -294,6 +296,7 @@ def test_get_pipette_available_volume() -> None:
             "pipette-id": StaticPipetteConfig(
                 min_volume=1,
                 max_volume=123,
+                channels=3,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
@@ -305,6 +308,7 @@ def test_get_pipette_available_volume() -> None:
             "pipette-id-none": StaticPipetteConfig(
                 min_volume=1,
                 max_volume=123,
+                channels=5,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
@@ -413,6 +417,7 @@ def test_get_static_config() -> None:
         serial_number="serial-number",
         min_volume=1.23,
         max_volume=4.56,
+        channels=9,
         return_tip_scale=7.89,
         nominal_tip_overlap={},
         home_position=10.12,
@@ -442,6 +447,7 @@ def test_get_nominal_tip_overlap() -> None:
         serial_number="",
         min_volume=0,
         max_volume=0,
+        channels=10,
         return_tip_scale=0,
         nominal_tip_overlap={
             "some-uri": 100,

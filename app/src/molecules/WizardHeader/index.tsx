@@ -11,6 +11,7 @@ import {
   COLORS,
   SPACING,
   RESPONSIVENESS,
+  BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
@@ -37,12 +38,19 @@ const EXIT_BUTTON_STYLE = css`
     font-weight: ${TYPOGRAPHY.fontWeightBold};
   }
 `
+const BOX_STYLE = css`
+  background-color: ${COLORS.white} @media
+    ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-radius: ${BORDERS.borderRadiusSize4};
+  }
+`
 const HEADER_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing16} ${SPACING.spacing32};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: 1.75rem ${SPACING.spacing32};
+    border-radius: ${BORDERS.borderRadiusSize4};
   }
 `
 const HEADER_TEXT_STYLE = css`
@@ -67,7 +75,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const { t } = useTranslation('shared')
 
   return (
-    <Box backgroundColor={COLORS.white}>
+    <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW}>
           <StyledText css={HEADER_TEXT_STYLE} marginRight={SPACING.spacing8}>

@@ -4,57 +4,46 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.12.0
+# Internal Release 0.13.0
 
 ## New Stuff In This Release
 
-- If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
-
-# Internal Release 0.11.0
-
-This is internal release 0.11.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
-
-Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
-
-## Update Notes
-
-- ⚠️ After upgrading your robot to 0.11.0, you'll need to factory-reset its run history before you can use it.
-
-  1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
-  2. Under **Advanced > Factory reset**, select **Choose reset settings.**
-  3. Choose **Clear protocol run history,** and then select **Clear data and restart robot.**
-
-  Note that this will remove all of your saved labware offsets.
-
-  You will need to follow these steps if you subsequently downgrade back to a prior release, too.
-
-## New Stuff In This Release
-
-- The HTTP API will now accept both styles of deck slot name: coordinates like "C2", and integers like "5". Flexes will now return the "C2" style, and OT-2s will continue to return the "5" style.
+- Multiple updates to Flex motion control parameters from hardware testing for both gantry and plunger speeds and acceleration
+   - Pipette default flowrates are higher
+- The LED status bar animates during firmware updates
+- Tip presence detection is now integrated; you should get errors after failing to pick up or drop a tip
+- Many (many) visual and workflow fixes and improvements from design QA for the ODD
+- ODD should now display an error screen instead of a white screen
+- You can load labware to an OFF_DECK location
+- You can now use calibrate gripper in the reset settings options
+- There are consistent error codes in protocol status inforation now
+- The ODD should prompt you to update your pipettes when you attach one that needs it (!)
+- The 96 shouldn't fall down when you attach it now (!)
+- More little stall detection fixes
+- The ODD will now display a spinner until the robot server has started
+- Homing now goes to the limit switch then backs off until the limit switch is released
+- Support for PVT (v3.5) pipettes
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
 ### ODD
-- While many individual flows work, going in between them often does not, you have to use the secret menu
-- The ODD generally won't synch up to what the robot is doing if the app is controlling it - for instance, if you start a protocol from the app the ODD won't follow along on its own
-- The ODD doesn't really tell you if the robot server hasn't started yet; if a robot looks on but has the name "opentrons", or says it's not network-connected when you know it is, probably the server isn't up yet, give it another little bit
 - It can take a while for the robot to start after installing an update (it's the firmware updates happening on boot). Allow 10 minutes after an update that has a firmware change.
 
 ### Robot Control
-- Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot or restart the robot server
 - Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
 - Labware pick up failure with gripper
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
-- Liquid handling protocols with 1 and 8 channel pipettes
+- Protocol behavior
 - Labware movement between slots/modules, both manual and with gripper, from python protocols
 - Labware drop/gripper crash errors, but they're very insensitive
 - Pipette and gripper automated offset calibration
 - Network connectivity and discoverability
-- Firmware update for all devices attached when the robot turns on
+- Firmware update for all devices 
 - Cancelling a protocol run. We're even more sure we fixed this so definitely tell us if it's not.
 - USB connectivity
+- Stall detection firing basically ever unless you clearly ran into something
 
 ### ODD
 - Protocol execution including end-of-protocol screen

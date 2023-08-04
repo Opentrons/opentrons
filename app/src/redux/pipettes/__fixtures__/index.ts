@@ -349,6 +349,8 @@ export const mockPipetteData1Channel: PipetteData = {
   instrumentType: 'pipette',
   mount: 'left',
   serialNumber: 'abc',
+  subsystem: 'pipette_left',
+  ok: true,
 }
 export const mockAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData1Channel,
@@ -371,6 +373,8 @@ export const mockPipetteData8Channel: PipetteData = {
   instrumentType: 'pipette',
   mount: 'right',
   serialNumber: 'cba',
+  subsystem: 'pipette_right',
+  ok: true,
 }
 export const mock8ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData8Channel,
@@ -391,8 +395,10 @@ export const mockPipetteData96Channel: PipetteData = {
   instrumentModel: 'p1000_96_v1',
   instrumentName: 'p1000_96',
   instrumentType: 'pipette',
-  mount: 'right',
+  mount: 'left',
   serialNumber: 'cba',
+  subsystem: 'pipette_left',
+  ok: true,
 }
 export const mock96ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData96Channel,
