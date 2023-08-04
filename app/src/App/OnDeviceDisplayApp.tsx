@@ -12,7 +12,10 @@ import {
   useIdle,
   useScrolling,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import {
+  ApiHostProvider,
+  useCurrentSubsystemUpdateQuery,
+} from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../atoms/SleepScreen'
@@ -292,6 +295,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 }
 
 function TopLevelRedirects(): JSX.Element | null {
+  const { data: subsystems } = useCurrentSubsystemUpdateQuery(null)
+  console.log('subsystems', subsystems)
+
   const runRouteMatch = useRouteMatch({ path: '/runs/:runId' })
   const currentRunRoute = useCurrentRunRoute()
 

@@ -7,13 +7,25 @@ export type Subsystem =
   | 'gripper'
   | 'rear_panel'
 
+type UpdateStatus = 'queued' | 'updating' | 'done'
 export interface SubsystemUpdateProgressData {
   data: {
     id: string
     createdAt: string
     subsystem: Subsystem
-    updateStatus: 'queued' | 'updating' | 'done'
+    updateStatus: UpdateStatus
     updateProgress: number
     updateError: string
   }
+}
+
+export interface CurrentSubsystemUpdate {
+  id: string
+  createdAt: string
+  subsystem: Subsystem
+  updateStatus: UpdateStatus
+}
+
+export interface CurrentSubsystemUpdates {
+  data: CurrentSubsystemUpdate[]
 }
