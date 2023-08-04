@@ -2,7 +2,7 @@
 import argparse
 import asyncio
 from dataclasses import dataclass
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, Any
 from pprint import pprint
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -83,7 +83,7 @@ async def _check_belt_accuracy(
     return ret
 
 
-async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> AttitudeMatrix:
+async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> Tuple[AttitudeMatrix, Dict[str, Any]]:
     ui.print_header("PROBE the DECK")
     await api.reset_instrument_offset(mount)
     pip = api.hardware_pipettes[mount.to_mount()]
@@ -101,13 +101,13 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> AttitudeMatrix
     pprint(attitude)
     print("details")
     pprint(details)
-    return attitude
+    return attitude, details
 
 
 async def run_belt_calibration(
     api: OT3API, mount: types.OT3Mount, test: bool
 ) -> Tuple[
-    Optional[TestBeltCalibrationData], AttitudeMatrix, Optional[TestBeltCalibrationData]
+    Optional[TestBeltCalibrationData], AttitudeMatrix, Dict[str, Any], Optional[TestBeltCalibrationData]
 ]:
     """Run belt calibration."""
     # setup
@@ -119,29 +119,26 @@ async def run_belt_calibration(
     await api.move_to(mount, attach_pos._replace(z=current_pos.z))
     if not api.is_simulator:
         ui.get_user_ready("ATTACH a probe to pipette")
-    print("resetting robot calibration")
-    await api.reset_instrument_offset(mount)
-    api.reset_robot_calibration()
 
-    before_data = None
-    after_data = None
-
-    # test before
-    if test:
-        ui.print_header("TEST BEFORE CALIBRATION")
-        before_data = TestBeltCalibrationData(
-            pipette_offset=await _calibrate_pipette(api, mount),
-            deck_offsets=await _check_belt_accuracy(api, mount),
-        )
+    without_data = None
+    with_data = None
 
     # calibrate belts
     ui.print_header("CALIBRATE BELTS")
-    attitude = await _calibrate_belts(api, mount)
+    attitude, details = await _calibrate_belts(api, mount)
 
     # test after
     if test:
-        ui.print_header("TEST AFTER CALIBRATION")
-        after_data = TestBeltCalibrationData(
+        ui.print_header("TEST WITH CALIBRATION")
+        with_data = TestBeltCalibrationData(
+            pipette_offset=await _calibrate_pipette(api, mount),
+            deck_offsets=await _check_belt_accuracy(api, mount),
+        )
+        ui.print_header("TEST WITHOUT CALIBRATION")
+        print("resetting robot calibration")
+        await api.reset_instrument_offset(mount)
+        api.reset_robot_calibration()
+        without_data = TestBeltCalibrationData(
             pipette_offset=await _calibrate_pipette(api, mount),
             deck_offsets=await _check_belt_accuracy(api, mount),
         )
@@ -152,7 +149,7 @@ async def run_belt_calibration(
     await api.move_to(mount, attach_pos._replace(z=current_pos.z))
     if not api.is_simulator:
         ui.get_user_ready("REMOVE probe from pipette")
-    return before_data, attitude, after_data
+    return without_data, attitude, details, with_data
 
 
 async def _main(is_simulating: bool, mount: types.OT3Mount, test: bool) -> None:

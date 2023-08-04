@@ -1050,18 +1050,20 @@ class BeltCalibrationData:
         self._rear_left = slot_rear_left
 
     def check_alignment(self) -> Dict[str, Any]:
+        # FIXME: we are repeating the slot offsets for each axis
+        #        change this so they are only listed once
         shift_details = {
             shift.value: {
                 "spec": MAX_SHIFT[shift],
                 "pass": abs(self._get_shift_mm(shift)) < MAX_SHIFT[shift],
-                "shift": round(self._get_shift_mm(shift), 3),
-                "slots": {
-                    "front_left": str(self._front_left.actual),
-                    "front_right": str(self._front_right.actual),
-                    "rear_left": str(self._rear_left.actual),
-                },
+                "shift": round(self._get_shift_mm(shift), 3)
             }
             for shift in AlignmentShift
+        }
+        shift_details["slots"] = {
+            "front_left": self._front_left.actual,
+            "front_right": self._front_right.actual,
+            "rear_left": self._rear_left.actual,
         }
         LOG.info(shift_details)
         failures = [

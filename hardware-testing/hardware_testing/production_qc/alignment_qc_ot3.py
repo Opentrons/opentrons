@@ -32,30 +32,6 @@ from hardware_testing.opentrons_api import helpers_ot3
 MAX_ERROR_DISTANCE_MM = 0.5
 
 
-def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
-    """Build CSV Lines."""
-    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    lines.append(CSVLine("distance-after-max-spec-mm", [float]))
-    lines.append(CSVLine(f"pipette-offset-before", [float, float, float]))
-    lines.append(CSVLine(f"pipette-offset-after", [float, float, float]))
-    lines.append(
-        CSVLine(
-            f"attitude", [float, float, float, float, float, float, float, float, float]
-        )
-    )
-    for slot in TEST_SLOTS:
-        lines.append(CSVLine(f"slot-offset-before-{slot}", [float, float, float]))
-    for slot in TEST_SLOTS:
-        lines.append(CSVLine(f"slot-offset-after-{slot}", [float, float, float]))
-    for slot in TEST_SLOTS:
-        lines.append(CSVLine(f"slot-distance-before-{slot}", [float]))
-    for slot in TEST_SLOTS:
-        lines.append(CSVLine(f"slot-distance-after-{slot}", [float, CSVResult]))
-    for slot in TEST_SLOTS:
-        lines.append(CSVLine(f"slot-distance-improvement-{slot}", [float, CSVResult]))
-    return lines
-
-
 def _create_csv_report() -> CSVReport:
     return CSVReport(
         test_name=Path(__file__).name.replace("_", "-"),
@@ -65,6 +41,21 @@ def _create_csv_report() -> CSVReport:
                     CSVLine("attitude-x", [float, float, float]),
                     CSVLine("attitude-y", [float, float, float]),
                     CSVLine("attitude-z", [float, float, float]),
+                ]
+            ),
+            CSVSection(
+                title="BELT-CALIBRATION-OFFSETS", lines=[
+                    CSVLine("slot-front-left", [float, float, float]),
+                    CSVLine("slot-front-right", [float, float, float]),
+                    CSVLine("slot-rear-left", [float, float, float]),
+                ]
+            ),
+            CSVSection(
+                title="BELT-CALIBRATION-SHIFTS", lines=[
+                    CSVLine("left-to-right-y", [float]),
+                    CSVLine("left-to-right-z", [float]),
+                    CSVLine("front-to-rear-x", [float]),
+                    CSVLine("front-to-rear-z", [float]),
                 ]
             ),
             CSVSection(
@@ -136,7 +127,7 @@ async def _main(is_simulating: bool) -> None:
 
     # RUN TEST
     try:
-        before, attitude, after = await run_belt_calibration(api, mount, test=True)
+        before, attitude, details, after = await run_belt_calibration(api, mount, test=True)
     except (
         EarlyCapacitiveSenseTrigger,
         EdgeNotFoundError,
@@ -150,6 +141,15 @@ async def _main(is_simulating: bool) -> None:
     report("ATTITUDE", "attitude-x", attitude[0])
     report("ATTITUDE", "attitude-y", attitude[1])
     report("ATTITUDE", "attitude-z", attitude[2])
+
+    # STORE DETAILS
+    report("BELT-CALIBRATION-OFFSETS", "slot-front-left", [details["slots"]["front_left"]])
+    report("BELT-CALIBRATION-OFFSETS", "slot-front-right", [details["slots"]["front_right"]])
+    report("BELT-CALIBRATION-OFFSETS", "slot-rear-left", [details["slots"]["rear_left"]])
+    report("BELT-CALIBRATION-SHIFTS", "left-to-right-y", [details["left_to_right_y"]["shift"]])
+    report("BELT-CALIBRATION-SHIFTS", "left-to-right-z", [details["left_to_right_z"]["shift"]])
+    report("BELT-CALIBRATION-SHIFTS", "front-to-rear-x", [details["front_to_rear_y"]["shift"]])
+    report("BELT-CALIBRATION-SHIFTS", "front-to-rear-z", [details["front_to_rear_z"]["shift"]])
 
     # STORE PIPETTE-OFFSET CALIBRATIONS
     bef_o = before.pipette_offset
