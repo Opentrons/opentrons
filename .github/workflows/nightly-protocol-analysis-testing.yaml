@@ -1,6 +1,11 @@
 name: Nightly Protocol Analysis Testing 
 on:
   push:
+
+env:
+  EXECUTABLE_PATH: ${{ github.action_path }}/Opentrons.AppImage
+  ELECTRON_VERSION: "21.3.1"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,12 +25,12 @@ jobs:
         with:
             python-version: 3.11
 
-      - name: Store Python executable names
+      - name: Store Python xecutable names as env vars
         run: |
           echo "PYTHON_3_11_EXEC=${{ steps.python-3-11.outputs.python-path }}" >> $GITHUB_ENV
           echo "PYTHON_3_7_EXEC=${{ steps.python-3-7.outputs.python-path }}" >> $GITHUB_ENV
 
-      - name: Install Dependenvies
+      - name: Install Linux dependencies
         run: |
           sudo apt-get install libudev-dev libusb-1.0-0-dev libsystemd-dev
 
@@ -37,33 +42,26 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Setup Code
+      - name: Build .AppImage
         run: |
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make setup
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell setup
           OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell dist-linux
-          mv app-shell/dist/*.AppImage ./
+          mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}/
+          chmod +x ${{ env.EXECUTABLE_PATH }}
 
-      # - name: Get Opentrons AppImage and set env.EXECUTABLE_PATH
-      #   run: |
-      #     wget ${{ github.event.inputs.appimage-url }}
-      #     filename=$(basename ${{ github.event.inputs.appimage-url }})
-      #     chmod +x $filename
-      #     filepath=$(pwd)/$filename
-      #     echo "EXECUTABLE_PATH=$filepath" >> $GITHUB_ENV
+      - name: Install Chromedriver on the path.
+        working-directory: ./app-testing
+        run: |
+          chmod +x ./ci-tools/linux_get_chromedriver.sh
+          ./ci-tools/linux_get_chromedriver.sh ${{ env.ELECTRON_VERSION }}
+          chromedriver --version
 
-    #   - name: Install Chromedriver on the path.
-    #     run: |
-    #       chmod +x ./app-testing/ci-tools/linux_get_chromedriver.sh
-    #       ./app-testing/ci-tools/linux_get_chromedriver.sh ${{ github.event.inputs.electron-version }}
-    #       chromedriver --version
-    #   - name: Run docker robot
-    #     run: docker-compose up -d
-    #   - name: Install python dependencies.
-    #     working-directory: ./app-testing
-    #     run: |
-    #       pip install pipenv==2020.8.13
-    #       pipenv install --skip-lock
+      - name: Install python dependencies.
+        working-directory: ./app-testing
+        run: |
+          pipenv install --skip-lock
+
     #   - name: Run Tests.
     #     working-directory: ./app-testing
     #     run: |
