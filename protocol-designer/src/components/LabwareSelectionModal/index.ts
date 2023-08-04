@@ -35,7 +35,6 @@ function mapStateToProps(state: BaseState): SP {
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
-  console.log('slot from labwareSelectionmodal', slot)
   const labwareById = stepFormSelectors.getInitialDeckSetup(state).labware
   const parentModule =
     (slot != null &&

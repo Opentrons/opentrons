@@ -34,6 +34,3 @@ export const wellFillFromWellContents = (
     },
     {}
   )
-
-export const getIsAdapter = (labwareOnDeck: LabwareOnDeck): boolean =>
-  labwareOnDeck.def.metadata.displayCategory === 'adapter'
