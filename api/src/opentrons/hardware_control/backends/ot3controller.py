@@ -44,6 +44,7 @@ from .ot3utils import (
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
+    moving_axes_in_move_group,
 )
 
 try:
@@ -485,8 +486,7 @@ class OT3Controller:
         )
         mounts_moving = [
             k
-            for g in move_group
-            for k in g.keys()
+            for k in moving_axes_in_move_group(move_group)
             if k in [NodeId.pipette_left, NodeId.pipette_right]
         ]
         async with self._monitor_overpressure(mounts_moving):

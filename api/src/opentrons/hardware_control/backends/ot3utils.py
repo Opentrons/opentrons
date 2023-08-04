@@ -464,6 +464,16 @@ def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
     return move_group
 
 
+def moving_axes_in_move_group(group: MoveGroup) -> Set[NodeId]:
+    """Utility function to get only the moving nodes in a move group."""
+    ret: Set[NodeId] = set()
+    for step in group:
+        for node, node_step in step.items():
+            if node_step.is_moving_step():
+                ret.add(node)
+    return ret
+
+
 AxisMapPayload = TypeVar("AxisMapPayload")
 
 
