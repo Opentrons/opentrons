@@ -37,7 +37,7 @@ def _get_slot_name(slot_key: DeckLocation, api_version: APIVersion) -> DeckSlotN
     try:
         return validation.ensure_deck_slot(slot_key, api_version)
     except (TypeError, ValueError) as error:
-        raise KeyError(str(error)) from error
+        raise KeyError(slot_key) from error
 
 
 class Deck(Mapping[DeckLocation, Optional[DeckItem]]):

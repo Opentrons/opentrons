@@ -103,10 +103,10 @@ def test_get_slot_invalid_key(
         ValueError("oh no")
     )
 
-    with pytest.raises(KeyError, match="uh oh"):
+    with pytest.raises(KeyError, match="1"):
         subject[1]
 
-    with pytest.raises(KeyError, match="oh no"):
+    with pytest.raises(KeyError, match="2"):
         subject[2]
 
 
