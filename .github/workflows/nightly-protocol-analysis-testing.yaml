@@ -61,16 +61,21 @@ jobs:
       - name: Install python dependencies.
         working-directory: ./app-testing
         run: |
+          pipenv --rm
           pipenv install --skip-lock
 
-    #   - name: Run Tests.
-    #     working-directory: ./app-testing
-    #     run: |
-    #       export DISPLAY=:99
-    #       sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-    #       export EXECUTABLE_PATH=${{ env.EXECUTABLE_PATH }}
-    #       export ROBOT_BASE_URL="http://127.0.0.1:31950"
-    #       make test
+      - name: Copy env file.
+        working-directory: ./app-testing
+        run: |
+          cp ci_flex.env .env
+
+      - name: Run Tests.
+        working-directory: ./app-testing
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          pipenv run python -m pytest -k test_analyses
+
     #   - name: Upload results.
     #     uses: actions/upload-artifact@v2
     #     with:
