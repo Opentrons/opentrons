@@ -17,6 +17,12 @@ async def mark_odd_for_reset_next_boot() -> None:
 
     This assumes you're running on a real Flex, as opposed to an OT-2 or a local dev machine.
     """
-    await _RESET_MARKER_PATH.write_text(
-        encoding="utf-8", data=_RESET_MARKER_FILE_CONTENTS
-    )
+    try:
+        await _RESET_MARKER_PATH.write_text(
+            encoding="utf-8", data=_RESET_MARKER_FILE_CONTENTS
+        )
+    except FileNotFoundError:
+        # No-op if the parent directory doesn't exist.
+        # This probably means the on-device display hasn't started up for the
+        # first time, or it's already been reset.
+        pass
