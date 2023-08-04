@@ -1145,12 +1145,12 @@ def test_get_labware_grip_point_on_labware(
         )
     )
 
-    decoy.when(labware_view.get_dimensions("labware-id")).then_return(
-        Dimensions(x=500, y=5001, z=10)
-    )
     decoy.when(labware_view.get_dimensions("below-id")).then_return(
         Dimensions(x=1000, y=1001, z=11)
     )
+    decoy.when(
+        labware_view.get_grip_height_from_labware_bottom("labware-id")
+    ).then_return(100)
     decoy.when(
         labware_view.get_labware_overlap_offsets("labware-id", "below-name")
     ).then_return(OverlapOffset(x=0, y=1, z=6))
@@ -1159,11 +1159,11 @@ def test_get_labware_grip_point_on_labware(
         Point(x=5, y=9, z=10)
     )
 
-    labware_center = subject.get_labware_grip_point(
+    grip_point = subject.get_labware_grip_point(
         labware_id="labware-id", location=OnLabwareLocation(labwareId="below-id")
     )
 
-    assert labware_center == Point(5, 10, 20)
+    assert grip_point == Point(5, 10, 115.0)
 
 
 @pytest.mark.parametrize(
