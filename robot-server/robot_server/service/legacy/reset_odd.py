@@ -12,13 +12,19 @@ It tells the on-device display process to clear its configuration on the next bo
 """
 
 
-async def mark_odd_for_reset_next_boot() -> None:
+async def mark_odd_for_reset_next_boot(
+    reset_marker_path: AsyncPath = _RESET_MARKER_PATH,
+) -> None:
     """Mark the configuration of the Flex's on-device display so it gets reset on the next boot.
 
     This assumes you're running on a real Flex, as opposed to an OT-2 or a local dev machine.
+
+    Params:
+        reset_marker_path: The path of the marker file to create. This should only be overridden
+            for unit-testing this function.
     """
     try:
-        await _RESET_MARKER_PATH.write_text(
+        await reset_marker_path.write_text(
             encoding="utf-8", data=_RESET_MARKER_FILE_CONTENTS
         )
     except FileNotFoundError:
