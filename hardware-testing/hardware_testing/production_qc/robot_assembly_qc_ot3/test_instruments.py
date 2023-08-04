@@ -14,8 +14,6 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperProbe
 from hardware_testing.data import ui
 
-from .utils import wait_for_instrument_presence
-
 PLUNGER_TOLERANCE_MM = 0.2
 
 GRIPPER_Z_ENDSTOP_RETRACT_MM = 0.5
@@ -241,30 +239,24 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    print("homing")
-    await api.home()
+    print("homing...")
+    await api.home_z()
+
     print("moving to front of machine")
-    await api.move_rel(
-        OT3Mount.LEFT,
-        RELATIVE_MOVE_FROM_HOME_DELTA,
-    )
+    slot_pos = helpers_ot3.get_slot_calibration_square_position_ot3(4)
+    current_pos = await api.gantry_position(OT3Mount.LEFT)
+    attach_pos = slot_pos._replace(z=current_pos.z)
+    await api.move_to(OT3Mount.LEFT, attach_pos)
 
     # PIPETTES
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
         ui.print_header(f"PIPETTE - {mount.name}")
-        if await wait_for_instrument_presence(api, mount, presence=True):
+        if await helpers_ot3.wait_for_instrument_presence(api, mount, presence=True):
             await _test_pipette(api, mount, report, section)
-            await wait_for_instrument_presence(api, mount, presence=False)
+            await helpers_ot3.wait_for_instrument_presence(api, mount, presence=False)
 
     # GRIPPER
     ui.print_header("GRIPPER")
-    if await wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=True):
+    if await helpers_ot3.wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=True):
         await _test_gripper(api, report, section)
-        await wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=False)
-
-    print("moving back near home position")
-    await api.home([Axis.Z_L, Axis.Z_R])
-    await api.move_rel(
-        OT3Mount.LEFT,
-        RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,
-    )
+        await helpers_ot3.wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=False)
