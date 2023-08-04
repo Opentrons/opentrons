@@ -399,6 +399,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
         if (
+          labware.slot === 'offDeck' ||
           allModules.some(m => m.id === labware.slot) ||
           allLabware.some(lab => lab.id === labware.slot)
         )
@@ -450,7 +451,11 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
       {/* all adapters on deck and not on module  */}
       {allLabware.map(labware => {
-        if (allModules.some(m => m.id === labware.slot)) return null
+        if (
+          allModules.some(m => m.id === labware.slot) ||
+          labware.slot === 'offDeck'
+        )
+          return null
         const slotOnDeck = deckSlots.find(slot => slot.id === labware.slot)
         if (slotOnDeck != null) {
           return null
