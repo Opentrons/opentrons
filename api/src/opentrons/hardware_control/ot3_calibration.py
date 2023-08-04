@@ -1038,6 +1038,10 @@ class OT3Transforms(RobotCalibration):
     gripper_mount_offset: Point
 
 
+def _point_to_tuple(_p: Point) -> Tuple[float, float, float]:
+    return _p.x, _p.y, _p.z
+
+
 class BeltCalibrationData:
     def __init__(
         self,
@@ -1049,22 +1053,24 @@ class BeltCalibrationData:
         self._front_right = slot_front_right
         self._rear_left = slot_rear_left
 
-    def check_alignment(self) -> Dict[str, Any]:
-        # FIXME: we are repeating the slot offsets for each axis
-        #        change this so they are only listed once
+    def build_details(self) -> Dict[str, Any]:
         shift_details = {
             shift.value: {
                 "spec": MAX_SHIFT[shift],
                 "pass": abs(self._get_shift_mm(shift)) < MAX_SHIFT[shift],
-                "shift": round(self._get_shift_mm(shift), 3)
+                "shift": round(self._get_shift_mm(shift), 3),
             }
             for shift in AlignmentShift
         }
         shift_details["slots"] = {
-            "front_left": self._front_left.actual,
-            "front_right": self._front_right.actual,
-            "rear_left": self._rear_left.actual,
+            "front_left": _point_to_tuple(self._front_left.actual),  # type: ignore[dict-item]
+            "front_right": _point_to_tuple(self._front_right.actual),  # type: ignore[dict-item]
+            "rear_left": _point_to_tuple(self._rear_left.actual),  # type: ignore[dict-item]
         }
+        return shift_details
+
+    def check_alignment(self) -> Dict[str, Any]:
+        shift_details = self.build_details()
         LOG.info(shift_details)
         failures = [
             shift for shift in AlignmentShift if not shift_details[shift.value]["pass"]
@@ -1074,9 +1080,6 @@ class BeltCalibrationData:
         return shift_details
 
     def get_solve_points(self) -> Tuple[SolvePoints, SolvePoints]:
-        def _point_to_tuple(_p: Point) -> Tuple[float, float, float]:
-            return _p.x, _p.y, _p.z
-
         actual = (
             _point_to_tuple(self._front_left.actual),
             _point_to_tuple(self._rear_left.actual),

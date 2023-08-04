@@ -257,6 +257,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # GRIPPER
     ui.print_header("GRIPPER")
-    if await helpers_ot3.wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=True):
+    if await helpers_ot3.wait_for_instrument_presence(
+        api, OT3Mount.GRIPPER, presence=True
+    ):
         await _test_gripper(api, report, section)
-        await helpers_ot3.wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=False)
+        await helpers_ot3.wait_for_instrument_presence(
+            api, OT3Mount.GRIPPER, presence=False
+        )

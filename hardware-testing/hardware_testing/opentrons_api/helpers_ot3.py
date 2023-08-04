@@ -195,10 +195,10 @@ async def reset_api(api: OT3API) -> None:
     """Reset OT3API."""
     print(f"Firmware: v{api.fw_version}")
     if not api.is_simulator:
-        await api._backend.engage_sync()  # FIXME: i think fw is backwards
-        await api._backend.release_estop()
+        await api._backend.engage_sync()  # type: ignore[union-attr]
+        await api._backend.release_estop()  # type: ignore[union-attr]
         await update_firmware(api)
-        await api._backend.probe_network()
+        await api._backend.probe_network()  # type: ignore[union-attr]
     await api.cache_instruments()
     await api.refresh_positions()
 

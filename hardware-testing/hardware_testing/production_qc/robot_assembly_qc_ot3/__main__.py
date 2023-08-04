@@ -1,5 +1,6 @@
 """Robot assembly QC OT3."""
 from os import environ
+
 if "OT_SYSTEM_VERSION" not in environ:
     environ["OT_SYSTEM_VERSION"] = "0.0.0"
 
