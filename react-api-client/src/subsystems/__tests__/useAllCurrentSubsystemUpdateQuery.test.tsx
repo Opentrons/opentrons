@@ -2,39 +2,45 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import { getCurrentSubsystemUpdate } from '@opentrons/api-client'
+import { getCurrentAllSubsystemUpdates } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
-import { useCurrentSubsystemUpdateQuery } from '../useCurrentSubsystemUpdateQuery'
+import { useCurrentAllSubsystemUpdatesQuery } from '../useCurrentAllSubsystemUpdatesQuery'
 
 import type {
+  CurrentSubsystemUpdate,
+  CurrentSubsystemUpdates,
   HostConfig,
   Response,
-  SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockGetCurrentSubsystemUpdate = getCurrentSubsystemUpdate as jest.MockedFunction<
-  typeof getCurrentSubsystemUpdate
+const mockGetCurrentAllSubsystemUpdates = getCurrentAllSubsystemUpdates as jest.MockedFunction<
+  typeof getCurrentAllSubsystemUpdates
 >
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const SUBSYSTEM_TYPE = 'pipette_left'
-const CURRENT_SUBSYSTEM_UPDATE_RESPONSE = {
-  data: {
-    id: 'mock_pipette_left',
-    createdAt: '2023-07-24T18:15:22Z',
-    subsystem: 'pipette_left',
-    updateStatus: 'updating',
-    updateProgress: 50,
-    updateError: 'no error',
-  },
-} as SubsystemUpdateProgressData
+const CURRENT_SUBSYSTEM_UPDATES_RESPONSE = {
+  data: [
+    {
+      id: 'mock_gantry_x',
+      createdAt: '2023-07-24T14:15:22Z',
+      subsystem: 'gantry_x',
+      updateStatus: 'queued',
+    } as CurrentSubsystemUpdate,
+    {
+      id: 'mock_pipette_left',
+      createdAt: '2023-07-24T18:15:22Z',
+      subsystem: 'pipette_left',
+      updateStatus: 'updating',
+    } as CurrentSubsystemUpdate,
+  ],
+} as CurrentSubsystemUpdates
 
-describe('useCurrentSubsystemUpdateQuery', () => {
+describe('useAllCurrentSubsystemUpdateQuery', () => {
   let wrapper: React.FunctionComponent<{}>
 
   beforeEach(() => {
@@ -52,7 +58,7 @@ describe('useCurrentSubsystemUpdateQuery', () => {
 
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
-    const { result } = renderHook(() => useCurrentSubsystemUpdateQuery(null), {
+    const { result } = renderHook(() => useCurrentAllSubsystemUpdatesQuery(), {
       wrapper,
     })
 
@@ -61,29 +67,26 @@ describe('useCurrentSubsystemUpdateQuery', () => {
 
   it('should return no data if the get current system updates request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetCurrentSubsystemUpdate)
-      .calledWith(HOST_CONFIG, SUBSYSTEM_TYPE)
+    when(mockGetCurrentAllSubsystemUpdates)
+      .calledWith(HOST_CONFIG)
       .mockRejectedValue('oh no')
 
-    const { result } = renderHook(
-      () => useCurrentSubsystemUpdateQuery(SUBSYSTEM_TYPE),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCurrentAllSubsystemUpdatesQuery(), {
+      wrapper,
+    })
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should return current subsystem update data', async () => {
+  it('should return current subsystem updates', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetCurrentSubsystemUpdate)
-      .calledWith(HOST_CONFIG, SUBSYSTEM_TYPE)
+    when(mockGetCurrentAllSubsystemUpdates)
+      .calledWith(HOST_CONFIG)
       .mockResolvedValue({
-        data: CURRENT_SUBSYSTEM_UPDATE_RESPONSE,
-      } as Response<SubsystemUpdateProgressData>)
+        data: CURRENT_SUBSYSTEM_UPDATES_RESPONSE,
+      } as Response<CurrentSubsystemUpdates>)
 
     const { result, waitFor } = renderHook(
-      () => useCurrentSubsystemUpdateQuery(SUBSYSTEM_TYPE),
+      () => useCurrentAllSubsystemUpdatesQuery(),
       {
         wrapper,
       }
@@ -91,6 +94,6 @@ describe('useCurrentSubsystemUpdateQuery', () => {
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(CURRENT_SUBSYSTEM_UPDATE_RESPONSE)
+    expect(result.current.data).toEqual(CURRENT_SUBSYSTEM_UPDATES_RESPONSE)
   })
 })

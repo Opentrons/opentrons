@@ -16,7 +16,6 @@ import {
 import {
   useAllProtocolsQuery,
   useAllRunsQuery,
-  useCurrentSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -131,9 +130,6 @@ export function ProtocolDashboard(): JSX.Element {
       handleProtocolsBySortKey('recentCreated')
     }
   }
-
-  const { data } = useCurrentSubsystemUpdateQuery(null)
-  console.log('subsystem', data)
 
   return (
     <>
