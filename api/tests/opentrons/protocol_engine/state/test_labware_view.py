@@ -47,6 +47,15 @@ plate = LoadedLabware(
     displayName="Fancy Plate Name",
 )
 
+flex_tiprack = LoadedLabware(
+    id="flex-tiprack-id",
+    loadName="flex-tiprack-load-name",
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+    definitionUri="some-flex-tiprack-uri",
+    offsetId=None,
+    displayName="Flex Tiprack Name",
+)
+
 reservoir = LoadedLabware(
     id="reservoir-id",
     loadName="reservoir-load-name",
@@ -1318,19 +1327,19 @@ def test_get_labware_gripper_offsets(
 
 
 def test_get_grip_force(
-    well_plate_def: LabwareDefinition,
+    flex_50uL_tiprack: LabwareDefinition,
     reservoir_def: LabwareDefinition,
 ) -> None:
     """It should get the grip force, if present, from labware definition or return default."""
     subject = get_labware_view(
-        labware_by_id={"plate-id": plate, "reservoir-id": reservoir},
+        labware_by_id={"flex-tiprack-id": flex_tiprack, "reservoir-id": reservoir},
         definitions_by_uri={
-            "some-plate-uri": well_plate_def,
+            "some-flex-tiprack-uri": flex_50uL_tiprack,
             "some-reservoir-uri": reservoir_def,
         },
     )
 
-    assert subject.get_grip_force("plate-id") == 10  # from definition
+    assert subject.get_grip_force("flex-tiprack-id") == 16  # from definition
     assert subject.get_grip_force("reservoir-id") == 15  # default
 
 

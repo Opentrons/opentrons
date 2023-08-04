@@ -101,6 +101,14 @@ def well_plate_def() -> LabwareDefinition:
 
 
 @pytest.fixture(scope="session")
+def flex_50uL_tiprack() -> LabwareDefinition:
+    """Get the definition of a Flex 50uL tiprack."""
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_flex_96_filtertiprack_50ul", 1)
+    )
+
+
+@pytest.fixture(scope="session")
 def adapter_plate_def() -> LabwareDefinition:
     """Get the definition of a h/s adapter plate."""
     return LabwareDefinition.parse_obj(
