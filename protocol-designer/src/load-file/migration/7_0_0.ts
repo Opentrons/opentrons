@@ -261,7 +261,7 @@ export const migrateFile = (
     labwareLocationUpdateIds: string[],
     stepForm: any
   ): any => {
-    if (stepForm.stepType === 'moveLliquid') {
+    if (stepForm.stepType === 'moveLiquid') {
       const aspirateLabwareId = stepForm.aspirate_labware.split(':')[0]
       const dispenseLabwareId = stepForm.dispense_labware.split(':')[0]
       for (const labwareLocationUpdateId of labwareLocationUpdateIds) {
@@ -302,7 +302,6 @@ export const migrateFile = (
         },
         savedStepForms: {
           ...appData.designerApplication?.data?.savedStepForms,
-          ...newLiquidHandlingStepForms,
           [INITIAL_DECK_SETUP_STEP_ID]: {
             ...appData.designerApplication?.data?.savedStepForms[
               INITIAL_DECK_SETUP_STEP_ID
@@ -311,6 +310,7 @@ export const migrateFile = (
               ...newLabwareLocationUpdate,
             },
           },
+          ...newLiquidHandlingStepForms,
         },
       },
     },
