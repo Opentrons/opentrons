@@ -77,6 +77,18 @@ CornerOffsetFromSlot = TypedDict(
     "CornerOffsetFromSlot", {"x": float, "y": float, "z": float}
 )
 
+
+class NamedOffset(TypedDict):
+    x: float
+    y: float
+    z: float
+
+
+class GripperOffsets(TypedDict):
+    pickUpOffset: NamedOffset
+    dropOffset: NamedOffset
+
+
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
 ModuleDefinitionV3 = TypedDict(
     "ModuleDefinitionV3",
@@ -94,7 +106,9 @@ ModuleDefinitionV3 = TypedDict(
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
         "twoDimensionalRendering": Dict[str, Any],
+        "gripperOffsets": Dict[str, GripperOffsets],
     },
+    total=False,
 )
 
 # V2 is not used anymore. This type is preserved for historical purposes

@@ -55,7 +55,7 @@ export function ProtocolDashboard(): JSX.Element {
     setTargetProtocol,
   ] = React.useState<ProtocolResource | null>(null)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
-  const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+  const protocolsData = protocols.data?.data ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
 
   // The pinned protocols are stored as an array of IDs in config

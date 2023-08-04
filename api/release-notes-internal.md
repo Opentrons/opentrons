@@ -4,34 +4,30 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.13.0
+# Internal Release 0.14.0
 
 ## New Stuff In This Release
 
-- Multiple updates to Flex motion control parameters from hardware testing for both gantry and plunger speeds and acceleration
-   - Pipette default flowrates are higher
-- The LED status bar animates during firmware updates
-- Tip presence detection is now integrated; you should get errors after failing to pick up or drop a tip
-- Many (many) visual and workflow fixes and improvements from design QA for the ODD
-- ODD should now display an error screen instead of a white screen
-- You can load labware to an OFF_DECK location
-- You can now use calibrate gripper in the reset settings options
-- There are consistent error codes in protocol status inforation now
-- The ODD should prompt you to update your pipettes when you attach one that needs it (!)
-- The 96 shouldn't fall down when you attach it now (!)
-- More little stall detection fixes
-- The ODD will now display a spinner until the robot server has started
-- Homing now goes to the limit switch then backs off until the limit switch is released
-- Support for PVT (v3.5) pipettes
+- Return tip heights and some other pipette behaviors are now properly executed based on the kind of tip being used
+- Release Flex robot software builds are now cryptographically signed. If you run a release build, you can only install other properly signed release builds. Note that if the robot was previously on a non-release build this won't latch; remove the update server config file at ``/var/lib/otupdate/config.json`` to go back to signed builds only. 
+- Error handling has been overhauled; all errors now display with an error code for easier reporting. Many of those error codes are the 4000 catchall still but this will improve over time.
+- Further updates to Flex motion control parameters from hardware testing for both gantry and plunger speeds and acceleration
+- Pipette overpressure detection is now integrated.
+- All instrument flows should now show errors if they occur instead of skipping a step
+- Fixes to several incorrect status displays in ODD (i.e. protocols skipping the full-color outcome splash)
+- Robot can now handle json protocol v7
+- Support for PVT (v1.1) grippers
+- Update progress should get displayed after restart for firmware updates
+- Removed `use_pick_up_location_lpc_offset` and `use_drop_location_lpc_offset` from `protocol_context.move_labware` arguments. So they should be removed from any protocols that used them. This change also requires resetting the protocol run database on the robot.
+- Added 'contextual' gripper offsets to deck, labware and module definitions. So, any labware movement offsets that were previously being specified in the protocol should now be removed or adjusted or they will get added twice.
+
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
-### ODD
-- It can take a while for the robot to start after installing an update (it's the firmware updates happening on boot). Allow 10 minutes after an update that has a firmware change.
-
 ### Robot Control
-- Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
+- Pipette pressure sensing for liquid-level sensing purposes
 - Labware pick up failure with gripper
+- E-stop integrated handling especially with modules
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control

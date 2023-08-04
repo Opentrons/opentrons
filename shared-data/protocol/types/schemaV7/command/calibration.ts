@@ -40,7 +40,8 @@ export interface CalibrateModuleRunTimeCommand
   result?: CalibrateModuleResult
 }
 export interface MoveToMaintenancePositionRunTimeCommand
-  extends MoveToMaintenancePositionCreateCommand {
+  extends CommonCommandRunTimeInfo,
+    MoveToMaintenancePositionCreateCommand {
   result?: {}
 }
 

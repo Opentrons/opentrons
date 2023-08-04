@@ -1,10 +1,11 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
+from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict, Optional
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock, call, PropertyMock, MagicMock
+from decoy import Decoy
+from mock import AsyncMock, patch, Mock, PropertyMock, MagicMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
@@ -44,6 +45,8 @@ from opentrons.hardware_control.types import (
     SubSystem,
     GripperJawState,
     StatusBarState,
+    EstopState,
+    EstopStateNotification,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -58,6 +61,7 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.types import Point, Mount
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motion_planning.types import Move
 
 from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
@@ -69,6 +73,14 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
 )
+from opentrons.hardware_control.modules import (
+    Thermocycler,
+    TempDeck,
+    MagDeck,
+    HeaterShaker,
+    SpeedStatus,
+)
+from opentrons.hardware_control.module_control import AttachedModulesControl
 
 
 @pytest.fixture
@@ -467,6 +479,8 @@ async def test_blow_out_position(
     blowout_volume: float,
 ) -> None:
     for mount, configs in load_configs.items():
+        if configs["channels"] == 96:
+            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
             ot3_hardware, mount, configs
         )
@@ -479,7 +493,6 @@ async def test_blow_out_position(
             max_allowed_input_distance * instr_data["config"].shaft_ul_per_mm
         )
         assume(blowout_volume < max_input_vol)
-
         await ot3_hardware.blow_out(mount, blowout_volume)
         pipette_axis = Axis.of_main_tool_actuator(mount)
         position_result = await ot3_hardware.current_position_ot3(mount)
@@ -512,6 +525,8 @@ async def test_blow_out_error(
     blowout_volume: float,
 ) -> None:
     for mount, configs in load_configs.items():
+        if configs["channels"] == 96:
+            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
             ot3_hardware, mount, configs
         )
@@ -1308,7 +1323,7 @@ async def test_pick_up_tip_full_tiprack(
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
-
+        backend._gear_motor_position = {NodeId: 0}
         pipette_handler.plan_check_pick_up_tip.return_value = (
             PickUpTipSpec(
                 plunger_prep_pos=0,
@@ -1322,23 +1337,46 @@ async def test_pick_up_tip_full_tiprack(
                     # Move onto the posts
                     tiprack_down=Point(0, 0, 0),
                     tiprack_up=Point(0, 0, 0),
-                    pick_up_distance=0,
+                    pick_up_distance=10,
                     speed=0,
                     currents={Axis.Q: 0},
                 ),
             ),
             _fake_function,
         )
+
+        def _update_gear_motor_pos(
+            moves: Optional[List[Move[Axis]]] = None,
+            distance: Optional[float] = None,
+            velocity: Optional[float] = None,
+            tip_action: str = "home",
+        ) -> None:
+            if NodeId.pipette_left not in backend._gear_motor_position:
+                backend._gear_motor_position = {NodeId.pipette_left: 0.0}
+            if moves:
+                for move in moves:
+                    for block in move.blocks:
+                        backend._gear_motor_position[
+                            NodeId.pipette_left
+                        ] += block.distance
+            elif distance:
+                backend._gear_motor_position[NodeId.pipette_left] += distance
+
+        tip_action.side_effect = _update_gear_motor_pos
+        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
         pipette_handler.plan_check_pick_up_tip.assert_called_once_with(
             OT3Mount.LEFT, 40.0, None, None
         )
-        tip_action.assert_has_calls(
-            calls=[
-                call([Axis.P_L], 0, 0, "clamp"),
-                call([Axis.P_L], 0, 0, "home"),
-            ]
-        )
+        # first call should be "clamp", moving down
+        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
+        # next call should be "clamp", moving back up
+        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
+        # last call should be "home"
+        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
+        assert len(tip_action.call_args_list) == 3
 
 
 async def test_drop_tip_full_tiprack(
@@ -1354,11 +1392,12 @@ async def test_drop_tip_full_tiprack(
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
+        backend._gear_motor_position = {NodeId.pipette_left: 0}
         pipette_handler.plan_check_drop_tip.return_value = (
             DropTipSpec(
                 drop_moves=[
                     DropTipMove(
-                        target_position=1,
+                        target_position=10,
                         current={Axis.P_L: 1.0},
                         speed=1,
                         is_ht_tip_action=True,
@@ -1369,14 +1408,38 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
+
+        def _update_gear_motor_pos(
+            moves: Optional[List[Move[Axis]]] = None,
+            distance: Optional[float] = None,
+            velocity: Optional[float] = None,
+            tip_action: str = "home",
+        ) -> None:
+            if NodeId.pipette_left not in backend._gear_motor_position:
+                backend._gear_motor_position = {NodeId.pipette_left: 0.0}
+            if moves:
+                for move in moves:
+                    for block in move.blocks:
+                        backend._gear_motor_position[
+                            NodeId.pipette_left
+                        ] += block.distance
+            elif distance:
+                backend._gear_motor_position[NodeId.pipette_left] += distance
+
+        tip_action.side_effect = _update_gear_motor_pos
+
+        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
-        tip_action.assert_has_calls(
-            calls=[
-                call([Axis.P_L], 1, 1, "clamp"),
-                call([Axis.P_L], 1, 1, "home"),
-            ]
-        )
+        # first call should be "clamp", moving down
+        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
+        # next call should be "clamp", moving back up
+        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
+        # last call should be "home"
+        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
+        assert len(tip_action.call_args_list) == 3
 
 
 @pytest.mark.parametrize(
@@ -1619,3 +1682,56 @@ async def test_tip_presence_disabled_ninety_six_channel(
         await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)
 
         tip_present.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    argnames=["old_state", "new_state", "should_trigger"],
+    argvalues=[
+        [EstopState.DISENGAGED, EstopState.NOT_PRESENT, False],
+        [EstopState.DISENGAGED, EstopState.PHYSICALLY_ENGAGED, True],
+        [EstopState.LOGICALLY_ENGAGED, EstopState.PHYSICALLY_ENGAGED, True],
+        [EstopState.NOT_PRESENT, EstopState.PHYSICALLY_ENGAGED, True],
+        [EstopState.PHYSICALLY_ENGAGED, EstopState.LOGICALLY_ENGAGED, False],
+        [EstopState.PHYSICALLY_ENGAGED, EstopState.PHYSICALLY_ENGAGED, False],
+    ],
+)
+async def test_estop_event_deactivate_module(
+    ot3_hardware: ThreadManager[OT3API],
+    decoy: Decoy,
+    old_state: EstopState,
+    new_state: EstopState,
+    should_trigger: bool,
+) -> None:
+    """Test the helper to deactivate modules."""
+    api = ot3_hardware.wrapped()
+    api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
+    tc = decoy.mock(cls=Thermocycler)
+    hs = decoy.mock(cls=HeaterShaker)
+    md = decoy.mock(cls=MagDeck)
+    td = decoy.mock(cls=TempDeck)
+
+    decoy.when(hs.speed_status).then_return(SpeedStatus.HOLDING)
+
+    decoy.when(api._backend.module_controls.available_modules).then_return(
+        [tc, hs, md, td]
+    )
+
+    estop_event = EstopStateNotification(old_state=old_state, new_state=new_state)
+
+    futures = api._update_estop_state(estop_event)
+
+    if should_trigger:
+        assert len(futures) != 0
+
+        for fut in futures:
+            fut.result()
+
+        decoy.verify(
+            await tc.deactivate(must_be_running=False),
+            await hs.deactivate_heater(must_be_running=False),
+            await hs.deactivate_shaker(must_be_running=False),
+            await md.deactivate(must_be_running=False),
+            await td.deactivate(must_be_running=False),
+        )
+    else:
+        assert len(futures) == 0

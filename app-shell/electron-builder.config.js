@@ -5,7 +5,6 @@ const { versionForProject } = require('../scripts/git-version')
 const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
-const NO_USB_DETECTION = process.env.NO_USB_DETECTION === 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
 const ot3PublishConfig =
@@ -41,17 +40,6 @@ module.exports = async () => ({
     'build/br-premigration-wheels',
     '!Makefile',
     '!python',
-    ...(NO_USB_DETECTION
-      ? ['!node_modules/usb-detection']
-      : // this detail with node modules makes sure that any byproducts from the build process
-        // of the usb-detection submodule - which should only exist anyway if we don't get a
-        // prebuild - won't get packed into the app. If they are, they'll prevent the app
-        // from running on OSX, because they intern paths on the action runner in their binaries
-        // sometimes and gatekeeper will scan them, notice, and fail us.
-        [
-          '!node_modules/usb-detection/build',
-          'node_modules/usb-detection/build/Release',
-        ]),
     {
       from: '../app/dist',
       to: './ui',

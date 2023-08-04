@@ -10,6 +10,7 @@ from opentrons.config.defaults_ot3 import (
 )
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
+from hardware_testing.data import get_git_description
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -42,17 +43,11 @@ MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
 MAX_SPEED = max(TEST_SPEEDS)
 
 
-def _get_operator(is_simulating: bool) -> str:
-    if is_simulating:
-        return "simulating"
-    return input("enter OPERATOR name: ")
-
-
 def _get_test_tag(current: float, speed: float, direction: str, pos: str) -> str:
     return f"current-{current}-speed-{speed}-{direction}-{pos}"
 
 
-def _build_csv_report(operator: str, pipette_sn: str) -> CSVReport:
+def _build_csv_report() -> CSVReport:
     _report = CSVReport(
         test_name="pipette-current-speed-qc-ot3",
         sections=[
@@ -74,9 +69,6 @@ def _build_csv_report(operator: str, pipette_sn: str) -> CSVReport:
             ),
         ],
     )
-    _report.set_tag(pipette_sn)
-    _report.set_version("unknown")
-    _report.set_operator(operator)
     return _report
 
 
@@ -239,7 +231,10 @@ async def _main(is_simulating: bool) -> None:
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_multi_v3.4",
     )
-    _operator = _get_operator(api.is_simulator)
+    if not api.is_simulator:
+        operator = input("enter OPERATOR name: ")
+    else:
+        operator = "simulation"
     # home and move to a safe position
     await _reset_gantry(api)
 
@@ -252,7 +247,16 @@ async def _main(is_simulating: bool) -> None:
         ui.print_title(f"{pipette_sn} - {mount.name}")
         if not api.is_simulator and not ui.get_user_answer("QC this pipette"):
             continue
-        report = _build_csv_report(_operator, pipette_sn)
+        report = _build_csv_report()
+        report.set_version(get_git_description())
+        report.set_operator(operator)
+        report.set_robot_id(helpers_ot3.get_robot_serial_ot3(api))
+        report.set_tag(pipette_sn)
+        if not api.is_simulator:
+            barcode = input("scan pipette barcode: ")
+        else:
+            barcode = str(pipette_sn)
+        report.set_device_id(pipette_sn, CSVResult.from_bool(barcode == pipette_sn))
         failing_current = await _test_plunger(api, mount, report)
         report(
             "OVERALL",

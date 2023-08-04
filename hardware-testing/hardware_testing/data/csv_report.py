@@ -41,6 +41,8 @@ META_DATA_TITLE = "META_DATA"
 META_DATA_TEST_NAME = "test_name"
 META_DATA_TEST_TAG = "test_tag"
 META_DATA_TEST_RUN_ID = "test_run_id"
+META_DATA_TEST_DEVICE_ID = "test_device_id"
+META_DATA_TEST_ROBOT_ID = "test_robot_id"
 META_DATA_TEST_TIME_UTC = "test_time_utc"
 META_DATA_TEST_OPERATOR = "test_operator"
 META_DATA_TEST_VERSION = "test_version"
@@ -89,6 +91,11 @@ class CSVLine:
     def stored(self) -> bool:
         """Line stored."""
         return self._stored
+
+    @property
+    def num_data_points(self) -> int:
+        """Get the number of data points saved in this line."""
+        return len(self._data_types)
 
     def cache_start_time(self, start_time: float) -> None:
         """Line cache start time."""
@@ -260,8 +267,10 @@ def _generate_meta_data_section() -> CSVSection:
             CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
             CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
             CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
+            CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, CSVResult]),
+            CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
             CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
-            CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str]),
+            CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str, CSVResult]),
             CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
             CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
         ],
@@ -291,7 +300,7 @@ class CSVReport:
         self._tag: Optional[str] = None
         self._file_name: Optional[str] = None
         _section_meta = _generate_meta_data_section()
-        _section_titles = [s.title for s in sections]
+        _section_titles = [META_DATA_TITLE] + [s.title for s in sections]
         _section_results = _generate_results_overview_section(_section_titles)
         self._sections = [_section_meta, _section_results] + sections
         self._cache_start_time(start_time)  # must happen before storing any data
@@ -330,9 +339,11 @@ class CSVReport:
         raise ValueError(f"unexpected section title: {item}")
 
     def _refresh_results_overview_values(self) -> None:
-        for s in self._sections[2:]:
-            section = self[RESULTS_OVERVIEW_TITLE]
-            line = section[f"RESULT_{s.title}"]
+        results_section = self[RESULTS_OVERVIEW_TITLE]
+        for s in self._sections:
+            if s == results_section:
+                continue
+            line = results_section[f"RESULT_{s.title}"]
             assert isinstance(line, CSVLine)
             line.store(CSVResult.PASS, print_results=False)
             if s.result_passed:
@@ -343,7 +354,17 @@ class CSVReport:
 
     def __str__(self) -> str:
         """CSV Report string."""
-        return "\n".join([str(s) for s in self._sections])
+        max_cols = max(
+            [
+                line.num_data_points
+                for section in self._sections
+                for line in section.lines
+            ]
+        )
+        max_cols += 2  # all lines are prepended with the timestamp and tag
+        # the first line in the CSV should be populated with "copy"
+        first_line = ",".join(["copy"] * max_cols)
+        return f"{first_line}\n" + "\n".join([str(s) for s in self._sections])
 
     @property
     def completed(self) -> bool:
@@ -382,9 +403,18 @@ class CSVReport:
         )
         self.save_to_disk()
 
+    def set_device_id(self, device_id: str, result: CSVResult) -> None:
+        """Store DUT serial number."""
+        self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id, result])
+
+    def set_robot_id(self, robot_id: str) -> None:
+        """Store robot serial number."""
+        self(META_DATA_TITLE, META_DATA_TEST_ROBOT_ID, [robot_id])
+
     def set_operator(self, operator: str) -> None:
         """Set operator."""
-        self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator])
+        result = CSVResult.from_bool(bool(operator))
+        self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator, result])
 
     def set_version(self, version: str) -> None:
         """Set version."""

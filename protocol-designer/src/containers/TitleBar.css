@@ -20,14 +20,3 @@
   display: flex;
   align-items: center;
 }
-
-.beta_tag {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-left: 0.75rem;
-  padding: 0.4rem 0.5rem;
-  color: var(--c-font-light);
-  background-color: var(--c-med-gray);
-  letter-spacing: 0.5px;
-  border-radius: 0.3125rem;
-}

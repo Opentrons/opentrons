@@ -34,19 +34,19 @@
   font-weight: var(--fw-semibold);
 }
 
-.title,
-.subtitle {
+.title {
   @apply --truncate;
 
   padding: 0 1.5rem;
 }
 
-.title.right {
-  margin-left: auto;
+.subtitle {
+  padding: 0 1.5rem;
+  font-weight: normal;
 }
 
-.subtitle {
-  font-weight: normal;
+.title.right {
+  margin-left: auto;
 }
 
 .title_button {

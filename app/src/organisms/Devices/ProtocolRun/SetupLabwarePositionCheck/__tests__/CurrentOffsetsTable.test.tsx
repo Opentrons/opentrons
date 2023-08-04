@@ -83,24 +83,48 @@ describe('CurrentOffsetsTable', () => {
     props = {
       currentOffsets: mockCurrentOffsets,
       commands: protocolWithTC.commands,
-      labware: Object.entries(protocolWithTC.labware).map(([id, labware]) => ({
-        id,
-        ...labware,
-        loadName: 'fakeLoadName',
-        definitionUri: labware.definitionId,
-        location: 'offDeck',
-      })),
-      modules: Object.entries(protocolWithTC.modules).map(([id, module]) => ({
-        id,
-        ...module,
-        location: { slotName: '1' },
-        serialNumber: 'fakeserial',
-      })),
+      labware: [
+        {
+          id: 'mockId',
+          displayName: 'Opentrons 96 Tip Rack 300 µL',
+          loadName: 'fakeLoadName',
+          definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+          location: 'offDeck',
+        },
+      ],
+      modules: [
+        {
+          id: 'mockModId',
+          model: 'thermocyclerModuleV1',
+
+          location: { slotName: '1' },
+          serialNumber: 'fakeserial',
+        },
+      ],
     }
     mockUseLPCDisabledReason.mockReturnValue(null)
-    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
-      protocolWithTC.labware as any
-    )
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({
+      fixedTrash: {
+        displayName: 'Trash',
+        definitionId: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+      },
+      '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+        displayName: 'Opentrons 96 Tip Rack 300 µL',
+        definitionId: 'opentrons/opentrons_96_tiprack_300ul/1',
+      },
+      '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+        displayName: 'NEST 12 Well Reservoir 15 mL',
+        definitionId: 'opentrons/nest_12_reservoir_15ml/1',
+      },
+      'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+        displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
+        definitionId: 'opentrons/opentrons_96_tiprack_300ul/1',
+      },
+      '1dc0c050-0122-11ec-88a3-f1745cf9b36c:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
+        displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        definitionId: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+      },
+    } as any)
     mockLabwarePositionCheck.mockReturnValue(
       <div>mock labware position check</div>
     )

@@ -128,12 +128,6 @@ export function validateJsonProtocolFileContents(
   }
 }
 
-export function protocolHasModules(
-  protocol: ProtocolAnalysisFile<{}>
-): boolean {
-  return 'modules' in protocol && Object.entries(protocol.modules).length > 0
-}
-
 export function protocolHasLiquids(
   protocol: ProtocolAnalysisFile<{}> | ProtocolAnalysisOutput
 ): boolean {
