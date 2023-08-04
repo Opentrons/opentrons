@@ -1,10 +1,9 @@
 """QC Belt Calibration."""
 import argparse
 import asyncio
-from typing import List, Dict, Union
+from typing import List, Union
 from pathlib import Path
 
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.errors.exceptions import (
     EarlyCapacitiveSenseTrigger,
     EdgeNotFoundError,

@@ -21,7 +21,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 
 
-TEST_SLOTS = [1, 3, 9, 11]
+TEST_SLOTS = [1, 3, 9, 10]
 
 
 @dataclass
