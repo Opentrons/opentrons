@@ -174,6 +174,11 @@ class PartialTipDefinition(BaseModel):
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
     )
+    current_scale: float = Field(
+        default=0.5,
+        description="A current scale for pick up tip in a parital tip configuration",
+        alias="currentScale",
+    )
 
 
 class PipettePhysicalPropertiesDefinition(BaseModel):
