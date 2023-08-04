@@ -1,5 +1,3 @@
-//
-
 import assert from 'assert'
 import * as React from 'react'
 import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'

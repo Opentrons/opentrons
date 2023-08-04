@@ -52,8 +52,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
-        const isAdapter =
-          labwareEntity.def.metadata.displayCategory === 'adapter'
+        const isAdapterOrAluminumBlock =
+          labwareEntity.def.metadata.displayCategory === 'adapter' ||
+          labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
         const moduleOnDeck = getModuleUnderLabware(initialDeckSetup, labwareId)
         const prefix = moduleOnDeck
           ? i18n.t(
@@ -65,7 +66,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           : nicknamesById[labwareId]
 
         if (!moveLabwarePresavedStep) {
-          return getIsTiprack(labwareEntity.def) || isAdapter
+          return getIsTiprack(labwareEntity.def) || isAdapterOrAluminumBlock
             ? acc
             : [
                 ...acc,
@@ -77,7 +78,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         } else {
           //  TODO(jr, 7/17/23): filter out moving trash for now in MoveLabware step type
           //  remove this when we support other slots for trash
-          return nickName === 'Trash' || isAdapter
+          return nickName === 'Trash' || isAdapterOrAluminumBlock
             ? acc
             : [
                 ...acc,

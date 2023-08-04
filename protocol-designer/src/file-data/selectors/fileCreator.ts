@@ -212,8 +212,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         acc,
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
-        // change this type to LoadAdapterCreateCommand when it exists!
-      ): any => {
+      ): LoadAdapterCreateCommand[] => {
         const { labwareDefURI, def } = labwareEntities[labwareId]
         const isAdapter = def.metadata.displayCategory === 'adapter'
         if (!isAdapter) return [...acc]
