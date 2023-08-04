@@ -367,7 +367,7 @@
     },
     "gripHeightFromLabwareBottom": {
       "type": "number",
-      "description": "Z-height, from the labware bottom, where the gripper should grip the labware."
+      "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
     }
   }
 }
