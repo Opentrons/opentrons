@@ -61,7 +61,6 @@ jobs:
       - name: Install python dependencies.
         working-directory: ./app-testing
         run: |
-          pipenv --rm
           pipenv install --skip-lock
 
       - name: Copy env file.
