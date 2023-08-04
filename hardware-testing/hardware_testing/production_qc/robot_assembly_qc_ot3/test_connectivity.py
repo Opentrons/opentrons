@@ -362,33 +362,33 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     # ETHERNET
     ui.print_header("ETHERNET")
-    # await _test_ethernet(api, report, section)
+    await _test_ethernet(api, report, section)
 
     # WIFI
     ui.print_header("WIFI")
-    # if not api.is_simulator:
-    #     await _test_wifi(report, section)
-    # else:
-    #     report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
-    #     assert nmcli.iface_info
-    #     assert nmcli.configure
-    #     assert nmcli.wifi_disconnect
+    if not api.is_simulator:
+        await _test_wifi(report, section)
+    else:
+        report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
+        assert nmcli.iface_info
+        assert nmcli.configure
+        assert nmcli.wifi_disconnect
 
     # USB-B-REAR
-    # ui.print_header("USB-B-REAR")
-    # if not api.is_simulator:
-    #     inp = ui.get_user_answer(
-    #         "Connect USB-B to computer, does computer detect device"
-    #     )
-    #     result = CSVResult.from_bool(inp)
-    # else:
-    #     result = CSVResult.PASS
-    # report(section, "usb-b-rear", [result])
+    ui.print_header("USB-B-REAR")
+    if not api.is_simulator:
+        inp = ui.get_user_answer(
+            "Connect USB-B to computer, does computer detect device"
+        )
+        result = CSVResult.from_bool(inp)
+    else:
+        result = CSVResult.PASS
+    report(section, "usb-b-rear", [result])
 
     # USB-A
-    # ui.print_header("USB-A")
+    ui.print_header("USB-A")
     await _test_usb_a_ports(api, report, section)
 
     # AUX
     ui.print_header("AUX")
-    # await _test_aux(api, report, section)
+    await _test_aux(api, report, section)
