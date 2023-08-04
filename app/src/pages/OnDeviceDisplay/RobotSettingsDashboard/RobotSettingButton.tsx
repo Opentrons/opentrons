@@ -45,7 +45,7 @@ interface RobotSettingButtonProps {
   robotName?: string
   isUpdateAvailable?: boolean
   enabledDevTools?: boolean
-  enabledHistoricOffests?: boolean
+  enabledHistoricOffsets?: boolean
   devToolsOn?: boolean
   historicOffsetsOn?: boolean
   ledLights?: boolean
@@ -61,7 +61,7 @@ export function RobotSettingButton({
   isUpdateAvailable,
   iconName,
   enabledDevTools,
-  enabledHistoricOffests,
+  enabledHistoricOffsets,
   devToolsOn,
   historicOffsetsOn,
   ledLights,
@@ -76,7 +76,7 @@ export function RobotSettingButton({
       setCurrentOption(currentOption)
     } else if (Boolean(enabledDevTools)) {
       dispatch(toggleDevtools())
-    } else if (Boolean(enabledHistoricOffests)) {
+    } else if (Boolean(enabledHistoricOffsets)) {
       dispatch(toggleHistoricOffsets())
     } else if (Boolean(ledLights)) {
       if (toggleLights != null) toggleLights()
@@ -135,7 +135,7 @@ export function RobotSettingButton({
           </StyledText>
         </Flex>
       ) : null}
-      {enabledHistoricOffests != null ? (
+      {enabledHistoricOffsets != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing12}
@@ -163,7 +163,11 @@ export function RobotSettingButton({
           </StyledText>
         </Flex>
       ) : null}
-      <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+      <Flex
+        gridGap={SPACING.spacing24}
+        alignItems={ALIGN_CENTER}
+        marginLeft={isUpdateAvailable ? '-18rem' : undefined}
+      >
         {isUpdateAvailable ?? false ? (
           <InlineNotification
             type="alert"
@@ -172,7 +176,7 @@ export function RobotSettingButton({
           />
         ) : null}
         {enabledDevTools == null &&
-        enabledHistoricOffests == null &&
+        enabledHistoricOffsets == null &&
         ledLights == null ? (
           <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         ) : null}
