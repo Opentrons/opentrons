@@ -68,7 +68,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           : nicknamesById[labwareId]
 
         if (!moveLabwarePresavedStep) {
-          return getIsTiprack(labwareEntity.def) || isAdapter
+          return getIsTiprack(labwareEntity.def) || isAdapterOrAluminumBlock
             ? acc
             : [
                 ...acc,
