@@ -49,7 +49,7 @@ const provideExports = (): SystemD => {
         promisifyProcess(`/bin/systemctl restart opentrons-robot-app`),
       updateBrightness: text =>
         promisifyProcess(
-          `echo "${text}" | cat > /sys/class/backlight/backlight/device/backlight/backlight/brightness`
+          `echo "${text}" > /sys/class/backlight/backlight/device/backlight/backlight/brightness`
         ),
     }
   } else {

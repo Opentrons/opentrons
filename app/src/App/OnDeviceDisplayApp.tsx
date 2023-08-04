@@ -212,7 +212,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     events: onDeviceDisplayEvents,
     initialState: false,
   }
-  // const [usersBrightness, setUsersBrightness] = React.useState(brightness)
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
   const scrollRef = React.useRef(null)
