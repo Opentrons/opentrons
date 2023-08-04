@@ -120,7 +120,7 @@ export const AdapterControlsComponents = (
             onClick: isOver ? noop : undefined,
           }}
         >
-            hello
+          hello
           <a className={styles.overlay_button} onClick={addLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
             {i18n.t(

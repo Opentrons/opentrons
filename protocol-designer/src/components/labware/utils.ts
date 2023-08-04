@@ -3,7 +3,6 @@ import { AIR } from '@opentrons/step-generation'
 import { WellFill } from '@opentrons/components'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { ContentsByWell, WellContents } from '../../labware-ingred/types'
-import { LabwareOnDeck } from '../../step-forms'
 
 const ingredIdsToColor = (
   groupIds: string[],

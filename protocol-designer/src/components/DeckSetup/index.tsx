@@ -334,7 +334,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             {labwareLoadedOnModule == null &&
             !shouldHideChildren &&
             !isAdapter ? (
-              // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
+              //  @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
               <SlotControls
                 key={slot.id}
                 slot={labwareInterfaceSlotDef}
@@ -448,7 +448,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         )
       })}
 
-      {/* all adapters on deck and not on module*/}
+      {/* all adapters on deck and not on module  */}
       {allLabware.map(labware => {
         if (allModules.some(m => m.id === labware.slot)) return null
         const slotOnDeck = deckSlots.find(slot => slot.id === labware.slot)

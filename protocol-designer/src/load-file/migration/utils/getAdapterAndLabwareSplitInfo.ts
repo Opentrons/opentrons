@@ -1,4 +1,4 @@
-export type AdapterAndLabware = {
+export interface AdapterAndLabware {
   labwareUri: string
   adapterUri: string
   labwareDisplayName: string

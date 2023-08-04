@@ -37,9 +37,9 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     strategy: TOOLTIP_FIXED,
   })
 
-  let destSlot = null
+  let destSlot: string | null | undefined = null
   if (destinationSlot === 'offDeck') {
-    destSlot === 'off deck'
+    destSlot = 'off deck'
   } else if (
     destinationSlot != null &&
     moduleEntites[destinationSlot] != null

@@ -77,7 +77,6 @@ import {
   RootState,
   SavedStepFormState,
   BatchEditFormChangesState,
-  labwareInvariantProperties,
 } from '../reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms

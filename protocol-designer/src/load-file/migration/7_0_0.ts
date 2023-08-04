@@ -26,8 +26,9 @@ import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 //  adapter + labware commands and definitions to their commands/definitions split up
 const PD_VERSION = '7.0.0'
 const SCHEMA_VERSION = 7
-
-type LabwareLocationUpdate = { [id: string]: string }
+interface LabwareLocationUpdate {
+  [id: string]: string
+}
 
 //  might need better way to filter this???
 const getIsAdapter = (id: string): boolean =>
@@ -74,10 +75,9 @@ export const migrateFile = (
       },
     }))
 
-  const loadAdapterAndLabwareCommands: (
-    | LoadAdapterCreateCommand
-    | LoadLabwareCreateCommand
-  )[] = commands
+  const loadAdapterAndLabwareCommands: Array<
+    LoadAdapterCreateCommand | LoadLabwareCreateCommand
+  > = commands
     .filter(
       (command): command is LoadLabwareCommandV6 =>
         command.commandType === 'loadLabware' &&
