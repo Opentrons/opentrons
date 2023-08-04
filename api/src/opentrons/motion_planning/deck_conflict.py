@@ -15,7 +15,10 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 
 from opentrons.types import DeckSlotName
 
-_FIXED_TRASH_SLOT: Final = DeckSlotName.FIXED_TRASH
+_FIXED_TRASH_SLOT: Final[Set[DeckSlotName]] = {
+    DeckSlotName.FIXED_TRASH,
+    DeckSlotName.SLOT_A3,
+}
 
 
 # The maximum height allowed for items adjacent to a Heater-Shaker in the x-direction.
@@ -146,7 +149,7 @@ class _NoHeaterShakerModule(NamedTuple):
 class _FixedTrashOnly(NamedTuple):
     """Only fixed-trash labware is allowed in this slot."""
 
-    location: DeckSlotName = _FIXED_TRASH_SLOT
+    location: DeckSlotName
 
     def is_allowed(self, item: DeckItem) -> bool:
         return _is_fixed_trash(item)
@@ -185,7 +188,13 @@ def check(
     Raises:
         DeckConflictError: Adding this item should not be allowed.
     """
-    restrictions: List[_DeckRestriction] = [_FixedTrashOnly()]
+    restrictions: List[_DeckRestriction] = [
+        _FixedTrashOnly(
+            location=DeckSlotName.FIXED_TRASH.to_equivalent_for_robot_type(
+                robot_type  # type: ignore[arg-type]
+            )
+        )
+    ]
     # build restrictions driven by existing items
     for location, item in existing_items.items():
         restrictions += _create_restrictions(
@@ -221,7 +230,7 @@ def _create_ot2_restrictions(
 ) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
-    if location != _FIXED_TRASH_SLOT:
+    if location not in _FIXED_TRASH_SLOT:
         # Disallow a different item from overlapping this item in this deck slot.
         restrictions.append(
             _NothingAllowed(
@@ -284,6 +293,15 @@ def _create_flex_restrictions(
 ) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
+    if location not in _FIXED_TRASH_SLOT:
+        restrictions.append(
+            _NothingAllowed(
+                location=location,
+                source_item=item,
+                source_location=location,
+            )
+        )
+
     if isinstance(item, ThermocyclerModule):
         for covered_location in _flex_slots_covered_by_thermocycler():
             restrictions.append(
@@ -293,14 +311,7 @@ def _create_flex_restrictions(
                     source_location=location,
                 )
             )
-    else:
-        restrictions.append(
-            _NothingAllowed(
-                location=location,
-                source_item=item,
-                source_location=location,
-            )
-        )
+
     return restrictions
 
 
