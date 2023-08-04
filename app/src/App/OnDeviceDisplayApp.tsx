@@ -295,9 +295,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 }
 
 function TopLevelRedirects(): JSX.Element | null {
-  const { data: subsystems } = useCurrentSubsystemUpdateQuery(null)
-  console.log('subsystems', subsystems)
-
   const runRouteMatch = useRouteMatch({ path: '/runs/:runId' })
   const currentRunRoute = useCurrentRunRoute()
 

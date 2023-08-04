@@ -64,6 +64,7 @@ describe('useCurrentSubsystemUpdateQuery', () => {
 
     wrapper = clientProvider
   })
+
   afterEach(() => {
     resetAllWhenMocks()
   })

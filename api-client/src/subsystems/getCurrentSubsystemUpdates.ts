@@ -6,6 +6,7 @@ import type {
   CurrentSubsystemUpdates,
   SubsystemUpdateProgressData,
 } from './types'
+
 /**
  *
  * @param config
@@ -18,9 +19,14 @@ export function getCurrentSubsystemUpdates(
   config: HostConfig,
   subsystem: string | null
 ): ResponsePromise<CurrentSubsystemUpdates | SubsystemUpdateProgressData> {
+  let url = '/subsystems/updates/current'
+  if (subsystem !== null) {
+    url = `/subsystems/updates/current/${subsystem}`
+  }
+
   return request<CurrentSubsystemUpdates | SubsystemUpdateProgressData>(
     GET,
-    `/subsystems/updates/current/${subsystem}`,
+    url,
     null,
     config
   )
