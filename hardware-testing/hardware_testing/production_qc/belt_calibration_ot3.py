@@ -72,8 +72,8 @@ async def _check_belt_accuracy(
     for slot in TEST_SLOTS:
         await api.home()
         try:
-            slot_offset = await find_pipette_offset(  # type: ignore[arg-type]
-                api, mount, slot=slot, reset_instrument_offset=False
+            slot_offset = await find_pipette_offset(
+                api, mount, slot=slot, reset_instrument_offset=False  # type: ignore[arg-type]
             )
             ret[slot] = slot_offset
             print(f"Slot #{slot}: {slot_offset}")

@@ -2,6 +2,7 @@
 import asyncio
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from math import pi
 from subprocess import run
 from time import time
@@ -29,6 +30,7 @@ from opentrons.hardware_control.instruments.ot2.pipette import Pipette as Pipett
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
 
+from ..data import get_git_description, csv_report
 from .types import (
     GantryLoad,
     PerPipetteAxisSettings,
@@ -247,6 +249,60 @@ async def build_async_ot3_hardware_api(
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     await reset_api(api)
     return api
+
+
+class DeviceUnderTest(Enum):
+    ROBOT = "robot"
+    PIPETTE_LEFT = "pipette-left"
+    PIPETTE_RIGHT = "pipette-right"
+    GRIPPER = "gripper"
+    OTHER = "other"
+
+
+def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
+    if dut == DeviceUnderTest.ROBOT:
+        return get_robot_serial_ot3(api)
+    elif dut == DeviceUnderTest.PIPETTE_LEFT or dut == DeviceUnderTest.PIPETTE_RIGHT:
+        mnt = OT3Mount.LEFT if dut == DeviceUnderTest.PIPETTE_LEFT else OT3Mount.RIGHT
+        pipette = api.hardware_pipettes[mnt.to_mount()]
+        assert pipette
+        return get_pipette_serial_ot3(pipette)
+    elif dut == DeviceUnderTest.GRIPPER:
+        gripper = api.attached_gripper
+        assert gripper
+        return str(gripper["gripper_id"])
+    elif api.is_simulator:
+        return dut.value
+    else:
+        return input("enter device SERIAL-NUMBER: ")
+
+
+def set_csv_report_meta_data_ot3(
+    api: OT3API,
+    report: csv_report.CSVReport,
+    dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
+    tag: str = "",
+) -> None:
+    # operator should be entered first
+    report.set_operator(
+        "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    )
+
+    # default DUT to be the robot serial
+    # and only scan barcode if we're not simulating
+    robot_serial = get_robot_serial_ot3(api)
+    dut_str = _get_serial_for_dut(api, dut)
+    if not api.is_simulator and dut != DeviceUnderTest.OTHER:
+        barcode = input("SCAN device barcode: ").strip()
+    else:
+        barcode = dut_str
+
+    # default the CSV tag to be the DUT
+    report.set_tag(tag if tag else dut_str)
+    report.set_device_id(dut_str, csv_report.CSVResult.from_bool(barcode == dut_str))
+    report.set_robot_id(robot_serial)
+    report.set_firmware(api.fw_version)
+    report.set_version(get_git_description())
 
 
 def set_gantry_per_axis_setting_ot3(
