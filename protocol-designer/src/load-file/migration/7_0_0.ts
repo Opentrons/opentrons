@@ -246,50 +246,6 @@ export const migrateFile = (
   }
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
 
-  const liquidHandlingOrderedStepIds = orderedStepIds?.filter(
-    id =>
-      savedStepForms &&
-      (savedStepForms[id]?.stepType === 'mix' ||
-        savedStepForms[id]?.stepType === 'moveLiquid')
-  )
-  const liquidHandlingStepForms = liquidHandlingOrderedStepIds?.map(
-    id => savedStepForms[id]
-  )
-  const labwareLocationUpdateIds = Object.keys(newLabwareLocationUpdate)
-
-  const getReplaceLabwareIds = (
-    labwareLocationUpdateIds: string[],
-    stepForm: any
-  ): any => {
-    if (stepForm.stepType === 'moveLiquid') {
-      const aspirateLabwareId = stepForm.aspirate_labware.split(':')[0]
-      const dispenseLabwareId = stepForm.dispense_labware.split(':')[0]
-      for (const labwareLocationUpdateId of labwareLocationUpdateIds) {
-        const labwareUuid = labwareLocationUpdateId.split(':')[0]
-        if (labwareUuid.includes(aspirateLabwareId)) {
-          stepForm.aspirate_labware = labwareLocationUpdateId
-        }
-        if (labwareUuid.includes(dispenseLabwareId)) {
-          stepForm.dispense_labware = labwareLocationUpdateId
-        }
-      }
-    }
-    if (stepForm.stepType === 'mix') {
-      const labwareId = stepForm.labware.split(':')[0]
-      for (const labwareLocationUpdateId of labwareLocationUpdateIds) {
-        const labwareUuid = labwareLocationUpdateId.split(':')[0]
-        if (labwareUuid.includes(labwareId)) {
-          stepForm.labware = labwareLocationUpdateId
-        }
-      }
-    }
-
-    return stepForm
-  }
-  const newLiquidHandlingStepForms = liquidHandlingStepForms?.map(step =>
-    getReplaceLabwareIds(labwareLocationUpdateIds, step)
-  )
-
   return {
     ...rest,
     designerApplication: {
@@ -310,7 +266,6 @@ export const migrateFile = (
               ...newLabwareLocationUpdate,
             },
           },
-          ...newLiquidHandlingStepForms,
         },
       },
     },
