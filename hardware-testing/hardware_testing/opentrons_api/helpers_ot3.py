@@ -252,11 +252,23 @@ async def build_async_ot3_hardware_api(
 
 
 class DeviceUnderTest(Enum):
+    """Device Under Test."""
+
     ROBOT = "robot"
     PIPETTE_LEFT = "pipette-left"
     PIPETTE_RIGHT = "pipette-right"
     GRIPPER = "gripper"
     OTHER = "other"
+
+    @classmethod
+    def by_mount(cls, mount: OT3Mount) -> "DeviceUnderTest":
+        """Get DUT by mount."""
+        lookup = {
+            OT3Mount.LEFT: cls.PIPETTE_LEFT,
+            OT3Mount.RIGHT: cls.PIPETTE_RIGHT,
+            OT3Mount.GRIPPER: cls.GRIPPER,
+        }
+        return lookup[mount]
 
 
 def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
@@ -274,7 +286,7 @@ def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
     elif api.is_simulator:
         return dut.value
     else:
-        return input("enter device SERIAL-NUMBER: ")
+        return input("enter ID for test: ")
 
 
 def set_csv_report_meta_data_ot3(
@@ -283,6 +295,7 @@ def set_csv_report_meta_data_ot3(
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
 ) -> None:
+    """Set CSVReport meta-data given an OT3."""
     # operator should be entered first
     report.set_operator(
         "simulating" if api.is_simulator else input("enter OPERATOR name: ")
@@ -292,7 +305,9 @@ def set_csv_report_meta_data_ot3(
     # and only scan barcode if we're not simulating
     robot_serial = get_robot_serial_ot3(api)
     dut_str = _get_serial_for_dut(api, dut)
+    print(f"device under test: {dut_str}")
     if not api.is_simulator and dut != DeviceUnderTest.OTHER:
+        # always confirm barcode for robot/pipette/gripper
         barcode = input("SCAN device barcode: ").strip()
     else:
         barcode = dut_str

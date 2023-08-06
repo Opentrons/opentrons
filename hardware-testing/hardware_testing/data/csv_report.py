@@ -384,6 +384,14 @@ class CSVReport:
         """Tag."""
         return f"{self.__class__.__name__}-{self._tag}"
 
+    @property
+    def file_path(self) -> Path:
+        """Get file-path."""
+        if not self._file_name:
+            raise RuntimeError("must set tag of report using `Report.set_tag()`")
+        test_path = data_io.create_folder_for_test_data(self._test_name)
+        return test_path / self._file_name
+
     def _cache_start_time(self, start_time: Optional[float] = None) -> None:
         checked_start_time = start_time if start_time else time()
         for section in self._sections:
@@ -433,3 +441,11 @@ class CSVReport:
         return data_io.dump_data_to_file(
             self._test_name, self._file_name, _report_str + "\n"
         )
+
+    def print_results(self) -> None:
+        """Print overall results."""
+        complete_msg = "complete" if self.completed else "incomplete"
+        print(f"done, {complete_msg} report -> {self.file_path}")
+        print("Overall Results:")
+        for line in self[RESULTS_OVERVIEW_TITLE].lines:
+            print(f" - {line.tag}: {line.result}")

@@ -27,9 +27,8 @@ from opentrons_shared_data.errors.exceptions import (
     MisalignedGantryError,
 )
 
-from hardware_testing.data import get_git_description, ui
+from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
-    RESULTS_OVERVIEW_TITLE,
     CSVReport,
     CSVSection,
     CSVResult,
@@ -241,16 +240,6 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
     """Run."""
     ui.print_header("BELT CALIBRATION")
 
-    # CREATE REPORT
-    report = _create_csv_report()
-    report.set_version(get_git_description())
-
-    # GET OPERATOR
-    if not is_simulating:
-        report.set_operator(input("enter operator name: "))
-    else:
-        report.set_operator("simulation")
-
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
         use_defaults=True,  # includes default XY calibration matrix
@@ -258,18 +247,9 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
         pipette_left="p1000_single_v3.5",
     )
 
-    # GET ROBOT SERIAL NUMBER
-    robot_id = helpers_ot3.get_robot_serial_ot3(api)
-    print(f"robot SN: {robot_id}")
-    if not robot_id:
-        ui.print_error("no robot serial number found")
-    report.set_tag(robot_id)
-    report.set_robot_id(robot_id)
-    if not api.is_simulator:
-        barcode = input("scan robot barcode: ").strip()
-        report.set_device_id(robot_id, CSVResult.from_bool(barcode == robot_id))
-    else:
-        report.set_device_id(robot_id, CSVResult.PASS)
+    # CREATE REPORT
+    report = _create_csv_report()
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report)
 
     # RUN TEST
     try:
@@ -357,12 +337,8 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
     ui.print_title("DONE")
 
     # SAVE REPORT
-    report_path = report.save_to_disk()
-    complete_msg = "complete" if report.completed else "incomplete"
-    print(f"done, {complete_msg} report -> {report_path}")
-    print("Overall Results:")
-    for line in report[RESULTS_OVERVIEW_TITLE].lines:
-        print(f" - {line.tag}: {line.result}")
+    report.save_to_disk()
+    report.print_results()
 
 
 if __name__ == "__main__":

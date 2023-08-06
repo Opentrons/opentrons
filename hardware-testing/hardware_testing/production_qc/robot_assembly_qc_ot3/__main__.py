@@ -8,8 +8,7 @@ import argparse
 import asyncio
 from pathlib import Path
 
-from hardware_testing.data import ui, get_git_description
-from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE, CSVResult
+from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
 
 from .config import TestSection, TestConfig, build_report, TESTS
@@ -19,14 +18,6 @@ async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
     test_name = Path(__file__).parent.name.replace("_", "-")
     ui.print_title(test_name.upper())
-    report = build_report(test_name)
-    report.set_version(get_git_description())
-
-    # GET OPERATOR
-    if not cfg.simulate:
-        report.set_operator(input("enter operator name: "))
-    else:
-        report.set_operator("simulation")
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -37,33 +28,19 @@ async def _main(cfg: TestConfig) -> None:
         gripper="GRPV122",
     )
 
-    # GET ROBOT SERIAL NUMBER
-    robot_id = helpers_ot3.get_robot_serial_ot3(api)
-    print(f"robot SN: {robot_id}")
-    if not robot_id:
-        ui.print_error("no robot serial number found")
-    report.set_tag(robot_id)
-    report.set_robot_id(robot_id)
-    if not api.is_simulator:
-        barcode = input("scan robot barcode: ").strip()
-        report.set_device_id(robot_id, CSVResult.from_bool(barcode == robot_id))
-    else:
-        report.set_device_id(robot_id, CSVResult.PASS)
+    # CSV REPORT
+    report = build_report(test_name)
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report)
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
         ui.print_title(section.value)
         await test_run(api, report, section.value)
 
-    ui.print_title("DONE")
-
     # SAVE REPORT
-    report_path = report.save_to_disk()
-    complete_msg = "complete" if report.completed else "incomplete"
-    print(f"done, {complete_msg} report -> {report_path}")
-    print("Overall Results:")
-    for line in report[RESULTS_OVERVIEW_TITLE].lines:
-        print(f" - {line.tag}: {line.result}")
+    ui.print_title("DONE")
+    report.save_to_disk()
+    report.print_results()
 
 
 if __name__ == "__main__":
