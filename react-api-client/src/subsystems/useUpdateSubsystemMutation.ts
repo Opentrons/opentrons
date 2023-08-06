@@ -14,7 +14,6 @@ import type {
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
 
-
 export type UseUpdateSubsystemMutationResult = UseMutationResult<
   SubsystemUpdateProgressData,
   AxiosError,
