@@ -92,8 +92,6 @@ export const AdapterControlsComponents = (
   ) {
     slotBlocked = 'Labware incompatible with this adapter'
   }
-  console.log('labwareId', labwareId)
-  console.log('slot', slot.id)
 
   return connectDropTarget(
     <g>
@@ -107,8 +105,8 @@ export const AdapterControlsComponents = (
         />
       ) : (
         <RobotCoordsForeignDiv
-          x={slot.position[0]}
-          y={slot.position[1]}
+          x={0}
+          y={0}
           width={slot.boundingBox.xDimension}
           height={slot.boundingBox.yDimension}
           innerDivProps={{
