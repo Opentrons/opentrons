@@ -188,6 +188,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
   })
@@ -210,6 +211,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -230,6 +232,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -256,6 +259,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -281,6 +285,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -297,6 +302,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -315,6 +321,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -335,6 +342,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -354,6 +362,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -374,6 +383,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -394,6 +404,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -414,6 +425,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
 
@@ -441,6 +453,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: true,
       runId: 'id',
     }
@@ -462,6 +475,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: true,
       runId: 'id',
     }
@@ -498,6 +512,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -525,6 +540,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
@@ -560,6 +576,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleInstructionsClick: jest.fn(),
+      handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
