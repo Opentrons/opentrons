@@ -43,13 +43,18 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Build .AppImage
+      - name: Download App Image
         run: |
-          OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make setup
-          OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell setup
-          OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell dist-linux
-          mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}
+          curl -o Opentrons.AppImage -L https://s3.amazonaws.com/opentrons-app/builds/Opentrons-v6.3.1-linux-b32811-internal-release_0.14.0.AppImage
           chmod +x ${{ env.EXECUTABLE_PATH }}
+
+      # - name: Build .AppImage
+      #   run: |
+      #     OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make setup
+      #     OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell setup
+      #     OT_PYTHON=${{ env.PYTHON_3_7_EXEC }} make -C app-shell dist-linux
+      #     mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}
+      #     chmod +x ${{ env.EXECUTABLE_PATH }}
 
       - name: Install Chromedriver on the path.
         working-directory: ./app-testing
