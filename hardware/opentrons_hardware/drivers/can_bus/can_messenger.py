@@ -277,7 +277,7 @@ class CanMessenger:
         exclusive: bool = False,
     ) -> ErrorCode:
         if len(expected_nodes) == 0:
-            log.warning("Expected Nodes should have been specified")
+            log.debug("Expected Nodes should have been specified")
             if node_id == NodeId.broadcast:
                 expected_nodes = _Basic_Nodes.copy()
             else:
