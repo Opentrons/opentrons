@@ -17,6 +17,7 @@ import type {
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
   LoadLiquidRunTimeCommand,
+  LoadAdapterRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 interface PipetteNamesByMount {
@@ -117,28 +118,95 @@ export function parseInitialLoadedLabwareBySlot(
     .reverse()
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
-    (acc, command) =>
-      typeof command.params.location === 'object' &&
-      'slotName' in command.params.location
-        ? { ...acc, [command.params.location.slotName]: command }
-        : acc,
+    (acc, command) => {
+      if (
+        typeof command.params.location === 'object' &&
+        'slotName' in command.params.location
+      ) {
+        return { ...acc, [command.params.location.slotName]: command }
+      } else {
+        return acc
+      }
+    },
     {}
   )
 }
 
-interface LoadedLabwareByModuleId {
-  [moduleId: string]: LoadLabwareRunTimeCommand
+interface LoadedLabwareByAdapter {
+  [labwareId: string]: LoadLabwareRunTimeCommand
 }
-export function parseInitialLoadedLabwareByModuleId(
+export function parseInitialLoadedLabwareByAdapter(
   commands: RunTimeCommand[]
-): LoadedLabwareByModuleId {
+): LoadedLabwareByAdapter {
   const loadLabwareCommandsReversed = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
         command.commandType === 'loadLabware'
     )
     .reverse()
-  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareByModuleId>(
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
+    loadLabwareCommandsReversed,
+    (acc, command) => {
+      if (
+        typeof command.params.location === 'object' &&
+        'labwareId' in command.params.location
+      ) {
+        return { ...acc, [command.params.location.labwareId]: command }
+      } else {
+        return acc
+      }
+    },
+    {}
+  )
+}
+
+interface LoadedAdapterBySlot {
+  [slotName: string]: LoadAdapterRunTimeCommand
+}
+export function parseInitialLoadAdapterBySlot(
+  commands: RunTimeCommand[]
+): LoadedAdapterBySlot {
+  const loadAdapterCommandsReversed = commands
+    .filter(
+      (command): command is LoadAdapterRunTimeCommand =>
+        command.commandType === 'loadAdapter'
+    )
+    .reverse()
+  return reduce<LoadAdapterRunTimeCommand, LoadedAdapterBySlot>(
+    loadAdapterCommandsReversed,
+    (acc, command) => {
+      if (
+        typeof command.params.location === 'object' &&
+        'slotName' in command.params.location
+      ) {
+        return { ...acc, [command.params.location.slotName]: command }
+      } else {
+        return acc
+      }
+    },
+    {}
+  )
+}
+
+interface LoadedLabwareByModuleId {
+  [moduleId: string]: LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand
+}
+export function parseInitialLoadedLabwareByModuleId(
+  commands: RunTimeCommand[]
+): LoadedLabwareByModuleId {
+  const loadLabwareCommandsReversed = commands
+    .filter(
+      (
+        command
+      ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
+        command.commandType === 'loadLabware' ||
+        command.commandType === 'loadAdapter'
+    )
+    .reverse()
+  return reduce<
+    LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand,
+    LoadedLabwareByModuleId
+  >(
     loadLabwareCommandsReversed,
     (acc, command) =>
       typeof command.params.location === 'object' &&
@@ -152,22 +220,33 @@ export function parseInitialLoadedLabwareByModuleId(
 export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
 ): LoadedLabware[] {
-  const loadLabwareCommands = commands.filter(
-    (command): command is LoadLabwareRunTimeCommand =>
-      command.commandType === 'loadLabware'
+  const loadLabwareAndAdapterCommands = commands.filter(
+    (
+      command
+    ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
+      command.commandType === 'loadLabware' ||
+      command.commandType === 'loadAdapter'
   )
-  const filterOutTrashCommands = loadLabwareCommands.filter(
+  const filterOutTrashCommands = loadLabwareAndAdapterCommands.filter(
     command => command.result?.definition?.metadata.displayCategory !== 'trash'
   )
   return filterOutTrashCommands.map(command => {
     const definition = command.result?.definition
-    return {
-      id: command.result?.labwareId ?? '',
-      loadName: definition?.parameters?.loadName ?? '',
-      definitionUri: definition != null ? getLabwareDefURI(definition) : '',
-      location: command.params.location,
-      displayName: command.params.displayName,
-    }
+    return command.commandType === 'loadAdapter'
+      ? {
+          id: command.result?.adapterId ?? '',
+          loadName: definition?.parameters?.loadName ?? '',
+          definitionUri: definition != null ? getLabwareDefURI(definition) : '',
+          location: command.params.location,
+          displayName: command.params.displayName,
+        }
+      : {
+          id: command.result?.labwareId ?? '',
+          loadName: definition?.parameters?.loadName ?? '',
+          definitionUri: definition != null ? getLabwareDefURI(definition) : '',
+          location: command.params.location,
+          displayName: command.params.displayName,
+        }
   })
 }
 

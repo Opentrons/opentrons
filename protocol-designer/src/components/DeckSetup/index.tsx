@@ -308,6 +308,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 {isAdapter ? (
                   //  @ts-expect-error
                   <AdapterControls
+                    onDeck={false}
                     labwareId={labwareLoadedOnModule.id}
                     key={slot.id}
                     slot={slot}
@@ -423,6 +424,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 <>
                   {/* @ts-expect-error */}
                   <AdapterControls
+                    onDeck={true}
                     labwareId={labware.id}
                     key={slot.id}
                     slot={slot}

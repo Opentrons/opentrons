@@ -27,12 +27,15 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
+  LoadAdapterRunTimeCommand,
+  LoadModuleRunTimeCommand,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
@@ -61,6 +64,7 @@ interface LabwareListItemProps extends LabwareSetupItem {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
   isOt3: boolean
+  commands: RunTimeCommand[]
 }
 
 export function LabwareListItem(
@@ -75,6 +79,7 @@ export function LabwareListItem(
     moduleLocation,
     extraAttentionModules,
     isOt3,
+    commands,
   } = props
   const { t } = useTranslation('protocol_setup')
   const [
@@ -98,6 +103,38 @@ export function LabwareListItem(
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand
 
+  if (initialLocation !== 'offDeck' && 'labwareId' in initialLocation) {
+    const adapter = commands.find(
+      (command): command is LoadAdapterRunTimeCommand =>
+        command.result?.adapterId === initialLocation.labwareId
+    )
+    let location
+    let name
+    if (
+      adapter?.params.location != null &&
+      adapter?.params.location !== 'offDeck'
+    ) {
+      if ('slotName' in adapter?.params?.location) {
+        location = adapter?.params.location.slotName
+        t('slot_location', {
+          slotName: location,
+        })
+      } else if ('moduleId' in adapter?.params?.location) {
+        const module = commands.find(
+          (command): command is LoadModuleRunTimeCommand =>
+            command.params.moduleId === adapter?.params.location.moduleId
+        )
+        if (module != null) {
+          location = module.params.location.slotName
+          name = adapter?.result?.definition.metadata.displayName
+          slotInfo = t('module_slot_location', {
+            slotName: location,
+            moduleName: name,
+          })
+        }
+      }
+    }
+  }
   if (
     initialLocation !== 'offDeck' &&
     'moduleId' in initialLocation &&

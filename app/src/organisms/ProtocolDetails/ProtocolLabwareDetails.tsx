@@ -21,11 +21,17 @@ import { Portal } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type {
+  LoadLabwareRunTimeCommand,
+  LoadAdapterRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {
-  requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null
+  requiredLabwareDetails: (
+    | LoadLabwareRunTimeCommand
+    | LoadAdapterRunTimeCommand
+  )[]
 }
 
 export const ProtocolLabwareDetails = (
@@ -52,7 +58,6 @@ export const ProtocolLabwareDetails = (
             .values(),
         ]
       : []
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

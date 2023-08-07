@@ -40,6 +40,7 @@ interface OP {
   slot: DeckSlotDefinition & { id: DeckSlot }
   //    labwareId is the adapter's labwareId
   labwareId: string
+  onDeck: boolean
   selectedTerminalItemId?: TerminalItemId | null
   handleDragHover?: () => unknown
 }
@@ -69,6 +70,7 @@ export const AdapterControlsComponents = (
     deleteLabware,
     labwareId,
     customLabwareDefs,
+    onDeck,
   } = props
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
@@ -105,8 +107,8 @@ export const AdapterControlsComponents = (
         />
       ) : (
         <RobotCoordsForeignDiv
-          x={0}
-          y={0}
+          x={onDeck ? slot.position[0] : 0}
+          y={onDeck ? slot.position[1] : 0}
           width={slot.boundingBox.xDimension}
           height={slot.boundingBox.yDimension}
           innerDivProps={{

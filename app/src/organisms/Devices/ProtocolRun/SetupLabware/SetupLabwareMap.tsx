@@ -44,8 +44,8 @@ export function SetupLabwareMap({
   )
   const { robotType } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
+  console.log('labwareRenderInfoById', labwareRenderInfoById)
   const deckDef = getDeckDefFromRobotType(robotType)
-
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>

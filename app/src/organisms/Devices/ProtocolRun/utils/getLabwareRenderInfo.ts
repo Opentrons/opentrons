@@ -6,7 +6,10 @@ import {
   ProtocolAnalysisFile,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type {
+  LoadLabwareRunTimeCommand,
+  LoadAdapterRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -53,20 +56,23 @@ export const getLabwareRenderInfo = (
 ): LabwareRenderInfoById =>
   protocolData.commands
     .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
+      (
+        command
+      ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
+        command.commandType === 'loadLabware' ||
+        command.commandType === 'loadAdapter'
     )
     .reduce((acc, command) => {
-      const labwareId = command.result?.labwareId
+      let labwareId
+      if (command?.result != null && 'labwareId' in command?.result) {
+        labwareId = command.result.labwareId
+      } else if (command?.result != null && 'adapterId' in command?.result) {
+        labwareId = command.result.adapterId
+      }
       const location = command.params.location
       const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
-      if (
-        location === 'offDeck' ||
-        'moduleId' in location ||
-        'labwareId' in location
-      )
-        return acc
+      if (location === 'offDeck' || 'moduleId' in location) return acc
       if (labwareId == null) {
         throw new Error('expected to find labware id but could not')
       }
@@ -77,7 +83,13 @@ export const getLabwareRenderInfo = (
           )} but could not`
         )
       }
-      const slotName = location.slotName.toString()
+      let slotName = ''
+      if ('labwareId' in location) {
+        slotName = location.labwareId
+      } else if ('slotName' in location) {
+        slotName = location.slotName
+      }
+      console.log(slotName)
       const slotPosition = getSlotPosition(deckDef, slotName)
 
       const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(

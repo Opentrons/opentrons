@@ -51,6 +51,7 @@ export function SetupLabwareList(
       </HeaderRow>
       {onDeckItems.map((labwareItem, index) => (
         <LabwareListItem
+          commands={commands}
           key={index}
           attachedModuleInfo={attachedModuleInfo}
           extraAttentionModules={extraAttentionModules}
