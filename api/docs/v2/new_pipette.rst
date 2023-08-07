@@ -353,9 +353,6 @@ Finally, let's slow down the blow out flow rate from its default::
         pipette.aspirate(volume=50, plate['A1'])
         pipette.blow_out(volume=50)
 
-The :py:obj:`.InstrumentContext.speed` object offers functionality that's similar to ``flow_rate``, but is measured in mm/s of plunger speed. These units do not have a linear transfer to flow rate and
-should only be used if you have a specific need.
-
 .. note::
     In API version 2.13 and earlier, :py:obj:`.InstrumentContext.speed` offered similar functionality. It attempted to set the plunger speed in mm/s. Due to technical limitations, that speed could only be approximate. You must use ``.flow_rate`` in version 2.14 and later, and you should consider replacing older code that sets ``.speed``.
 
