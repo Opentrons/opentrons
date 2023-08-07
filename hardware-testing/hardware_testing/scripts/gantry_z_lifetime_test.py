@@ -153,14 +153,14 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
     for i in range(cycles):
         print(f"\n========== Cycle {i + 1}/{cycles} ==========\n")
 
-        # if (i + 1) % 20 == 0:
-        #     # set current to 1.5A
-        #     print("Setting pick up current to 1.5A\n")
-        #     await helpers_ot3.update_pick_up_current(api, mount, 1.5)
-        # else:
-        # set current to 0.75A
-        print("Setting pick up current to 0.75A\n")
-        await helpers_ot3.update_pick_up_current(api, mount, 0.75)
+        if (i + 1) % 16 == 0: ### CHANGE 16 to 10 after second lifetime test complete on GL2
+            # set current to 1.5A
+            print("Setting pick up current to 1.5A\n")
+            await helpers_ot3.update_pick_up_current(api, mount, 1.5)
+        else:
+            # set current to 0.75A
+            print("Setting pick up current to 0.75A\n")
+            await helpers_ot3.update_pick_up_current(api, mount, 0.75)
 
         # opentrons.opentrons_shared_data.data.pipette.definitions.2.general.ninety_six_channel.p1000.3_4.json
         # path = '/opt/opentrons-robot-server/opentrons_shared_data/data/pipette/definitions/2/general/ninety_six_channel/p1000/3_4.json'
