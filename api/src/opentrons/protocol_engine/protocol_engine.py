@@ -217,7 +217,7 @@ class ProtocolEngine:
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
-    async def stop(self) -> None:
+    async def stop(self, halt_api: bool = True) -> None:
         """Stop execution immediately, halting all motion and cancelling future commands.
 
         After an engine has been `stop`'ed, it cannot be restarted.
@@ -228,7 +228,8 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
-        await self._hardware_stopper.do_halt()
+        if halt_api:
+            await self._hardware_stopper.do_halt()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -245,6 +246,7 @@ class ProtocolEngine:
         error: Optional[Exception] = None,
         drop_tips_and_home: bool = True,
         set_run_status: bool = True,
+        force_cancel: bool = False,
     ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
@@ -285,7 +287,7 @@ class ProtocolEngine:
         )
 
         try:
-            await self._queue_worker.join()
+            await self._queue_worker.join(force_cancel=force_cancel)
 
         # todo(mm, 2022-01-31): We should use something like contextlib.AsyncExitStack
         # to robustly clean up all these resources
