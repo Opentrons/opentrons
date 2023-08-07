@@ -320,16 +320,17 @@ class ProtocolCore(
         if deck_slot is None:
             module_type = ModuleType.from_model(model)
             if module_type == ModuleType.THERMOCYCLER:
-                robot_type = self._engine_client.state.config.robot_type
-                deck_slot = DeckSlotName.SLOT_7.to_equivalent_for_robot_type(robot_type)
+                deck_slot = DeckSlotName.SLOT_7
             else:
                 raise InvalidModuleLocationError(deck_slot, model.name)
 
-        self._ensure_module_location(deck_slot, module_type)
+        robot_type = self._engine_client.state.config.robot_type
+        normalized_deck_slot = deck_slot.to_equivalent_for_robot_type(robot_type)
+        self._ensure_module_location(normalized_deck_slot, module_type)
 
         result = self._engine_client.load_module(
             model=EngineModuleModel(model),
-            location=DeckSlotLocation(slotName=deck_slot),
+            location=DeckSlotLocation(slotName=normalized_deck_slot),
         )
 
         module_core = self._get_module_core(load_module_result=result, model=model)
