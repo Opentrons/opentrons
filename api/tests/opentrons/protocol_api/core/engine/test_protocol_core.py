@@ -867,13 +867,6 @@ def test_add_labware_definition(
             DeckSlotName.SLOT_1,
         ),
         (
-            MagneticModuleModel.MAGNETIC_V2,
-            EngineModuleModel.MAGNETIC_MODULE_V2,
-            MagneticModuleCore,
-            lazy_fixture("ot3_standard_deck_def"),
-            DeckSlotName.SLOT_D1,
-        ),
-        (
             ThermocyclerModuleModel.THERMOCYCLER_V1,
             EngineModuleModel.THERMOCYCLER_MODULE_V1,
             ThermocyclerModuleCore,
