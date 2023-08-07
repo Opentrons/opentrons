@@ -185,11 +185,11 @@ export function parseInitialLoadedLabwareByModuleId(
 export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
 ): LoadedLabware[] {
-  const loadLabwareCommands = commands.filter(
+  const loadLabwareAndAdapterCommands = commands.filter(
     (command): command is LoadLabwareRunTimeCommand =>
       command.commandType === 'loadLabware'
   )
-  const filterOutTrashCommands = loadLabwareCommands.filter(
+  const filterOutTrashCommands = loadLabwareAndAdapterCommands.filter(
     command => command.result?.definition?.metadata.displayCategory !== 'trash'
   )
   return filterOutTrashCommands.map(command => {

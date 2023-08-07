@@ -45,6 +45,7 @@ export function SetupLabwareMap({
   )
   const { robotType } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
+  console.log('labwareRenderInfoById', labwareRenderInfoById)
   const deckDef = getDeckDefFromRobotType(robotType)
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
