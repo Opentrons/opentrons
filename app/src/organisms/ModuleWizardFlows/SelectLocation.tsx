@@ -26,7 +26,7 @@ export const BODY_STYLE = css`
 export const SelectLocation = (
   props: ModuleCalibrationWizardStepProps
 ): JSX.Element | null => {
-  const { proceed, goBack, attachedModule } = props
+  const { proceed, attachedModule } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   // TODO: keep track of the selected slot in a state variable that can be
@@ -40,7 +40,7 @@ export const SelectLocation = (
         {t('module_secured')}
       </Banner>
       <StyledText css={BODY_STYLE}>
-        {t('select_the_slot', { module: moduleName })}{' '}
+        {t('select_the_slot', { module: moduleName })}
       </StyledText>
     </>
   )
@@ -53,7 +53,6 @@ export const SelectLocation = (
       bodyText={bodyText}
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}
-      back={goBack}
     />
   )
 }

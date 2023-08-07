@@ -36,7 +36,7 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const { attachedModule, slotName, closeFlow, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
-  const { t } = useTranslation('module_calibration_wizard_flows')
+  const { t } = useTranslation('module_wizard_flows')
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const host = useHost()
@@ -149,7 +149,14 @@ export const ModuleWizardFlows = (
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
     modalContent = <AttachProbe {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SUCCESS) {
-    modalContent = <Success {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <Success
+        {...currentStep}
+        {...calibrateBaseProps}
+        isRobotMoving={isRobotMoving}
+        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
+      />
+    )
   }
 
   const wizardHeader = (
