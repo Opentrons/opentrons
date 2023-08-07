@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import {
-  RESPONSIVENESS,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { RESPONSIVENESS, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import type { ModuleCalibrationWizardStepProps } from './types'
@@ -28,9 +25,7 @@ export const FirmwareUpdate = (
   }
   const bodyText = (
     <>
-      <StyledText css={BODY_STYLE}>
-        TODO: FIRMWARE UPDATE CONTENTS
-      </StyledText>
+      <StyledText css={BODY_STYLE}>TODO: FIRMWARE UPDATE CONTENTS</StyledText>
     </>
   )
   return (
