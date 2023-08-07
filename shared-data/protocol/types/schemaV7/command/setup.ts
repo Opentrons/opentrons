@@ -24,10 +24,6 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
   params: LoadLabwareParams
 }
 
-export interface LoadAdapterCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'loadAdapter'
-  params: LoadAdapterParams
-}
 export interface LoadLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     LoadLabwareCreateCommand {
@@ -77,7 +73,6 @@ export type SetupCreateCommand =
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
-  | LoadAdapterCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
@@ -108,15 +103,6 @@ interface LoadLabwareParams {
   loadName: string
   displayName?: string
   labwareId?: string
-}
-
-interface LoadAdapterParams {
-  location: LabwareLocation
-  version: number
-  namespace: string
-  loadName: string
-  displayName?: string
-  adapterId?: string
 }
 
 interface LoadLabwareResult {

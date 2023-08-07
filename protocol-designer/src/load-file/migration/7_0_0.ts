@@ -45,8 +45,6 @@ export const migrateFile = (
       INITIAL_DECK_SETUP_STEP_ID
     ].labwareLocationUpdate
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
-  const orderedStepIds = appData.designerApplication?.data?.orderedStepIds
-  const savedStepForms: any = appData.designerApplication?.data?.savedStepForms
 
   const allLatestDefs = getOnlyLatestDefs()
 
