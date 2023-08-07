@@ -2,6 +2,7 @@
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
 import Store from 'electron-store'
 import get from 'lodash/get'
+import forEach from 'lodash/forEach'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 import fs from 'fs-extra'
@@ -23,7 +24,7 @@ import type { Config, Overrides } from './types'
 
 export * from './types'
 
-const ODD_DIR = '/data/ODD'
+export const ODD_DIR = '/data/ODD'
 
 // Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
 const BRIGHTNESS_FILE =
@@ -149,4 +150,12 @@ export function handleConfigChange(
   changeHandler: (newValue: any, oldValue: any) => unknown
 ): void {
   store().onDidChange(path, changeHandler)
+}
+export function resetStore(): void {
+  log().debug('Resetting the store')
+  store().clear()
+  const migratedConfig = migrate(DEFAULTS_V12)
+  forEach(migratedConfig, (configVal, configKey) => {
+    store().set(configKey, configVal)
+  })
 }
