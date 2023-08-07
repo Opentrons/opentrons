@@ -183,7 +183,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             wellName: 'A1',
             wellLocation: {
               origin: 'top' as const,
-              offset: goldenLPC ? {x: 0, y:0, z: PROBE_LENGTH_MM} : IDENTITY_VECTOR
+              offset: goldenLPC
+                ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
+                : IDENTITY_VECTOR,
             },
           },
         },

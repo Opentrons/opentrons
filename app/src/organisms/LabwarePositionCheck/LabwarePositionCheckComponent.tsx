@@ -180,7 +180,9 @@ export const LabwarePositionCheckComponent = (
     )
   }
   if (protocolData == null) return null
-  const LPCSteps = goldenLPC ? getGoldenCheckSteps(protocolData) : getLabwarePositionCheckSteps(protocolData)
+  const LPCSteps = goldenLPC
+    ? getGoldenCheckSteps(protocolData)
+    : getLabwarePositionCheckSteps(protocolData)
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null

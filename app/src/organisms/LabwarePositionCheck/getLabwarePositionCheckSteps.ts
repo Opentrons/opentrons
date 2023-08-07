@@ -48,9 +48,13 @@ export const getGoldenLabwarePositionCheckSteps = (
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     if (protocolData.pipettes.length === 0) {
-      throw new Error('no pipettes loaded within protocol, labware position check cannot be performed')
+      throw new Error(
+        'no pipettes loaded within protocol, labware position check cannot be performed'
+      )
     }
     return getGoldenCheckSteps(protocolData)
   }
-  throw new Error('no pipettes found in protocol, labware position check cannot be performed')
+  throw new Error(
+    'no pipettes found in protocol, labware position check cannot be performed'
+  )
 }

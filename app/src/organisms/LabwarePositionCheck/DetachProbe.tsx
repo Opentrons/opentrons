@@ -4,14 +4,21 @@ import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { RobotMotionLoader } from './RobotMotionLoader'
-import { CompletedProtocolAnalysis, getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
 import detachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
 import type { Jog } from '../../molecules/JogControls/types'
-import type { DetachProbeStep, RegisterPositionAction, WorkingOffset } from './types'
+import type {
+  DetachProbeStep,
+  RegisterPositionAction,
+  WorkingOffset,
+} from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface DetachProbeProps extends DetachProbeStep {
@@ -38,10 +45,10 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
 
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
-  const pipetteChannels = pipetteName != null ? getPipetteNameSpecs(pipetteName)?.channels ?? 1 : 1
+  const pipetteChannels =
+    pipetteName != null ? getPipetteNameSpecs(pipetteName)?.channels ?? 1 : 1
   const pipetteMount = pipette?.mount
-  if (pipetteName == null || pipetteMount == null)
-    return null
+  if (pipetteName == null || pipetteMount == null) return null
 
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
@@ -83,12 +90,12 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
     <GenericWizardTile
       header={i18n.format(t('detach_probe'), 'capitalize')}
       //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
-      rightHandBody={(
+      rightHandBody={
         <video
           css={css`
             padding-top: ${SPACING.spacing4};
             width: 100%;
-            min-height: 18rem
+            min-height: 18rem;
           `}
           autoPlay={true}
           loop={true}
@@ -96,7 +103,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
         >
           <source src={pipetteChannels > 1 ? detachProbe8 : detachProbe1} />
         </video>
-      )}
+      }
       bodyText={
         <StyledText css={BODY_STYLE}>
           {i18n.format(t('remove_probe'), 'capitalize')}
@@ -116,5 +123,3 @@ export const BODY_STYLE = css`
     line-height: 1.75rem;
   }
 `
-
-
