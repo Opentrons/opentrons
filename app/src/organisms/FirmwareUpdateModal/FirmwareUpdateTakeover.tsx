@@ -24,7 +24,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     if (subsystemUpdateInstrument != null && maintenanceRunData == null) {
       setShowUpdateNeededModal(true)
     }
-  }, [subsystemUpdateInstrument])
+  }, [subsystemUpdateInstrument, maintenanceRunData])
 
   return (
     <>

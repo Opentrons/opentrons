@@ -29,6 +29,7 @@ export const dropTip: CommandCreator<DropTipArgs> = (
         labwareId: FIXED_TRASH_ID,
         wellName: 'A1',
       },
+      //  TODO(jr, 7/17/23): add WellLocation params!
     },
   ]
   return {

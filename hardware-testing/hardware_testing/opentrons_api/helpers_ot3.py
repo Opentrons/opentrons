@@ -2,6 +2,7 @@
 import asyncio
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from math import pi
 from subprocess import run
 from time import time
@@ -17,7 +18,11 @@ from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.advanced_settings import set_adv_setting
-from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
+from opentrons.hardware_control.types import SubSystem
+from opentrons.hardware_control.backends.ot3utils import (
+    sensor_node_for_mount,
+    axis_convert,
+)
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -25,6 +30,7 @@ from opentrons.hardware_control.instruments.ot2.pipette import Pipette as Pipett
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
 
+from ..data import get_git_description, csv_report
 from .types import (
     GantryLoad,
     PerPipetteAxisSettings,
@@ -37,6 +43,8 @@ from .types import (
 # TODO: use values from shared data, so we don't need to update here again
 TIP_LENGTH_OVERLAP = 10.5
 TIP_LENGTH_LOOKUP = {50: 57.9, 200: 58.35, 1000: 95.6}
+
+RESET_DELAY_SECONDS = 2
 
 
 @dataclass
@@ -121,6 +129,82 @@ def _create_attached_instruments_dict(
     }
 
 
+async def update_firmware(
+    api: OT3API, force: bool = False, subsystems: Optional[List[SubSystem]] = None
+) -> None:
+    """Update firmware of OT3."""
+    if not api.is_simulator:
+        await asyncio.sleep(RESET_DELAY_SECONDS)
+    subsystems_on_boot = api.attached_subsystems
+    progress_tracker: Dict[SubSystem, List[int]] = {}
+
+    def _print_update_progress() -> None:
+        msg = ""
+        for _sub_sys, (_ver, _prog) in progress_tracker.items():
+            if msg:
+                msg += ", "
+            msg += f"{_sub_sys.name}: v{_ver} ({_prog}%)"
+        print(msg)
+
+    if not subsystems:
+        subsystems = []
+    is_updating = False
+    async for update in api.update_firmware(set(subsystems), force=force):
+        is_updating = True
+        fw_version = subsystems_on_boot[update.subsystem].next_fw_version
+        if update.subsystem not in progress_tracker:
+            progress_tracker[update.subsystem] = [fw_version, 0]
+        if update.progress != progress_tracker[update.subsystem][1]:
+            progress_tracker[update.subsystem][1] = update.progress
+            _print_update_progress()
+    if is_updating and not api.is_simulator:
+        await asyncio.sleep(1)
+
+
+async def wait_for_instrument_presence(
+    api: OT3API, mount: OT3Mount, presence: bool
+) -> bool:
+    """Wait for instrument presence."""
+    is_gripper = mount == OT3Mount.GRIPPER
+    instr_str = "gripper" if is_gripper else "pipette"
+    verb = "attach" if presence else "remove"
+    direction = "to" if presence else "from"
+    if not api.is_simulator:
+        input(
+            f"WAIT: {verb} a {instr_str} {direction} the {mount.name} mount: "
+            f"press ENTER when ready"
+        )
+    await reset_api(api)
+    await api.cache_instruments()
+    if is_gripper:
+        found = api.has_gripper()
+    else:
+        found = api.hardware_pipettes[mount.to_mount()] is not None
+    if found == presence:
+        print(f"{instr_str} {verb} {direction} {mount.name}\n")
+        return True
+    else:
+        print(
+            f"ERROR: unable to detect {instr_str} was {verb}d"
+            f"{direction} {mount.name} mount"
+        )
+        if not api.is_simulator and "y" in input("QUESTION: try again? (y/n): "):
+            return await wait_for_instrument_presence(api, mount, presence)
+        return False
+
+
+async def reset_api(api: OT3API) -> None:
+    """Reset OT3API."""
+    print(f"Firmware: v{api.fw_version}")
+    if not api.is_simulator:
+        await api._backend.engage_sync()  # type: ignore[union-attr]
+        await api._backend.release_estop()  # type: ignore[union-attr]
+        await update_firmware(api)
+        await api._backend.probe_network()  # type: ignore[union-attr]
+    await api.cache_instruments()
+    await api.refresh_positions()
+
+
 async def build_async_ot3_hardware_api(
     is_simulating: Optional[bool] = False,
     use_defaults: Optional[bool] = True,
@@ -163,12 +247,78 @@ async def build_async_ot3_hardware_api(
         print(e)
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
-    if not is_simulating:
-        await asyncio.sleep(0.5)
-        await api.cache_instruments()
-        async for update in api.update_firmware():
-            print(f"Update: {update.subsystem.name}: {update.progress}%")
+    await reset_api(api)
     return api
+
+
+class DeviceUnderTest(Enum):
+    """Device Under Test."""
+
+    ROBOT = "robot"
+    PIPETTE_LEFT = "pipette-left"
+    PIPETTE_RIGHT = "pipette-right"
+    GRIPPER = "gripper"
+    OTHER = "other"
+
+    @classmethod
+    def by_mount(cls, mount: OT3Mount) -> "DeviceUnderTest":
+        """Get DUT by mount."""
+        lookup = {
+            OT3Mount.LEFT: cls.PIPETTE_LEFT,
+            OT3Mount.RIGHT: cls.PIPETTE_RIGHT,
+            OT3Mount.GRIPPER: cls.GRIPPER,
+        }
+        return lookup[mount]
+
+
+def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
+    if dut == DeviceUnderTest.ROBOT:
+        return get_robot_serial_ot3(api)
+    elif dut == DeviceUnderTest.PIPETTE_LEFT or dut == DeviceUnderTest.PIPETTE_RIGHT:
+        mnt = OT3Mount.LEFT if dut == DeviceUnderTest.PIPETTE_LEFT else OT3Mount.RIGHT
+        pipette = api.hardware_pipettes[mnt.to_mount()]
+        assert pipette
+        return get_pipette_serial_ot3(pipette)
+    elif dut == DeviceUnderTest.GRIPPER:
+        gripper = api.attached_gripper
+        assert gripper
+        return str(gripper["gripper_id"])
+    elif api.is_simulator:
+        return dut.value
+    else:
+        return input("enter ID for test: ")
+
+
+def set_csv_report_meta_data_ot3(
+    api: OT3API,
+    report: csv_report.CSVReport,
+    dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
+    tag: str = "",
+) -> None:
+    """Set CSVReport meta-data given an OT3."""
+    # operator should be entered first
+    report.set_operator(
+        "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    )
+
+    # default DUT to be the robot serial
+    # and only scan barcode if we're not simulating
+    robot_serial = get_robot_serial_ot3(api)
+    dut_str = _get_serial_for_dut(api, dut)
+    print(f"device under test: {dut_str}")
+    if not api.is_simulator and dut != DeviceUnderTest.OTHER:
+        # always confirm barcode for robot/pipette/gripper
+        barcode = input("SCAN device barcode: ").strip()
+    else:
+        barcode = dut_str
+    print("barcode: barcode")
+
+    # default the CSV tag to be the DUT
+    report.set_tag(tag if tag else dut_str)
+    report.set_device_id(dut_str, barcode)
+    report.set_robot_id(robot_serial)
+    report.set_firmware(api.fw_version)
+    report.set_version(get_git_description())
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -417,6 +567,7 @@ async def move_plunger_absolute_ot3(
     position: float,
     motor_current: Optional[float] = None,
     speed: Optional[float] = None,
+    expect_stalls: bool = False,
 ) -> None:
     """Move OT3 plunger position to an absolute position."""
     if not api.hardware_pipettes[mount.to_mount()]:
@@ -425,6 +576,7 @@ async def move_plunger_absolute_ot3(
     _move_coro = api._move(
         target_position={plunger_axis: position},  # type: ignore[arg-type]
         speed=speed,
+        expect_stalls=expect_stalls,
     )
     if motor_current is None:
         await _move_coro
@@ -445,15 +597,21 @@ async def move_tip_motor_relative_ot3(
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
-    if distance < 0:
-        action = "home"
-    else:
-        action = "clamp"
+
+    current_gear_pos_float = axis_convert(api._backend.gear_motor_position, 0.0)[
+        Axis.P_L
+    ]
+    current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
+    target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
+
+    if speed is not None and distance < 0:
+        speed *= -1
+
+    tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict)
+
     _move_coro = api._backend.tip_action(
-        axes=[Axis.Q],
-        distance=distance,
-        speed=speed if speed else 5,
-        tip_action=action,
+        moves=tip_motor_move[0],
+        tip_action="clamp",
     )
     if motor_current is None:
         await _move_coro
@@ -934,6 +1092,16 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     else:
         id = pipette.pipette_id
     return f"P{volume}{channels}V{version}{id}"
+
+
+def get_robot_serial_ot3(api: OT3API) -> str:
+    """Get robot serial number."""
+    if api.is_simulator:
+        return "FLXA1000000000000"
+    robot_id = api._backend.eeprom_data.serial_number
+    if not robot_id:
+        robot_id = ""
+    return robot_id
 
 
 def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:

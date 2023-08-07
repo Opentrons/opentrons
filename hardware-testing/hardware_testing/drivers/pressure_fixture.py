@@ -11,6 +11,7 @@ from opentrons.types import Point
 FIXTURE_REBOOT_TIME = 2
 FIXTURE_NUM_CHANNELS: Final[int] = 8
 FIXTURE_BAUD_RATE: Final[int] = 115200
+FIXTURE_VERSION_REQUIRED = "1.0.0"
 
 FIXTURE_CMD_TERMINATOR = "\r\n"
 FIXTURE_CMD_GET_VERSION = "VERSION"
@@ -89,7 +90,7 @@ class SimPressureFixture(PressureFixtureBase):
 
     def firmware_version(self) -> str:
         """Firmware version."""
-        return "0.0.0"
+        return FIXTURE_VERSION_REQUIRED
 
     def read_all_pressure_channel(self) -> List[float]:
         """Read Pressure for all channels."""
@@ -121,7 +122,10 @@ class PressureFixture(PressureFixtureBase):
         self._port.flushInput()
         # NOTE: device might take a few seconds to boot up
         sleep(FIXTURE_REBOOT_TIME)
-        assert self.firmware_version(), "unable to communicate with pressure fixture"
+        fw_version = self.firmware_version()
+        assert (
+            fw_version == FIXTURE_VERSION_REQUIRED
+        ), f"unexpected pressure-fixture version: {fw_version}"
 
     def disconnect(self) -> None:
         """Disconnect."""

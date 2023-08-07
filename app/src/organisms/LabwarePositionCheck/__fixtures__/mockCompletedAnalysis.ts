@@ -44,6 +44,9 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
       params: {
         labwareId: 'labwareId1',
         location: { slotName: '1' },
+        version: 1,
+        loadName: 'mockLoadname',
+        namespace: 'mockNamespace',
       },
       result: {
         labwareId: 'labwareId1',
@@ -62,6 +65,9 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
       params: {
         labwareId: 'labwareId2',
         location: { slotName: '2' },
+        version: 1,
+        loadName: 'mockLoadname',
+        namespace: 'mockNamespace',
       },
       result: {
         labwareId: 'labwareId2',

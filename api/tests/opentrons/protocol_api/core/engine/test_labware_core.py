@@ -94,6 +94,7 @@ def test_get_definition(subject: LabwareCore) -> None:
             "allowedRoles": [],
             "stackingOffsetWithLabware": {},
             "stackingOffsetWithModule": {},
+            "gripperOffsets": {},
         },
     )
     assert subject.get_parameters() == cast(LabwareParamsDict, {"loadName": "world"})

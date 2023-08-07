@@ -11,7 +11,7 @@ from hardware_testing.drivers.pressure_fixture import (
 )
 
 from hardware_testing.data.csv_report import CSVReport, CSVSection, CSVLine
-from hardware_testing.data import ui, get_git_description
+from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Point, OT3Mount
 
@@ -94,11 +94,13 @@ def _get_tip_offset_in_rack(tip_name: str) -> Point:
 async def _main(is_simulating: bool, volume: float) -> None:
     ui.print_title("TIP IQC")
 
-    # CONNECT
+    # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=is_simulating, pipette_left="p50_single_v3.4"
+        is_simulating=is_simulating,
+        pipette_left="p1000_single_v3.3",
+        pipette_right="p1000_single_v3.3",
+        gripper="GRPV1120230323A01",
     )
-    mount = OT3Mount.LEFT
 
     # CREATE CSV REPORT
     report = CSVReport(
@@ -115,13 +117,10 @@ async def _main(is_simulating: bool, volume: float) -> None:
             for tip in WELL_NAMES
         ],
     )
-    if api.is_simulator:
-        report.set_operator("simulation")
-        report.set_tag("simulation")
-    else:
-        report.set_operator(input("enter OPERATOR: "))
-        report.set_tag(input("enter TAG: "))
-    report.set_version(get_git_description())
+    dut = helpers_ot3.DeviceUnderTest.OTHER
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+
+    mount = OT3Mount.LEFT
 
     # SETUP DECK
     if not api.is_simulator:

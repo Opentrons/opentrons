@@ -173,29 +173,63 @@ class MoveGroupRunner:
         position: NodeDict[
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
+        gear_motor_position: NodeDict[
+            List[Tuple[Tuple[int, int], float, float, bool, bool]]
+        ] = defaultdict(list)
         for arbid, completion in completions:
             if isinstance(completion, TipActionResponse):
-                continue
-            position[NodeId(arbid.parts.originating_node_id)].append(
-                (
+                # if any completions are TipActionResponses, separate them from the 'positions'
+                # dict so the left pipette's position doesn't get overwritten
+                gear_motor_position[NodeId(arbid.parts.originating_node_id)].append(
                     (
-                        completion.payload.group_id.value,
-                        completion.payload.seq_id.value,
-                    ),
-                    float(completion.payload.current_position_um.value) / 1000.0,
-                    float(completion.payload.encoder_position_um.value) / 1000.0,
-                    bool(
-                        completion.payload.position_flags.value
-                        & MotorPositionFlags.stepper_position_ok.value
-                    ),
-                    bool(
-                        completion.payload.position_flags.value
-                        & MotorPositionFlags.encoder_position_ok.value
-                    ),
+                        (
+                            completion.payload.group_id.value,
+                            completion.payload.seq_id.value,
+                        ),
+                        float(completion.payload.current_position_um.value) / 1000.0,
+                        float(completion.payload.encoder_position_um.value) / 1000.0,
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.stepper_position_ok.value
+                        ),
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.encoder_position_ok.value
+                        ),
+                    )
                 )
-            )
+            else:
+                position[NodeId(arbid.parts.originating_node_id)].append(
+                    (
+                        (
+                            completion.payload.group_id.value,
+                            completion.payload.seq_id.value,
+                        ),
+                        float(completion.payload.current_position_um.value) / 1000.0,
+                        float(completion.payload.encoder_position_um.value) / 1000.0,
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.stepper_position_ok.value
+                        ),
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.encoder_position_ok.value
+                        ),
+                    )
+                )
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
+        if any(gear_motor_position):
+            return {
+                node: next(
+                    reversed(
+                        sorted(
+                            poslist, key=lambda position_element: position_element[0]
+                        )
+                    )
+                )[1:]
+                for node, poslist in gear_motor_position.items()
+            }
         return {
             node: next(
                 reversed(
@@ -326,6 +360,17 @@ class MoveGroupRunner:
             ),
             action=PipetteTipActionTypeField(step.action),
             request_stop_condition=MoveStopConditionField(step.stop_condition),
+            acceleration=Int32Field(
+                int(
+                    (
+                        step.acceleration_mm_sec_sq
+                        * 1000.0
+                        / tip_interrupts_per_sec
+                        / tip_interrupts_per_sec
+                    )
+                    * (2**31)
+                )
+            ),
         )
         return TipActionRequest(payload=tip_action_payload)
 
@@ -352,7 +397,7 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[List[MoveStopCondition]] = []
         self._start_at_index = start_at_index
-        self._expected_tip_action_motors: List[List[List[GearMotorId]]] = []
+        self._expected_tip_action_motors = []
 
         for move_group in move_groups:
             move_set = set()
@@ -485,7 +530,7 @@ class MoveScheduler:
         elif isinstance(message, TipActionResponse):
             if self._handle_tip_action_motors(message):
                 self._remove_move_group(message, arbitration_id)
-            self._handle_move_completed(message, arbitration_id)
+                self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
 

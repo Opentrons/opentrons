@@ -681,7 +681,7 @@ async def test_tip_action(
     controller: OT3Controller,
     mock_move_group_run: mock.AsyncMock,
 ) -> None:
-    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="clamp")
+    await controller.tip_action(distance=33, velocity=-5.5, tip_action="home")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -690,22 +690,25 @@ async def test_tip_action(
         # we should be sending this command to the pipette axes to process.
         assert list(move_group[0].keys()) == [NodeId.pipette_left]
         step = move_group[0][NodeId.pipette_left]
-        assert step.stop_condition == MoveStopCondition.none
+        assert step.stop_condition == MoveStopCondition.limit_switch
 
     mock_move_group_run.reset_mock()
 
-    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="home")
+    await controller.tip_action(
+        distance=33, velocity=-5.5, tip_action="home", back_off=True
+    )
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
-        for move_group in move_group_runner._move_groups:
-            assert move_group  # don't pass in empty groups
-            assert len(move_group) == 1
-
         move_groups = move_group_runner._move_groups
+
+        for move_group in move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) >= 1
+
         # we should be sending this command to the pipette axes to process.
         home_step = move_groups[0][0][NodeId.pipette_left]
         assert home_step.stop_condition == MoveStopCondition.limit_switch
-        backoff_step = move_groups[1][0][NodeId.pipette_left]
+        backoff_step = move_groups[0][1][NodeId.pipette_left]
         assert backoff_step.stop_condition == MoveStopCondition.limit_switch_backoff
 
 

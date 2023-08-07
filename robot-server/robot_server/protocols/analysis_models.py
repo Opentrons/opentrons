@@ -108,7 +108,11 @@ class CompletedAnalysis(BaseModel):
     )
     errors: List[ErrorOccurrence] = Field(
         ...,
-        description="Any errors the protocol run produced",
+        description=(
+            "The protocol's fatal error, if there was one."
+            " For historical reasons, this is an array,"
+            " but it won't have more than one element."
+        ),
     )
     liquids: List[Liquid] = Field(
         default_factory=list,

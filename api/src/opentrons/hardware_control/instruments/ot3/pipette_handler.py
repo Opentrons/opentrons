@@ -56,6 +56,7 @@ class LiquidActionSpec:
     volume: float
     plunger_distance: float
     speed: float
+    acceleration: float
     instr: Pipette
     current: float
 
@@ -229,6 +230,7 @@ class PipetteHandlerProvider:
                 "default_blow_out_flow_rates",
                 "default_dispense_flow_rates",
                 "back_compat_names",
+                "supported_tips",
             ]
 
             instr_dict = instr.as_dict()
@@ -469,6 +471,12 @@ class PipetteHandlerProvider:
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
 
+    def plunger_acceleration(self, instr: Pipette, ul_per_s_per_s: float) -> float:
+        # using nominal ul/mm, to make sure accelerations are always the same
+        # regardless of volume being aspirated/dispensed
+        mm_per_s_per_s = ul_per_s_per_s / instr.config.shaft_ul_per_mm
+        return round(mm_per_s_per_s, 6)
+
     def plan_check_aspirate(
         self,
         mount: OT3Mount,
@@ -514,12 +522,16 @@ class PipetteHandlerProvider:
         speed = self.plunger_speed(
             instrument, instrument.aspirate_flow_rate * rate, "aspirate"
         )
+        acceleration = self.plunger_acceleration(
+            instrument, instrument.flow_acceleration
+        )
 
         return LiquidActionSpec(
             axis=Axis.of_main_tool_actuator(mount),
             volume=asp_vol,
             plunger_distance=dist,
             speed=speed,
+            acceleration=acceleration,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
         )
@@ -570,11 +582,15 @@ class PipetteHandlerProvider:
         speed = self.plunger_speed(
             instrument, instrument.dispense_flow_rate * rate, "dispense"
         )
+        acceleration = self.plunger_acceleration(
+            instrument, instrument.flow_acceleration
+        )
         return LiquidActionSpec(
             axis=Axis.of_main_tool_actuator(mount),
             volume=disp_vol,
             plunger_distance=dist,
             speed=speed,
+            acceleration=acceleration,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
         )
@@ -586,6 +602,9 @@ class PipetteHandlerProvider:
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
+        acceleration = self.plunger_acceleration(
+            instrument, instrument.flow_acceleration
+        )
         if volume is None:
             ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
         else:
@@ -597,6 +616,7 @@ class PipetteHandlerProvider:
             volume=0,
             plunger_distance=distance_mm,
             speed=speed,
+            acceleration=acceleration,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
         )
