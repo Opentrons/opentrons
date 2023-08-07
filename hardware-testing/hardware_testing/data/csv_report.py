@@ -267,7 +267,7 @@ def _generate_meta_data_section() -> CSVSection:
             CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
             CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
             CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
-            CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, CSVResult]),
+            CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, str, CSVResult]),
             CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
             CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
             CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str, CSVResult]),
@@ -384,6 +384,14 @@ class CSVReport:
         """Tag."""
         return f"{self.__class__.__name__}-{self._tag}"
 
+    @property
+    def file_path(self) -> Path:
+        """Get file-path."""
+        if not self._file_name:
+            raise RuntimeError("must set tag of report using `Report.set_tag()`")
+        test_path = data_io.create_folder_for_test_data(self._test_name)
+        return test_path / self._file_name
+
     def _cache_start_time(self, start_time: Optional[float] = None) -> None:
         checked_start_time = start_time if start_time else time()
         for section in self._sections:
@@ -403,9 +411,10 @@ class CSVReport:
         )
         self.save_to_disk()
 
-    def set_device_id(self, device_id: str, result: CSVResult) -> None:
+    def set_device_id(self, device_id: str, barcode_id: str) -> None:
         """Store DUT serial number."""
-        self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id, result])
+        result = CSVResult.from_bool(device_id == barcode_id)
+        self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id, barcode_id, result])
 
     def set_robot_id(self, robot_id: str) -> None:
         """Store robot serial number."""
@@ -433,3 +442,11 @@ class CSVReport:
         return data_io.dump_data_to_file(
             self._test_name, self._file_name, _report_str + "\n"
         )
+
+    def print_results(self) -> None:
+        """Print overall results."""
+        complete_msg = "complete" if self.completed else "incomplete"
+        print(f"done, {complete_msg} report -> {self.file_path}")
+        print("Overall Results:")
+        for line in self[RESULTS_OVERVIEW_TITLE].lines:
+            print(f" - {line.tag}: {line.result}")

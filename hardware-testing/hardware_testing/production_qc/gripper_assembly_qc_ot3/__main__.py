@@ -3,8 +3,7 @@ import argparse
 import asyncio
 from pathlib import Path
 
-from hardware_testing.data import ui, get_git_description
-from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE, CSVResult
+from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis
 
@@ -13,16 +12,8 @@ from .config import TestSection, TestConfig, build_report, TESTS, TESTS_INCREMEN
 
 async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
-    test_name = Path(__file__).parent.name
-    ui.print_title(test_name.replace("_", " ").upper())
-    report = build_report(test_name.replace("_", "-"))
-    version = get_git_description()
-    report.set_version(version)
-    print(f"version: {version}")
-    if not cfg.simulate:
-        report.set_operator(input("enter operator name: "))
-    else:
-        report.set_operator("simulation")
+    test_name = Path(__file__).parent.name.replace("_", "-")
+    ui.print_title(test_name)
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -31,23 +22,11 @@ async def _main(cfg: TestConfig) -> None:
         pipette_right="p1000_single_v3.3",
         gripper="GRPV1120230323A01",
     )
-    report.set_firmware(api.fw_version)
-    robot_id = helpers_ot3.get_robot_serial_ot3(api)
-    print(f"robot serial: {robot_id}")
-    report.set_robot_id(robot_id)
 
-    # GRIPPER SERIAL NUMBER
-    gripper = api.attached_gripper
-    assert gripper
-    gripper_id = str(gripper["gripper_id"])
-    report.set_tag(gripper_id)
-    if not api.is_simulator:
-        barcode = input("SCAN gripper serial number: ").strip()
-    else:
-        barcode = str(gripper_id)
-    barcode_pass = CSVResult.from_bool(barcode == gripper_id)
-    print(f"barcode: {barcode} ({barcode_pass})")
-    report.set_device_id(gripper_id, result=barcode_pass)
+    # CSV REPORT
+    report = build_report(test_name)
+    dut = helpers_ot3.DeviceUnderTest.GRIPPER
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
     # HOME and ATTACH
     await api.home_z(OT3Mount.GRIPPER)
@@ -71,12 +50,8 @@ async def _main(cfg: TestConfig) -> None:
     ui.print_title("DONE")
 
     # SAVE REPORT
-    report_path = report.save_to_disk()
-    complete_msg = "complete" if report.completed else "incomplete"
-    print(f"done, {complete_msg} report -> {report_path}")
-    print("Overall Results:")
-    for line in report[RESULTS_OVERVIEW_TITLE].lines:
-        print(f" - {line.tag}: {line.result}")
+    report.save_to_disk()
+    report.print_results()
 
 
 if __name__ == "__main__":

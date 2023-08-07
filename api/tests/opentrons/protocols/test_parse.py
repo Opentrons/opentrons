@@ -1,7 +1,7 @@
 import ast
 import json
 from textwrap import dedent
-from typing import Optional
+from typing import Any, Callable, Optional, Type, Union
 
 import pytest
 
@@ -17,6 +17,7 @@ from opentrons.protocols.parse import (
 )
 from opentrons.protocols.types import (
     JsonProtocol,
+    Protocol,
     PythonProtocol,
     StaticPythonInfo,
     MalformedProtocolError,
@@ -223,7 +224,7 @@ parse_version_cases = [
 
 
 @pytest.mark.parametrize("proto,version", parse_version_cases)
-def test_parse_get_version(proto, version):
+def test_parse_get_version(proto: str, version: APIVersion) -> None:
     proto = dedent(proto)
     if version == APIVersion(1, 0):
         with pytest.raises(ApiDeprecationError):
@@ -305,7 +306,9 @@ def test_parse_get_version(proto, version):
         ),
     ],
 )
-def test_version_from_static_python_info_valid(static_info, expected_version):
+def test_version_from_static_python_info_valid(
+    static_info: StaticPythonInfo, expected_version: APIVersion
+) -> None:
     assert version_from_static_python_info(static_info) == expected_version
 
 
@@ -316,13 +319,15 @@ test_invalid_metadata = [
 ]
 
 
-@pytest.mark.parametrize("metadata,exc", test_invalid_metadata)
-def test_version_from_static_python_info_invalid(metadata, exc):
+@pytest.mark.parametrize("static_python_info,exc", test_invalid_metadata)
+def test_version_from_static_python_info_invalid(
+    static_python_info: StaticPythonInfo, exc: Type[Exception]
+) -> None:
     with pytest.raises(exc):
-        version_from_static_python_info(metadata)
+        version_from_static_python_info(static_python_info)
 
 
-def test_get_protocol_schema_version():
+def test_get_protocol_schema_version() -> None:
     assert _get_protocol_schema_version({"protocol-schema": "1.0.0"}) == 1
     assert _get_protocol_schema_version({"protocol-schema": "2.0.0"}) == 2
     assert _get_protocol_schema_version({"schemaVersion": 123}) == 123
@@ -341,7 +346,10 @@ def test_get_protocol_schema_version():
         _get_protocol_schema_version({"protocol-schema": "1.2.3"})
 
 
-def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
+def test_validate_json(
+    get_json_protocol_fixture: Callable[..., Any],
+    get_labware_fixture: Callable[..., Any],
+) -> None:
     # valid data that has no schema should fail
     with pytest.raises(RuntimeError, match="deprecated"):
         validate_json({"protocol-schema": "1.0.0"})
@@ -363,9 +371,11 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
 @pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
 @pytest.mark.parametrize("protocol_text_kind", ["str", "bytes"])
 @pytest.mark.parametrize("filename", ["real", "none"])
-def test_parse_python_details(protocol, protocol_text_kind, filename, protocol_file):
+def test_parse_python_details(
+    protocol: Protocol, protocol_text_kind: str, filename: str
+) -> None:
     if protocol_text_kind == "bytes":
-        text = protocol.text.encode("utf-8")
+        text: Union[bytes, str] = protocol.text.encode("utf-8")
     else:
         text = protocol.text
     if filename == "real":
@@ -390,16 +400,26 @@ def test_parse_python_details(protocol, protocol_text_kind, filename, protocol_f
 
 
 @pytest.mark.parametrize(
-    "protocol_details", [("3", "simple"), ("3", "testAllAtomicSingleV3")]
+    ("fixture_version", "fixture_name"),
+    [
+        ("3", "simple"),
+        ("3", "testAllAtomicSingleV3"),
+    ],
 )
 @pytest.mark.parametrize("protocol_text_kind", ["str", "bytes"])
 @pytest.mark.parametrize("filename", ["real", "none"])
 def test_parse_json_details(
-    get_json_protocol_fixture, protocol_details, protocol_text_kind, filename
-):
-    protocol = get_json_protocol_fixture(*protocol_details, decode=False)
+    get_json_protocol_fixture: Callable[..., Any],
+    fixture_version: str,
+    fixture_name: str,
+    protocol_text_kind: str,
+    filename: str,
+) -> None:
+    protocol = get_json_protocol_fixture(
+        fixture_version=fixture_version, fixture_name=fixture_name, decode=False
+    )
     if protocol_text_kind == "text":
-        protocol_text = protocol
+        protocol_text: Union[bytes, str] = protocol
     else:
         protocol_text = protocol.encode("utf-8")
     if filename == "real":
@@ -411,13 +431,13 @@ def test_parse_json_details(
     assert parsed.filename == fname
     assert parsed.contents == json.loads(protocol)
     assert parsed.metadata == parsed.contents["metadata"]
-    assert parsed.schema_version == int(protocol_details[0])
+    assert parsed.schema_version == int(fixture_version)
     # TODO(IL, 2020-10-07): if schema v6 declares its own api_level,
     # then those v6 fixtures will need to be asserted differently
     assert parsed.api_level == API_VERSION_FOR_JSON_V5_AND_BELOW
 
 
-def test_parse_bundle_details(get_bundle_fixture):
+def test_parse_bundle_details(get_bundle_fixture: Callable[..., Any]) -> None:
     fixture = get_bundle_fixture("simple_bundle")
     filename = fixture["filename"]
 
@@ -433,7 +453,9 @@ def test_parse_bundle_details(get_bundle_fixture):
 
 
 @pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
-def test_parse_extra_contents(get_labware_fixture, protocol_file, protocol):
+def test_parse_extra_contents(
+    get_labware_fixture: Callable[..., Any], protocol_file: str, protocol: Protocol
+) -> None:
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
     extra_data = {"hi": b"there"}
@@ -470,6 +492,6 @@ def test_parse_extra_contents(get_labware_fixture, protocol_file, protocol):
         """,
     ],
 )
-def test_parse_bad_structure(bad_protocol):
+def test_parse_bad_structure(bad_protocol: str) -> None:
     with pytest.raises(MalformedProtocolError):
         parse(dedent(bad_protocol))
