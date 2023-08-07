@@ -5,6 +5,7 @@ from contextlib import nullcontext
 import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.motion_planning import deck_conflict
 
@@ -15,7 +16,7 @@ from opentrons.types import DeckSlotName
     "robot_type, slot_name",
     [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
 )
-def test_empty_no_conflict(robot_type: str, slot_name: DeckSlotName) -> None:
+def test_empty_no_conflict(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not raise on empty input."""
     deck_conflict.check(
         existing_items={},
@@ -31,7 +32,7 @@ def test_empty_no_conflict(robot_type: str, slot_name: DeckSlotName) -> None:
     "robot_type, slot_name",
     [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
 )
-def test_no_multiple_locations(robot_type: str, slot_name: DeckSlotName) -> None:
+def test_no_multiple_locations(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not allow two items in the same slot."""
     item_1 = deck_conflict.OtherModule(
         highest_z_including_labware=123, name_for_errors="some_item_1"
@@ -59,7 +60,9 @@ def test_no_multiple_locations(robot_type: str, slot_name: DeckSlotName) -> None
         (DeckSlotName.SLOT_A3, "OT-3 Standard"),
     ],
 )
-def test_only_trash_in_fixed_slot(slot_name: DeckSlotName, robot_type: str) -> None:
+def test_only_trash_in_fixed_slot(
+    slot_name: DeckSlotName, robot_type: RobotType
+) -> None:
     """It should only allow trash labware in slot 12."""
     trash_labware = deck_conflict.Labware(
         uri=LabwareUri("trash_labware_uri"),
@@ -114,7 +117,7 @@ def test_only_trash_in_fixed_slot(slot_name: DeckSlotName, robot_type: str) -> N
         (DeckSlotName.SLOT_A3, "OT-3 Standard"),
     ],
 )
-def test_trash_override(slot_name: DeckSlotName, robot_type: str) -> None:
+def test_trash_override(slot_name: DeckSlotName, robot_type: RobotType) -> None:
     """It should allow the trash labware to be replaced with another trash labware."""
     trash_labware_1 = deck_conflict.Labware(
         uri=LabwareUri("trash_labware_1_uri"),

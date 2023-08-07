@@ -6,7 +6,7 @@ from typing import List, Mapping, NamedTuple, Optional, Set, Union
 from typing_extensions import Final
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
-
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_slots,
     get_south_slot,
@@ -176,7 +176,7 @@ def check(
     existing_items: Mapping[DeckSlotName, DeckItem],
     new_item: DeckItem,
     new_location: DeckSlotName,
-    robot_type: str,
+    robot_type: RobotType,
 ) -> None:
     """Check a deck layout for conflicts.
 
@@ -184,15 +184,14 @@ def check(
         existing_items: Existing items on the deck, assumed to be valid.
         new_item: New item to add to the deck.
         new_location: Location where the new item will be added.
+        robot_type: Robot deck definition.
 
     Raises:
         DeckConflictError: Adding this item should not be allowed.
     """
     restrictions: List[_DeckRestriction] = [
         _FixedTrashOnly(
-            location=DeckSlotName.FIXED_TRASH.to_equivalent_for_robot_type(
-                robot_type  # type: ignore[arg-type]
-            )
+            location=DeckSlotName.FIXED_TRASH.to_equivalent_for_robot_type(robot_type)
         )
     ]
     # build restrictions driven by existing items
