@@ -154,7 +154,7 @@ function FeatureFlags(): JSX.Element {
         alignItems={ALIGN_CENTER}
         onClick={() => {
           console.log('CLICKED TOGGLE flag', flag)
-          dispatch(() => toggleDevInternalFlag(flag))
+          dispatch(toggleDevInternalFlag(flag))
         }}
       >
         <Flex

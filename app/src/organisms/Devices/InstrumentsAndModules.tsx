@@ -74,8 +74,7 @@ export function InstrumentsAndModules({
     setSubsystemToUpdate,
   ] = React.useState<Subsystem | null>(null)
 
-  // const { data: attachedInstruments } = useInstrumentsQuery()
-  const attachedInstruments = {data: []}
+  const { data: attachedInstruments } = useInstrumentsQuery()
   // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
   // { refetchInterval: EQUIPMENT_POLL_MS, },
   const attachedGripper =
