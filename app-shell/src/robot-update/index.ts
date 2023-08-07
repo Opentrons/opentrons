@@ -156,11 +156,12 @@ export function getRobotSystemUpdateUrls(
   const manifestUrls = UPDATE_MANIFEST_URLS()
 
   return ensureDir(CACHE_DIR_FOR_MACHINE(robot))
-    .then(
-      () => downloadManifest(
+    .then(() =>
+      downloadManifest(
         manifestUrls[robot],
         path.join(CACHE_DIR_FOR_MACHINE(robot), 'releases.json')
-      ))
+      )
+    )
     .then(manifest => {
       const urls = getReleaseSet(manifest, CURRENT_VERSION)
 
@@ -231,7 +232,10 @@ export function checkForRobotUpdate(
         })
       )
       .then(() =>
-        cleanupReleaseFiles(CACHE_DIR_FOR_MACHINE_FILES(target), CURRENT_VERSION)
+        cleanupReleaseFiles(
+          CACHE_DIR_FOR_MACHINE_FILES(target),
+          CURRENT_VERSION
+        )
       )
   }
 

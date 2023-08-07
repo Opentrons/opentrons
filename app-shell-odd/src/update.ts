@@ -56,11 +56,15 @@ export const updateLatestVersion = (): Promise<string> => {
         .find(verson => channelFinder(verson, channel))
 
       LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? _PKG_VERSION_
-      log.info(`Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`)
+      log.info(
+        `Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`
+      )
       return LATEST_OT_SYSTEM_VERSION
     })
     .catch((e: Error) => {
-      log.warn(`Update: error fetching latest system version from ${FLEX_MANIFEST_URL}: ${e.message}, keeping latest version at ${LATEST_OT_SYSTEM_VERSION}`)
+      log.warn(
+        `Update: error fetching latest system version from ${FLEX_MANIFEST_URL}: ${e.message}, keeping latest version at ${LATEST_OT_SYSTEM_VERSION}`
+      )
       return LATEST_OT_SYSTEM_VERSION
     })
 }
