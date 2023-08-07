@@ -184,7 +184,7 @@ def check(
         existing_items: Existing items on the deck, assumed to be valid.
         new_item: New item to add to the deck.
         new_location: Location where the new item will be added.
-        robot_type: Robot deck definition.
+        robot_type: The type of the robot to choose the restriction rules.
 
     Raises:
         DeckConflictError: Adding this item should not be allowed.
