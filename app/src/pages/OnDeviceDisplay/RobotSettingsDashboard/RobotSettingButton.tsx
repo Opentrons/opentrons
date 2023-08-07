@@ -176,6 +176,7 @@ export function RobotSettingButton({
             heading={i18n.format(t('update_available'), 'capitalize')}
             hug={true}
           />
+          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         </Flex>
       ) : null}
     </Btn>
