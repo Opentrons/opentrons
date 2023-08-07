@@ -254,7 +254,7 @@ def _create_ot2_restrictions(
             )
 
     if isinstance(item, ThermocyclerModule):
-        for covered_location in _slots_covered_by_thermocycler(item):
+        for covered_location in _ot2_slots_covered_by_thermocycler(item):
             restrictions.append(
                 _NothingAllowed(
                     location=covered_location,
@@ -354,7 +354,7 @@ def _create_deck_conflict_error_message(
     return message
 
 
-def _slots_covered_by_thermocycler(
+def _ot2_slots_covered_by_thermocycler(
     thermocycler: ThermocyclerModule,
 ) -> Set[DeckSlotName]:
     if thermocycler.is_semi_configuration:
