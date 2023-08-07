@@ -40,6 +40,7 @@ import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
+import { updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
 import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
@@ -199,17 +200,18 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
   'scroll',
 ]
 
-const TURN_OFF_BACKLIGHT = 7
+const TURN_OFF_BACKLIGHT = '7'
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const { brightness, sleepMs } = useSelector(getOnDeviceDisplaySettings)
+  const { brightness: userSetBrightness, sleepMs } = useSelector(
+    getOnDeviceDisplaySettings
+  )
 
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
   const options = {
     events: onDeviceDisplayEvents,
     initialState: false,
   }
-  const [usersBrightness, setUsersBrightness] = React.useState(brightness)
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
   const scrollRef = React.useRef(null)
@@ -240,19 +242,16 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   React.useEffect(() => {
     if (isIdle) {
-      setUsersBrightness(brightness)
+      dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
+    } else {
       dispatch(
         updateConfigValue(
           'onDeviceDisplaySettings.brightness',
-          TURN_OFF_BACKLIGHT
+          userSetBrightness
         )
       )
-    } else {
-      dispatch(
-        updateConfigValue('onDeviceDisplaySettings.brightness', usersBrightness)
-      )
     }
-  }, [dispatch, isIdle, usersBrightness])
+  }, [dispatch, isIdle, userSetBrightness])
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (

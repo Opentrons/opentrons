@@ -4,7 +4,6 @@ import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
-import fs from 'fs-extra'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
@@ -24,10 +23,6 @@ import type { Config, Overrides } from './types'
 export * from './types'
 
 const ODD_DIR = '/data/ODD'
-
-// Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
-const BRIGHTNESS_FILE =
-  '/sys/class/backlight/backlight/device/backlight/backlight/brightness'
 
 // make sure all arguments are included in production
 const argv = process.argv0.endsWith('defaultApp')
@@ -93,16 +88,16 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
           )
         }
 
-        // Note (kj:03/02/2023)  this is to change brightness
+        // Note (kj:08/03/2023) change touchscreen brightness
         if (path === 'onDeviceDisplaySettings.brightness') {
-          fs.writeFile(BRIGHTNESS_FILE, String(nextValue), 'ascii')
-            .then(() => fs.readFile(BRIGHTNESS_FILE))
-            .then(data => {
-              log().debug('Change display brightness', { nextValue })
-            })
-            .catch(err => {
-              log().debug('Something wrong during overwriting', { err })
-            })
+          systemd.updateBrightness(String(nextValue)).catch(err =>
+            log().debug(
+              'Something wrong when updating the touchscreen brightness',
+              {
+                err,
+              }
+            )
+          )
         }
 
         log().debug('Updating config', { path, nextValue })

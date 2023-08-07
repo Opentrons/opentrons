@@ -4,7 +4,11 @@ import { createUi } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
-import { registerUpdate, updateLatestVersion } from './update'
+import {
+  registerUpdate,
+  updateLatestVersion,
+  registerUpdateBrightness,
+} from './update'
 import { registerRobotSystemUpdate } from './system-update'
 import { registerAppRestart } from './restart'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
@@ -73,6 +77,7 @@ function startUp(): void {
     registerUpdate(dispatch),
     registerRobotSystemUpdate(dispatch),
     registerAppRestart(),
+    registerUpdateBrightness(),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
