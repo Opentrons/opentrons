@@ -19,6 +19,10 @@ class HealthLinks(BaseModel):
         ...,
         description="The path to the HTTP server logs endpoint",
     )
+    oddLog: typing.Optional[str] = Field(
+        None,
+        description="The path to the ODD server logs endpoint",
+    )
     apiSpec: str = Field(
         ...,
         description="The path to the OpenAPI specification of the server",
