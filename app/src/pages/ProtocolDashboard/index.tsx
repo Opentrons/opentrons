@@ -8,7 +8,6 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   POSITION_STICKY,
   POSITION_STATIC,
@@ -147,7 +146,6 @@ export function ProtocolDashboard(): JSX.Element {
       ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
         minHeight="25rem"
         paddingBottom={SPACING.spacing40}
       >
@@ -272,9 +270,9 @@ export function ProtocolDashboard(): JSX.Element {
                 })}
               </Flex>
             </>
-          ) : (
-            <>{pinnedProtocols.length === 0 && <NoProtocols />}</>
-          )}
+          ) : pinnedProtocols.length === 0 ? (
+            <NoProtocols />
+          ) : null}
         </Box>
       </Flex>
     </>
