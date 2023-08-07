@@ -63,6 +63,8 @@ jobs:
           ./ci-tools/linux_get_chromedriver.sh ${{ env.ELECTRON_VERSION }}
           chromedriver --version
           google-chrome --version
+          which chromedriver
+          which google-chrome
 
       - name: Install python dependencies.
         working-directory: ./app-testing
