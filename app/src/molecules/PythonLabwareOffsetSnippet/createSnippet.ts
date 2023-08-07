@@ -62,7 +62,8 @@ export function createSnippet(
       const offsetLocation = getLabwareOffsetLocation(
         command.result?.labwareId ?? '',
         commands,
-        modules
+        modules,
+        labware
       )
 
       const labwareOffset = labwareOffsets?.find(offset => {

@@ -1,5 +1,9 @@
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
-import { LoadedModule, ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import {
+  LoadedModule,
+  LoadedLabware,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import { getLabwareLocation } from './getLabwareLocation'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 
@@ -10,10 +14,12 @@ import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 export const getLabwareOffsetLocation = (
   labwareId: string,
   commands: ProtocolAnalysisOutput['commands'],
-  modules: LoadedModule[]
+  modules: LoadedModule[],
+  labware: LoadedLabware[]
 ): LabwareOffsetLocation | null => {
-  let location: LabwareOffsetLocation | null
+  let location: LabwareOffsetLocation | null = null
   const labwareLocation = getLabwareLocation(labwareId, commands)
+
   if (labwareLocation === 'offDeck') {
     location = null
   } else if ('moduleId' in labwareLocation) {
@@ -26,6 +32,24 @@ export const getLabwareOffsetLocation = (
       commands
     ).location.slotName
     location = { slotName, moduleModel }
+  } else if ('labwareId' in labwareLocation) {
+    const adapter = labware.find(lw => lw.id === labwareLocation.labwareId) // Rename variable to avoid conflict
+    if (adapter == null) {
+      location = null
+    } else if (adapter.location === 'offDeck') {
+      location = null
+    } else if ('slotName' in adapter.location) {
+      location = adapter.location
+    } else if ('moduleId' in adapter.location) {
+      const adapterModLocation = adapter.location.moduleId
+      const module = modules.find(module => module.id === adapterModLocation)
+      const moduleModel = module?.model
+      const slotName = getModuleInitialLoadInfo(
+        adapter.location.moduleId,
+        commands
+      ).location.slotName
+      location = { slotName, moduleModel }
+    }
   } else {
     location = labwareLocation
   }

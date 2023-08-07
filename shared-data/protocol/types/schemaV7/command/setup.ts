@@ -33,6 +33,12 @@ export interface LoadLabwareRunTimeCommand
     LoadLabwareCreateCommand {
   result?: LoadLabwareResult
 }
+export interface LoadAdapterRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadAdapterCreateCommand {
+  result?: LoadAdapterResult
+}
+
 export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveLabware'
   params: MoveLabwareParams
@@ -70,6 +76,8 @@ export type SetupRunTimeCommand =
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
+  | LoadAdapterRunTimeCommand
+
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
@@ -83,6 +91,11 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
+
+export type NonStackedLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
 
 export interface ModuleLocation {
   slotName: string
@@ -103,9 +116,8 @@ interface LoadLabwareParams {
   displayName?: string
   labwareId?: string
 }
-
 interface LoadAdapterParams {
-  location: LabwareLocation
+  location: NonStackedLocation
   version: number
   namespace: string
   loadName: string
@@ -117,6 +129,12 @@ interface LoadLabwareResult {
   labwareId: string
   definition: LabwareDefinition2
   offset: LabwareOffset
+}
+
+interface LoadAdapterResult {
+  adapterId: string
+  definition: LabwareDefinition2
+  offsetId?: string
 }
 
 export type LabwareMovementStrategy =

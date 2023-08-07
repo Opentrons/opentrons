@@ -38,6 +38,20 @@ export function getLabwareLocationCombos(
               labwareId: command.result.labwareId,
               moduleId,
             })
+      } else if ('labwareId' in command.params.location) {
+        const { labwareId } = command.params.location
+        const adapterLocation = resolveAdapterLocation(
+          labware,
+          modules,
+          labwareId
+        )
+        return adapterLocation == null
+          ? acc
+          : appendLocationComboIfUniq(acc, {
+              location: adapterLocation,
+              definitionUri,
+              labwareId: command.result.labwareId,
+            })
       } else {
         return appendLocationComboIfUniq(acc, {
           location: command.params.location,
@@ -67,6 +81,19 @@ export function getLabwareLocationCombos(
               definitionUri: labwareEntity.definitionUri,
               labwareId: command.params.labwareId,
               moduleId: command.params.newLocation.moduleId,
+            })
+      } else if ('labwareId' in command.params.newLocation) {
+        const adapterLocation = resolveAdapterLocation(
+          labware,
+          modules,
+          command.params.newLocation.labwareId
+        )
+        return adapterLocation == null
+          ? acc
+          : appendLocationComboIfUniq(acc, {
+              location: adapterLocation,
+              definitionUri: labwareEntity.definitionUri,
+              labwareId: command.params.newLocation.labwareId,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
@@ -109,4 +136,32 @@ function resolveModuleLocation(
     slotName: moduleEntity.location.slotName,
     moduleModel: moduleEntity.model,
   }
+}
+
+function resolveAdapterLocation(
+  labware: ProtocolAnalysisOutput['labware'],
+  modules: ProtocolAnalysisOutput['modules'],
+  labwareId: string
+): LabwareOffsetLocation | null {
+  const labwareEntity = labware.find(l => l.id === labwareId)
+  if (labwareEntity == null) {
+    console.warn(
+      `command specified an adapter ${labwareId} that could not be found in the labware entities`
+    )
+    return null
+  }
+  let adapterLocation
+  if (labwareEntity.location === 'offDeck') {
+    return null
+    //  can't have adapter on top of an adapter
+  } else if ('labwareId' in labwareEntity.location) {
+    return null
+  } else if ('moduleId' in labwareEntity.location) {
+    const moduleId = labwareEntity.location.moduleId
+    adapterLocation = resolveModuleLocation(modules, moduleId)
+  } else {
+    adapterLocation = { slotName: labwareEntity.location.slotName }
+  }
+
+  return adapterLocation
 }

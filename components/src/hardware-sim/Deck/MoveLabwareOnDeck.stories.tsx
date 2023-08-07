@@ -21,6 +21,7 @@ export const MoveLabwareOnDeck: Story = {
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
       loadedModules={[]}
+      loadedLabware={[]}
       robotType={args.robotType}
     />
   ),
