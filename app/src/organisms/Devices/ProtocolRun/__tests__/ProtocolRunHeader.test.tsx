@@ -72,6 +72,7 @@ import { RunProgressMeter } from '../../../RunProgressMeter'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
+import { RunFailedModal } from '../RunFailedModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -105,6 +106,7 @@ jest.mock('../../../RunProgressMeter')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/buildroot/selectors')
+jest.mock('../RunFailedModal')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -175,6 +177,9 @@ const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
 >
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
+>
+const mockRunFailedModal = RunFailedModal as jest.MockedFunction<
+  typeof RunFailedModal
 >
 
 const ROBOT_NAME = 'otie'
@@ -299,11 +304,11 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCreatedAtTimestamp)
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
-    when(mockUseRunQuery)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        data: { data: mockIdleUnstartedRun },
-      } as UseQueryResult<Run>)
+    // when(mockUseRunQuery)
+    //   .calledWith(RUN_ID)
+    //   .mockReturnValue({
+    //     data: { data: mockIdleUnstartedRun },
+    //   } as UseQueryResult<Run>)
     when(mockUseDismissCurrentRunMutation)
       .calledWith()
       .mockReturnValue({
@@ -321,6 +326,8 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
+    mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
+    mockUseRunQuery.mockReturnValue({ data: null } as any)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -663,13 +670,13 @@ describe('ProtocolRunHeader', () => {
     getByText('Close robot door to resume run')
   })
 
-  it('renders a clear protocol banner when run has failed', () => {
+  it('renders a error detail link banner when run has failed', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
-    const [{ getByTestId, getByText }] = render()
+    const [{ getByText }] = render()
 
-    getByText('Run failed.')
-    getByTestId('Banner_close-button').click()
+    getByText('View error').click()
     expect(mockCloseCurrentRun).toBeCalled()
+    getByText('mock RunFailedModal')
   })
 
   it('renders a clear protocol banner when run has been canceled', () => {
@@ -778,12 +785,14 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
     getByText('Protocol analysis failed.')
   })
+
   it('renders the devices page when robot is not viewable but protocol is loaded', async () => {
     mockUseIsRobotViewable.mockReturnValue(false)
     waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/devices')
     })
   })
+
   it('renders banner with spinner if currently closing current run', async () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)

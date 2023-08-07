@@ -38,6 +38,7 @@ import {
   SecondaryButton,
   useConditionalConfirm,
   JUSTIFY_FLEX_END,
+  Link as LinkButton,
 } from '@opentrons/components'
 
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
@@ -82,8 +83,10 @@ import {
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'
+import { getHighestPriorityError } from '../../OnDeviceDisplay/RunningProtocol'
+import { RunFailedModal } from './RunFailedModal'
 
-import type { Run } from '@opentrons/api-client'
+import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { RunProgressMeter } from '../../RunProgressMeter'
@@ -124,9 +127,15 @@ export function ProtocolRunHeader({
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const isRunCurrent = Boolean(runRecord?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+  const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
+  const highestPriorityError =
+    runRecord?.data?.errors != null
+      ? getHighestPriorityError(runRecord?.data?.errors)
+      : undefined
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -193,117 +202,140 @@ export function ProtocolRunHeader({
   }
 
   return (
-    <Flex
-      ref={protocolRunHeaderRef}
-      backgroundColor={COLORS.white}
-      border={BORDERS.lineBorder}
-      borderRadius={BORDERS.radiusSoftCorners}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing16}
-      marginBottom={SPACING.spacing16}
-      padding={SPACING.spacing16}
-    >
-      {showAnalysisErrorModal &&
-        analysisErrors != null &&
-        analysisErrors?.length > 0 && (
-          <ProtocolAnalysisErrorModal
-            displayName={displayName}
-            errors={analysisErrors}
-            onClose={handleErrorModalCloseClick}
-            robotName={robotName}
-          />
-        )}
+    <>
+      {showRunFailedModal ? (
+        <RunFailedModal
+          robotName={robotName}
+          runId={runId}
+          setShowRunFailedModal={setShowRunFailedModal}
+          highestPriorityError={highestPriorityError}
+        />
+      ) : null}
+      <Flex
+        ref={protocolRunHeaderRef}
+        backgroundColor={COLORS.white}
+        border={BORDERS.lineBorder}
+        borderRadius={BORDERS.radiusSoftCorners}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing16}
+        marginBottom={SPACING.spacing16}
+        padding={SPACING.spacing16}
+      >
+        {showAnalysisErrorModal &&
+          analysisErrors != null &&
+          analysisErrors?.length > 0 && (
+            <ProtocolAnalysisErrorModal
+              displayName={displayName}
+              errors={analysisErrors}
+              onClose={handleErrorModalCloseClick}
+              robotName={robotName}
+            />
+          )}
 
-      <Flex>
-        {protocolKey != null ? (
-          <Link to={`/protocols/${protocolKey}`}>
-            <StyledText
-              as="h2"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.blueEnabled}
-            >
+        <Flex>
+          {protocolKey != null ? (
+            <Link to={`/protocols/${protocolKey}`}>
+              <StyledText
+                as="h2"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                color={COLORS.blueEnabled}
+              >
+                {displayName}
+              </StyledText>
+            </Link>
+          ) : (
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {displayName}
             </StyledText>
-          </Link>
-        ) : (
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {displayName}
-          </StyledText>
-        )}
-      </Flex>
-      {analysisErrors != null && analysisErrors?.length > 0 && (
-        <ProtocolAnalysisErrorBanner errors={analysisErrors} />
-      )}
-      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
-        <Banner type="warning">{t('close_door_to_resume')}</Banner>
-      ) : null}
-      {runStatus === RUN_STATUS_STOPPED ? (
-        <Banner type="warning">{t('run_canceled')}</Banner>
-      ) : null}
-      {isRunCurrent ? (
-        <TerminalRunBanner
-          {...{ runStatus, handleClearClick, isClosingCurrentRun }}
-        />
-      ) : null}
-      <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
-        <LabeledValue label={t('run')} value={createdAtTimestamp} />
-        <LabeledValue
-          label={t('status')}
-          value={<DisplayRunStatus runStatus={runStatus} />}
-        />
-        <LabeledValue
-          label={t('run_time')}
-          value={
-            <RunTimer {...{ runStatus, startedAt, stoppedAt, completedAt }} />
-          }
-        />
-        <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <ActionButton
-            runId={runId}
-            robotName={robotName}
-            runStatus={runStatus}
-            isProtocolAnalyzing={protocolData == null || !!isProtocolAnalyzing}
-          />
+          )}
         </Flex>
-      </Box>
-      {runStatus != null ? (
-        <Box
-          backgroundColor={COLORS.fundamentalsBackground}
-          display="grid"
-          gridTemplateColumns="4fr 6fr 4fr"
-          padding={SPACING.spacing8}
-        >
+        {analysisErrors != null && analysisErrors?.length > 0 && (
+          <ProtocolAnalysisErrorBanner errors={analysisErrors} />
+        )}
+        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+          <Banner type="warning">{t('close_door_to_resume')}</Banner>
+        ) : null}
+        {runStatus === RUN_STATUS_STOPPED ? (
+          <Banner type="warning">{t('run_canceled')}</Banner>
+        ) : null}
+        {isRunCurrent ? (
+          <TerminalRunBanner
+            {...{
+              runStatus,
+              handleClearClick,
+              isClosingCurrentRun,
+              setShowRunFailedModal,
+              highestPriorityError,
+            }}
+          />
+        ) : null}
+        <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
+          <LabeledValue label={t('run')} value={createdAtTimestamp} />
           <LabeledValue
-            label={t('protocol_start')}
-            value={startedAtTimestamp}
+            label={t('status')}
+            value={<DisplayRunStatus runStatus={runStatus} />}
           />
           <LabeledValue
-            label={t('protocol_end')}
-            value={completedAtTimestamp}
+            label={t('run_time')}
+            value={
+              <RunTimer {...{ runStatus, startedAt, stoppedAt, completedAt }} />
+            }
           />
           <Flex justifyContent={JUSTIFY_FLEX_END}>
-            {CANCELLABLE_STATUSES.includes(runStatus) && (
-              <SecondaryButton
-                isDangerous
-                onClick={handleCancelClick}
-                disabled={isClosingCurrentRun}
-              >
-                {t('cancel_run')}
-              </SecondaryButton>
-            )}
+            <ActionButton
+              runId={runId}
+              robotName={robotName}
+              runStatus={runStatus}
+              isProtocolAnalyzing={
+                protocolData == null || !!isProtocolAnalyzing
+              }
+            />
           </Flex>
         </Box>
-      ) : null}
-      <RunProgressMeter
-        {...{ makeHandleJumpToStep, runId, robotName, resumeRunHandler: play }}
-      />
-      {showConfirmCancelModal ? (
-        <ConfirmCancelModal
-          onClose={() => setShowConfirmCancelModal(false)}
-          runId={runId}
+        {runStatus != null ? (
+          <Box
+            backgroundColor={COLORS.fundamentalsBackground}
+            display="grid"
+            gridTemplateColumns="4fr 6fr 4fr"
+            padding={SPACING.spacing8}
+          >
+            <LabeledValue
+              label={t('protocol_start')}
+              value={startedAtTimestamp}
+            />
+            <LabeledValue
+              label={t('protocol_end')}
+              value={completedAtTimestamp}
+            />
+            <Flex justifyContent={JUSTIFY_FLEX_END}>
+              {CANCELLABLE_STATUSES.includes(runStatus) && (
+                <SecondaryButton
+                  isDangerous
+                  onClick={handleCancelClick}
+                  disabled={isClosingCurrentRun}
+                >
+                  {t('cancel_run')}
+                </SecondaryButton>
+              )}
+            </Flex>
+          </Box>
+        ) : null}
+        <RunProgressMeter
+          {...{
+            makeHandleJumpToStep,
+            runId,
+            robotName,
+            resumeRunHandler: play,
+          }}
         />
-      ) : null}
-    </Flex>
+        {showConfirmCancelModal ? (
+          <ConfirmCancelModal
+            onClose={() => setShowConfirmCancelModal(false)}
+            runId={runId}
+          />
+        ) : null}
+      </Flex>
+    </>
   )
 }
 
@@ -582,23 +614,57 @@ interface TerminalRunProps {
   runStatus: RunStatus | null
   handleClearClick: () => void
   isClosingCurrentRun: boolean
+  setShowRunFailedModal: (showRunFailedModal: boolean) => void
+  highestPriorityError?: RunError
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
-  const { runStatus, handleClearClick, isClosingCurrentRun } = props
+  const {
+    runStatus,
+    handleClearClick,
+    isClosingCurrentRun,
+    setShowRunFailedModal,
+    highestPriorityError,
+  } = props
   const { t } = useTranslation('run_details')
+
+  const handleClick = (): void => {
+    console.log('clicked')
+    setShowRunFailedModal(true)
+  }
+
   if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
     return (
-      <Banner
-        type={runStatus === RUN_STATUS_FAILED ? 'error' : 'success'}
-        onCloseClick={handleClearClick}
-        isCloseActionLoading={isClosingCurrentRun}
-      >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-          {runStatus === RUN_STATUS_FAILED
-            ? t('run_failed')
-            : t('run_completed')}
-        </Flex>
-      </Banner>
+      <>
+        {runStatus === RUN_STATUS_SUCCEEDED ? (
+          <Banner
+            type="success"
+            onCloseClick={handleClearClick}
+            isCloseActionLoading={isClosingCurrentRun}
+          >
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              {t('run_completed')}
+            </Flex>
+          </Banner>
+        ) : (
+          <Banner type="error">
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+              <StyledText>
+                {t('error_info', {
+                  errorType: highestPriorityError?.errorType,
+                  errorCode: highestPriorityError?.errorCode,
+                })}
+              </StyledText>
+
+              <LinkButton
+                onClick={handleClick}
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              >
+                {t('view_error')}
+              </LinkButton>
+            </Flex>
+          </Banner>
+        )}
+      </>
     )
   }
   return null
