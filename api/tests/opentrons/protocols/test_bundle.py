@@ -1,12 +1,13 @@
 import io
 import zipfile
+from typing import Any, Callable
 
 import pytest
 
 from opentrons.protocols import bundle
 
 
-def test_parse_bundle_no_root_files(get_bundle_fixture):
+def test_parse_bundle_no_root_files(get_bundle_fixture: Callable[..., Any]) -> None:
     fixture = get_bundle_fixture("no_root_files_bundle")
     with pytest.raises(
         RuntimeError, match="No files found in ZIP file's root directory"
@@ -17,7 +18,9 @@ def test_parse_bundle_no_root_files(get_bundle_fixture):
         bundle.extract_bundle(zf)
 
 
-def test_parse_bundle_no_entrypoint_protocol(get_bundle_fixture):
+def test_parse_bundle_no_entrypoint_protocol(
+    get_bundle_fixture: Callable[..., Any]
+) -> None:
     fixture = get_bundle_fixture("no_entrypoint_protocol_bundle")
     with pytest.raises(RuntimeError, match="Bundled protocol should have a"):
         buf = io.BytesIO(fixture["binary_zipfile"])
@@ -26,7 +29,9 @@ def test_parse_bundle_no_entrypoint_protocol(get_bundle_fixture):
         bundle.extract_bundle(zf)
 
 
-def test_parse_bundle_conflicting_labware(get_bundle_fixture):
+def test_parse_bundle_conflicting_labware(
+    get_bundle_fixture: Callable[..., Any]
+) -> None:
     fixture = get_bundle_fixture("conflicting_labware_bundle")
     with pytest.raises(RuntimeError, match="Conflicting labware in bundle"):
         buf = io.BytesIO(fixture["binary_zipfile"])
@@ -35,7 +40,7 @@ def test_parse_bundle_conflicting_labware(get_bundle_fixture):
         bundle.extract_bundle(zf)
 
 
-def test_write_bundle(get_bundle_fixture):
+def test_write_bundle(get_bundle_fixture: Callable[..., Any]) -> None:
     fixture = get_bundle_fixture("simple_bundle")
     buf = io.BytesIO(fixture["binary_zipfile"])
     buf.seek(0)
