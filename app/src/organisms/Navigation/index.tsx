@@ -85,6 +85,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ? POSITION_STATIC
             : POSITION_STICKY
         }
+        paddingX={SPACING.spacing40}
         top="0"
         width="100%"
         backgroundColor={COLORS.white}
