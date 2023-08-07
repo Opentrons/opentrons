@@ -311,10 +311,11 @@ def set_csv_report_meta_data_ot3(
         barcode = input("SCAN device barcode: ").strip()
     else:
         barcode = dut_str
+    print("barcode: barcode")
 
     # default the CSV tag to be the DUT
     report.set_tag(tag if tag else dut_str)
-    report.set_device_id(dut_str, csv_report.CSVResult.from_bool(barcode == dut_str))
+    report.set_device_id(dut_str, barcode)
     report.set_robot_id(robot_serial)
     report.set_firmware(api.fw_version)
     report.set_version(get_git_description())

@@ -267,7 +267,7 @@ def _generate_meta_data_section() -> CSVSection:
             CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
             CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
             CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
-            CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, CSVResult]),
+            CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, str, CSVResult]),
             CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
             CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
             CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str, CSVResult]),
@@ -411,9 +411,10 @@ class CSVReport:
         )
         self.save_to_disk()
 
-    def set_device_id(self, device_id: str, result: CSVResult) -> None:
+    def set_device_id(self, device_id: str, barcode_id: str) -> None:
         """Store DUT serial number."""
-        self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id, result])
+        result = CSVResult.from_bool(device_id == barcode_id)
+        self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id, barcode_id, result])
 
     def set_robot_id(self, robot_id: str) -> None:
         """Store robot serial number."""

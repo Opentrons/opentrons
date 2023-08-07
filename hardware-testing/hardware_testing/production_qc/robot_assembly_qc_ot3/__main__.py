@@ -1,6 +1,7 @@
 """Robot assembly QC OT3."""
 from os import environ
 
+# NOTE: this is required to get WIFI test to work
 if "OT_SYSTEM_VERSION" not in environ:
     environ["OT_SYSTEM_VERSION"] = "0.0.0"
 
@@ -15,13 +16,12 @@ from .config import TestSection, TestConfig, build_report, TESTS
 
 
 async def _main(cfg: TestConfig) -> None:
-    # BUILD REPORT
     test_name = Path(__file__).parent.name.replace("_", "-")
     ui.print_title(test_name.upper())
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        use_defaults=True,  # includes default XY calibration matrix
+        use_defaults=True,  # use default belt calibration
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.5",
         pipette_right="p1000_single_v3.5",
