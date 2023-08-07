@@ -22,31 +22,33 @@ Similar to working with labware and modules, you must inform the robot about the
 Loading Flex 1- and 8-Channel Pipettes
 --------------------------------------
 
-This code sample loads a Flex 8-Channel Pipette in the left slot along with a Flex 1-Channel Pipette and two tip racks in the right slot. Both pipettes are 1000 µL. 
+This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-Channel Pipette in the right mount. Both pipettes are 1000 µL. Each pipette uses its own 1000 µL tip rack.  
 
 .. code-block:: Python
     :substitutions:
-    
+
     from opentrons import protocol_api
     
-    requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
+    requirements = {'robotType': 'Flex', '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        left = protocol.load_instrument(
-            instrument_name='flex_8channel_1000', mount='left')   
         tiprack1 = protocol.load_labware(
             load_name='opentrons_flex_96_tiprack_1000ul', location='D1')
         tiprack2 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_1000ul', location='C1')
-        right = protocol.load_instrument(
+            load_name='opentrons_flex_96_tiprack_1000ul', location='C1')       
+        left = protocol.load_instrument(
             instrument_name='flex_1channel_1000',
+            mount='left',
+            tip_racks=[tiprack1])                
+        right = protocol.load_instrument(
+            instrument_name='flex_8channel_1000',
             mount='right',
-            tip_racks=[tiprack1, tiprack2]) 
+            tip_racks=[tiprack2]) 
 
 Loading a Flex 96-Channel Pipette
 ---------------------------------
 
-This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with a 1- or 8-Channel Pipette in the same protocol or when these other instruments are attached to the robot. To load the 96-Channel Pipette, specify its position as ``mount='left'`` as shown here:
+This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. To load the 96-Channel Pipette, specify its position as ``mount='left'`` as shown here:
 
 .. code-block:: python
 
@@ -54,12 +56,12 @@ This code sample loads the Flex 96-Channel Pipette. Because of its size, the Fle
         left = protocol.load_instrument(
             instrument_name='flex_96channel_1000', mount='left')
 
-.. version added, 2.15??
+.. versionadded:: 2.15
 
 Loading OT-2 Pipettes
 ---------------------
 
-This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a single-channel, P1000 GEN2 pipette with two tip racks in the right slot. 
+This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and a P300 Single-Channel GEN2 pipette in the right mount. Each pipette uses its own 1000 µL tip rack. 
 
 .. code-block:: python
 
@@ -68,19 +70,20 @@ This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a sin
     metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        left = protocol.load_instrument(
-            instrument_name='p300_multi_gen2',
-            mount='left')
         tiprack1 = protocol.load_labware(
             load_name='opentrons_96_tiprack_1000ul',
             location=1)
         tiprack2 = protocol.load_labware(
             load_name='opentrons_96_tiprack_1000ul',
             location=2)
-        right = protocol.load_instrument(
+        left = protocol.load_instrument(
             instrument_name='p1000_single_gen2',
+            mount='left',
+            tip_racks=[tiprack1])
+        right = protocol.load_instrument(
+            instrument_name='p300_multi_gen2',
             mount='right',
-            tip_racks=[tiprack1, tiprack2])
+            tip_racks=[tiprack1])
 
 .. versionadded:: 2.0
 
@@ -95,17 +98,13 @@ Multi-Channel Pipettes
 
 All building block and advanced commands work with single- and multi-channel pipettes.
 
-To keep the interface to the Opentrons API consistent between single- and
-multi-channel pipettes, commands treat the *backmost channel* (furthest from the
-door) of a multi-channel pipette as the location of the pipette. Location arguments to
-building block and advanced commands are specified for the backmost channel.
+To keep the interface to the Opentrons API consistent between single- and multi-channel pipettes, commands treat the *backmost channel* (furthest from the door) of a multi-channel pipette as the location of the pipette. Location arguments to building block and advanced commands are specified for the backmost channel.
 
-This also means that offset changes (such as :py:meth:`.Well.top` or
-:py:meth:`.Well.bottom`) can be applied to the single specified well, and each
-pipette channel will be at the same position relative to the well
-that it is over.
+Also, this means that offset changes (such as :py:meth:`.Well.top` or :py:meth:`.Well.bottom`) can be applied to the single specified well, and each pipette channel will be at the same position relative to the well that it is over.
 
-Because there is only one motor in a multi-channel pipette, these pipettes always aspirate and dispense on all channels simultaneously. For instance, to aspirate from the first column of a 96-well plate you would write:
+Finally, because there is only one motor in a multi-channel pipette, these pipettes always aspirate and dispense on all channels simultaneously.
+
+Let's write a protocol to demonstrate these concepts. To start, we'll load a pipette in the right mount and add some labware.
 
 .. code-block:: python
 
@@ -113,30 +112,34 @@ Because there is only one motor in a multi-channel pipette, these pipettes alway
         # Load a tiprack for 1000uL tips
         tiprack1 = protocol.load_labware(
         load_name='opentrons_flex_96_tiprack_1000ul',
-        location='D1')
-        # Load a wellplate
+        location='D1')       
+        # Load a 96-well plate
         plate = protocol.load_labware(
             load_name='corning_96_wellplate_360ul_flat',
-            location='C1')
-            # Load an 8-channel pipette on the right mount
+            location='C1')       
+        # Load an 8-channel pipette on the right mount
         right = protocol.load_instrument(
             instrument_name='flex_8channel_1000',
             mount='right',
             tip_racks=[tiprack1])
 
-        # Specify well A1 for pick_up_tip. The backmost channel of the
-        # pipette moves to A1, which means the rest of the wells are above the
-        # rest of the wells in column 1.
-        right.pick_up_tip(tiprack1['A1'])
+After loading our instruments and labware, let's tell the robot to pick up a pipette tip from location ``A1`` in ``tiprack1``::
 
-        # Similarly, specifying well A2 for aspirate means the pipette will
-        # position its backmost channel over well A2, and the rest of the
-        # pipette channels are over the rest of the wells of column 1
-        right.aspirate(volume=300, location=plate['A2'])
+    right.pick_up_tip(tiprack1['A1'])
 
-        # Dispense into column 3 of the plate with all 8 channels of the
-        # pipette at the top of their respective wells
-        right.dispense(volume=300, location=plate['A3'].top())
+With the backmost pipette channel above location A1 on the tip rack, this means all 8 channels are above the eight wells in column 1.   
+
+After picking up a tip, let's tell the robot to aspirate 300 ul into the well plate at location ``A2``::
+        
+    right.aspirate(volume=300, location=plate['A2'])
+
+With the backmost pipette tip above location A2 on the well plate, this means all 8 channels are above the eight wells in column 1.
+
+Finally, let's tell the robot to dispense 300 ul into the well plate at location ``A3``::
+
+    right.dispense(volume=300, location=plate['A3'].top())
+
+With the backmost pipette tip above location A3, this means all 8 channels are above the eight wells in column 3. The pipette will dispense liquid into all the wells simultaneously.
 
 In general, you should specify wells in the first row of a well plate when using multi-channel pipettes. One exception to this rule is when using 384-well plates. The limited space between the wells in a 384-well plate and between the nozzles of a multi-channel pipette means the pipette accesses every other well in a column. Specifying well A1 accesses every other well starting with the first (rows A, C, E, G, I, K, M, and O). Similarly, specifying well B1 also accesses every other well, but starts with the second (rows B, D, F, H, J, L, N, and P).
 
@@ -197,15 +200,15 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
         +-----------------------------+--------------------+-----------------------+
         | Pipette Name                | Capacity           | API Load Name         |
         +=============================+====================+=======================+
-        | P20 GEN2 (single channel)   | 1-20 µL            | ``p20_single_gen2``   |
+        | P20 Single-Channel GEN2     | 1-20 µL            | ``p20_single_gen2``   |
         +-----------------------------+                    +-----------------------+
-        | P20 GEN2 (8-channel)        |                    | ``p20_multi_gen2``    |
+        | P20 Multi-Channel GEN2      |                    | ``p20_multi_gen2``    |
         +-----------------------------+--------------------+-----------------------+
-        | P300 GEN2 (single chanel)   | 20-300 µL          | ``p300_single_gen2``  |
+        | P300 Single-Channel GEN2    | 20-300 µL          | ``p300_single_gen2``  |
         +-----------------------------+                    +-----------------------+
-        | P300 GEN2 (8-channel)       |                    | ``p300_multi_gen2``   |
+        | P300 Multi-Channel GEN2     |                    | ``p300_multi_gen2``   |
         +-----------------------------+--------------------+-----------------------+
-        | P1000 GEN2 (single channel) | 100-1000 µL        | ``p1000_single_gen2`` |
+        | P1000 Single-Channel GEN2   | 100-1000 µL        | ``p1000_single_gen2`` |
         +-----------------------------+--------------------+-----------------------+
 
         See the OT-2 Pipette Generations section below if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-chanel model.
@@ -221,18 +224,24 @@ The OT-2 works with the GEN1 and GEN2 pipette models. The newer GEN2 pipettes ha
     
     * - GEN2 Pipette
       - GEN1 Pipette
-    * - P20 Single GEN2 (1-20 µL)
-      - P10 Single GEN1 (1-10 µL)
-    * - P20 Multi-Channel GEN2 (1-20 µL)
-      - P10 Multi GEN1 (1-10 µL)
-    * - P300 Single GEN2 (20-300 µL)
-      - P300 Single GEN1 (30-300 µL)
-    * - P300 Multi-Channel GEN2 (20-300 µL)
-      - P300 Multi GEN1 (20-200 µL)
-    * - P1000 Single GEN2 (100-1000 µL)
-      - P1000 Single GEN1 (100-1000 µL)
+      - GEN1 Volume
+    * - P20 Single-Channel GEN2
+      - P10 Single-Channel GEN1
+      - 1-10 µL
+    * - P20 Multi-Channel GEN2
+      - P10 Multi-Channel GEN1
+      - 1-10 µL
+    * - P300 Single-Channel GEN2
+      - P300 Single-Channel GEN1
+      - 30-300 µL
+    * - P300 Multi-Channel GEN2
+      - P300 Multi-Channel GEN1
+      - 20-200 µL
+    * - P1000 Single-Channel GEN2
+      - P1000 Single-Channel GEN1
+      - 100-1000 µL
 
-The single- and multi-channel P50 GEN1 pipettes are the exceptions here. If your protocol uses a P50 GEN1 pipette, there is no backward compatibility with a related GEN2 pipette. To replace a P50 GEN1 with a corresponding GEN2 pipette, edit your protocol to load a P20 Single GEN2 (for volumes below 20 µL) or a P300 Single GEN2 (for volumes between 20 and 50 µL).
+The single- and multi-channel P50 GEN1 pipettes are the exceptions here. If your protocol uses a P50 GEN1 pipette, there is no backward compatibility with a related GEN2 pipette. To replace a P50 GEN1 with a corresponding GEN2 pipette, edit your protocol to load a P20 Single-Channel GEN2 (for volumes below 20 µL) or a P300 Single-Channel GEN2 (for volumes between 20 and 50 µL).
 
 Adding Tip Racks
 ================
@@ -347,29 +356,29 @@ Flex Pipette Flow Rates
 
 The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for Flex pipettes.
 
-INFORMATION TBD 
+*Flex Flow rate data coming soon.* 
 
 OT-2 Pipette Flow Rates
 -----------------------
 
 The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes.
 
-+---------------------------------+---------------+---------------+---------------+
-| Pipette                         | Aspirate      | Dispense      | Blow-out      |
-+=================================+===============+===============+===============+ 
-| P20 Single GEN2 (1-20 µL)       | * API v2.6 or higher: 7.56 µL/s               |
-|                                 | * API v2.5 or lower: 3.78 µL/s                |
-+---------------------------------+-----------------------------------------------+
-| P300 Single GEN2 (20-300 µL)    | * API v2.6 or higher: 92.86 µL/s              |
-|                                 | * API v2.5 or lower: 46.43 µL/s               |
-+---------------------------------+-----------------------------------------------+
-| P1000 Single GEN2 (100-1000 µL) | * API v2.6 or higher: 274.7 µL/s              |
-|                                 | * API v2.5 or lower: 137.35 µL/s              |
-+---------------------------------+-----------------------------------------------+
-| P20 Multi GEN2 (1-20 µL)        |    7.6 µL/s                                   |
-+---------------------------------+-----------------------------------------------+
-| P300 Multi GEN2 (20-300 µL)     |    94 µL/s                                    |
-+---------------------------------+-----------------------------------------------+
++-----------------------------------------+-----------------------------+
+| Pipette Model                           | Flow Rates (µL/s)           |
++=========================================+=============================+ 
+| P20 Single-Channel GEN2 (1-20 µL)       | * API v2.6 or higher: 7.56  |
+|                                         | * API v2.5 or lower: 3.78   |
++-----------------------------------------+-----------------------------+
+| P300 Single-Channel GEN2 (20-300 µL)    | * API v2.6 or higher: 92.86 |
+|                                         | * API v2.5 or lower: 46.43  |
++-----------------------------------------+-----------------------------+
+| P1000 Single-Channel GEN2 (100-1000 µL) | * API v2.6 or higher: 274.7 |
+|                                         | * API v2.5 or lower: 137.35 |
++-----------------------------------------+-----------------------------+
+| P20 Multi-Channel GEN2 (1-20 µL)        | 7.6                         |
++-----------------------------------------+-----------------------------+
+| P300 Multi-Channel GEN2 (20-300 µL)     | 94                          |
++-----------------------------------------+-----------------------------+
 
 .. what is head speed, is it important/significant? applies to gantry movement or pipette? need to find out.
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/second and a well bottom clearance of 1mm for aspirate and dispense actions.
