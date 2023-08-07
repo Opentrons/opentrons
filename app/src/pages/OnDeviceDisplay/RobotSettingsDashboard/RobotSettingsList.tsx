@@ -102,7 +102,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('apply_historic_offsets')}
           settingInfo={t('historic_offsets_description')}
           iconName="reticle"
-          enabledHistoricOffests
+          enabledHistoricOffsets
           historicOffsetsOn={historicOffsetsOn}
         />
         <RobotSettingButton
