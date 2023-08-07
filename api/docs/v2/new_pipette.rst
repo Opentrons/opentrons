@@ -15,9 +15,7 @@ For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v
 Loading Pipettes
 ================
 
-You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks.
-
-Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
+Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. As noted above, the:py:meth:`~.ProtocolContext.load_instrument` method provides this capability. It also requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
 
 Loading Flex 1- and 8-Channel Pipettes
 --------------------------------------
@@ -64,10 +62,11 @@ Loading OT-2 Pipettes
 This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and a P300 Single-Channel GEN2 pipette in the right mount. Each pipette uses its own 1000 µL tip rack. 
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.14'}
+    metadata = {'apiLevel': |apiLevel|}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
@@ -147,7 +146,7 @@ With the backmost pipette tip above location A3, all 8 channels are above the ei
 8-Channel, 384-Well Plate Example
 ---------------------------------
 
-In general, you should specify wells in the first row of a well plate when using multi-channel pipettes. An exception to this rule is when using 384-well plates. The limited space between the wells in a 384-well plate and between the nozzles of a multi-channel pipette means the pipette accesses every other well in a column. Specifying well A1 accesses every other well starting with the first (rows A, C, E, G, I, K, M, and O). Similarly, specifying well B1 also accesses every other well, but starts with the second (rows B, D, F, H, J, L, N, and P).
+In general, you should specify wells in the first row of a well plate when using multi-channel pipettes. An exception to this rule is when using 384-well plates. The greater well density means the nozzles of a multi-channel pipette can only accesses every other well in a column. Specifying well A1 accesses every other well starting with the first (rows A, C, E, G, I, K, M, and O). Similarly, specifying well B1 also accesses every other well, but starts with the second (rows B, D, F, H, J, L, N, and P).
 
 To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel Pipette and a 384-well plate. We'll then aspirate and dispense a liquid to different locations on the same well plate. To start, let's load a pipette in the right mount and add our labware.
 
@@ -157,7 +156,7 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
         # Load a tiprack for 200uL tips
         tiprack1 = protocol.load_labware(
             load_name='opentrons_flex_96_tiprack_200ul', location=1)
-        # Load a wellplate
+        # Load a well plate
         plate = protocol.load_labware(
             load_name='corning_384_wellplate_112ul_flat', location=4)
         # Load an 8-channel pipette on the right mount
@@ -188,7 +187,7 @@ Because of the limited clearance between wells, the eight pipette channels will 
 Adding Tip Racks
 ================
 
-The ``load_instrument()`` method includes the optional argument, ``tip_racks``. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. The advantage of using ``tip_racks`` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the :py:meth:`.InstrumentContext.pick_up_tip` method. For example, let's start by loading loading some labware and instruments like this::
+The ``load_instrument()`` method includes the optional argument ``tip_racks``. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. The advantage of using ``tip_racks`` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the :py:meth:`.InstrumentContext.pick_up_tip` method. For example, let's start by loading loading some labware and instruments like this::
         
     def run(protocol: protocol_api.ProtocolContext):
     tiprack_left = protocol.load_labware(
@@ -244,11 +243,11 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
         +-------------------------+-----------+-------------------------+
         | Pipette Name            | Capacity  | API Load Name           |
         +=========================+===========+=========================+
-        | Flex 1-Channel Pipette  | 0.5–50 µL | ``flex_1channel_50``    |
+        | Flex 1-Channel Pipette  | 1–50 µL   | ``flex_1channel_50``    |
         +                         +-----------+-------------------------+
         |                         | 5–1000 µL | ``flex_1channel_1000``  |
         +-------------------------+-----------+-------------------------+
-        | Flex 8-Channel Pipette  + 0.5–50 µL + ``flex_8channel_50``    |
+        | Flex 8-Channel Pipette  | 1–50 µL   + ``flex_8channel_50``    |
         +                         +-----------+-------------------------+
         |                         | 5–1000 µL | ``flex_8channel_1000``  |
         +-------------------------+-----------+-------------------------+
@@ -308,7 +307,7 @@ The single- and multi-channel P50 GEN1 pipettes are the exceptions here. If your
 Pipette Flow Rates
 ==================
 
-Pipettes aspirate or dispense at different rates measured in units of µL/second. You can change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`~.InstrumentContext.flow_rate` properties listed below:
+Pipettes aspirate or dispense at different rates measured in units of µL/s. You can change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`~.InstrumentContext.flow_rate` properties listed below:
 
 * ``InstrumentContext.flow_rate.aspirate``
 * ``InstrumentContext.flow_rate.dispense``
@@ -357,7 +356,8 @@ Finally, let's slow down the blow out flow rate from its default::
 The :py:obj:`.InstrumentContext.speed` object offers functionality that's similar to ``flow_rate``, but is measured in mm/s of plunger speed. These units do not have a linear transfer to flow rate and
 should only be used if you have a specific need.
 
-See :ref:`gantry_speed` and :ref:`axis_speed_limits` for information about other ways of controlling pipette movement.
+.. note::
+    In API version 2.13 and earlier, :py:obj:`.InstrumentContext.speed` offered similar functionality. It attempted to set the plunger speed in mm/s. Due to technical limitations, that speed could only be approximate. You must use ``.flow_rate`` in version 2.14 and later, and you should consider replacing older code that sets ``.speed``.
 
 .. versionadded:: 2.0
 
