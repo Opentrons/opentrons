@@ -304,11 +304,11 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCreatedAtTimestamp)
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
-    // when(mockUseRunQuery)
-    //   .calledWith(RUN_ID, { staleTime: Infinity })
-    //   .mockReturnValue({
-    //     data: { data: mockIdleUnstartedRun },
-    //   } as UseQueryResult<Run>)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID, { staleTime: Infinity })
+      .mockReturnValue({
+        data: { data: mockIdleUnstartedRun },
+      } as UseQueryResult<Run>)
     when(mockUseDismissCurrentRunMutation)
       .calledWith()
       .mockReturnValue({
@@ -327,9 +327,6 @@ describe('ProtocolRunHeader', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
-    when(mockUseRunQuery)
-      .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({ data: { data: null } } as any)
   })
 
   afterEach(() => {
