@@ -59,7 +59,6 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   }
 
   React.useEffect(() => {
-    console.log('useEffect', isDismissedModal)
     setIsDismissedModal(isDismissedModal)
     if (!isDismissedModal) {
       setShowEstopModal(true)
