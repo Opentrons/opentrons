@@ -1,4 +1,3 @@
-import ast
 import json
 from textwrap import dedent
 from typing import Any, Callable, Optional, Union
@@ -7,7 +6,6 @@ import pytest
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.parse import (
-    extract_static_python_info,
     _get_protocol_schema_version,
     validate_json,
     parse,
@@ -24,94 +22,6 @@ from opentrons.protocols.types import (
     ApiDeprecationError,
 )
 from opentrons.protocols.api_support.types import APIVersion
-
-
-@pytest.mark.parametrize(
-    "protocol_source,expected_result",
-    [
-        (
-            # Neither metadata nor requirements:
-            "",
-            StaticPythonInfo(metadata=None, requirements=None),
-        ),
-        (
-            # Just metadata:
-            """
-            metadata = {
-                'k1': 'v1',
-                'k2': 'v2'
-            }
-            """,
-            StaticPythonInfo(metadata={"k1": "v1", "k2": "v2"}, requirements=None),
-        ),
-        (
-            # Just requirements:
-            """
-            requirements = {
-                'k1': 'v1',
-                'k2': 'v2'
-            }
-            """,
-            StaticPythonInfo(metadata=None, requirements={"k1": "v1", "k2": "v2"}),
-        ),
-        (
-            # Both:
-            """
-            metadata = {
-                'mk1': 'mv1',
-                'mk2': 'mv2'
-            }
-            requirements = {
-                'rk1': 'rv1',
-                'rk2': 'rv2'
-            }
-            """,
-            StaticPythonInfo(
-                metadata={"mk1": "mv1", "mk2": "mv2"},
-                requirements={"rk1": "rv1", "rk2": "rv2"},
-            ),
-        ),
-        (
-            # Surrounded by other stuff:
-            """
-            this = 0
-            that = 1
-            metadata = {
-                'mk1': 'mv1',
-                'mk2': 'mv2'
-            }
-            requirements = {
-                'rk1': 'rv1',
-                'rk2': 'rv2'
-            }
-            print('wat?')
-            metadata['hello'] = 'moon'
-            fakedata['what?'] = 'ham'
-            """,
-            StaticPythonInfo(
-                metadata={"mk1": "mv1", "mk2": "mv2"},
-                requirements={"rk1": "rv1", "rk2": "rv2"},
-            ),
-        ),
-        (
-            # Later assignments should override earlier assignments:
-            # TODO(mm, 2022-10-24): Reconsider whether we actually want this behavior.
-            # Protocols probably shouldn't do this. Note that metadata["k"] = "v" is
-            # unsupported.
-            """
-            metadata = {"k1": "v1"}
-            metadata = {"k2": "v2"}
-            """,
-            StaticPythonInfo(metadata={"k2": "v2"}, requirements=None),
-        ),
-    ],
-)
-def test_extract_static_python_info(
-    protocol_source: str, expected_result: StaticPythonInfo
-) -> None:
-    parsed = ast.parse(dedent(protocol_source), filename="testy", mode="exec")
-    actual_result = extract_static_python_info(parsed)
-    assert actual_result == expected_result
 
 
 parse_version_cases = [
@@ -395,6 +305,7 @@ def test_validate_json(
     ),
     [
         (
+            # Basic APIv2 test with a bunch of stuff in metadata.
             """
             from opentrons import protocol_api, types
 
@@ -425,6 +336,49 @@ def test_validate_json(
                 "apiLevel": "2.0",
             },
             APIVersion(2, 0),
+            "OT-2 Standard",
+        ),
+        (
+            # Both metadata and requirements, intermixed with a bunch of other statements.
+            """
+            this = 0
+            that = 1
+            metadata = {
+                'mk1': 'mv1',
+                'mk2': 'mv2',
+                'apiLevel': '2.0'
+            }
+            print('wat?')
+            def run(cxt): pass
+            requirements = {
+                'robotType': 'Flex'
+            }
+            metadata['hello'] = 'moon'
+            fakedata['what?'] = 'ham'
+            """,
+            {
+                "mk1": "mv1",
+                "mk2": "mv2",
+                "apiLevel": "2.0",
+            },
+            APIVersion(2, 0),
+            "OT-3 Standard",
+        ),
+        (
+            # Later assignments to metadata should override earlier ones.
+            # TODO(mm, 2022-10-24): We're covering this with this test to retain current behavior,
+            # but we should reconsider whether we actually want this behavior.
+            # Protocols probably shouldn't do this. Note that metadata["k"] = "v" is
+            # unsupported.
+            """
+            metadata = {'mk1': 'mv1'}
+            metadata = {'mk2': 'mv2'}
+            requirements = {'apiLevel': '2.0'}
+            requirements = {'apiLevel': '2.1'}
+            def run(cxt): pass
+            """,
+            {"mk2": "mv2"},
+            APIVersion(2, 1),
             "OT-2 Standard",
         ),
     ],

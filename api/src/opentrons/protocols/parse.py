@@ -153,7 +153,7 @@ def _parse_python(
         # but ValueError if the source contains null bytes.
         raise MalformedPythonError(short_message=str(null_bytes_error))
 
-    static_info = extract_static_python_info(parsed)
+    static_info = _extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
     version = _get_version(static_info, parsed, filename_checked)
     robot_type = _robot_type_from_static_python_info(static_info)
@@ -259,9 +259,7 @@ def parse(
             )
 
 
-# TODO(mm, 2023-08-08): This should be made a private implementation detail of this module
-# once its unit tests are ported to go through parse() instead.
-def extract_static_python_info(parsed: ast.Module) -> StaticPythonInfo:
+def _extract_static_python_info(parsed: ast.Module) -> StaticPythonInfo:
     """Extract statically analyzable info from a Python protocol, like its metadata.
 
     Raises:
