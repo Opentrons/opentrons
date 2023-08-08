@@ -191,6 +191,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await asyncio.sleep(0.1)
         if time() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to close")
+            break
     print(api.door_state)
     is_closed = api.door_state == DoorState.CLOSED
     print("OPEN the front door")
@@ -199,6 +200,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await asyncio.sleep(0.1)
         if time() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to open")
+            break
     print(api.door_state)
     is_open = api.door_state == DoorState.OPEN
     report(section, "door-switch", [CSVResult.from_bool(is_closed and is_open)])
