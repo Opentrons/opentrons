@@ -144,7 +144,7 @@ def _parse_python(
             short_message=str(syntax_error),
             # Get Python's nice syntax error message with carets pointing to where in the line
             # had the problem.
-            long_additional_message="".join(
+            long_additional_message="\n".join(
                 traceback.format_exception_only(type(syntax_error), syntax_error)
             ),
         ) from syntax_error
