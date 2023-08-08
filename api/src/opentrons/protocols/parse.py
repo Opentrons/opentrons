@@ -156,7 +156,7 @@ def _parse_python(
     static_info = extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
     version = _get_version(static_info, parsed, filename_checked)
-    robot_type = robot_type_from_static_python_info(static_info)
+    robot_type = _robot_type_from_static_python_info(static_info)
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
@@ -259,6 +259,8 @@ def parse(
             )
 
 
+# TODO(mm, 2023-08-08): This should be made a private implementation detail of this module
+# once its unit tests are ported to go through parse() instead.
 def extract_static_python_info(parsed: ast.Module) -> StaticPythonInfo:
     """Extract statically analyzable info from a Python protocol, like its metadata.
 
@@ -381,6 +383,8 @@ def _has_api_v1_imports(parsed: ast.Module) -> bool:
     return bool(v1_markers.intersection(opentrons_imports))
 
 
+# TODO(mm, 2023-08-08): This should be made a private implementation detail of this module
+# once its unit tests are ported to go through parse() instead.
 def version_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> Optional[APIVersion]:
@@ -426,7 +430,7 @@ def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:
         )
 
 
-def robot_type_from_static_python_info(
+def _robot_type_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> RobotType:
     python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
