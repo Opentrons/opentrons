@@ -98,12 +98,12 @@ You can manually move any standard or custom labware. Using the gripper to move 
           * ``nest_96_wellplate_2ml_deep``
     * - All Opentrons Flex 96 Tip Racks 
       - 
-          * ``opentrons_flex_96_filtertiprack_1000ul``
-          * ``opentrons_flex_96_filtertiprack_200ul``
-          * ``opentrons_flex_96_filtertiprack_50ul``
-          * ``opentrons_flex_96_tiprack_1000ul``
-          * ``opentrons_flex_96_tiprack_200ul``
           * ``opentrons_flex_96_tiprack_50ul``
+          * ``opentrons_flex_96_tiprack_200ul``
+          * ``opentrons_flex_96_tiprack_1000ul``
+          * ``opentrons_flex_96_filtertiprack_50ul``
+          * ``opentrons_flex_96_filtertiprack_200ul``
+          * ``opentrons_flex_96_filtertiprack_1000ul``
     
 The gripper may work with other ANSI/SLAS standard labware, but this is not recommended.
 
