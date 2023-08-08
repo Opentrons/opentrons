@@ -51,7 +51,7 @@ class QueueWorker:
         if self._worker_task:
             self._worker_task.cancel()
 
-    async def join(self, force_cancel: bool = False) -> None:
+    async def join(self) -> None:
         """Wait for the worker to finish, propagating any errors."""
         worker_task = self._worker_task
 
@@ -59,8 +59,6 @@ class QueueWorker:
             self._worker_task = None
 
             try:
-                if force_cancel:
-                    worker_task.cancel()
                 await worker_task
             except asyncio.CancelledError:  # From self.cancel().
                 pass

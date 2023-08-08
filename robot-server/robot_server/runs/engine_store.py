@@ -89,9 +89,10 @@ class EngineStore:
                 return
             if self._runner_engine_pair is None:
                 return
-            asyncio.run_coroutine_threadsafe(
-                coro=self._handle_estop_event(), loop=self._loop
-            ).future()
+            self._runner_engine_pair.engine.estop()
+            #asyncio.run_coroutine_threadsafe(
+            #    coro=self._handle_estop_event(), loop=self._loop
+            #).future()
 
     @property
     def engine(self) -> ProtocolEngine:

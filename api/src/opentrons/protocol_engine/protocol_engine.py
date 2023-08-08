@@ -12,6 +12,7 @@ from opentrons_shared_data.errors import (
 )
 
 from .errors import ProtocolCommandFailedError
+from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
@@ -46,6 +47,7 @@ from .actions import (
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    FailCommandAction,
 )
 
 
@@ -217,7 +219,21 @@ class ProtocolEngine:
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
-    async def stop(self, halt_api: bool = True) -> None:
+    def estop(self) -> None:
+        if self._state_store.commands.get_is_stopped():
+            return
+        current_id = self._state_store.commands.state.running_command_id
+        if current_id is not None:
+            action = FailCommandAction(
+                command_id=current_id,
+                error_id=self._model_utils.generate_id(),
+                failed_at=self._model_utils.get_timestamp(),
+                error=EStopActivatedError(message="Estop Activated"))
+            self._action_dispatcher.dispatch(action)
+            self._queue_worker.cancel()
+
+
+    async def stop(self) -> None:
         """Stop execution immediately, halting all motion and cancelling future commands.
 
         After an engine has been `stop`'ed, it cannot be restarted.
@@ -228,8 +244,7 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
-        if halt_api:
-            await self._hardware_stopper.do_halt()
+        await self._hardware_stopper.do_halt()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -246,7 +261,6 @@ class ProtocolEngine:
         error: Optional[Exception] = None,
         drop_tips_and_home: bool = True,
         set_run_status: bool = True,
-        force_cancel: bool = False,
     ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
@@ -264,10 +278,19 @@ class ProtocolEngine:
             set_run_status: Whether to calculate a `success` or `failure` run status.
                 If `False`, will set status to `stopped`.
         """
+        for err in self.state_view.commands.get_all_errors():
+            if (
+                isinstance(error, EnumeratedError)
+                and self._code_in_exception_stack(
+                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
+                )
+            ):
+                drop_tips_and_home = False
+            if error is None:
+                error = err
         if error:
             if (
-                isinstance(error, ProtocolCommandFailedError)
-                and error.original_error is not None
+                isinstance(error, EnumeratedError)
                 and self._code_in_exception_stack(
                     error=error, code=ErrorCodes.E_STOP_ACTIVATED
                 )
@@ -287,7 +310,7 @@ class ProtocolEngine:
         )
 
         try:
-            await self._queue_worker.join(force_cancel=force_cancel)
+            await self._queue_worker.join()
 
         # todo(mm, 2022-01-31): We should use something like contextlib.AsyncExitStack
         # to robustly clean up all these resources
