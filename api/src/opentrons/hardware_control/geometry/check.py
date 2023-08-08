@@ -16,3 +16,18 @@ def get_instrument_bounds() -> None:
 
 def get_robot_bounds() -> None:
 	return None
+
+def generate_bounding_box(bottom_left_corner, top_right_corner, offset) -> None:
+	return None
+
+def check_against_robot_bounds() -> bool:
+	return False
+
+def check_for_bounding_box_collision(bounding_box_1, bounding_box_2) -> bool:
+	check_slot_origin = bound
+	check_slot_end = None
+	return True
+
+
+def check_for_point_collision() -> bool:
+	return True
