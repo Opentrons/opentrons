@@ -109,7 +109,7 @@ def driver(request: pytest.FixtureRequest) -> Generator[WebDriver, None, None]:
     os.environ["OT_APP_UPDATE__CHANNEL"] = update_channel
     os.environ["OT_APP_LOG__LEVEL__CONSOLE"] = "error"
     os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"  # fixed in 6.2
-    
+    print(os.environ["CHROMEWEBDRIVER"])
     with webdriver.Chrome(options=options, service=Service(os.environ["CHROMEWEBDRIVER"])) as driver:
         _console.print("Driver Capabilities.", style="bright_yellow on blue")
         _console.print(driver.capabilities)
