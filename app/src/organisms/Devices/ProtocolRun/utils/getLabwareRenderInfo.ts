@@ -61,7 +61,12 @@ export const getLabwareRenderInfo = (
       const location = command.params.location
       const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
-      if (location === 'offDeck' || 'moduleId' in location) return acc
+      if (
+        location === 'offDeck' ||
+        'moduleId' in location ||
+        'labwareId' in location
+      )
+        return acc
       if (labwareId == null) {
         throw new Error('expected to find labware id but could not')
       }
@@ -72,13 +77,7 @@ export const getLabwareRenderInfo = (
           )} but could not`
         )
       }
-      let slotName = ''
-      if ('labwareId' in location) {
-        slotName = location.labwareId
-      } else if ('slotName' in location) {
-        slotName = location.slotName
-      }
-      console.log(slotName)
+      const slotName = location.slotName.toString()
       const slotPosition = getSlotPosition(deckDef, slotName)
 
       const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
