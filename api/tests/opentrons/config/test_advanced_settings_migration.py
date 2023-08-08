@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 27
+    return 28
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -27,6 +27,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableStallDetection": None,
         "disableStatusBar": None,
         "disableOverpressureDetection": None,
+        "disableTipPresenceDetection": None,
     }
 
 
@@ -333,6 +334,18 @@ def v27_config(v26_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v28_config(v27_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v27_config.copy()
+    r.update(
+        {
+            "_version": 28,
+            "disableTipPresenceDetection": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -365,6 +378,7 @@ def v27_config(v26_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v25_config"),
         lazy_fixture("v26_config"),
         lazy_fixture("v27_config"),
+        lazy_fixture("v28_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:

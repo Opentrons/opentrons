@@ -36,7 +36,7 @@ from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, feature_flags as ff
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -1814,7 +1814,10 @@ class OT3API(
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
 
-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
+            and ff.tip_presence_detection_enabled()
+        ):
             await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
@@ -1909,7 +1912,10 @@ class OT3API(
 
         await self._backend.set_active_current(spec.ending_current)
         # TODO: implement tip-detection sequence during drop-tip for 96ch
-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
+            and ff.tip_presence_detection_enabled()
+        ):
             await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
 
         # home mount axis
