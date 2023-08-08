@@ -25,7 +25,7 @@ interface EstopBannerProps {
 
 export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const { setIsDismissedModal } = useEstopContext()
+  const { setIsEmergencyStopModalDismissed } = useEstopContext()
 
   let bannerText = ''
   let buttonText = ''
@@ -47,7 +47,7 @@ export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
   }
 
   const handleClick = (): void => {
-    setIsDismissedModal(false)
+    setIsEmergencyStopModalDismissed(false)
   }
 
   return (

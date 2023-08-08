@@ -24,7 +24,10 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
     refetchInterval: ESTOP_REFETCH_INTERVAL_MS,
   })
   const [showEstopModal, setShowEstopModal] = React.useState<boolean>(false)
-  const { isDismissedModal, setIsDismissedModal } = useEstopContext()
+  const {
+    isEmergencyStopModalDismissed,
+    setIsEmergencyStopModalDismissed,
+  } = useEstopContext()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const closeModal = (): void => {
     if (estopStatus?.data.status === DISENGAGED) {
@@ -32,7 +35,7 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
     }
   }
 
-  const targetEstopModal = (): JSX.Element | null => {
+  const TargetEstopModal = (): JSX.Element | null => {
     switch (estopStatus?.data.status) {
       case PHYSICALLY_ENGAGED:
       case LOGICALLY_ENGAGED:
@@ -40,8 +43,8 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
           <EstopPressedModal
             isEngaged={estopStatus?.data.status === PHYSICALLY_ENGAGED}
             closeModal={closeModal}
-            isDismissedModal={isDismissedModal}
-            setIsDismissedModal={setIsDismissedModal}
+            isDismissedModal={isEmergencyStopModalDismissed}
+            setIsDismissedModal={setIsEmergencyStopModalDismissed}
           />
         )
       case NOT_PRESENT:
@@ -49,8 +52,8 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
           <EstopMissingModal
             robotName={robotName}
             closeModal={closeModal}
-            isDismissedModal={isDismissedModal}
-            setIsDismissedModal={setIsDismissedModal}
+            isDismissedModal={isEmergencyStopModalDismissed}
+            setIsDismissedModal={setIsEmergencyStopModalDismissed}
           />
         )
       default:
@@ -59,17 +62,21 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   }
 
   React.useEffect(() => {
-    setIsDismissedModal(isDismissedModal)
-    if (!isDismissedModal) {
+    setIsEmergencyStopModalDismissed(isEmergencyStopModalDismissed)
+    if (!isEmergencyStopModalDismissed) {
       setShowEstopModal(true)
     }
-  }, [isDismissedModal, setIsDismissedModal, showEstopModal])
+  }, [
+    isEmergencyStopModalDismissed,
+    setIsEmergencyStopModalDismissed,
+    showEstopModal,
+  ])
 
   return (
     <>
-      {showEstopModal && isUnboxingFlowOngoing === false
-        ? targetEstopModal()
-        : null}
+      {showEstopModal && isUnboxingFlowOngoing === false ? (
+        <TargetEstopModal />
+      ) : null}
     </>
   )
 }

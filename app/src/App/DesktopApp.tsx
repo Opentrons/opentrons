@@ -33,7 +33,10 @@ import type { RouteProps, DesktopRouteParams } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
-  const [isDismissedModal, setIsDismissedModal] = React.useState<boolean>(false)
+  const [
+    isEmergencyStopModalDismissed,
+    setIsEmergencyStopModalDismissed,
+  ] = React.useState<boolean>(false)
 
   const desktopRoutes: RouteProps[] = [
     {
@@ -99,8 +102,8 @@ export const DesktopApp = (): JSX.Element => {
       <ToasterOven>
         <EmergencyStopContext.Provider
           value={{
-            isDismissedModal,
-            setIsDismissedModal,
+            isEmergencyStopModalDismissed,
+            setIsEmergencyStopModalDismissed,
           }}
         >
           <Box width="100%">
