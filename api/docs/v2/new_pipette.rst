@@ -321,14 +321,14 @@ These flow rate properties operate independently. This means you can specify dif
         tiprack1 = protocol.load_labware(
             load_name='opentrons_flex_96_tiprack_1000ul',
             location='D1')       
-    pipette = protocol.load_instrument(
+        pipette = protocol.load_instrument(
             instrument_name='flex_1channel_1000',
             mount='left',
             tip_racks=[tiprack1])                
-    plate = protocol.load_labware(
+        plate = protocol.load_labware(
             load_name='corning_96_wellplate_360ul_flat',
             location='D3')
-    pipette.pick_up_tip()
+        pipette.pick_up_tip()
 
 Let's tell the robot to aspirate, dispense, and blow out the liquid using default flow rates. Notice how you don't need to specify a ``flow_rate`` attribute to use the defaults::
 
