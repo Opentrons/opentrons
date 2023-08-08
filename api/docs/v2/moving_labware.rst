@@ -75,21 +75,35 @@ You can manually move any standard or custom labware. Using the gripper to move 
     :header-rows: 1
 
     * - Labware Type
-      - API Load Name
-    * - NEST 96 Deep Well Plate 2mL
-      - ``nest_96_wellplate_2ml_deep``
-    * - Armadillo 96 well plate 200 µL Full Skirt
-      - ``armadillo_96_wellplate_200ul_pcr_full_skirt``
-    * - NEST 96 Well Plate 200 µL Flat
-      - ``nest_96_wellplate_200ul_flat``
+      - API Load Names
+    * - Full-skirt PCR plates
+      - 
+          * ``armadillo_96_wellplate_200ul_pcr_full_skirt``
+          * ``biorad_96_wellplate_200ul_pcr``
+          * ``nest_96_wellplate_100ul_pcr_full_skirt``
+          * ``opentrons_96_wellplate_200ul_pcr_full_skirt``
+    * - Bio-Rad 384-well plate 
+      - 
+          * ``biorad_384_wellplate_50ul``
+    * - Most Corning flat well plates 
+      - 
+          * ``corning_12_wellplate_6.9ml_flat``
+          * ``corning_48_wellplate_1.6ml_flat``
+          * ``corning_96_wellplate_360ul_flat``
+          * ``corning_384_wellplate_112ul_flat``
+    * - Certain NEST reservoirs and plates
+      - 
+          * ``nest_1_reservoir_195ml``
+          * ``nest_96_wellplate_200ul_flat``
+          * ``nest_96_wellplate_2ml_deep``
     * - All Opentrons Flex 96 Tip Racks 
       - 
-          * ``opentrons_flex_96_tiprack_50ul``
-          * ``opentrons_flex_96_tiprack_200ul``
-          * ``opentrons_flex_96_tiprack_1000ul``
-          * ``opentrons_flex_96_filtertiprack_50ul``
-          * ``opentrons_flex_96_filtertiprack_200ul``
           * ``opentrons_flex_96_filtertiprack_1000ul``
+          * ``opentrons_flex_96_filtertiprack_200ul``
+          * ``opentrons_flex_96_filtertiprack_50ul``
+          * ``opentrons_flex_96_tiprack_1000ul``
+          * ``opentrons_flex_96_tiprack_200ul``
+          * ``opentrons_flex_96_tiprack_50ul``
     
 The gripper may work with other ANSI/SLAS standard labware, but this is not recommended.
 
