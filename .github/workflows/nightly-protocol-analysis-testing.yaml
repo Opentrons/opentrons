@@ -62,6 +62,8 @@ jobs:
           chmod +x ./ci-tools/linux_get_chromedriver.sh
           ./ci-tools/linux_get_chromedriver.sh ${{ env.ELECTRON_VERSION }}
           chromedriver --version
+          which chromedriver
+          echo "$PATH"
           CHROMEWEBDRIVER="$(which chromedriver)" >> $GITHUB_ENV
 
       - name: Install python dependencies.
