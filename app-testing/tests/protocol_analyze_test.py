@@ -38,7 +38,7 @@ def test_analyses(
     protocol_landing: ProtocolLanding = ProtocolLanding(driver, console, request.node.nodeid)
 
     # Upload labware if any
-    if protocol.custom_labware:
+    if protocol.custom_labware is not None and len(protocol.custom_labware) > 0:
         for labware in protocol.labware_paths:
             left_menu.navigate("labware")
             labware_landing.click_import_button()
