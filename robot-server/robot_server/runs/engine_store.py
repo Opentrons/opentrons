@@ -9,6 +9,7 @@ from opentrons.hardware_control.types import (
     EstopState,
     HardwareEvent,
     EstopStateNotification,
+    HardwareEventHandler,
 )
 from opentrons.protocol_runner import (
     AnyRunner,
@@ -45,6 +46,20 @@ class RunnerEnginePair(NamedTuple):
     engine: ProtocolEngine
 
 
+def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
+    """Create a callback for estop events."""
+
+    def _callback(event: HardwareEvent) -> None:
+        if isinstance(event, EstopStateNotification):
+            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+                return
+            if engine_store.current_run_id is None:
+                return
+            engine_store.engine.estop(maintenance_run=False)
+
+    return _callback
+
+
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
@@ -67,15 +82,7 @@ class EngineStore:
         self._deck_type = deck_type
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
-        hardware_api.register_callback(self._estop_listener)
-
-    def _estop_listener(self, event: HardwareEvent) -> None:
-        if isinstance(event, EstopStateNotification):
-            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
-                return
-            if self._runner_engine_pair is None:
-                return
-            self._runner_engine_pair.engine.estop(maintenance_run=False)
+        hardware_api.register_callback(get_estop_listener(self))
 
     @property
     def engine(self) -> ProtocolEngine:
