@@ -33,7 +33,7 @@ jobs:
 
       - name: Install Linux dependencies
         run: |
-          sudo apt-get install libudev-dev libusb-1.0-0-dev libsystemd-dev 
+          sudo apt-get install libudev-dev libusb-1.0-0-dev libsystemd-dev fuse libfuse2
 
       - name: Install pipenv
         run: pip install pipenv
