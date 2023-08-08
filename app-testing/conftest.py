@@ -56,6 +56,7 @@ def _chrome_options() -> Options:
     options.add_argument("disable-popup-blocking")  # type: ignore
     options.add_argument("allow-elevated-browser")  # type: ignore
     options.add_argument("disable-dev-shm-usage")  # type: ignore
+    options.add_argument("--remote-debugging-port=9222")
     return options
 
 
