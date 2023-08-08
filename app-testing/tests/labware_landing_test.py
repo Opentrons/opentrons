@@ -8,7 +8,7 @@ from automation.menus.left_menu import LeftMenu
 from automation.pages.labware_landing import LabwareLanding
 from automation.resources.robot_data import RobotDataType
 from rich.console import Console
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.chromium.webdriver import WebDriver
 
 
 @pytest.mark.skip("Need to fix.")

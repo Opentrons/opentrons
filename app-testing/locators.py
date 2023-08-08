@@ -20,7 +20,7 @@ from dotenv import find_dotenv, load_dotenv
 from rich import pretty, traceback
 from rich.console import Console
 from rich.table import Table
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.chromium.webdriver import WebDriver
 
 # to make printing pretty
 console = Console()

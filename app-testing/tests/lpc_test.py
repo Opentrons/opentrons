@@ -7,7 +7,7 @@ from typing import Dict, List
 import pytest
 from pytest import FixtureRequest
 from rich.console import Console
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.chromium.webdriver import WebDriver
 
 from automation.driver.drag_drop import drag_and_drop_file
 from automation.menus.left_menu import LeftMenu

@@ -35,9 +35,6 @@ jobs:
         run: |
           sudo apt-get install libudev-dev libusb-1.0-0-dev libsystemd-dev 
 
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
-
       - name: Install pipenv
         run: pip install pipenv
 
@@ -65,8 +62,6 @@ jobs:
           chmod +x ./ci-tools/linux_get_chromedriver.sh
           ./ci-tools/linux_get_chromedriver.sh ${{ env.ELECTRON_VERSION }}
           chromedriver --version
-          which chromedriver
-          echo "$PATH"
           CHROMEWEBDRIVER="$(which chromedriver)" >> $GITHUB_ENV
 
       - name: Install python dependencies.

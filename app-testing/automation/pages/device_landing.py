@@ -3,7 +3,7 @@ import time
 from typing import List, Optional
 
 from rich.console import Console
-from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.chromium.webdriver import WebDriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
