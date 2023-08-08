@@ -381,6 +381,36 @@ def test_validate_json(
             APIVersion(2, 1),
             "OT-2 Standard",
         ),
+        (
+            # Explicitly-specified robotType.
+            """
+            requirements = {"apiLevel": "2.15", "robotType": "OT-2"}
+            def run(ctx): pass
+            """,
+            None,
+            APIVersion(2, 15),
+            "OT-2 Standard",
+        ),
+        (
+            # Explicitly-specified robotType.
+            """
+            requirements = {"apiLevel": "2.15", "robotType": "Flex"}
+            def run(ctx): pass
+            """,
+            None,
+            APIVersion(2, 15),
+            "OT-3 Standard",
+        ),
+        (
+            # Explicitly-specified robotType.
+            """
+            requirements = {"apiLevel": "2.15", "robotType": "OT-3"}
+            def run(ctx): pass
+            """,
+            None,
+            APIVersion(2, 15),
+            "OT-3 Standard",
+        ),
     ],
 )
 @pytest.mark.parametrize("protocol_text_kind", ["str", "bytes"])

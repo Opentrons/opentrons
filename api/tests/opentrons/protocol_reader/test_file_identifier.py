@@ -2,7 +2,6 @@
 
 import json
 from dataclasses import dataclass
-import textwrap
 
 from decoy import Decoy
 import pytest
@@ -34,138 +33,37 @@ def use_mock_parse(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(parse, "parse", mock_parse)
 
 
-@dataclass
-class _ValidPythonProtocolSpec:
-    file_name: str
-    contents: str
-    expected_api_level: APIVersion
-    expected_robot_type: RobotType
-    expected_metadata: Metadata
+@pytest.mark.parametrize("filename", ["protocol.py", "protocol.PY", "protocol.Py"])
+async def test_python_parsing(
+    decoy: Decoy, use_mock_parse: None, filename: str
+) -> None:
+    """It should use opentrons.protocols.parse() to extract basic ID info out of Python files."""
+    input_file = BufferedFile(name=filename, contents=b"contents", path=None)
 
+    decoy.when(parse.parse(b"contents", filename)).then_return(
+        PythonProtocol(
+            api_level=APIVersion(2, 1),
+            robot_type="OT-3 Standard",
+            metadata={"Hello": "World"},
+            text="",
+            filename="",
+            contents=None,
+            bundled_data=None,
+            bundled_labware=None,
+            bundled_python=None,
+            extra_labware=None,
+        )
+    )
 
-@pytest.mark.parametrize(
-    "spec",
-    [
-        # Basic Python:
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "author": "Dr. Sy. N. Tist",
-                    "apiLevel": "2.11",
-                }
-                def run(protocol):
-                    pass
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "2.11"},
-        ),
-        # Python with a weirdly capitalized file extension:
-        _ValidPythonProtocolSpec(
-            file_name="foo.Py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                def run(protocol):
-                    pass
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        # Explicitly specified robotType:
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                requirements = {
-                    "robotType": "OT-2",
-                }
-                def run(protocol):
-                    pass
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                requirements = {
-                    "robotType": "Flex",
-                }
-                def run(protocol):
-                    pass
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-3 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                requirements = {
-                    "robotType": "OT-3",
-                }
-                def run(protocol):
-                    pass
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-3 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        # apiLevel in `requirements`, instead of `metadata`:
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                requirements = {
-                    "apiLevel": "2.11",
-                }
-                def run(protocol):
-                    pass
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={},
-        ),
-    ],
-)
-async def test_valid_python_protocol(spec: _ValidPythonProtocolSpec) -> None:
-    """It should identify the file as a Python main file and extract basic info."""
-    input_file = BufferedFile(
-        name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None
-    )
-    expected_result = IdentifiedPythonMain(
-        original_file=input_file,
-        api_level=spec.expected_api_level,
-        robot_type=spec.expected_robot_type,
-        metadata=spec.expected_metadata,
-    )
     subject = FileIdentifier()
     [result] = await subject.identify([input_file])
-    assert result == expected_result
+
+    assert result == IdentifiedPythonMain(
+        original_file=input_file,
+        api_level=APIVersion(2, 1),
+        robot_type="OT-3 Standard",
+        metadata={"Hello": "World"},
+    )
 
 
 @dataclass
@@ -177,6 +75,8 @@ class _ValidJsonProtocolSpec:
     expected_metadata: Metadata
 
 
+# todo(mm, 2021-09-13): Some of these tests overlap with opentrons.protocols.parse.
+# Delegate to opentrons.protocols.parse and test with mocks here.
 @pytest.mark.parametrize(
     "spec",
     [
@@ -330,9 +230,6 @@ class _InvalidInputSpec:
     expected_message: str
 
 
-# todo(mm, 2021-09-13): Some of these tests overlap with
-# opentrons.protocol_runner.parse.
-# Decide where this logic should canonically live, and deduplicate.
 @pytest.mark.parametrize(
     "spec",
     [
@@ -374,39 +271,6 @@ async def test_invalid_input(spec: _InvalidInputSpec) -> None:
     subject = FileIdentifier()
     with pytest.raises(FileIdentificationError, match=spec.expected_message):
         await subject.identify([input_file])
-
-
-@pytest.mark.parametrize("filename", ["protocol.py", "protocol.PY", "protocol.Py"])
-async def test_python_parsing(
-    decoy: Decoy, use_mock_parse: None, filename: str
-) -> None:
-    """It should use opentrons.protocols.parse() to extract basic ID info out of Python files."""
-    input_file = BufferedFile(name=filename, contents=b"contents", path=None)
-
-    decoy.when(parse.parse(b"contents", filename)).then_return(
-        PythonProtocol(
-            api_level=APIVersion(2, 1),
-            robot_type="OT-3 Standard",
-            metadata={"Hello": "World"},
-            text="",
-            filename="",
-            contents=None,
-            bundled_data=None,
-            bundled_labware=None,
-            bundled_python=None,
-            extra_labware=None,
-        )
-    )
-
-    subject = FileIdentifier()
-    [result] = await subject.identify([input_file])
-
-    assert result == IdentifiedPythonMain(
-        original_file=input_file,
-        api_level=APIVersion(2, 1),
-        robot_type="OT-3 Standard",
-        metadata={"Hello": "World"},
-    )
 
 
 async def test_invalid_python_api_level(decoy: Decoy, use_mock_parse: None) -> None:
