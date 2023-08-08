@@ -112,7 +112,7 @@ def driver(request: pytest.FixtureRequest) -> Generator[WebDriver, None, None]:
     os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"  # fixed in 6.2
 
     web_driver_path = os.environ["CHROMEWEBDRIVER"]
-    
+    print(f"web_driver_path is {web_driver_path}")
     service = Service(web_driver_path)
     service.start()
     
