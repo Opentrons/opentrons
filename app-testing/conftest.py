@@ -51,20 +51,20 @@ def _chrome_options() -> Options:
     # options.add_argument("disable-xss-auditor")  # type: ignore
     # options.add_argument("disable-web-security")  # type: ignore
     # options.add_argument("allow-running-insecure-content")  # type: ignore
-    options.add_argument("no-sandbox")  # type: ignore
+    options.add_argument("--no-sandbox")  # type: ignore
     # options.add_argument("disable-setuid-sandbox")  # type: ignore
     # options.add_argument("disable-popup-blocking")  # type: ignore
     # options.add_argument("allow-elevated-browser")  # type: ignore
     
     # options.add_argument("disable-setuid-sandbox")  # type: ignore
 
-    # options.add_argument("disable-dev-shm-usage")  # type: ignore
+    options.add_argument("--disable-dev-shm-usage")  # type: ignore
     options.add_argument("--remote-debugging-port=9222")
-    # options.add_argument("headless")  # type: ignore
-    # options.add_argument("disable-gpu")  # type: ignore
-    # options.add_argument("window-size=1920,1080")  # type: ignore
-    # options.add_argument("disable-extensions")  # type: ignore
-    # options.add_argument("ignore-certificate-errors")  # type: ignore
+    options.add_argument("--headless")  # type: ignore
+    options.add_argument("--disable-gpu")  # type: ignore
+    options.add_argument("--window-size=1920,1080")  # type: ignore
+    options.add_argument("--disable-extensions")  # type: ignore
+    options.add_argument("--ignore-certificate-errors")  # type: ignore
     return options
 
 
