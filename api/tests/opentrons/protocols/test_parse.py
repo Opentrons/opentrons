@@ -115,6 +115,13 @@ def test_extract_static_python_info(
 
 
 parse_version_cases = [
+    # No explicitly-declared apiLevel (infer heuristically from APIv1 imports):
+    (
+        """
+        from opentrons import types, containers
+        """,
+        APIVersion(1, 0),
+    ),
     (
         """
         from opentrons import instruments
@@ -125,7 +132,15 @@ parse_version_cases = [
     ),
     (
         """
-        import opentrons.instruments
+        from opentrons import labware, instruments
+
+        p = instruments.P10_Single(mount='right')
+        """,
+        APIVersion(1, 0),
+    ),
+    (
+        """
+        from opentrons import types, instruments
 
         p = instruments.P10_Single(mount='right')
         """,
@@ -141,6 +156,15 @@ parse_version_cases = [
     ),
     (
         """
+        import opentrons.instruments
+
+        p = instruments.P10_Single(mount='right')
+        """,
+        APIVersion(1, 0),
+    ),
+    # Explicitly-declared APIv1:
+    (
+        """
         from opentrons import instruments
 
         metadata = {
@@ -151,6 +175,21 @@ parse_version_cases = [
         """,
         APIVersion(1, 0),
     ),
+    (
+        # Explicitly-declared APIv1 despite having an APIv2-style run(ctx) function.
+        """
+        from opentrons import types
+
+        metadata = {
+          'apiLevel': '1'
+          }
+
+        def run(ctx):
+            right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
+        """,
+        APIVersion(1, 0),
+    ),
+    # Explicitly-declared APIv2:
     (
         """
         from opentrons import types
@@ -169,19 +208,6 @@ parse_version_cases = [
         from opentrons import types
 
         metadata = {
-          'apiLevel': '1'
-          }
-
-        def run(ctx):
-            right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-        """,
-        APIVersion(1, 0),
-    ),
-    (
-        """
-        from opentrons import types
-
-        metadata = {
           'apiLevel': '2.0'
           }
 
@@ -189,36 +215,6 @@ parse_version_cases = [
             right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
         """,
         APIVersion(2, 0),
-    ),
-    (
-        """
-        from opentrons import labware, instruments
-
-        p = instruments.P10_Single(mount='right')
-        """,
-        APIVersion(1, 0),
-    ),
-    (
-        """
-        from opentrons import types, containers
-        """,
-        APIVersion(1, 0),
-    ),
-    (
-        """
-        from opentrons import types, instruments
-
-        p = instruments.P10_Single(mount='right')
-        """,
-        APIVersion(1, 0),
-    ),
-    (
-        """
-        from opentrons import instruments as instr
-
-        p = instr.P300_Single('right')
-        """,
-        APIVersion(1, 0),
     ),
 ]
 
