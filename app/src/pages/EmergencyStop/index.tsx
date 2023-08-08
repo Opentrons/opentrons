@@ -34,8 +34,6 @@ export function EmergencyStop(): JSX.Element {
     refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL_MS,
   })
 
-  console.log('status', estopStatusData)
-
   const isEstopConnected = estopStatusData?.data?.status !== 'notPresent'
 
   return (
