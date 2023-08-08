@@ -1,7 +1,7 @@
 import ast
 import json
 from textwrap import dedent
-from typing import Any, Callable, Optional, Type, Union
+from typing import Any, Callable, Optional, Union
 
 import pytest
 
@@ -12,14 +12,12 @@ from opentrons.protocols.parse import (
     parse,
     API_VERSION_FOR_JSON_V5_AND_BELOW,
     MAX_SUPPORTED_JSON_SCHEMA_VERSION,
-    version_from_static_python_info,
     JSONSchemaVersionTooNewError,
 )
 from opentrons.protocols.types import (
     JsonProtocol,
     Protocol,
     PythonProtocol,
-    StaticPythonInfo,
     MalformedPythonError,
     ApiDeprecationError,
 )
@@ -189,7 +187,33 @@ parse_version_cases = [
         """,
         APIVersion(1, 0),
     ),
-    # Explicitly-declared APIv2:
+    (
+        # apiLevel as major.minor, not just major.
+        # APIv1 didn't have minor apiLevel versions, so nobody would have actually written this in
+        # the APIv1 days, but we should make sure we don't choke on it.
+        """
+        metadata = {
+          'apiLevel': '1.0'
+        }
+
+        p = instruments.P10_Single(mount='right')
+        """,
+        APIVersion(1, 0),
+    ),
+    (
+        # apiLevel as major.minor, not just major.
+        # APIv1 didn't have minor apiLevel versions, so nobody would have actually written this in
+        # the APIv1 days, but we should make sure we don't choke on it.
+        """
+        metadata = {
+          'apiLevel': '1.2'
+        }
+
+        p = instruments.P10_Single(mount='right')
+        """,
+        APIVersion(1, 2),
+    ),
+    # Explicitly-declared APIv2 or above:
     (
         """
         from opentrons import types
@@ -216,13 +240,69 @@ parse_version_cases = [
         """,
         APIVersion(2, 0),
     ),
+    (
+        """
+        metadata = {'apiLevel': '2.6'}
+        def run(ctx): pass
+        """,
+        APIVersion(2, 6),
+    ),
+    (
+        """
+        metadata = {'apiLevel': '10.23123151'}
+        def run(ctx): pass
+        """,
+        APIVersion(10, 23123151),
+    ),
+    # Explicitly-declared apiLevel with various cases of it being in metadata or requirements:
+    # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
+    (
+        """
+        requirements = {"apiLevel": "123.456"}
+        def run(ctx): pass
+        """,
+        APIVersion(123, 456),
+    ),
+    (
+        """
+        metadata = {}
+        requirements = {"apiLevel": "123.456"}
+        def run(ctx): pass
+        """,
+        APIVersion(123, 456),
+    ),
+    (
+        """
+        metadata = {"apiLevel": "123.456"}
+        def run(ctx): pass
+        """,
+        APIVersion(123, 456),
+    ),
+    (
+        """
+        metadata = {"apiLevel": "123.456"}
+        requirements = {}
+        def run(ctx): pass
+        """,
+        APIVersion(123, 456),
+    ),
+    (
+        # Overriding:
+        # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
+        """
+        metadata = {"apiLevel": "123.456"}
+        requirements = {"apiLevel": "789.0"}
+        def run(ctx): pass
+        """,
+        APIVersion(789, 0),
+    ),
 ]
 
 
 @pytest.mark.parametrize("proto,version", parse_version_cases)
 def test_parse_get_version(proto: str, version: APIVersion) -> None:
     proto = dedent(proto)
-    if version == APIVersion(1, 0):
+    if version < APIVersion(2, 0):
         with pytest.raises(ApiDeprecationError):
             parse(proto)
     else:
@@ -231,105 +311,36 @@ def test_parse_get_version(proto: str, version: APIVersion) -> None:
 
 
 @pytest.mark.parametrize(
-    "static_info,expected_version",
+    ("protocol_source", "expected_message"),
     [
-        # Basic extraction:
         (
-            StaticPythonInfo(metadata={"apiLevel": "1"}, requirements=None),
-            APIVersion(1, 0),
+            """
+            metadata = {"apiLevel": "2"}
+            def run(cxt): pass
+            """,
+            "incorrectly formatted. It should be major.minor",
         ),
         (
-            StaticPythonInfo(metadata={"apiLevel": "1.0"}, requirements=None),
-            APIVersion(1, 0),
+            """
+            metadata = {"apiLevel": "2.0.0"}
+            def run(cxt): pass
+            """,
+            "incorrectly formatted. It should be major.minor",
         ),
         (
-            StaticPythonInfo(metadata={"apiLevel": "1.2"}, requirements=None),
-            APIVersion(1, 2),
-        ),
-        (
-            StaticPythonInfo(metadata={"apiLevel": "2.0"}, requirements=None),
-            APIVersion(2, 0),
-        ),
-        (
-            StaticPythonInfo(metadata={"apiLevel": "2.6"}, requirements=None),
-            APIVersion(2, 6),
-        ),
-        (
-            StaticPythonInfo(metadata={"apiLevel": "10.23123151"}, requirements=None),
-            APIVersion(10, 23123151),
-        ),
-        # When one or both is missing:
-        # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
-        (
-            StaticPythonInfo(metadata=None, requirements=None),
-            None,
-        ),
-        (
-            StaticPythonInfo(metadata=None, requirements={}),
-            None,
-        ),
-        (
-            StaticPythonInfo(metadata=None, requirements={"apiLevel": "123.456"}),
-            APIVersion(123, 456),
-        ),
-        (
-            StaticPythonInfo(metadata={}, requirements=None),
-            None,
-        ),
-        (
-            StaticPythonInfo(metadata={}, requirements={}),
-            None,
-        ),
-        (
-            StaticPythonInfo(metadata={}, requirements={"apiLevel": "123.456"}),
-            APIVersion(123, 456),
-        ),
-        (
-            StaticPythonInfo(metadata={"apiLevel": "123.456"}, requirements=None),
-            APIVersion(123, 456),
-        ),
-        (
-            StaticPythonInfo(metadata={"apiLevel": "123.456"}, requirements={}),
-            APIVersion(123, 456),
-        ),
-        # Overriding:
-        # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
-        (
-            StaticPythonInfo(
-                metadata={"apiLevel": "123.456"}, requirements={"apiLevel": "789.0"}
-            ),
-            APIVersion(789, 0),
+            """
+            metadata = {"apiLevel": "asda"}
+            def run(cxt): pass
+            """,
+            "incorrectly formatted. It should be major.minor",
         ),
     ],
 )
-def test_version_from_static_python_info_valid(
-    static_info: StaticPythonInfo, expected_version: APIVersion
-) -> None:
-    assert version_from_static_python_info(static_info) == expected_version
-
-
-test_invalid_metadata = [
-    (
-        StaticPythonInfo(metadata={"apiLevel": "2"}, requirements=None),
-        MalformedPythonError,
-    ),
-    (
-        StaticPythonInfo(metadata={"apiLevel": "2.0.0"}, requirements=None),
-        MalformedPythonError,
-    ),
-    (
-        StaticPythonInfo(metadata={"apiLevel": "asda"}, requirements=None),
-        MalformedPythonError,
-    ),
-]
-
-
-@pytest.mark.parametrize("static_python_info,exc", test_invalid_metadata)
 def test_version_from_static_python_info_invalid(
-    static_python_info: StaticPythonInfo, exc: Type[Exception]
+    protocol_source: str, expected_message: str
 ) -> None:
-    with pytest.raises(exc):
-        version_from_static_python_info(static_python_info)
+    with pytest.raises(MalformedPythonError, match=expected_message):
+        parse(dedent(protocol_source), "protocol.py")
 
 
 def test_get_protocol_schema_version() -> None:

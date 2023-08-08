@@ -383,9 +383,7 @@ def _has_api_v1_imports(parsed: ast.Module) -> bool:
     return bool(v1_markers.intersection(opentrons_imports))
 
 
-# TODO(mm, 2023-08-08): This should be made a private implementation detail of this module
-# once its unit tests are ported to go through parse() instead.
-def version_from_static_python_info(
+def _version_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> Optional[APIVersion]:
     """Get an explicitly specified apiLevel from static info, if we can.
@@ -457,7 +455,7 @@ def _get_version(
     APIv2 protocol (note that 'labware' is not in this list, as there is a
     valid APIv2 import named 'labware').
     """
-    declared_version = version_from_static_python_info(static_python_info)
+    declared_version = _version_from_static_python_info(static_python_info)
     if declared_version:
         return declared_version
     else:
