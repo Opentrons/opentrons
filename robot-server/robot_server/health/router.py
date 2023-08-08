@@ -131,8 +131,16 @@ async def get_health(
         if config.feature_flags.enable_ot3_hardware_controller()
         else "OT-2 Standard"
     )
+    health_links = HealthLinks(
+        apiLog="/logs/api.log",
+        serialLog="/logs/serial.log",
+        serverLog="/logs/server.log",
+        apiSpec="/openapi.json",
+        systemTime="/system/time",
+    )
     if robot_model == "OT-3 Standard" and OOD_LOG_PATH not in LOG_PATHS:
         LOG_PATHS.append(OOD_LOG_PATH)
+        health_links.appLog = OOD_LOG_PATH
     return Health(
         name=config.name(),
         api_version=versions.api_version,
@@ -143,12 +151,5 @@ async def get_health(
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
         robot_model=robot_model,
-        links=HealthLinks(
-            apiLog="/logs/api.log",
-            serialLog="/logs/serial.log",
-            serverLog="/logs/server.log",
-            oddLog=OOD_LOG_PATH if robot_model == "OT-3 Standard" else None,
-            apiSpec="/openapi.json",
-            systemTime="/system/time",
-        ),
+        links=health_links,
     )

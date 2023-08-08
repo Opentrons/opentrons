@@ -40,6 +40,7 @@ def test_get_health(
 
     resp = api_client.get("/health")
     text = resp.json()
+    print(text)
     assert resp.status_code == 200
     assert text == expected
 
