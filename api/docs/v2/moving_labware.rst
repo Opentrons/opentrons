@@ -69,7 +69,7 @@ If you attempt to use the gripper to move labware in an OT-2 protocol, the API w
 Supported Labware
 =================
 
-You can manually move any standard or custom labware. Using the gripper to move the following types of labware is fully supported by Opentrons:
+You can manually move any standard or custom labware. Using the gripper to move the following labware is fully supported by Opentrons:
 
 .. list-table::
     :header-rows: 1
@@ -79,24 +79,12 @@ You can manually move any standard or custom labware. Using the gripper to move 
     * - Full-skirt PCR plates
       - 
           * ``armadillo_96_wellplate_200ul_pcr_full_skirt``
-          * ``biorad_96_wellplate_200ul_pcr``
-          * ``nest_96_wellplate_100ul_pcr_full_skirt``
           * ``opentrons_96_wellplate_200ul_pcr_full_skirt``
-    * - Bio-Rad 384-well plate 
+    * - NEST well plates
       - 
-          * ``biorad_384_wellplate_50ul``
-    * - Most Corning flat well plates 
-      - 
-          * ``corning_12_wellplate_6.9ml_flat``
-          * ``corning_48_wellplate_1.6ml_flat``
-          * ``corning_96_wellplate_360ul_flat``
-          * ``corning_384_wellplate_112ul_flat``
-    * - Certain NEST reservoirs and plates
-      - 
-          * ``nest_1_reservoir_195ml``
           * ``nest_96_wellplate_200ul_flat``
           * ``nest_96_wellplate_2ml_deep``
-    * - All Opentrons Flex 96 Tip Racks 
+    * - Opentrons Flex 96 Tip Racks 
       - 
           * ``opentrons_flex_96_tiprack_50ul``
           * ``opentrons_flex_96_tiprack_200ul``
@@ -109,7 +97,7 @@ The gripper may work with other ANSI/SLAS standard labware, but this is not reco
 
 .. note::
 
-    The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default position and force values for other labware. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
+    The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default values for labware definitions that don't include position and force information. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
 
 
 .. _movement-modules: 
