@@ -20,7 +20,7 @@ from opentrons.protocols.types import (
     Protocol,
     PythonProtocol,
     StaticPythonInfo,
-    MalformedProtocolError,
+    MalformedPythonError,
     ApiDeprecationError,
 )
 from opentrons.protocols.api_support.types import APIVersion
@@ -313,9 +313,18 @@ def test_version_from_static_python_info_valid(
 
 
 test_invalid_metadata = [
-    (StaticPythonInfo(metadata={"apiLevel": "2"}, requirements=None), ValueError),
-    (StaticPythonInfo(metadata={"apiLevel": "2.0.0"}, requirements=None), ValueError),
-    (StaticPythonInfo(metadata={"apiLevel": "asda"}, requirements=None), ValueError),
+    (
+        StaticPythonInfo(metadata={"apiLevel": "2"}, requirements=None),
+        MalformedPythonError,
+    ),
+    (
+        StaticPythonInfo(metadata={"apiLevel": "2.0.0"}, requirements=None),
+        MalformedPythonError,
+    ),
+    (
+        StaticPythonInfo(metadata={"apiLevel": "asda"}, requirements=None),
+        MalformedPythonError,
+    ),
 ]
 
 
@@ -470,28 +479,37 @@ def test_parse_extra_contents(
 
 
 @pytest.mark.parametrize(
-    "bad_protocol",
+    ("bad_protocol", "expected_message"),
     [
-        """
-        metadata={"apiLevel": "2.0"}
-        def run(ctx): pass
-        def run(ctx): pass
-        """,
-        """
-        metadata = {"apiLevel": "2.0"}
+        (
+            """
+            metadata={"apiLevel": "2.0"}
+            def run(ctx): pass
+            def run(ctx): pass
+            """,
+            "More than one run function",
+        ),
+        (
+            """
+            metadata = {"apiLevel": "2.0"}
 
-        print('hi')
-        """,
-        """
-        metadata = {"apiLevel": "2.0"}
-        def run(ctx):
-          pass
+            print('hi')
+            """,
+            "No function 'run\\(ctx\\)'",  # This is a regex, so '\\' to escape '(' and ')' chars.
+        ),
+        (
+            """
+            metadata = {"apiLevel": "2.0"}
+            def run(ctx):
+              pass
 
-        def run(blahblah):
-          pass
-        """,
+            def run(blahblah):
+              pass
+            """,
+            "More than one run function",
+        ),
     ],
 )
-def test_parse_bad_structure(bad_protocol: str) -> None:
-    with pytest.raises(MalformedProtocolError):
+def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
+    with pytest.raises(MalformedPythonError, match=expected_message):
         parse(dedent(bad_protocol))

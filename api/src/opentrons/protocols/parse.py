@@ -8,6 +8,7 @@ import itertools
 import json
 import logging
 import re
+import traceback
 from io import BytesIO
 from zipfile import ZipFile
 from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
@@ -23,13 +24,14 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from .api_support.types import APIVersion
 from .types import (
+    RUN_FUNCTION_MESSAGE,
     Protocol,
     PythonProtocol,
     JsonProtocol,
     StaticPythonInfo,
     PythonProtocolMetadata,
     PythonProtocolRequirements,
-    MalformedProtocolError,
+    MalformedPythonError,
     ApiDeprecationError,
 )
 from .bundle import extract_bundle
@@ -66,15 +68,21 @@ def _validate_v2_ast(protocol_ast: ast.Module) -> None:
     if len(rundefs) > 1:
         lines = [str(d.lineno) for d in rundefs]
         linestr = ", ".join(lines)
-        raise MalformedProtocolError(
-            f"More than one run function is defined (lines {linestr})"
+        raise MalformedPythonError(
+            short_message=f"More than one run function is defined (lines {linestr}).",
+            long_additional_message=RUN_FUNCTION_MESSAGE,
         )
     if not rundefs:
-        raise MalformedProtocolError("No function 'run(ctx)' defined")
+        raise MalformedPythonError(
+            short_message="No function 'run(ctx)' defined",
+            long_additional_message=RUN_FUNCTION_MESSAGE,
+        )
     if _has_api_v1_imports(protocol_ast):
-        raise MalformedProtocolError(
-            "Protocol API v1 modules such as robot, instruments, and labware "
-            "may not be imported in Protocol API V2 protocols"
+        raise MalformedPythonError(
+            short_message=(
+                "Protocol API v1 modules such as robot, instruments, and labware "
+                "may not be imported in Protocol API V2 protocols"
+            )
         )
 
 
@@ -87,9 +95,11 @@ def version_from_string(vstr: str) -> APIVersion:
     """
     matches = API_VERSION_RE.match(vstr)
     if not matches:
-        raise ValueError(
-            f"apiLevel {vstr} is incorrectly formatted. It should "
-            "major.minor, where both major and minor are numbers."
+        raise MalformedPythonError(
+            short_message=(
+                f"apiLevel {vstr} is incorrectly formatted. It should "
+                "major.minor, where both major and minor are numbers."
+            )
         )
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
@@ -124,11 +134,28 @@ def _parse_python(
     else:
         ast_filename = filename_checked
 
-    parsed = ast.parse(protocol_contents, filename=ast_filename)
+    # todo(mm, 2021-09-13): By default, ast.parse will inherit compiler options
+    # and future features from this module. This may not be appropriate.
+    # Investigate switching to compile() with dont_inherit=True.
+    try:
+        parsed = ast.parse(protocol_contents, filename=ast_filename)
+    except SyntaxError as syntax_error:
+        raise MalformedPythonError(
+            short_message=str(syntax_error),
+            # Get Python's nice syntax error message with carets pointing to where in the line
+            # had the problem.
+            long_additional_message="".join(
+                traceback.format_exception_only(type(syntax_error), syntax_error)
+            ),
+        ) from syntax_error
+    except ValueError as null_bytes_error:
+        # ast.parse() raises SyntaxError for most errors,
+        # but ValueError if the source contains null bytes.
+        raise MalformedPythonError(short_message=str(null_bytes_error))
 
     static_info = extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
-    version = get_version(static_info, parsed)
+    version = _get_version(static_info, parsed)
     robot_type = robot_type_from_static_python_info(static_info)
 
     if version >= APIVersion(2, 0):
@@ -165,8 +192,8 @@ def _parse_bundle(bundle: ZipFile, filename: Optional[str] = None) -> PythonProt
     )
 
     if result.api_level < APIVersion(2, 0):
-        raise RuntimeError(
-            "Bundled protocols must use Protocol API V2, " + f"got {result.api_level}"
+        raise MalformedPythonError(
+            short_message=f"Bundled protocols must use Protocol API v2, got {result.api_level}."
         )
 
     return result
@@ -277,7 +304,7 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
             for error reporting.
 
     Raises:
-        ValueError: If the dict is too complex for this function to understand
+        MalformedPythonError: If the dict is too complex for this function to understand
             statically, or if it contains unsupported types.
     """
     try:
@@ -286,10 +313,12 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
         # Undocumented, but ast.literal_eval() seems to raise ValueError for
         # expressions that aren't statically or "safely" evaluable, like
         # `{"o": object()}` or `{"s": "abc"[0]}`.
-        raise ValueError(
-            f"Could not read the contents of the {name} dict."
-            f" Make sure it doesn't contain any complex expressions, such as"
-            f" function calls or array indexings."
+        raise MalformedPythonError(
+            short_message=(
+                f"Could not read the contents of the {name} dict."
+                f" Make sure it doesn't contain any complex expressions, such as"
+                f" function calls or array indexings."
+            )
         ) from exception
 
     # ast.literal_eval() is typed as returning Any, but we're pretty sure it
@@ -299,14 +328,18 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
     # Make sure we don't return anything outside of our declared return type.
     for key, value in evaluated_literal.items():
         if not isinstance(key, str):
-            raise ValueError(
-                f'Keys in the {name} dict must be strings, but key "{key}"'
-                f' has type "{type(key).__name__}".'
+            raise MalformedPythonError(
+                short_message=(
+                    f'Keys in the {name} dict must be strings, but key "{key}"'
+                    f' has type "{type(key).__name__}".'
+                )
             )
         if not isinstance(value, str):
-            raise ValueError(
-                f'Values in the {name} dict must be strings, but value "{value}"'
-                f' has type "{type(value).__name__}".'
+            raise MalformedPythonError(
+                short_message=(
+                    f'Values in the {name} dict must be strings, but value "{value}"'
+                    f' has type "{type(value).__name__}".'
+                )
             )
 
     return evaluated_literal
@@ -388,8 +421,8 @@ def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:
     elif python_robot_type in ("Flex", "OT-3"):
         return "OT-3 Standard"
     else:
-        raise ValueError(
-            f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
+        raise MalformedPythonError(
+            short_message=f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
         )
 
 
@@ -403,14 +436,15 @@ def robot_type_from_static_python_info(
         return robot_type_from_python_identifier(python_robot_type)
 
 
-def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> APIVersion:
+def _get_version(
+    static_python_info: StaticPythonInfo, parsed: ast.Module
+) -> APIVersion:
     """
     Infer protocol API version based on a combination of metadata and imports.
 
     If a protocol specifies its API version using the 'apiLevel' key of a top-
     level dict variable named `metadata`, the value for that key will be
-    returned as the version (the value will be intified, so numeric values
-    only can be used).
+    returned as the version.
 
     If that variable does not exist or if it does not contain the 'apiLevel'
     key, the API version will be inferred from the imports. A script with an
@@ -425,10 +459,12 @@ def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> API
     else:
         # No apiLevel key, may be apiv1
         if not _has_api_v1_imports(parsed):
-            raise RuntimeError(
-                "If this is not an API v1 protocol, you must specify the target "
-                "api level in the apiLevel key of the metadata. For instance, "
-                'metadata={"apiLevel": "2.0"}'
+            raise MalformedPythonError(
+                short_message=(
+                    "If this is not an API v1 protocol, you must specify the target "
+                    "API version in the apiLevel key of the metadata dict. For instance, "
+                    'metadata={"apiLevel": "2.0"}'
+                )
             )
         return APIVersion(1, 0)
 

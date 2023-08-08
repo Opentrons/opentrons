@@ -365,7 +365,7 @@ class _InvalidInputSpec:
                 metadata = {"apiLevel": "123" + ".456"}
                 """
             ),
-            expected_message="Unable to extract metadata from protocol.py",
+            expected_message="Could not read the contents of the metadata dict",
         ),
         _InvalidInputSpec(
             file_name="protocol.py",
@@ -375,10 +375,7 @@ class _InvalidInputSpec:
                 metadata = {"apiLevel": 123.456}
                 """
             ),
-            # TODO(mm, 2021-09-13): bug in opentrons.protocols.parse.extract_metadata.
-            # It errors when a field isn't a string, even though its return type suggests
-            # suggests it should allow ints. This error message should be different.
-            expected_message="Unable to extract metadata from protocol.py",
+            expected_message="must be strings",
         ),
         _InvalidInputSpec(
             file_name="protocol.py",
