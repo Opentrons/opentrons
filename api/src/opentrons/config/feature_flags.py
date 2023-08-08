@@ -48,3 +48,8 @@ def overpressure_detection_enabled() -> bool:
 def status_bar_enabled() -> bool:
     """Whether the status bar is enabled."""
     return not advs.get_setting_with_env_overload("disableStatusBar")
+
+
+def tip_presence_detection_enabled() -> bool:
+    """Whether tip presence is enabled on the Flex"""
+    return not advs.get_setting_with_env_overload("disableTipPresenceDetection")

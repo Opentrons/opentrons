@@ -31,7 +31,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=2,
+                    blow_out_submerged=2,
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
@@ -40,7 +40,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=2,
+                    blow_out_submerged=2,
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
@@ -49,7 +49,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=2,
+                    blow_out_submerged=2,
                 ),
             },
         },
@@ -62,7 +62,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
@@ -71,7 +71,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 50: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
@@ -80,7 +80,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
             },
             200: {  # T200
@@ -91,7 +91,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
@@ -100,7 +100,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 200: DispenseSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
@@ -109,7 +109,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
             },
             1000: {  # T1000
@@ -120,7 +120,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
                 100: DispenseSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
@@ -129,7 +129,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
                 1000: DispenseSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
@@ -138,7 +138,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
             },
         },
@@ -153,7 +153,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=2,
+                    blow_out_submerged=2,
                 ),
                 10: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
@@ -162,7 +162,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=2,
+                    blow_out_submerged=2,
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
@@ -171,7 +171,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=2,
+                    blow_out_submerged=2,
                 ),
             },
         },
@@ -184,7 +184,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
@@ -193,7 +193,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
@@ -202,7 +202,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
             },
             200: {  # T200
@@ -213,7 +213,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
@@ -222,7 +222,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 200: DispenseSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
@@ -231,7 +231,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
             },
             1000: {  # T1000
@@ -242,7 +242,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
                 100: DispenseSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
@@ -251,7 +251,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
                 1000: DispenseSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
@@ -260,7 +260,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
             },
         },
@@ -275,7 +275,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
@@ -284,7 +284,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
@@ -293,7 +293,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
             },
             200: {  # T200
@@ -304,7 +304,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
@@ -313,7 +313,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
                 200: DispenseSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
@@ -322,7 +322,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=5,
+                    blow_out_submerged=5,
                 ),
             },
             1000: {  # T1000
@@ -333,7 +333,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
                 100: DispenseSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
@@ -342,7 +342,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
                 1000: DispenseSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
@@ -351,7 +351,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    leading_air_gap=20,
+                    blow_out_submerged=20,
                 ),
             },
         },
@@ -369,6 +369,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 10: AspirateSettings(  # 10uL
@@ -378,6 +379,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -387,6 +389,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
             },
@@ -400,6 +403,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 10: AspirateSettings(  # 10uL
@@ -409,6 +413,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -418,6 +423,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
             },
@@ -429,6 +435,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=5,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -438,6 +445,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=3.5,
                 ),
                 200: AspirateSettings(  # 200uL
@@ -447,6 +455,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=2,
                 ),
             },
@@ -458,6 +467,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
                 100: AspirateSettings(  # 100uL
@@ -467,6 +477,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
                 1000: AspirateSettings(  # 1000uL
@@ -476,6 +487,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
             },
@@ -491,6 +503,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 10: AspirateSettings(  # 10uL
@@ -500,6 +513,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -509,6 +523,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
             },
@@ -522,6 +537,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 10: AspirateSettings(  # 10uL
@@ -531,6 +547,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -540,6 +557,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
             },
@@ -551,6 +569,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=5,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -560,6 +579,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=3.5,
                 ),
                 200: AspirateSettings(  # 200uL
@@ -569,6 +589,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=2,
                 ),
             },
@@ -580,6 +601,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
                 100: AspirateSettings(  # 100uL
@@ -589,6 +611,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
                 1000: AspirateSettings(  # 1000uL
@@ -598,6 +621,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
             },
@@ -613,6 +637,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 10: AspirateSettings(  # 10uL
@@ -622,6 +647,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -631,6 +657,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=0.1,
                 ),
             },
@@ -642,6 +669,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=2,
                 ),
                 50: AspirateSettings(  # 50uL
@@ -651,6 +679,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=3.5,
                 ),
                 200: AspirateSettings(  # 200uL
@@ -660,6 +689,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=2,
                 ),
             },
@@ -671,6 +701,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
                 100: AspirateSettings(  # 100uL
@@ -680,6 +711,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
                 1000: AspirateSettings(  # 1000uL
@@ -689,6 +721,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
+                    leading_air_gap=0,
                     trailing_air_gap=10,
                 ),
             },

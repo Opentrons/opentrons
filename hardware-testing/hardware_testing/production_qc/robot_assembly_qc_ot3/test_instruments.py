@@ -199,7 +199,7 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     # CHECK FOR MISALIGNED ENCODER
     result = CSVResult.FAIL
     target_z = 100
-    await api.home([z_ax])
+    await api.home([z_ax, Axis.G])
     start_pos = await api.gantry_position(OT3Mount.GRIPPER)
     await api.move_to(mount, start_pos._replace(z=target_z), _expect_stalls=True)
     enc_pos = await api.encoder_current_position_ot3(OT3Mount.GRIPPER)
