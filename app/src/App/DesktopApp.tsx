@@ -133,16 +133,11 @@ export const DesktopApp = (): JSX.Element => {
   )
 }
 
-// interface EmergencyStopTakeoverProps {
-//   children: React.ReactNode
-// }
 function RobotControlTakeover(): JSX.Element | null {
   const deviceRouteMatch = useRouteMatch({ path: '/devices/:robotName' })
-  // console.log('deviceRouteMatch', deviceRouteMatch)
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
-  // const [isDismissedModal, setIsDismissedModal] = React.useState<boolean>(false)
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
@@ -153,14 +148,7 @@ function RobotControlTakeover(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
-      {/* <EmergencyStopContext.Provider
-        value={{
-          isDismissedModal,
-          setIsDismissedModal,
-        }}
-      > */}
       <EstopTakeover robotName={robotName} />
-      {/* </EmergencyStopContext.Provider> */}
     </ApiHostProvider>
   )
 }
