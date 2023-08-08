@@ -61,6 +61,7 @@ def build_arg_parser():
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-f', '--force', type=int, required=False, help='Set the gripper force in Newtons', default=20)
     arg_parser.add_argument('-t', '--time', type=int, required=False, help='Set the gripper hold time in seconds', default=10)
+    arg_parser.add_argument('-g', '--height', type=int, required=False, help='Sets the grip height', default=0)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the deck slot number', default=6)
     arg_parser.add_argument('-z', '--fast', action="store_true", required=False, help='Fast mode')
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
@@ -68,7 +69,7 @@ def build_arg_parser():
 
 class Gripper_Lifetime_Test:
     def __init__(
-        self, simulate: bool, calibrate: bool, fast: bool, mode: str, cycles: int, force: float, time: float, slot: int
+        self, simulate: bool, calibrate: bool, fast: bool, mode: str, cycles: int, force: float, time: float, height: int, slot: int
     ) -> None:
         self.simulate = simulate
         self.calibrate = calibrate
@@ -77,6 +78,7 @@ class Gripper_Lifetime_Test:
         self.cycles = cycles
         self.grip_force = force
         self.hold_time = time
+        self.height = height
         self.slot = slot
         self.api = None
         self.mount = None
@@ -255,6 +257,8 @@ class Gripper_Lifetime_Test:
                     self.grip_height = Point(0, 0, -125)
                 else:
                     self.grip_height = Point(0, 0, -100)
+                if self.height > 0:
+                    self.grip_height = Point(0, 0, -self.height)
                 for i in range(self.cycles):
                     self.cycle = i + 1
                     print(f"\n-> Starting Test Cycle {self.cycle}/{self.cycles}")
@@ -277,5 +281,5 @@ if __name__ == '__main__':
     dictConfig(LOG_CONFIG)
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Lifetime_Test(args.simulate, args.calibrate, args.fast, args.mode, args.cycles, args.force, args.time, args.slot)
+    test = Gripper_Lifetime_Test(args.simulate, args.calibrate, args.fast, args.mode, args.cycles, args.force, args.time, args.height, args.slot)
     asyncio.run(test.run())
