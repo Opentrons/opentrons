@@ -15,8 +15,6 @@ import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
 import { useSoftwareUpdatePoll } from '../hooks'
-// import { useRobot } from '../../organisms/Devices/hooks'
-// import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { DesktopApp } from '../DesktopApp'
 
 jest.mock('../../organisms/Alerts')
@@ -81,7 +79,6 @@ describe('DesktopApp', () => {
     mockAlerts.mockReturnValue(<div>Mock Alerts</div>)
     mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
     mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
-    // mockUseRobot.mockReturnValue(mockConnectedRobot)
   })
   afterEach(() => {
     jest.resetAllMocks()
