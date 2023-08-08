@@ -207,8 +207,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             if not api.is_simulator:
                 await set_ui_color(
                     state[0],  # red
-                    state[1],  # green
                     state[2],  # blue
+                    state[1],  # green
                     state[3],  # white
                     api._backend._usb_messenger,  # type: ignore[union-attr]
                 )
