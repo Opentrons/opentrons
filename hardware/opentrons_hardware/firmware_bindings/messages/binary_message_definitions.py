@@ -278,16 +278,6 @@ class DoorSwitchStateInfo(utils.BinarySerializable):
 
 
 @dataclass
-class EstopStateRequest(utils.BinarySerializable):
-    """Request the estop state from the device."""
-
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.estop_state_request
-    )
-    length: utils.UInt16Field = utils.UInt16Field(0)
-
-
-@dataclass
 class SyncStateRequest(utils.BinarySerializable):
     """Request the sync state from the device."""
 

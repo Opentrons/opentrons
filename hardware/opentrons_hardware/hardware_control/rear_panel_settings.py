@@ -229,7 +229,9 @@ async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinStat
         response_type=EstopStateChange,
     )
     if response is not None:
-        current_state.estop_active = bool(cast(EstopStateChange, response).engaged.value)
+        current_state.estop_active = bool(
+            cast(EstopStateChange, response).engaged.value
+        )
 
     # sync out pin
     response = await messenger.send_and_receive(

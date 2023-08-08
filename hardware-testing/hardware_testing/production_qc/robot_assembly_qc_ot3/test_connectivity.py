@@ -1,7 +1,7 @@
 """Test Connectivity."""
 import asyncio
 from subprocess import run as run_subprocess
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Tuple
 import re
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -15,19 +15,10 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
-
-from opentrons_hardware.drivers.binary_usb.build import (
-    build_rear_panel_messenger,
-    usb_driver
-)
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     RearPinState,
-    get_door_state,
-    set_deck_light,
-    get_deck_light_state,
-    set_ui_color,
     get_all_pin_state,
-    set_sync_pin
+    set_sync_pin,
 )
 
 import logging
@@ -40,9 +31,9 @@ for logger in loggers:
 
 LOG.setLevel(logging.CRITICAL)
 
-##START TEST PASSING CONDITIONS
+# START TEST PASSING CONDITIONS
 
-#Pre-test conditions, nothing plugged in
+# Pre-test conditions, nothing plugged in
 PRE_TEST_CONDITIONS = RearPinState()
 PRE_TEST_CONDITIONS.aux1_estop_det = False
 PRE_TEST_CONDITIONS.aux2_estop_det = False
@@ -54,7 +45,7 @@ PRE_TEST_CONDITIONS.estop_active = False
 PRE_TEST_CONDITIONS.door_open = True
 PRE_TEST_CONDITIONS.sync_engaged = False
 
-#Aux 1 only plugged in, sync active on tester
+# Aux 1 only plugged in, sync active on tester
 AUX_1_CONDITIONS = RearPinState()
 AUX_1_CONDITIONS.aux1_estop_det = True
 AUX_1_CONDITIONS.aux2_estop_det = False
@@ -66,7 +57,7 @@ AUX_1_CONDITIONS.estop_active = False
 AUX_1_CONDITIONS.door_open = False
 AUX_1_CONDITIONS.sync_engaged = True
 
-#Aux 2 only plugged in, sync active on tester
+# Aux 2 only plugged in, sync active on tester
 AUX_2_CONDITIONS = RearPinState()
 AUX_2_CONDITIONS.aux1_estop_det = False
 AUX_2_CONDITIONS.aux2_estop_det = True
@@ -78,7 +69,7 @@ AUX_2_CONDITIONS.estop_active = False
 AUX_2_CONDITIONS.door_open = False
 AUX_2_CONDITIONS.sync_engaged = True
 
-#Aux 1 and 2 plugged in, sync NOT active on tester
+# Aux 1 and 2 plugged in, sync NOT active on tester
 POST_PLUG_CONDITIONS = RearPinState()
 POST_PLUG_CONDITIONS.aux1_estop_det = True
 POST_PLUG_CONDITIONS.aux2_estop_det = True
@@ -90,7 +81,7 @@ POST_PLUG_CONDITIONS.estop_active = False
 POST_PLUG_CONDITIONS.door_open = True
 POST_PLUG_CONDITIONS.sync_engaged = False
 
-#Aux 1 and 2 plugged in, ESTOP pressed, sync NOT active on tester
+# Aux 1 and 2 plugged in, ESTOP pressed, sync NOT active on tester
 ESTOP_CONDITIONS = RearPinState()
 ESTOP_CONDITIONS.aux1_estop_det = True
 ESTOP_CONDITIONS.aux2_estop_det = True
@@ -102,7 +93,7 @@ ESTOP_CONDITIONS.estop_active = True
 ESTOP_CONDITIONS.door_open = True
 ESTOP_CONDITIONS.sync_engaged = False
 
-#Aux 1 and 2 not plugged in, door closed
+# Aux 1 and 2 not plugged in, door closed
 DOOR_CONDITIONS = RearPinState()
 DOOR_CONDITIONS.aux1_estop_det = False
 DOOR_CONDITIONS.aux2_estop_det = False
@@ -114,9 +105,9 @@ DOOR_CONDITIONS.estop_active = False
 DOOR_CONDITIONS.door_open = False
 DOOR_CONDITIONS.sync_engaged = False
 
-##END TEST PASSING CONDITIONS
+# END TEST PASSING CONDITIONS
 
-## Start UI Prompts
+# Start UI Prompts
 PROMPT_UNPLUGGED = "ENSURE AUX TESTER IS NOT PLUGGED IN"
 PROMPT_AUX_1 = "PLUG IN AUX PORT 1 RIGHT"
 PROMPT_PLUGGED = "PLUG IN AUX PORT 2 LEFT"
@@ -126,9 +117,9 @@ PROMPT_AUX_2 = "UNPLUG AUX PORT 1 RIGHT"
 PROMPT_DOOR = "UNPLUG AUX PORT 2 LEFT AND CLOSE DOOR"
 
 
-## End UI Prompts
+# End UI Prompts
 
-#List Format [UI Prompt, pass_state, sync_state]
+# List Format [UI Prompt, pass_state, sync_state]
 APT_PROMT = 0
 APT_PASS_STATE = 1
 APT_SYNC_STATE = 2
@@ -139,7 +130,7 @@ AUX_PORT_TESTS = {
     "ESTOP_1_TEST": [PROMPT_ESTOP_1, ESTOP_CONDITIONS, 0],
     "ESTOP_2_TEST": [PROMPT_ESTOP_2, ESTOP_CONDITIONS, 0],
     "CAN": 0,
-    "AUX_2_TEST": [PROMPT_AUX_2, AUX_2_CONDITIONS, 1]
+    "AUX_2_TEST": [PROMPT_AUX_2, AUX_2_CONDITIONS, 1],
 }
 
 USB_WAIT_TIMEOUT_SECONDS = 10
@@ -157,15 +148,15 @@ USB_PORTS_TO_TEST = [
 ]
 
 USB_PORTS_MAPPING = {
-    "usb-1":"1-1/1-1.4/1-1.4.4/1-1.4.4",
-    "usb-2":"1-1/1-1.4/1-1.4.3/1-1.4.3",
-    "usb-3":"1-1/1-1.4/1-1.4.2/1-1.4.2",
-    "usb-4":"1-1/1-1.4/1-1.4.1/1-1.4.1",
-    "usb-5":"1-1/1-1.3/1-1.3.4/1-1.3.4",
-    "usb-6":"1-1/1-1.3/1-1.3.3/1-1.3.3",
-    "usb-7":"1-1/1-1.3/1-1.3.2/1-1.3.2",
-    "usb-8":"1-1/1-1.3/1-1.3.1/1-1.3.1",
-    "usb-9":"1-1/1-1.7/1-1.7",
+    "usb-1": "1-1/1-1.4/1-1.4.4/1-1.4.4",
+    "usb-2": "1-1/1-1.4/1-1.4.3/1-1.4.3",
+    "usb-3": "1-1/1-1.4/1-1.4.2/1-1.4.2",
+    "usb-4": "1-1/1-1.4/1-1.4.1/1-1.4.1",
+    "usb-5": "1-1/1-1.3/1-1.3.4/1-1.3.4",
+    "usb-6": "1-1/1-1.3/1-1.3.3/1-1.3.3",
+    "usb-7": "1-1/1-1.3/1-1.3.2/1-1.3.2",
+    "usb-8": "1-1/1-1.3/1-1.3.1/1-1.3.1",
+    "usb-9": "1-1/1-1.7/1-1.7",
 }
 
 AUX_CAN_TESTS = [
@@ -195,7 +186,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     ssid = ""
     password: Optional[str] = None
     result = CSVResult.FAIL
-    wifi_ip = ""
+    wifi_ip: Optional[str] = None
 
     def _finish() -> None:
         report(section, "wifi", [ssid, password, wifi_ip, result])
@@ -262,7 +253,11 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
         print("pausing 2 seconds before reading USB data")
         await asyncio.sleep(2)
         for tag in USB_PORTS_TO_TEST:
-            res = run_subprocess(["blkid", "--label", f"OT3-{tag.upper()}"], capture_output=True, text=True)
+            res = run_subprocess(
+                ["blkid", "--label", f"OT3-{tag.upper()}"],
+                capture_output=True,
+                text=True,
+            )
             blkid_out = res.stdout
             # blkid should return a /dev/sdxx if USB drive is connected
             LOG.info(f"OT3-{tag.upper()}: {blkid_out}")
@@ -273,9 +268,18 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
                 continue
 
             # determine port mapping from dev name
-            drive_name = re.search('\/dev\/([a-z]{3}\d)', blkid_out).group(1)
+            match = re.search("/dev/([a-z]{3}\d)", blkid_out)  # noqa: W605
+            if not match:
+                print(f"no match found: {tag}")
+                report(section, tag, [CSVResult.FAIL])
+                continue
+            drive_name = match.group(1)
             LOG.info(f"drive_name: {drive_name}")
-            res = run_subprocess(["find", "/sys/bus/usb/devices/usb1/", "-name", drive_name], capture_output=True, text=True)
+            res = run_subprocess(
+                ["find", "/sys/bus/usb/devices/usb1/", "-name", drive_name],
+                capture_output=True,
+                text=True,
+            )
             usb_port = res.stdout
             LOG.info(f"Find: {usb_port}")
 
@@ -292,54 +296,60 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
             result = CSVResult.from_bool(found)
             report(section, tag, [result])
 
-async def _aux_subtest(usb_messenger, ui_promt, pass_states, sync_state):
-    ui.get_user_ready(ui_promt)
-    await set_sync_pin(sync_state, usb_messenger)
-    result = await get_all_pin_state(usb_messenger)
-    LOG.info(f"Aux Result: {result}")
-    await set_sync_pin(0, usb_messenger)
 
-    #format the state comparison nicely for csv output
+async def _aux_subtest(
+    api: OT3API, ui_promt: str, pass_states: RearPinState, sync_state: int
+) -> Tuple[bool, str]:
+    ui.get_user_ready(ui_promt)
+    await set_sync_pin(sync_state, api._backend._usb_messenger)  # type: ignore[union-attr]
+    result = await get_all_pin_state(api._backend._usb_messenger)  # type: ignore[union-attr]
+    LOG.info(f"Aux Result: {result}")
+    await set_sync_pin(0, api._backend._usb_messenger)  # type: ignore[union-attr]
+
+    # format the state comparison nicely for csv output
     result_dict = vars(result)
     pass_dict = vars(pass_states)
     formatted_result = str()
     for i in result_dict.keys():
         if result_dict[i] == pass_dict[i]:
-            f = i + '=PASS'
+            f = i + "=PASS"
             print(f)
-            formatted_result = formatted_result + f + '|'
+            formatted_result = formatted_result + f + "|"
         else:
-            f = i + '=FAIL'
+            f = i + "=FAIL"
             print(f)
-            formatted_result = formatted_result + f + '|'
+            formatted_result = formatted_result + f + "|"
 
     return (result == pass_states), formatted_result
 
+
 async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
     for test_name, test_config in AUX_PORT_TESTS.items():
-        if api.is_simulator:
-            result = CSVResult.PASS
+        if test_name == "CAN":
+            if not api.is_simulator:
+                ui.get_user_ready("Release ESTOP 2")
+                ui.get_user_ready("prepare CAN analyzer and PCAN software")
+            for test_name in AUX_CAN_TESTS:
+                if api.is_simulator:
+                    result = CSVResult.PASS
+                else:
+                    inp = ui.get_user_answer(
+                        f"does {test_name.upper()} count TRANSMIT = RECEIVE"
+                    )
+                    result = CSVResult.from_bool(inp)
+                report(section, test_name, [result])
         else:
-            if test_name == "CAN":
-                if not api.is_simulator:
-                    ui.get_user_ready("Release ESTOP 2")
-                    ui.get_user_ready("prepare CAN analyzer and PCAN software")
-                for test_name in AUX_CAN_TESTS:
-                    if api.is_simulator:
-                        result = CSVResult.PASS
-                    else:
-                        inp = ui.get_user_answer(
-                            f"does {test_name.upper()} count TRANSMIT = RECEIVE"
-                        )
-                        result = CSVResult.from_bool(inp)
-                    report(section, test_name, [result])
-            else:
-                test_result = await _aux_subtest(api._backend._usb_messenger,
-                                           test_config[APT_PROMT],
-                                           test_config[APT_PASS_STATE],
-                                           test_config[APT_SYNC_STATE])
-                csv_result = CSVResult.from_bool(test_result[0])
-                report(section, test_name, [test_result[1], csv_result])
+            if api.is_simulator:
+                report(section, test_name, ["", CSVResult.PASS])
+                continue
+            test_result = await _aux_subtest(
+                api,
+                test_config[APT_PROMT],  # type: ignore[index]
+                test_config[APT_PASS_STATE],  # type: ignore[index]
+                test_config[APT_SYNC_STATE],  # type: ignore[index]
+            )
+            csv_result = CSVResult.from_bool(test_result[0])
+            report(section, test_name, [test_result[1], csv_result])
 
     # PCAN
     if not api.is_simulator:
@@ -349,7 +359,9 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     usb_a_tests = [CSVLine(t, [CSVResult]) for t in USB_PORTS_TO_TEST]
-    aux_tests = [CSVLine(t, [str, CSVResult]) for t in AUX_PORT_TESTS.keys()]
+    aux_tests = [
+        CSVLine(t, [str, CSVResult]) for t in AUX_PORT_TESTS.keys() if t != "CAN"
+    ]
     can_tests = [CSVLine(t, [CSVResult]) for t in AUX_CAN_TESTS]
     other_tests = [
         CSVLine("ethernet", [str, CSVResult]),
