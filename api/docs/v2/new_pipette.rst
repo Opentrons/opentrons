@@ -15,7 +15,7 @@ For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v
 Loading Pipettes
 ================
 
-Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. As noted above, the:py:meth:`~.ProtocolContext.load_instrument` method provides this capability. It also requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
+Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. As noted above, the :py:meth:`~.ProtocolContext.load_instrument` method provides this capability. It also requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
 
 Loading Flex 1- and 8-Channel Pipettes
 --------------------------------------
@@ -42,6 +42,8 @@ This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-C
             instrument_name='flex_8channel_1000',
             mount='right',
             tip_racks=[tiprack2]) 
+
+If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your gripper requires a protocol is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
 
 Loading a Flex 96-Channel Pipette
 ---------------------------------
@@ -86,14 +88,10 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 
 .. versionadded:: 2.0
 
-When you load a pipette in this way, you are declaring that you want the specified pipette to be attached to the robot. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App or the touchscreen on Flex will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached.
-
-If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your gripper requires a protocol is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
-
 .. _new-multichannel-pipettes:
 
-Multi-Channel Pipettes and Well Plates
-======================================
+Multi-Channel Pipettes
+======================
 
 All building block and advanced commands work with single- and multi-channel pipettes.
 
@@ -111,10 +109,10 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        # Load a tiprack for 1000uL tips
+        # Load a tiprack for 1000 µL tips
         tiprack1 = protocol.load_labware(
-        load_name='opentrons_flex_96_tiprack_1000ul',
-        location='D1')       
+            load_name='opentrons_flex_96_tiprack_1000ul',
+            location='D1')       
         # Load a 96-well plate
         plate = protocol.load_labware(
             load_name='corning_96_wellplate_360ul_flat',
@@ -127,33 +125,33 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
 
 After loading our instruments and labware, let's tell the robot to pick up a pipette tip from location ``A1`` in ``tiprack1``::
 
-    right.pick_up_tip(tiprack1['A1'])
+    right.pick_up_tip()
 
 With the backmost pipette channel above location A1 on the tip rack, all eight channels are above the eight tip rack wells in column 1.   
 
-After picking up a tip, let's tell the robot to aspirate 300 ul from the well plate at location ``A2``::
+After picking up a tip, let's tell the robot to aspirate 300 µL from the well plate at location ``A2``::
         
     right.aspirate(volume=300, location=plate['A2'])
 
-With the backmost pipette tip above location A2 on the well plate, all eight channels are above the eight wells in column 1.
+With the backmost pipette tip above location A2 on the well plate, all eight channels are above the eight wells in column 2.
 
-Finally, let's tell the robot to dispense 300 ul into the well plate at location ``A3``::
+Finally, let's tell the robot to dispense 300 µL into the well plate at location ``A3``::
 
     right.dispense(volume=300, location=plate['A3'].top())
 
-With the backmost pipette tip above location A3, all 8 channels are above the eight wells in column 3. The pipette will dispense liquid into all the wells simultaneously.
+With the backmost pipette tip above location A3, all eight channels are above the eight wells in column 3. The pipette will dispense liquid into all the wells simultaneously.
 
 8-Channel, 384-Well Plate Example
 ---------------------------------
 
-In general, you should specify wells in the first row of a well plate when using multi-channel pipettes. An exception to this rule is when using 384-well plates. The greater well density means the nozzles of a multi-channel pipette can only accesses every other well in a column. Specifying well A1 accesses every other well starting with the first (rows A, C, E, G, I, K, M, and O). Similarly, specifying well B1 also accesses every other well, but starts with the second (rows B, D, F, H, J, L, N, and P).
+In general, you should specify wells in the first row of a well plate when using multi-channel pipettes. An exception to this rule is when using 384-well plates. The greater well density means the nozzles of a multi-channel pipette can only access every other well in a column. Specifying well A1 accesses every other well starting with the first (rows A, C, E, G, I, K, M, and O). Similarly, specifying well B1 also accesses every other well, but starts with the second (rows B, D, F, H, J, L, N, and P).
 
 To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel Pipette and a 384-well plate. We'll then aspirate and dispense a liquid to different locations on the same well plate. To start, let's load a pipette in the right mount and add our labware.
 
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        # Load a tiprack for 200uL tips
+        # Load a tiprack for 200 µL tips
         tiprack1 = protocol.load_labware(
             load_name='opentrons_flex_96_tiprack_200ul', location=1)
         # Load a well plate
@@ -168,21 +166,21 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
 
 After loading our instruments and labware, let's tell the robot to pick up a pipette tip from location ``A1`` in ``tiprack1``::
 
-    right.pick_up_tip(tiprack1['A1'])
+    right.pick_up_tip()
 
 With the backmost pipette channel above location A1 on the tip rack, all eight channels are above the eight tip rack wells in column 1.
 
-After picking up a tip, let's tell the robot to aspirate 100 ul from the well plate at location ``A1``::
+After picking up a tip, let's tell the robot to aspirate 100 µL from the well plate at location ``A1``::
 
     right.aspirate(volume=100, location=plate['A1'])
 
-Because of the limited clearance between wells, the eight pipette channels will only aspirate from every other well in the column (e.g. A1, C1, E1, G1, I1, K1, M1, O1).
+The eight pipette channels will only aspirate from every other well in the column: A1, C1, E1, G1, I1, K1, M1, and O1.
 
-Finally, let's tell the robot to dispense 100 ul into the well plate at location ``B1``::
+Finally, let's tell the robot to dispense 100 µL into the well plate at location ``B1``::
 
     right.dispense(volume=100, location=plate['B1'])
 
-Because of the limited clearance between wells, the eight pipette channels will only dispense into every other well in the column (e.g. B1, D1, F1, H1, J1, L1, N1, P1).
+The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1.
 
 Adding Tip Racks
 ================
@@ -191,18 +189,20 @@ The ``load_instrument()`` method includes the optional argument ``tip_racks``. T
         
     def run(protocol: protocol_api.ProtocolContext):
     tiprack_left = protocol.load_labware(
-        load_name='opentrons_flex_96_tiprack_200ul', location='1')
+        load_name='opentrons_flex_96_tiprack_200ul', location='D1')
     tiprack_right = protocol.load_labware(
-        load_name='opentrons_flex_96_tiprack_200ul', location='2')
+        load_name='opentrons_flex_96_tiprack_200ul', location='D2')
     left_pipette = protocol.load_instrument(
         instrument_name='flex_8channel_1000', mount='left')
     right_pipette = protocol.load_instrument(
-            instrument_name='flex_8channel_1000',
-            mount='right',
-            tip_racks=[tiprack_right])
+        instrument_name='flex_8channel_1000',
+        mount='right',
+        tip_racks=[tiprack_right])
 
-Next, let's specify the tip rack location for the left pipette, which was loaded without a ``tip_racks`` argument::
-    
+Let's pick up a tip with the left pipette. We need to specify the location as an argument of ``pick_up_tip()``, since we loaded the left pipette without a ``tip_racks`` argument.
+
+.. code-block:: python
+
     left_pipette.pick_up_tip(tiprack_left['A1'])
     left_pipette.drop_tip()
 
@@ -220,9 +220,9 @@ However, because you specified a tip rack location for the right pipette, the ro
 
 Additional calls to ``pick_up_tip`` will automatically progress through the tips in the right rack::
 
-    right_pipette.pick_up_tip()
+    right_pipette.pick_up_tip()  # picks up from A2
     right_pipette.drop_tip()
-    right_pipette.pick_up_tip()
+    right_pipette.pick_up_tip()  # picks up from A3
     right_pipette.drop_tip()
        
 See also, :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
@@ -332,18 +332,18 @@ These flow rate properties operate independently. This means you can specify dif
 
 Let's tell the robot to aspirate, dispense, and blow out the liquid using default flow rates. Notice how you don't need to specify a ``flow_rate`` attribute to use the defaults::
 
-        pipette.aspirate(200, plate['A1'])
-        pipette.dispense(200, plate['A2'])
-        pipette.blow_out()
+        pipette.aspirate(200, plate['A1'])  # 160 µL/s
+        pipette.dispense(200, plate['A2'])  # 160 µL/s
+        pipette.blow_out()                  #  80 µL/s
 
 Now let's change the flow rates for each action::
 
         pipette.flow_rate.aspirate = 50
         pipette.flow_rate.dispense = 100
         pipette.flow_rate.blow_out = 75
-        pipette.aspirate(200, plate['A1'])
-        pipette.dispense(200, plate['A2'])
-        pipette.blow_out()
+        pipette.aspirate(200, plate['A1'])  #  50 µL/s
+        pipette.dispense(200, plate['A2'])  # 100 µL/s
+        pipette.blow_out()                  #  75 µL/s
 
 .. note::
     In API version 2.13 and earlier, :py:obj:`.InstrumentContext.speed` offered similar functionality. It attempted to set the plunger speed in mm/s. Due to technical limitations, that speed could only be approximate. You must use ``.flow_rate`` in version 2.14 and later, and you should consider replacing older code that sets ``.speed``.
@@ -362,22 +362,22 @@ The following table provides data on the default aspirate, dispense, and blow-ou
 | Pipette Model           | Volume (µL) | Aspirate (µL/s) | Dispense (µL/s) | Blow-out (µL/s) |
 +=========================+=============+=================+=================+=================+
 | Flex 1-Channel Pipette  | 1-50        | 8                                 | 4               |
-+-------------------------+             +                                   +                 +
-| Flex 8-Channel Pipette  |             |                                   |                 |
++-------------------------+             +-----------------------------------+-----------------+
+| Flex 8-Channel Pipette  |             | 8                                 | 4               |
 +-------------------------+-------------+-----------------------------------+-----------------+
 | Flex 1-Channel Pipette  | 5-1000      | 160                               | 80              |
-+-------------------------+             +                                   +                 +
-| Flex 8-Channel Pipette  |             |                                   |                 |
-+-------------------------+             +                                   +                 +
-| Flex 96-Channel Pipette |             |                                   |                 |
++-------------------------+             +-----------------------------------+-----------------+
+| Flex 8-Channel Pipette  |             | 160                               | 80              |
++-------------------------+             +-----------------------------------+-----------------+
+| Flex 96-Channel Pipette |             | 160                               | 80              |
 +-------------------------+-------------+-----------------------------------+-----------------+
 
-Additionally, all Flex pipettes have a well bottom clearance of 1mm for aspirate and dispense actions.
+Additionally, all Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
 
 OT-2 Pipette Flow Rates
 -----------------------
 
-The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes. Because the flow rates are the same across types, we've consolidated the data into the "Flow Rates" column.
+The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes. Because the flow rates are the same across all three actions, we've consolidated the data into the "Flow Rates" column.
 
 .. list-table::
     :header-rows: 1
@@ -407,4 +407,4 @@ The following table provides data on the default aspirate, dispense, and blow-ou
       - 20-300
       - 94
  
-Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/second and a well bottom clearance of 1mm for aspirate and dispense actions.
+Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/s and a well bottom clearance of 1 mm for aspirate and dispense actions.
