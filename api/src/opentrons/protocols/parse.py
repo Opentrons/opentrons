@@ -155,7 +155,7 @@ def _parse_python(
 
     static_info = extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
-    version = _get_version(static_info, parsed)
+    version = _get_version(static_info, parsed, filename_checked)
     robot_type = robot_type_from_static_python_info(static_info)
 
     if version >= APIVersion(2, 0):
@@ -437,7 +437,7 @@ def robot_type_from_static_python_info(
 
 
 def _get_version(
-    static_python_info: StaticPythonInfo, parsed: ast.Module
+    static_python_info: StaticPythonInfo, parsed: ast.Module, filename: str
 ) -> APIVersion:
     """
     Infer protocol API version based on a combination of metadata and imports.
@@ -461,9 +461,10 @@ def _get_version(
         if not _has_api_v1_imports(parsed):
             raise MalformedPythonError(
                 short_message=(
-                    "If this is not an API v1 protocol, you must specify the target "
-                    "API version in the apiLevel key of the metadata dict. For instance, "
-                    'metadata={"apiLevel": "2.0"}'
+                    f"apiLevel not declared in {filename}. "
+                    f"You must specify the target API version "
+                    f"in the apiLevel key of the metadata dict. For instance, "
+                    f'metadata={{"apiLevel": "2.0"}}'
                 )
             )
         return APIVersion(1, 0)

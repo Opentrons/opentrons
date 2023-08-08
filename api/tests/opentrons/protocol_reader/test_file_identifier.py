@@ -43,6 +43,8 @@ class _ValidPythonProtocolSpec:
                     "author": "Dr. Sy. N. Tist",
                     "apiLevel": "2.11",
                 }
+                def run(protocol):
+                    pass
                 """
             ),
             expected_api_level=APIVersion(2, 11),
@@ -57,6 +59,8 @@ class _ValidPythonProtocolSpec:
                 metadata = {
                     "apiLevel": "2.11",
                 }
+                def run(protocol):
+                    pass
                 """
             ),
             expected_api_level=APIVersion(2, 11),
@@ -74,6 +78,8 @@ class _ValidPythonProtocolSpec:
                 requirements = {
                     "robotType": "OT-2",
                 }
+                def run(protocol):
+                    pass
                 """
             ),
             expected_api_level=APIVersion(2, 11),
@@ -90,6 +96,8 @@ class _ValidPythonProtocolSpec:
                 requirements = {
                     "robotType": "Flex",
                 }
+                def run(protocol):
+                    pass
                 """
             ),
             expected_api_level=APIVersion(2, 11),
@@ -106,6 +114,8 @@ class _ValidPythonProtocolSpec:
                 requirements = {
                     "robotType": "OT-3",
                 }
+                def run(protocol):
+                    pass
                 """
             ),
             expected_api_level=APIVersion(2, 11),
@@ -120,6 +130,8 @@ class _ValidPythonProtocolSpec:
                 requirements = {
                     "apiLevel": "2.11",
                 }
+                def run(protocol):
+                    pass
                 """
             ),
             expected_api_level=APIVersion(2, 11),
@@ -325,7 +337,7 @@ class _InvalidInputSpec:
                     pass
                 """
             ),
-            expected_message="Unable to parse",
+            expected_message="invalid syntax",
         ),
         # Python with various kinds of invalid metadata dict or apiLevel:
         _InvalidInputSpec(
@@ -333,6 +345,9 @@ class _InvalidInputSpec:
             contents=textwrap.dedent(
                 """
                 # Metadata missing entirely.
+
+                def run():
+                    pass
                 """
             ),
             expected_message="apiLevel not declared in protocol.py",
@@ -343,6 +358,9 @@ class _InvalidInputSpec:
                 """
                 # Metadata provided, but not as a dict.
                 metadata = "Hello"
+
+                def run():
+                    pass
                 """
             ),
             expected_message="apiLevel not declared in protocol.py",
@@ -353,6 +371,9 @@ class _InvalidInputSpec:
                 """
                 # apiLevel missing from metadata.
                 metadata = {"Hello": "World"}
+
+                def run():
+                    pass
                 """
             ),
             expected_message="apiLevel not declared in protocol.py",
@@ -363,6 +384,9 @@ class _InvalidInputSpec:
                 """
                 # Metadata not statically parsable.
                 metadata = {"apiLevel": "123" + ".456"}
+
+                def run():
+                    pass
                 """
             ),
             expected_message="Could not read the contents of the metadata dict",
@@ -373,6 +397,9 @@ class _InvalidInputSpec:
                 """
                 # apiLevel provided, but not as a string.
                 metadata = {"apiLevel": 123.456}
+
+                def run():
+                    pass
                 """
             ),
             expected_message="must be strings",
@@ -383,6 +410,9 @@ class _InvalidInputSpec:
                 """
                 # apiLevel provided, but not as a well formatted string.
                 metadata = {"apiLevel": "123*456"}
+
+                def run():
+                    pass
                 """
             ),
             expected_message="is incorrectly formatted",
@@ -393,6 +423,9 @@ class _InvalidInputSpec:
                 """
                 # apiLevel provided, but not a valid version.
                 metadata = {"apiLevel": "123.456"}
+
+                def run():
+                    pass
                 """
             ),
             expected_message="API version 123.456 is not supported by this robot software. Please either reduce your requested API version or update your robot.",
@@ -404,6 +437,9 @@ class _InvalidInputSpec:
                 metadata = {"apiLevel": "2.11"}
                 # robotType provided, but not a valid string.
                 requirements = {"robotType": "ot2"}
+
+                def run():
+                    pass
                 """
             ),
             expected_message="robotType must be 'OT-2' or 'Flex', not 'ot2'.",
@@ -415,6 +451,9 @@ class _InvalidInputSpec:
                 metadata = {"apiLevel": "2.11"}
                 # robotType provided, but not a valid string.
                 requirements = {"robotType": "flex"}
+
+                def run():
+                    pass
                 """
             ),
             expected_message="robotType must be 'OT-2' or 'Flex', not 'flex'.",
