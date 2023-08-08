@@ -12,9 +12,6 @@ from rich.console import Console
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
-from selenium.webdriver.chrome.service import Service
-
 
 collect_ignore_glob = ["files/**/*.py"]
 
@@ -50,23 +47,15 @@ def _chrome_options() -> Options:
     assert executable_path is not None, "EXECUTABLE_PATH environment variable must be set"
     _console.print(f"EXECUTABLE_PATH is {executable_path}", style="white on blue")
     options.binary_location = executable_path
-    # options.add_argument("whitelisted-ips=''")  # type: ignore
-    # options.add_argument("disable-xss-auditor")  # type: ignore
-    # options.add_argument("disable-web-security")  # type: ignore
-    # options.add_argument("allow-running-insecure-content")  # type: ignore
-    options.add_argument("--no-sandbox")  # type: ignore
-    # options.add_argument("disable-popup-blocking")  # type: ignore
-    # options.add_argument("allow-elevated-browser")  # type: ignore
-    
+    options.add_argument("whitelisted-ips=''")  # type: ignore
+    options.add_argument("disable-xss-auditor")  # type: ignore
+    options.add_argument("disable-web-security")  # type: ignore
+    options.add_argument("allow-running-insecure-content")  # type: ignore
+    options.add_argument("no-sandbox")  # type: ignore
     options.add_argument("disable-setuid-sandbox")  # type: ignore
-
-    options.add_argument("--disable-dev-shm-usage")  # type: ignore
-    options.add_argument("--remote-debugging-port=9222")
-    options.add_argument("--headless")  # type: ignore
-    options.add_argument("--disable-gpu")  # type: ignore
-    options.add_argument("--window-size=1920,1080")  # type: ignore
-    options.add_argument("--disable-extensions")  # type: ignore
-    options.add_argument("--ignore-certificate-errors")  # type: ignore
+    options.add_argument("disable-popup-blocking")  # type: ignore
+    options.add_argument("allow-elevated-browser")  # type: ignore
+    options.add_argument("disable-dev-shm-usage")  # type: ignore
     return options
 
 
@@ -110,26 +99,14 @@ def driver(request: pytest.FixtureRequest) -> Generator[WebDriver, None, None]:
     os.environ["OT_APP_UPDATE__CHANNEL"] = update_channel
     os.environ["OT_APP_LOG__LEVEL__CONSOLE"] = "error"
     os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"  # fixed in 6.2
-
-    web_driver_path = os.environ["CHROMEWEBDRIVER"]
-    print(f"web_driver_path is {web_driver_path}")
-    service = Service(web_driver_path)
-    service.start()
-    
-    with RemoteWebDriver(
-        command_executor=service.service_url,
-        desired_capabilities=options.to_capabilities(),
-        browser_profile=None,
-        proxy=None,
-        keep_alive=True,
-        ) as driver:
-            _console.print("Driver Capabilities.", style="bright_yellow on blue")
-            _console.print(driver.capabilities)
-            localhost: Optional[str] = os.getenv("LOCALHOST")
-            if localhost:
-                if localhost.lower() == "true":
-                    add_localhost(driver=driver, request=request)
-            yield driver
+    with webdriver.Chrome(options=options) as driver:
+        _console.print("Driver Capabilities.", style="bright_yellow on blue")
+        _console.print(driver.capabilities)
+        localhost: Optional[str] = os.getenv("LOCALHOST")
+        if localhost:
+            if localhost.lower() == "true":
+                add_localhost(driver=driver, request=request)
+        yield driver
 
 
 @pytest.fixture(scope="session")
