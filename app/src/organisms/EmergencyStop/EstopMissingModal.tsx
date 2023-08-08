@@ -25,8 +25,8 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 interface EstopMissingModalProps {
   robotName: string
   closeModal: () => void
-  isDismissedModal?: boolean
-  setIsDismissedModal?: (isDismissedModal: boolean) => void
+  isDismissedModal: boolean
+  setIsDismissedModal: (isDismissedModal: boolean) => void
 }
 
 export function EstopMissingModal({
@@ -56,7 +56,13 @@ export function EstopMissingModal({
   )
 }
 
-function TouchscreenModal({ robotName }: EstopMissingModalProps): JSX.Element {
+interface TouchscreenModalProps
+  extends Omit<
+    EstopMissingModalProps,
+    'isDismissedModal' | 'setIsDismissedModal'
+  > {}
+
+function TouchscreenModal({ robotName }: TouchscreenModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
@@ -81,11 +87,14 @@ function TouchscreenModal({ robotName }: EstopMissingModalProps): JSX.Element {
   )
 }
 
+interface DesktopModalProps
+  extends Omit<EstopMissingModalProps, 'isDismissedModal'> {}
+
 function DesktopModal({
   robotName,
   closeModal,
   setIsDismissedModal,
-}: EstopMissingModalProps): JSX.Element {
+}: DesktopModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   const handleCloseModal = (): void => {
