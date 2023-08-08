@@ -25,6 +25,8 @@ describe('EstopMissingModal - Touchscreen', () => {
     props = {
       robotName: 'mockFlex',
       closeModal: jest.fn(),
+      isDismissedModal: false,
+      setIsDismissedModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(true)
   })

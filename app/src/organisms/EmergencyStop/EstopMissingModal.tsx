@@ -56,13 +56,15 @@ export function EstopMissingModal({
   )
 }
 
-interface TouchscreenModalProps
+interface EstopMissingTouchscreenModalProps
   extends Omit<
     EstopMissingModalProps,
     'isDismissedModal' | 'setIsDismissedModal'
   > {}
 
-function TouchscreenModal({ robotName }: TouchscreenModalProps): JSX.Element {
+function TouchscreenModal({
+  robotName,
+}: EstopMissingTouchscreenModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
@@ -87,14 +89,14 @@ function TouchscreenModal({ robotName }: TouchscreenModalProps): JSX.Element {
   )
 }
 
-interface DesktopModalProps
+interface EstopMissingDesktopModalProps
   extends Omit<EstopMissingModalProps, 'isDismissedModal'> {}
 
 function DesktopModal({
   robotName,
   closeModal,
   setIsDismissedModal,
-}: DesktopModalProps): JSX.Element {
+}: EstopMissingDesktopModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   const handleCloseModal = (): void => {
