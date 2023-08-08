@@ -14,6 +14,7 @@ import {
   Flex,
   JUSTIFY_END,
   TYPOGRAPHY,
+  COLORS,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.css'
@@ -38,7 +39,16 @@ interface LiquidEditFormValues {
   [key: string]: unknown
 }
 
-const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff']
+function checkColor(hex: string): boolean {
+  const cleanHex = hex.replace('#', '')
+  const red = parseInt(cleanHex.slice(0, 2), 16)
+  const green = parseInt(cleanHex.slice(2, 4), 16)
+  const blue = parseInt(cleanHex.slice(4, 6), 16)
+  const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255
+  return luminance < 0.1 || luminance > 0.9
+}
+
+const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', COLORS.whaleGrey]
 
 export const liquidEditFormSchema: Yup.Schema<
   { name: string; description: string; serialize: boolean } | undefined,
@@ -53,10 +63,12 @@ export const liquidEditFormSchema: Yup.Schema<
     'disallowed-color',
     'Invalid display color',
     value => {
-      if (value === null || value === undefined) {
+      if (value == null) {
         return true
       }
       return !INVALID_DISPLAY_COLORS.includes(value)
+        ? !checkColor(value)
+        : !INVALID_DISPLAY_COLORS.includes(value)
     }
   ),
   description: Yup.string(),
@@ -146,12 +158,11 @@ export function LiquidEditForm(props: Props): JSX.Element {
                   color="#9e5e00"
                   fontSize="0.625rem"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  marginTop={errors.name != null ? `-0.25rem` : `0rem`}
+                  marginTop={errors.name != null ? '-0.25rem' : '0rem'}
                 >
                   {errors.displayColor != null ? errors.displayColor : null}
                 </Flex>
               </section>
-
               <section className={styles.section}>
                 <div className={formStyles.header}>
                   {i18n.t('form.liquid_edit.serialize_title')}
