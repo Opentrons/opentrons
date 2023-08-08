@@ -489,6 +489,16 @@ def test_parse_extra_contents(
 @pytest.mark.parametrize(
     ("bad_protocol", "expected_message"),
     [
+        # Bad Python syntax:
+        (
+            """
+            metadata = {"apiLevel": "2.0"}
+            def run(ctx)  # Missing ":".
+                pass
+            """,
+            "(invalid syntax)|(missing ':')",  # This error message depends on the Python version.
+        ),
+        # Bad Python Protocol API structure:
         (
             """
             metadata={"apiLevel": "2.0"}
@@ -515,6 +525,87 @@ def test_parse_extra_contents(
               pass
             """,
             "More than one run function",
+        ),
+        # Various kinds of invalid metadata dict or apiLevel:
+        (
+            # metadata missing entirely.
+            """
+            def run():
+                pass
+            """,
+            "apiLevel not declared",
+        ),
+        (
+            # Metadata provided, but not as a dict.
+            """
+            metadata = "Hello"
+
+            def run():
+                pass
+            """,
+            "apiLevel not declared",
+        ),
+        (
+            # apiLevel missing from metadata dict and requirements dict.
+            """
+            metadata = {"Hello": "World"}
+
+            def run():
+                pass
+            """,
+            "apiLevel not declared",
+        ),
+        (
+            # Metadata not statically parsable.
+            """
+            metadata = {"apiLevel": "123" + ".456"}
+
+            def run():
+                pass
+            """,
+            "Could not read the contents of the metadata dict",
+        ),
+        (
+            # apiLevel provided, but not as a string.
+            """
+            metadata = {"apiLevel": 123.456}
+
+            def run():
+                pass
+            """,
+            "must be strings",
+        ),
+        (
+            # apiLevel provided, but not as a well formatted string.
+            """
+            metadata = {"apiLevel": "123*456"}
+
+            def run():
+                pass
+            """,
+            "is incorrectly formatted",
+        ),
+        (
+            # robotType provided, but not a valid string.
+            """
+            metadata = {"apiLevel": "2.11"}
+            requirements = {"robotType": "ot2"}
+
+            def run():
+                pass
+            """,
+            "robotType must be 'OT-2' or 'Flex', not 'ot2'.",
+        ),
+        (
+            # robotType provided, but not a valid string.
+            """
+            metadata = {"apiLevel": "2.11"}
+            requirements = {"robotType": "flex"}
+
+            def run():
+                pass
+            """,
+            "robotType must be 'OT-2' or 'Flex', not 'flex'.",
         ),
     ],
 )
