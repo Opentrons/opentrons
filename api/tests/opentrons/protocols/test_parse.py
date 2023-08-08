@@ -496,7 +496,7 @@ def test_parse_extra_contents(
             def run(ctx)  # Missing ":".
                 pass
             """,
-            "(invalid syntax)|(missing ':')",  # This error message depends on the Python version.
+            '(invalid syntax)|(Missing ":")',  # This error message depends on the Python version.
         ),
         # Bad Python Protocol API structure:
         (
