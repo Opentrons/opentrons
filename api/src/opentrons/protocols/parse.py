@@ -86,6 +86,39 @@ def _validate_v2_ast(protocol_ast: ast.Module) -> None:
         )
 
 
+def _validate_v2_static_info(static_info: StaticPythonInfo) -> None:
+    # Unlike the metadata dict, in the requirements dict, we only allow you to specify
+    # officially known keys. This lets us add new keys in the future without having to worry about
+    # conflicting with other random junk that people might have put there, and it prevents silly
+    # typos from causing confusing downstream problems.
+    allowed_requirements_keys = {
+        "apiLevel",
+        "robotType",
+        # NOTE(mm, 2023-08-08): If we add new allowed keys to this dict in the future,
+        # we should probably gate them behind new apiLevels.
+    }
+    actual_requirements_keys = set((static_info.requirements or {}).keys())
+    unexpected_requirements_keys = actual_requirements_keys - allowed_requirements_keys
+    if unexpected_requirements_keys:
+        raise MalformedPythonProtocolError(
+            f"Unrecognized {'key' if len(unexpected_requirements_keys) == 1 else 'keys'}"
+            f" in requirements dict:"
+            f" {', '.join(repr(k) for k in unexpected_requirements_keys)}."
+            f" Allowed keys:"
+            f" {', '.join(repr(k) for k in allowed_requirements_keys)}."
+        )
+
+    api_level_in_metadata = "apiLevel" in (static_info.metadata or {})
+    api_level_in_requirements = "apiLevel" in (static_info.requirements or {})
+    if api_level_in_metadata and api_level_in_requirements:
+        # If a user does this, it's almost certainly a mistake. Forbid it to avoid complexity in
+        # which dict takes precedence, and in what happens when you upload to an old software
+        # version that only knows about the metadata dict, not the requirements dict.
+        raise MalformedPythonProtocolError(
+            "You may only put apiLevel in the metadata dict or the requirements dict, not both."
+        )
+
+
 def version_from_string(vstr: str) -> APIVersion:
     """Parse an API version from a string
 
@@ -160,6 +193,7 @@ def _parse_python(
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
+        _validate_v2_static_info(static_info)
     else:
         raise ApiDeprecationError(version)
 
