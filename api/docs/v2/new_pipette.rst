@@ -240,34 +240,34 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
 
     .. tab:: Flex Pipettes
         
-        +-------------------------+-----------+-------------------------+
-        | Pipette Name            | Capacity  | API Load Name           |
-        +=========================+===========+=========================+
-        | Flex 1-Channel Pipette  | 1–50 µL   | ``flex_1channel_50``    |
-        +                         +-----------+-------------------------+
-        |                         | 5–1000 µL | ``flex_1channel_1000``  |
-        +-------------------------+-----------+-------------------------+
-        | Flex 8-Channel Pipette  | 1–50 µL   + ``flex_8channel_50``    |
-        +                         +-----------+-------------------------+
-        |                         | 5–1000 µL | ``flex_8channel_1000``  |
-        +-------------------------+-----------+-------------------------+
-        | Flex 96-Channel Pipette | 5–1000 µL | ``flex_96channel_1000`` |
-        +-------------------------+-----------+-------------------------+
+        +-------------------------+---------------+-------------------------+
+        | Pipette Model           | Volume (µL)   | API Load Name           |
+        +=========================+===============+===+=====================+
+        | Flex 1-Channel Pipette  | 1–50          | ``flex_1channel_50``    |
+        +                         +---------------+-------------------------+
+        |                         | 5–1000        | ``flex_1channel_1000``  |
+        +-------------------------+---------------+-------------------------+
+        | Flex 8-Channel Pipette  | 1–50          | ``flex_8channel_50``    |
+        +                         +---------------+-------------------------+
+        |                         | 5–1000        | ``flex_8channel_1000``  |
+        +-------------------------+---------------+-------------------------+
+        | Flex 96-Channel Pipette | 5–1000        | ``flex_96channel_1000`` |
+        +-------------------------+---------------+-------------------------+
 
     .. tab:: OT-2 Pipettes
 
         +-----------------------------+--------------------+-----------------------+
-        | Pipette Name                | Capacity           | API Load Name         |
+        | Pipette Model               | Volume (µL)        | API Load Name         |
         +=============================+====================+=======================+
-        | P20 Single-Channel GEN2     | 1-20 µL            | ``p20_single_gen2``   |
+        | P20 Single-Channel GEN2     | 1-20               | ``p20_single_gen2``   |
         +-----------------------------+                    +-----------------------+
         | P20 Multi-Channel GEN2      |                    | ``p20_multi_gen2``    |
         +-----------------------------+--------------------+-----------------------+
-        | P300 Single-Channel GEN2    | 20-300 µL          | ``p300_single_gen2``  |
+        | P300 Single-Channel GEN2    | 20-300             | ``p300_single_gen2``  |
         +-----------------------------+                    +-----------------------+
         | P300 Multi-Channel GEN2     |                    | ``p300_multi_gen2``   |
         +-----------------------------+--------------------+-----------------------+
-        | P1000 Single-Channel GEN2   | 100-1000 µL        | ``p1000_single_gen2`` |
+        | P1000 Single-Channel GEN2   | 100-1000           | ``p1000_single_gen2`` |
         +-----------------------------+--------------------+-----------------------+
 
         See the OT-2 Pipette Generations section below if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-chanel model.
@@ -366,28 +366,53 @@ Flex Pipette Flow Rates
 
 The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for Flex pipettes.
 
-*Flex Flow rate data coming soon.* 
++-------------------------+-------------+-----------------+-----------------+-----------------+
+| Pipette Model           | Volume (µL) | Aspirate (µL/s) | Dispense (µL/s) | Blow-out (µL/s) |
++=========================+=============+=================+=================+=================+
+| Flex 1-Channel Pipette  | 1-50        | 8                                 | 4               |
++-------------------------+             +                                   +                 +
+| Flex 8-Channel Pipette  |             |                                   |                 |
++-------------------------+-------------+-----------------------------------+-----------------+
+| Flex 1-Channel Pipette  | 5-1000      | 160                               | 80              |
++-------------------------+             +                                   +                 +
+| Flex 8-Channel Pipette  |             |                                   |                 |
++-------------------------+             +                                   +                 +
+| Flex 96-Channel Pipette |             |                                   |                 |
++-------------------------+-------------+-----------------------------------+-----------------+
+
+Additionally, all Flex pipettes have a well bottom clearance of 1mm for aspirate and dispense actions.
 
 OT-2 Pipette Flow Rates
 -----------------------
 
 The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes.
 
-+-----------------------------------------+-----------------------------+
-| Pipette Model                           | Flow Rates (µL/s)           |
-+=========================================+=============================+ 
-| P20 Single-Channel GEN2 (1-20 µL)       | * API v2.6 or higher: 7.56  |
-|                                         | * API v2.5 or lower: 3.78   |
-+-----------------------------------------+-----------------------------+
-| P300 Single-Channel GEN2 (20-300 µL)    | * API v2.6 or higher: 92.86 |
-|                                         | * API v2.5 or lower: 46.43  |
-+-----------------------------------------+-----------------------------+
-| P1000 Single-Channel GEN2 (100-1000 µL) | * API v2.6 or higher: 274.7 |
-|                                         | * API v2.5 or lower: 137.35 |
-+-----------------------------------------+-----------------------------+
-| P20 Multi-Channel GEN2 (1-20 µL)        | 7.6                         |
-+-----------------------------------------+-----------------------------+
-| P300 Multi-Channel GEN2 (20-300 µL)     | 94                          |
-+-----------------------------------------+-----------------------------+
+.. list-table::
+    :header-rows: 1
 
+    * - Pipette Model
+      - Volume (µL)
+      - Flow Rates (µL/s)
+    * - P20 Single-Channel GEN2
+      - 1-20
+      - 
+          * API v2.6 or higher: 7.56
+          * API v2.5 or lower: 3.78
+    * - P300 Single-Channel GEN2
+      - 20-300
+      - 
+          * API v2.6 or higher: 92.86
+          * API v2.5 or lower: 46.43
+    * - P1000 Single-Channel GEN2
+      - 100-1000
+      -
+          * API v2.6 or higher: 274.7
+          * API v2.5 or lower: 137.35
+    * - P20 Multi-Channel GEN2
+      - 1-20
+      - 7.6
+    * - P300 Multi-Channel GEN2
+      - 20-300
+      - 94
+ 
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/second and a well bottom clearance of 1mm for aspirate and dispense actions.
