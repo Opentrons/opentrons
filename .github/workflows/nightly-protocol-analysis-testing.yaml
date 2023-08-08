@@ -56,13 +56,6 @@ jobs:
       #     mv app-shell/dist/*.AppImage ${{ env.EXECUTABLE_PATH }}
       #     chmod +x ${{ env.EXECUTABLE_PATH }}
 
-      - name: Remove Chrome
-        run: sudo apt purge google-chrome-stable
-      - name: Remove default Chromium
-        run: sudo apt purge chromium-browser
-      - name: Install a new Chromium
-        run: sudo apt install -y chromium-browser
-
       - name: Install Chromedriver on the path.
         working-directory: ./app-testing
         run: |
