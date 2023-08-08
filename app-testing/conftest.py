@@ -10,8 +10,10 @@ from dotenv import find_dotenv, load_dotenv
 from rich import pretty, traceback
 from rich.console import Console
 from selenium import webdriver
-from selenium.webdriver.chromium.options import Options
-from selenium.webdriver.chromium.webdriver import WebDriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
+
 
 collect_ignore_glob = ["files/**/*.py"]
 
@@ -19,7 +21,7 @@ _console = Console(color_system="auto")
 pretty.install(console=_console)
 traceback.install(console=_console)
 
-
+from selenium.chrome.service import Service
 # Check to see if we have a dotenv file and use it
 if find_dotenv():
     load_dotenv(find_dotenv())
@@ -108,15 +110,25 @@ def driver(request: pytest.FixtureRequest) -> Generator[WebDriver, None, None]:
     os.environ["OT_APP_LOG__LEVEL__CONSOLE"] = "error"
     os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"  # fixed in 6.2
 
+    web_driver_path = os.environ["CHROMEWEBDRIVER"]
     
-    with webdriver.Chromium(options=options) as driver:
-        _console.print("Driver Capabilities.", style="bright_yellow on blue")
-        _console.print(driver.capabilities)
-        localhost: Optional[str] = os.getenv("LOCALHOST")
-        if localhost:
-            if localhost.lower() == "true":
-                add_localhost(driver=driver, request=request)
-        yield driver
+    service = webdriver.chrome.service.Service(web_driver_path)
+    service.start()
+    
+    with RemoteWebDriver(
+        command_executor=service.service_url,
+        desired_capabilities=options.to_capabilities(),
+        browser_profile=None,
+        proxy=None,
+        keep_alive=True,
+        ) as driver:
+            _console.print("Driver Capabilities.", style="bright_yellow on blue")
+            _console.print(driver.capabilities)
+            localhost: Optional[str] = os.getenv("LOCALHOST")
+            if localhost:
+                if localhost.lower() == "true":
+                    add_localhost(driver=driver, request=request)
+            yield driver
 
 
 @pytest.fixture(scope="session")

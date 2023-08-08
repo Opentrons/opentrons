@@ -9,7 +9,7 @@ from automation.menus.left_menu import LeftMenu
 from automation.pages.labware_landing import LabwareLanding
 from automation.pages.protocol_landing import ProtocolLanding
 from rich.console import Console
-from selenium.webdriver.chromium.webdriver import WebDriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 def _what_protocols() -> list[(Protocol)]:

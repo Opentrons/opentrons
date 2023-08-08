@@ -12,7 +12,7 @@ from automation.pages.module_setup import ModuleSetup
 from automation.pages.protocol_landing import ProtocolLanding
 from automation.pages.setup_calibration import SetupCalibration
 from rich.console import Console
-from selenium.webdriver.chromium.webdriver import WebDriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 @pytest.mark.skip("Need to fix.")

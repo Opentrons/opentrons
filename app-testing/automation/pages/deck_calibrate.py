@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 
 from rich.console import Console
-from selenium.webdriver.chromium.webdriver import WebDriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 

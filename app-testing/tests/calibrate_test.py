@@ -10,7 +10,7 @@ from automation.resources.ot_robot import OtRobot
 from automation.resources.robot_data import EmulatedAlpha, RobotDataType
 from pytest import FixtureRequest
 from rich.console import Console
-from selenium.webdriver.chromium.webdriver import WebDriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 @pytest.mark.skip("Need to fix.")

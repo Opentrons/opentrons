@@ -16,7 +16,7 @@ from automation.pages.setup_calibration import SetupCalibration
 from automation.resources.ot_robot import OtRobot
 from automation.resources.robot_data import Dev, EmulatedAlpha, RobotDataType
 from rich.console import Console
-from selenium.webdriver.chromium.webdriver import WebDriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 @pytest.mark.skip("Need to fix.")
