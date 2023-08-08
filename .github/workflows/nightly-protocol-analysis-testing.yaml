@@ -33,7 +33,7 @@ jobs:
 
       - name: Install Linux dependencies
         run: |
-          sudo apt-get install libudev-dev libusb-1.0-0-dev libsystemd-dev
+          sudo apt-get install libudev-dev libusb-1.0-0-dev libsystemd-dev 
 
       - name: Install pipenv
         run: pip install pipenv
@@ -62,9 +62,7 @@ jobs:
           chmod +x ./ci-tools/linux_get_chromedriver.sh
           ./ci-tools/linux_get_chromedriver.sh ${{ env.ELECTRON_VERSION }}
           chromedriver --version
-          google-chrome --version
           which chromedriver
-          which google-chrome
 
       - name: Install python dependencies.
         working-directory: ./app-testing
@@ -79,8 +77,9 @@ jobs:
       - name: Run Tests.
         working-directory: ./app-testing
         run: |
-          export DISPLAY=:99
+          export DISPLAY=:99.0
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          echo "${{ env.EXECUTABLE_PATH }}"
           pipenv run python -m pytest -k test_analyses
 
     #   - name: Upload results.
