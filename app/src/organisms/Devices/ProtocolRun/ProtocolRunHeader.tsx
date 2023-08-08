@@ -127,11 +127,11 @@ export function ProtocolRunHeader({
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
-  const isRunCurrent = Boolean(runRecord?.data?.current)
+  const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
+  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
     runRecord?.data?.errors != null
       ? getHighestPriorityError(runRecord?.data?.errors)
@@ -628,7 +628,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
 
   const handleClick = (): void => {
-    console.log('clicked')
+    handleClearClick()
     setShowRunFailedModal(true)
   }
 

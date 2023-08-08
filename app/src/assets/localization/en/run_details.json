@@ -91,7 +91,7 @@
   "run_completed": "Run completed.",
   "run_cta_disabled": "Complete required steps on Protocol tab before starting the run",
   "run_failed_modal_body": "Error occurred when protocol was {{command}}",
-  "run_failed_modal_description_desktop": "Download the run logs and send it to support@opentrons.com for assistance.",
+  "run_failed_modal_description_desktop": "Download the run log and send it to support@opentrons.com for assistance.",
   "run_failed_modal_description": "Please contact support@opentrons.com with relevant information for assistance with troubleshooting.",
   "run_failed_modal_header": "{{errorName}}: {{errorCode}} at protocol step {{count}}",
   "run_failed_modal_title": "Run failed",

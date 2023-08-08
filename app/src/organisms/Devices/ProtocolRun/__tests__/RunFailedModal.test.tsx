@@ -56,7 +56,7 @@ describe('', () => {
     getByText('Error 4000: ModuleNotAttachedError')
     getByText('No available thermocyclerModuleV2 found.')
     getByText(
-      'Download the run logs and send it to support@opentrons.com for assistance.'
+      'Download the run log and send it to support@opentrons.com for assistance.'
     )
     getByText('Download Run Log')
     getByRole('button', { name: 'Close' })

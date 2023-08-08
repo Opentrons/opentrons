@@ -87,9 +87,10 @@ export function RunFailedModal({
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-          backgroundColor={COLORS.medGreyEnabled}
+          backgroundColor={COLORS.fundamentalsBackground}
           borderRadius={BORDERS.borderRadiusSize1}
-          overflowWrap="break-word"
+          overflowWrap="anywhere"
+          border={BORDERS.lineBorder}
         >
           <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {highestPriorityError.detail}

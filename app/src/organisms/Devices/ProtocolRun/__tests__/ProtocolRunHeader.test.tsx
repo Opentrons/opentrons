@@ -305,7 +305,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
     // when(mockUseRunQuery)
-    //   .calledWith(RUN_ID)
+    //   .calledWith(RUN_ID, { staleTime: Infinity })
     //   .mockReturnValue({
     //     data: { data: mockIdleUnstartedRun },
     //   } as UseQueryResult<Run>)
@@ -327,8 +327,11 @@ describe('ProtocolRunHeader', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
-    mockUseRunQuery.mockReturnValue({ data: null } as any)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID, { staleTime: Infinity })
+      .mockReturnValue({ data: { data: null } } as any)
   })
+
   afterEach(() => {
     resetAllWhenMocks()
     jest.restoreAllMocks()
@@ -671,6 +674,11 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a error detail link banner when run has failed', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockFailedRun },
+      } as UseQueryResult<Run>)
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
     const [{ getByText }] = render()
 
@@ -690,6 +698,11 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a clear protocol banner when run has succeeded', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
@@ -794,6 +807,11 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders banner with spinner if currently closing current run', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
