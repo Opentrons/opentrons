@@ -58,7 +58,7 @@ function RenderDeviceDetails({
   const { data: estopStatus } = useEstopQuery({
     refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
   })
-  const { isDismissedModal } = useEstopContext()
+  const { isEmergencyStopModalDismissed } = useEstopContext()
 
   return (
     <Box
@@ -68,7 +68,8 @@ function RenderDeviceDetails({
       paddingTop={SPACING.spacing16}
       paddingBottom={SPACING.spacing48}
     >
-      {estopStatus?.data.status !== DISENGAGED && isDismissedModal ? (
+      {estopStatus?.data.status !== DISENGAGED &&
+      isEmergencyStopModalDismissed ? (
         <Flex marginBottom={SPACING.spacing16}>
           <EstopBanner status={estopStatus?.data.status} />
         </Flex>

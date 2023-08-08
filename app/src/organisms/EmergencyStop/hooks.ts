@@ -4,12 +4,13 @@ import { EmergencyStopContext } from './EmergencyStopContext'
 import type { EmergencyStopContextType } from './EmergencyStopContext'
 
 export function useEstopContext(): EmergencyStopContextType {
-  const { isDismissedModal, setIsDismissedModal } = React.useContext(
-    EmergencyStopContext
-  )
+  const {
+    isEmergencyStopModalDismissed,
+    setIsEmergencyStopModalDismissed,
+  } = React.useContext(EmergencyStopContext)
 
   return {
-    isDismissedModal,
-    setIsDismissedModal,
+    isEmergencyStopModalDismissed,
+    setIsEmergencyStopModalDismissed,
   }
 }
