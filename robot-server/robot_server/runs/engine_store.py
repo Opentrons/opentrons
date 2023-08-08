@@ -1,6 +1,5 @@
 """In-memory storage of ProtocolEngine instances."""
 from typing import List, NamedTuple, Optional
-import asyncio
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -26,7 +25,6 @@ from opentrons.protocol_engine import (
     StateSummary,
     create_protocol_engine,
 )
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 
 from robot_server.protocols import ProtocolResource
 
@@ -69,19 +67,7 @@ class EngineStore:
         self._deck_type = deck_type
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
-        self._loop = asyncio.get_running_loop()
         hardware_api.register_callback(self._estop_listener)
-
-    async def _handle_estop_event(self) -> None:
-        if not self.engine.state_view.commands.get_is_okay_to_clear():
-            await self.engine.stop(halt_api=False)
-        await self.engine.finish(
-            error=EStopActivatedError(message="Estop activated during run"),
-            drop_tips_and_home=False,
-            set_run_status=True,
-            force_cancel=True,
-        )
-        self._runner_engine_pair = None
 
     def _estop_listener(self, event: HardwareEvent) -> None:
         if isinstance(event, EstopStateNotification):
@@ -89,10 +75,7 @@ class EngineStore:
                 return
             if self._runner_engine_pair is None:
                 return
-            self._runner_engine_pair.engine.estop()
-            #asyncio.run_coroutine_threadsafe(
-            #    coro=self._handle_estop_event(), loop=self._loop
-            #).future()
+            self._runner_engine_pair.engine.estop(maintenance_run=False)
 
     @property
     def engine(self) -> ProtocolEngine:

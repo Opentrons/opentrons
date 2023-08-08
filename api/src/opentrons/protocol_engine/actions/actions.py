@@ -52,6 +52,8 @@ class StopAction:
     After a StopAction, the engine status will be marked as stopped.
     """
 
+    from_estop: bool = False
+
 
 @dataclass(frozen=True)
 class FinishErrorDetails:

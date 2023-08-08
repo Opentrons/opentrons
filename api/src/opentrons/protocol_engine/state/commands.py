@@ -156,6 +156,9 @@ class CommandState:
     This value can be used to generate future hashes.
     """
 
+    stopped_by_estop: bool
+    """If this is set to True, the engine was stopped by an estop event."""
+
 
 class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container."""
@@ -183,6 +186,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
+            stopped_by_estop=False,
         )
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
@@ -318,6 +322,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
+                if action.from_estop:
+                    self._state.stopped_by_estop = True
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:

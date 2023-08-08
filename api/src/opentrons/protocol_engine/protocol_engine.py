@@ -219,19 +219,30 @@ class ProtocolEngine:
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
-    def estop(self) -> None:
+    def estop(self, maintenance_run: bool) -> None:
         if self._state_store.commands.get_is_stopped():
             return
         current_id = self._state_store.commands.state.running_command_id
+
         if current_id is not None:
-            action = FailCommandAction(
+            fail_action = FailCommandAction(
                 command_id=current_id,
                 error_id=self._model_utils.generate_id(),
                 failed_at=self._model_utils.get_timestamp(),
-                error=EStopActivatedError(message="Estop Activated"))
-            self._action_dispatcher.dispatch(action)
+                error=EStopActivatedError(message="Estop Activated"),
+            )
+            self._action_dispatcher.dispatch(fail_action)
             self._queue_worker.cancel()
-
+        elif maintenance_run:
+            stop_action = self._state_store.commands.validate_action_allowed(
+                StopAction(from_estop=True)
+            )
+            self._action_dispatcher.dispatch(stop_action)
+            hardware_stop_action = HardwareStoppedAction(
+                completed_at=self._model_utils.get_timestamp()
+            )
+            self._action_dispatcher.dispatch(hardware_stop_action)
+            self._queue_worker.cancel()
 
     async def stop(self) -> None:
         """Stop execution immediately, halting all motion and cancelling future commands.
@@ -278,22 +289,11 @@ class ProtocolEngine:
             set_run_status: Whether to calculate a `success` or `failure` run status.
                 If `False`, will set status to `stopped`.
         """
-        for err in self.state_view.commands.get_all_errors():
-            if (
-                isinstance(error, EnumeratedError)
-                and self._code_in_exception_stack(
-                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
-                )
-            ):
-                drop_tips_and_home = False
-            if error is None:
-                error = err
+        if error is None and self._state_store.commands.state.stopped_by_estop:
+            error = EStopActivatedError(message="Estop was activated during a run")
         if error:
-            if (
-                isinstance(error, EnumeratedError)
-                and self._code_in_exception_stack(
-                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
-                )
+            if isinstance(error, EnumeratedError) and self._code_in_exception_stack(
+                error=error, code=ErrorCodes.E_STOP_ACTIVATED
             ):
                 drop_tips_and_home = False
 
@@ -425,13 +425,22 @@ class ProtocolEngine:
     # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
     @staticmethod
     def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
+        if error.code == code:
+            return True
         if (
             isinstance(error, ProtocolCommandFailedError)
             and error.original_error is not None
         ):
+            if error.original_error.errorCode == code.value.code:
+                return True
             return any(
-                code.value.code == wrapped_error.errorCode
-                for wrapped_error in error.original_error.wrappedErrors
+                wrapped.errorCode == code.value.code
+                for wrapped in error.original_error.wrappedErrors
             )
-        else:
-            return any(code == wrapped_error.code for wrapped_error in error.wrapping)
+
+        if len(error.wrapping) == 0:
+            return False
+        return any(
+            ProtocolEngine._code_in_exception_stack(wrapped_error, code)
+            for wrapped_error in error.wrapping
+        )
