@@ -59,7 +59,6 @@ export const LoadCommandText = ({
       })
     }
     case 'loadAdapter': {
-      console.log(command)
       if (
         command.params.location !== 'offDeck' &&
         'moduleId' in command.params.location

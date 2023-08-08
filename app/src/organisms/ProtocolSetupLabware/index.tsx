@@ -29,6 +29,8 @@ import {
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   inferModuleOrientationFromXCoordinate,
+  LoadAdapterRunTimeCommand,
+  RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -154,7 +156,11 @@ export function ProtocolSetupLabware({
     'slotName' in selectedLabware?.location
   ) {
     location = <LocationIcon slotName={selectedLabware?.location.slotName} />
-  } else if (selectedLabware != null) {
+  } else if (
+    selectedLabware != null &&
+    typeof selectedLabware.location === 'object' &&
+    'moduleId' in selectedLabware?.location
+  ) {
     const matchedModule = attachedProtocolModuleMatches.find(
       module =>
         typeof selectedLabware.location === 'object' &&
@@ -172,6 +178,40 @@ export function ProtocolSetupLabware({
           />
         </>
       )
+    }
+  } else if (
+    selectedLabware != null &&
+    typeof selectedLabware.location === 'object' &&
+    'labwareId' in selectedLabware?.location
+  ) {
+    const adapterId = selectedLabware.location.labwareId
+    const adapter = mostRecentAnalysis?.commands.find(
+      (command): command is LoadAdapterRunTimeCommand => {
+        return command.result?.adapterId === adapterId
+      }
+    )
+    if (
+      adapter?.params.location != null &&
+      adapter?.params.location !== 'offDeck'
+    ) {
+      if ('slotName' in adapter?.params?.location) {
+        location = <LocationIcon slotName={adapter?.params.location.slotName} />
+      } else if ('moduleId' in adapter?.params?.location) {
+        const module = attachedProtocolModuleMatches.find(
+          //  @ts-expect-error: jr, 8/7/23: for some reason TS isn't type narrowing this
+          module => module.moduleId === adapter?.params?.location.moduleId
+        )
+        if (module != null) {
+          location = (
+            <>
+              <LocationIcon slotName={module.slotName} />
+              <LocationIcon
+                iconName={MODULE_ICON_NAME_BY_TYPE[module.moduleDef.moduleType]}
+              />
+            </>
+          )
+        }
+      }
     }
   }
 
@@ -355,6 +395,7 @@ export function ProtocolSetupLabware({
               labware={labware}
               attachedProtocolModules={attachedProtocolModuleMatches}
               refetchModules={moduleQuery.refetch}
+              commands={mostRecentAnalysis?.commands}
             />
           ) : null
         })}
@@ -509,12 +550,14 @@ interface RowLabwareProps {
   labware: LabwareSetupItem
   attachedProtocolModules: AttachedProtocolModuleMatch[]
   refetchModules: UseQueryResult<Modules>['refetch']
+  commands?: RunTimeCommand[]
 }
 
 function RowLabware({
   labware,
   attachedProtocolModules,
   refetchModules,
+  commands,
 }: RowLabwareProps): JSX.Element | null {
   const { definition, initialLocation, nickName } = labware
   const { t: commandTextTranslator } = useTranslation('protocol_command_text')
@@ -550,10 +593,41 @@ function RowLabware({
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     location = (
       <>
-        <LocationIcon slotName={matchedModule?.slotName} />{' '}
+        <LocationIcon slotName={matchedModule?.slotName} />
         <LocationIcon iconName={MODULE_ICON_NAME_BY_TYPE[matchedModuleType]} />
       </>
     )
+  } else if ('labwareId' in initialLocation) {
+    const adapterId = initialLocation.labwareId
+    const adapter =
+      commands != null
+        ? commands.find((command): command is LoadAdapterRunTimeCommand => {
+            return command.result?.adapterId === adapterId
+          })
+        : null
+    if (
+      adapter?.params.location != null &&
+      adapter?.params.location !== 'offDeck'
+    ) {
+      if ('slotName' in adapter?.params?.location) {
+        location = <LocationIcon slotName={adapter?.params.location.slotName} />
+      } else if ('moduleId' in adapter?.params?.location) {
+        const module = attachedProtocolModules.find(
+          //  @ts-expect-error: jr, 8/7/23: for some reason TS isn't type narrowing this
+          module => module.moduleId === adapter?.params?.location.moduleId
+        )
+        if (module != null) {
+          location = (
+            <>
+              <LocationIcon slotName={module.slotName} />
+              <LocationIcon
+                iconName={MODULE_ICON_NAME_BY_TYPE[module.moduleDef.moduleType]}
+              />
+            </>
+          )
+        }
+      }
+    }
   }
 
   return (

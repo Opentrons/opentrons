@@ -47,7 +47,6 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     location: lastTiprackCheckStep.location,
   }
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
-
   const returnTipSectionStep: ReturnTipStep = {
     section: SECTIONS.RETURN_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
@@ -143,7 +142,6 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
   const { labware, modules, commands, primaryPipetteId } = args
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
-
   return labware.reduce<CheckLabwareStep[]>((acc, currentLabware) => {
     const labwareDef = labwareDefinitions.find(
       def => getLabwareDefURI(def) === currentLabware.definitionUri
@@ -169,7 +167,6 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
           if (labwareId !== currentLabware.id) {
             return innerAcc
           }
-
           return [
             ...innerAcc,
             {

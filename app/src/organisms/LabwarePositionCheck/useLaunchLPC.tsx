@@ -23,7 +23,6 @@ export function useLaunchLPC(
   const {
     createLabwareDefinition,
   } = useCreateMaintenanceRunLabwareDefinitionMutation()
-
   const handleCloseLPC = (): void => {
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {

@@ -45,12 +45,16 @@ export function getLabwareLocationCombos(
           modules,
           labwareId
         )
+        const moduleId = Object.values(modules).find(
+          mod => mod.model === adapterLocation?.moduleModel
+        )?.id
         return adapterLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
               location: adapterLocation,
               definitionUri,
               labwareId: command.result.labwareId,
+              moduleId,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
@@ -150,18 +154,30 @@ function resolveAdapterLocation(
     )
     return null
   }
-  let adapterLocation
+  let adapterLocation: LabwareOffsetLocation | null = null
   if (labwareEntity.location === 'offDeck') {
     return null
-    //  can't have adapter on top of an adapter
+    // can't have adapter on top of an adapter
   } else if ('labwareId' in labwareEntity.location) {
     return null
   } else if ('moduleId' in labwareEntity.location) {
     const moduleId = labwareEntity.location.moduleId
-    adapterLocation = resolveModuleLocation(modules, moduleId)
+    const resolvedModuleLocation: LabwareOffsetLocation | null = resolveModuleLocation(
+      modules,
+      moduleId
+    )
+    adapterLocation =
+      resolvedModuleLocation != null
+        ? {
+            labwareId,
+            ...resolvedModuleLocation,
+          }
+        : null
   } else {
-    adapterLocation = { slotName: labwareEntity.location.slotName }
+    adapterLocation = {
+      labwareId,
+      slotName: labwareEntity.location.slotName,
+    }
   }
-
   return adapterLocation
 }

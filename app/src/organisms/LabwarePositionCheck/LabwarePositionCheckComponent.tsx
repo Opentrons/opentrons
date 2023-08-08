@@ -80,6 +80,7 @@ export const LabwarePositionCheckComponent = (
         action.type === 'finalPosition'
       ) {
         const { labwareId, location, position } = action
+        console.log('labwareId', labwareId)
         const existingRecordIndex = state.workingOffsets.findIndex(
           record =>
             record.labwareId === labwareId && isEqual(record.location, location)

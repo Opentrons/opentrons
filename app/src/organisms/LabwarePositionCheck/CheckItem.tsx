@@ -14,6 +14,8 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
+  LabwareLocation,
+  MoveLabwareCreateCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
@@ -68,6 +70,16 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
   )
+
+  //  find labware on adapter's location
+  const adapter = protocolData.labware.find(
+    lab => lab.id === location.labwareId
+  )
+  const adapterId = adapter?.id ?? null
+  const adapterDisplayName =
+    adapterId != null
+      ? getLabwareDef(adapterId, protocolData)?.metadata.displayName
+      : ''
 
   const pipetteMount = pipette?.mount
   const pipetteName = pipette?.pipetteName
@@ -127,18 +139,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const isTiprack = getIsTiprack(labwareDef)
   const displayLocation = getDisplayLocation(location, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
-  const placeItemInstruction = isTiprack ? (
-    <Trans
-      t={t}
-      i18nKey="place_a_full_tip_rack_in_location"
-      tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
-      components={{
-        bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
-        ),
-      }}
-    />
-  ) : (
+  let placeItemInstruction: JSX.Element = (
     <Trans
       t={t}
       i18nKey="place_labware_in_location"
@@ -151,18 +152,84 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     />
   )
 
+  if (isTiprack) {
+    placeItemInstruction = (
+      <Trans
+        t={t}
+        i18nKey="place_a_full_tip_rack_in_location"
+        tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
+        components={{
+          bold: (
+            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          ),
+        }}
+      />
+    )
+  } else if (adapterId != null) {
+    placeItemInstruction = (
+      <Trans
+        t={t}
+        i18nKey="place_labware_in_adapter_in_location"
+        tOptions={{
+          adapter: adapterDisplayName,
+          labware: labwareDisplayName,
+          location: displayLocation,
+        }}
+        components={{
+          bold: (
+            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          ),
+        }}
+      />
+    )
+  }
+
+  let newLocation: LabwareLocation
+  if (moduleId != null) {
+    newLocation = { moduleId }
+  } else {
+    newLocation = { slotName: location.slotName }
+  }
+
+  let moveLabware: MoveLabwareCreateCommand[]
+  if (adapterId != null) {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId: adapterId,
+          newLocation,
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation:
+            adapterId != null
+              ? { labwareId: adapterId }
+              : { slotName: location.slotName },
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  } else {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation,
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  }
   const handleConfirmPlacement = (): void => {
     chainRunCommands(
       [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation:
-              moduleId != null ? { moduleId } : { slotName: location.slotName },
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabware,
         ...protocolData.modules.reduce<CreateCommand[]>((acc, mod) => {
           if (getModuleType(mod.model) === HEATERSHAKER_MODULE_TYPE) {
             return [
@@ -178,8 +245,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: {
               origin: 'top' as const,
@@ -216,6 +283,37 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       })
   }
 
+  const moveLabwareOffDeck: CreateCommand[] =
+    adapterId != null
+      ? [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: adapterId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
+      : [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
+
   const handleConfirmPosition = (): void => {
     let confirmPositionCommands: CreateCommand[] = [
       {
@@ -232,15 +330,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         commandType: 'retractAxis' as const,
         params: { axis: 'y' },
       },
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId: labwareId,
-          newLocation: 'offDeck',
-          strategy: 'manualMoveWithoutPause',
-        },
-      },
+      ...moveLabwareOffDeck,
     ]
+
     if (
       moduleId != null &&
       moduleType != null &&
