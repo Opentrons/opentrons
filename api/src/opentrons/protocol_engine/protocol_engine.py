@@ -220,6 +220,16 @@ class ProtocolEngine:
         return self._state_store.commands.get(command.id)
 
     def estop(self, maintenance_run: bool) -> None:
+        """Signal to the engine that an estop event occurred.
+
+        If there are any queued commands for the engine, they will be marked
+        as failed due to the estop event. If there aren't any queued commands
+        *and* this is a maintenance run (which has commands queued one-by-one),
+        a series of actions will mark the engine as Stopped. In either case the
+        queue worker will be deactivated; the primary difference is that the former
+        case will expect the protocol runner to `finish()` the engine, whereas the
+        maintenance run will be put into a state wherein the engine can be discarded.
+        """
         if self._state_store.commands.get_is_stopped():
             return
         current_id = self._state_store.commands.state.running_command_id

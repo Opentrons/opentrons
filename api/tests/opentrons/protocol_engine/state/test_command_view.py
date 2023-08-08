@@ -67,6 +67,7 @@ def get_command_view(
         commands_by_id=commands_by_id,
         run_started_at=run_started_at,
         latest_command_hash=latest_command_hash,
+        stopped_by_estop=False,
     )
 
     return CommandView(state=state)
