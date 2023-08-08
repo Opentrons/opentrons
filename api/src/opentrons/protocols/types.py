@@ -122,10 +122,9 @@ class MalformedPythonError(Exception):
 
     def __str__(self) -> str:
         if self.long_additional_message:
-            to_append = "\n\n" + self.long_additional_message
+            return self.short_message + "\n\n" + self.long_additional_message
         else:
-            to_append = ""
-        return self.short_message + to_append
+            return self.short_message
 
     def __repr__(self) -> str:
         return "<{}: {}>".format(self.__class__.__name__, self.short_message)
