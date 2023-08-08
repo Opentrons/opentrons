@@ -97,7 +97,7 @@ def version_from_string(vstr: str) -> APIVersion:
     if not matches:
         raise MalformedPythonError(
             short_message=(
-                f"apiLevel {vstr} is incorrectly formatted. It should "
+                f"apiLevel {vstr} is incorrectly formatted. It should be "
                 "major.minor, where both major and minor are numbers."
             )
         )
