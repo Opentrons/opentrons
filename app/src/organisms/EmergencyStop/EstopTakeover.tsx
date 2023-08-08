@@ -23,7 +23,6 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const { data: estopStatus } = useEstopQuery({
     refetchInterval: ESTOP_REFETCH_INTERVAL_MS,
   })
-  const [showEstopModal, setShowEstopModal] = React.useState<boolean>(false)
   const {
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
@@ -31,7 +30,7 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const closeModal = (): void => {
     if (estopStatus?.data.status === DISENGAGED) {
-      setShowEstopModal(false)
+      setIsEmergencyStopModalDismissed(false)
     }
   }
 
@@ -61,20 +60,10 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
     }
   }
 
-  React.useEffect(() => {
-    setIsEmergencyStopModalDismissed(isEmergencyStopModalDismissed)
-    if (!isEmergencyStopModalDismissed) {
-      setShowEstopModal(true)
-    }
-  }, [
-    isEmergencyStopModalDismissed,
-    setIsEmergencyStopModalDismissed,
-    showEstopModal,
-  ])
-
   return (
     <>
-      {showEstopModal && isUnboxingFlowOngoing === false ? (
+      {estopStatus?.data.status !== DISENGAGED &&
+      isUnboxingFlowOngoing === false ? (
         <TargetEstopModal />
       ) : null}
     </>
