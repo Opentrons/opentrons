@@ -109,7 +109,7 @@ The gripper may work with other ANSI/SLAS standard labware, but this is not reco
 
 .. note::
 
-    Labware definitions don't explicitly declare compatibility or incompatibility with the gripper. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
+    The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default position and force values for other labware. The Python Protocol API won’t raise a warning or error if you try to grip and move other types of labware.
 
 
 .. _movement-modules: 
