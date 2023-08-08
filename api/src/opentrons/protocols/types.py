@@ -121,7 +121,7 @@ class MalformedPythonError(Exception):
         super().__init__(short_message, long_additional_message)
 
     def __str__(self) -> str:
-        if self.long_additional_message:
+        if self.long_additional_message is not None:
             return self.short_message + "\n\n" + self.long_additional_message
         else:
             return self.short_message
