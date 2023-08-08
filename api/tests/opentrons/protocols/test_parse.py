@@ -4,6 +4,7 @@ from textwrap import dedent
 from typing import Any, Callable, Optional, Union
 
 import pytest
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.parse import (
     extract_static_python_info,
@@ -18,6 +19,7 @@ from opentrons.protocols.types import (
     JsonProtocol,
     Protocol,
     PythonProtocol,
+    PythonProtocolMetadata,
     MalformedPythonError,
     ApiDeprecationError,
 )
@@ -384,35 +386,80 @@ def test_validate_json(
     assert validate_json(v4)[0] == 4
 
 
-@pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
+@pytest.mark.parametrize(
+    (
+        "protocol_source",
+        "expected_metadata",
+        "expected_api_level",
+        "expected_robot_type",
+    ),
+    [
+        (
+            """
+            from opentrons import protocol_api, types
+
+            metadata = {
+                "protocolName": "Testosaur",
+                "author": "Opentrons <engineering@opentrons.com>",
+                "description": 'A variant on "Dinosaur" for testing',
+                "source": "Opentrons Repository",
+                "apiLevel": "2.0",
+            }
+
+
+            def run(ctx: protocol_api.ProtocolContext) -> None:
+                ctx.home()
+                tr = ctx.load_labware("opentrons_96_tiprack_1000ul", 1)
+                right = ctx.load_instrument("p1000_single", types.Mount.RIGHT, [tr])
+                lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
+                right.pick_up_tip()
+                right.aspirate(100, lw.wells()[0].bottom())
+                right.dispense(100, lw.wells()[1].bottom())
+                right.drop_tip(tr.wells()[-1].top())
+            """,
+            {
+                "protocolName": "Testosaur",
+                "author": "Opentrons <engineering@opentrons.com>",
+                "description": 'A variant on "Dinosaur" for testing',
+                "source": "Opentrons Repository",
+                "apiLevel": "2.0",
+            },
+            APIVersion(2, 0),
+            "OT-2 Standard",
+        ),
+    ],
+)
 @pytest.mark.parametrize("protocol_text_kind", ["str", "bytes"])
-@pytest.mark.parametrize("filename", ["real", "none"])
+@pytest.mark.parametrize("filename", ["protocol.py", None])
 def test_parse_python_details(
-    protocol: Protocol, protocol_text_kind: str, filename: str
+    protocol_source: str,
+    protocol_text_kind: str,
+    filename: Optional[str],
+    expected_api_level: APIVersion,
+    expected_robot_type: RobotType,
+    expected_metadata: PythonProtocolMetadata,
 ) -> None:
+    protocol_source = dedent(protocol_source)
+
     if protocol_text_kind == "bytes":
-        text: Union[bytes, str] = protocol.text.encode("utf-8")
+        text: Union[bytes, str] = protocol_source.encode("utf-8")
     else:
-        text = protocol.text
-    if filename == "real":
-        fake_fname = protocol.filename
-    else:
-        fake_fname = None
-    parsed = parse(text, fake_fname)
+        text = protocol_source
+
+    parsed = parse(text, filename)
+
     assert isinstance(parsed, PythonProtocol)
-    assert parsed.text == protocol.text
+    assert parsed.text == protocol_source
     assert isinstance(parsed.text, str)
-    fname = fake_fname if fake_fname else "<protocol>"
+
+    fname = filename if filename is not None else "<protocol>"
+
     assert parsed.filename == fname
-    assert parsed.api_level == APIVersion(2, 0)
-    assert parsed.metadata == {
-        "protocolName": "Testosaur",
-        "author": "Opentrons <engineering@opentrons.com>",
-        "description": 'A variant on "Dinosaur" for testing',
-        "source": "Opentrons Repository",
-        "apiLevel": "2.0",
-    }
-    assert parsed.contents == compile(protocol.text, filename=fname, mode="exec")
+
+    assert parsed.api_level == expected_api_level
+    assert expected_robot_type == expected_robot_type
+    assert parsed.metadata == expected_metadata
+    assert parsed.contents == compile(protocol_source, filename=fname, mode="exec")
 
 
 @pytest.mark.parametrize(
