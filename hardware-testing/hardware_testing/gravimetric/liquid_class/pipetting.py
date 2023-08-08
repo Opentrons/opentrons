@@ -303,7 +303,7 @@ def _pipette_with_liquid_settings(
             # FIXME: using the HW-API to specify that we want to blow-out the full
             #        available blow-out volume
             # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
-            max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
+            max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 14.9
             hw_api.blow_out(hw_mount, max_blow_out_volume)
             hw_api.prepare_for_aspirate(hw_mount)
         if touch_tip:
