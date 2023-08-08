@@ -16,9 +16,18 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 
+from opentrons_hardware.drivers.binary_usb.build import (
+    build_rear_panel_messenger,
+    usb_driver
+)
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     RearPinState,
+    get_door_state,
+    set_deck_light,
+    get_deck_light_state,
+    set_ui_color,
     get_all_pin_state,
+    set_sync_pin
 )
 
 import logging
@@ -283,12 +292,12 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
             result = CSVResult.from_bool(found)
             report(section, tag, [result])
 
-async def _aux_subtest(api, ui_promt, pass_states):
+async def _aux_subtest(usb_messenger, ui_promt, pass_states, sync_state):
     ui.get_user_ready(ui_promt)
-    await api._backend.engage_sync()
-    result = await get_all_pin_state(api._backend.usb_messenger)
+    await set_sync_pin(sync_state, usb_messenger)
+    result = await get_all_pin_state(usb_messenger)
     LOG.info(f"Aux Result: {result}")
-    await api._backend.release()
+    await set_sync_pin(0, usb_messenger)
 
     #format the state comparison nicely for csv output
     result_dict = vars(result)
@@ -325,9 +334,10 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
                         result = CSVResult.from_bool(inp)
                     report(section, test_name, [result])
             else:
-                test_result = await _aux_subtest(api,
+                test_result = await _aux_subtest(api._backend._usb_messenger,
                                            test_config[APT_PROMT],
-                                           test_config[APT_PASS_STATE])
+                                           test_config[APT_PASS_STATE],
+                                           test_config[APT_SYNC_STATE])
                 csv_result = CSVResult.from_bool(test_result[0])
                 report(section, test_name, [test_result[1], csv_result])
 
