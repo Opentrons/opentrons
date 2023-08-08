@@ -27,7 +27,7 @@ This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-C
 
     from opentrons import protocol_api
     
-    requirements = {'robotType': 'Flex', '|apiLevel|'}
+    requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
@@ -307,51 +307,43 @@ The single- and multi-channel P50 GEN1 pipettes are the exceptions here. If your
 Pipette Flow Rates
 ==================
 
-Pipettes aspirate or dispense at different rates measured in units of µL/s. You can change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`~.InstrumentContext.flow_rate` properties listed below:
+Measured in µL/s, the flow rate determines how much liquid a pipette can aspirate, dispense, and blow-out. Opentrons pipettes have their own default flow rates. The API lets you change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`.InstrumentContext.flow_rate` properties listed below. 
 
-* ``InstrumentContext.flow_rate.aspirate``
-* ``InstrumentContext.flow_rate.dispense``
-* ``InstrumentContext.flow_rate.blow_out``
+* Aspirate: ``InstrumentContext.flow_rate.aspirate``
+* Dispense: ``InstrumentContext.flow_rate.dispense``
+* Blow-out: ``InstrumentContext.flow_rate.blow_out``
 
-You can change each attribute without affecting the others. For example, let's load a simple OT-2 protocol as shown below:
+These flow rate properties operate independently. This means you can specify different flow rates for each property within the same protocol. For example, let's load a simple protocol and set different flow rates for the attached pipette.
 
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware(
-            load_name='opentrons_96_tiprack_300ul',
-            location='1')
-        pipette = protocol.load_instrument(
-            instrument_name='p300_single',
-            mount='right',
-            tip_racks=[tiprack])
-        plate = protocol.load_labware(
+        tiprack1 = protocol.load_labware(
+            load_name='opentrons_flex_96_tiprack_1000ul',
+            location='D1')       
+    pipette = protocol.load_instrument(
+            instrument_name='flex_1channel_1000',
+            mount='left',
+            tip_racks=[tiprack1])                
+    plate = protocol.load_labware(
             load_name='corning_96_wellplate_360ul_flat',
-            location='3')
-        pipette.pick_up_tip()
+            location='D3')
+    pipette.pick_up_tip()
 
-Next, let's aspirate at the default flow rate of 150 µL/s and dispense at the default flow rate of 300 µL/s::
+Let's tell the robot to aspirate, dispense, and blow out the liquid using default flow rates. Notice how you don't need to specify a ``flow_rate`` attribute to use the defaults::
 
-        pipette.aspirate(volume=150, plate['A1'])
-        pipette.dispense(volume=300, plate['A1'])
+        pipette.aspirate(200, plate['A1'])
+        pipette.dispense(200, plate['A2'])
+        pipette.blow_out()
 
-Here we're changing default aspirate rate to 50 ul/s (1/3 of the default), but the dispense rate remains unchanged at 300 ul/s::
+Now let's change the flow rates for each action::
 
         pipette.flow_rate.aspirate = 50
-        pipette.aspirate(volume=50, plate['A1'])
-        pipette.dispense(volume=300, plate['A1'])
-
-Here we're slowing down the dispense rate to match the aspirate rate.::
-        
-        pipette.flow_rate.dispense = 50
-        pipette.aspirate(volume=50, plate['A1'])
-        pipette.dispense(volume=50, plate['A1'])
-
-Finally, let's slow down the blow out flow rate from its default::
-
-        pipette.flow_rate.blow_out = 100
-        pipette.aspirate(volume=50, plate['A1'])
-        pipette.blow_out(volume=50)
+        pipette.flow_rate.dispense = 100
+        pipette.flow_rate.blow_out = 75
+        pipette.aspirate(200, plate['A1'])
+        pipette.dispense(200, plate['A2'])
+        pipette.blow_out()
 
 .. note::
     In API version 2.13 and earlier, :py:obj:`.InstrumentContext.speed` offered similar functionality. It attempted to set the plunger speed in mm/s. Due to technical limitations, that speed could only be approximate. You must use ``.flow_rate`` in version 2.14 and later, and you should consider replacing older code that sets ``.speed``.
@@ -385,7 +377,7 @@ Additionally, all Flex pipettes have a well bottom clearance of 1mm for aspirate
 OT-2 Pipette Flow Rates
 -----------------------
 
-The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes.
+The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes. Because the flow rates are the same across types, we've consolidated the data into the "Flow Rates" column.
 
 .. list-table::
     :header-rows: 1
