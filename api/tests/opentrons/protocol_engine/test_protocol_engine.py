@@ -15,6 +15,7 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import (
     DeckType,
     LabwareOffset,
@@ -51,6 +52,7 @@ from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     HardwareStoppedAction,
     ResetTipsAction,
+    FailCommandAction,
 )
 
 
@@ -417,11 +419,13 @@ async def test_finish(
     drop_tips_and_home: bool,
     set_run_status: bool,
     model_utils: ModelUtils,
+    state_store: StateStore,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
     completed_at = datetime(2021, 1, 1, 0, 0)
 
     decoy.when(model_utils.get_timestamp()).then_return(completed_at)
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
 
     await subject.finish(
         drop_tips_and_home=drop_tips_and_home,
@@ -444,8 +448,10 @@ async def test_finish_with_defaults(
     action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
+    state_store: StateStore,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
     await subject.finish()
 
     decoy.verify(
@@ -539,11 +545,14 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     plugin_starter: PluginStarter,
     subject: ProtocolEngine,
     model_utils: ModelUtils,
+    state_store: StateStore,
 ) -> None:
     """It should be able to stop the engine."""
     decoy.when(
         await queue_worker.join(),
     ).then_raise(RuntimeError("oh no"))
+
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
 
     completed_at = datetime(2021, 1, 1, 0, 0)
 
@@ -597,6 +606,77 @@ async def test_stop(
         queue_worker.cancel(),
         await hardware_stopper.do_halt(),
     )
+
+
+@pytest.mark.parametrize("maintenance_run", [True, False])
+async def test_estop_during_command(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+    model_utils: ModelUtils,
+    maintenance_run: bool,
+) -> None:
+    """It should be able to stop the engine."""
+    timestamp = datetime(2021, 1, 1, 0, 0)
+    command_id = "command_fake_id"
+    error_id = "fake_error_id"
+
+    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
+    decoy.when(model_utils.generate_id()).then_return(error_id)
+    decoy.when(state_store.commands.get_is_stopped()).then_return(False)
+    decoy.when(state_store.commands.state.running_command_id).then_return(command_id)
+
+    expected_action = FailCommandAction(
+        command_id=command_id,
+        error_id=error_id,
+        failed_at=timestamp,
+        error=EStopActivatedError(message="Estop Activated"),
+    )
+
+    subject.estop(maintenance_run=maintenance_run)
+
+    decoy.verify(
+        action_dispatcher.dispatch(action=expected_action),
+        queue_worker.cancel(),
+    )
+
+
+@pytest.mark.parametrize("maintenance_run", [True, False])
+async def test_estop_without_command(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+    model_utils: ModelUtils,
+    maintenance_run: bool,
+) -> None:
+    """It should be able to stop the engine."""
+    timestamp = datetime(2021, 1, 1, 0, 0)
+
+    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
+    decoy.when(state_store.commands.get_is_stopped()).then_return(False)
+    decoy.when(state_store.commands.state.running_command_id).then_return(None)
+
+    expected_stop = StopAction(from_estop=True)
+    expected_hardware_stop = HardwareStoppedAction(completed_at=timestamp)
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_stop),
+    ).then_return(expected_stop)
+
+    subject.estop(maintenance_run=maintenance_run)
+
+    decoy.verify(
+        action_dispatcher.dispatch(expected_stop), times=1 if maintenance_run else 0
+    )
+    decoy.verify(
+        action_dispatcher.dispatch(expected_hardware_stop),
+        times=1 if maintenance_run else 0,
+    )
+    decoy.verify(queue_worker.cancel(), times=1 if maintenance_run else 0)
 
 
 def test_add_plugin(
