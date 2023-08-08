@@ -64,6 +64,22 @@ export function getPrepCommands(
             },
           ]
         } else if (
+          command.commandType === 'loadAdapter' &&
+          command.result?.adapterId != null
+        ) {
+          // load all adapter  off-deck so that LPC can move them on individually later
+          return [
+            ...acc,
+            {
+              ...command,
+              params: {
+                ...command.params,
+                location: 'offDeck',
+                adapterId: command.result.adapterId,
+              },
+            },
+          ]
+        } else if (
           command.commandType === 'loadModule' &&
           command.result?.moduleId != null
         ) {
@@ -128,6 +144,7 @@ function isLoadCommand(
     'loadLabware',
     'loadModule',
     'loadPipette',
+    'loadAdapter',
   ]
   return loadCommands.includes(command.commandType)
 }
