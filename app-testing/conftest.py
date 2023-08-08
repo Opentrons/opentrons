@@ -13,6 +13,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
+from selenium.webdriver.chrome.service import Service
 
 
 collect_ignore_glob = ["files/**/*.py"]
@@ -21,7 +22,7 @@ _console = Console(color_system="auto")
 pretty.install(console=_console)
 traceback.install(console=_console)
 
-from selenium.chrome.service import Service
+
 # Check to see if we have a dotenv file and use it
 if find_dotenv():
     load_dotenv(find_dotenv())
@@ -112,7 +113,7 @@ def driver(request: pytest.FixtureRequest) -> Generator[WebDriver, None, None]:
 
     web_driver_path = os.environ["CHROMEWEBDRIVER"]
     
-    service = webdriver.chrome.service.Service(web_driver_path)
+    service = Service(web_driver_path)
     service.start()
     
     with RemoteWebDriver(
