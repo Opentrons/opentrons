@@ -29,6 +29,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "[A-Z]+[0-9]+": { "$ref": "#/definitions/xyzArray" }
+      }
     }
   }
 }
