@@ -110,16 +110,12 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             let labwareId =
               labwareInSlot != null ? labwareInSlot.result?.labwareId : null
             let labwareInAdapter = null
-            let labwareInModuleId
             if (
               labwareInModule?.result != null &&
               'labwareId' in labwareInModule.result
             ) {
               labwareInAdapter =
                 initialLoadedLabwareByAdapter[labwareInModule?.result.labwareId]
-
-              labwareInModuleId = labwareInModule?.result.labwareId
-
               labwareId =
                 labwareInAdapter != null
                   ? labwareInAdapter.result?.labwareId
@@ -130,7 +126,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             ) {
               labwareInAdapterInMod =
                 initialLoadedLabwareByAdapter[labwareInModule?.result.adapterId]
-              labwareInModuleId = labwareInModule?.result.adapterId
               labwareId = labwareInAdapterInMod.result?.labwareId
             }
             const wellFill =

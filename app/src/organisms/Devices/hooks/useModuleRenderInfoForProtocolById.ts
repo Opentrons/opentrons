@@ -36,7 +36,6 @@ export function useModuleRenderInfoForProtocolById(
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
-
   const protocolModulesInfoInLoadOrder = protocolModulesInfo.sort(
     (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder
   )

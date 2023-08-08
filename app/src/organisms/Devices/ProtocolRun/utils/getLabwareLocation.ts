@@ -1,6 +1,7 @@
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LoadLabwareRunTimeCommand,
+  LoadAdapterRunTimeCommand,
   LabwareLocation,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
@@ -16,17 +17,22 @@ export const getLabwareLocation = (
   if (labwareId === TRASH_ID) {
     return { slotName: '12' }
   }
-  const labwareLocation = commands.find(
-    (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
-      command.commandType === 'loadLabware' &&
-      command.result?.labwareId === labwareId
-  )?.params?.location
 
-  if (labwareLocation == null) {
+  const locationCommand = commands.find(
+    (
+      command
+    ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
+      (command.commandType === 'loadLabware' &&
+        command.result?.labwareId === labwareId) ||
+      (command.commandType === 'loadAdapter' &&
+        command.result?.adapterId === labwareId)
+  )
+
+  if (locationCommand?.params?.location == null) {
     throw new Error(
-      'expected to be able to find labware location, but could not'
+      'Expected to be able to find labware location, but could not'
     )
   }
 
-  return labwareLocation
+  return locationCommand.params.location
 }

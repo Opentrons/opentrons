@@ -26,6 +26,7 @@ import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
+import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 
 interface SetupLabwareMapProps {
   robotName: string
@@ -44,9 +45,11 @@ export function SetupLabwareMap({
   )
   const { robotType } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  console.log('labwareRenderInfoById', labwareRenderInfoById)
   const deckDef = getDeckDefFromRobotType(robotType)
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
+  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
+    commands
+  )
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16}>
@@ -69,54 +72,80 @@ export function SetupLabwareMap({
                     nestedLabwareDef,
                     nestedLabwareId,
                     nestedLabwareDisplayName,
-                  }) => (
-                    <Module
-                      key={`LabwareSetup_Module_${String(
-                        moduleDef.model
-                      )}_${x}${y}`}
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                      def={moduleDef}
-                      innerProps={
-                        moduleDef.model === THERMOCYCLER_MODULE_V1
-                          ? { lidMotorState: 'open' }
-                          : {}
-                      }
-                    >
-                      {nestedLabwareDef != null && nestedLabwareId != null ? (
-                        <React.Fragment
-                          key={`LabwareSetup_Labware_${String(
-                            nestedLabwareDef.metadata.displayName
-                          )}_${x}${y}`}
-                        >
-                          <LabwareRender definition={nestedLabwareDef} />
-                          <LabwareInfoOverlay
-                            definition={nestedLabwareDef}
-                            labwareId={nestedLabwareId}
-                            displayName={nestedLabwareDisplayName}
-                            runId={runId}
-                          />
-                        </React.Fragment>
-                      ) : null}
-                    </Module>
-                  )
+                  }) => {
+                    const labwareInAdapterInMod =
+                      nestedLabwareId != null
+                        ? initialLoadedLabwareByAdapter[nestedLabwareId]
+                        : null
+                    const definition =
+                      labwareInAdapterInMod?.result?.definition ??
+                      nestedLabwareDef
+                    const labwareIdToUse =
+                      labwareInAdapterInMod?.result?.labwareId ??
+                      nestedLabwareId
+                    const displayNameToUse =
+                      labwareInAdapterInMod?.result?.definition.metadata
+                        .displayName ?? nestedLabwareDisplayName
+
+                    return (
+                      <Module
+                        key={`LabwareSetup_Module_${String(
+                          moduleDef.model
+                        )}_${x}${y}`}
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                        def={moduleDef}
+                        innerProps={
+                          moduleDef.model === THERMOCYCLER_MODULE_V1
+                            ? { lidMotorState: 'open' }
+                            : {}
+                        }
+                      >
+                        {definition != null &&
+                        displayNameToUse != null &&
+                        labwareIdToUse != null ? (
+                          <React.Fragment
+                            key={`LabwareSetup_Labware_${displayNameToUse}_${x}${y}`}
+                          >
+                            <LabwareRender definition={definition} />
+                            <LabwareInfoOverlay
+                              definition={definition}
+                              labwareId={labwareIdToUse}
+                              displayName={displayNameToUse}
+                              runId={runId}
+                            />
+                          </React.Fragment>
+                        ) : null}
+                      </Module>
+                    )
+                  }
                 )}
                 {map(
                   labwareRenderInfoById,
                   ({ x, y, labwareDef, displayName }, labwareId) => {
+                    const labwareInAdapter =
+                      initialLoadedLabwareByAdapter[labwareId]
+                    const definition =
+                      labwareInAdapter?.result?.definition ?? labwareDef
+                    const labwareIdToUse =
+                      labwareInAdapter?.result?.labwareId ?? labwareId
+                    const displayNameToUse =
+                      labwareInAdapter?.result?.definition.metadata
+                        .displayName ?? displayName
+
                     return (
                       <React.Fragment
                         key={`LabwareSetup_Labware_${String(
-                          labwareDef.metadata.displayName
+                          displayNameToUse
                         )}_${x}${y}`}
                       >
                         <g transform={`translate(${x},${y})`}>
-                          <LabwareRender definition={labwareDef} />
+                          <LabwareRender definition={definition} />
                           <LabwareInfoOverlay
-                            definition={labwareDef}
-                            labwareId={labwareId}
-                            displayName={displayName}
+                            definition={definition}
+                            labwareId={labwareIdToUse}
+                            displayName={displayNameToUse}
                             runId={runId}
                           />
                         </g>
@@ -124,6 +153,7 @@ export function SetupLabwareMap({
                     )
                   }
                 )}
+
                 <SlotLabels robotType={robotType} />
               </>
             )}
@@ -132,6 +162,7 @@ export function SetupLabwareMap({
         <OffDeckLabwareList
           labwareItems={offDeckItems}
           isOt3={robotType === 'OT-3 Standard'}
+          commands={commands}
         />
       </Flex>
     </Flex>

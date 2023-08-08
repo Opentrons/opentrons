@@ -84,6 +84,7 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a thermocycler (OT2), clicking on secure labware instructions opens the modal', () => {
     const { getByText } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -110,6 +111,7 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a thermocycler (OT3)', () => {
     const { getByText } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -132,6 +134,7 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
     const { getByText } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -164,6 +167,7 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a labware on top of a temperature module', () => {
     const { getByText } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -193,6 +197,7 @@ describe('LabwareListItem', () => {
   it('renders the correct info for a labware on top of a heater shaker', () => {
     const { getByText, getByLabelText } = render({
       nickName: mockNickName,
+      commands: [],
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
       moduleModel: 'heaterShakerModuleV1' as ModuleModel,
@@ -236,6 +241,7 @@ describe('LabwareListItem', () => {
       nickName: null,
       definition: mockLabwareDef,
       initialLocation: 'offDeck',
+      commands: [],
       moduleModel: null,
       moduleLocation: null,
       extraAttentionModules: [],

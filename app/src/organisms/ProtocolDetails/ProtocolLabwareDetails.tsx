@@ -28,10 +28,9 @@ import type {
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {
-  requiredLabwareDetails: (
-    | LoadLabwareRunTimeCommand
-    | LoadAdapterRunTimeCommand
-  )[]
+  requiredLabwareDetails: Array<
+    LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand
+  >
 }
 
 export const ProtocolLabwareDetails = (

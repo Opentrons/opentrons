@@ -105,9 +105,11 @@ export function LabwareListItem(
 
   if (initialLocation !== 'offDeck' && 'labwareId' in initialLocation) {
     const adapter = commands.find(
-      (command): command is LoadAdapterRunTimeCommand =>
-        command.result?.adapterId === initialLocation.labwareId
+      (command): command is LoadAdapterRunTimeCommand => {
+        return command.result?.adapterId === initialLocation.labwareId
+      }
     )
+
     let location
     let name
     if (
@@ -116,20 +118,24 @@ export function LabwareListItem(
     ) {
       if ('slotName' in adapter?.params?.location) {
         location = adapter?.params.location.slotName
-        t('slot_location', {
+        name = adapter?.result?.definition.metadata.displayName
+        slotInfo = t('adapter_slot_location', {
           slotName: location,
+          adapterName: name,
         })
       } else if ('moduleId' in adapter?.params?.location) {
         const module = commands.find(
           (command): command is LoadModuleRunTimeCommand =>
+            //  @ts-expect-error: jr, 8/7/23: for some reason TS isn't type narrowing this
             command.params.moduleId === adapter?.params.location.moduleId
         )
         if (module != null) {
           location = module.params.location.slotName
           name = adapter?.result?.definition.metadata.displayName
-          slotInfo = t('module_slot_location', {
+          slotInfo = t('adapter_slot_location_module', {
             slotName: location,
-            moduleName: name,
+            adapterName: name,
+            moduleName: getModuleDisplayName(module.params.model),
           })
         }
       }

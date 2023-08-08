@@ -1,5 +1,7 @@
 {
   "96_mount": "left + right mount",
+  "adapter_slot_location": "Slot {{slotName}}, {{adapterName}}",
+  "adapter_slot_location_module": "Slot {{slotName}}, {{adapterName}} on {{moduleName}}",
   "additional_labware": "{{count}} additional labware",
   "additional_off_deck_labware": "Additional Off-Deck Labware",
   "attach_gripper_failure_reason": "Attach the required gripper to continue",

@@ -4,6 +4,7 @@ import isEmpty from 'lodash/isEmpty'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
+  parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
@@ -53,7 +54,7 @@ interface SetupLiquidsMapProps {
 
 export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
   const { runId, robotName } = props
-  const [hoverLabwareId, setHoverLabwareId] = React.useState('')
+  const [hoverLabwareId, setHoverLabwareId] = React.useState<string>('')
 
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
@@ -64,6 +65,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
   const protocolData = useMostRecentCompletedAnalysis(runId)
   const liquids = parseLiquidsInLoadOrder(
     protocolData?.liquids != null ? protocolData?.liquids : [],
+    protocolData?.commands ?? []
+  )
+  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     protocolData?.commands ?? []
   )
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -101,44 +105,103 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 nestedLabwareDef,
                 nestedLabwareId,
                 nestedLabwareDisplayName,
-              }) => (
-                <Module
-                  key={`LabwareSetup_Module_${String(
-                    moduleDef.model
-                  )}_${x}${y}`}
-                  x={x}
-                  y={y}
-                  orientation={inferModuleOrientationFromXCoordinate(x)}
-                  def={moduleDef}
-                  innerProps={
-                    moduleDef.model === THERMOCYCLER_MODULE_V1
-                      ? { lidMotorState: 'open' }
-                      : {}
-                  }
-                >
-                  {nestedLabwareDef != null && nestedLabwareId != null ? (
-                    <React.Fragment
-                      key={`LabwareSetup_Labware_${String(
-                        nestedLabwareDef.metadata.displayName
-                      )}_${x}${y}`}
-                    >
-                      <LabwareRender definition={nestedLabwareDef} />
-                      <LabwareInfoOverlay
-                        definition={nestedLabwareDef}
-                        labwareId={nestedLabwareId}
-                        displayName={nestedLabwareDisplayName}
-                        runId={runId}
-                      />
-                    </React.Fragment>
-                  ) : null}
-                </Module>
-              )
+              }) => {
+                const labwareInAdapterInMod =
+                  nestedLabwareId != null
+                    ? initialLoadedLabwareByAdapter[nestedLabwareId]
+                    : null
+                const definition =
+                  labwareInAdapterInMod?.result?.definition ?? nestedLabwareDef
+                const labwareIdToUse =
+                  labwareInAdapterInMod?.result?.labwareId ?? nestedLabwareId
+                const displayNameToUse =
+                  labwareInAdapterInMod?.result?.definition.metadata
+                    .displayName ?? nestedLabwareDisplayName
+                let id: string = ''
+                if (labwareInAdapterInMod != null) {
+                  id = labwareInAdapterInMod.result?.labwareId ?? ''
+                } else {
+                  id = nestedLabwareId ?? ''
+                }
+                const wellFill = getWellFillFromLabwareId(
+                  id,
+                  liquids,
+                  labwareByLiquidId
+                )
+                const labwareHasLiquid = !isEmpty(wellFill)
+
+                return (
+                  <Module
+                    key={`LabwareSetup_Module_${String(
+                      moduleDef.model
+                    )}_${x}${y}`}
+                    x={x}
+                    y={y}
+                    orientation={inferModuleOrientationFromXCoordinate(x)}
+                    def={moduleDef}
+                    innerProps={
+                      moduleDef.model === THERMOCYCLER_MODULE_V1
+                        ? { lidMotorState: 'open' }
+                        : {}
+                    }
+                  >
+                    {definition != null &&
+                    displayNameToUse != null &&
+                    labwareIdToUse != null ? (
+                      <React.Fragment
+                        key={`LabwareSetup_Labware_${displayNameToUse}_${x}${y}`}
+                      >
+                        <g
+                          transform="translate(0,0)"
+                          onMouseEnter={() => setHoverLabwareId(id)}
+                          onMouseLeave={() => setHoverLabwareId('')}
+                          onClick={() =>
+                            labwareHasLiquid
+                              ? setLiquidDetailsLabwareId(id)
+                              : null
+                          }
+                          cursor={labwareHasLiquid ? 'pointer' : ''}
+                        >
+                          <LabwareRender
+                            definition={definition}
+                            wellFill={wellFill ?? undefined}
+                            hover={id === hoverLabwareId && labwareHasLiquid}
+                          />
+                          <LabwareInfoOverlay
+                            definition={definition}
+                            labwareId={labwareIdToUse}
+                            displayName={displayNameToUse}
+                            runId={runId}
+                            hover={id === hoverLabwareId && labwareHasLiquid}
+                            labwareHasLiquid={labwareHasLiquid}
+                          />
+                        </g>
+                      </React.Fragment>
+                    ) : null}
+                  </Module>
+                )
+              }
             )}
             {map(
               labwareRenderInfoById,
               ({ x, y, labwareDef, displayName }, labwareId) => {
+                const labwareInAdapter =
+                  initialLoadedLabwareByAdapter[labwareId]
+                const definition =
+                  labwareInAdapter?.result?.definition ?? labwareDef
+                const labwareIdToUse =
+                  labwareInAdapter?.result?.labwareId ?? labwareId
+                const displayNameToUse =
+                  labwareInAdapter?.result?.definition.metadata.displayName ??
+                  displayName
+                let id: string = ''
+                if (labwareInAdapter != null) {
+                  id = labwareInAdapter.result?.labwareId ?? ''
+                } else {
+                  id = labwareId ?? ''
+                }
                 const wellFill = getWellFillFromLabwareId(
-                  labwareId,
+                  id,
                   liquids,
                   labwareByLiquidId
                 )
@@ -146,29 +209,27 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 return (
                   <React.Fragment
                     key={`LabwareSetup_Labware_${String(
-                      labwareDef.metadata.displayName
+                      displayNameToUse
                     )}_${x}${y}`}
                   >
                     <g
                       transform={`translate(${x},${y})`}
-                      onMouseEnter={() => setHoverLabwareId(labwareId)}
+                      onMouseEnter={() => setHoverLabwareId(id)}
                       onMouseLeave={() => setHoverLabwareId('')}
                       onClick={() =>
-                        labwareHasLiquid
-                          ? setLiquidDetailsLabwareId(labwareId)
-                          : null
+                        labwareHasLiquid ? setLiquidDetailsLabwareId(id) : null
                       }
                       cursor={labwareHasLiquid ? 'pointer' : ''}
                     >
                       <LabwareRender
-                        definition={labwareDef}
+                        definition={definition}
                         wellFill={labwareHasLiquid ? wellFill : undefined}
                         hover={labwareId === hoverLabwareId && labwareHasLiquid}
                       />
                       <LabwareInfoOverlay
-                        definition={labwareDef}
-                        labwareId={labwareId}
-                        displayName={displayName}
+                        definition={definition}
+                        labwareId={labwareIdToUse}
+                        displayName={displayNameToUse}
                         runId={runId}
                         hover={labwareId === hoverLabwareId && labwareHasLiquid}
                         labwareHasLiquid={labwareHasLiquid}

@@ -59,7 +59,11 @@ export function SetupLabwareList(
           isOt3={isOt3}
         />
       ))}
-      <OffDeckLabwareList labwareItems={offDeckItems} isOt3={isOt3} />
+      <OffDeckLabwareList
+        commands={commands}
+        labwareItems={offDeckItems}
+        isOt3={isOt3}
+      />
     </Flex>
   )
 }

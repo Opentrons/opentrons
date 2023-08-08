@@ -56,6 +56,7 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
 } from '@opentrons/shared-data'
+import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
@@ -121,6 +122,9 @@ export function ProtocolSetupLabware({
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
     protocolModulesInfo
+  )
+  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
+    mostRecentAnalysis?.commands ?? []
   )
 
   const handleLabwareClick = (
@@ -203,59 +207,83 @@ export function ProtocolSetupLabware({
                       moduleDef,
                       nestedLabwareDef,
                       nestedLabwareId,
-                    }) => (
-                      <Module
-                        key={`LabwareSetup_Module_${String(
-                          moduleDef.model
-                        )}_${x}${y}`}
-                        x={x}
-                        y={y}
-                        orientation={inferModuleOrientationFromXCoordinate(x)}
-                        def={moduleDef}
-                        innerProps={
-                          moduleDef.model === THERMOCYCLER_MODULE_V1
-                            ? { lidMotorState: 'open' }
-                            : {}
-                        }
-                      >
-                        {nestedLabwareDef != null && nestedLabwareId != null ? (
-                          <React.Fragment
-                            key={`LabwareSetup_Labware_${String(
-                              nestedLabwareDef.metadata.displayName
-                            )}_${x}${y}`}
-                          >
+                      nestedLabwareDisplayName,
+                    }) => {
+                      const labwareInAdapterInMod =
+                        nestedLabwareId != null
+                          ? initialLoadedLabwareByAdapter[nestedLabwareId]
+                          : null
+                      const definition =
+                        labwareInAdapterInMod?.result?.definition ??
+                        nestedLabwareDef
+                      const labwareIdToUse =
+                        labwareInAdapterInMod?.result?.labwareId ??
+                        nestedLabwareId
+                      const displayNameToUse =
+                        labwareInAdapterInMod?.result?.definition.metadata
+                          .displayName ?? nestedLabwareDisplayName
+
+                      return (
+                        <Module
+                          key={`LabwareSetup_Module_${String(
+                            moduleDef.model
+                          )}_${x}${y}`}
+                          x={x}
+                          y={y}
+                          orientation={inferModuleOrientationFromXCoordinate(x)}
+                          def={moduleDef}
+                          innerProps={
+                            moduleDef.model === THERMOCYCLER_MODULE_V1
+                              ? { lidMotorState: 'open' }
+                              : {}
+                          }
+                        >
+                          {definition != null &&
+                          displayNameToUse != null &&
+                          labwareIdToUse != null ? (
+                            <React.Fragment
+                              key={`LabwareSetup_Labware_${displayNameToUse}_${x}${y}`}
+                            >
+                              <LabwareRender
+                                definition={definition}
+                                onLabwareClick={() =>
+                                  handleLabwareClick(definition, labwareIdToUse)
+                                }
+                              />
+                            </React.Fragment>
+                          ) : null}
+                        </Module>
+                      )
+                    }
+                  )}
+                  {map(
+                    labwareRenderInfo,
+                    ({ x, y, labwareDef, displayName }, labwareId) => {
+                      const labwareInAdapter =
+                        initialLoadedLabwareByAdapter[labwareId]
+                      const definition =
+                        labwareInAdapter?.result?.definition ?? labwareDef
+                      const labwareIdToUse =
+                        labwareInAdapter?.result?.labwareId ?? labwareId
+                      const displayNameToUse =
+                        labwareInAdapter?.result?.definition.metadata
+                          .displayName ?? displayName
+                      return (
+                        <React.Fragment
+                          key={`LabwareSetup_Labware_${displayNameToUse}_${x}${y}`}
+                        >
+                          <g transform={`translate(${x},${y})`}>
                             <LabwareRender
-                              definition={nestedLabwareDef}
+                              definition={definition}
                               onLabwareClick={() =>
-                                handleLabwareClick(
-                                  nestedLabwareDef,
-                                  nestedLabwareId
-                                )
+                                handleLabwareClick(definition, labwareIdToUse)
                               }
                             />
-                          </React.Fragment>
-                        ) : null}
-                      </Module>
-                    )
+                          </g>
+                        </React.Fragment>
+                      )
+                    }
                   )}
-                  {map(labwareRenderInfo, ({ x, y, labwareDef }, labwareId) => {
-                    return (
-                      <React.Fragment
-                        key={`LabwareSetup_Labware_${String(
-                          labwareDef.metadata.displayName
-                        )}_${x}${y}`}
-                      >
-                        <g transform={`translate(${x},${y})`}>
-                          <LabwareRender
-                            definition={labwareDef}
-                            onLabwareClick={() =>
-                              handleLabwareClick(labwareDef, labwareId)
-                            }
-                          />
-                        </g>
-                      </React.Fragment>
-                    )
-                  })}
                   <SlotLabels robotType={ROBOT_MODEL_OT3} />
                 </>
               )}

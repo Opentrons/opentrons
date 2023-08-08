@@ -106,6 +106,5 @@ export function getLabwareSetupItemGroups(
     }, []),
     ({ initialLocation }) => initialLocation === 'offDeck'
   )
-  console.log('onDeckItems', onDeckItems)
   return { onDeckItems, offDeckItems }
 }
