@@ -6,8 +6,7 @@
 Building Block Commands
 #######################
 
-Building block, or basic, commands are the smallest individual actions that can be completed on an OT-2.
-For example, the complex command ``transfer`` (see :ref:`v2-complex-commands`) executes a series of ``pick_up_tip()``, ``aspirate()``, ``dispense()`` and ``drop_tip()`` basic commands.
+Building block commands execute some of the most basic actions that you can have the robot complete. But, basic doesn’t mean these are simple or lack utility. In fact, these commands perform important tasks in your protocols. They’re also part of the foundation that the :ref:`complex commands <v2-complex-commands>` rely on. In this section, we’ll look at building block commands that help you manipulate pipette tips, work with liquids, and interact with robot utility features.
 
 The examples in this section would be added to the following:
 
