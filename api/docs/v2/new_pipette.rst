@@ -15,7 +15,7 @@ For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v
 Loading Pipettes
 ================
 
-Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. As noted above, the :py:meth:`~.ProtocolContext.load_instrument` method provides this capability. It also requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
+As noted above, you call the :py:meth:`~.ProtocolContext.load_instrument` method to load a pipette. This method also requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
 
 Loading Flex 1- and 8-Channel Pipettes
 --------------------------------------
@@ -345,7 +345,7 @@ Now let's change the flow rates for each action::
 .. versionadded:: 2.0
 
 
-.. _defaults:
+.. _pipette:
 
 Flex Pipette Flow Rates
 -----------------------
