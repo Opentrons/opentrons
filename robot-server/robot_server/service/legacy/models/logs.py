@@ -8,7 +8,7 @@ class LogIdentifier(str, Enum):
     serial = "serial.log"
     server = "server.log"
     api_server = "combined_api_server.log"
-    odd = "app.log"
+    odd = "odd.log"
 
 
 class LogFormat(str, Enum):
