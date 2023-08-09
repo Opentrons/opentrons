@@ -10,11 +10,11 @@ from opentrons.hardware_control import HardwareControlAPI
 
 from server_utils.util import call_once
 
-from robot_server.hardware import get_hardware
+from robot_server.hardware import get_hardware, get_robot_type
 from robot_server.persistence import get_sql_engine as ensure_sql_engine_is_ready
 from robot_server.service.legacy.models import V1BasicResponse
 
-from opentrons_shared_data.deck.dev_types import RobotModel
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from .models import Health, HealthLinks
 
@@ -124,6 +124,7 @@ async def get_health(
     # errors that would present in a confusing way.
     sql_engine: object = Depends(ensure_sql_engine_is_ready),
     versions: ComponentVersions = Depends(get_versions),
+    robot_type: RobotType = Depends(get_robot_type),
 ) -> Health:
     """Get information about the health of the robot server.
 
@@ -131,11 +132,6 @@ async def get_health(
     and ready to operate. A 200 OK response means the server is running.
     The response includes information about the software and system.
     """
-    robot_model: RobotModel = (
-        "OT-3 Standard"
-        if config.feature_flags.enable_ot3_hardware_controller()
-        else "OT-2 Standard"
-    )
     health_links = HealthLinks(
         apiLog="/logs/api.log",
         serialLog="/logs/serial.log",
@@ -144,7 +140,7 @@ async def get_health(
         systemTime="/system/time",
     )
 
-    if robot_model == "OT-3 Standard":
+    if robot_type == "OT-3 Standard":
         logs = FLEX_LOG_PATHS
         health_links.oddLog = "/logs/odd.log"
     else:
@@ -159,6 +155,6 @@ async def get_health(
         system_version=versions.system_version,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
-        robot_model=robot_model,
+        robot_model=robot_type,
         links=health_links,
     )
