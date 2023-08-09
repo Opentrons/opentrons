@@ -20,9 +20,14 @@ from .models import Health, HealthLinks
 
 _log = logging.getLogger(__name__)
 
-LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+OT2_LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+FLEX_LOG_PATHS = [
+    "/logs/serial.log",
+    "/logs/api.log",
+    "/logs/server.log",
+    "/logs/odd.log",
+]
 VERSION_PATH = "/etc/VERSION.json"
-OOD_LOG_PATH = "/logs/odd.log"
 
 
 @dataclass
@@ -138,17 +143,19 @@ async def get_health(
         apiSpec="/openapi.json",
         systemTime="/system/time",
     )
+
     if robot_model == "OT-3 Standard":
-        if OOD_LOG_PATH not in LOG_PATHS:
-            LOG_PATHS.append(OOD_LOG_PATH)
-        health_links.oddLog = OOD_LOG_PATH
+        logs = FLEX_LOG_PATHS
+        health_links.oddLog = "/logs/odd.log"
+    else:
+        logs = OT2_LOG_PATHS
 
     return Health(
         name=config.name(),
         api_version=versions.api_version,
         fw_version=hardware.fw_version,
         board_revision=hardware.board_revision,
-        logs=LOG_PATHS,
+        logs=logs,
         system_version=versions.system_version,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
