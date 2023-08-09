@@ -192,7 +192,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
       proceed()
     }
   }
-  let justifyContentForOddButton: undefined | string = undefined
   let button: JSX.Element = isOnDevice ? (
     <SmallButton
       textTransform={TYPOGRAPHY.textTransformCapitalize}
