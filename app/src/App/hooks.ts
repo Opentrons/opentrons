@@ -83,8 +83,7 @@ export function useProtocolReceiptToast(): void {
               t('protocol_added', {
                 protocol_name: name,
               }),
-              'success',
-              { closeButton: true, disableTimeout: true }
+              'success'
             )
           })
         })
