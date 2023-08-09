@@ -232,7 +232,10 @@ class ProtocolEngine:
         """
         if self._state_store.commands.get_is_stopped():
             return
-        current_id = self._state_store.commands.state.running_command_id
+        current_id = (
+            self._state_store.commands.state.running_command_id
+            or self._state_store.commands.state.queued_command_ids.head(None)
+        )
 
         if current_id is not None:
             fail_action = FailCommandAction(
@@ -242,6 +245,18 @@ class ProtocolEngine:
                 error=EStopActivatedError(message="Estop Activated"),
             )
             self._action_dispatcher.dispatch(fail_action)
+
+            # In the case where the running command was a setup command - check if there
+            # are any pending *run* commands and, if so, clear them all
+            current_id = self._state_store.commands.state.queued_command_ids.head(None)
+            if current_id is not None:
+                fail_action = FailCommandAction(
+                    command_id=current_id,
+                    error_id=self._model_utils.generate_id(),
+                    failed_at=self._model_utils.get_timestamp(),
+                    error=EStopActivatedError(message="Estop Activated"),
+                )
+                self._action_dispatcher.dispatch(fail_action)
             self._queue_worker.cancel()
         elif maintenance_run:
             stop_action = self._state_store.commands.validate_action_allowed(

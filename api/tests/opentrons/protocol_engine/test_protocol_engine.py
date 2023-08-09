@@ -7,6 +7,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons.ordered_set import OrderedSet
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -622,14 +623,24 @@ async def test_estop_during_command(
     timestamp = datetime(2021, 1, 1, 0, 0)
     command_id = "command_fake_id"
     error_id = "fake_error_id"
+    fake_command_set = OrderedSet(["fake-id-1", "fake-id-1"])
 
     decoy.when(model_utils.get_timestamp()).then_return(timestamp)
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(state_store.commands.get_is_stopped()).then_return(False)
     decoy.when(state_store.commands.state.running_command_id).then_return(command_id)
+    decoy.when(state_store.commands.state.queued_command_ids).then_return(
+        fake_command_set
+    )
 
     expected_action = FailCommandAction(
         command_id=command_id,
+        error_id=error_id,
+        failed_at=timestamp,
+        error=EStopActivatedError(message="Estop Activated"),
+    )
+    expected_action_2 = FailCommandAction(
+        command_id=fake_command_set.head(),
         error_id=error_id,
         failed_at=timestamp,
         error=EStopActivatedError(message="Estop Activated"),
@@ -639,6 +650,7 @@ async def test_estop_during_command(
 
     decoy.verify(
         action_dispatcher.dispatch(action=expected_action),
+        action_dispatcher.dispatch(action=expected_action_2),
         queue_worker.cancel(),
     )
 
