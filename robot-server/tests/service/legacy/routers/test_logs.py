@@ -142,8 +142,8 @@ def test_get_api_log_with_params(api_client, format_param, records_param, mode_p
         ("text", 1, "short-precise"),
     ],
 )
-def test_get_app_log_with_params(api_client, format_param, records_param, mode_param):
-    logs = '{"app": "application programing interface logs"}'
+def test_get_odd_log_with_params(api_client, format_param, records_param, mode_param):
+    logs = '{"odd": "application programing interface logs"}'
     res_bytes = logs.encode("utf-8")
     if format_param == "json":
         expected = json.loads(res_bytes)
@@ -156,7 +156,7 @@ def test_get_app_log_with_params(api_client, format_param, records_param, mode_p
     with patch("opentrons.system.log_control.get_records_dumb") as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get(
-            f"/logs/app.log?format={format_param}&records={records_param}"
+            f"/logs/odd.log?format={format_param}&records={records_param}"
         )
         if format_param == "json":
             body = response.json()
@@ -167,7 +167,7 @@ def test_get_app_log_with_params(api_client, format_param, records_param, mode_p
         m.assert_called_once_with("opentrons-robot-app", records_param, mode_param)
 
 
-def test_get_app_log_with_defaults(api_client):
+def test_get_odd_log_with_defaults(api_client):
     logs = '{"app": "application programing interface logs"}'
     res_bytes = logs.encode("utf-8")
     expected = res_bytes.decode("utf-8")
@@ -177,8 +177,9 @@ def test_get_app_log_with_defaults(api_client):
 
     with patch("opentrons.system.log_control.get_records_dumb") as m:
         m.side_effect = mock_get_records_dumb
-        response = api_client.get("/logs/app.log")
+        response = api_client.get("/logs/odd.log")
         body = response.text
+        print(body)
         assert response.status_code == 200
         assert body == expected
         m.assert_called_once_with(
