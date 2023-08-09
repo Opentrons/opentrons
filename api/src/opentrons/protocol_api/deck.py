@@ -23,9 +23,6 @@ from . import validation
 DeckItem = Union[Labware, ModuleContext]
 
 
-_DELITEM_VERSION_GATE = APIVersion(2, 15)
-
-
 @dataclass(frozen=True)
 class CalibrationPosition:
     """A calibration point on the deck of the robot.
@@ -99,10 +96,15 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         return item
 
     def __delitem__(self, key: DeckLocation) -> None:
-        if self._api_version < _DELITEM_VERSION_GATE:
+        if self._api_version == APIVersion(2, 14):
+            # __delitem__() support history:
+            #
+            # * PAPIv<=2.13 (non Protocol Engine): Yes, but that goes through a different Deck class
+            # * PAPIv2.14 (Protocol Engine): No
+            # * PAPIv2.15 (Protocol Engine): Yes
             raise APIVersionError(
                 f"Deleting deck elements is not supported with apiLevel {self._api_version}."
-                f" Try increasing your apiLevel to {_DELITEM_VERSION_GATE}."
+                f" Try increasing your apiLevel to {APIVersion(2, 15)}."
             )
 
         slot_name = _get_slot_name(
@@ -111,9 +113,12 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         item_core = self._protocol_core.get_slot_item(slot_name)
 
         if item_core is None:
-            raise TypeError(f"Slot {repr(key)} doesn't contain anything to delete.")
+            # No-op if trying to delete from an empty slot.
+            # This matches pre-Protocol-Engine (PAPIv<=2.13) behavior.
+            pass
         elif isinstance(item_core, AbstractModuleCore):
             # Protocol Engine does not support removing modules from the deck.
+            # This is a change from pre-Protocol-Engine (PAPIv<=2.13) behavior, unfortunately.
             raise TypeError(
                 f"Slot {repr(key)} contains a module, {item_core.get_display_name()}."
                 f" You can only delete labware, not modules."

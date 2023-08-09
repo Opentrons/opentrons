@@ -173,31 +173,28 @@ def test_delitem_aliases_to_move_labware(
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_delitem_raises_on_old_api_version(
+def test_delitem_raises_on_api_2_14(
     subject: Deck,
 ) -> None:
+    """It should raise on apiLevel 2.14."""
     with pytest.raises(APIVersionError):
         del subject[1]
 
 
-def test_delitem_raises_if_slot_is_empty(
+def test_delitem_noops_if_slot_is_empty(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
     api_version: APIVersion,
     subject: Deck,
 ) -> None:
-    """It should raise a descriptive error if you try to delete from an empty slot."""
+    """It should do nothing, and not raise anything, if you try to delete from an empty slot."""
     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
         mock_validation.ensure_and_convert_deck_slot(1, api_version, "OT-3 Standard")
     ).then_return(DeckSlotName.SLOT_1)
     decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_1)).then_return(None)
 
-    with pytest.raises(
-        TypeError,
-        match=("Slot 1 doesn't contain anything to delete."),
-    ):
-        del subject[1]
+    del subject[1]
 
 
 def test_delitem_raises_if_slot_has_module(
