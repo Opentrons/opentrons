@@ -117,10 +117,12 @@ async def test_python_custom_labware_upload(
         ok_analysis_response = await poll_until_analysis_returns_ok(
             robot_client=robot_client, protocol_id=protocol_id, analysis_id=analysis_id
         )
-    [analysis_command] = ok_analysis_response["data"]["commands"]
-    assert analysis_command["commandType"] == "loadLabware"
-    assert analysis_command["params"]["loadName"] == EXPECTED_LABWARE_LOAD_NAME
+    analysis_commands = ok_analysis_response["data"]["commands"]
     assert (
-        analysis_command["result"]["definition"]["parameters"]["loadName"]
+        analysis_commands[1]["commandType"] == "loadLabware"
+    )  # Zeroth command is Home command
+    assert analysis_commands[1]["params"]["loadName"] == EXPECTED_LABWARE_LOAD_NAME
+    assert (
+        analysis_commands[1]["result"]["definition"]["parameters"]["loadName"]
         == EXPECTED_LABWARE_LOAD_NAME
     )
