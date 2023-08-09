@@ -8,10 +8,83 @@ Building Block Commands
 
 Building block commands execute some of the most basic actions that your robot can complete. But basic doesn’t mean these commands lack capabilities. They perform important tasks in your protocols. They’re also foundational to the :ref:`complex commands <v2-complex-commands>` that help you write and run longer, more intricate procedures. In this section, we’ll look at building block commands that help you work with pipette tips, liquids, and robot utility features.
 
-.. _protocol-foundation:
+.. _atomic-instruments-labware:
 
-Protocol Foundations
-====================
+Instruments and Labware
+=======================
+
+The examples in this section will work with Flex or an OT-2. If you want to follow along and test this code, make sure you have the right instruments and labware ready for your robot.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Labware type
+      - Labware name
+      - API load name
+    * - Well plate
+      - Corning 96 Well Plate 360 µL Flat
+      - ``corning_96_wellplate_360ul_flat``
+    * - Tip rack
+      - Opentrons 96 Tip Rack 300 µL
+      - ``opentrons_96_tiprack_300ul``
+    * - Flex pipette
+      - Flex 1-Channel Pipette
+      - ``flex_1channel_1000``
+    * - OT-2 pipette
+      - P300 Single-Channel GEN2
+      - ``p300_single_gen2``
+
+.. _atomic-file:
+
+Creating a Protocol File 
+========================
+
+Depending on your robot model and/or API version, your basic protocol file should look similar to the following examples. For information about variations in the code before the ``run()`` function, see the :ref:`Metadata <tutorial-metadata>` and :ref:`Requirements <tutorial-requirements>` sections of the :ref:`tutorial`.
+
+Samples are formatted to fit the available space and avoid horizontal scrolling.
+
+.. tabs::
+
+    .. tab:: Flex
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            # robotType could also be 'OT-2' with API v2.15 or higher
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}'
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location= 'D2')
+                tiprack = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location='D3')
+                pipette = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000',
+                    mount='left')
+    
+    .. tab:: OT-2
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=2)
+                tiprack = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=3)
+                pipette = protocol.load_instrument(
+                    instrument_name='p300_single_gen2',
+                    mount='left')
 
 The examples in this section would be added to the following:
 

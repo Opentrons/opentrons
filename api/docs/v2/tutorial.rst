@@ -73,6 +73,8 @@ Everything else in the protocol file is required. Next, you’ll specify the ver
 
 For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on your robot can be a part of a protocol. 
 
+.. _tutorial-metadata:
+
 Metadata
 ^^^^^^^^
 
@@ -99,6 +101,8 @@ You can include any other information you like in the metadata dictionary. The f
         }
 
 Note, if you have a Flex, or are using an OT-2 with API v2.15 (or higher), we recommend adding a ``requirements`` section to your code. See the Requirements section below.
+
+.. _tutorial-requirements:
 
 Requirements
 ^^^^^^^^^^^^
