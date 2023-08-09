@@ -1,40 +1,41 @@
 import {
-  HostConfig,
-  EstopStatus,
-  acknowledgeEstopDisengage,
-} from '@opentrons/api-client'
-
-import {
   UseMutationResult,
   useMutation,
   UseMutateFunction,
   UseMutationOptions,
 } from 'react-query'
 
+import {
+  HostConfig,
+  EstopStatus,
+  acknowledgeEstopDisengage,
+} from '@opentrons/api-client'
+
 import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 
-export type UseSetEstopPhysicalStatusMutationResult = UseMutationResult<
+export type UseAcknowledgeEstopDisengageMutationResult = UseMutationResult<
   EstopStatus,
   AxiosError
 > & {
-  acknowledgeEstopDisengage: UseMutateFunction<EstopStatus, AxiosError>
+  acknowledgeEstopDisengage: UseMutateFunction<EstopStatus, AxiosError, unknown>
 }
 
-export type UseSetEstopPhysicalStatusMutationOptions = UseMutationOptions<
+export type UseAcknowledgeEstopDisengageMutationOptions = UseMutationOptions<
   EstopStatus,
-  AxiosError
+  AxiosError,
+  unknown
 >
 
 export function useAcknowledgeEstopDisengageMutation(
-  options: UseSetEstopPhysicalStatusMutationOptions = {},
+  options: UseAcknowledgeEstopDisengageMutationOptions = {},
   hostOverride?: HostConfig | null
-): UseSetEstopPhysicalStatusMutationResult {
+): UseAcknowledgeEstopDisengageMutationResult {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  const mutation = useMutation<EstopStatus, AxiosError>(
+  const mutation = useMutation<EstopStatus, AxiosError, unknown>(
     [host, 'robot/control/acknowledgeEstopDisengage'],
     () =>
       acknowledgeEstopDisengage(host as HostConfig)
@@ -44,6 +45,7 @@ export function useAcknowledgeEstopDisengageMutation(
         }),
     options
   )
+
   return {
     ...mutation,
     acknowledgeEstopDisengage: mutation.mutate,
