@@ -145,9 +145,33 @@ describe('RobotConfigurationDetails', () => {
     when(mockUseFeatureFlag)
       .calledWith('enableExtendedHardware')
       .mockReturnValue(true)
-
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: OT3_STANDARD_MODEL,
+    }
     const { getByText } = render(props)
     getByText('extension mount')
+  })
+
+  it('should not render extension mount section when robotType is OT-2', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(true)
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
+    }
+    const { queryByText } = render(props)
+    console.log(props.robotType)
+    expect(queryByText('extension mount')).not.toBeInTheDocument()
   })
 
   it('renders the magnetic module when the protocol contains a magnetic module', () => {

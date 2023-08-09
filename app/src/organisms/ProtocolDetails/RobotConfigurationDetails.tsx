@@ -131,7 +131,7 @@ export const RobotConfigurationDetails = (
           />
         </>
       )}
-      {enableExtendedHardware ? (
+      {enableExtendedHardware && robotType === 'OT-3 Standard' ? (
         <>
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
