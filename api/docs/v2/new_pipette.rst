@@ -68,7 +68,7 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': |apiLevel|}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
@@ -105,6 +105,10 @@ Finally, because there is only one motor in a multi-channel pipette, these pipet
 To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel Pipette and a 96-well plate. We'll then aspirate and dispense a liquid to different locations on the same well plate. To start, let's load a pipette in the right mount and add our labware.
 
 .. code-block:: python
+
+    from opentrons import protocol_api
+    
+    requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 1000 µL tips
@@ -184,16 +188,16 @@ Adding Tip Racks
 The ``load_instrument()`` method includes the optional argument ``tip_racks``. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. The advantage of using ``tip_racks`` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the :py:meth:`.InstrumentContext.pick_up_tip` method. For example, let's start by loading loading some labware and instruments like this::
         
     def run(protocol: protocol_api.ProtocolContext):
-    tiprack_left = protocol.load_labware(
-        load_name='opentrons_flex_96_tiprack_200ul', location='D1')
-    tiprack_right = protocol.load_labware(
-        load_name='opentrons_flex_96_tiprack_200ul', location='D2')
-    left_pipette = protocol.load_instrument(
-        instrument_name='flex_8channel_1000', mount='left')
-    right_pipette = protocol.load_instrument(
-        instrument_name='flex_8channel_1000',
-        mount='right',
-        tip_racks=[tiprack_right])
+        tiprack_left = protocol.load_labware(
+            load_name='opentrons_flex_96_tiprack_200ul', location='D1')
+        tiprack_right = protocol.load_labware(
+            load_name='opentrons_flex_96_tiprack_200ul', location='D2')
+        left_pipette = protocol.load_instrument(
+            instrument_name='flex_8channel_1000', mount='left')
+        right_pipette = protocol.load_instrument(
+            instrument_name='flex_8channel_1000',
+            mount='right',
+            tip_racks=[tiprack_right])
 
 Let's pick up a tip with the left pipette. We need to specify the location as an argument of ``pick_up_tip()``, since we loaded the left pipette without a ``tip_racks`` argument.
 
@@ -344,8 +348,6 @@ Now let's change the flow rates for each action::
 
 .. versionadded:: 2.0
 
-
-.. _pipette:
 
 Flex Pipette Flow Rates
 -----------------------
