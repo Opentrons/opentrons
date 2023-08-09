@@ -28,6 +28,7 @@ class VolumetricTrial:
     volume: float
     mix: bool
     acceptable_cv: Optional[float]
+    acceptable_d: Optional[float]
     env_sensor: asair_sensor.AsairSensorBase
 
 
@@ -118,6 +119,7 @@ def build_gravimetric_trials(
                     stable=True,
                     scale_delay=cfg.scale_delay,
                     acceptable_cv=None,
+                    acceptable_d=None,
                     cfg=cfg,
                     env_sensor=env_sensor,
                 )
@@ -132,6 +134,9 @@ def build_gravimetric_trials(
                 trial_list[volume][channel] = []
                 channel_offset = helpers._get_channel_offset(cfg, channel)
                 for trial in range(cfg.trials):
+                    d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
+                        cfg.pipette_volume
+                    ][cfg.tip_volume][volume]
                     trial_list[volume][channel].append(
                         GravimetricTrial(
                             ctx=ctx,
@@ -151,7 +156,8 @@ def build_gravimetric_trials(
                             mix=cfg.mix,
                             stable=True,
                             scale_delay=cfg.scale_delay,
-                            acceptable_cv=None,
+                            acceptable_cv=cv,
+                            acceptable_d=d,
                             cfg=cfg,
                             env_sensor=env_sensor,
                         )
@@ -175,6 +181,9 @@ def build_photometric_trials(
     for volume in test_volumes:
         trial_list[volume] = []
         for trial in range(cfg.trials):
+            d, cv = config.QC_TEST_MIN_REQUIREMENTS[96][cfg.pipette_volume][
+                cfg.tip_volume
+            ][volume]
             trial_list[volume].append(
                 PhotometricTrial(
                     ctx=ctx,
@@ -189,7 +198,8 @@ def build_photometric_trials(
                     inspect=cfg.inspect,
                     cfg=cfg,
                     mix=cfg.mix,
-                    acceptable_cv=None,
+                    acceptable_cv=cv,
+                    acceptable_d=d,
                     env_sensor=env_sensor,
                 )
             )
