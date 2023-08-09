@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import type { CreateCommand, PipetteMount } from '@opentrons/shared-data'
@@ -52,6 +52,7 @@ export function CalibrationErrorModal(
       header={i18n.format(t('pip_cal_failed'), 'capitalize')}
       subHeader={errorMessage}
       isSuccess={false}
+      justifyContent={JUSTIFY_FLEX_END}
     >
       {isOnDevice ? (
         <SmallButton
