@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useSetEstopPhysicalStatusMutation } from '@opentrons/react-api-client'
+import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
@@ -75,7 +75,7 @@ function TouchscreenModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
-  const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
+  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
@@ -87,7 +87,7 @@ function TouchscreenModal({
   }
   const handleClick = (): void => {
     setIsResuming(true)
-    setEstopPhysicalStatus(null)
+    acknowledgeEstopDisengage(null)
     closeModal()
   }
   return (
@@ -133,7 +133,10 @@ function DesktopModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
-  const { setEstopPhysicalStatus, data } = useSetEstopPhysicalStatusMutation()
+  const {
+    acknowledgeEstopDisengage,
+    data,
+  } = useAcknowledgeEstopDisengageMutation()
 
   const handleCloseModal = (): void => {
     if (setIsDismissedModal != null) {
@@ -155,7 +158,7 @@ function DesktopModal({
     e.preventDefault()
     e.stopPropagation()
     setIsResuming(true)
-    setEstopPhysicalStatus(null, {
+    acknowledgeEstopDisengage({
       onSuccess: () => {},
       onError: () => {
         setIsResuming(false)
