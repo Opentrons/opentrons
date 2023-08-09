@@ -4,10 +4,6 @@ from typing import Dict
 from opentrons.system import log_control
 from robot_server.service.legacy.models.logs import LogIdentifier, LogFormat
 
-import logging
-
-_log = logging.getLogger(__name__)
-
 router = APIRouter()
 
 IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
