@@ -11,7 +11,6 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
   Module,
-  SlotLabels,
   COLORS,
 } from '@opentrons/components'
 import {
@@ -66,6 +65,7 @@ import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
+import { SlotLabels } from './SlotLabels'
 import styles from './DeckSetup.css'
 
 export const DECK_LAYER_BLOCKLIST = [
@@ -477,10 +477,7 @@ export const DeckSetup = (): JSX.Element => {
                   showGen1MultichannelCollisionWarnings,
                 }}
               />
-              <SlotLabels
-                robotType={robotType}
-                displayType="protocolDesigner"
-              />
+              <SlotLabels robotType={robotType} />
             </>
           )}
         </RobotWorkSpace>

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { COLORS } from '../../ui-style-constants'
 import { DeckFromData } from './DeckFromData'
 import { FlexTrash } from './FlexTrash'
 
