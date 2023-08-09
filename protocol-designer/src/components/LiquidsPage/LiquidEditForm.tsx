@@ -156,7 +156,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
                 <Flex
                   justifyContent={JUSTIFY_END}
                   color="#9e5e00"
-                  fontSize="0.625rem"
+                  fontSize={TYPOGRAPHY.fontSizeCaption}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   marginTop={errors.name != null ? '-0.25rem' : '0rem'}
                 >
