@@ -123,7 +123,7 @@ class Base:
             + ".png"
         )
         screenshot_full_path: str = str(Path(directory_for_results, file_name))
-        self.console.print(f"screenshot saved: {file_name}", style="white on blue")
+        self.console.print(f"screenshot saved: {screenshot_full_path}", style="white on blue")
         self.driver.save_screenshot(screenshot_full_path)
 
     def click(self, element: Element) -> None:
