@@ -196,9 +196,9 @@ settings = [
         title="If enabled, the Flex gantry can move with no estop attached.",
         description="This setting allows the gantry on the Flex to move with no estop attached.",
         show_if=(
-            "invalid_setting",
+            "estopNotRequired",
             True,
-        ),  # Configured so this should never show in HTTP
+        ),  # Configured so this only shows if it has been set by a user
     ),
 ]
 
