@@ -13,7 +13,7 @@ Building block commands execute some of the most basic actions that your robot c
 Instruments and Labware
 =======================
 
-The examples in this section will work with Flex or an OT-2. If you want to follow along and test this code, make sure you have the right instruments and labware ready for your robot.
+The examples in this section will work with Flex or an OT-2. If you want to follow along and test this code, make sure you have the right instruments and labware ready for your robot. We'll be using the equipment listed in the table below.
 
 .. list-table::
     :header-rows: 1
@@ -116,6 +116,9 @@ Because we already instantiated the variable ``tiprack`` with a tip rack deck lo
 * **Flex**: The robot will pick up the tip in rack position A1 from the rack loaded in slot D3.
 * **OT-2**: The robot will pick up the tip in rack position A1 from the rack loaded in slot 3.
 
+.. start here tomorrow
+.. this is original below
+.. fix it up some 
 If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` or :ref:`protocol_api-protocols-and-instruments` sections, then you can simply call::
 
     pipette.pick_up_tip()
