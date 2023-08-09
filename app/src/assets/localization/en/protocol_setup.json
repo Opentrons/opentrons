@@ -131,6 +131,8 @@
   "no_usb_required": "No USB required",
   "not_calibrated": "Not calibrated yet",
   "offset_data": "Offset Data",
+  "offsets_applied": "{{count}} offset applied",
+  "offsets_applied_plural": "{{count}} offsets applied",
   "on-deck_labware": "{{count}} on-deck labware",
   "opening": "Opening...",
   "pipette_mismatch": "Pipette generation mismatch.",

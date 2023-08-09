@@ -14,5 +14,5 @@ OFF_DECK: Final = OffDeckType.OFF_DECK
 OFF_DECK.__doc__ = """\
 A special location value, indicating that a labware is not currently on the robot's deck.
 
-See :py:obj:`ProtocolContext.move_labware()`.
+See :ref:`off-deck-location` for details on using ``OFF_DECK`` with :py:obj:`ProtocolContext.move_labware()`.
 """

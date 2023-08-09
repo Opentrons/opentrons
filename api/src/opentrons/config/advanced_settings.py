@@ -602,6 +602,16 @@ def _migrate26to27(previous: SettingsMap) -> SettingsMap:
 def _migrate27to28(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 28 of the feature flags file.
 
+    - Adds the disableTipPresenceDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableTipPresenceDetection"] = None
+    return newmap
+
+
+def _migrate28to29(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 29 of the feature flags file.
+
     - Adds the estopNotRequired config element.
     """
     newmap = {k: v for k, v in previous.items()}
@@ -638,6 +648,7 @@ _MIGRATIONS = [
     _migrate25to26,
     _migrate26to27,
     _migrate27to28,
+    _migrate28to29,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

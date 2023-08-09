@@ -27,6 +27,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableStallDetection": None,
         "disableStatusBar": None,
         "disableOverpressureDetection": None,
+        "disableTipPresenceDetection": None,
         "estopNotRequired": None,
     }
 
@@ -340,6 +341,18 @@ def v28_config(v27_config: Dict[str, Any]) -> Dict[str, Any]:
     r.update(
         {
             "_version": 28,
+            "disableTipPresenceDetection": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v29_config(v28_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v28_config.copy()
+    r.update(
+        {
+            "_version": 29,
             "estopNotRequired": None,
         }
     )
@@ -379,6 +392,7 @@ def v28_config(v27_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v26_config"),
         lazy_fixture("v27_config"),
         lazy_fixture("v28_config"),
+        lazy_fixture("v29_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
