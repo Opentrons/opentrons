@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 28
+    return 29
 
 
 # make sure to set a boolean value in default_file_settings only if
