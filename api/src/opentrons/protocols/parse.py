@@ -22,6 +22,8 @@ from opentrons_shared_data.protocol import (
 )
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.ordered_set import OrderedSet
+
 from .api_support.types import APIVersion
 from .types import (
     RUN_FUNCTION_MESSAGE,
@@ -97,7 +99,8 @@ def _validate_v2_static_info(static_info: StaticPythonInfo) -> None:
         # NOTE(mm, 2023-08-08): If we add new allowed keys to this dict in the future,
         # we should probably gate them behind new apiLevels.
     }
-    actual_requirements_keys = set((static_info.requirements or {}).keys())
+    # OrderedSet just to make the error message deterministic and easy to test.
+    actual_requirements_keys = OrderedSet((static_info.requirements or {}).keys())
     unexpected_requirements_keys = actual_requirements_keys - allowed_requirements_keys
     if unexpected_requirements_keys:
         raise MalformedPythonProtocolError(
