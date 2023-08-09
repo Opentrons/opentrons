@@ -40,11 +40,11 @@ interface RecentRunProtocolCardProps {
 export function RecentRunProtocolCard({
   runData,
 }: RecentRunProtocolCardProps): JSX.Element | null {
-  const { data, isFetching, isLoading } = useProtocolQuery(
+  const { data, isLoading } = useProtocolQuery(
     runData.protocolId ?? null
   )
   const protocolData = data?.data ?? null
-  const isProtocolFetching = isFetching || isLoading
+  const isProtocolFetching = isLoading
   return protocolData == null ? null : (
     <ProtocolWithLastRun
       protocolData={protocolData}
