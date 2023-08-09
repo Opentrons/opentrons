@@ -49,7 +49,7 @@ describe('useAcknowledgeEstopDisengageMutation hook', () => {
       { wrapper }
     )
     expect(result.current.data).toBeUndefined()
-    result.current.acknowledgeEstopDisengage()
+    result.current.acknowledgeEstopDisengage(null)
     await waitFor(() => {
       return result.current.status !== 'loading'
     })
@@ -68,7 +68,7 @@ describe('useAcknowledgeEstopDisengageMutation hook', () => {
       () => useAcknowledgeEstopDisengageMutation(),
       { wrapper }
     )
-    act(() => result.current.acknowledgeEstopDisengage())
+    act(() => result.current.acknowledgeEstopDisengage(null))
     await waitFor(() => result.current.data != null)
     expect(result.current.data).toEqual(updatedEstopPhysicalStatus)
   })
