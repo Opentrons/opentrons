@@ -10,6 +10,7 @@ import type { TrashSlotName } from './FlexTrash'
 
 interface StyledDeckProps {
   deckFill: string
+  trashColor?: string
   trashSlotName?: TrashSlotName
 }
 
@@ -23,7 +24,12 @@ const StyledG = styled.g<StyledDeckProps>`
 export function StyledDeck(
   props: StyledDeckProps & DeckFromDataProps
 ): JSX.Element {
-  const { deckFill, trashSlotName, ...deckFromDataProps } = props
+  const {
+    deckFill,
+    trashSlotName,
+    trashColor = '#757070',
+    ...deckFromDataProps
+  } = props
 
   const robotType = deckFromDataProps.def.robot.model ?? 'OT-2 Standard'
 
@@ -45,7 +51,7 @@ export function StyledDeck(
         <FlexTrash
           robotType={robotType}
           trashIconColor={deckFill}
-          backgroundColor={COLORS.light1}
+          backgroundColor={trashColor}
           trashSlotName={trashSlotName}
         />
       ) : null}

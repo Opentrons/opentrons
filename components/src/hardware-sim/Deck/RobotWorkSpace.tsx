@@ -20,6 +20,7 @@ export interface RobotWorkSpaceProps extends StyleProps {
   deckFill?: string
   deckLayerBlocklist?: string[]
   trashSlotName?: TrashSlotName
+  trashColor?: string
   id?: string
 }
 
@@ -33,6 +34,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     deckLayerBlocklist = [],
     trashSlotName,
     viewBox,
+    trashColor,
     id,
     ...styleProps
   } = props
@@ -83,6 +85,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
           def={deckDef}
           layerBlocklist={deckLayerBlocklist}
           trashSlotName={trashSlotName}
+          trashColor={trashColor}
         />
       )}
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}

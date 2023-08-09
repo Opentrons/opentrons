@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { LocationIcon } from '../../molecules'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
@@ -7,8 +8,10 @@ import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'
 
+export type DisplayType = 'app' | 'protocolDesigner'
 interface SlotLabelsProps {
   robotType: RobotType
+  displayType?: DisplayType
   color?: string
 }
 
@@ -19,8 +22,9 @@ interface SlotLabelsProps {
 export const SlotLabels = ({
   robotType,
   color,
+  displayType = 'app',
 }: SlotLabelsProps): JSX.Element | null => {
-  return robotType === 'OT-3 Standard' ? (
+  return robotType === FLEX_ROBOT_TYPE ? (
     <>
       <RobotCoordsForeignObject
         width="2.5rem"
@@ -73,7 +77,7 @@ export const SlotLabels = ({
         height="2.5rem"
         width="30.375rem"
         x="-15"
-        y="-55"
+        y={displayType === 'protocolDesigner' ? '-65' : '-55'}
       >
         <Flex
           alignItems={ALIGN_CENTER}

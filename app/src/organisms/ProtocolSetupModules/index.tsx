@@ -210,6 +210,7 @@ export function ProtocolSetupModules({
               deckFill={COLORS.light1}
               trashSlotName="A3"
               id="ModuleSetup_deckMap"
+              trashColor={COLORS.darkGreyEnabled}
             >
               {() => (
                 <>
