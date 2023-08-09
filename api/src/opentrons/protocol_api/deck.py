@@ -113,6 +113,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         if item_core is None:
             raise TypeError(f"Slot {repr(key)} doesn't contain anything to delete.")
         elif isinstance(item_core, AbstractModuleCore):
+            # Protocol Engine does not support removing modules from the deck.
             raise TypeError(
                 f"Slot {repr(key)} contains a module, {item_core.get_display_name()}."
                 f" You can only delete labware, not modules."
@@ -122,6 +123,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
                 item_core,
                 new_location=OFF_DECK,
                 use_gripper=False,
+                pause_for_manual_move=False,
                 pick_up_offset=None,
                 drop_offset=None,
             )

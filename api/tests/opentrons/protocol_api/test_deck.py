@@ -147,6 +147,7 @@ def test_delitem_aliases_to_move_labware(
     api_version: APIVersion,
     subject: Deck,
 ) -> None:
+    """It should be equivalent to a manual labware move to off-deck, without pausing."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
@@ -164,6 +165,7 @@ def test_delitem_aliases_to_move_labware(
             mock_labware_core,
             OFF_DECK,
             use_gripper=False,
+            pause_for_manual_move=False,
             pick_up_offset=None,
             drop_offset=None,
         )
@@ -184,6 +186,7 @@ def test_delitem_raises_if_slot_is_empty(
     api_version: APIVersion,
     subject: Deck,
 ) -> None:
+    """It should raise a descriptive error if you try to delete from an empty slot."""
     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
         mock_validation.ensure_and_convert_deck_slot(1, api_version, "OT-3 Standard")
@@ -203,6 +206,7 @@ def test_delitem_raises_if_slot_has_module(
     api_version: APIVersion,
     subject: Deck,
 ) -> None:
+    """It should raise a descriptive error if you try to delete a module."""
     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
     mock_module_core = decoy.mock(cls=ModuleCore)
     decoy.when(mock_module_core.get_display_name()).then_return("<module display name>")
