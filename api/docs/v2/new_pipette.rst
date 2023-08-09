@@ -72,11 +72,9 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_96_tiprack_1000ul',
-            location=1)
+            load_name='opentrons_96_tiprack_1000ul', location=1)
         tiprack2 = protocol.load_labware(
-            load_name='opentrons_96_tiprack_1000ul',
-            location=2)
+            load_name='opentrons_96_tiprack_1000ul', location=2)
         left = protocol.load_instrument(
             instrument_name='p1000_single_gen2',
             mount='left',
@@ -111,12 +109,10 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 1000 µL tips
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_1000ul',
-            location='D1')       
+            load_name='opentrons_flex_96_tiprack_1000ul', location='D1')       
         # Load a 96-well plate
         plate = protocol.load_labware(
-            load_name='corning_96_wellplate_360ul_flat',
-            location='C1')       
+            load_name='corning_96_wellplate_360ul_flat', location='C1')       
         # Load an 8-channel pipette on the right mount
         right = protocol.load_instrument(
             instrument_name='flex_8channel_1000',
@@ -153,12 +149,10 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 200 µL tips
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_200ul',
-            location="D1")
+            load_name='opentrons_flex_96_tiprack_200ul', location="D1")
         # Load a well plate
         plate = protocol.load_labware(
-            load_name='corning_384_wellplate_112ul_flat',
-            location="D2")
+            load_name='corning_384_wellplate_112ul_flat', location="D2")
         # Load an 8-channel pipette on the right mount
         right = protocol.load_instrument(
             instrument_name='flex_8channel_1000',
@@ -321,15 +315,13 @@ These flow rate properties operate independently. This means you can specify dif
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_1000ul',
-            location='D1')       
+            load_name='opentrons_flex_96_tiprack_1000ul', location='D1')       
         pipette = protocol.load_instrument(
             instrument_name='flex_1channel_1000',
             mount='left',
             tip_racks=[tiprack1])                
         plate = protocol.load_labware(
-            load_name='corning_96_wellplate_360ul_flat',
-            location='D3')
+            load_name='corning_96_wellplate_360ul_flat', location='D3')
         pipette.pick_up_tip()
 
 Let's tell the robot to aspirate, dispense, and blow out the liquid using default flow rates. Notice how you don't need to specify a ``flow_rate`` attribute to use the defaults::
