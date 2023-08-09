@@ -426,17 +426,6 @@ def _version_from_static_python_info(
     If the protocol doesn't declare apiLevel at all, return None.
     If the protocol declares apiLevel incorrectly, raise a ValueError.
     """
-    # TODO(mm, 2022-10-21):
-    #
-    # This logic is quick and dirty, and might allow things that we don't want.
-    #
-    # - Require protocols with new `apiLevel`s to specify `apiLevel` in `requirements`
-    #   and not in `metadata`?
-    # - Forbid protocols from specifying `apiLevel` in both `requirements` and
-    #   `metadata`?
-    # - Be more careful with falsey values, like `"apiLevel": ""`?
-    # - Forbid unrecognized keys in `requirements`?
-
     from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
     from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
     requested_level = from_requirements or from_metadata
