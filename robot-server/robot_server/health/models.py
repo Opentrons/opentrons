@@ -2,6 +2,7 @@
 import typing
 from pydantic import BaseModel, Field
 from opentrons_shared_data.deck.dev_types import RobotModel
+from robot_server.service.json_api import BaseResponseBody
 
 
 class HealthLinks(BaseModel):
@@ -33,7 +34,7 @@ class HealthLinks(BaseModel):
     )
 
 
-class Health(BaseModel):
+class Health(BaseResponseBody):
     """Information about the server and system."""
 
     name: str = Field(
