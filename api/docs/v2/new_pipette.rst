@@ -105,6 +105,7 @@ Finally, because there is only one motor in a multi-channel pipette, these pipet
 To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel Pipette and a 96-well plate. We'll then aspirate and dispense a liquid to different locations on the same well plate. To start, let's load a pipette in the right mount and add our labware.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
     
