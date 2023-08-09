@@ -22,6 +22,7 @@ export function createSnippet(
   labwareOffsets?: Array<Omit<LabwareOffset, 'createdAt' | 'id'>>
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
+  let adapterCount = 0
   let labwareCount = 0
   const loadCommandLines = commands.reduce<string[]>((acc, command) => {
     let loadStatement = ''
@@ -53,7 +54,11 @@ export function createSnippet(
         loadStatement = `labware_${labwareCount} = ${moduleVariable}.load_labware("${String(
           loadName
         )}")`
+        //  load labware on adapter
+      } else if ('labwareId' in command.params.location) {
+        loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}}, location="${command.params.location.labwareId}")`
       }
+
       const labwareDefUri = getLabwareDefinitionUri(
         command.result?.labwareId ?? '',
         labware,
@@ -102,6 +107,29 @@ export function createSnippet(
         )}", location="${String(slotName)}")`,
         '',
       ]
+    } else if (command.commandType === 'loadAdapter') {
+      adapterCount = adapterCount + 1
+      const loadedAdapter = labware.find(
+        item => item.id === command.result?.adapterId
+      )
+      if (loadedAdapter == null) return acc
+      const labwareDefinitions = getLoadedLabwareDefinitionsByUri(commands)
+      const { loadName } = labwareDefinitions[
+        loadedAdapter.definitionUri
+      ].parameters
+      if (command.params.location === 'offDeck') {
+        loadStatement = `adapter_${adapterCount} = protocol.load_adapter("${loadName}", location="offDeck")`
+      } else if ('slotName' in command.params.location) {
+        // load adapter on deck
+        const { slotName } = command.params.location
+        loadStatement = `adapter_${adapterCount} = protocol.load_adapter("${loadName}", location="${slotName}")`
+      } else if ('moduleId' in command.params.location) {
+        // load adapter on module
+        const moduleVariable =
+          moduleVariableById[command.params.location.moduleId]
+        loadStatement = `adapter_${adapterCount} = ${moduleVariable}.load_adapter"${loadName}")`
+      }
+      addendum = [loadStatement, '']
     }
 
     return addendum != null ? [...acc, ...addendum] : acc
