@@ -89,7 +89,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           alignItems={ALIGN_FLEX_END}
           position={POSITION_FIXED}
           right={SPACING.spacing32}
-          bottom={SPACING.spacing16}
+          bottom={SPACING.spacing32}
           zIndex={1000}
           width="100%"
         >
