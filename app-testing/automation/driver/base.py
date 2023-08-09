@@ -109,11 +109,11 @@ class Base:
 
     def take_screenshot(self, message: str = "") -> None:
         """Take a screenshot and place in the results directory."""
-        directory_for_results: Path = Path(Path(__file__).resolve().parents[2], "results")
-        workspace = os.getenv("GITHUB_WORKSPACE", None)
-        if workspace is not None:
-            # We are in a GitHub action.
-            directory_for_results = Path(workspace, "test", "results")
+        directory_for_results: Path = Path(Path(__file__).resolve().parents[2], "tests", "results", "screenshots")
+        in_ci = os.getenv("CI", None)
+        user_set_directory_for_results = os.getenv("DIRECTORY_FOR_RESULTS", None)
+        if in_ci and user_set_directory_for_results is not None:
+            directory_for_results = Path(user_set_directory_for_results)
         if not os.path.exists(directory_for_results):
             os.makedirs(directory_for_results)
         note = "" if (message == "") else f"_{message}".replace(" ", "_")

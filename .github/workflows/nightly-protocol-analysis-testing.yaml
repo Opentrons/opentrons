@@ -29,7 +29,8 @@ jobs:
         run: |
           echo "PYTHON_3_11_EXEC=${{ steps.python-3-11.outputs.python-path }}" >> $GITHUB_ENV
           echo "PYTHON_3_7_EXEC=${{ steps.python-3-7.outputs.python-path }}" >> $GITHUB_ENV
-          echo "EXECUTABLE_PATH=${{ github.workspace }}/${{ env.EXECUTABLE_NAME }}" >> $GITHUB_ENV
+          echo "EXECUTABLE_PATH=${{ github.workspace }}/${{ env.EXECUTABLE_NAME }}" >> 
+          echo "DIRECTORY_FOR_RESULTS=${{ github.workspace }}/app-testing/tests/results/screenshots" >> $GITHUB_ENV
 
       - name: Install Linux dependencies
         run: |
