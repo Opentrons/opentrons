@@ -3,11 +3,17 @@ import os
 from pathlib import Path
 from opentrons.config import ARCHITECTURE, SystemArchitecture
 from opentrons_shared_data.errors.exceptions import CommunicationError
+from opentrons_shared_data.errors.codes import ErrorCodes
 
 
 class CameraException(CommunicationError):
     def __init__(self, message: str, system_error: str) -> None:
-        super().__init__(self, message, {'internal-error-message': system_error})
+        super().__init__(
+            ErrorCodes.COMMUNICATION_ERROR,
+            message,
+            {"internal-error-message": system_error},
+        )
+
 
 async def take_picture(filename: Path) -> None:
     """Take a picture and save it to filename
@@ -23,7 +29,7 @@ async def take_picture(filename: Path) -> None:
         pass
 
     if ARCHITECTURE == SystemArchitecture.YOCTO:
-        cmd = f'v4l2-ctl --device /dev/video0 --set-fmt-video=width=1280,height=720,pixelformat=MJPG --stream-mmap --stream-to={str(filename)} --stream-count=1'
+        cmd = f"v4l2-ctl --device /dev/video0 --set-fmt-video=width=1280,height=720,pixelformat=MJPG --stream-mmap --stream-to={str(filename)} --stream-count=1"
     elif ARCHITECTURE == SystemArchitecture.BUILDROOT:
         cmd = f"ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 {str(filename)}"
     else:  # HOST
@@ -39,6 +45,6 @@ async def take_picture(filename: Path) -> None:
     await proc.wait()
 
     if proc.returncode != 0:
-        raise CameraException('Failed to communicate with camera', res)
+        raise CameraException("Failed to communicate with camera", res)
     if not filename.exists():
-        raise CameraException("Failed to save image", '')
+        raise CameraException("Failed to save image", "")
