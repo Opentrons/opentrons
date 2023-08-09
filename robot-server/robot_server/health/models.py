@@ -20,7 +20,7 @@ class HealthLinks(BaseModel):
         ...,
         description="The path to the HTTP server logs endpoint",
     )
-    appLog: typing.Optional[str] = Field(
+    oddLog: typing.Optional[str] = Field(
         None,
         description="The path to the ODD app logs endpoint",
     )

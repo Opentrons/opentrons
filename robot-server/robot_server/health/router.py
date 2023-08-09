@@ -22,7 +22,7 @@ _log = logging.getLogger(__name__)
 
 LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
 VERSION_PATH = "/etc/VERSION.json"
-OOD_LOG_PATH = "/logs/app.log"
+OOD_LOG_PATH = "/logs/odd.log"
 
 
 @dataclass
@@ -138,9 +138,11 @@ async def get_health(
         apiSpec="/openapi.json",
         systemTime="/system/time",
     )
-    if robot_model == "OT-3 Standard" and OOD_LOG_PATH not in LOG_PATHS:
-        LOG_PATHS.append(OOD_LOG_PATH)
-        health_links.appLog = OOD_LOG_PATH
+    if robot_model == "OT-3 Standard":
+        if OOD_LOG_PATH not in LOG_PATHS:
+            LOG_PATHS.append(OOD_LOG_PATH)
+        health_links.oddLog = OOD_LOG_PATH
+
     return Health(
         name=config.name(),
         api_version=versions.api_version,
