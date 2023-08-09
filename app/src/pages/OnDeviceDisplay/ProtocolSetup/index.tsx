@@ -540,7 +540,7 @@ function PrepareToRun({
               : null
           }
           status="general"
-          // disabled={lpcDisabledReason != null}
+          disabled={lpcDisabledReason != null}
           disabledReason={lpcDisabledReason}
         />
         <ProtocolSetupStep
