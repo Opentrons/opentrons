@@ -22,6 +22,7 @@ export function createSnippet(
   labwareOffsets?: Array<Omit<LabwareOffset, 'createdAt' | 'id'>>
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
+  let adapterCount = 0
   let labwareCount = 0
   const loadCommandLines = commands.reduce<string[]>((acc, command) => {
     let loadStatement = ''
