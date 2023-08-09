@@ -444,8 +444,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
 
-    total_tips = (
-        len([tip for chnl_tips in resources.tips.values() for tip in chnl_tips])
+    total_tips = len(
+        [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
     )
     channels_to_test = _get_test_channels(cfg)
     for channel in channels_to_test:
@@ -660,6 +660,18 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
 
+                acceptable_cv = trials[volume][channel][0].acceptable_cv
+                acceptable_d = trials[volume][channel][0].acceptable_d
+                if acceptable_cv is not None and acceptable_d is not None:
+                    if (
+                        dispense_cv > acceptable_cv
+                        or aspirate_cv > acceptable_cv
+                        or aspirate_d > acceptable_d
+                        or dispense_d > acceptable_d
+                    ):
+                        raise RuntimeError(
+                            f"Trial with volume {volume} on channel {channel} did not pass spec"
+                        )
             for trial in range(cfg.trials):
                 trial_asp_list = trial_asp_dict[trial]
                 trial_disp_list = trial_disp_dict[trial]
