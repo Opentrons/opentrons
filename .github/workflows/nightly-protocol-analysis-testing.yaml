@@ -30,7 +30,7 @@ jobs:
           echo "PYTHON_3_11_EXEC=${{ steps.python-3-11.outputs.python-path }}" >> $GITHUB_ENV
           echo "PYTHON_3_7_EXEC=${{ steps.python-3-7.outputs.python-path }}" >> $GITHUB_ENV
           echo "EXECUTABLE_PATH=${{ github.workspace }}/${{ env.EXECUTABLE_NAME }}" >> $GITHUB_ENV
-          echo "DIRECTORY_FOR_RESULTS=${{ github.workspace }}/app-testing/tests/results/screenshots" >> $GITHUB_ENV
+          echo "DIRECTORY_FOR_RESULTS=${{ github.workspace }}/app-testing/tests/results/screenshots/" >> $GITHUB_ENV
 
       - name: Install Linux dependencies
         run: |
@@ -88,6 +88,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: results
-          path: app-testing/results/
+          path: app-testing/tests/results/
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ failure() && steps.run_tests.conclusion == 'failure' }}
