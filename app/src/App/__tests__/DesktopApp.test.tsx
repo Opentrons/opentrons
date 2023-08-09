@@ -55,7 +55,6 @@ const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 const mockUseSoftwareUpdatePoll = useSoftwareUpdatePoll as jest.MockedFunction<
   typeof useSoftwareUpdatePoll
 >
-// const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const render = (path = '/') => {
   return renderWithProviders(
