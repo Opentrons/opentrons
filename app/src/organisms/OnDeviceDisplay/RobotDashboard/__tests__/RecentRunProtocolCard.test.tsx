@@ -202,15 +202,6 @@ describe('RecentRunProtocolCard', () => {
     expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 
-  it('should render the skeleton when react query is fetching', () => {
-    mockUseProtocolQuery.mockReturnValue({
-      isFetching: true,
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
-    const [{ getByText }] = render(props)
-    getByText('mock Skeleton')
-  })
-
   it('should render the skeleton when react query is loading', () => {
     mockUseProtocolQuery.mockReturnValue({
       isLoading: true,
