@@ -7,9 +7,9 @@ import { createLogger } from '../log'
 
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import {
-  UPDATE_MANIFEST_URLS,
-  CACHE_DIR_FOR_MACHINE,
-  CACHE_DIR_FOR_MACHINE_FILES,
+  getUpdateManifestUrls,
+  cacheDirForMachine,
+  cacheDirForMachineFiles,
 } from './constants'
 import { CURRENT_VERSION } from '../update'
 import {
@@ -153,13 +153,13 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
 export function getRobotSystemUpdateUrls(
   robot: RobotUpdateTarget
 ): Promise<ReleaseSetUrls | null> {
-  const manifestUrls = UPDATE_MANIFEST_URLS()
+  const manifestUrls = getUpdateManifestUrls()
 
-  return ensureDir(CACHE_DIR_FOR_MACHINE(robot))
+  return ensureDir(cacheDirForMachine(robot))
     .then(() =>
       downloadManifest(
         manifestUrls[robot],
-        path.join(CACHE_DIR_FOR_MACHINE(robot), 'releases.json')
+        path.join(cacheDirForMachine(robot), 'releases.json')
       )
     )
     .then(manifest => {
@@ -217,7 +217,7 @@ export function checkForRobotUpdate(
       }
     }
 
-    const targetDownloadDir = CACHE_DIR_FOR_MACHINE_FILES(target)
+    const targetDownloadDir = cacheDirForMachineFiles(target)
 
     return ensureDir(targetDownloadDir)
       .then(() => getReleaseFiles(urls, targetDownloadDir, handleProgress))
@@ -232,10 +232,7 @@ export function checkForRobotUpdate(
         })
       )
       .then(() =>
-        cleanupReleaseFiles(
-          CACHE_DIR_FOR_MACHINE_FILES(target),
-          CURRENT_VERSION
-        )
+        cleanupReleaseFiles(cacheDirForMachineFiles(target), CURRENT_VERSION)
       )
   }
 

@@ -161,7 +161,7 @@ _dist-collect-artifacts:
 
 .PHONY: clean-dev-autoupdate
 clean-dev-autoupdate:
-	rm ./dev-app-update.yml
+	rm -f ./dev-app-update.yml
 
 dev-app-update.yml:
 	cp ./dev-app-update-$(OPENTRONS_PROJECT).yml ./dev-app-update.yml

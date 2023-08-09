@@ -4,24 +4,24 @@ import type { UpdateManifestUrls } from './types'
 import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
 import { CURRENT_VERSION } from '../update'
 
-export const UPDATE_MANIFEST_URLS_RELEASE = {
+const UPDATE_MANIFEST_URLS_RELEASE = {
   ot2: 'https://builds.opentrons.com/ot2-br/releases.json',
   flex: 'https://builds.opentrons.com/ot3-oe/releases.json',
 }
 
-export const UPDATE_MANIFEST_URLS_INTERNAL_RELEASE = {
+const UPDATE_MANIFEST_URLS_INTERNAL_RELEASE = {
   ot2: 'https://ot3-development.builds.opentrons.com/ot2-br/releases.json',
   flex: 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json',
 }
 
-export const UPDATE_MANIFEST_URLS = (): UpdateManifestUrls =>
+export const getUpdateManifestUrls = (): UpdateManifestUrls =>
   _OPENTRONS_PROJECT_.includes('robot-stack')
     ? UPDATE_MANIFEST_URLS_RELEASE
     : UPDATE_MANIFEST_URLS_INTERNAL_RELEASE
 
 const DIRECTORY = path.join(app.getPath('userData'), 'robot-update-cache')
-export const CACHE_DIR_FOR_MACHINE = (machine: RobotUpdateTarget): string =>
+export const cacheDirForMachine = (machine: RobotUpdateTarget): string =>
   path.join(DIRECTORY, machine)
-export const CACHE_DIR_FOR_MACHINE_FILES = (
+export const cacheDirForMachineFiles = (
   machine: RobotUpdateTarget
-): string => path.join(CACHE_DIR_FOR_MACHINE(machine), CURRENT_VERSION)
+): string => path.join(cacheDirForMachine(machine), CURRENT_VERSION)
