@@ -1,11 +1,12 @@
 import * as React from 'react'
-
+import { useSelector } from 'react-redux'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 import { useEstopContext } from './hooks'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
+import { getLocalRobot } from '../../redux/discovery'
 import {
   PHYSICALLY_ENGAGED,
   LOGICALLY_ENGAGED,
@@ -16,7 +17,7 @@ import {
 const ESTOP_REFETCH_INTERVAL_MS = 10000
 
 interface EstopTakeoverProps {
-  robotName: string
+  robotName?: string
 }
 
 export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
@@ -33,6 +34,8 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
       setIsEmergencyStopModalDismissed(false)
     }
   }
+  const localRobot = useSelector(getLocalRobot)
+  const localRobotName = localRobot?.name ?? 'no name'
 
   const TargetEstopModal = (): JSX.Element | null => {
     switch (estopStatus?.data.status) {
@@ -49,7 +52,7 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
       case NOT_PRESENT:
         return (
           <EstopMissingModal
-            robotName={robotName}
+            robotName={robotName != null ? robotName : localRobotName}
             closeModal={closeModal}
             isDismissedModal={isEmergencyStopModalDismissed}
             setIsDismissedModal={setIsEmergencyStopModalDismissed}
