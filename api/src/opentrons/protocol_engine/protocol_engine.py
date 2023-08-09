@@ -1,5 +1,5 @@
 """ProtocolEngine class definition."""
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -11,7 +11,7 @@ from opentrons_shared_data.errors import (
     EnumeratedError,
 )
 
-from .errors import ProtocolCommandFailedError
+from .errors import ProtocolCommandFailedError, ErrorOccurrence
 from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
@@ -434,19 +434,30 @@ class ProtocolEngine:
 
     # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
     @staticmethod
-    def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
+    def _code_in_exception_stack(
+        error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
+    ) -> bool:
+        if isinstance(error, ErrorOccurrence):
+            # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
+            # code by a string value.
+            if error.errorCode == code.value.code:
+                return True
+            return any(
+                ProtocolEngine._code_in_exception_stack(wrapped, code)
+                for wrapped in error.wrappedErrors
+            )
+
+        # From here we have an exception, can just check the code + recurse to wrapped errors.
         if error.code == code:
             return True
+
         if (
             isinstance(error, ProtocolCommandFailedError)
             and error.original_error is not None
         ):
-            if error.original_error.errorCode == code.value.code:
-                return True
-            return any(
-                wrapped.errorCode == code.value.code
-                for wrapped in error.original_error.wrappedErrors
-            )
+            # For this specific EnumeratedError child, we recurse on the original_error field
+            # in favor of the general error.wrapping field.
+            return ProtocolEngine._code_in_exception_stack(error.original_error, code)
 
         if len(error.wrapping) == 0:
             return False
