@@ -22,6 +22,5 @@ export const getUpdateManifestUrls = (): UpdateManifestUrls =>
 const DIRECTORY = path.join(app.getPath('userData'), 'robot-update-cache')
 export const cacheDirForMachine = (machine: RobotUpdateTarget): string =>
   path.join(DIRECTORY, machine)
-export const cacheDirForMachineFiles = (
-  machine: RobotUpdateTarget
-): string => path.join(cacheDirForMachine(machine), CURRENT_VERSION)
+export const cacheDirForMachineFiles = (machine: RobotUpdateTarget): string =>
+  path.join(cacheDirForMachine(machine), CURRENT_VERSION)
