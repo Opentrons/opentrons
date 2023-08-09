@@ -153,14 +153,16 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 200 µL tips
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_200ul', location=1)
+            load_name='opentrons_flex_96_tiprack_200ul',
+            location="D1")
         # Load a well plate
         plate = protocol.load_labware(
-            load_name='corning_384_wellplate_112ul_flat', location=4)
+            load_name='corning_384_wellplate_112ul_flat',
+            location="D2")
         # Load an 8-channel pipette on the right mount
         right = protocol.load_instrument(
             instrument_name='flex_8channel_1000',
-            location='right',
+            mount='right',
             tip_racks=[tiprack1])
 
 
