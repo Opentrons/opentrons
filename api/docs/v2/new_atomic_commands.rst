@@ -39,13 +39,13 @@ The examples in this section will work with Flex or an OT-2. If you want to foll
 Creating a Protocol File 
 ========================
 
-Depending on your robot model and/or API version, your basic protocol file should look similar to the following examples. For information about variations in the code before the ``run()`` function, see the :ref:`Metadata <tutorial-metadata>` and :ref:`Requirements <tutorial-requirements>` sections of the :ref:`tutorial`.
+Depending on your robot model and/or API version, the beginning of your basic protocol file should look similar to the following examples. For information about variations in the code before the ``run()`` function, see the :ref:`Metadata <tutorial-metadata>` and :ref:`Requirements <tutorial-requirements>` sections of the :ref:`tutorial`.
 
 Samples are formatted to fit the available space and avoid horizontal scrolling.
 
 .. tabs::
 
-    .. tab:: Flex
+    .. tab:: Flex 
 
         .. code-block:: python
             :substitutions:
@@ -56,15 +56,19 @@ Samples are formatted to fit the available space and avoid horizontal scrolling.
             requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}'
 
             def run(protocol: protocol_api.ProtocolContext):
+                # load well plate in deck slot D2
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location= 'D2')
+                    location='D2')
+                # load tip rack in deck slot D3
                 tiprack = protocol.load_labware(
                     load_name='opentrons_96_tiprack_300ul',
                     location='D3')
+                # attach pipette to left mount
                 pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left')
+                # Put building block commands here
     
     .. tab:: OT-2
 
@@ -76,61 +80,54 @@ Samples are formatted to fit the available space and avoid horizontal scrolling.
             metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
+                # load well plate in deck slot 2
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location=2)
+                    location=2)    
+                # load tip rack in deck slot 3
                 tiprack = protocol.load_labware(
                     load_name='opentrons_96_tiprack_300ul',
-                    location=3)
+                    location=3)    
+                # attach pipette to left mount
                 pipette = protocol.load_instrument(
                     instrument_name='p300_single_gen2',
-                    mount='left')
+                    mount='left')  
+                # Put building block commands here
 
-The examples in this section would be added to the following:
-
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
-        plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        pipette = protocol.load_instrument('p300_single_gen2', mount='left')
-        # the example code below would go here, inside the run function
-
-
-This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 3, and uses a P300 Single GEN2 pipette.
-
+.. _atomic-tip-manipulation:
 
 Manipulating Pipette Tips
 =========================
 
-When the OT-2 handle liquids with, it constantly exchanges old, used tips for new ones to prevent cross-contamination between wells. Tip handling uses the functions :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`.
+The API provides three basic functions that help the robot manipulate pipette tips during a protocol run. These are :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`. 
+Respectively, they tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack. Let's look at examples for each of these functions.
 
-Pick Up Tip
------------
+.. _atomic-tip-pickup:
 
-Before any liquid handling can be done, your pipette must have a tip on it. The command :py:meth:`.InstrumentContext.pick_up_tip` will move the pipette over to the specified tip, then press down into it to create a vacuum seal. The below example picks up the tip at location ``'A1'`` of the tiprack previously loaded in slot 3.
+Picking Up a Tip
+----------------
 
-.. code-block:: python
+Your robot needs to attach a disposable tip to the pipette barrel before it can work with the liquids in a protocol. To attach a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` function. In the function argument, specify the tip rack you want to use, including the tip's coordinate location in the rack (e.g. A1, B1, C1, etc.). To pick up a tip, you'd add this code to your protocol file::
 
    pipette.pick_up_tip(tiprack['A1'])
 
-If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` or :ref:`protocol_api-protocols-and-instruments` sections, then you can simply call
+Because we already instantiated the variable ``tiprack`` with a tip rack deck location, your robot knows where to go:
 
-.. code-block:: python
+* **Flex**: The robot will pick up the tip in rack position A1 from the rack loaded in slot D3.
+* **OT-2**: The robot will pick up the tip in rack position A1 from the rack loaded in slot 3.
+
+If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` or :ref:`protocol_api-protocols-and-instruments` sections, then you can simply call::
 
     pipette.pick_up_tip()
 
-This will use the next available tip from the list of tipracks passed in to the ``tip_racks`` argument of :py:meth:`.ProtocolContext.load_instrument`.
+This will use the next available tip from the list of tip racks passed in to the ``tip_racks`` argument of :py:meth:`.ProtocolContext.load_instrument` method.
 
 .. versionadded:: 2.0
 
-Drop Tip
---------
+.. _atomic-drop-tip:
+
+Dropping a Tip
+--------------
 
 Once finished with a tip, the pipette will remove the tip when we call :py:meth:`.InstrumentContext.drop_tip`. You can specify where to drop the tip by passing in a location. The below example drops the tip back at its original location on the tip rack.
 If no location is specified, the OT-2 will drop the tip in the fixed trash in slot 12 of the deck.
@@ -147,8 +144,8 @@ If no location is specified, the OT-2 will drop the tip in the fixed trash in sl
 
 .. _pipette-return-tip:
 
-Return Tip
-----------
+Returning a Tip
+---------------
 
 To return the tip to the original location, you can call :py:meth:`.InstrumentContext.return_tip`. The example below will automatically return the tip to ``'A3'`` on the tip rack.
 
@@ -188,6 +185,9 @@ In API version 2.0 and 2.1:
     pipette.pick_up_tip() # picks up tip_rack:A1
     pipette.return_tip()
     pipette.pick_up_tip() # picks up tip_rack:A1
+
+.. careful here below re: info in preceding sections
+.. might need different title format for better fit
 
 Iterating Through Tips
 ----------------------
