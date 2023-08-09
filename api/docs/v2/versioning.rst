@@ -115,6 +115,43 @@ Changes in API Versions
 Version 2.15
 ------------
 
+This version introduces support for the Opentrons Flex robot, instruments, modules, and labware.
+
+- Flex features
+
+  - Write protocols for Opentrons Flex by declaring ``"robotType": "Flex"`` in the new ``requirements`` dictionary.
+  
+  - :py:meth:`.load_instrument` supports loading Flex 1-, 8-, and 96-channel pipettes. See :ref:`new-create-pipette`.
+  
+  - The new :py:meth:`.move_labware` method can move labware automatically using the Flex Gripper. You can also move labware manually on Flex.
+  
+  - :py:meth:`.load_module` supports loading the :ref:`magnetic-block`. 
+  
+  - The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.
+  
+- Flex and OT-2 features
+
+  - Optionally declare ``apiLevel`` in the new ``requirements`` dictionary (you can still declare it in ``metadata``). 
+  
+  - Optionally declare ``"robotType": "OT-2"`` in ``requirements``.
+
+  - Use coordinates or numbers to specify :ref:`deck-slots`. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of ``robotType``.
+  
+  - The new :py:meth:`.load_adapter` method lets you load adapters and labware separately on modules, and lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
+  
+  - Move labware manually using :py:meth:`.move_labware`, without having to stop your protocol. 
+  
+  - Manual labware moves support moving to or from the new :py:obj:`~.protocol_api.OFF_DECK` location (outside of the robot).
+  
+  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
+
+- Bug fixes
+
+  - TK
+
+  
+  
+
 Version 2.14
 ------------
 
