@@ -107,9 +107,7 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 
   const orderedTiprackIds = tipRackIdsVisited
     .reduce<LabwareToOrder[]>((acc, tipRackId) => {
-      const tiprackEntity = labware.find(
-        l => l.id === tipRackId && !l.definitionUri.includes('adapter')
-      )
+      const tiprackEntity = labware.find(l => l.id === tipRackId)
       const definition = labwareDefinitions.find(
         def => getLabwareDefURI(def) === tiprackEntity?.definitionUri
       )

@@ -33,7 +33,7 @@ export const getLabwareOffsetLocation = (
     ).location.slotName
     location = { slotName, moduleModel }
   } else if ('labwareId' in labwareLocation) {
-    const adapter = labware.find(lw => lw.id === labwareLocation.labwareId) // Rename variable to avoid conflict
+    const adapter = labware.find(lw => lw.id === labwareLocation.labwareId)
     if (adapter == null) {
       location = null
     } else if (adapter.location === 'offDeck') {

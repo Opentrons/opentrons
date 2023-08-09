@@ -232,21 +232,20 @@ export function parseInitialLoadedLabwareEntity(
   )
   return filterOutTrashCommands.map(command => {
     const definition = command.result?.definition
-    return command.commandType === 'loadAdapter'
-      ? {
-          id: command.result?.adapterId ?? '',
-          loadName: definition?.parameters?.loadName ?? '',
-          definitionUri: definition != null ? getLabwareDefURI(definition) : '',
-          location: command.params.location,
-          displayName: command.params.displayName,
-        }
-      : {
-          id: command.result?.labwareId ?? '',
-          loadName: definition?.parameters?.loadName ?? '',
-          definitionUri: definition != null ? getLabwareDefURI(definition) : '',
-          location: command.params.location,
-          displayName: command.params.displayName,
-        }
+    let id = ''
+    if (command.commandType === 'loadAdapter') {
+      id = command.result?.adapterId ?? ''
+    } else if (command.commandType === 'loadLabware') {
+      id = command.result?.labwareId ?? ''
+    }
+
+    return {
+      id,
+      loadName: definition?.parameters?.loadName ?? '',
+      definitionUri: definition != null ? getLabwareDefURI(definition) : '',
+      location: command.params.location,
+      displayName: command.params.displayName,
+    }
   })
 }
 
