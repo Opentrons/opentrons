@@ -52,7 +52,7 @@ export function CalibrationErrorModal(
       header={i18n.format(t('pip_cal_failed'), 'capitalize')}
       subHeader={errorMessage}
       isSuccess={false}
-      justifyContent={JUSTIFY_FLEX_END}
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
     >
       {isOnDevice ? (
         <SmallButton

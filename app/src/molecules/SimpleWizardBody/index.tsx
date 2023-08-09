@@ -27,7 +27,14 @@ interface Props extends StyleProps {
   children?: React.ReactNode
   subHeader?: string | JSX.Element
   isPending?: boolean
+  /**
+   *  change justifyContent of OnDeviceDisplay buttons
+   *  TODO(jr, 8/9/23): this should really be refactored though so the
+   *  buttons' justifyContent is specified at the parent level
+   */
+  justifyContentForOddButton?: string
 }
+
 const BACKGROUND_SIZE = '47rem'
 
 const HEADER_STYLE = css`
@@ -90,7 +97,8 @@ export function SimpleWizardBody(props: Props): JSX.Element {
     padding-bottom: ${SPACING.spacing32};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      justify-content: ${props.justifyContent ?? JUSTIFY_SPACE_BETWEEN};
+      justify-content: ${props.justifyContentForOddButton ??
+      JUSTIFY_SPACE_BETWEEN};
       padding-bottom: ${SPACING.spacing32};
       padding-left: ${SPACING.spacing32};
     }

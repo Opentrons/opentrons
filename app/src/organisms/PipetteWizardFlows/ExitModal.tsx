@@ -46,7 +46,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       header={t('progress_will_be_lost', { flow: flowTitle })}
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}
-      justifyContent={JUSTIFY_FLEX_END}
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
     >
       {isOnDevice ? (
         <>
