@@ -230,11 +230,11 @@ This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_we
 Aspirate
 ========
 
-To aspirate is to pull liquid up into the pipette's tip. When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, you can specify the volume to aspirate in µL, where to aspirate from, and how fast to aspirate liquid.
+To aspirate is to pull liquid up into the pipette's tip. When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, you can specify the volume to aspirate in  µL, where to aspirate from, and how fast to aspirate liquid.
 
 .. code-block:: python
 
-    pipette.aspirate(50, plate['A1'], rate=2.0)  # aspirate 50uL from plate:A1
+    pipette.aspirate(50, plate['A1'], rate=2.0)  # aspirate 50 µL from plate:A1
 
 Now the pipette's tip is holding 50 µL.
 
@@ -246,7 +246,7 @@ You can also simply specify the volume to aspirate, and not mention a location. 
 
 .. code-block:: python
 
-    pipette.aspirate(50)                     # aspirate 50uL from current position
+    pipette.aspirate(50)                     # aspirate 50 µL from current position
 
 Now our pipette's tip is holding 100 µL.
 
@@ -273,8 +273,8 @@ To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:
 
 .. code-block:: python
 
-    pipette.dispense(50, plate['B1'], rate=2.0) # dispense 50uL to plate:B1 at twice the normal rate
-    pipette.dispense(50)              # dispense 50uL to current position at the normal rate
+    pipette.dispense(50, plate['B1'], rate=2.0) # dispense 50 µL to plate:B1 at twice the normal rate
+    pipette.dispense(50)              # dispense 50 µL to current position at the normal rate
 
 
 The ``location`` parameter is either a well (like ``plate['A1']``) or a position within a well, like the return value of ``plate['A1'].bottom``.
@@ -358,9 +358,9 @@ The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, loca
 
 .. code-block:: python
 
-    # mix 4 times, 100uL, in plate:A2
+    # mix 4 times, 100 µL, in plate:A2
     pipette.mix(4, 100, plate['A2'])
-    # mix 3 times, 50uL, in current location
+    # mix 3 times, 50 µL, in current location
     pipette.mix(3, 50)
     # mix 2 times, pipette's max volume, in current location
     pipette.mix(2)
