@@ -167,7 +167,6 @@ parse_version_cases = [
         APIVersion(10, 23123151),
     ),
     # Explicitly-declared apiLevel with various cases of it being in metadata or requirements:
-    # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
     (
         """
         requirements = {"apiLevel": "123.456"}
@@ -197,16 +196,6 @@ parse_version_cases = [
         def run(ctx): pass
         """,
         APIVersion(123, 456),
-    ),
-    (
-        # Overriding:
-        # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
-        """
-        metadata = {"apiLevel": "123.456"}
-        requirements = {"apiLevel": "789.0"}
-        def run(ctx): pass
-        """,
-        APIVersion(789, 0),
     ),
 ]
 
@@ -636,6 +625,24 @@ def test_parse_extra_contents(
                 pass
             """,
             "robotType must be 'OT-2' or 'Flex', not 'flex'.",
+        ),
+        (
+            # apiLevel in both metadata and requirements.
+            """
+            metadata = {"apiLevel": "2.14"}
+            requirements = {"apiLevel": "2.14"}
+            def run(ctx): pass
+            """,
+            "You may only put apiLevel in the metadata dict or the requirements dict, not both.",
+        ),
+        (
+            # apiLevel in both metadata and requirements.
+            """
+            metadata = {"apiLevel": "2.14"}
+            requirements = {"apiLevel": ""}
+            def run(ctx): pass
+            """,
+            "You may only put apiLevel in the metadata dict or the requirements dict, not both.",
         ),
     ],
 )
