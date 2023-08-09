@@ -82,10 +82,10 @@ jobs:
           echo "${{ env.EXECUTABLE_PATH }}"
           pipenv run python -m pytest -k test_analyses
 
-    #   - name: Upload results.
-    #     uses: actions/upload-artifact@v2
-    #     with:
-    #       name: results
-    #       path: app-testing/results/
-    #     # Use always() to always run this step to publish test results when there are test failures
-    #     if: ${{ always() }}
+      - name: Upload results.
+        uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: app-testing/results/
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
