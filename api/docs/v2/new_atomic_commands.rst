@@ -6,7 +6,12 @@
 Building Block Commands
 #######################
 
-Building block commands execute some of the most basic actions that you can have the robot complete. But, basic doesn’t mean these are simple or lack utility. In fact, these commands perform important tasks in your protocols. They’re also part of the foundation that the :ref:`complex commands <v2-complex-commands>` rely on. In this section, we’ll look at building block commands that help you manipulate pipette tips, work with liquids, and interact with robot utility features.
+Building block commands execute some of the most basic actions that your robot can complete. But basic doesn’t mean these commands lack capabilities. They perform important tasks in your protocols. They’re also foundational to the :ref:`complex commands <v2-complex-commands>` that help you write and run longer, more intricate procedures. In this section, we’ll look at building block commands that help you work with pipette tips, liquids, and robot utility features.
+
+.. _protocol-foundation:
+
+Protocol Foundations
+====================
 
 The examples in this section would be added to the following:
 
@@ -27,14 +32,13 @@ The examples in this section would be added to the following:
 This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 3, and uses a P300 Single GEN2 pipette.
 
 
-**************
-Tip Handling
-**************
+Manipulating Pipette Tips
+=========================
 
 When the OT-2 handle liquids with, it constantly exchanges old, used tips for new ones to prevent cross-contamination between wells. Tip handling uses the functions :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`.
 
 Pick Up Tip
-===========
+-----------
 
 Before any liquid handling can be done, your pipette must have a tip on it. The command :py:meth:`.InstrumentContext.pick_up_tip` will move the pipette over to the specified tip, then press down into it to create a vacuum seal. The below example picks up the tip at location ``'A1'`` of the tiprack previously loaded in slot 3.
 
@@ -53,7 +57,7 @@ This will use the next available tip from the list of tipracks passed in to the 
 .. versionadded:: 2.0
 
 Drop Tip
-========
+--------
 
 Once finished with a tip, the pipette will remove the tip when we call :py:meth:`.InstrumentContext.drop_tip`. You can specify where to drop the tip by passing in a location. The below example drops the tip back at its original location on the tip rack.
 If no location is specified, the OT-2 will drop the tip in the fixed trash in slot 12 of the deck.
@@ -71,7 +75,7 @@ If no location is specified, the OT-2 will drop the tip in the fixed trash in sl
 .. _pipette-return-tip:
 
 Return Tip
-===========
+----------
 
 To return the tip to the original location, you can call :py:meth:`.InstrumentContext.return_tip`. The example below will automatically return the tip to ``'A3'`` on the tip rack.
 
@@ -198,11 +202,8 @@ To check whether you should pick up a tip or not, you can utilize :py:meth:`.Ins
 
 .. versionadded:: 2.7
 
-**********************
-
-****************
-Liquid Control
-****************
+Handling liquids
+================
 
 This section describes the :py:class:`.InstrumentContext` 's liquid-handling commands.
 
@@ -227,7 +228,7 @@ This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_we
 .. _new-aspirate:
 
 Aspirate
-========
+--------
 
 To aspirate is to pull liquid up into the pipette's tip. When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, you can specify the volume to aspirate in  µL, where to aspirate from, and how fast to aspirate liquid.
 
@@ -266,7 +267,7 @@ Now our pipette's tip is holding 100 µL.
 .. _new-dispense:
 
 Dispense
-========
+--------
 
 To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:`.InstrumentContext.dispense` in the Protocol API is similar to :py:meth:`.InstrumentContext.aspirate`, in that you can specify volume in µL and location, or only volume.
 
@@ -299,7 +300,7 @@ The ``rate`` parameter is a multiplication factor of the pipette's default dispe
 .. _blow-out:
 
 Blow Out
-========
+--------
 
 To blow out is to push an extra amount of air through the pipette's tip, to make sure that any remaining droplets are expelled.
 
@@ -316,7 +317,7 @@ When calling :py:meth:`.InstrumentContext.blow_out`, you can specify a location 
 .. _touch-tip:
 
 Touch Tip
-=========
+---------
 
 To touch tip is to move the pipette's currently attached tip to four opposite edges of a well, to knock off any droplets that might be hanging from the tip.
 
@@ -349,7 +350,7 @@ When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the 
 .. _mix:
 
 Mix
-===
+---
 
 To mix is to perform a series of ``aspirate`` and ``dispense`` commands in a row on a single location. Instead of having to write those commands out every time, you can call :py:meth:`.InstrumentContext.mix`.
 
@@ -373,7 +374,7 @@ The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, loca
 .. _air-gap:
 
 Air Gap
-=======
+-------
 
 When dealing with certain liquids, you may need to aspirate air after aspirating the liquid to prevent it from sliding out of the pipette's tip. A call to :py:meth:`.InstrumentContext.air_gap` with a volume in µL will aspirate that much air into the tip. ``air_gap`` takes up to two arguments: ``air_gap(volume, height)``:
 
@@ -385,16 +386,14 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 
 .. versionadded:: 2.0
 
-**********************
-
 .. _new-utility-commands:
 
-****************
+
 Utility Commands
-****************
+================
 
 Delay for an Amount of Time
-===========================
+---------------------------
 
 Sometimes you need to wait as a step in your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to wait your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol and the OT-2 as a whole.
 
@@ -408,7 +407,7 @@ The values passed into ``delay()`` specify the number of minutes and seconds tha
 
 
 Pause Until Resumed
-===================
+-------------------
 
 The method :py:meth:`.ProtocolContext.pause` will pause protocol execution at a specific step.
 You can resume by pressing 'resume' in your Opentrons App. You can optionally specify a message that
@@ -432,7 +431,7 @@ will be displayed in the Opentrons App when protocol execution pauses.
 .. versionadded:: 2.0
 
 Homing
-======
+------
 
 You can manually request that the OT-2 home during protocol execution. This is typically
 not necessary; however, if at any point you will disengage motors or move
@@ -463,7 +462,7 @@ None of these functions take any arguments:
 
 
 Comment
-=======
+-------
 
 The method :py:meth:`.ProtocolContext.comment` lets you display messages in the Opentrons App during protocol execution:
 
@@ -482,7 +481,7 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
 
 
 Control and Monitor Robot Rail Lights
-=====================================
+-------------------------------------
 
 You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
 
@@ -516,7 +515,7 @@ You can also check whether the rail lights are on or off in the protocol using :
 
 
 Monitor Robot Door
-==================
+------------------
 
 The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
 
