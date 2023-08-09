@@ -644,6 +644,20 @@ def test_parse_extra_contents(
             """,
             "You may only put apiLevel in the metadata dict or the requirements dict, not both.",
         ),
+        (
+            # Unrecognized keys in requirements.
+            """
+            requirements = {
+                "apiLevel": "2.14",
+                "robotType": "Flex",
+                "APILevel": "2.14",
+                "RobotType": "Flex",
+                "foo": "bar",
+            }
+            def run(cxt): pass
+            """,
+            "Unrecognized keys in requirements dict: 'APILevel', 'RobotType', 'foo'",
+        ),
     ],
 )
 def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
