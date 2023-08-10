@@ -1,0 +1,49 @@
+test_name: Upload, analyze, and confirm correctness of loading via deck coordinate names
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+stages:
+  - name: Upload deck_coordinate_move_labware protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/deck_coordinate_move_labware.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: deck_coordinate_move_labware.py
+              role: main
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          robotType: OT-2 Standard
+          metadata:
+            protocolName: Deck Coordinate PAPIv2 Test
+          analyses: []
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+  - name: Retry until analyses status is completed and result is ok.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
+  # TODO(jbl 2023-04-25) When returning deck coordinates is implemented, check output here

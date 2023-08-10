@@ -36,7 +36,7 @@ HS_MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
 #
 # TODO(mc, 2022-06-16): move this constant to the module definition
 HS_ALLOWED_ADJACENT_TALL_LABWARE = [
-    LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
+    LabwareUri("opentrons//1"),
     LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
     LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
     LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),

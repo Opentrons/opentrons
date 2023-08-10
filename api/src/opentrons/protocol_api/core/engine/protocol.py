@@ -277,8 +277,22 @@ class ProtocolCore(
             else None
         )
 
-        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
-        # when move_labware() support is no longer experimental.
+        # FIXME(jbl, 2023-06-23) read fixme above:
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            # It's important that we don't fetch these IDs from Protocol Engine, and
+            # use our own bookkeeping instead. If we fetched these IDs from Protocol
+            # Engine, it would have leaked state from Labware Position Check in the
+            # same HTTP run.
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+            new_labware_id=labware_core.labware_id,
+            move_to_location=to_location.slotName
+            if isinstance(to_location, DeckSlotLocation)
+            else None,
+        )
 
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
@@ -287,6 +301,7 @@ class ProtocolCore(
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
+
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
             # Clear out last location since it is not relevant to pipetting
             # and we only use last location for in-place pipetting commands

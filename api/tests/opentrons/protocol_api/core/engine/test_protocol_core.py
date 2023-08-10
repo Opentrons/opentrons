@@ -575,7 +575,9 @@ def test_move_labware(
     ).then_return(
         LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
     )
+
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+
     subject.move_labware(
         labware_core=labware,
         new_location=DeckSlotName.SLOT_5,
@@ -583,6 +585,7 @@ def test_move_labware(
         pick_up_offset=pick_up_offset,
         drop_offset=drop_offset,
     )
+
     decoy.verify(
         mock_engine_client.move_labware(
             labware_id="labware-id",
@@ -592,6 +595,15 @@ def test_move_labware(
             if pick_up_offset
             else None,
             drop_offset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
+        )
+    )
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_labware_id="labware-id",
         )
     )
 
