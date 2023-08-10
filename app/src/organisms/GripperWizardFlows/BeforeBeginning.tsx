@@ -68,6 +68,7 @@ export const BeforeBeginning = (
     isRobotMoving,
     chainRunCommands,
     errorMessage,
+    maintenanceRunId,
     setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
@@ -141,7 +142,7 @@ export const BeforeBeginning = (
         />
       }
       proceedButtonText={t('move_gantry_to_front')}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={handleOnClick}
     />
   )

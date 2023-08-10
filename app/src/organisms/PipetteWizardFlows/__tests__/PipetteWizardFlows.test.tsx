@@ -145,8 +145,10 @@ describe('PipetteWizardFlows', () => {
     )
     mockUseCurrentMaintenanceRun.mockReturnValue({
       data: {
-        runId: 'mockRunId',
-      } as any,
+        data: {
+          id: 'mockRunId',
+        } as any,
+      },
     } as any)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
@@ -164,6 +166,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'loadPipette',
@@ -190,6 +193,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(initiate)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'home',
@@ -345,6 +349,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           { commandType: 'home' as const, params: {} },
           {
@@ -402,6 +407,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           { commandType: 'home' as const, params: {} },
           {
@@ -462,6 +468,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'loadPipette',
@@ -533,6 +540,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           { commandType: 'home' as const, params: {} },
           {
@@ -562,6 +570,7 @@ describe('PipetteWizardFlows', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'loadPipette',
@@ -587,6 +596,7 @@ describe('PipetteWizardFlows', () => {
     getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'home',

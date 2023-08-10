@@ -7,6 +7,7 @@ import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   LoadedPipette,
+  CreateCommand,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -40,8 +41,8 @@ import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
+import { CommandData } from '@opentrons/api-client'
 
-const RUN_DELETION_TIMEOUT = 10000
 const RUN_REFETCH_INTERVAL = 5000
 
 interface PipetteWizardFlowsProps {
@@ -79,7 +80,6 @@ export const PipetteWizardFlows = (
     pipette => pipette.mount === mount
   )
   const host = useHost()
-  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
@@ -104,37 +104,33 @@ export const PipetteWizardFlows = (
       currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+  })
+  const prevMaintenanceRunId = React.useRef<string | undefined>(
+    maintenanceRunData?.data.id
+  )
+  // maybe do this conditionally - only if maintenance run id doesn't equal null
+  React.useEffect(() => {
+    prevMaintenanceRunId.current = maintenanceRunData?.data.id
+  }, [maintenanceRunData?.data.id])
   const {
     chainRunCommands,
     isCommandMutationLoading,
-  } = useChainMaintenanceCommands(maintenanceRunId)
+  } = useChainMaintenanceCommands()
 
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation(
-    {
-      onSuccess: response => {
-        setMaintenanceRunId(response.data.id)
-      },
-    },
-    host
-  )
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
-    refetchInterval: RUN_REFETCH_INTERVAL,
-  })
+  } = useCreateMaintenanceRunMutation({}, host)
+
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
-    setTimeout(() => {
-      if (
-        maintenanceRunId !== '' &&
-        maintenanceRunData?.data.id !== maintenanceRunId
-      ) {
-        closeFlow()
-      }
-    }, RUN_DELETION_TIMEOUT)
-  }, [maintenanceRunData, maintenanceRunId, closeFlow])
+    if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
+      closeFlow()
+    }
+  }, [maintenanceRunData, closeFlow])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
@@ -162,11 +158,15 @@ export const PipetteWizardFlows = (
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunId == null) handleClose()
+    if (maintenanceRunData?.data.id == null) handleClose()
     else {
-      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+      chainRunCommands(
+        maintenanceRunData?.data.id,
+        [{ commandType: 'home' as const, params: {} }],
+        false
+      )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunId)
+          deleteMaintenanceRun(maintenanceRunData?.data.id)
         })
         .catch(error => {
           console.error(error.message)
@@ -190,11 +190,25 @@ export const PipetteWizardFlows = (
     }
   }, [isCommandMutationLoading, isExiting])
 
+  let chainMaintenanceRunCommands
+
+  if (maintenanceRunData?.data.id != null) {
+    chainMaintenanceRunCommands = (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ): Promise<CommandData[]> =>
+      chainRunCommands(
+        maintenanceRunData.data.id,
+        commands,
+        continuePastCommandFailure
+      )
+  }
+
   const calibrateBaseProps = {
-    chainRunCommands,
+    chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
-    maintenanceRunId,
+    maintenanceRunId: maintenanceRunData?.data.id,
     goBack,
     attachedPipettes,
     setShowErrorMessage,
