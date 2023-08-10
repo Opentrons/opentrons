@@ -3,7 +3,12 @@ import * as React from 'react'
 import type { ToastProps, ToastType } from '../../atoms/Toast'
 import type { SnackbarProps } from '../../atoms/Snackbar'
 
-export type MakeToastOptions = Omit<ToastProps, 'id' | 'message' | 'type'>
+export type MakeToastOptions = Omit<
+  ToastProps,
+  'id' | 'message' | 'type' | 'exitNow'
+> & {
+  allowOneToastOnlyODD?: boolean
+}
 
 type MakeToast = (
   message: string,

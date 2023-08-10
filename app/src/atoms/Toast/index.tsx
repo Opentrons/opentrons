@@ -44,9 +44,12 @@ export interface ToastProps extends StyleProps {
   duration?: number
   heading?: string
   displayType?: 'desktop' | 'odd'
+  exitNow?: boolean
 }
 
-const TOAST_ANIMATION_DURATION = 500
+// TODO: (jh: 08/10/23) refactor toast component and render logic.
+
+export const TOAST_ANIMATION_DURATION = 500
 
 export function Toast(props: ToastProps): JSX.Element {
   const {
@@ -60,10 +63,11 @@ export function Toast(props: ToastProps): JSX.Element {
     duration = 8000,
     heading,
     displayType,
+    exitNow = false,
     ...styleProps
   } = props
   const { t } = useTranslation('shared')
-  const [isClosed, setIsClosed] = React.useState<boolean>(false)
+  const [isClosed, setIsClosed] = React.useState<boolean>(exitNow)
 
   // We want to be able to storybook both the ODD and the Desktop versions,
   // so let it (and unit tests, for that matter) be able to pass in a parameter
@@ -81,7 +85,7 @@ export function Toast(props: ToastProps): JSX.Element {
       : closeButton === true
       ? t('close')
       : ''
-  const DESKTOP_ANIMATION_IN = css`
+  const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidein;
     overflow: hidden;
@@ -95,7 +99,7 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const DESKTOP_ANIMATION_OUT = css`
+  const DESKTOP_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideout;
     overflow: hidden;
@@ -109,11 +113,12 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const desktopAnimation = isClosed
-    ? DESKTOP_ANIMATION_OUT
-    : DESKTOP_ANIMATION_IN
 
-  const ODD_ANIMATION_IN = css`
+  const desktopAnimation = isClosed
+    ? DESKTOP_ANIMATION_SLIDE_DOWN_AND_OUT
+    : DESKTOP_ANIMATION_SLIDE_UP_AND_IN
+
+  const ODD_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideup;
     overflow: hidden;
@@ -127,7 +132,7 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const ODD_ANIMATION_OUT = css`
+  const ODD_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidedown;
     overflow: hidden;
@@ -141,8 +146,30 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
+  const ODD_ANIMATION_FADE_UP_AND_OUT = css`
+    animation-duration: ${TOAST_ANIMATION_DURATION}ms;
+    animation-name: fadeUpAndOut;
+    overflow: hidden;
 
-  const oddAnimation = isClosed ? ODD_ANIMATION_OUT : ODD_ANIMATION_IN
+    @keyframes fadeUpAndOut {
+      from {
+        transform: translateY(0%);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-10%);
+        opacity: 0;
+      }
+    }
+  `
+
+  const oddAnimation = isClosed
+    ? exitNow
+      ? ODD_ANIMATION_FADE_UP_AND_OUT
+      : ODD_ANIMATION_SLIDE_DOWN_AND_OUT
+    : exitNow
+    ? css``
+    : ODD_ANIMATION_SLIDE_UP_AND_IN
 
   const toastStyleByType: {
     [k in ToastType]: {
@@ -194,6 +221,7 @@ export function Toast(props: ToastProps): JSX.Element {
     duration: number | undefined
   ): number => {
     const combinedDuration = (message.length + heading.length) * 50
+    if (exitNow) return 0
     if (duration !== undefined) {
       return duration
     }
@@ -206,7 +234,17 @@ export function Toast(props: ToastProps): JSX.Element {
     return combinedDuration
   }
 
-  if (!disableTimeout) {
+  // Handle dismissal of toast when no timer is set.
+  const onCloseHandler = (): void => {
+    setIsClosed(true)
+    setTimeout(() => {
+      onClose?.()
+    }, TOAST_ANIMATION_DURATION - 50)
+  }
+
+  const isAutomaticAnimationExit = !disableTimeout || exitNow
+
+  if (isAutomaticAnimationExit) {
     setTimeout(() => {
       setIsClosed(true)
       setTimeout(() => {
@@ -228,7 +266,7 @@ export function Toast(props: ToastProps): JSX.Element {
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      onClick={closeText.length > 0 ? onClose : undefined}
+      onClick={isAutomaticAnimationExit ? onClose : onCloseHandler}
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle

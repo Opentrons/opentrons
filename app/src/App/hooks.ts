@@ -84,7 +84,11 @@ export function useProtocolReceiptToast(): void {
                 protocol_name: name,
               }),
               'success',
-              { closeButton: true, disableTimeout: true }
+              {
+                closeButton: true,
+                disableTimeout: true,
+                allowOneToastOnlyODD: true,
+              }
             )
           })
         })

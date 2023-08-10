@@ -53,10 +53,33 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     options?: MakeToastOptions
   ): string {
     const id = uuidv4()
+    const allowOneToastOnlyODD = options?.allowOneToastOnlyODD ?? false
 
-    setToasts(t =>
-      [{ id, message, type, ...options }, ...t].slice(0, TOASTER_OVEN_SIZE)
-    )
+    if (allowOneToastOnlyODD) {
+      const toastsForRemoval = toasts.map(toast => {
+        return {
+          ...toast,
+          exitNow: true,
+          zIndex: 1,
+          position: POSITION_FIXED,
+        }
+      })
+      setToasts(t => [
+        {
+          id,
+          message,
+          type,
+          ...options,
+          zIndex: 2,
+          position: POSITION_FIXED,
+        },
+        ...toastsForRemoval,
+      ])
+    } else {
+      setToasts(t =>
+        [{ id, message, type, ...options }, ...t].slice(0, TOASTER_OVEN_SIZE)
+      )
+    }
 
     return id
   }
