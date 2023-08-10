@@ -22,7 +22,6 @@ import {
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
-import { useFeatureFlag } from '../../redux/config'
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
@@ -50,7 +49,6 @@ export const RobotConfigurationDetails = (
     robotType,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
-  const enableExtendedHardware = useFeatureFlag('enableExtendedHardware')
 
   const loadingText = <StyledText as="p">{t('shared:loading')}</StyledText>
   const emptyText = (
@@ -131,7 +129,7 @@ export const RobotConfigurationDetails = (
           />
         </>
       )}
-      {enableExtendedHardware ? (
+      {robotType === 'OT-3 Standard' ? (
         <>
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
