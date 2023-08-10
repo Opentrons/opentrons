@@ -327,7 +327,7 @@ class API(
     @property
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
-    
+
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         return {}
 
