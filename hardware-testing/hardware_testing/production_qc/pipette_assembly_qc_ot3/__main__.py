@@ -846,7 +846,7 @@ async def _test_diagnostics_capacitive(
         capacitive_open_air_pass
         and capacitive_probe_attached_pass
         and capacitive_probing_pass
-        and probe_slot_result
+        and capacitive_square_pass
     )
 
 
