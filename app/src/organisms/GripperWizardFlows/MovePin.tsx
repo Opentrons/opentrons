@@ -49,11 +49,10 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       const jaw = movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'
       createRunCommand({
         command: {
-          commandType: 'calibration/calibrateGripper' as const,
-          params:
-            jaw === 'rear' && frontJawOffset != null
-              ? { jaw, otherJawOffset: frontJawOffset }
-              : { jaw },
+          commandType: 'home' as const,
+          params: {
+            axes: ['extensionZ', 'extensionJaw'],
+          },
         },
         waitUntilComplete: true,
       })
@@ -61,15 +60,13 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           if (data.status === 'failed') {
             setErrorMessage(data.error?.detail ?? null)
           }
-          if (jaw === 'front' && data?.result?.jawOffset != null) {
-            setFrontJawOffset(data.result.jawOffset)
-          }
           createRunCommand({
             command: {
-              commandType: 'calibration/moveToMaintenancePosition' as const,
-              params: {
-                mount: EXTENSION,
-              },
+              commandType: 'calibration/calibrateGripper' as const,
+              params:
+                jaw === 'rear' && frontJawOffset != null
+                  ? { jaw, otherJawOffset: frontJawOffset }
+                  : { jaw },
             },
             waitUntilComplete: true,
           })
@@ -77,7 +74,25 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
               if (data.status === 'failed') {
                 setErrorMessage(data.error?.detail ?? null)
               }
-              proceed()
+              if (jaw === 'front' && data?.result?.jawOffset != null) {
+                setFrontJawOffset(data.result.jawOffset)
+              }
+              createRunCommand({
+                command: {
+                  commandType: 'calibration/moveToMaintenancePosition' as const,
+                  params: {
+                    mount: EXTENSION,
+                  },
+                },
+                waitUntilComplete: true,
+              })
+                .then(({ data }) => {
+                  if (data.status === 'failed') {
+                    setErrorMessage(data.error?.detail ?? null)
+                  }
+                  proceed()
+                })
+                .catch(error => setErrorMessage(error.message))
             })
             .catch(error => setErrorMessage(error.message))
         })
