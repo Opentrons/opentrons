@@ -6,7 +6,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
 
-from .types import ModuleType
+from .types import ModuleType, SpeedStatus
 from .mod_abc import AbstractModule
 from .tempdeck import TempDeck
 from .magdeck import MagDeck
@@ -51,3 +51,13 @@ async def build(
         execution_manager=execution_manager,
         sim_model=sim_model,
     )
+
+
+async def disable_module(module: AbstractModule) -> None:
+    """Async function to deactivate a module immediately, for error recovery."""
+    if isinstance(module, HeaterShaker):
+        await module.deactivate_heater(must_be_running=False)
+        if module.speed_status != SpeedStatus.IDLE:
+            await module.deactivate_shaker(must_be_running=False)
+    else:
+        await module.deactivate(must_be_running=False)

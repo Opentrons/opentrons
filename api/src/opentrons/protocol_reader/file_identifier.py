@@ -1,6 +1,5 @@
 """File identifier interface."""
 
-import ast
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, Sequence, Union
@@ -10,13 +9,9 @@ import anyio
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.parse import (
-    extract_static_python_info,
-    robot_type_from_static_python_info,
-    version_from_static_python_info,
-)
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.types import StaticPythonInfo
+from opentrons.protocols import parse
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 from .file_reader_writer import BufferedFile
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
@@ -204,64 +199,29 @@ def _analyze_json_protocol(
     )
 
 
-# todo(mm, 2021-09-13): This duplicates opentrons.protocols.parse.parse()
-# and misses some of its functionality. For example, this misses looking at import
-# statements to see if a protocol looks like APIv1, and this misses statically
-# validating the structure of an APIv2 protocol to make sure it has exactly 1 run()
-# function, etc.
 def _analyze_python_protocol(
     py_file: BufferedFile,
 ) -> IdentifiedPythonMain:
     try:
-        # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave
-        # the Python compilation flags at their defaults. For example, we probably
-        # don't truly want the protocol to inherit our own __future__ features.
-        module_ast = ast.parse(source=py_file.contents, filename=py_file.name)
-    except (SyntaxError, ValueError) as e:
-        # ast.parse() raises SyntaxError for most errors,
-        # but ValueError if the source contains null bytes.
-        raise FileIdentificationError(f"Unable to parse {py_file.name}.") from e
+        parsed = parse.parse(protocol_file=py_file.contents, filename=py_file.name)
+    except MalformedPythonProtocolError as e:
+        raise FileIdentificationError(e.short_message) from e
 
-    try:
-        static_info = extract_static_python_info(module_ast)
-    except ValueError as e:
+    # We know this should never be a JsonProtocol. Help out the type-checker.
+    assert isinstance(
+        parsed, PythonProtocol
+    ), "Parsing a Python file returned something other than a Python protocol."
+
+    if parsed.api_level > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(
-            f"Unable to extract metadata from {py_file.name}."
-        ) from e
-
-    api_version = _get_api_version(static_info, py_file.name)
-
-    robot_type = _get_robot_type(static_info)
-
-    return IdentifiedPythonMain(
-        original_file=py_file,
-        metadata=static_info.metadata or {},
-        robot_type=robot_type,
-        api_level=api_version,
-    )
-
-
-def _get_api_version(
-    static_python_info: StaticPythonInfo, file_name_for_error: str
-) -> APIVersion:
-    try:
-        api_version = version_from_static_python_info(static_python_info)
-    except ValueError as e:
-        raise FileIdentificationError(str(e)) from e
-    if api_version is None:
-        raise FileIdentificationError(f"apiLevel not declared in {file_name_for_error}")
-    if api_version > MAX_SUPPORTED_VERSION:
-        raise FileIdentificationError(
-            f"API version {api_version} is not supported by this "
+            f"API version {parsed.api_level} is not supported by this "
             f"robot software. Please either reduce your requested API "
             f"version or update your robot."
         )
 
-    return api_version
-
-
-def _get_robot_type(static_python_info: StaticPythonInfo) -> RobotType:
-    try:
-        return robot_type_from_static_python_info(static_python_info)
-    except ValueError as e:
-        raise FileIdentificationError(str(e)) from e
+    return IdentifiedPythonMain(
+        original_file=py_file,
+        metadata=parsed.metadata or {},
+        robot_type=parsed.robot_type,
+        api_level=parsed.api_level,
+    )

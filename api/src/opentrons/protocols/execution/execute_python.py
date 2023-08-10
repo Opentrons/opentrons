@@ -8,7 +8,7 @@ from typing import Any, Dict
 from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
-from opentrons.protocols.types import PythonProtocol, MalformedProtocolError
+from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
 from opentrons.hardware_control import ExecutionCancelledError
 from opentrons.protocol_engine.errors import ProtocolCommandFailedError
 
@@ -55,7 +55,7 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
     try:
         _runfunc_ok(new_globs.get("run"))
     except SyntaxError as se:
-        raise MalformedProtocolError(str(se))
+        raise MalformedPythonProtocolError(str(se))
     new_globs["__context"] = context
     try:
         exec("run(__context)", new_globs)

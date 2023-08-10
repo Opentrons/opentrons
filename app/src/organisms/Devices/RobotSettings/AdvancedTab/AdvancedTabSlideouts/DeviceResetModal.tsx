@@ -23,7 +23,11 @@ import {
   SUCCESS,
   PENDING,
 } from '../../../../../redux/robot-api'
-import { resetConfig } from '../../../../../redux/robot-admin'
+import {
+  getResetConfigOptions,
+  resetConfig,
+} from '../../../../../redux/robot-admin'
+import { useIsOT3 } from '../../../hooks'
 
 import type { State } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
@@ -44,13 +48,36 @@ export function DeviceResetModal({
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const isOT3 = useIsOT3(robotName)
   const resetRequestStatus = useSelector((state: State) => {
     const lastId = last(requestIds)
     return lastId != null ? getRequestById(state, lastId) : null
   })?.status
 
+  const serverResetOptions = useSelector((state: State) =>
+    getResetConfigOptions(state, robotName)
+  )
+
   const triggerReset = (): void => {
     if (resetOptions != null) {
+      if (isOT3) {
+        const totalOptionsSelected = Object.values(resetOptions).filter(
+          selected => selected === true
+        ).length
+
+        const isEveryOptionSelected =
+          totalOptionsSelected > 0 &&
+          totalOptionsSelected ===
+            // filtering out ODD setting because this gets implicitly cleared if all settings are selected
+            serverResetOptions.filter(o => o.id !== 'onDeviceDisplay').length
+
+        if (isEveryOptionSelected) {
+          resetOptions = {
+            ...resetOptions,
+            onDeviceDisplay: true,
+          }
+        }
+      }
       dispatchRequest(resetConfig(robotName, resetOptions))
       history.push(`/devices/`)
     }

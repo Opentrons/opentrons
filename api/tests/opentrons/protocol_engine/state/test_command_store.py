@@ -83,6 +83,7 @@ def test_initial_state(
         run_error=None,
         finish_error=None,
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -662,6 +663,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         run_error=None,
         finish_error=None,
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -685,6 +687,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -709,6 +712,7 @@ def test_command_store_handles_finish_action() -> None:
         finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -722,12 +726,13 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
     assert subject.state.run_result == RunResult.STOPPED
 
 
-def test_command_store_handles_stop_action() -> None:
+@pytest.mark.parametrize("from_estop", [True, False])
+def test_command_store_handles_stop_action(from_estop: bool) -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
-    subject.handle_action(StopAction())
+    subject.handle_action(StopAction(from_estop=from_estop))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
@@ -743,6 +748,7 @@ def test_command_store_handles_stop_action() -> None:
         finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
+        stopped_by_estop=from_estop,
     )
 
 
@@ -766,6 +772,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -894,6 +901,7 @@ def test_command_store_wraps_unknown_errors() -> None:
         ),
         run_started_at=None,
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -953,6 +961,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
         ),
         run_started_at=None,
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -978,6 +987,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -1003,6 +1013,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -1051,6 +1062,7 @@ def test_command_store_handles_command_failed() -> None:
         finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 
@@ -1076,6 +1088,7 @@ def test_handles_hardware_stopped() -> None:
         finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
+        stopped_by_estop=False,
     )
 
 

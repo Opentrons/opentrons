@@ -32,7 +32,7 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
@@ -49,6 +49,7 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -185,6 +186,11 @@ export function ProtocolSetupModules({
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
 
+  const modalHeader: ModalHeaderBaseProps = {
+    title: t('map_view'),
+    hasExitIcon: true,
+  }
+
   return (
     <>
       <Portal level="top">
@@ -199,10 +205,10 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showDeckMapModal ? (
-          <LegacyModal
-            title={t('map_view')}
-            onClose={() => setShowDeckMapModal(false)}
-            fullPage
+          <Modal
+            header={modalHeader}
+            modalSize="large"
+            onOutsideClick={() => setShowDeckMapModal(false)}
           >
             <RobotWorkSpace
               deckDef={deckDef}
@@ -210,6 +216,7 @@ export function ProtocolSetupModules({
               deckFill={COLORS.light1}
               trashSlotName="A3"
               id="ModuleSetup_deckMap"
+              trashColor={COLORS.darkGreyEnabled}
             >
               {() => (
                 <>
@@ -237,7 +244,7 @@ export function ProtocolSetupModules({
                 </>
               )}
             </RobotWorkSpace>
-          </LegacyModal>
+          </Modal>
         ) : null}
       </Portal>
       <Flex

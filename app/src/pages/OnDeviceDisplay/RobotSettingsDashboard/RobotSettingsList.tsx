@@ -48,7 +48,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
+      <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
         <RobotSettingButton
           settingName={t('network_settings')}
           settingInfo={networkConnection?.connectionStatus}

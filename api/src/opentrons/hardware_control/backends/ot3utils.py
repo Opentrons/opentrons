@@ -216,9 +216,20 @@ def get_current_settings(
     for axis_kind in conf_by_pip["hold_current"].keys():
         for axis in Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
-                conf_by_pip["hold_current"][axis_kind],
-                conf_by_pip["run_current"][axis_kind],
+                hold_current=conf_by_pip["hold_current"][axis_kind],
+                run_current=conf_by_pip["run_current"][axis_kind],
             )
+    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        # In high-throughput configuration, the right mount doesn't do anything: the
+        # lead screw nut is disconnected from the carriage, and it just hangs out
+        # up at the top of the axis. We should therefore not give it a lot of current.
+        # TODO: think of a better way to do this
+        lt_config = config.by_gantry_load(GantryLoad.LOW_THROUGHPUT)
+        currents[Axis.Z_R] = CurrentConfig(
+            hold_current=lt_config["hold_current"][OT3AxisKind.Z],
+            # not a typo: keep that current low
+            run_current=lt_config["hold_current"][OT3AxisKind.Z],
+        )
     return currents
 
 
@@ -269,6 +280,30 @@ def get_system_constraints_for_calibration(
                 DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
             )
     return constraints
+
+
+def get_system_constraints_for_plunger_acceleration(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+    mount: OT3Mount,
+    acceleration: float,
+) -> "SystemConstraints[Axis]":
+    old_constraints = config.by_gantry_load(gantry_load)
+    new_constraints = {}
+    axis_kinds = set([k for _, v in old_constraints.items() for k in v.keys()])
+    for axis_kind in axis_kinds:
+        for axis in Axis.of_kind(axis_kind):
+            if axis == Axis.of_main_tool_actuator(mount):
+                _accel = acceleration
+            else:
+                _accel = old_constraints["acceleration"][axis_kind]
+            new_constraints[axis] = AxisConstraints.build(
+                _accel,
+                old_constraints["max_speed_discontinuity"][axis_kind],
+                old_constraints["direction_change_speed_discontinuity"][axis_kind],
+                old_constraints["default_max_speed"][axis_kind],
+            )
+    return new_constraints
 
 
 def _convert_to_node_id_dict(

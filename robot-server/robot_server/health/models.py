@@ -2,6 +2,7 @@
 import typing
 from pydantic import BaseModel, Field
 from opentrons_shared_data.deck.dev_types import RobotModel
+from robot_server.service.json_api import BaseResponseBody
 
 
 class HealthLinks(BaseModel):
@@ -19,6 +20,10 @@ class HealthLinks(BaseModel):
         ...,
         description="The path to the HTTP server logs endpoint",
     )
+    oddLog: typing.Optional[str] = Field(
+        None,
+        description="The path to the ODD app logs endpoint",
+    )
     apiSpec: str = Field(
         ...,
         description="The path to the OpenAPI specification of the server",
@@ -29,7 +34,7 @@ class HealthLinks(BaseModel):
     )
 
 
-class Health(BaseModel):
+class Health(BaseResponseBody):
     """Information about the server and system."""
 
     name: str = Field(

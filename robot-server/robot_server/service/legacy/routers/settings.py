@@ -19,6 +19,7 @@ from opentrons.config import (
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware, get_robot_type
+from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
     AdvancedSettingsResponse,
@@ -103,6 +104,7 @@ def _create_settings_response() -> AdvancedSettingsResponse:
                 value=s.value,
             )
             for s in data.values()
+            if s.definition.should_show()
         ],
     )
 
@@ -232,6 +234,9 @@ async def post_settings_reset_options(
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
         await persistence_resetter.mark_directory_reset()
 
+    if factory_reset_commands.get(reset_util.ResetOptionId.on_device_display, False):
+        await reset_odd.mark_odd_for_reset_next_boot()
+
     # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
     # The message returned to the client will be printed in the wrong order.
     message = (
@@ -307,7 +312,6 @@ async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
 async def patch_pipette_setting(
     pipette_id: str, settings_update: PipetteSettingsUpdate
 ) -> PipetteSettings:
-
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}
     field_values = {k: None if v is None else v.value for k, v in fields.items()}

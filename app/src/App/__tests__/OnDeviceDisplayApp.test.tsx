@@ -24,6 +24,8 @@ import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoading
 import { EmergencyStop } from '../../pages/EmergencyStop'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
+import { getLocalRobot } from '../../redux/discovery'
+import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
@@ -46,6 +48,7 @@ jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
 jest.mock('../../pages/EmergencyStop')
 jest.mock('../../redux/config')
 jest.mock('../../redux/shell')
+jest.mock('../../redux/discovery')
 jest.mock('../hooks')
 
 const mockSettings = {
@@ -109,6 +112,9 @@ const mockUseCurrentRunRoute = useCurrentRunRoute as jest.MockedFunction<
 const mockUseProtocolReceiptToasts = useProtocolReceiptToast as jest.MockedFunction<
   typeof useProtocolReceiptToast
 >
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -144,6 +150,7 @@ describe('OnDeviceDisplayApp', () => {
     mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
     mockEmergencyStop.mockReturnValue(<div>Mock EmergencyStop</div>)
     mockUseCurrentRunRoute.mockReturnValue(null)
+    mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
   })
   afterEach(() => {
     jest.resetAllMocks()

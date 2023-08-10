@@ -69,11 +69,6 @@ async def _read_gantry_position_and_check_alignment(
     else:
         estimate = {ax: 200.0 for ax in GANTRY_AXES}
         encoder = {ax: 200.0 for ax in GANTRY_AXES}
-    # NOTE: DVT2.0 firmware's Z encoders are backwards,
-    #       so the absolute encoder position moves in the opposite direction.
-    #       For reference, we can know a DVT2.0 firmware Z-Stages passes
-    #       if it's "max" encoder value is read close to 468.475
-    # FIXME: switch to expected behavior once FW bug is resolved
     all_aligned_axes = [
         ax
         for ax in GANTRY_AXES
@@ -109,8 +104,6 @@ async def _record_test_status(
     if test not in GANTRY_TESTS:
         raise ValueError(f"unexpected gantry test: {test}")
     status = await _read_gantry_position_and_check_alignment(api, axis)
-    if "min" in test and "z" in test:
-        status.aligned = True  # TODO: remove once DVT@2.0 FW bug is fixed
     estimate, encoder = status.as_lists()
     print(f"estimate: {estimate}, encoder: {encoder}")
     report(section, f"{test}-estimate", estimate)

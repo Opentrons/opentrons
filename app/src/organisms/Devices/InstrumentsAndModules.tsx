@@ -218,9 +218,9 @@ export function InstrumentsAndModules({
                     <Banner type="warning" marginBottom={SPACING.spacing4}>
                       <Trans
                         t={t}
-                        i18nKey="update_now"
+                        i18nKey="firmware_update_available_now"
                         components={{
-                          calLink: (
+                          updateLink: (
                             <StyledText
                               as="p"
                               css={BANNER_LINK_CSS}

@@ -63,6 +63,16 @@ async def test_lid_temperature(thermocycler: Thermocycler) -> None:
     assert thermocycler.lid_target is None
 
 
+async def test_forcible_deactivate(
+    thermocycler: Thermocycler, execution_manager: ExecutionManager
+) -> None:
+    """Can override wait_for_is_running."""
+    await execution_manager.pause()
+    await thermocycler.deactivate(must_be_running=False)
+    await thermocycler.deactivate_block(must_be_running=False)
+    await thermocycler.deactivate_lid(must_be_running=False)
+
+
 async def test_plate_temperature(thermocycler: Thermocycler) -> None:
     """It should change  plate temperature."""
     await thermocycler.set_temperature(temperature=52, hold_time_seconds=10)

@@ -1,17 +1,17 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { selectors } from '../../labware-ingred/selectors'
-import { IconButton, SidePanel } from '@opentrons/components'
+import { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import { IconButton, SidePanel, truncateString } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
+import { selectors } from '../../labware-ingred/selectors'
 import { PDTitledList, PDListItem } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
-import styles from './IngredientsList.css'
 import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
-import { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import styles from './IngredientsList.css'
 
 type RemoveWellsContents = (args: {
   liquidGroupId: string
@@ -54,10 +54,11 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
     // do not show liquid card if it has no instances for this labware
     return null
   }
-
+  const truncatedName =
+    ingredGroup.name != null ? truncateString(ingredGroup.name, 25) : null
   return (
     <PDTitledList
-      title={ingredGroup.name || i18n.t('card.unnamedLiquid')}
+      title={truncatedName ?? i18n.t('card.unnamedLiquid')}
       iconProps={{
         style: {
           fill: liquidDisplayColors[Number(groupId)] ?? swatchColors(groupId),

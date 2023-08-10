@@ -71,6 +71,14 @@ export interface SendLogAction {
   meta: { shell: true }
 }
 
+export interface UpdateBrightnessAction {
+  type: 'shell:UPDATE_BRIGHTNESS'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -79,3 +87,4 @@ export type ShellAction =
   | UsbRequestsAction
   | AppRestartAction
   | SendLogAction
+  | UpdateBrightnessAction

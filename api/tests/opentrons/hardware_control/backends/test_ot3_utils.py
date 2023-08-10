@@ -4,8 +4,10 @@ from opentrons_hardware.hardware_control.motion import (
 )
 from opentrons.hardware_control.backends import ot3utils
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, OT3Mount
 from numpy import float64 as f64
+
+from opentrons.config import defaults_ot3, types as conf_types
 
 
 def test_create_step() -> None:
@@ -103,3 +105,17 @@ def test_nodeid_replace_gripper() -> None:
     assert ot3utils.replace_gripper_node(set([NodeId.gripper_g])) == set(
         [NodeId.gripper_g]
     )
+
+
+def test_get_system_contraints_for_plunger() -> None:
+    set_acceleration = 2
+    axis = Axis.P_L
+    config = defaults_ot3.build_with_defaults({})
+    updated_contraints = ot3utils.get_system_constraints_for_plunger_acceleration(
+        config.motion_settings,
+        conf_types.GantryLoad.LOW_THROUGHPUT,
+        OT3Mount.LEFT,
+        set_acceleration,
+    )
+
+    assert updated_contraints[axis].max_acceleration == set_acceleration

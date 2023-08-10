@@ -73,9 +73,15 @@ export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware | n
       (
         labwareLiquids: StepGeneration.SingleLabwareLiquidState,
         labwareId: string
-      ) =>
-        _wellContentsForLabware(labwareLiquids, labwareEntities[labwareId].def)
+      ) => {
+        if (labwareEntities[labwareId] == null) return null
+        return _wellContentsForLabware(
+          labwareLiquids,
+          labwareEntities[labwareId].def
+        )
+      }
     )
+
     return wellContentsByLabwareId
   }
 )
