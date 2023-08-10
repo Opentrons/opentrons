@@ -41,7 +41,7 @@ import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
-import { CommandData } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 
 const RUN_REFETCH_INTERVAL = 5000
 

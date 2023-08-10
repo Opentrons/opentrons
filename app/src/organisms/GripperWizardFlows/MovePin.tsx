@@ -36,6 +36,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     goBack,
     movement,
     setFrontJawOffset,
+    maintenanceRunId,
     frontJawOffset,
     createRunCommand,
     errorMessage,
@@ -45,11 +46,12 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
   const handleOnClick = (): void => {
-    if (movement === REMOVE_PIN_FROM_REAR_JAW) {
+    if (movement === REMOVE_PIN_FROM_REAR_JAW || maintenanceRunId == null) {
       proceed()
     } else {
       const jaw = movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'
       createRunCommand({
+        maintenanceRunId,
         command: {
           commandType: 'home' as const,
           params: {
@@ -63,6 +65,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
             setErrorMessage(data.error?.detail ?? null)
           }
           createRunCommand({
+            maintenanceRunId,
             command: {
               commandType: 'calibration/calibrateGripper' as const,
               params:
@@ -80,6 +83,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                 setFrontJawOffset(data.result.jawOffset)
               }
               createRunCommand({
+                maintenanceRunId,
                 command: {
                   commandType: 'calibration/moveToMaintenancePosition' as const,
                   params: {
@@ -248,6 +252,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       bodyText={<StyledText as="p">{body}</StyledText>}
       proceedButtonText={buttonText}
       proceed={handleOnClick}
+      proceedIsDisabled={maintenanceRunId == null}
       back={goBack}
     />
   )

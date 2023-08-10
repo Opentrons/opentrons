@@ -87,7 +87,7 @@ export const BeforeBeginning = (
   ]
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, false)
+    chainRunCommands?.(commandsOnProceed, false)
       .then(() => {
         proceed()
       })
