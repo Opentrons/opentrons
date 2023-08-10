@@ -48,7 +48,9 @@ describe('', () => {
     })
   })
 
-  afterEach(() => {})
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('should render text, link and button', () => {
     const [{ getByText, getByRole }] = render(props)

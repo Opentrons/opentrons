@@ -223,7 +223,7 @@ export function ProtocolRunHeader({
       >
         {showAnalysisErrorModal &&
           analysisErrors != null &&
-          analysisErrors?.length > 0 && (
+          analysisErrors.length > 0 && (
             <ProtocolAnalysisErrorModal
               displayName={displayName}
               errors={analysisErrors}
@@ -249,7 +249,7 @@ export function ProtocolRunHeader({
             </StyledText>
           )}
         </Flex>
-        {analysisErrors != null && analysisErrors?.length > 0 && (
+        {analysisErrors != null && analysisErrors.length > 0 && (
           <ProtocolAnalysisErrorBanner errors={analysisErrors} />
         )}
         {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
