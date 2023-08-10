@@ -6,7 +6,7 @@
 Versioning
 **********
 
-The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with.
+The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows protocols to run on newer robot software versions without modification.
 
 Major and Minor Versions
 ========================
@@ -20,7 +20,7 @@ The minor version of the API increases whenever there is new functionality that 
 Specifying Versions
 ===================
 
-You must specify the API version you are targeting in the ``metadata`` block at the top of your Python protocol. Use the ``'apiLevel'`` key, alongside any other metadata elements:
+You must specify the API version you are targeting in your Python protocol. In all minor versions, you can do this with the ``apiLevel`` key in the ``metadata`` dictionary, alongside any other metadata elements:
 
 .. code-block:: python
   :substitutions:
@@ -33,14 +33,31 @@ You must specify the API version you are targeting in the ``metadata`` block at 
 
    def run(protocol: protocol_api.ProtocolContext):
        protocol.comment('Hello, world!')
+       
+From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` dictionary instead:
 
+.. code-block:: python
+  :substitutions:
 
-Version specification is required by the system. If you do not specify a target API version, you will not be able to simulate or run your protocol.
+   from opentrons import protocol_api
+
+   metadata = {'author': 'A. Biologist'}
+   requirements = {'apiLevel': '2.15', 'robotType': 'Flex'}
+
+   def run(protocol: protocol_api.ProtocolContext):
+       protocol.comment('Hello, Flex!')
+
+Choose only one of these places to specify ``apiLevel``. If put it in neither or both places, you will not be able to simulate or run your protocol.
 
 The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can't specify a lower version and then call ``HeaterShakerContext`` methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
-When choosing an API level, consider what features you need and how widely you plan to share your protocol. On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
+When choosing an API level, consider what features you need and how widely you plan to share your protocol. Throughout the Python Protocol API documentation, there are version statements indicating when elements (features, function calls, available properties, etc.) were introduced. Keep these in mind when specifying your protocol's API version. Version statements look like this:
 
+.. versionadded:: 2.0
+
+On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
+
+.. need to update this to include 2.15 behavior
 .. note::
 
     Python protocols with an ``apiLevel`` of 2.14 can't currently be simulated with the ``opentrons_simulate`` command-line tool, the :py:func:`opentrons.simulate.simulate` function, or the :py:func:`opentrons.simulate.get_protocol_api` function. If your protocol doesn't rely on new functionality added in version 2.14, use a lower ``apiLevel``. For protocols that require 2.14, analyze your protocol with the Opentrons App instead.
@@ -49,17 +66,14 @@ When choosing an API level, consider what features you need and how widely you p
 Maximum Supported Versions
 ==========================
 
-From version 3.15.0 to 5.0.2 of the OT-2 software and Opentrons App, the maximum supported API level was listed in the robot's **Information** card in the app. Since version 6.0.0, the same information is listed under **Robot Settings > Advanced**.
+The maximum supported API version for your robot is listed in the Opentrons App under **Robots** > your robot > **Robot Settings** > **Advanced**. Before version 6.0.0 of the app, the same information was listed on your robot's **Information** card.
 
-If you upload a protocol that specifies a higher API level than the maximum supported by your OT-2, it won't be able to analyze or run your protocol. You may be able to increase the maximum supported version by updating your OT-2 to the latest robot software and Opentrons App. All OT-2 hardware is capable of running protocols specifying any minor version of the API v2, as long as its software is up to date.
+If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
+Opentrons robots running the latest software support the following version ranges: 
 
-Added Features
-==============
-
-Throughout the Python Protocol API documentation, there are version statements indicating when elements (features, function calls, available properties, etc.) were introduced. Keep these in mind when specifying your protocol's API version. Version statements look like this:
-
-.. versionadded:: 2.0
+    * **OT-2:** versions 2.0–|apiLevel|.
+    * **Flex:** version 2.15.
 
 
 .. _version-table:
