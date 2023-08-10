@@ -11,7 +11,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.types import MalformedPythonError, PythonProtocol
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 from opentrons.protocol_reader.file_identifier import (
     FileIdentifier,
@@ -303,7 +303,7 @@ async def test_malformed_python(decoy: Decoy, use_mock_parse: None) -> None:
     input_file = BufferedFile(name="filename.py", contents=b"contents", path=None)
 
     decoy.when(parse.parse(b"contents", "filename.py")).then_raise(
-        MalformedPythonError(
+        MalformedPythonProtocolError(
             short_message="message 1", long_additional_message="message 2"
         )
     )

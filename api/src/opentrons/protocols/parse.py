@@ -31,7 +31,7 @@ from .types import (
     StaticPythonInfo,
     PythonProtocolMetadata,
     PythonProtocolRequirements,
-    MalformedPythonError,
+    MalformedPythonProtocolError,
     ApiDeprecationError,
 )
 from .bundle import extract_bundle
@@ -68,17 +68,17 @@ def _validate_v2_ast(protocol_ast: ast.Module) -> None:
     if len(rundefs) > 1:
         lines = [str(d.lineno) for d in rundefs]
         linestr = ", ".join(lines)
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message=f"More than one run function is defined (lines {linestr}).",
             long_additional_message=RUN_FUNCTION_MESSAGE,
         )
     if not rundefs:
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message="No function 'run(ctx)' defined",
             long_additional_message=RUN_FUNCTION_MESSAGE,
         )
     if _has_api_v1_imports(protocol_ast):
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message=(
                 "Protocol API v1 modules such as robot, instruments, and labware "
                 "may not be imported in Protocol API V2 protocols"
@@ -95,7 +95,7 @@ def version_from_string(vstr: str) -> APIVersion:
     """
     matches = API_VERSION_RE.match(vstr)
     if not matches:
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message=(
                 f"apiLevel {vstr} is incorrectly formatted. It should be "
                 "major.minor, where both major and minor are numbers."
@@ -140,7 +140,7 @@ def _parse_python(
     try:
         parsed = ast.parse(protocol_contents, filename=ast_filename)
     except SyntaxError as syntax_error:
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message=str(syntax_error),
             # Get Python's nice syntax error message with carets pointing to where in the line
             # had the problem.
@@ -151,7 +151,7 @@ def _parse_python(
     except ValueError as null_bytes_error:
         # ast.parse() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
-        raise MalformedPythonError(short_message=str(null_bytes_error))
+        raise MalformedPythonProtocolError(short_message=str(null_bytes_error))
 
     static_info = _extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
@@ -192,7 +192,7 @@ def _parse_bundle(bundle: ZipFile, filename: Optional[str] = None) -> PythonProt
     )
 
     if result.api_level < APIVersion(2, 0):
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message=f"Bundled protocols must use Protocol API v2, got {result.api_level}."
         )
 
@@ -313,7 +313,7 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
         # Undocumented, but ast.literal_eval() seems to raise ValueError for
         # expressions that aren't statically or "safely" evaluable, like
         # `{"o": object()}` or `{"s": "abc"[0]}`.
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message=(
                 f"Could not read the contents of the {name} dict."
                 f" Make sure it doesn't contain any complex expressions, such as"
@@ -328,14 +328,14 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
     # Make sure we don't return anything outside of our declared return type.
     for key, value in evaluated_literal.items():
         if not isinstance(key, str):
-            raise MalformedPythonError(
+            raise MalformedPythonProtocolError(
                 short_message=(
                     f'Keys in the {name} dict must be strings, but key "{key}"'
                     f' has type "{type(key).__name__}".'
                 )
             )
         if not isinstance(value, str):
-            raise MalformedPythonError(
+            raise MalformedPythonProtocolError(
                 short_message=(
                     f'Values in the {name} dict must be strings, but value "{value}"'
                     f' has type "{type(value).__name__}".'
@@ -421,7 +421,7 @@ def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:
     elif python_robot_type in ("Flex", "OT-3"):
         return "OT-3 Standard"
     else:
-        raise MalformedPythonError(
+        raise MalformedPythonProtocolError(
             short_message=f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
         )
 
@@ -459,7 +459,7 @@ def _get_version(
     else:
         # No apiLevel key, may be apiv1
         if not _has_api_v1_imports(parsed):
-            raise MalformedPythonError(
+            raise MalformedPythonProtocolError(
                 short_message=(
                     f"apiLevel not declared in {filename}. "
                     f"You must specify the target API version "

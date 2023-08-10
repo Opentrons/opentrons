@@ -98,16 +98,16 @@ through the downgrade process.
 
 # TODO(mm, 2023-08-07): Align with the app team on how to surface errors like this,
 # and probably make this an EnumeratedError.
-class MalformedPythonError(Exception):
+class MalformedPythonProtocolError(Exception):
     def __init__(
         self, short_message: str, long_additional_message: Optional[str] = None
     ) -> None:
         """Raised when a user's Python protocol file is malformed.
 
-        "Malformed" in this case means it doesn't conform to the Python Protocol API's structural
-        requirements, like having a `run()` function and declaring an `apiLevel`. This does not
-        cover runtime or analysis errors such as aspirating from a nonexistent well or running
-        out of tips.
+        "Malformed" in this case means it's either syntactically invalid as standard Python, or it
+        doesn't conform to the Python Protocol API's structural requirements, like having a `run()`
+        function and declaring an `apiLevel`. This does not cover runtime or analysis errors such as
+        aspirating from a nonexistent well or running out of tips.
 
         Params:
             short_message: A short (~1-2 sentences), self-contained message describing what's wrong

@@ -11,7 +11,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols import parse
-from opentrons.protocols.types import MalformedPythonError, PythonProtocol
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 from .file_reader_writer import BufferedFile
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
@@ -205,7 +205,7 @@ def _analyze_python_protocol(
     try:
         parsed = parse.parse(protocol_file=py_file.contents, filename=py_file.name)
         assert isinstance(parsed, PythonProtocol)
-    except MalformedPythonError as e:
+    except MalformedPythonProtocolError as e:
         raise FileIdentificationError(e.short_message) from e
 
     if parsed.api_level > MAX_SUPPORTED_VERSION:

@@ -18,7 +18,7 @@ from opentrons.protocols.types import (
     Protocol,
     PythonProtocol,
     PythonProtocolMetadata,
-    MalformedPythonError,
+    MalformedPythonProtocolError,
     ApiDeprecationError,
 )
 from opentrons.protocols.api_support.types import APIVersion
@@ -251,7 +251,7 @@ def test_parse_get_version(proto: str, version: APIVersion) -> None:
 def test_version_from_static_python_info_invalid(
     protocol_source: str, expected_message: str
 ) -> None:
-    with pytest.raises(MalformedPythonError, match=expected_message):
+    with pytest.raises(MalformedPythonProtocolError, match=expected_message):
         parse(dedent(protocol_source), "protocol.py")
 
 
@@ -640,5 +640,5 @@ def test_parse_extra_contents(
     ],
 )
 def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
-    with pytest.raises(MalformedPythonError, match=expected_message):
+    with pytest.raises(MalformedPythonProtocolError, match=expected_message):
         parse(dedent(bad_protocol))
