@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 from typing import Optional, List
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
@@ -144,6 +144,7 @@ async def test_get_current_status(
             StatusBarState.UPDATING,
         ],
         [EngineStatus.STOP_REQUESTED, EngineStatus.STOPPED, True, StatusBarState.IDLE],
+        [None, EngineStatus.IDLE, False, StatusBarState.OFF],
         [EngineStatus.RUNNING, EngineStatus.FINISHING, True, StatusBarState.UPDATING],
     ],
 )
@@ -230,9 +231,71 @@ async def test_estop_precedence(
         prev_status=Status([], EstopState.LOGICALLY_ENGAGED, EngineStatus.RUNNING),
         new_status=Status([], EstopState.PHYSICALLY_ENGAGED, EngineStatus.IDLE),
     )
+    # Software error even though there's an update
+    await subject.update(
+        prev_status=Status([], EstopState.LOGICALLY_ENGAGED, EngineStatus.RUNNING),
+        new_status=Status(
+            [SubSystem.gantry_x], EstopState.PHYSICALLY_ENGAGED, EngineStatus.IDLE
+        ),
+    )
+    # Updating takes precedence over the engine status once estop is released
+    await subject.update(
+        prev_status=Status(
+            [SubSystem.gantry_x], EstopState.PHYSICALLY_ENGAGED, EngineStatus.IDLE
+        ),
+        new_status=Status(
+            [SubSystem.gantry_x], EstopState.LOGICALLY_ENGAGED, EngineStatus.IDLE
+        ),
+    )
 
     decoy.verify(
         await hardware_api.set_status_bar_state(state=StatusBarState.SOFTWARE_ERROR),
         await hardware_api.set_status_bar_state(state=StatusBarState.RUNNING),
         await hardware_api.set_status_bar_state(state=StatusBarState.SOFTWARE_ERROR),
+        await hardware_api.set_status_bar_state(state=StatusBarState.SOFTWARE_ERROR),
+        await hardware_api.set_status_bar_state(state=StatusBarState.UPDATING),
     )
+
+
+@pytest.mark.parametrize(
+    ["previous_updates", "current_updates", "initialized", "expected"],
+    [
+        [[], [SubSystem.rear_panel], True, None],
+        [[], [SubSystem.gantry_x], True, StatusBarState.UPDATING],
+        [[], [SubSystem.gantry_x], False, StatusBarState.UPDATING],
+        [
+            [SubSystem.rear_panel, SubSystem.gantry_x],
+            [SubSystem.gantry_x],
+            True,
+            StatusBarState.UPDATING,
+        ],
+        [[SubSystem.gantry_y, SubSystem.gantry_x], [SubSystem.gantry_x], True, None],
+        [[SubSystem.gantry_y, SubSystem.gantry_x], [], True, StatusBarState.IDLE],
+        [[SubSystem.gantry_y, SubSystem.gantry_x], [], False, StatusBarState.OFF],
+    ],
+)
+async def test_light_control_updates(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    subject: LightController,
+    previous_updates: List[SubSystem],
+    current_updates: List[SubSystem],
+    initialized: bool,
+    expected: Optional[StatusBarState],
+) -> None:
+    """Test logic for ongoing subsystem updates."""
+    if initialized:
+        subject.mark_initialization_done()
+
+    if expected is None:
+        decoy.when(
+            await hardware_api.set_status_bar_state(state=matchers.Anything())
+        ).then_raise(RuntimeError("Test failed: unexpected call"))
+
+    await subject.update(
+        prev_status=Status(previous_updates, EstopState.DISENGAGED, None),
+        new_status=Status(current_updates, EstopState.DISENGAGED, None),
+    )
+
+    if expected is not None:
+        decoy.verify(await hardware_api.set_status_bar_state(state=expected), times=1)
