@@ -1,3 +1,4 @@
+import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { i18n } from '../../../../localization'
