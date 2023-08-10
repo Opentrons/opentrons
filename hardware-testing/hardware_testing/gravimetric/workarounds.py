@@ -44,7 +44,7 @@ def http_get_all_labware_offsets() -> List[dict]:
     runs_response = urlopen(req)
     runs_response_data = runs_response.read()
     stop_server_ot3()
-    atexit_register(start_server_ot3)
+    # atexit_register(start_server_ot3)
 
     runs_json = json_loads(runs_response_data)
     protocols_list = runs_json["data"]

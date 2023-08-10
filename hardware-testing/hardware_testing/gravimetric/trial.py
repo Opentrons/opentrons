@@ -134,9 +134,12 @@ def build_gravimetric_trials(
                 trial_list[volume][channel] = []
                 channel_offset = helpers._get_channel_offset(cfg, channel)
                 for trial in range(cfg.trials):
-                    d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
-                        cfg.pipette_volume
-                    ][cfg.tip_volume][volume]
+                    d: Optional[float] = None
+                    cv: Optional[float] = None
+                    if not cfg.increment:
+                        d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
+                            cfg.pipette_volume
+                        ][cfg.tip_volume][volume]
                     trial_list[volume][channel].append(
                         GravimetricTrial(
                             ctx=ctx,
@@ -181,9 +184,12 @@ def build_photometric_trials(
     for volume in test_volumes:
         trial_list[volume] = []
         for trial in range(cfg.trials):
-            d, cv = config.QC_TEST_MIN_REQUIREMENTS[96][cfg.pipette_volume][
-                cfg.tip_volume
-            ][volume]
+            d: Optional[float] = None
+            cv: Optional[float] = None
+            if not cfg.increment:
+                d, cv = config.QC_TEST_MIN_REQUIREMENTS[96][cfg.pipette_volume][
+                    cfg.tip_volume
+                ][volume]
             trial_list[volume].append(
                 PhotometricTrial(
                     ctx=ctx,

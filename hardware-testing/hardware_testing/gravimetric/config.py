@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from typing_extensions import Final
 from enum import Enum
+from opentrons.config.types import LiquidProbeSettings
 
 
 class ConfigType(Enum):
@@ -77,6 +78,20 @@ TIP_SPEED_WHILE_RETRACTING_DISPENSE = 50
 VIAL_SAFE_Z_OFFSET: Final = 25
 LABWARE_BOTTOM_CLEARANCE = 1.5
 
+DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
+    starting_mount_height=40,
+    max_z_distance=40,
+    min_z_distance=5,
+    mount_speed=10,
+    plunger_speed=5,
+    sensor_threshold_pascals=40,
+    expected_liquid_height=110,
+    log_pressure=True,
+    aspirate_while_sensing=False,
+    auto_zero_sensor=True,
+    num_baseline_reads=10,
+    data_file="/var/pressure_sensor_data.csv",
+)
 
 QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     1: {

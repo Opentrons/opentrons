@@ -141,6 +141,23 @@ def _jog_to_find_liquid_height(
     return _liquid_height
 
 
+def _sense_liquid_height(
+    ctx: ProtocolContext, pipette: InstrumentContext, well: Well
+) -> float:
+    hwapi = get_sync_hw_api(ctx)
+    pipette.move_to(well.top())
+    print(f"well top {well.top().point}")
+    lps = config.DEFAULT_LIQUID_PROBE_SETTINGS
+    lps.starting_mount_height = well.top().point.z
+    lps.max_z_distance = well.depth
+    print(f"lps settings {lps}")
+    height = well.top().point.z - hwapi.liquid_probe(
+        OT3Mount.LEFT, lps
+    )
+    print(f"well top {well.top()} height {height}")
+    return height
+
+
 def _calculate_average(volume_list: List[float]) -> float:
     return sum(volume_list) / len(volume_list)
 

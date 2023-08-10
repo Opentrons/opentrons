@@ -15,7 +15,7 @@ from .helpers import (
     _calculate_stats,
     _get_channel_offset,
     _calculate_average,
-    _jog_to_find_liquid_height,
+    _sense_liquid_height,
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
@@ -484,9 +484,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
-        _liquid_height = _jog_to_find_liquid_height(
-            resources.ctx, resources.pipette, well
-        )
+        _liquid_height = _sense_liquid_height(resources.ctx, resources.pipette, well)
         resources.pipette.move_to(well.top().move(Point(0, 0, _minimum_z_height(cfg))))
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
@@ -660,8 +658,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
 
-                acceptable_cv = trials[volume][channel][0].acceptable_cv
-                acceptable_d = trials[volume][channel][0].acceptable_d
+                acceptable_cv = trials[volume][channel][0].acceptable_cv/100
+                acceptable_d = trials[volume][channel][0].acceptable_d/100
+                print(f"acceptable cv {acceptable_cv} acceptable_d {acceptable_d}")
+                print(f"dispense cv {dispense_cv} aspirate_cv {aspirate_cv}")
+                print(f"dispense d {dispense_cv} aspirate_d {aspirate_d}")
                 if acceptable_cv is not None and acceptable_d is not None:
                     if (
                         dispense_cv > acceptable_cv
