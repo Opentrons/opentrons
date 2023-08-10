@@ -51,6 +51,7 @@ from opentrons.hardware_control.types import (
     UpdateState,
     TipStateType,
     FailedTipStateCheck,
+    EstopState,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -73,6 +74,14 @@ from opentrons_hardware.hardware_control.tools.types import (
     PipetteInformation,
     GripperInformation,
 )
+
+from opentrons.hardware_control.estop_state import EstopStateMachine
+
+from opentrons_shared_data.errors.exceptions import (
+    EStopActivatedError,
+    EStopNotPresentError,
+)
+
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 
@@ -248,6 +257,16 @@ def mock_subsystem_manager(
         controller, "_subsystem_manager", decoy.mock(cls=SubsystemManager)
     ) as mock_subsystem:
         yield mock_subsystem
+
+
+@pytest.fixture
+def mock_estop_state_machine(
+    controller: OT3Controller, decoy: Decoy
+) -> Iterator[EstopStateMachine]:
+    with mock.patch.object(
+        controller, "_estop_state_machine", decoy.mock(cls=EstopStateMachine)
+    ) as mock_estop_state:
+        yield mock_estop_state
 
 
 @pytest.fixture
@@ -681,7 +700,7 @@ async def test_tip_action(
     controller: OT3Controller,
     mock_move_group_run: mock.AsyncMock,
 ) -> None:
-    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="clamp")
+    await controller.tip_action(distance=33, velocity=-5.5, tip_action="home")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -690,22 +709,25 @@ async def test_tip_action(
         # we should be sending this command to the pipette axes to process.
         assert list(move_group[0].keys()) == [NodeId.pipette_left]
         step = move_group[0][NodeId.pipette_left]
-        assert step.stop_condition == MoveStopCondition.none
+        assert step.stop_condition == MoveStopCondition.limit_switch
 
     mock_move_group_run.reset_mock()
 
-    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="home")
+    await controller.tip_action(
+        distance=33, velocity=-5.5, tip_action="home", back_off=True
+    )
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
-        for move_group in move_group_runner._move_groups:
-            assert move_group  # don't pass in empty groups
-            assert len(move_group) == 1
-
         move_groups = move_group_runner._move_groups
+
+        for move_group in move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) >= 1
+
         # we should be sending this command to the pipette axes to process.
         home_step = move_groups[0][0][NodeId.pipette_left]
         assert home_step.stop_condition == MoveStopCondition.limit_switch
-        backoff_step = move_groups[1][0][NodeId.pipette_left]
+        backoff_step = move_groups[0][1][NodeId.pipette_left]
         assert backoff_step.stop_condition == MoveStopCondition.limit_switch_backoff
 
 
@@ -1067,3 +1089,26 @@ async def test_get_tip_present(
     ):
         with expectation:
             await controller.get_tip_present(mount, tip_state_type)
+
+
+@pytest.mark.parametrize(
+    "estop_state, expectation",
+    [
+        [EstopState.DISENGAGED, does_not_raise()],
+        [EstopState.NOT_PRESENT, pytest.raises(EStopNotPresentError)],
+        [EstopState.PHYSICALLY_ENGAGED, pytest.raises(EStopActivatedError)],
+        [EstopState.LOGICALLY_ENGAGED, pytest.raises(EStopActivatedError)],
+    ],
+)
+async def test_requires_estop(
+    controller: OT3Controller,
+    mock_estop_state_machine: EstopStateMachine,
+    decoy: Decoy,
+    estop_state: EstopState,
+    expectation: ContextManager[None],
+) -> None:
+    """Test that the estop state machine raises properly."""
+    decoy.when(mock_estop_state_machine.state).then_return(estop_state)
+
+    with expectation:
+        await controller.home([Axis.X, Axis.Y], gantry_load=GantryLoad.LOW_THROUGHPUT)

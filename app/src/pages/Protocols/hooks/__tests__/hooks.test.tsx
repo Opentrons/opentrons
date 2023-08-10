@@ -6,11 +6,8 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import {
   useProtocolAnalysesQuery,
   useInstrumentsQuery,
+  useModulesQuery,
 } from '@opentrons/react-api-client'
-import {
-  useAttachedModules,
-  useAttachedPipettes,
-} from '../../../../organisms/Devices/hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
@@ -26,11 +23,8 @@ const PROTOCOL_ID = 'fake_protocol_id'
 const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
   typeof useProtocolAnalysesQuery
 >
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
 >
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
@@ -133,9 +127,14 @@ describe('useRequiredProtocolLabware', () => {
 describe('useMissingProtocolHardware', () => {
   let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
-    mockUseInstrumentsQuery.mockReturnValue({ data: { data: [] } } as any)
-    mockUseAttachedPipettes.mockReturnValue({ left: {}, right: {} } as any)
-    mockUseAttachedModules.mockReturnValue([])
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+    } as any)
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+    } as any)
     mockUseProtocolAnalysesQuery.mockReturnValue({
       data: { data: [PROTOCOL_ANALYSIS as any] },
     } as UseQueryResult<ProtocolAnalyses>)
@@ -149,33 +148,50 @@ describe('useMissingProtocolHardware', () => {
       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
       { wrapper }
     )
-    expect(result.current).toEqual([
-      {
-        hardwareType: 'pipette',
-        pipetteName: 'p1000_multi_flex',
-        mount: 'left',
-        connected: false,
-      },
-      {
-        hardwareType: 'module',
-        moduleModel: 'heaterShakerModuleV1',
-        slot: '1',
-        connected: false,
-      },
-    ])
+    expect(result.current).toEqual({
+      isLoading: false,
+      missingProtocolHardware: [
+        {
+          hardwareType: 'pipette',
+          pipetteName: 'p1000_multi_flex',
+          mount: 'left',
+          connected: false,
+        },
+        {
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: '1',
+          connected: false,
+        },
+      ],
+    })
   })
   it('should return empty array when the correct modules and pipettes are attached', () => {
-    mockUseAttachedPipettes.mockReturnValue({
-      left: {
-        name: 'p1000_multi_flex',
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            mount: 'left',
+            instrumentType: 'pipette',
+            instrumentName: 'p1000_multi_flex',
+            ok: true,
+          },
+        ],
       },
-      right: {},
+      isLoading: false,
     } as any)
-    mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
+
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+      isLoading: false,
+    } as any)
     const { result } = renderHook(
       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
       { wrapper }
     )
-    expect(result.current).toEqual([])
+    expect(result.current).toEqual({
+      missingProtocolHardware: [],
+      isLoading: false,
+    })
   })
 })

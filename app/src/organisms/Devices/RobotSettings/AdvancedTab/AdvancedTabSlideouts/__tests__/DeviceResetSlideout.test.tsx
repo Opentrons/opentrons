@@ -106,20 +106,10 @@ describe('RobotSettings DeviceResetSlideout', () => {
   it('should change some options and text for Flex', () => {
     mockUseIsOT3.mockReturnValue(true)
     const [{ getByText, getByRole, queryByRole, queryByText }] = render()
-    getByText('Factory Reset')
+    getByText('Clear all data')
     getByText(
       'Resets all settings. You’ll have to redo initial setup before using the robot again.'
     )
-    getByText('Clear all stored data')
-    getByText(
-      'Clears instrument calibrations and protocols. Keeps robot name and network settings.'
-    )
-
-    expect(
-      queryByText(
-        'Resetting Deck and/or Tip Length Calibration data will also clear Pipette Offset Calibration data.'
-      )
-    ).toBeNull()
     expect(queryByText('Clear deck calibration')).toBeNull()
     getByText('Clear pipette calibration(s)')
     expect(queryByText('Clear tip length calibrations')).toBeNull()

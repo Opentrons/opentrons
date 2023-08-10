@@ -94,6 +94,9 @@
       "disabled": {
         "latchOpen": "Labware Latch cannot be open while the module is shaking"
       }
+    },
+    "touchTip": {
+      "disabled": "Touch tip is not supported with this labware"
     }
   },
   "edit_module_card": {

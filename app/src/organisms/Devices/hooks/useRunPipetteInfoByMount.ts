@@ -12,8 +12,8 @@ import {
   useStoredProtocolAnalysis,
 } from '.'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   Mount,
   AttachedPipette,

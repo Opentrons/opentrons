@@ -9,16 +9,23 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import {
+  getRobotAddressesByName,
+  HEALTH_STATUS_OK,
+  OPENTRONS_USB,
+} from '../../../redux/discovery'
 import { getNetworkInterfaces } from '../../../redux/networking'
 
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
+import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
 import type { State } from '../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
 jest.mock('../hooks')
 
@@ -35,6 +42,23 @@ const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
   typeof getNetworkInterfaces
 >
+const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
+  typeof getRobotAddressesByName
+>
+
+const MOCK_OTIE = {
+  name: 'otie',
+  local: true,
+  robotModel: 'OT-2',
+}
+const MOCK_BUZZ = {
+  name: 'buzz',
+  local: true,
+  robotModel: 'Opentrons Flex',
+}
+
+const WIFI_IP = 'wifi-ip'
+const ETHERNET_IP = 'ethernet-ip'
 
 const render = (props: React.ComponentProps<typeof RobotStatusHeader>) => {
   return renderWithProviders(
@@ -50,11 +74,7 @@ describe('RobotStatusHeader', () => {
   let props: React.ComponentProps<typeof RobotStatusHeader>
 
   beforeEach(() => {
-    props = {
-      name: 'otie',
-      local: true,
-      robotModel: 'OT-2',
-    }
+    props = MOCK_OTIE
     when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
     when(mockUseRunQuery)
@@ -82,6 +102,22 @@ describe('RobotStatusHeader', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, 'otie')
       .mockReturnValue({ wifi: null, ethernet: null })
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue([
+        {
+          ip: WIFI_IP,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+        {
+          ip: ETHERNET_IP,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+        {
+          ip: OPENTRONS_USB,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+      ])
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -94,12 +130,26 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders the model of robot and robot name - OT-3', () => {
-    props.name = 'buzz'
-    props.robotModel = 'Opentrons Flex'
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, 'buzz')
       .mockReturnValue({ wifi: null, ethernet: null })
-    const [{ getByText }] = render(props)
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, 'buzz')
+      .mockReturnValue([
+        {
+          ip: WIFI_IP,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+        {
+          ip: ETHERNET_IP,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+        {
+          ip: OPENTRONS_USB,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+      ])
+    const [{ getByText }] = render(MOCK_BUZZ)
     getByText('Opentrons Flex')
     getByText('buzz')
   })
@@ -127,25 +177,12 @@ describe('RobotStatusHeader', () => {
     )
   })
 
-  it('renders a wifi icon when connected by wifi and ethernet', () => {
+  it('renders an ethernet icon when connected by wifi and ethernet', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, 'otie')
       .mockReturnValue({
-        wifi: { ipAddress: 'wifi-ip' } as SimpleInterfaceStatus,
-        ethernet: { ipAddress: 'ethernet-ip' } as SimpleInterfaceStatus,
-      })
-
-    const [{ getByLabelText }] = render(props)
-
-    getByLabelText('wifi')
-  })
-
-  it('renders an ethernet icon when only connected by ethernet', () => {
-    when(mockGetNetworkInterfaces)
-      .calledWith({} as State, 'otie')
-      .mockReturnValue({
-        wifi: null,
-        ethernet: { ipAddress: 'ethernet-ip' } as SimpleInterfaceStatus,
+        wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
+        ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
       })
 
     const [{ getByLabelText }] = render(props)
@@ -153,9 +190,38 @@ describe('RobotStatusHeader', () => {
     getByLabelText('ethernet')
   })
 
+  it('renders a wifi icon when only connected by wifi', () => {
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue({
+        wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
+        ethernet: null,
+      })
+
+    const [{ getByLabelText }] = render(props)
+
+    getByLabelText('wifi')
+  })
+
   it('renders a usb icon when only connected locally', () => {
     const [{ getByLabelText }] = render(props)
 
     getByLabelText('usb')
+  })
+
+  it('does not render a wifi or ethernet icon when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue({
+        wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
+        ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
+      })
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue([])
+    const [{ queryByLabelText }] = render(props)
+
+    expect(queryByLabelText('wifi')).toBeNull()
+    expect(queryByLabelText('ethernet')).toBeNull()
   })
 })

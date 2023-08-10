@@ -5,7 +5,7 @@
 ################################################################################
 
 define OTSHAREDDATA_CALL_PBU
-	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py shared-data robot-stack $(1))
+	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py shared-data $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
 
 PYTHON_OPENTRONS_SHARED_DATA_VERSION = $(call OTSHAREDDATA_CALL_PBU,get_version)

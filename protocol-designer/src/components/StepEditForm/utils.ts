@@ -18,7 +18,9 @@ import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForS
 import { Options } from '@opentrons/components'
 import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import { FormWarning } from '../../steplist/formLevel/warnings'
-import { StepFormErrors } from '../../steplist/types'
+import type { StepFormErrors } from '../../steplist/types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+
 export function getBlowoutLocationOptionsForForm(args: {
   stepType: StepType
   path?: PathOption | null | undefined
@@ -197,4 +199,16 @@ export function getLabwareFieldForPositioningField(
     mix_touchTip_mmFromBottom: 'labware',
   }
   return fieldMap[name]
+}
+
+export function getTouchTipNotSupportedLabware(
+  allLabware: LabwareDefByDefURI,
+  labwareId?: string
+): boolean {
+  const labwareDefURI = labwareId?.split(':')[1] ?? ''
+  const isTouchTipNotSupported =
+    allLabware[labwareDefURI]?.parameters?.quirks?.includes(
+      'touchTipDisabled'
+    ) ?? false
+  return isTouchTipNotSupported
 }

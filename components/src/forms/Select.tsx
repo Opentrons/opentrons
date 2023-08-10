@@ -6,8 +6,6 @@ import ReactSelect, {
 import cx from 'classnames'
 
 import { Icon } from '../icons'
-import { Box } from '../primitives'
-import { SPACING } from '../ui-style-constants'
 import { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 import styles from './Select.css'
 
@@ -115,20 +113,13 @@ function DropdownIndicator(
 ): JSX.Element {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
-      <Box
-        position={POSITION_ABSOLUTE}
-        top="0.25rem"
-        right={SPACING.spacing8}
-        width={SPACING.spacing20}
+      <div
+        className={cx(styles.dropdown_indicator, {
+          [styles.flipped]: props.selectProps.menuIsOpen,
+        })}
       >
-        <Icon
-          name="menu-down"
-          transform={`rotate(${
-            props.selectProps.menuIsOpen === true ? '180' : '0'
-          })`}
-          height="1.25rem"
-        />
-      </Box>
+        <Icon name="menu-down" className={cx(styles.dropdown_indicator_icon)} />
+      </div>
     </reactSelectComponents.DropdownIndicator>
   )
 }

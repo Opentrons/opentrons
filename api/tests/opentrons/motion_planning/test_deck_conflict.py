@@ -5,22 +5,34 @@ from contextlib import nullcontext
 import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.motion_planning import deck_conflict
 
+from opentrons.types import DeckSlotName
 
-def test_empty_no_conflict() -> None:
+
+@pytest.mark.parametrize(
+    "robot_type, slot_name",
+    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
+)
+def test_empty_no_conflict(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not raise on empty input."""
     deck_conflict.check(
         existing_items={},
         new_item=deck_conflict.OtherModule(
             highest_z_including_labware=123, name_for_errors="foo"
         ),
-        new_location=1,
+        new_location=slot_name,
+        robot_type=robot_type,
     )
 
 
-def test_no_multiple_locations() -> None:
+@pytest.mark.parametrize(
+    "robot_type, slot_name",
+    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
+)
+def test_no_multiple_locations(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not allow two items in the same slot."""
     item_1 = deck_conflict.OtherModule(
         highest_z_including_labware=123, name_for_errors="some_item_1"
@@ -31,12 +43,26 @@ def test_no_multiple_locations() -> None:
 
     with pytest.raises(
         deck_conflict.DeckConflictError,
-        match="some_item_1 in slot 1 prevents some_item_2 from using slot 1",
+        match=f"some_item_1 in slot {slot_name} prevents some_item_2 from using slot {slot_name}",
     ):
-        deck_conflict.check(existing_items={1: item_1}, new_item=item_2, new_location=1)
+        deck_conflict.check(
+            existing_items={slot_name: item_1},
+            new_item=item_2,
+            new_location=slot_name,
+            robot_type=robot_type,
+        )
 
 
-def test_only_trash_in_12() -> None:
+@pytest.mark.parametrize(
+    "slot_name, robot_type",
+    [
+        (DeckSlotName.FIXED_TRASH, "OT-2 Standard"),
+        (DeckSlotName.SLOT_A3, "OT-3 Standard"),
+    ],
+)
+def test_only_trash_in_fixed_slot(
+    slot_name: DeckSlotName, robot_type: RobotType
+) -> None:
     """It should only allow trash labware in slot 12."""
     trash_labware = deck_conflict.Labware(
         uri=LabwareUri("trash_labware_uri"),
@@ -54,24 +80,44 @@ def test_only_trash_in_12() -> None:
         highest_z_including_labware=123, name_for_errors="not_trash_module"
     )
 
-    deck_conflict.check(existing_items={}, new_item=trash_labware, new_location=12)
+    deck_conflict.check(
+        existing_items={},
+        new_item=trash_labware,
+        new_location=slot_name,
+        robot_type=robot_type,
+    )
 
     with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError,
+        match=f"Only fixed-trash is allowed in slot {slot_name}",
     ):
         deck_conflict.check(
-            existing_items={}, new_item=not_trash_labware, new_location=12
+            existing_items={},
+            new_item=not_trash_labware,
+            new_location=slot_name,
+            robot_type=robot_type,
         )
 
     with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError,
+        match=f"Only fixed-trash is allowed in slot {slot_name}",
     ):
         deck_conflict.check(
-            existing_items={}, new_item=not_trash_module, new_location=12
+            existing_items={},
+            new_item=not_trash_module,
+            new_location=slot_name,
+            robot_type=robot_type,
         )
 
 
-def test_trash_override() -> None:
+@pytest.mark.parametrize(
+    "slot_name, robot_type",
+    [
+        (DeckSlotName.FIXED_TRASH, "OT-2 Standard"),
+        (DeckSlotName.SLOT_A3, "OT-3 Standard"),
+    ],
+)
+def test_trash_override(slot_name: DeckSlotName, robot_type: RobotType) -> None:
     """It should allow the trash labware to be replaced with another trash labware."""
     trash_labware_1 = deck_conflict.Labware(
         uri=LabwareUri("trash_labware_1_uri"),
@@ -96,27 +142,32 @@ def test_trash_override() -> None:
     )
 
     deck_conflict.check(
-        existing_items={12: trash_labware_1},
+        existing_items={slot_name: trash_labware_1},
         new_item=trash_labware_2,
-        new_location=12,
+        new_location=slot_name,
+        robot_type=robot_type,
     )
 
     with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError,
+        match=f"Only fixed-trash is allowed in slot {slot_name}",
     ):
         deck_conflict.check(
-            existing_items={12: trash_labware_1},
+            existing_items={slot_name: trash_labware_1},
             new_item=not_trash_labware,
-            new_location=12,
+            new_location=slot_name,
+            robot_type=robot_type,
         )
 
     with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError,
+        match=f"Only fixed-trash is allowed in slot {slot_name}",
     ):
         deck_conflict.check(
-            existing_items={12: trash_labware_1},
+            existing_items={slot_name: trash_labware_1},
             new_item=not_trash_module,
-            new_location=12,
+            new_location=slot_name,
+            robot_type=robot_type,
         )
 
 
@@ -124,22 +175,22 @@ def test_trash_override() -> None:
     ("thermocycler_is_semi", "labware_location", "labware_should_be_allowed"),
     [
         # Non-semi config:
-        (False, 1, True),
-        (False, 7, False),
-        (False, 8, False),
-        (False, 10, False),
-        (False, 11, False),
+        (False, DeckSlotName.SLOT_1, True),
+        (False, DeckSlotName.SLOT_7, False),
+        (False, DeckSlotName.SLOT_8, False),
+        (False, DeckSlotName.SLOT_10, False),
+        (False, DeckSlotName.SLOT_11, False),
         # Semi config:
-        (True, 1, True),
-        (True, 7, False),
-        (True, 8, True),
-        (True, 10, False),
-        (True, 11, True),
+        (True, DeckSlotName.SLOT_1, True),
+        (True, DeckSlotName.SLOT_7, False),
+        (True, DeckSlotName.SLOT_8, True),
+        (True, DeckSlotName.SLOT_10, False),
+        (True, DeckSlotName.SLOT_11, True),
     ],
 )
 def test_labware_when_thermocycler(
     thermocycler_is_semi: bool,
-    labware_location: int,
+    labware_location: DeckSlotName,
     labware_should_be_allowed: bool,
 ) -> None:
     """It should reject labware if a Thermocycler covers the same slot."""
@@ -169,9 +220,10 @@ def test_labware_when_thermocycler(
         )
     with maybe_raises:
         deck_conflict.check(
-            existing_items={7: thermocycler},
+            existing_items={DeckSlotName.SLOT_7: thermocycler},
             new_location=labware_location,
             new_item=labware,
+            robot_type="OT-2 Standard",
         )
 
     if labware_should_be_allowed:
@@ -187,33 +239,100 @@ def test_labware_when_thermocycler(
     with maybe_raises:
         deck_conflict.check(
             existing_items={labware_location: labware},
-            new_location=7,
+            new_location=DeckSlotName.SLOT_7,
             new_item=thermocycler,
+            robot_type="OT-2 Standard",
+        )
+
+
+@pytest.mark.parametrize(
+    ("labware_location", "labware_should_be_allowed"),
+    [
+        (DeckSlotName.SLOT_D1, True),
+        (DeckSlotName.SLOT_B1, False),
+        (DeckSlotName.SLOT_B2, True),
+        (DeckSlotName.SLOT_A1, False),
+        (DeckSlotName.SLOT_A2, True),
+    ],
+)
+def test_flex_labware_when_thermocycler(
+    labware_location: DeckSlotName,
+    labware_should_be_allowed: bool,
+) -> None:
+    """It should reject labware if a Thermocycler covers the same slot."""
+    thermocycler = deck_conflict.ThermocyclerModule(
+        name_for_errors="some_thermocycler",
+        highest_z_including_labware=123,
+        is_semi_configuration=False,
+    )
+
+    labware = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_labware",
+    )
+
+    maybe_raises: ContextManager[object]
+    if labware_should_be_allowed:
+        maybe_raises = nullcontext()  # Expecct no exception.
+    else:
+        maybe_raises = pytest.raises(  # Expect an exception..
+            deck_conflict.DeckConflictError,
+            match=(
+                "some_thermocycler in slot B1 prevents"
+                f" some_labware from using slot {labware_location}"
+            ),
+        )
+    with maybe_raises:
+        deck_conflict.check(
+            existing_items={DeckSlotName.SLOT_B1: thermocycler},
+            new_location=labware_location,
+            new_item=labware,
+            robot_type="OT-3 Standard",
+        )
+
+    if labware_should_be_allowed:
+        maybe_raises = nullcontext()  # Expecct no exception.
+    else:
+        maybe_raises = pytest.raises(  # Expect an exception..
+            deck_conflict.DeckConflictError,
+            match=(
+                f"some_labware in slot {labware_location}"
+                " prevents some_thermocycler from using slot B1"
+            ),
+        )
+    with maybe_raises:
+        deck_conflict.check(
+            existing_items={labware_location: labware},
+            new_location=DeckSlotName.SLOT_B1,
+            new_item=thermocycler,
+            robot_type="OT-3 Standard",
         )
 
 
 @pytest.mark.parametrize(
     ("heater_shaker_location", "labware_location"),
     [
-        (1, 2),
-        (2, 1),
-        (2, 3),
-        (3, 2),
-        (4, 5),
-        (5, 4),
-        (5, 6),
-        (6, 5),
-        (7, 8),
-        (8, 7),
-        (8, 9),
-        (9, 8),
-        (10, 11),
-        (11, 10),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_10),
     ],
 )
 def test_labware_when_heater_shaker(
-    heater_shaker_location: int,
-    labware_location: int,
+    heater_shaker_location: DeckSlotName,
+    labware_location: DeckSlotName,
 ) -> None:
     """It should allow short labware east and west if a heater-shaker is placed."""
     heater_shaker = deck_conflict.HeaterShakerModule(
@@ -236,11 +355,13 @@ def test_labware_when_heater_shaker(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=labware_location,
         new_item=cool_labware,
+        robot_type="OT-2 Standard",
     )
     deck_conflict.check(
         existing_items={labware_location: cool_labware},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
+        robot_type="OT-2 Standard",
     )
 
     with pytest.raises(
@@ -254,6 +375,7 @@ def test_labware_when_heater_shaker(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=labware_location,
             new_item=lame_labware,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -267,47 +389,48 @@ def test_labware_when_heater_shaker(
             existing_items={labware_location: lame_labware},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
+            robot_type="OT-2 Standard",
         )
 
 
 @pytest.mark.parametrize(
     ("heater_shaker_location", "other_module_location"),
     [
-        (1, 2),
-        (1, 4),
-        (2, 1),
-        (2, 3),
-        (2, 5),
-        (3, 2),
-        (3, 6),
-        (4, 1),
-        (4, 5),
-        (4, 7),
-        (5, 2),
-        (5, 4),
-        (5, 6),
-        (5, 8),
-        (6, 3),
-        (6, 5),
-        (6, 9),
-        (7, 4),
-        (7, 8),
-        (7, 10),
-        (8, 5),
-        (8, 7),
-        (8, 9),
-        (8, 11),
-        (9, 6),
-        (9, 8),
-        (10, 7),
-        (10, 11),
-        (11, 8),
-        (11, 10),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_10),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_10),
     ],
 )
 def test_no_modules_when_heater_shaker(
-    heater_shaker_location: int,
-    other_module_location: int,
+    heater_shaker_location: DeckSlotName,
+    other_module_location: DeckSlotName,
 ) -> None:
     """It should not allow other modules north and south of the H/S.
 
@@ -332,6 +455,7 @@ def test_no_modules_when_heater_shaker(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=other_module_location,
             new_item=other_module,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -345,6 +469,7 @@ def test_no_modules_when_heater_shaker(
             existing_items={other_module_location: other_module},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -355,26 +480,26 @@ def test_no_modules_when_heater_shaker(
 @pytest.mark.parametrize(
     ("heater_shaker_location", "tip_rack_location"),
     [
-        (1, 2),
-        (2, 1),
-        (2, 3),
-        (3, 2),
-        (4, 5),
-        (5, 4),
-        (5, 6),
-        (6, 5),
-        (7, 8),
-        (8, 7),
-        (8, 9),
-        (9, 8),
-        (10, 11),
-        (11, 10),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_10),
     ],
 )
 def test_tip_rack_when_heater_shaker(
     allowed_tip_rack_uri: LabwareUri,
-    heater_shaker_location: int,
-    tip_rack_location: int,
+    heater_shaker_location: DeckSlotName,
+    tip_rack_location: DeckSlotName,
 ) -> None:
     """It should allow short tip racks east and west if a heater-shaker is placed."""
     heater_shaker = deck_conflict.HeaterShakerModule(
@@ -402,11 +527,13 @@ def test_tip_rack_when_heater_shaker(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=tip_rack_location,
         new_item=cool_tip_rack,
+        robot_type="OT-2 Standard",
     )
     deck_conflict.check(
         existing_items={tip_rack_location: cool_tip_rack},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
+        robot_type="OT-2 Standard",
     )
 
     with pytest.raises(
@@ -420,6 +547,7 @@ def test_tip_rack_when_heater_shaker(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=tip_rack_location,
             new_item=lame_tip_rack,
+            robot_type="OT-2 Standard",
         )
 
     with pytest.raises(
@@ -433,6 +561,7 @@ def test_tip_rack_when_heater_shaker(
             existing_items={tip_rack_location: lame_tip_rack},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
+            robot_type="OT-2 Standard",
         )
 
 
@@ -464,7 +593,8 @@ def test_no_heater_shaker_south_of_trash() -> None:
         ),
     ):
         deck_conflict.check(
-            existing_items={12: trash},
+            existing_items={DeckSlotName.FIXED_TRASH: trash},
             new_item=heater_shaker,
-            new_location=9,
+            new_location=DeckSlotName.SLOT_9,
+            robot_type="OT-2 Standard",
         )

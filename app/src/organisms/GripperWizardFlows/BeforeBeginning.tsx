@@ -2,7 +2,7 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -78,10 +78,9 @@ export const BeforeBeginning = (
   const commandsOnProceed: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT,
+        mount: EXTENSION,
       },
     },
   ]

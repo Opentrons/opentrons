@@ -3,14 +3,19 @@ import { LEFT, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
+import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { useMaintenanceRunTakeover } from '../../TakeoverModal'
 import { ProtocolInstrumentMountItem } from '..'
 
 jest.mock('../../PipetteWizardFlows')
+jest.mock('../../GripperWizardFlows')
 jest.mock('../../TakeoverModal')
 
 const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
   typeof PipetteWizardFlows
+>
+const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
+  typeof GripperWizardFlows
 >
 const mockUseMaintenanceRunTakeover = useMaintenanceRunTakeover as jest.MockedFunction<
   typeof useMaintenanceRunTakeover
@@ -29,7 +34,7 @@ const mockGripperData = {
         z: 4,
       },
       source: 'standard',
-      last_modified: 'date',
+      last_modified: undefined,
     },
   },
   subsystem: 'gripper',
@@ -74,6 +79,7 @@ describe('ProtocolInstrumentMountItem', () => {
       speccedName: 'p1000_multi_flex',
     }
     mockPipetteWizardFlows.mockReturnValue(<div>pipette wizard flow</div>)
+    mockGripperWizardFlows.mockReturnValue(<div>gripper wizard flow</div>)
     mockUseMaintenanceRunTakeover.mockReturnValue({
       setODDMaintenanceFlowInProgress: mockSetODDMaintenanceFlowInProgress,
     })
@@ -152,9 +158,12 @@ describe('ProtocolInstrumentMountItem', () => {
     getByText('Extension Mount')
     getByText('No data')
     getByText('Flex Gripper')
-    getByText('Attach')
+    const button = getByText('Attach')
+    fireEvent.click(button)
+    getByText('gripper wizard flow')
+    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
-  it('renders the correct information when gripper is attached', () => {
+  it('renders the correct information when gripper is attached but not calibrated', () => {
     props = {
       ...props,
       mount: 'extension',
@@ -163,7 +172,10 @@ describe('ProtocolInstrumentMountItem', () => {
     }
     const { getByText } = render(props)
     getByText('Extension Mount')
-    getByText('Calibrated')
     getByText('Flex Gripper')
+    const button = getByText('Calibrate')
+    fireEvent.click(button)
+    getByText('gripper wizard flow')
+    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
 })

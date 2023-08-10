@@ -10,6 +10,7 @@ Welcome
     tutorial
     versioning
     new_labware
+    moving_labware
     new_modules
     deck_slots
     new_pipette

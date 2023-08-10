@@ -191,6 +191,15 @@ settings = [
         title="Disable the LED status bar on the Flex.",
         description="This setting disables the LED status bar on the Flex.",
     ),
+    SettingDefinition(
+        _id="estopNotRequired",
+        title="If enabled, the Flex gantry can move with no estop attached.",
+        description="This setting allows the gantry on the Flex to move with no estop attached.",
+        show_if=(
+            "estopNotRequired",
+            True,
+        ),  # Configured so this only shows if it has been set by a user
+    ),
 ]
 
 if (
@@ -590,6 +599,26 @@ def _migrate26to27(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate27to28(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 28 of the feature flags file.
+
+    - Adds the disableTipPresenceDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableTipPresenceDetection"] = None
+    return newmap
+
+
+def _migrate28to29(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 29 of the feature flags file.
+
+    - Adds the estopNotRequired config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["estopNotRequired"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -618,6 +647,8 @@ _MIGRATIONS = [
     _migrate24to25,
     _migrate25to26,
     _migrate26to27,
+    _migrate27to28,
+    _migrate28to29,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

@@ -42,6 +42,7 @@ const GO_BACK_BUTTON_STYLE = css`
     }
   }
 `
+const QUICK_GRIPPER_POLL_MS = 3000
 
 export const MountGripper = (
   props: GripperWizardStepProps
@@ -51,9 +52,8 @@ export const MountGripper = (
   const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
   const [isPending, setIsPending] = React.useState(false)
-  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
-    refetchInterval: 3000,
+    refetchInterval: QUICK_GRIPPER_POLL_MS,
   })
   const isGripperAttached = (instrumentsQueryData?.data ?? []).some(
     (i): i is GripperData | BadGripper => i.instrumentType === 'gripper'

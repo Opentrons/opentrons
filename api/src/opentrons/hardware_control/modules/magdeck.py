@@ -124,6 +124,7 @@ class MagDeck(mod_abc.AbstractModule):
         self,
         height: Optional[float] = None,
         height_from_base: Optional[float] = None,
+        must_be_running: bool = True,
     ) -> None:
         """Move the magnet to a specific height, measured from home position.
 
@@ -135,7 +136,8 @@ class MagDeck(mod_abc.AbstractModule):
             assert height_from_base is not None, "An engage height must be specified"
             height = height_from_base + OFFSET_TO_LABWARE_BOTTOM[self.model()]
 
-        await self.wait_for_is_running()
+        if must_be_running:
+            await self.wait_for_is_running()
         if not engage_height_is_in_range(self.model(), height):
             raise ValueError(
                 f"Invalid engage height for {self.model()}: {height}. "
@@ -144,11 +146,12 @@ class MagDeck(mod_abc.AbstractModule):
         await self._driver.move(height)
         self._current_height = await self._driver.get_mag_position()
 
-    async def deactivate(self) -> None:
+    async def deactivate(self, must_be_running: bool = True) -> None:
         """Home the magnet."""
-        await self.wait_for_is_running()
+        if must_be_running:
+            await self.wait_for_is_running()
         await self._driver.home()
-        await self.engage(0.0)
+        await self.engage(0.0, must_be_running=must_be_running)
 
     @property
     def current_height(self) -> float:

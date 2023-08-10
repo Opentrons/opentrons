@@ -50,6 +50,11 @@ class ErrorCodes(Enum):
     MOTION_PLANNING_FAILURE = _code_from_dict_entry("2004")
     POSITION_ESTIMATION_INVALID = _code_from_dict_entry("2005")
     MOVE_CONDITION_NOT_MET = _code_from_dict_entry("2006")
+    CALIBRATION_STRUCTURE_NOT_FOUND = _code_from_dict_entry("2007")
+    EDGE_NOT_FOUND = _code_from_dict_entry("2008")
+    EARLY_CAPACITIVE_SENSE_TRIGGER = _code_from_dict_entry("2009")
+    INACCURATE_NON_CONTACT_SWEEP = _code_from_dict_entry("2010")
+    MISALIGNED_GANTRY = _code_from_dict_entry("2011")
     ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
     LABWARE_DROPPED = _code_from_dict_entry("3001")
     LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")
@@ -69,6 +74,7 @@ class ErrorCodes(Enum):
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")
+    NOT_SUPPORTED_ON_ROBOT_TYPE = _code_from_dict_entry("4003")
 
     @classmethod
     @lru_cache(25)

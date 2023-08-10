@@ -28,6 +28,20 @@
     "z": 0
   },
   "config": {},
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0.5
+      }
+    }
+  },
   "displayName": "Magnetic Block GEN1",
   "quirks": [],
   "slotTransforms": {

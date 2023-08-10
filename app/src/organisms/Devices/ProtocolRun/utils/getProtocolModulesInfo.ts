@@ -3,8 +3,8 @@ import {
   getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import type {
   DeckDefinition,
   LabwareDefinition2,

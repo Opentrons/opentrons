@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import { LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
@@ -51,7 +51,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         command: {
           commandType: 'home' as const,
           params: {
-            axes: [], // TODO: use gripper motor axis const here
+            axes: ['extensionZ', 'extensionJaw'],
           },
         },
         waitUntilComplete: true,
@@ -62,7 +62,6 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           }
           createRunCommand({
             command: {
-              // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
               commandType: 'calibration/calibrateGripper' as const,
               params:
                 jaw === 'rear' && frontJawOffset != null
@@ -80,10 +79,9 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
               }
               createRunCommand({
                 command: {
-                  // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
                   commandType: 'calibration/moveToMaintenancePosition' as const,
                   params: {
-                    mount: LEFT,
+                    mount: EXTENSION,
                   },
                 },
                 waitUntilComplete: true,

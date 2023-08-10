@@ -532,13 +532,10 @@ class ProtocolContext(CommandPublisher):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
-        """Move a loaded labware to a new location.
+        """Move a loaded labware to a new location. See :ref:`moving-labware` for more details.
 
-        *** This API method is currently being developed. ***
-        *** Expect changes without API level bump.        ***
-
-        :param labware: Labware to move. Should be a labware already loaded
-                        using :py:meth:`load_labware`
+        :param labware: The labware to move. It should be a labware already loaded
+                        using :py:meth:`load_labware`.
 
         :param new_location: Where to move the labware to. This is either:
 
@@ -549,27 +546,23 @@ class ProtocolContext(CommandPublisher):
                   with :py:meth:`load_labware` or :py:meth:`load_adapter`.
                 * The special constant :py:obj:`OFF_DECK`.
 
-        :param use_gripper: Whether to use gripper to perform this move.
-                            If True, will use the gripper to perform the move (OT3 only).
-                            If False, will pause protocol execution to allow the user
-                            to perform a manual move and click resume to continue
-                            protocol execution.
+        :param use_gripper: Whether to use the Flex Gripper for this movement.
 
-        Other experimental params:
+                * If ``True``, will use the gripper to perform an automatic
+                  movement. This will raise an error on an OT-2 protocol.
+                * If ``False``, will pause protocol execution until the user
+                  performs the movement. Protocol execution remains paused until
+                  the user presses **Confirm and resume**.
 
-        :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
-                                                associated with its pick up location.
-        :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
-                                             associated with its drop off location.
-        :param pick_up_offset: Offset to use when picking up labware.
-        :param drop_offset: Offset to use when dropping off labware.
+        Gripper-only parameters:
 
-        Before moving a labware from or to a hardware module, make sure that the labware
-        and its new location is reachable by the gripper. So, thermocycler lid should be
-        open and heater-shaker's labware latch should be open.
+        :param pick_up_offset: Optional x, y, z vector offset to use when picking up labware.
+        :param drop_offset: Optional x, y, z vector offset to use when dropping off labware.
+
+        Before moving a labware to or from a hardware module, make sure that the labware's
+        current and new locations are accessible, i.e., open the Thermocycler lid or
+        open the Heater-Shaker's labware latch.
         """
-        # TODO (spp, 2022-10-31): re-evaluate whether to allow specifying `use_gripper`
-        #  in the args or whether to have it specified in protocol requirements.
 
         if not isinstance(labware, Labware):
             raise ValueError(
