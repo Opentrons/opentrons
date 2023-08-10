@@ -204,9 +204,13 @@ def _analyze_python_protocol(
 ) -> IdentifiedPythonMain:
     try:
         parsed = parse.parse(protocol_file=py_file.contents, filename=py_file.name)
-        assert isinstance(parsed, PythonProtocol)
     except MalformedPythonProtocolError as e:
         raise FileIdentificationError(e.short_message) from e
+
+    # We know this should never be a JsonProtocol. Help out the type-checker.
+    assert isinstance(
+        parsed, PythonProtocol
+    ), "Parsing a Python file returned something other than a Python protocol."
 
     if parsed.api_level > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(
