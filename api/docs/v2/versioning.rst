@@ -57,10 +57,9 @@ When choosing an API level, consider what features you need and how widely you p
 
 On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
 
-.. need to update this to include 2.15 behavior
 .. note::
 
-    Python protocols with an ``apiLevel`` of 2.14 can't currently be simulated with the ``opentrons_simulate`` command-line tool, the :py:func:`opentrons.simulate.simulate` function, or the :py:func:`opentrons.simulate.get_protocol_api` function. If your protocol doesn't rely on new functionality added in version 2.14, use a lower ``apiLevel``. For protocols that require 2.14, analyze your protocol with the Opentrons App instead.
+    Python protocols with an ``apiLevel`` of 2.14 or higher can't currently be simulated with the ``opentrons_simulate`` command-line tool, the :py:func:`opentrons.simulate.simulate` function, or the :py:func:`opentrons.simulate.get_protocol_api` function. If your protocol doesn't rely on new functionality added in version 2.14, use a lower ``apiLevel``. For protocols that require 2.14, analyze your protocol with the Opentrons App instead.
 
 
 Maximum Supported Versions
@@ -143,6 +142,8 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.
   
+  - By default, repeated calls to :py:meth:`.drop_tip` cycle through multiple locations above the trash bin to prevent tips from stacking up.
+  
 - Flex and OT-2 features
 
   - Optionally declare ``apiLevel`` in the new ``requirements`` dictionary (you can still declare it in ``metadata``). 
@@ -158,12 +159,6 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   - Manual labware moves support moving to or from the new :py:obj:`~.protocol_api.OFF_DECK` location (outside of the robot).
   
   - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
-
-- Bug fixes
-
-  - TK
-
-  
   
 
 Version 2.14
