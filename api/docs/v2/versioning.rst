@@ -71,8 +71,8 @@ If you upload a protocol that specifies a higher API level than the maximum supp
 
 Opentrons robots running the latest software support the following version ranges: 
 
-    * **OT-2:** versions 2.0–|apiLevel|.
     * **Flex:** version 2.15.
+    * **OT-2:** versions 2.0–|apiLevel|.
 
 
 .. _version-table:
