@@ -38,6 +38,7 @@ from robot_server.service.legacy.models.settings import (
     AdvancedSetting,
 )
 from robot_server.persistence import PersistenceResetter, get_persistence_resetter
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 log = logging.getLogger(__name__)
 
@@ -78,14 +79,20 @@ async def post_settings(
     response_model=AdvancedSettingsResponse,
     response_model_exclude_unset=True,
 )
-async def get_settings() -> AdvancedSettingsResponse:
+async def get_settings(robot_type: str = Depends(get_robot_type)) -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
-    return _create_settings_response()
+    return _create_settings_response(robot_type)
 
 
-def _create_settings_response() -> AdvancedSettingsResponse:
+def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
     """Create the feature flag settings response object"""
-    data = advanced_settings.get_all_adv_settings()
+    # TODO lc(8-10-2023) We should convert the robot type function to return
+    # the enum value directly.
+    if robot_type == "OT-2 Standard":
+        robot_type_enum = RobotTypeEnum.OT2
+    else:
+        robot_type_enum = RobotTypeEnum.FLEX
+    data = advanced_settings.get_all_adv_settings(robot_type_enum)
 
     if advanced_settings.is_restart_required():
         links = Links(restart="/server/restart")
