@@ -324,8 +324,10 @@ class ProtocolEngine:
             set_run_status: Whether to calculate a `success` or `failure` run status.
                 If `False`, will set status to `stopped`.
         """
-        if error is None and self._state_store.commands.state.stopped_by_estop:
-            error = EStopActivatedError(message="Estop was activated during a run")
+        if self._state_store.commands.state.stopped_by_estop:
+            drop_tips_and_home = False
+            if error is None:
+                error = EStopActivatedError(message="Estop was activated during a run")
         if error:
             if isinstance(error, EnumeratedError) and self._code_in_exception_stack(
                 error=error, code=ErrorCodes.E_STOP_ACTIVATED
