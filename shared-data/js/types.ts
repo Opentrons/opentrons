@@ -472,6 +472,8 @@ export type MotorAxis =
   | 'rightZ'
   | 'leftPlunger'
   | 'rightPlunger'
+  | 'extensionZ'
+  | 'extensionJaw'
 
 export type MotorAxes = MotorAxis[]
 
