@@ -483,8 +483,6 @@ if __name__ == "__main__":
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         for tip, volumes in run_args.volumes:
             hw = run_args.ctx._core.get_hardware()
-            if not run_args.ctx.is_simulating():
-                ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
             _main(args, run_args, tip, volumes)
     finally:
         if run_args.recorder is not None:
