@@ -542,6 +542,7 @@ class PushTipPresenceNotificationPayload(EmptyPayload):
     """A notification that the ejector flag status has changed."""
 
     ejector_flag_status: utils.UInt8Field
+    sensor_id: SensorIdField
 
 
 @dataclass(eq=False)
@@ -561,6 +562,13 @@ class TipActionResponsePayload(MoveCompletedPayload):
     action: PipetteTipActionTypeField
     success: utils.UInt8Field
     gear_motor_id: GearMotorIdField
+
+
+@dataclass(eq=False)
+class TipStatusQueryRequestPayload(EmptyPayload):
+    """A request to read tip presence status."""
+
+    sensor_id: SensorIdField
 
 
 @dataclass(eq=False)
