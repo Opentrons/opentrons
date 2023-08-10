@@ -14,6 +14,7 @@ import {
   StyleProps,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
+  JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import SuccessIcon from '../../assets/images/icon_success.png'
 import { getIsOnDevice } from '../../redux/config'
@@ -104,12 +105,21 @@ export function SimpleWizardBody(props: Props): JSX.Element {
     }
   `
 
+  const ICON_POSITION_STYLE = css`
+    justify-content: ${JUSTIFY_CENTER};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      justify-content: ${JUSTIFY_FLEX_START};
+      margin-top: ${isSuccess ? SPACING.spacing32 : '8.1875rem'};
+    }
+  `
+
   return (
     <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
       <Flex
         width="100%"
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
+        css={ICON_POSITION_STYLE}
         flexDirection={DIRECTION_COLUMN}
         flex="1 0 auto"
       >
