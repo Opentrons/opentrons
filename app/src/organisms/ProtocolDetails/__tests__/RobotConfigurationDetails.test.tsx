@@ -3,15 +3,8 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-
-jest.mock('../../../redux/config')
-
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const mockRequiredModuleDetails = [
   {
@@ -71,12 +64,6 @@ const render = (
 
 describe('RobotConfigurationDetails', () => {
   let props: React.ComponentProps<typeof RobotConfigurationDetails>
-
-  beforeEach(() => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(false)
-  })
 
   afterEach(() => {
     resetAllWhenMocks()
@@ -142,9 +129,6 @@ describe('RobotConfigurationDetails', () => {
   })
 
   it('renders extension mount section when extended hardware feature flag is on', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(true)
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
@@ -158,9 +142,6 @@ describe('RobotConfigurationDetails', () => {
   })
 
   it('should not render extension mount section when robotType is OT-2', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(true)
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
