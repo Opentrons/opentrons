@@ -1,5 +1,4 @@
 """Opentrons API Workarounds."""
-from atexit import register as atexit_register
 from datetime import datetime
 from urllib.request import Request, urlopen
 from typing import List

@@ -658,12 +658,14 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
 
-                acceptable_cv = trials[volume][channel][0].acceptable_cv/100
-                acceptable_d = trials[volume][channel][0].acceptable_d/100
+                acceptable_cv = trials[volume][channel][0].acceptable_cv
+                acceptable_d = trials[volume][channel][0].acceptable_d
                 print(f"acceptable cv {acceptable_cv} acceptable_d {acceptable_d}")
                 print(f"dispense cv {dispense_cv} aspirate_cv {aspirate_cv}")
                 print(f"dispense d {dispense_cv} aspirate_d {aspirate_d}")
                 if acceptable_cv is not None and acceptable_d is not None:
+                    acceptable_cv /= 100
+                    acceptable_d /= 100
                     if (
                         dispense_cv > acceptable_cv
                         or aspirate_cv > acceptable_cv

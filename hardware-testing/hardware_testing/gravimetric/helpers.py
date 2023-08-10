@@ -151,9 +151,7 @@ def _sense_liquid_height(
     lps.starting_mount_height = well.top().point.z
     lps.max_z_distance = well.depth
     print(f"lps settings {lps}")
-    height = well.top().point.z - hwapi.liquid_probe(
-        OT3Mount.LEFT, lps
-    )
+    height = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
     print(f"well top {well.top()} height {height}")
     return height
 
