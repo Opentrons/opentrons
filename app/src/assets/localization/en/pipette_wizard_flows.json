@@ -71,6 +71,7 @@
   "remove_labware": "<block>To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.</block><block>The calibration probe is included with the robot and should be stored on the front pillar of the robot.</block>",
   "remove_probe": "unlatch the calibration probe, remove it from the nozzle, and return it to its storage location.",
   "replace_pipette": "replace {{mount}} pipette",
+  "return_probe_error": "<bold>Return the calibration probe to its storage location before exiting.</bold> <block>{{error}}</block>",
   "single_mount_attached_error": "Single mount pipette is selected when this is the 96 channel flow",
   "single_or_8_channel": "{{single}} or {{eight}} pipette",
   "something_seems_wrong": "There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance.",
