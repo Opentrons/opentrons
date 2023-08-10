@@ -1,31 +1,16 @@
 """OT-3 Z-stage test."""
-import os, time
 import argparse
 import asyncio
-from numpy import float64
-import subprocess
-from typing import Optional, Callable, List, Any, Tuple, Dict, Union
-from dataclasses import dataclass, fields
+from typing import List, Tuple, Dict, Union
 from threading import Thread
-from pathlib import Path
 from statistics import mean
 
-from opentrons.config.defaults_ot3 import (
-    DEFAULT_MAX_SPEEDS,
-    DEFAULT_ACCELERATIONS,
-    DEFAULT_RUN_CURRENT,
-    DEFAULT_HOLD_CURRENT,
-)
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api import types
-from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, OT3AxisKind
+from hardware_testing.opentrons_api.types import Axis, OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing import data
 from hardware_testing.data import ui
 
-from hardware_testing import data
-from hardware_testing.drivers import list_ports_and_select, find_port
 from hardware_testing.drivers.mark10.mark10_fg import Mark10, SimMark10
 
 from hardware_testing.data.csv_report import (
@@ -41,7 +26,7 @@ from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
+LOG.setLevel(logging.CRITICAL)
 
 # Test Parameters
 FORCE_SPEED = 10
@@ -76,9 +61,6 @@ force_output = []
 def _connect_to_mark10_fixture(simulate: bool) -> Mark10:
     """Connect to the force Gauge."""
     if not simulate:
-        # _port = list_ports_and_select('mark10')
-        # fixture = Mark10.create(port=_port)
-        # LOG.info(_port)
         fixture = Mark10.create(port="/dev/ttyUSB0")
     else:
         fixture = SimMark10()  # type: ignore[assignment]
@@ -227,7 +209,7 @@ async def _force_gauge(
     """Apply force to the gague and log."""
     global thread_sensor
     global force_output
-
+    ui.print_header(f"Test Force - Mount {mount.name}")
     LOG.info("_force_gauge")
     mark10 = _connect_to_mark10_fixture(simulate)
     LOG.info("connected to mark 10")
@@ -266,9 +248,6 @@ async def _force_gauge(
             try:
                 async with api._backend.restore_current():
                     await api._backend.set_active_current({z_ax: test_current})
-                    LOG.info(
-                        f"Current: {api._backend._current_settings[z_ax].run_current}"
-                    )
                     await api.move_to(
                         mount=mount,
                         abs_position=press_pos,
@@ -316,20 +295,12 @@ async def _run(api: OT3API, arguments: argparse.Namespace, report: CSVReport) ->
     qc_pass = True
 
     if not arguments.skip_left:
-        ui.print_header("Test mount left")
-
-        if not arguments.skip_force_left:
-            ui.print_header("Force_Gauge_Test")
-            res = await _force_gauge(api, OT3Mount.LEFT, report, arguments.simulate)
-            qc_pass = res and qc_pass
+        res = await _force_gauge(api, OT3Mount.LEFT, report, arguments.simulate)
+        qc_pass = res and qc_pass
 
     if not arguments.skip_right:
-        print("----Test mount right----")
-
-        if not arguments.skip_force_right:
-            print("Force_Gauge_Test")
-            res = await _force_gauge(api, OT3Mount.RIGHT, report, arguments.simulate)
-            qc_pass = res and qc_pass
+        res = await _force_gauge(api, OT3Mount.RIGHT, report, arguments.simulate)
+        qc_pass = res and qc_pass
 
     return qc_pass
 
@@ -347,6 +318,7 @@ async def _main(arguments: argparse.Namespace) -> None:
     for k, v in TEST_PARAMETERS.items():
         report("TEST_PARAMETERS", k, [v])
 
+    # Attempt to home if first homing fails because of OT-3 in box Y axis issue
     try:
         await api.home(
             [
@@ -384,12 +356,7 @@ async def _main(arguments: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(description="OT3 Z_stage Test")
-    # add_can_args(arg_parser)
     arg_parser.add_argument("--simulate", action="store_true")
-    arg_parser.add_argument("--operator", type=str, required=True)
-    arg_parser.add_argument("--sn", type=str, required=True)
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
-    arg_parser.add_argument("--skip_force_left", action="store_true")
-    arg_parser.add_argument("--skip_force_right", action="store_true")
     asyncio.run(_main(arg_parser.parse_args()))
