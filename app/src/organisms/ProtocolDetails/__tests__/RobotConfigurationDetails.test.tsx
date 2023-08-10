@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -66,8 +65,9 @@ describe('RobotConfigurationDetails', () => {
   let props: React.ComponentProps<typeof RobotConfigurationDetails>
 
   afterEach(() => {
-    resetAllWhenMocks()
+    jest.clearAllMocks()
   })
+
   it('renders a robot section showing the intended robot model for an OT-2 protocol', () => {
     props = {
       leftMountPipetteName: 'p10_single',
