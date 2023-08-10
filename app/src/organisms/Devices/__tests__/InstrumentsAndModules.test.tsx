@@ -206,6 +206,8 @@ describe('InstrumentsAndModules', () => {
       { refetchInterval: 5000 }
     )
     expect(mockUseModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
-    expect(mockUseInstrumentsQuery).toHaveBeenCalledWith()
+    expect(mockUseInstrumentsQuery).toHaveBeenCalledWith({
+      refetchInterval: 5000,
+    })
   })
 })

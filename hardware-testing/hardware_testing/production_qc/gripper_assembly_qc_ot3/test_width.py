@@ -20,7 +20,7 @@ GAUGE_HEIGHT_MM = 40
 GRIP_HEIGHT_MM = 30
 TEST_WIDTHS_MM: List[float] = [60, 85.75, 62]
 SLOT_WIDTH_GAUGE: List[Optional[int]] = [None, 3, 9]
-GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
+GRIP_FORCES_NEWTON: List[float] = [10, 15, 20]
 
 
 def _get_test_tag(width: float, force: float) -> str:

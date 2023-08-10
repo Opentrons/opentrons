@@ -10,7 +10,6 @@ from opentrons.config.defaults_ot3 import (
 )
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
-from hardware_testing.data import get_git_description
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -231,32 +230,19 @@ async def _main(is_simulating: bool) -> None:
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_multi_v3.4",
     )
-    if not api.is_simulator:
-        operator = input("enter OPERATOR name: ")
-    else:
-        operator = "simulation"
     # home and move to a safe position
     await _reset_gantry(api)
 
     # test each attached pipette
     while True:
         mount = await _get_next_pipette_mount(api)
-        pipette = api.hardware_pipettes[mount.to_mount()]
-        assert pipette
-        pipette_sn = helpers_ot3.get_pipette_serial_ot3(pipette)
-        ui.print_title(f"{pipette_sn} - {mount.name}")
-        if not api.is_simulator and not ui.get_user_answer("QC this pipette"):
+        if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
             continue
+
         report = _build_csv_report()
-        report.set_version(get_git_description())
-        report.set_operator(operator)
-        report.set_robot_id(helpers_ot3.get_robot_serial_ot3(api))
-        report.set_tag(pipette_sn)
-        if not api.is_simulator:
-            barcode = input("scan pipette barcode: ")
-        else:
-            barcode = str(pipette_sn)
-        report.set_device_id(pipette_sn, CSVResult.from_bool(barcode == pipette_sn))
+        dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+        helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+
         failing_current = await _test_plunger(api, mount, report)
         report(
             "OVERALL",

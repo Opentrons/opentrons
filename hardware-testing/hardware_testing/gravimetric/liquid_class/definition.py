@@ -18,6 +18,7 @@ class LiquidSettings:
 class AspirateSettings(LiquidSettings):
     """Aspirate Settings."""
 
+    leading_air_gap: float  # microliters
     trailing_air_gap: float  # microliters
 
 
@@ -25,7 +26,7 @@ class AspirateSettings(LiquidSettings):
 class DispenseSettings(LiquidSettings):
     """Dispense Settings."""
 
-    leading_air_gap: float  # microliters
+    blow_out_submerged: float  # microliters
 
 
 @dataclass
@@ -62,6 +63,9 @@ def interpolate(
             z_retract_height=_interp(
                 a.aspirate.z_retract_height, b.aspirate.z_retract_height
             ),
+            leading_air_gap=_interp(
+                a.aspirate.leading_air_gap, b.aspirate.leading_air_gap
+            ),
             trailing_air_gap=_interp(
                 a.aspirate.trailing_air_gap, b.aspirate.trailing_air_gap
             ),
@@ -83,8 +87,8 @@ def interpolate(
             z_retract_height=_interp(
                 a.dispense.z_retract_height, b.dispense.z_retract_height
             ),
-            leading_air_gap=_interp(
-                a.dispense.leading_air_gap, b.dispense.leading_air_gap
+            blow_out_submerged=_interp(
+                a.dispense.blow_out_submerged, b.dispense.blow_out_submerged
             ),
         ),
     )

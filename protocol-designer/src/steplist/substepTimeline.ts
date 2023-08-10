@@ -4,7 +4,7 @@ import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
-import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 import { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,

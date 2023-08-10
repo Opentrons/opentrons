@@ -82,6 +82,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   // These height mismatches need to be investigated. See Jira RSS-202.
   // Each one should either be explained here or marked as a known bug.
   'nest_1_reservoir_195ml/1.json': new Set(['A1']),
+  'nest_1_reservoir_195ml/2.json': new Set(['A1']),
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip/1.json': new Set(
     [
       'A3',

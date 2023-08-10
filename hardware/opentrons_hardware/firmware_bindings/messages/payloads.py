@@ -526,6 +526,7 @@ class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
 
     duty_cycle: utils.UInt32Field
     encoder_position_um: utils.Int32Field
+    stay_engaged: utils.UInt8Field
 
 
 @dataclass(eq=False)
@@ -550,6 +551,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
     request_stop_condition: MoveStopConditionField
+    acceleration: utils.Int32Field
 
 
 @dataclass(eq=False)

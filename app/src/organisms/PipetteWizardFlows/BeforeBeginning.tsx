@@ -158,15 +158,13 @@ export const BeforeBeginning = (
       {
         commandType: 'loadPipette' as const,
         params: {
-          // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipettes[mount]?.instrumentName,
-          pipetteId: pipetteId,
+          pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+          pipetteId: pipetteId ?? '',
           mount: mount,
         },
       },
       { commandType: 'home' as const, params: {} },
       {
-        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
           mount: mount,
@@ -186,7 +184,6 @@ export const BeforeBeginning = (
   const SingleMountAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: mount,
@@ -197,7 +194,6 @@ export const BeforeBeginning = (
   const NinetySixChannelAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,

@@ -18,7 +18,12 @@
         "p300_single_gen2",
         "p300_multi_gen2",
         "p1000_single",
-        "p1000_single_gen2"
+        "p1000_single_gen2",
+        "p50_single_flex",
+        "p50_multi_flex",
+        "p1000_single_flex",
+        "p1000_multi_flex",
+        "p1000_96"
       ]
     },
 
@@ -129,7 +134,7 @@
   "properties": {
     "$otSharedSchema": {
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
-      "enum": ["#/protocol/schemas/7-draft"]
+      "enum": ["#/protocol/schemas/7"]
     },
 
     "schemaVersion": {

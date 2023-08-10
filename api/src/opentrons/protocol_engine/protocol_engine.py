@@ -1,4 +1,6 @@
 """ProtocolEngine class definition."""
+from contextlib import AsyncExitStack
+from logging import getLogger
 from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
@@ -47,6 +49,9 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
+
+
+_log = getLogger(__name__)
 
 
 class ProtocolEngine:
@@ -252,9 +257,9 @@ class ProtocolEngine:
         and then shut down. After an engine has been `finished`'ed, it cannot
         be restarted.
 
-        This method should not raise, but if any exceptions happen during
-        execution that are not properly caught by the CommandExecutor, they
-        will be raised here.
+        This method should not raise. If any exceptions happened during execution that were not
+        properly caught by the CommandExecutor, or if any exceptions happen during this
+        `finish()` call, they should be saved as `.state_view.get_summary().errors`.
 
         Arguments:
             error: An error that caused the stop, if applicable.
@@ -284,25 +289,38 @@ class ProtocolEngine:
             FinishAction(error_details=error_details, set_run_status=set_run_status)
         )
 
+        # We have a lot of independent things to tear down. If any teardown fails, we want
+        # to continue with the rest, to avoid leaking resources or leaving the engine with a broken
+        # state. We use an AsyncExitStack to avoid a gigantic try/finally tree. Note that execution
+        # order will be backwards because the stack is first-in-last-out.
+        exit_stack = AsyncExitStack()
+        exit_stack.push_async_callback(self._plugin_starter.stop)  # Last step.
+        exit_stack.push_async_callback(
+            self._hardware_stopper.do_stop_and_recover,
+            drop_tips_and_home=drop_tips_and_home,
+        )
+        exit_stack.callback(self._door_watcher.stop)
+        exit_stack.push_async_callback(self._queue_worker.join)  # First step.
+
         try:
-            await self._queue_worker.join()
-
-        # todo(mm, 2022-01-31): We should use something like contextlib.AsyncExitStack
-        # to robustly clean up all these resources
-        # instead of try/finally, which can't scale without making indentation silly.
-        finally:
-            # Note: After we stop listening, straggling events might be processed
-            # concurrently to the below lines in this .finish() call,
-            # or even after this .finish() call completes.
-            self._door_watcher.stop_soon()
-
-            await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
-
-            completed_at = self._model_utils.get_timestamp()
-            self._action_dispatcher.dispatch(
-                HardwareStoppedAction(completed_at=completed_at)
+            # If any teardown steps failed, this will raise something.
+            await exit_stack.aclose()
+        except Exception as hardware_stopped_exception:
+            _log.exception("Exception during post-run finish steps.")
+            finish_error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
+                error_id=self._model_utils.generate_id(),
+                created_at=self._model_utils.get_timestamp(),
+                error=hardware_stopped_exception,
             )
-            await self._plugin_starter.stop()
+        else:
+            finish_error_details = None
+
+        self._action_dispatcher.dispatch(
+            HardwareStoppedAction(
+                completed_at=self._model_utils.get_timestamp(),
+                finish_error_details=finish_error_details,
+            )
+        )
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.

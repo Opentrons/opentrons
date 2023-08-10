@@ -35,7 +35,6 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: tooltipPlacement,
   })
-
   return (
     <>
       {tooltipContent && (
@@ -54,7 +53,7 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             updateValue(!value)
           }
-          value={Boolean(value)}
+          value={disabled ? false : Boolean(value)}
         />
         {value && !disabled && !isIndeterminate ? children : null}
       </div>

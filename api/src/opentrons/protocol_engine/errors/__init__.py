@@ -54,6 +54,7 @@ from .exceptions import (
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
     InvalidAxisForRobotType,
+    NotSupportedOnRobotType,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -114,6 +115,7 @@ __all__ = [
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
     "InvalidAxisForRobotType",
+    "NotSupportedOnRobotType",
     # error occurrence models
     "ErrorOccurrence",
 ]

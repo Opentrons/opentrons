@@ -1,5 +1,6 @@
 import assert from 'assert'
 import execa from 'execa'
+import usbDetection from 'usb-detection'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
@@ -19,11 +20,9 @@ export interface UsbDeviceMonitor {
 
 const log = createLogger('usb-devices')
 
-export async function createUsbDeviceMonitor(
+export function createUsbDeviceMonitor(
   options: UsbDeviceMonitorOptions = {}
-): Promise<UsbDeviceMonitor> {
-  const { default: usbDetection } = await import('usb-detection')
-
+): UsbDeviceMonitor {
   const { onDeviceAdd, onDeviceRemove } = options
   usbDetection.startMonitoring()
 

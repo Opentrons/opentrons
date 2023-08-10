@@ -102,7 +102,6 @@ export const liquidColors = [
   popPink,
   springGreen,
   tartRed,
-  whaleGrey,
 ]
 
 // touchscreen light mode colors

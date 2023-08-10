@@ -183,7 +183,7 @@ def _pipette_with_liquid_settings(
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.dispense.leading_air_gap)
+        hw_api.blow_out(hw_mount, liquid_class.dispense.blow_out_submerged)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -211,7 +211,8 @@ def _pipette_with_liquid_settings(
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
-        pass
+        if liquid_class.aspirate.leading_air_gap > 0:
+            pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_submerge() -> None:
         # TODO: re-implement mixing once we have a real use for it
