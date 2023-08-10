@@ -278,6 +278,8 @@ class ProtocolEngine:
             )
             self._action_dispatcher.dispatch(hardware_stop_action)
             self._queue_worker.cancel()
+        else:
+            _log.info("estop pressed before protocol was started, taking no action.")
 
     async def stop(self) -> None:
         """Stop execution immediately, halting all motion and cancelling future commands.
