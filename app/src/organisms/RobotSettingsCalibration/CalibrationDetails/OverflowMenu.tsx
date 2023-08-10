@@ -85,7 +85,7 @@ export function OverflowMenu({
   const isFlexPipette = isOT3Pipette(pipetteName as PipetteName)
   const ot3PipCal =
     useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
-      ?.offset ?? null
+      ?.last_modified ?? null
 
   const applicablePipetteOffsetCal = pipetteOffsetCalibrations?.find(
     p => p.mount === mount && p.pipette === serialNumber
