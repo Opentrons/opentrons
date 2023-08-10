@@ -16,6 +16,7 @@ stages:
 ---
 test_name: GET Health OT-3
 marks:
+  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
