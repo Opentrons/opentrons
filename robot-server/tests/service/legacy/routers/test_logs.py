@@ -179,7 +179,6 @@ def test_get_odd_log_with_defaults(api_client):
         m.side_effect = mock_get_records_dumb
         response = api_client.get("/logs/touchscreen.log")
         body = response.text
-        print(body)
         assert response.status_code == 200
         assert body == expected
         m.assert_called_once_with(
