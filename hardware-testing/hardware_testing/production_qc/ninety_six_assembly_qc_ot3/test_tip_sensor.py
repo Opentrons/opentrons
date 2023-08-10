@@ -93,12 +93,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         input(f"{pos}mm: {state}")
 
     while pos > 0:
-        await api._backend.tip_action(
-            axes=[Axis.Q],
-            distance=1,
-            speed=-5,
-            tip_action="clamp",
-        )
+        await helpers_ot3.move_tip_motor_relative_ot3(api, -1)
         pos -= 1
         state = await get_tip_status(api)
         input(f"{pos}mm: {state}")
