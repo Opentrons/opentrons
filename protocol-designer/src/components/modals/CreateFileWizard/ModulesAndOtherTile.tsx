@@ -112,7 +112,6 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
       showHeaterShakerPipetteCollisions={showHeaterShakerPipetteCollisions}
     />
   )
-
   const robotType = values.fields.robotType
   return (
     <HandleEnter onEnter={proceed}>

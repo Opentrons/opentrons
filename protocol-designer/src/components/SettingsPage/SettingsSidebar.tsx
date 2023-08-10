@@ -21,7 +21,6 @@ const SettingsSidebarComponent = (props: Props): JSX.Element => (
     <PDTitledList
       className={styles.sidebar_item}
       selected={props.currentPage === 'settings-app'}
-      onClick={props.makeNavigateToPage('settings-app')}
       title={i18n.t('nav.settings.app')}
     />
     {/* <PDTitledList

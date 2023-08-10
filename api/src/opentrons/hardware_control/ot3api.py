@@ -36,7 +36,7 @@ from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, feature_flags as ff
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -1438,10 +1438,12 @@ class OT3API(
         self._config = replace(self._config, **kwargs)
 
     @ExecutionManagerProvider.wait_for_running
-    async def _grip(self, duty_cycle: float) -> None:
+    async def _grip(self, duty_cycle: float, stay_engaged: bool = True) -> None:
         """Move the gripper jaw inward to close."""
         try:
-            await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
+            await self._backend.gripper_grip_jaw(
+                duty_cycle=duty_cycle, stay_engaged=stay_engaged
+            )
             await self._cache_encoder_position()
         except Exception:
             self._log.exception(
@@ -1474,12 +1476,14 @@ class OT3API(
             self._log.exception("Gripper set width failed")
             raise
 
-    async def grip(self, force_newtons: Optional[float] = None) -> None:
+    async def grip(
+        self, force_newtons: Optional[float] = None, stay_engaged: bool = True
+    ) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
         )
-        await self._grip(duty_cycle=dc)
+        await self._grip(duty_cycle=dc, stay_engaged=stay_engaged)
         self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
@@ -1814,7 +1818,10 @@ class OT3API(
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
 
-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
+            and ff.tip_presence_detection_enabled()
+        ):
             await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
@@ -1909,7 +1916,10 @@ class OT3API(
 
         await self._backend.set_active_current(spec.ending_current)
         # TODO: implement tip-detection sequence during drop-tip for 96ch
-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
+            and ff.tip_presence_detection_enabled()
+        ):
             await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
 
         # home mount axis

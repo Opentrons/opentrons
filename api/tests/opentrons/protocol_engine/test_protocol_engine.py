@@ -421,6 +421,7 @@ async def test_finish(
     set_run_status: bool,
     model_utils: ModelUtils,
     state_store: StateStore,
+    door_watcher: DoorWatcher,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
     completed_at = datetime(2021, 1, 1, 0, 0)
@@ -436,11 +437,14 @@ async def test_finish(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(set_run_status=set_run_status)),
         await queue_worker.join(),
+        door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
             drop_tips_and_home=drop_tips_and_home
         ),
-        action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
         await plugin_starter.stop(),
+        action_dispatcher.dispatch(
+            HardwareStoppedAction(completed_at=completed_at, finish_error_details=None)
+        ),
     )
 
 
@@ -464,10 +468,12 @@ async def test_finish_with_defaults(
 async def test_finish_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
+    plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
     model_utils: ModelUtils,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
+    door_watcher: DoorWatcher,
 ) -> None:
     """It should be able to tell the engine it's finished because of an error."""
     error = RuntimeError("oh no")
@@ -489,9 +495,14 @@ async def test_finish_with_error(
             FinishAction(error_details=expected_error_details, set_run_status=True)
         ),
         await queue_worker.join(),
+        door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
+        await plugin_starter.stop(),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
+            HardwareStoppedAction(
+                completed_at=datetime(year=2022, month=2, day=2),
+                finish_error_details=None,
+            )
         ),
     )
 
@@ -499,10 +510,12 @@ async def test_finish_with_error(
 async def test_finish_with_estop_error_will_not_drop_tip_and_home(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
+    plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
     model_utils: ModelUtils,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
+    door_watcher: DoorWatcher,
 ) -> None:
     """It should be able to tell the engine it's finished because of an error and will not drop tip and home."""
     error = ProtocolCommandFailedError(
@@ -530,9 +543,14 @@ async def test_finish_with_estop_error_will_not_drop_tip_and_home(
             FinishAction(error_details=expected_error_details, set_run_status=True)
         ),
         await queue_worker.join(),
+        door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=False),
+        await plugin_starter.stop(),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
+            HardwareStoppedAction(
+                completed_at=datetime(year=2022, month=2, day=2),
+                finish_error_details=None,
+            )
         ),
     )
 
@@ -549,24 +567,36 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     state_store: StateStore,
 ) -> None:
     """It should be able to stop the engine."""
+    exception = RuntimeError("oh no")
     decoy.when(
         await queue_worker.join(),
-    ).then_raise(RuntimeError("oh no"))
+    ).then_raise(exception)
 
     decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
 
+    error_id = "error-id"
     completed_at = datetime(2021, 1, 1, 0, 0)
 
+    decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
-    with pytest.raises(RuntimeError, match="oh no"):
-        await subject.finish()
+    await subject.finish()
 
     decoy.verify(
-        door_watcher.stop_soon(),
+        action_dispatcher.dispatch(FinishAction()),
+        # await queue_worker.join() should be called, and should raise, here.
+        # We can't verify that step in the sequence here because of a Decoy limitation.
+        door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
-        action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
         await plugin_starter.stop(),
+        action_dispatcher.dispatch(
+            HardwareStoppedAction(
+                completed_at=completed_at,
+                finish_error_details=FinishErrorDetails(
+                    error=exception, error_id="error-id", created_at=completed_at
+                ),
+            )
+        ),
     )
 
 
@@ -667,13 +697,22 @@ async def test_estop_without_command(
 ) -> None:
     """It should be able to stop the engine."""
     timestamp = datetime(2021, 1, 1, 0, 0)
+    error_id = "fake_error_id"
 
     decoy.when(model_utils.get_timestamp()).then_return(timestamp)
+    decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(state_store.commands.get_is_stopped()).then_return(False)
     decoy.when(state_store.commands.state.running_command_id).then_return(None)
 
     expected_stop = StopAction(from_estop=True)
-    expected_hardware_stop = HardwareStoppedAction(completed_at=timestamp)
+    expected_hardware_stop = HardwareStoppedAction(
+        completed_at=timestamp,
+        finish_error_details=FinishErrorDetails(
+            error=EStopActivatedError(message="Estop Activated"),
+            error_id=error_id,
+            created_at=timestamp,
+        ),
+    )
 
     decoy.when(
         state_store.commands.validate_action_allowed(expected_stop),

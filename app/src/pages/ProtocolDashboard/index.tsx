@@ -8,10 +8,10 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   POSITION_STICKY,
   POSITION_STATIC,
+  Box,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
@@ -146,9 +146,7 @@ export function ProtocolDashboard(): JSX.Element {
       ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
         minHeight="25rem"
-        paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
       >
         <Navigation
@@ -156,124 +154,126 @@ export function ProtocolDashboard(): JSX.Element {
           setNavMenuIsOpened={setNavMenuIsOpened}
           longPressModalIsOpened={longPressModalIsOpened}
         />
-        {pinnedProtocols.length > 0 && (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            marginBottom={SPACING.spacing32}
-          >
-            <StyledText
-              as="p"
-              marginBottom={SPACING.spacing8}
-              color={COLORS.darkBlack70}
-            >
-              {t('pinned_protocols')}
-            </StyledText>
-            <PinnedProtocolCarousel
-              pinnedProtocols={pinnedProtocols}
-              longPress={setLongPressModalOpened}
-              setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
-            />
-          </Flex>
-        )}
-        {sortedProtocols.length > 0 ? (
-          <>
+        <Box paddingX={SPACING.spacing40}>
+          {pinnedProtocols.length > 0 && (
             <Flex
-              alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.white}
-              flexDirection={DIRECTION_ROW}
-              paddingBottom={SPACING.spacing16}
-              paddingTop={SPACING.spacing16}
-              position={
-                navMenuIsOpened || longPressModalIsOpened
-                  ? POSITION_STATIC
-                  : POSITION_STICKY
-              }
-              top="7.75rem"
-              zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
-              width="100%"
+              flexDirection={DIRECTION_COLUMN}
+              marginBottom={SPACING.spacing32}
             >
-              <Flex width="32.3125rem">
-                <SmallButton
-                  buttonText={t('protocol_name_title')}
-                  buttonType={
-                    sortBy === 'alphabetical' || sortBy === 'reverse'
-                      ? 'secondary'
-                      : 'tertiaryLowLight'
-                  }
-                  iconName={
-                    sortBy === 'alphabetical' || sortBy === 'reverse'
-                      ? sortBy === 'alphabetical'
-                        ? 'arrow-down'
-                        : 'arrow-up'
-                      : undefined
-                  }
-                  iconPlacement="endIcon"
-                  onClick={handleSortByName}
-                />
-              </Flex>
-              <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
-                <SmallButton
-                  buttonText={t('last_run')}
-                  buttonType={
-                    sortBy === 'recentRun' || sortBy === 'oldRun'
-                      ? 'secondary'
-                      : 'tertiaryLowLight'
-                  }
-                  iconName={
-                    sortBy === 'recentRun' || sortBy === 'oldRun'
-                      ? sortBy === 'recentRun'
-                        ? 'arrow-down'
-                        : 'arrow-up'
-                      : undefined
-                  }
-                  iconPlacement="endIcon"
-                  onClick={handleSortByLastRun}
-                />
-              </Flex>
-              <Flex justifyContent={JUSTIFY_CENTER} width="14.625rem">
-                <SmallButton
-                  buttonText={t('date_added')}
-                  buttonType={
-                    sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                      ? 'secondary'
-                      : 'tertiaryLowLight'
-                  }
-                  iconName={
-                    sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                      ? sortBy === 'recentCreated'
-                        ? 'arrow-down'
-                        : 'arrow-up'
-                      : undefined
-                  }
-                  iconPlacement="endIcon"
-                  onClick={handleSortByDate}
-                />
-              </Flex>
+              <StyledText
+                as="p"
+                marginBottom={SPACING.spacing8}
+                color={COLORS.darkBlack70}
+              >
+                {t('pinned_protocols')}
+              </StyledText>
+              <PinnedProtocolCarousel
+                pinnedProtocols={pinnedProtocols}
+                longPress={setLongPressModalOpened}
+                setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+              />
             </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              {sortedProtocols.map(protocol => {
-                const lastRun = runs.data?.data.find(
-                  run => run.protocolId === protocol.id
-                )?.createdAt
-
-                return (
-                  <ProtocolCard
-                    key={protocol.id}
-                    lastRun={lastRun}
-                    protocol={protocol}
-                    longPress={setLongPressModalOpened}
-                    setShowDeleteConfirmationModal={
-                      setShowDeleteConfirmationModal
+          )}
+          {sortedProtocols.length > 0 ? (
+            <>
+              <Flex
+                alignItems={ALIGN_CENTER}
+                backgroundColor={COLORS.white}
+                flexDirection={DIRECTION_ROW}
+                paddingBottom={SPACING.spacing16}
+                paddingTop={SPACING.spacing16}
+                position={
+                  navMenuIsOpened || longPressModalIsOpened
+                    ? POSITION_STATIC
+                    : POSITION_STICKY
+                }
+                top="7.75rem"
+                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
+                width="100%"
+              >
+                <Flex width="32.3125rem">
+                  <SmallButton
+                    buttonText={t('protocol_name_title')}
+                    buttonType={
+                      sortBy === 'alphabetical' || sortBy === 'reverse'
+                        ? 'secondary'
+                        : 'tertiaryLowLight'
                     }
-                    setTargetProtocol={setTargetProtocol}
+                    iconName={
+                      sortBy === 'alphabetical' || sortBy === 'reverse'
+                        ? sortBy === 'alphabetical'
+                          ? 'arrow-down'
+                          : 'arrow-up'
+                        : undefined
+                    }
+                    iconPlacement="endIcon"
+                    onClick={handleSortByName}
                   />
-                )
-              })}
-            </Flex>
-          </>
-        ) : (
-          <>{pinnedProtocols.length === 0 && <NoProtocols />}</>
-        )}
+                </Flex>
+                <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
+                  <SmallButton
+                    buttonText={t('last_run')}
+                    buttonType={
+                      sortBy === 'recentRun' || sortBy === 'oldRun'
+                        ? 'secondary'
+                        : 'tertiaryLowLight'
+                    }
+                    iconName={
+                      sortBy === 'recentRun' || sortBy === 'oldRun'
+                        ? sortBy === 'recentRun'
+                          ? 'arrow-down'
+                          : 'arrow-up'
+                        : undefined
+                    }
+                    iconPlacement="endIcon"
+                    onClick={handleSortByLastRun}
+                  />
+                </Flex>
+                <Flex justifyContent={JUSTIFY_CENTER} width="14.625rem">
+                  <SmallButton
+                    buttonText={t('date_added')}
+                    buttonType={
+                      sortBy === 'recentCreated' || sortBy === 'oldCreated'
+                        ? 'secondary'
+                        : 'tertiaryLowLight'
+                    }
+                    iconName={
+                      sortBy === 'recentCreated' || sortBy === 'oldCreated'
+                        ? sortBy === 'recentCreated'
+                          ? 'arrow-down'
+                          : 'arrow-up'
+                        : undefined
+                    }
+                    iconPlacement="endIcon"
+                    onClick={handleSortByDate}
+                  />
+                </Flex>
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                {sortedProtocols.map(protocol => {
+                  const lastRun = runs.data?.data.find(
+                    run => run.protocolId === protocol.id
+                  )?.createdAt
+
+                  return (
+                    <ProtocolCard
+                      key={protocol.id}
+                      lastRun={lastRun}
+                      protocol={protocol}
+                      longPress={setLongPressModalOpened}
+                      setShowDeleteConfirmationModal={
+                        setShowDeleteConfirmationModal
+                      }
+                      setTargetProtocol={setTargetProtocol}
+                    />
+                  )
+                })}
+              </Flex>
+            </>
+          ) : pinnedProtocols.length === 0 ? (
+            <NoProtocols />
+          ) : null}
+        </Box>
       </Flex>
     </>
   )

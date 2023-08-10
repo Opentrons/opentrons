@@ -123,7 +123,10 @@ describe('RecentRunProtocolCard', () => {
     mockSkeleton.mockReturnValue(<div>mock Skeleton</div>)
     mockUseMissingHardwareText.mockReturnValue('Ready to run')
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockUseMissingProtocolHardware.mockReturnValue([])
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: [],
+      isLoading: false,
+    })
     mockUseAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
@@ -159,21 +162,30 @@ describe('RecentRunProtocolCard', () => {
   })
 
   it('should render missing chip when missing a pipette', () => {
-    mockUseMissingProtocolHardware.mockReturnValue(mockMissingPipette)
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: mockMissingPipette,
+      isLoading: false,
+    })
     mockUseMissingHardwareText.mockReturnValue('Missing 1 pipette')
     const [{ getByText }] = render(props)
     getByText('Missing 1 pipette')
   })
 
   it('should render missing chip when missing a module', () => {
-    mockUseMissingProtocolHardware.mockReturnValue(mockMissingModule)
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: mockMissingModule,
+      isLoading: false,
+    })
     mockUseMissingHardwareText.mockReturnValue('Missing 1 module')
     const [{ getByText }] = render(props)
     getByText('Missing 1 module')
   })
 
   it('should render missing chip (module and pipette) when missing a pipette and a module', () => {
-    mockUseMissingProtocolHardware.mockReturnValue(missingBoth)
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: missingBoth,
+      isLoading: false,
+    })
     mockUseMissingHardwareText.mockReturnValue('Missing hardware')
     const [{ getByText }] = render(props)
     getByText('Missing hardware')
@@ -188,15 +200,6 @@ describe('RecentRunProtocolCard', () => {
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
     expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
-  })
-
-  it('should render the skeleton when react query is fetching', () => {
-    mockUseProtocolQuery.mockReturnValue({
-      isFetching: true,
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
-    const [{ getByText }] = render(props)
-    getByText('mock Skeleton')
   })
 
   it('should render the skeleton when react query is loading', () => {
