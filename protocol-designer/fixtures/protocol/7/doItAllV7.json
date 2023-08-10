@@ -1394,7 +1394,7 @@
       "version": 1,
       "schemaVersion": 2,
       "allowedRoles": ["adapter"],
-      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
+      "cornerOffsetFromSlot": { "x": 8.5, "y": 5.5, "z": 0 }
     },
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2": {
       "ordering": [
@@ -2743,6 +2743,8 @@
         "yDimension": 85.36,
         "zDimension": 14.3
       },
+      "gripForce": 15,
+      "gripHeightFromLabwareBottom": 11.8,
       "wells": {
         "A1": {
           "depth": 10.8,
