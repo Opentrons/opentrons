@@ -5,11 +5,13 @@ import {
   componentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
+import { DISENGAGED, NOT_PRESENT } from '../../../../organisms/EmergencyStop'
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
 jest.mock('@opentrons/react-api-client')
@@ -20,6 +22,13 @@ jest.mock('../../../../organisms/Devices/RobotOverview')
 jest.mock('../../../../redux/discovery')
 
 const ROBOT_NAME = 'otie'
+const mockEstopStatus = {
+  data: {
+    status: DISENGAGED,
+    leftEstopPhysicalStatus: DISENGAGED,
+    rightEstopPhysicalStatus: NOT_PRESENT,
+  },
+}
 
 const mockRobotOverview = RobotOverview as jest.MockedFunction<
   typeof RobotOverview
@@ -29,6 +38,9 @@ const mockInstrumentsAndModules = InstrumentsAndModules as jest.MockedFunction<
 >
 const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
   typeof RecentProtocolRuns
+>
+const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
+  typeof useEstopQuery
 >
 
 const render = () => {
@@ -51,6 +63,7 @@ describe('DeviceDetailsComponent', () => {
     when(mockRecentProtocolRuns)
       .calledWith(componentPropsMatcher({ robotName: ROBOT_NAME }))
       .mockReturnValue(<div>Mock RecentProtocolRuns</div>)
+    mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
   })
 
   afterEach(() => {
