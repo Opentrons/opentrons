@@ -52,8 +52,10 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
+        const isAdapter =
+          labwareEntity.def.metadata.displayCategory === 'adapter'
         const isAdapterOrAluminumBlock =
-          labwareEntity.def.metadata.displayCategory === 'adapter' ||
+          isAdapter ||
           labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
         const moduleOnDeck = getModuleUnderLabware(initialDeckSetup, labwareId)
         const prefix = moduleOnDeck
@@ -66,7 +68,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           : nicknamesById[labwareId]
 
         if (!moveLabwarePresavedStep) {
-          return getIsTiprack(labwareEntity.def) || isAdapterOrAluminumBlock
+          return getIsTiprack(labwareEntity.def) || isAdapter
             ? acc
             : [
                 ...acc,

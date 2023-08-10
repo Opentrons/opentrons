@@ -61,7 +61,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
       <li className={styles.substep_header}>
         <span>LABWARE</span>
         <span className={styles.spacer} />
-        <span>DESTINATION SLOT</span>
+        <span>NEW LOCATION</span>
       </li>
 
       <Tooltip {...sourceTooltipProps}>

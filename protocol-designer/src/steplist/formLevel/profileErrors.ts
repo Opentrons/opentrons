@@ -81,10 +81,11 @@ const getMoveLabwareError = (
     return null
   const selectedLabwareDefUri = labware?.labwareDefURI
   if ('moduleId' in newLocation) {
+    const loadName = selectedLabwareDefUri.split('/')[1].split('/')[0]
     const modValueDefUri = newLocation.moduleId.split(':')[1] as ModuleType
     const modAllowList =
       COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[modValueDefUri]
-    errorString = !modAllowList.includes(selectedLabwareDefUri)
+    errorString = !modAllowList.includes(loadName)
       ? i18n.t(
           'form.step_edit_form.labwareLabel.errors.labwareIncompatibleWithMod'
         )
