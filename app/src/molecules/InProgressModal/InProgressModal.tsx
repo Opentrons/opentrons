@@ -45,7 +45,7 @@ const MODAL_STYLE = css`
   padding: ${SPACING.spacing32};
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 29.5625rem;
+    height: 29.5rem;
   }
 `
 const SPINNER_STYLE = css`
@@ -67,7 +67,7 @@ export function InProgressModal(props: Props): JSX.Element {
         <Icon
           name="ot-spinner"
           aria-label="spinner"
-          size={isOnDevice ? '5.25rem' : '5.125rem'}
+          size={isOnDevice ? '6.25rem' : '5.125rem'}
           css={SPINNER_STYLE}
           spin
         />
