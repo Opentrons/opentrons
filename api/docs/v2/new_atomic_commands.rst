@@ -13,18 +13,21 @@ Building block commands execute some of the most basic actions that your robot c
 Instruments and Labware
 =======================
 
-The examples in this section will work with Flex or an OT-2. If you want to follow along and test this code, make sure you have the right instruments and labware ready for your robot. We'll be using the equipment listed in the table below.
+The examples in this section will work with Flex or an OT-2. If you want to follow along and test this code, make sure you have the right instruments and labware ready for your robot. If you're looking for specific information, skip this setup section and jump straight to the topic you're interested in. All of the examples here use the equipment listed in the table below.
 
 .. list-table::
     :header-rows: 1
 
-    * - Labware type
-      - Labware name
+    * - Labware
+      - Name
       - API load name
     * - Well plate
       - Corning 96 Well Plate 360 µL Flat
       - ``corning_96_wellplate_360ul_flat``
-    * - Tip rack
+    * - Flex tip rack
+      - Opentrons Flex 96 Tip Rack 1000 µL
+      - ``opentrons_flex_96_tiprack_1000ul``
+    * - OT-2 tip rack
       - Opentrons 96 Tip Rack 300 µL
       - ``opentrons_96_tiprack_300ul``
     * - Flex pipette
@@ -53,7 +56,7 @@ Samples are formatted to fit the available space and avoid horizontal scrolling.
             from opentrons import protocol_api
 
             # robotType could also be 'OT-2' with API v2.15 or higher
-            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}'
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 # load well plate in deck slot D2
@@ -107,23 +110,22 @@ Respectively, they tell the robot to pick up a tip from a tip rack, drop a tip i
 Picking Up a Tip
 ----------------
 
-Your robot needs to attach a disposable tip to the pipette barrel before it can work with the liquids in a protocol. To attach a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` function. In the function argument, specify the tip rack you want to use, including the tip's coordinate location in the rack (e.g. A1, B1, C1, etc.). To pick up a tip, you'd add this code to your protocol file::
+Your robot needs to attach a disposable tip to the pipette barrel before it can work with the liquids in a protocol. To attach a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` function and include the tip's coordinate location in its rack (e.g. A1, B1, C1, etc.). For example::
 
    pipette.pick_up_tip(tiprack['A1'])
 
-Because we already instantiated the variable ``tiprack`` with a tip rack deck location, your robot knows where to go:
+Because we already instantiated the variable ``tiprack`` with a deck location, your robot knows where to go and what to do:
 
-* **Flex**: The robot will pick up the tip in rack position A1 from the rack loaded in slot D3.
-* **OT-2**: The robot will pick up the tip in rack position A1 from the rack loaded in slot 3.
+* **Flex**: The robot moves the pipette to deck slot D3 and picks up a tip from rack position A1.
+* **OT-2**: The robot moves the pipette to deck slot 3 and picks up a tip from rack position A1.
 
-.. start here tomorrow
-.. this is original below
-.. fix it up some 
-If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` or :ref:`protocol_api-protocols-and-instruments` sections, then you can simply call::
+.. Note::
 
-    pipette.pick_up_tip()
+    You can also associate a tip rack with a pipette by using the ``tip_racks`` argument of the :py:meth:`.ProtocolContext.load_instrument` method. In this case, you just call::
 
-This will use the next available tip from the list of tip racks passed in to the ``tip_racks`` argument of :py:meth:`.ProtocolContext.load_instrument` method.
+         pipette.pick_up_tip()
+    
+    And, this method tells the robot to use the next available tip from the list of tip racks passed in to ``load_instrument()``. See the :ref:`add-tip-racks` section of the :ref:`new-pipette` documentation for more information.
 
 .. versionadded:: 2.0
 
