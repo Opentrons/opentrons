@@ -19,12 +19,17 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     # The following labware definitions have had a version bump due to using new properties
     # introduced in an inplace schema v2 update
     "armadillo_96_wellplate_200ul_pcr_full_skirt": 2,
+    "biorad_96_wellplate_200ul_pcr": 2,
+    "biorad_384_wellplate_50ul": 2,
+    "corning_12_wellplate_6.9ml_flat": 2,
     "corning_384_wellplate_112ul_flat": 2,
+    "corning_48_wellplate_1.6ml_flat": 2,
+    "corning_96_wellplate_360ul_flat": 2,
+    "nest_1_reservoir_195ml": 2,
     "nest_96_wellplate_100ul_pcr_full_skirt": 2,
     "nest_96_wellplate_200ul_flat": 2,
     "nest_96_wellplate_2ml_deep": 2,
     "opentrons_96_wellplate_200ul_pcr_full_skirt": 2,
-    "biorad_96_wellplate_200ul_pcr": 2,
 }
 
 

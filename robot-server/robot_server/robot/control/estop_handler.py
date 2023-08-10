@@ -2,6 +2,7 @@
 import logging
 from typing import TYPE_CHECKING
 from .models import EstopState, EstopPhysicalStatus
+from opentrons.config.feature_flags import require_estop
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -23,7 +24,10 @@ class EstopHandler:
 
     def get_state(self) -> EstopState:
         """Get the current estop state."""
-        return EstopState.from_hw_state(self._hardware_handle.estop_status.state)
+        state = EstopState.from_hw_state(self._hardware_handle.estop_status.state)
+        if state == EstopState.NOT_PRESENT and not require_estop():
+            return EstopState.DISENGAGED
+        return state
 
     def get_left_physical_status(self) -> EstopPhysicalStatus:
         """Get the physical status of the left estop."""

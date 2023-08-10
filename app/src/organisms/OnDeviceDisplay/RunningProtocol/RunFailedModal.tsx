@@ -66,7 +66,14 @@ export function RunFailedModal({
       header={modalHeader}
       onOutsideClick={() => setShowRunFailedModal(false)}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing40}
+        width="100%"
+        css={css`
+          word-break: break-all;
+        `}
+      >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing16}

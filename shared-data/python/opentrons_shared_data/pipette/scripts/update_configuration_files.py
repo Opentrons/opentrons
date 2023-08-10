@@ -39,13 +39,22 @@ To run this script, you must be in `shared-data/python`. To invoke, use the comm
 
 `pipenv run python -m opentrons_shared_data.pipette.scripts.update_configuration_files`
 
-If you want to update all files, you can simply use the argument `--update-all-models`.
+If you want to update all files, you can simply use the argument `--update_all_models`.
+
+Make sure to run `make format-js` afterwards to ensure formatting of the json files
+is good.
 
 *Note* If you are adding a brand-new key, you MUST update the pydantic models
 found in `python/pipette/pipette_definition.py` before running this script.
+
+*Note* When you are entering in your data, please utilize the exact type. I.e. if it's a
+list, you must input the list like: [1, 2, 3] or if it's a dict, like: {"data": 1}..
+
+For now, we do not support updating pipetting functions in this script.
 """
 
 ROOT = get_shared_data_root() / "pipette" / "definitions" / "2"
+NOZZLE_LOCATION_CONFIGS = ["nozzle_offset", "nozzle_map"]
 
 
 def _change_to_camel_case(c: str) -> str:
@@ -144,6 +153,36 @@ def update(
     return dict_to_update
 
 
+def build_nozzle_map(
+    nozzle_offset: List[float], channels: PipetteChannelType
+) -> Dict[str, List[float]]:
+    Y_OFFSET = 9
+    X_OFFSET = -9
+    breakpoint()
+    if channels == PipetteChannelType.SINGLE_CHANNEL:
+        return {"A1": nozzle_offset}
+    elif channels == PipetteChannelType.EIGHT_CHANNEL:
+        return {
+            f"{chr(ord('A') + 1*row)}1": [
+                nozzle_offset[0],
+                nozzle_offset[1] + Y_OFFSET * row,
+                nozzle_offset[2],
+            ]
+            for row in range(8)
+        }
+    elif channels == PipetteChannelType.NINETY_SIX_CHANNEL:
+        return {
+            f"{chr(ord('A') + 1*row)}{1 + 1*col}": [
+                nozzle_offset[0] + X_OFFSET * col,
+                nozzle_offset[1] + Y_OFFSET * row,
+                nozzle_offset[2],
+            ]
+            for row in range(8)
+            for col in range(12)
+        }
+    raise ValueError(f"Unsupported channel type {channels}")
+
+
 def load_and_update_file_from_config(
     config_to_update: List[str],
     value_to_update: Any,
@@ -163,7 +202,20 @@ def load_and_update_file_from_config(
             model_to_update.pipette_type,
             model_to_update.pipette_version,
         )
-        geometry = update(geometry, camel_list_to_update, value_to_update)
+        if config_to_update[0] == "nozzle_map":
+            nozzle_to_use = (
+                value_to_update if value_to_update else geometry["nozzleOffset"]
+            )
+            geometry["nozzleMap"] = build_nozzle_map(
+                nozzle_to_use, model_to_update.pipette_channels
+            )
+        elif config_to_update[0] == "nozzle_offset":
+            geometry["nozzleMap"] = build_nozzle_map(
+                value_to_update, model_to_update.pipette_channels
+            )
+            geometry["nozzleOffset"] = value_to_update
+        else:
+            geometry = update(geometry, camel_list_to_update, value_to_update)
         PipetteGeometryDefinition.parse_obj(geometry)
 
         filepath = (
@@ -244,6 +296,12 @@ def _update_single_model(configuration_to_update: List[str]) -> None:
         f"{model.name}_{str(channels)}_v{version.major}.{version.minor}"
     )
 
+    if configuration_to_update[0] == NOZZLE_LOCATION_CONFIGS[1]:
+        print(
+            "You selected nozzle_map to edit. If you wish to update the nozzle offset, enter it on the next line.\n"
+        )
+        print("Otherwise, please type 'null' on the next line.\n")
+
     value_to_update = json.loads(
         input(
             f"Please select what you would like to update {configuration_to_update} to for {built_model}\n"
@@ -264,6 +322,7 @@ def _update_all_models(configuration_to_update: List[str]) -> None:
         "ninety_six_channel": "96",
         "eight_channel": "multi",
     }
+
     for channel_dir in os.listdir(paths_to_validate):
         for model_dir in os.listdir(paths_to_validate / channel_dir):
             for version_file in os.listdir(paths_to_validate / channel_dir / model_dir):
@@ -271,8 +330,17 @@ def _update_all_models(configuration_to_update: List[str]) -> None:
                 built_model: PipetteModel = PipetteModel(
                     f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
                 )
-                value_to_update = input(
-                    f"Please select what you would like to update {configuration_to_update} to for {built_model}\n"
+
+                if configuration_to_update[0] == NOZZLE_LOCATION_CONFIGS[1]:
+                    print(
+                        "You selected nozzle_map to edit. If you wish to update the nozzle offset, enter it on the next line.\n"
+                    )
+                    print("Otherwise, please type 'null' on the next line.\n")
+
+                value_to_update = json.loads(
+                    input(
+                        f"Please select what you would like to update {configuration_to_update} to for {built_model}\n"
+                    )
                 )
 
                 model_version = convert_pipette_model(built_model)
@@ -290,9 +358,14 @@ def determine_models_to_update(update_all_models: bool) -> None:
             for row in config_list:
                 print(f"\t{row}")
 
-            configuration_to_update = list(
+            configuration_to_update = [
                 table_lookup[int(input("select a configuration from above\n"))]
-            )
+            ]
+
+            if configuration_to_update[0] == NOZZLE_LOCATION_CONFIGS[0]:
+                print(
+                    f"NOTE: updating the {configuration_to_update[0]} will automatically update the {NOZZLE_LOCATION_CONFIGS[1]}\n"
+                )
 
             field_type = PipetteConfigurations.__fields__[
                 configuration_to_update[0]

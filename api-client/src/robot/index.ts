@@ -1,5 +1,5 @@
 export { getEstopStatus } from './getEstopStatus'
-export { setEstopPhysicalStatus } from './setEstopPhysicalStatus'
+export { acknowledgeEstopDisengage } from './acknowledgeEstopDisengage'
 export { getLights } from './getLights'
 export { setLights } from './setLights'
 export type {

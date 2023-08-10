@@ -63,19 +63,30 @@ export function RobotSettingsNetworking({
 
   const canDisconnect = useCanDisconnect(robotName)
 
-  const addresses = useSelector((state: State) =>
-    getRobotAddressesByName(state, robotName)
-  )
-  const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
-  const isOT3ConnectedViaUSB =
-    usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
-
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
   const activeNetwork = wifiList?.find(network => network.active)
 
   const ssid = activeNetwork?.ssid ?? null
+
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, robotName)
+  )
+
+  const wifiAddress = addresses.find(addr => addr.ip === wifi?.ipAddress)
+  const isOT3ConnectedViaWifi =
+    wifiAddress != null && wifiAddress.healthStatus === HEALTH_STATUS_OK
+
+  const ethernetAddress = addresses.find(
+    addr => addr.ip === ethernet?.ipAddress
+  )
+  const isOT3ConnectedViaEthernet =
+    ethernetAddress != null && ethernetAddress.healthStatus === HEALTH_STATUS_OK
+
+  const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
+  const isOT3ConnectedViaUSB =
+    usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
@@ -95,7 +106,7 @@ export function RobotSettingsNetworking({
       </Portal>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex alignItems={ALIGN_CENTER}>
-          {wifi?.ipAddress != null ? (
+          {isOT3ConnectedViaWifi ? (
             <Icon
               size="1.25rem"
               name="ot-check"
@@ -180,7 +191,7 @@ export function RobotSettingsNetworking({
         </Box>
         <Divider />
         <Flex alignItems={ALIGN_CENTER}>
-          {ethernet?.ipAddress != null ? (
+          {isOT3ConnectedViaEthernet ? (
             <Icon
               size="1.25rem"
               name="ot-check"

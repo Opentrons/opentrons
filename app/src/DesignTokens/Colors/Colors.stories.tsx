@@ -38,7 +38,6 @@ const Template: Story<ColorsStorybookProps> = args => {
     if (hex.length !== 6) {
       hex = hex.slice(0, 6)
     }
-    // hex = hex.toUpperCase()
     const r = (255 - parseInt(hex.slice(0, 2), 16))
       .toString(16)
       .padStart(2, '0')

@@ -131,6 +131,17 @@ export function DeviceResetSlideout({
     onCloseClick()
   }
 
+  const totalOptionsSelected = Object.values(resetOptions).filter(
+    selected => selected === true
+  ).length
+
+  // filtering out ODD setting because this gets implicitly cleared if all settings are selected
+  const allOptionsWithoutODD = options.filter(o => o.id !== 'onDeviceDisplay')
+
+  const isEveryOptionSelected =
+    totalOptionsSelected > 0 &&
+    totalOptionsSelected === allOptionsWithoutODD.length
+
   return (
     <Slideout
       title={t('device_reset')}
@@ -164,25 +175,35 @@ export function DeviceResetSlideout({
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>
-        {/* Note: (kj:06/07/2023) this part will be updated when be is ready */}
         {isOT3 ? (
           <>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {t('factory_reset')}
+                  {t('clear_all_data')}
                 </StyledText>
-                <StyledText as="p" marginTop={SPACING.spacing8}>
-                  {t('factory_reset_description')}
-                </StyledText>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {t('clear_all_stored_data')}
-                </StyledText>
-                <StyledText as="p" marginTop={SPACING.spacing8}>
+                <StyledText as="p" marginY={SPACING.spacing8}>
                   {t('clear_all_stored_data_description')}
                 </StyledText>
+                <CheckboxField
+                  onChange={() => {
+                    setResetOptions(
+                      isEveryOptionSelected
+                        ? {}
+                        : allOptionsWithoutODD.reduce((acc, val) => {
+                            return {
+                              ...acc,
+                              [val.id]: true,
+                            }
+                          }, {})
+                    )
+                  }}
+                  value={isEveryOptionSelected}
+                  label={t(`select_all_settings`)}
+                  isIndeterminate={
+                    !isEveryOptionSelected && totalOptionsSelected > 0
+                  }
+                />
               </Flex>
             </Flex>
             <Divider marginY={SPACING.spacing16} />

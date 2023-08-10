@@ -10,6 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
@@ -24,28 +25,46 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 interface EstopMissingModalProps {
   robotName: string
   closeModal: () => void
+  isDismissedModal: boolean
+  setIsDismissedModal: (isDismissedModal: boolean) => void
 }
 
 export function EstopMissingModal({
   robotName,
   closeModal,
+  isDismissedModal,
+  setIsDismissedModal,
 }: EstopMissingModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <>
+    <Portal level="top">
       {isOnDevice ? (
-        <TouchscreenModal robotName={robotName} />
+        <TouchscreenModal robotName={robotName} closeModal={closeModal} />
       ) : (
-        <DesktopModal robotName={robotName} closeModal={closeModal} />
+        <>
+          {isDismissedModal === false ? (
+            <DesktopModal
+              robotName={robotName}
+              closeModal={closeModal}
+              setIsDismissedModal={setIsDismissedModal}
+            />
+          ) : null}
+        </>
       )}
-    </>
+    </Portal>
   )
 }
 
+interface EstopMissingTouchscreenModalProps
+  extends Omit<
+    EstopMissingModalProps,
+    'isDismissedModal' | 'setIsDismissedModal'
+  > {}
+
 function TouchscreenModal({
   robotName,
-}: Omit<EstopMissingModalProps, 'closeModal'>): JSX.Element {
+}: EstopMissingTouchscreenModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
@@ -55,6 +74,7 @@ function TouchscreenModal({
   const modalProps = {
     header: { ...modalHeader },
   }
+
   return (
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
@@ -69,15 +89,27 @@ function TouchscreenModal({
   )
 }
 
+interface EstopMissingDesktopModalProps
+  extends Omit<EstopMissingModalProps, 'isDismissedModal'> {}
+
 function DesktopModal({
   robotName,
   closeModal,
-}: EstopMissingModalProps): JSX.Element {
+  setIsDismissedModal,
+}: EstopMissingDesktopModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+
+  const handleCloseModal = (): void => {
+    if (setIsDismissedModal != null) {
+      setIsDismissedModal(true)
+    }
+    closeModal()
+  }
+
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('estop_missing'),
-    onClose: () => closeModal(),
+    onClose: handleCloseModal,
     closeOnOutsideClick: false,
     childrenPadding: SPACING.spacing24,
     width: '47rem',

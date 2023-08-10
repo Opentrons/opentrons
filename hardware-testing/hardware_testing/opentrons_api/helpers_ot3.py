@@ -311,7 +311,7 @@ def set_csv_report_meta_data_ot3(
         barcode = input("SCAN device barcode: ").strip()
     else:
         barcode = dut_str
-    print("barcode: barcode")
+    print(f"barcode: {barcode}")
 
     # default the CSV tag to be the DUT
     report.set_tag(tag if tag else dut_str)

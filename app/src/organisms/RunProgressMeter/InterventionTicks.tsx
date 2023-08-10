@@ -6,7 +6,6 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 // percent of the entire analysis that two individual
 // ticks could appear within before being grouped
 const MIN_AGGREGATION_PERCENT = 0.6
-const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
 
 interface InterventionTicksProps {
   analysisCommands: RunTimeCommand[]
@@ -23,7 +22,11 @@ export function InterventionTicks(props: InterventionTicksProps): JSX.Element {
   const ticks = analysisCommands.reduce<
     Array<{ index: number; count: number; range: number }>
   >((acc, c, index) => {
-    if (TICKED_COMMAND_TYPES.includes(c.commandType)) {
+    if (
+      c.commandType === 'waitForResume' ||
+      (c.commandType === 'moveLabware' &&
+        c.params.strategy === 'manualMoveWithPause')
+    ) {
       const mostRecentTick = last(acc)
       if (mostRecentTick == null) {
         return [...acc, { index, count: 1, range: 1 }]
