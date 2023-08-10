@@ -387,7 +387,8 @@ def _calculate_evaporation(
             f"wait for scale to stabilize "
             f"({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
         )
-        sleep(1)
+        if not resources.ctx.is_simulating():
+            sleep(1)
     actual_asp_list_evap: List[float] = []
     actual_disp_list_evap: List[float] = []
     for b_trial in blank_trials[resources.test_volumes[-1]][0]:
