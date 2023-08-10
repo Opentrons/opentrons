@@ -167,6 +167,8 @@ Your robot considers returned tips to be "used" items. Tip tracking skips return
 .. versionchanged: 2.2
     Treats returned tips as used.
 
+.. skip iterating now, go to other sections, come back to this
+
 Iterating Through Tips
 ----------------------
 
@@ -256,9 +258,15 @@ To check whether you should pick up a tip or not, you can utilize :py:meth:`.Ins
 Handling liquids
 ================
 
-This section describes the :py:class:`.InstrumentContext` 's liquid-handling commands.
+The API provides multiple methods that let the robot perform its core function — handling liquids in scientific procedures. In this section, we'll look at functions that control how the robot:
 
-The examples in this section should be inserted in the following:
+* Aspirates and dispenses liquids using the :py:meth:`.InstrumentContext.aspirate` and :py:meth:`.InstrumentContext.dispense` methods.
+* Clears the pipette tip using the :py:meth:`.InstrumentContext.blow_out` and :py:meth:`.InstrumentContext.touch_tip` methods.
+* Mixes and separates liquids using the :py:meth:`.InstrumentContext.mix` and :py:meth:`.InstrumentContext.air_gap` methods.  
+
+The examples here use the same :ref:`instruments and labware <atomic-instruments-labware>` and :ref:`basic protocol file <atomic-file>` from the introduction above. You may want to take a moment to review that information before going any further. As always, feel free to skip the labware and protocol file information and jump straight to the topic you're interested in.
+
+.. start here
 
 .. code-block:: python
     :substitutions:
