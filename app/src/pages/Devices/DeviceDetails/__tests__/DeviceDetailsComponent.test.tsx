@@ -5,7 +5,6 @@ import {
   componentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
-import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
@@ -18,7 +17,6 @@ jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/InstrumentsAndModules')
 jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
 jest.mock('../../../../organisms/Devices/RobotOverview')
-jest.mock('../../../../organisms/Devices/EstopBanner')
 jest.mock('../../../../redux/discovery')
 
 const ROBOT_NAME = 'otie'
@@ -31,9 +29,6 @@ const mockInstrumentsAndModules = InstrumentsAndModules as jest.MockedFunction<
 >
 const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
   typeof RecentProtocolRuns
->
-const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
-  typeof useEstopQuery
 >
 
 const render = () => {
