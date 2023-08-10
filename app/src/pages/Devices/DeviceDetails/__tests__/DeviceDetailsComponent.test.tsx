@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { act, renderHook } from '@testing-library/react-hooks'
 
 import {
   componentPropsMatcher,
@@ -47,7 +46,6 @@ const render = () => {
 }
 
 describe('DeviceDetailsComponent', () => {
-  let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
     when(mockRobotOverview)
       .calledWith(componentPropsMatcher({ robotName: ROBOT_NAME }))
@@ -58,6 +56,8 @@ describe('DeviceDetailsComponent', () => {
     when(mockRecentProtocolRuns)
       .calledWith(componentPropsMatcher({ robotName: ROBOT_NAME }))
       .mockReturnValue(<div>Mock RecentProtocolRuns</div>)
+  })
+
   afterEach(() => {
     resetAllWhenMocks()
   })
@@ -78,3 +78,11 @@ describe('DeviceDetailsComponent', () => {
   })
 
   it.todo('renders EstopBanner when estop is engaged')
+  // mockEstopStatus.data.status = PHYSICALLY_ENGAGED
+  // mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
+  // const { result } = renderHook(() => useEstopContext(), { wrapper })
+  // result.current.setIsEmergencyStopModalDismissed(true)
+  // // act(() => result.current.setIsEmergencyStopModalDismissed(true))
+  // const [{ getByText }] = render()
+  // getByText('mock EstopBanner')
+})
