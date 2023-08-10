@@ -128,6 +128,7 @@ async def grip(
     seq_id: int,
     duration_sec: float,
     duty_cycle: int,
+    stay_engaged: bool = False,
 ) -> None:
     """Start grip motion."""
     await can_messenger.send(
@@ -141,6 +142,7 @@ async def grip(
                 ),
                 duty_cycle=UInt32Field(duty_cycle),
                 encoder_position_um=Int32Field(0),
+                stay_engaged=UInt8Field(int(stay_engaged)),
             )
         ),
     )
@@ -162,6 +164,7 @@ async def home(
                 duration=UInt32Field(0),
                 duty_cycle=UInt32Field(duty_cycle),
                 encoder_position_um=Int32Field(0),
+                stay_engaged=UInt8Field(0),
             )
         ),
     )
@@ -173,6 +176,7 @@ async def move(
     seq_id: int,
     duty_cycle: int,
     encoder_position_um: int,
+    stay_engaged: bool = False,
 ) -> None:
     """Start linear motion."""
     await can_messenger.send(
@@ -184,6 +188,7 @@ async def move(
                 duration=UInt32Field(0),
                 duty_cycle=UInt32Field(duty_cycle),
                 encoder_position_um=Int32Field(encoder_position_um),
+                stay_engaged=UInt8Field(int(stay_engaged)),
             )
         ),
     )

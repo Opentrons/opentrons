@@ -354,9 +354,10 @@ class OT3Simulator:
         self,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
+        stay_engaged: bool = True,
     ) -> None:
         """Move gripper inward."""
-        _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
+        _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition, stay_engaged)
 
     @ensure_yield
     async def gripper_home_jaw(self, duty_cycle: float) -> None:

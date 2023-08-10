@@ -37,6 +37,7 @@ class ResetOptionId(str, Enum):
     gripper_offset = "gripperOffsetCalibrations"
     tip_length_calibrations = "tipLengthCalibrations"
     runs_history = "runsHistory"
+    on_device_display = "onDeviceDisplay"
 
 
 _OT_2_RESET_OPTIONS = [
@@ -51,6 +52,7 @@ _FLEX_RESET_OPTIONS = [
     ResetOptionId.pipette_offset,
     ResetOptionId.gripper_offset,
     ResetOptionId.runs_history,
+    ResetOptionId.on_device_display,
 ]
 
 _settings_reset_options = {
@@ -59,7 +61,7 @@ _settings_reset_options = {
     ),
     ResetOptionId.deck_calibration: CommonResetOption(
         name="Deck Calibration",
-        description="Clear deck calibration (will also clear pipette " "offset)",
+        description="Clear deck calibration (will also clear pipette offset)",
     ),
     ResetOptionId.pipette_offset: CommonResetOption(
         name="Pipette Offset Calibrations",
@@ -71,15 +73,19 @@ _settings_reset_options = {
     ),
     ResetOptionId.tip_length_calibrations: CommonResetOption(
         name="Tip Length Calibrations",
-        description="Clear tip length calibrations (will also clear " "pipette offset)",
+        description="Clear tip length calibrations (will also clear pipette offset)",
     ),
-    # TODO(mm, 2022-05-23): Run and protocol history is a robot-server thing,
-    # and is not a concept known to this package (the `opentrons` library).
+    # TODO(mm, 2022-05-23): runs_history and on_device_display are robot-server things,
+    # and are not concepts known to this package (the `opentrons` library).
     # This option is defined here only as a convenience for robot-server.
-    # Find a way to split thing up and define this in robot-server instead.
+    # Find a way to split things up and define this in robot-server instead.
     ResetOptionId.runs_history: CommonResetOption(
         name="Clear Runs History",
         description="Erase this device's stored history of protocols and runs.",
+    ),
+    ResetOptionId.on_device_display: CommonResetOption(
+        name="On-Device Display Configuration",
+        description="Clear the configuration of the on-device display (touchscreen)",
     ),
 }
 

@@ -51,6 +51,7 @@
     "form-data": "2.5.0",
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
+    "lodash": "4.17.21",
     "merge-options": "1.0.1",
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",

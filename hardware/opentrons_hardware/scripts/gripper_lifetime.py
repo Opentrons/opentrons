@@ -102,6 +102,7 @@ async def run(args: argparse.Namespace) -> None:
                     pwm_frequency=float32(pwm_freq),
                     pwm_duty_cycle=float32(pwm_duty),
                     encoder_position_um=int32(0),
+                    stay_engaged=True,
                 )
             }
         ]
