@@ -167,7 +167,7 @@ QC_VOLUMES_P: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
 QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
     ConfigType.gravimetric: {
         1: 10,
-        8: 8,
+        8: 10,
         96: 9,
     },
     ConfigType.photometric: {
