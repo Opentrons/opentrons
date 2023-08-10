@@ -25,7 +25,7 @@ FLEX_LOG_PATHS = [
     "/logs/serial.log",
     "/logs/api.log",
     "/logs/server.log",
-    "/logs/odd.log",
+    "/logs/touchscreen.log",
 ]
 VERSION_PATH = "/etc/VERSION.json"
 
@@ -142,7 +142,7 @@ async def get_health(
 
     if robot_type == "OT-3 Standard":
         logs = FLEX_LOG_PATHS
-        health_links.oddLog = "/logs/odd.log"
+        health_links.oddLog = "/logs/touchscreen.log"
     else:
         logs = OT2_LOG_PATHS
 

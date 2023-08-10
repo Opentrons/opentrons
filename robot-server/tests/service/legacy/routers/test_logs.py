@@ -156,7 +156,7 @@ def test_get_odd_log_with_params(api_client, format_param, records_param, mode_p
     with patch("opentrons.system.log_control.get_records_dumb") as m:
         m.side_effect = mock_get_records_dumb
         response = api_client.get(
-            f"/logs/odd.log?format={format_param}&records={records_param}"
+            f"/logs/touchscreen.log?format={format_param}&records={records_param}"
         )
         if format_param == "json":
             body = response.json()
@@ -177,7 +177,7 @@ def test_get_odd_log_with_defaults(api_client):
 
     with patch("opentrons.system.log_control.get_records_dumb") as m:
         m.side_effect = mock_get_records_dumb
-        response = api_client.get("/logs/odd.log")
+        response = api_client.get("/logs/touchscreen.log")
         body = response.text
         print(body)
         assert response.status_code == 200
