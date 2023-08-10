@@ -2,10 +2,7 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
-from opentrons_shared_data.gripper.constants import (
-    LABWARE_GRIP_FORCE,
-    IDLE_STATE_GRIP_FORCE,
-)
+from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
@@ -117,10 +114,10 @@ class LabwareMovementHandler:
                     additional_offset_vector=user_offset_data,
                 )
             )
-            from_labware_center = self._state_store.geometry.get_labware_center(
+            from_labware_center = self._state_store.geometry.get_labware_grip_point(
                 labware_id=labware_id, location=current_location
             )
-            to_labware_center = self._state_store.geometry.get_labware_center(
+            to_labware_center = self._state_store.geometry.get_labware_grip_point(
                 labware_id=labware_id, location=new_location
             )
             movement_waypoints = get_gripper_labware_movement_waypoints(
@@ -129,19 +126,20 @@ class LabwareMovementHandler:
                 gripper_home_z=gripper_homed_position.z,
                 offset_data=final_offsets,
             )
+            labware_grip_force = self._state_store.labware.get_grip_force(labware_id)
 
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
                     await ot3api.ungrip()
                 else:
-                    await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
+                    await ot3api.grip(force_newtons=labware_grip_force)
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )
 
             # Keep the gripper in idly gripped position to avoid colliding with
             # things like the thermocycler latches
-            await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+            await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE, stay_engaged=False)
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation

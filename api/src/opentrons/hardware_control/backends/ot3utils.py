@@ -463,12 +463,14 @@ def create_gear_motor_home_group(
 def create_gripper_jaw_grip_group(
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
+    stay_engaged: bool = True,
 ) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
         duty_cycle=np.float32(round(duty_cycle)),
         stop_condition=stop_condition,
         move_type=MoveType.grip,
+        stay_engaged=stay_engaged,
     )
     move_group: MoveGroup = [step]
     return move_group
@@ -495,6 +497,16 @@ def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
     )
     move_group: MoveGroup = [step]
     return move_group
+
+
+def moving_axes_in_move_group(group: MoveGroup) -> Set[NodeId]:
+    """Utility function to get only the moving nodes in a move group."""
+    ret: Set[NodeId] = set()
+    for step in group:
+        for node, node_step in step.items():
+            if node_step.is_moving_step():
+                ret.add(node)
+    return ret
 
 
 AxisMapPayload = TypeVar("AxisMapPayload")

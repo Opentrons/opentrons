@@ -113,8 +113,8 @@ async def test_one_subscribe_one_unsubscribe(
 
     subject.start()
     subject.start()
-    subject.stop_soon()
-    subject.stop_soon()
+    subject.stop()
+    subject.stop()
 
     decoy.verify(unsubscribe(), times=1)
     decoy.verify(wrong_unsubscribe(), times=0)
