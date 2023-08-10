@@ -335,7 +335,7 @@ def test_validate_json(
             metadata = {
                 'mk1': 'mv1',
                 'mk2': 'mv2',
-                'apiLevel': '2.0'
+                'apiLevel': '2.123'
             }
             print('wat?')
             def run(cxt): pass
@@ -348,9 +348,9 @@ def test_validate_json(
             {
                 "mk1": "mv1",
                 "mk2": "mv2",
-                "apiLevel": "2.0",
+                "apiLevel": "2.123",
             },
-            APIVersion(2, 0),
+            APIVersion(2, 123),
             "OT-3 Standard",
         ),
         (
@@ -668,6 +668,14 @@ def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
             def run(ctx): pass
             """,
             "Unrecognized keys in requirements dict: 'APILevel', 'RobotType', 'foo'",
+        ),
+        (
+            # apiLevel too old to support the Flex.
+            """
+            requirements = {"apiLevel": "2.13", "robotType": "Flex"}
+            def run(cxt): pass
+            """,
+            "The Opentrons Flex only supports apiLevel 2.14 or newer.",
         ),
     ],
 )

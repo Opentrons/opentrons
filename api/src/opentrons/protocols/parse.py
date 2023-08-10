@@ -50,6 +50,10 @@ MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
 API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
 
 
+# Matches the minimum version for the Protocol Engine PAPI core.
+_MIN_API_VERSION_FOR_FLEX = APIVersion(2, 14)
+
+
 class JSONSchemaVersionTooNewError(RuntimeError):
     def __init__(self, attempted_schema_version: int) -> None:
         super().__init__(attempted_schema_version)
@@ -119,6 +123,16 @@ def _validate_v2_static_info(static_info: StaticPythonInfo) -> None:
         # version that only knows about the metadata dict, not the requirements dict.
         raise MalformedPythonProtocolError(
             "You may only put apiLevel in the metadata dict or the requirements dict, not both."
+        )
+
+
+def _validate_robot_type_at_version(robot_type: RobotType, version: APIVersion) -> None:
+    if robot_type == "OT-3 Standard" and version < _MIN_API_VERSION_FOR_FLEX:
+        raise MalformedPythonProtocolError(
+            short_message=(
+                f"The Opentrons Flex only supports apiLevel"
+                f" {_MIN_API_VERSION_FOR_FLEX} or newer."
+            )
         )
 
 
@@ -199,6 +213,7 @@ def _parse_python(
         _validate_v2_ast(parsed)
         if not flex_dev_compat:
             _validate_v2_static_info(static_info)
+            _validate_robot_type_at_version(robot_type, version)
     else:
         raise ApiDeprecationError(version)
 
