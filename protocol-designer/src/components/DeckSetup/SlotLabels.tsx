@@ -1,24 +1,28 @@
 import * as React from 'react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { LocationIcon } from '../../molecules'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
-import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
+import {
+  Flex,
+  JUSTIFY_CENTER,
+  LocationIcon,
+  RobotCoordsForeignObject,
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
 
 import type { RobotType } from '@opentrons/shared-data'
+
 interface SlotLabelsProps {
   robotType: RobotType
-  color?: string
 }
 
 /**
- * Component to render Opentrons Flex slot labels
- * For use as a RobotWorkspace child component
+ * This is an almost copy of SlotLabels in @opentrons/components
+ * in order to keep the changes between PD and the rest
+ * of the repo separate
  */
 export const SlotLabels = ({
   robotType,
-  color,
 }: SlotLabelsProps): JSX.Element | null => {
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
@@ -36,36 +40,16 @@ export const SlotLabels = ({
           width="2.5rem"
         >
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="A"
-              height="max-content"
-              width="100%"
-            />
+            <LocationIcon slotName="A" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="B"
-              height="max-content"
-              width="100%"
-            />
+            <LocationIcon slotName="B" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="C"
-              height="max-content"
-              width="100%"
-            />
+            <LocationIcon slotName="C" height="max-content" width="100%" />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="D"
-              height="max-content"
-              width="100%"
-            />
+            <LocationIcon slotName="D" height="max-content" width="100%" />
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
@@ -73,7 +57,7 @@ export const SlotLabels = ({
         height="2.5rem"
         width="30.375rem"
         x="-15"
-        y="-55"
+        y="-65"
       >
         <Flex
           alignItems={ALIGN_CENTER}
@@ -86,21 +70,21 @@ export const SlotLabels = ({
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <LocationIcon color={color} slotName="1" height="100%" />
+            <LocationIcon slotName="1" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <LocationIcon color={color} slotName="2" height="100%" />
+            <LocationIcon slotName="2" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <LocationIcon color={color} slotName="3" height="100%" />
+            <LocationIcon slotName="3" height="100%" />
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
