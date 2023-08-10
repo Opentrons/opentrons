@@ -10,14 +10,23 @@ from opentrons.hardware_control import HardwareControlAPI
 
 from server_utils.util import call_once
 
-from robot_server.hardware import get_hardware
+from robot_server.hardware import get_hardware, get_robot_type
 from robot_server.persistence import get_sql_engine as ensure_sql_engine_is_ready
 from robot_server.service.legacy.models import V1BasicResponse
+
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from .models import Health, HealthLinks
 
 _log = logging.getLogger(__name__)
 
-LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+OT2_LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+FLEX_LOG_PATHS = [
+    "/logs/serial.log",
+    "/logs/api.log",
+    "/logs/server.log",
+    "/logs/touchscreen.log",
+]
 VERSION_PATH = "/etc/VERSION.json"
 
 
@@ -115,6 +124,7 @@ async def get_health(
     # errors that would present in a confusing way.
     sql_engine: object = Depends(ensure_sql_engine_is_ready),
     versions: ComponentVersions = Depends(get_versions),
+    robot_type: RobotType = Depends(get_robot_type),
 ) -> Health:
     """Get information about the health of the robot server.
 
@@ -122,25 +132,29 @@ async def get_health(
     and ready to operate. A 200 OK response means the server is running.
     The response includes information about the software and system.
     """
+    health_links = HealthLinks(
+        apiLog="/logs/api.log",
+        serialLog="/logs/serial.log",
+        serverLog="/logs/server.log",
+        apiSpec="/openapi.json",
+        systemTime="/system/time",
+    )
+
+    if robot_type == "OT-3 Standard":
+        logs = FLEX_LOG_PATHS
+        health_links.oddLog = "/logs/touchscreen.log"
+    else:
+        logs = OT2_LOG_PATHS
+
     return Health(
         name=config.name(),
         api_version=versions.api_version,
         fw_version=hardware.fw_version,
         board_revision=hardware.board_revision,
-        logs=LOG_PATHS,
+        logs=logs,
         system_version=versions.system_version,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
-        robot_model=(
-            "OT-3 Standard"
-            if config.feature_flags.enable_ot3_hardware_controller()
-            else "OT-2 Standard"
-        ),
-        links=HealthLinks(
-            apiLog="/logs/api.log",
-            serialLog="/logs/serial.log",
-            serverLog="/logs/server.log",
-            apiSpec="/openapi.json",
-            systemTime="/system/time",
-        ),
+        robot_model=robot_type,
+        links=health_links,
     )
