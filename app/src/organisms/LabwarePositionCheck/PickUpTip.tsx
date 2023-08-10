@@ -70,7 +70,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
-  const displayLocation = getDisplayLocation(location, t)
+  const displayLocation = getDisplayLocation(location, protocolData, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   const instructions = [
     t('clear_all_slots'),

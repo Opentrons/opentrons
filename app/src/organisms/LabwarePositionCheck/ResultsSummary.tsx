@@ -113,11 +113,13 @@ export const ResultsSummary = (
     <TerseOffsetTable
       offsets={offsetsToApply}
       labwareDefinitions={labwareDefinitions}
+      protocolData={protocolData}
     />
   ) : (
     <OffsetTable
       offsets={offsetsToApply}
       labwareDefinitions={labwareDefinitions}
+      protocolData={protocolData}
     />
   )
   const JupyterSnippet = (
@@ -222,10 +224,11 @@ const Header = styled.h1`
 interface OffsetTableProps {
   offsets: LabwareOffsetCreateData[]
   labwareDefinitions: LabwareDefinition2[]
+  protocolData: CompletedProtocolAnalysis
 }
 
 const OffsetTable = (props: OffsetTableProps): JSX.Element => {
-  const { offsets, labwareDefinitions } = props
+  const { offsets, labwareDefinitions, protocolData } = props
   const { t } = useTranslation('labware_position_check')
   return (
     <Table>
@@ -251,7 +254,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, t)}
+                  {getDisplayLocation(location, protocolData, t)}
                 </StyledText>
               </TableDatum>
               <TableDatum>

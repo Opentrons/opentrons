@@ -44,7 +44,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
 
-  const displayLocation = getDisplayLocation(location, t)
+  const displayLocation = getDisplayLocation(location, protocolData, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [

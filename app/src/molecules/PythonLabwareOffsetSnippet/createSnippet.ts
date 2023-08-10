@@ -56,7 +56,7 @@ export function createSnippet(
         )}")`
         //  load labware on adapter
       } else if ('labwareId' in command.params.location) {
-        loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}}, location="${command.params.location.labwareId}")`
+        loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}}", location="${command.params.location.labwareId}")`
       }
 
       const labwareDefUri = getLabwareDefinitionUri(
@@ -127,7 +127,7 @@ export function createSnippet(
         // load adapter on module
         const moduleVariable =
           moduleVariableById[command.params.location.moduleId]
-        loadStatement = `adapter_${adapterCount} = ${moduleVariable}.load_adapter"${loadName}")`
+        loadStatement = `adapter_${adapterCount} = ${moduleVariable}.load_adapter("${loadName}")`
       }
       addendum = [loadStatement, '']
     }

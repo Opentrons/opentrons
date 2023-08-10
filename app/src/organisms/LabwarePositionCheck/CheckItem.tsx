@@ -137,7 +137,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
   const isTiprack = getIsTiprack(labwareDef)
-  const displayLocation = getDisplayLocation(location, t)
+  const displayLocation = getDisplayLocation(location, protocolData, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   let placeItemInstruction: JSX.Element = (
     <Trans
