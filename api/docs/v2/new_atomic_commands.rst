@@ -64,13 +64,14 @@ Samples are formatted to fit the available space and avoid horizontal scrolling.
                     load_name='corning_96_wellplate_360ul_flat',
                     location='D2')
                 # load tip rack in deck slot D3
-                tiprack = protocol.load_labware(
-                    load_name='opentrons_96_tiprack_300ul',
+                rack = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_1000ul',
                     location='D3')
                 # attach pipette to left mount
                 pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
-                    mount='left')
+                    mount='left',
+                    tip_racks=[rack])
                 # Put building block commands here
     
     .. tab:: OT-2
@@ -88,13 +89,14 @@ Samples are formatted to fit the available space and avoid horizontal scrolling.
                     load_name='corning_96_wellplate_360ul_flat',
                     location=2)    
                 # load tip rack in deck slot 3
-                tiprack = protocol.load_labware(
+                rack = protocol.load_labware(
                     load_name='opentrons_96_tiprack_300ul',
                     location=3)    
                 # attach pipette to left mount
                 pipette = protocol.load_instrument(
                     instrument_name='p300_single_gen2',
-                    mount='left')  
+                    mount='left',
+                    tip_racks=[rack])  
                 # Put building block commands here
 
 .. _atomic-tip-manipulation:
@@ -110,22 +112,22 @@ Respectively, they tell the robot to pick up a tip from a tip rack, drop a tip i
 Picking Up a Tip
 ----------------
 
-Your robot needs to attach a disposable tip to the pipette barrel before it can work with the liquids in a protocol. To attach a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` function and include the tip's coordinate location in its rack (e.g. A1, B1, C1, etc.). For example::
+Your robot needs to attach a disposable tip to the pipette before it can work with the liquids in a protocol. To attach a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` function like this::
 
-   pipette.pick_up_tip(tiprack['A1'])
+   pipette.pick_up_tip()
 
-Because we already instantiated the variable ``tiprack`` with a deck location, your robot knows where to go and what to do:
+And because we already loaded a tip rack via the ``rack`` variable, the robot automatically knows where to go and what to do:
 
-* **Flex**: The robot moves the pipette to deck slot D3 and picks up a tip from rack position A1.
-* **OT-2**: The robot moves the pipette to deck slot 3 and picks up a tip from rack position A1.
+* **Flex**: Moves the pipette to deck slot D3 and picks up a tip from rack position A1.
+* **OT-2**: Moves the pipette to deck slot 3 and picks up a tip from rack position A1.
 
 .. Note::
 
-    You can also associate a tip rack with a pipette by using the ``tip_racks`` argument of the :py:meth:`.ProtocolContext.load_instrument` method. In this case, you just call::
+    You can manually associate a tip rack and tip location with a pipette by excluding the ``tip_racks`` argument from the :py:meth:`~.ProtocolContext.load_instrument` method. For example, you'd tell the robot to get a tip like this::
 
-         pipette.pick_up_tip()
+         pipette.pick_up_tip(rack['A2'])
     
-    And, this method tells the robot to use the next available tip from the list of tip racks passed in to ``load_instrument()``. See the :ref:`add-tip-racks` section of the :ref:`new-pipette` documentation for more information.
+    There may be some use cases for this manual method, but it makes extra work for you by eliminating automatic tip tracking.
 
 .. versionadded:: 2.0
 
@@ -134,16 +136,15 @@ Because we already instantiated the variable ``tiprack`` with a deck location, y
 Dropping a Tip
 --------------
 
-Once finished with a tip, the pipette will remove the tip when we call :py:meth:`.InstrumentContext.drop_tip`. You can specify where to drop the tip by passing in a location. The below example drops the tip back at its original location on the tip rack.
-If no location is specified, the OT-2 will drop the tip in the fixed trash in slot 12 of the deck.
+You tell the robot to discard a used tip by calling the :py:meth:`.InstrumentContext.drop_tip` method. This method automatically drops a tip in the on-deck trash bin. It also lets you set a specific drop location. This code builds on the pick up command by including ``drop_tip()``.
 
 .. code-block:: python
 
-    pipette.pick_up_tip()
-    pipette.drop_tip(tiprack['A1'])  # drop back in A1 of the tiprack
-    pipette.pick_up_tip()
-    pipette.drop_tip()  # drop in the fixed trash on the deck
-
+    pipette.pick_up_tip()         # assume rack location A1
+    pipette.drop_tip()            # drop tip in trash bin         
+    pipette.pick_up_tip()         # pick up from rack location B1
+    pipette.drop_tip(rack['B1'])  # drop tip in rack location B1
+    
 
 .. versionadded:: 2.0
 
@@ -152,47 +153,19 @@ If no location is specified, the OT-2 will drop the tip in the fixed trash in sl
 Returning a Tip
 ---------------
 
-To return the tip to the original location, you can call :py:meth:`.InstrumentContext.return_tip`. The example below will automatically return the tip to ``'A3'`` on the tip rack.
+You tell the robot to return a tip to its original location in a tip rack by calling the :py:meth:`.InstrumentContext.return_tip` method. You cannot manually set a specific return location with this method. This code builds on the pick up command by including ``return_tip()``. 
 
 .. code-block:: python
 
-    pipette.pick_up_tip(tiprack['A3'])
-    pipette.return_tip()
+    pipette.pick_up_tip() # pick up tip at location A1
+    pipette.return_tip()  # return tip to location A1
+    pipette.pick_up_tip() # pick up tip at location B1
+    pipette.return_tip()  # return tip to location B1
 
-.. note:
+Your robot considers returned tips to be "used" items. Tip tracking skips returned/used tips and picks up the next unused tip in the rack.
 
-    In API Version 2.0 and 2.1, the returned tips are added back into the tip-tracker and thus treated as `unused`. If you make a subsequent call to `pick_up_tip` then the software will treat returned tips as valid locations.
-    In API Version 2.2, returned tips are no longer added back into the tip tracker. This means that returned tips are no longer valid locations and the pipette will not attempt to pick up tips from these locations.
-    Also in API Version 2.2, the return tip height was corrected to utilize values determined by hardware testing. This is more in-line with return tip behavior from Python Protocol API Version 1.
-
-In API version 2.2 or above:
-
-.. code-block:: python
-
-    tip_rack = protocol.load_labware(
-            'opentrons_96_tiprack_300ul', 1)
-    pipette = protocol.load_instrument(
-        'p300_single_gen2', mount='left', tip_racks=[tip_rack])
-
-    pipette.pick_up_tip() # picks up tip_rack:A1
-    pipette.return_tip()
-    pipette.pick_up_tip() # picks up tip_rack:B1
-
-In API version 2.0 and 2.1:
-
-.. code-block:: python
-
-    tip_rack = protocol.load_labware(
-            'opentrons_96_tiprack_300ul', 1)
-    pipette = protocol.load_instrument(
-        'p300_single_gen2', mount='left', tip_racks=[tip_rack])
-
-    pipette.pick_up_tip() # picks up tip_rack:A1
-    pipette.return_tip()
-    pipette.pick_up_tip() # picks up tip_rack:A1
-
-.. careful here below re: info in preceding sections
-.. might need different title format for better fit
+.. versionchanged: 2.2
+    Treats returned tips as used.
 
 Iterating Through Tips
 ----------------------
