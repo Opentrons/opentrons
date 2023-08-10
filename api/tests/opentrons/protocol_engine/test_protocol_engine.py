@@ -465,6 +465,7 @@ async def test_finish_with_defaults(
     )
 
 
+@pytest.mark.parametrize("stopped_by_estop", [True, False])
 async def test_finish_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
@@ -474,6 +475,8 @@ async def test_finish_with_error(
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
     door_watcher: DoorWatcher,
+    state_store: StateStore,
+    stopped_by_estop: bool,
 ) -> None:
     """It should be able to tell the engine it's finished because of an error."""
     error = RuntimeError("oh no")
@@ -483,6 +486,9 @@ async def test_finish_with_error(
         error=error,
     )
 
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(
+        stopped_by_estop
+    )
     decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2021, month=1, day=1), datetime(year=2022, month=2, day=2)
@@ -496,7 +502,9 @@ async def test_finish_with_error(
         ),
         await queue_worker.join(),
         door_watcher.stop(),
-        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
+        await hardware_stopper.do_stop_and_recover(
+            drop_tips_and_home=not stopped_by_estop
+        ),
         await plugin_starter.stop(),
         action_dispatcher.dispatch(
             HardwareStoppedAction(
