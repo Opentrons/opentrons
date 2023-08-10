@@ -7,6 +7,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
@@ -14,6 +15,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
+
+import { Portal } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
 import { Chip } from '../../atoms/Chip'
 import { ListItem } from '../../atoms/ListItem'
@@ -22,6 +26,7 @@ import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
+import { DISENGAGED } from './constants'
 
 import type {
   ModalHeaderBaseProps,
@@ -34,29 +39,43 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 interface EstopPressedModalProps {
   isEngaged: boolean
   closeModal: () => void
+  isDismissedModal?: boolean
+  setIsDismissedModal?: (isDismissedModal: boolean) => void
 }
 
 export function EstopPressedModal({
   isEngaged,
   closeModal,
+  isDismissedModal,
+  setIsDismissedModal,
 }: EstopPressedModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
-
   return (
-    <>
+    <Portal level="top">
       {isOnDevice ? (
-        <TouchscreenModal isEngaged={isEngaged} />
+        <TouchscreenModal isEngaged={isEngaged} closeModal={closeModal} />
       ) : (
-        <DesktopModal isEngaged={isEngaged} closeModal={closeModal} />
+        <>
+          {isDismissedModal === false ? (
+            <DesktopModal
+              isEngaged={isEngaged}
+              closeModal={closeModal}
+              setIsDismissedModal={setIsDismissedModal}
+            />
+          ) : null}
+        </>
       )}
-    </>
+    </Portal>
   )
 }
 
 function TouchscreenModal({
   isEngaged,
-}: Omit<EstopPressedModalProps, 'closeModal'>): JSX.Element {
+  closeModal,
+}: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const [isResuming, setIsResuming] = React.useState<boolean>(false)
+  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
@@ -65,6 +84,11 @@ function TouchscreenModal({
   const modalProps = {
     header: { ...modalHeader },
     modalSize: 'large' as ModalSize,
+  }
+  const handleClick = (): void => {
+    setIsResuming(true)
+    acknowledgeEstopDisengage(null)
+    closeModal()
   }
   return (
     <Modal {...modalProps}>
@@ -91,10 +115,11 @@ function TouchscreenModal({
         <SmallButton
           data-testid="Estop_pressed_button"
           width="100%"
+          iconName={isResuming ? 'ot-spinner' : undefined}
+          iconPlacement={isResuming ? 'startIcon' : undefined}
           buttonText={t('resume_robot_operations')}
-          disabled={isEngaged}
-          // ToDo (kk:07/17/2023) the function will be implemented by a following pr
-          onClick={() => console.log('pressed')}
+          disabled={isEngaged || isResuming}
+          onClick={handleClick}
         />
       </Flex>
     </Modal>
@@ -104,21 +129,46 @@ function TouchscreenModal({
 function DesktopModal({
   isEngaged,
   closeModal,
+  setIsDismissedModal,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const [isResuming, setIsResuming] = React.useState<boolean>(false)
+  const {
+    acknowledgeEstopDisengage,
+    data,
+  } = useAcknowledgeEstopDisengageMutation()
+
+  const handleCloseModal = (): void => {
+    if (setIsDismissedModal != null) {
+      setIsDismissedModal(true)
+    }
+    closeModal()
+  }
+
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('estop_pressed'),
-    onClose: () => closeModal(),
+    onClose: handleCloseModal,
     closeOnOutsideClick: false,
     childrenPadding: SPACING.spacing24,
     width: '47rem',
   }
 
-  const handleClick = (): void => {
-    // ToDo (kk:07/11/2023) this will be implemented by a following pr
-    console.log('resume robot operations')
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
+    setIsResuming(true)
+    acknowledgeEstopDisengage({
+      onSuccess: () => {},
+      onError: () => {
+        setIsResuming(false)
+      },
+    })
   }
+
+  React.useEffect(() => {
+    if (data?.data.status === DISENGAGED) {
+      closeModal()
+    }
+  }, [data?.data.status, closeModal])
 
   return (
     <LegacyModal {...modalProps}>
@@ -130,8 +180,18 @@ function DesktopModal({
           {t('estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <PrimaryButton onClick={handleClick} disabled={isEngaged}>
-            {t('resume_robot_operations')}
+          <PrimaryButton
+            onClick={handleClick}
+            disabled={isEngaged || isResuming}
+          >
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gridGap={SPACING.spacing8}
+              alignItems={ALIGN_CENTER}
+            >
+              {isResuming ? <Icon size="1rem" spin name="ot-spinner" /> : null}
+              {t('resume_robot_operations')}
+            </Flex>
           </PrimaryButton>
         </Flex>
       </Flex>

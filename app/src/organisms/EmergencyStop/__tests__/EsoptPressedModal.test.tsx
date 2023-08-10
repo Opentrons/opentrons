@@ -1,17 +1,22 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
+import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { getIsOnDevice } from '../../../redux/config'
 import { EstopPressedModal } from '../EstopPressedModal'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/config')
 
 const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
   typeof getIsOnDevice
 >
-
+const mockUseAcknowledgeEstopDisengageMutation = useAcknowledgeEstopDisengageMutation as jest.MockedFunction<
+  typeof useAcknowledgeEstopDisengageMutation
+>
 const render = (props: React.ComponentProps<typeof EstopPressedModal>) => {
   return renderWithProviders(<EstopPressedModal {...props} />, {
     i18nInstance: i18n,
@@ -27,6 +32,9 @@ describe('EstopPressedModal - Touchscreen', () => {
       closeModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(true)
+    when(mockUseAcknowledgeEstopDisengageMutation).mockReturnValue({
+      setEstopPhysicalStatus: jest.fn(),
+    } as any)
   })
 
   it('should render text and button', () => {
@@ -50,7 +58,11 @@ describe('EstopPressedModal - Touchscreen', () => {
     expect(getByTestId('Estop_pressed_button')).not.toBeDisabled()
   })
 
-  it.todo('should call a mock function when clicking resume robot operations')
+  it('should call a mock function when clicking resume robot operations', () => {
+    const [{ getByText }] = render(props)
+    getByText('Resume robot operations').click()
+    expect(mockUseAcknowledgeEstopDisengageMutation).toHaveBeenCalled()
+  })
 })
 
 describe('EstopPressedModal - Desktop', () => {
@@ -60,8 +72,13 @@ describe('EstopPressedModal - Desktop', () => {
     props = {
       isEngaged: true,
       closeModal: jest.fn(),
+      isDismissedModal: false,
+      setIsDismissedModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(false)
+    when(mockUseAcknowledgeEstopDisengageMutation).mockReturnValue({
+      setEstopPhysicalStatus: jest.fn(),
+    } as any)
   })
   it('should render text and button', () => {
     const [{ getByText, getByRole }] = render(props)
@@ -86,8 +103,13 @@ describe('EstopPressedModal - Desktop', () => {
   it('should call a mock function when clicking close icon', () => {
     const [{ getByTestId }] = render(props)
     getByTestId('ModalHeader_icon_close_E-stop pressed').click()
-    expect(props.closeModal).toBeCalled()
+    expect(props.setIsDismissedModal).toHaveBeenCalled()
+    expect(props.closeModal).toHaveBeenCalled()
   })
 
-  it.todo('should call a mock function when clicking resume robot operations')
+  it('should call a mock function when clicking resume robot operations', () => {
+    const [{ getByRole }] = render(props)
+    getByRole('button', { name: 'Resume robot operations' }).click()
+    expect(mockUseAcknowledgeEstopDisengageMutation).toHaveBeenCalled()
+  })
 })

@@ -4,14 +4,13 @@ import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type { EstopStatus } from './types'
 
-export function setEstopPhysicalStatus(
-  config: HostConfig,
-  data: null
+export function acknowledgeEstopDisengage(
+  config: HostConfig
 ): ResponsePromise<EstopStatus> {
-  return request<EstopStatus, null>(
+  return request<EstopStatus>(
     PUT,
     '/robot/control/acknowledgeEstopDisengage',
-    data,
+    null,
     config
   )
 }
