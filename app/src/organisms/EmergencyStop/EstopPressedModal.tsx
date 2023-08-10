@@ -155,8 +155,6 @@ function DesktopModal({
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
-    e.preventDefault()
-    e.stopPropagation()
     setIsResuming(true)
     acknowledgeEstopDisengage({
       onSuccess: () => {},
