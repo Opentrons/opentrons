@@ -104,6 +104,7 @@ def _create_settings_response() -> AdvancedSettingsResponse:
                 value=s.value,
             )
             for s in data.values()
+            if s.definition.should_show()
         ],
     )
 

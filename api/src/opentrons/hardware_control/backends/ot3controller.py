@@ -126,6 +126,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     TipStateType,
     FailedTipStateCheck,
+    EstopState,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -160,6 +161,11 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 
+from opentrons_shared_data.errors.exceptions import (
+    EStopActivatedError,
+    EStopNotPresentError,
+)
+
 from .subsystem_manager import SubsystemManager
 
 if TYPE_CHECKING:
@@ -182,6 +188,29 @@ def requires_update(func: Wrapped) -> Wrapped:
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         if self.update_required and self.initialized:
             raise FirmwareUpdateRequired()
+        return await func(self, *args, **kwargs)
+
+    return cast(Wrapped, wrapper)
+
+
+def requires_estop(func: Wrapped) -> Wrapped:
+    """Decorator that raises an exception if the Estop is engaged."""
+
+    @wraps(func)
+    async def wrapper(self: OT3Controller, *args: Any, **kwargs: Any) -> Any:
+        state = self._estop_state_machine.state
+        if state == EstopState.NOT_PRESENT and ff.require_estop():
+            raise EStopNotPresentError(
+                message="An Estop must be plugged in to move the robot."
+            )
+        if state == EstopState.LOGICALLY_ENGAGED:
+            raise EStopActivatedError(
+                message="Estop must be acknowledged and cleared to move the robot."
+            )
+        if state == EstopState.PHYSICALLY_ENGAGED:
+            raise EStopActivatedError(
+                message="Estop is currently engaged, robot cannot move."
+            )
         return await func(self, *args, **kwargs)
 
     return cast(Wrapped, wrapper)
@@ -462,6 +491,7 @@ class OT3Controller:
             )
 
     @requires_update
+    @requires_estop
     async def move(
         self,
         origin: Coordinates[Axis, float],
@@ -567,6 +597,7 @@ class OT3Controller:
         return None
 
     @requires_update
+    @requires_estop
     async def home(
         self, axes: Sequence[Axis], gantry_load: GantryLoad
     ) -> OT3AxisMap[float]:
@@ -656,6 +687,7 @@ class OT3Controller:
             log.debug("no position returned from NodeId.pipette_left")
 
     @requires_update
+    @requires_estop
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
@@ -670,6 +702,7 @@ class OT3Controller:
         self._handle_motor_status_response(positions)
 
     @requires_update
+    @requires_estop
     async def gripper_hold_jaw(
         self,
         encoder_position_um: int,
@@ -680,6 +713,7 @@ class OT3Controller:
         self._handle_motor_status_response(positions)
 
     @requires_update
+    @requires_estop
     async def gripper_home_jaw(self, duty_cycle: float) -> None:
         move_group = create_gripper_jaw_home_group(duty_cycle)
         runner = MoveGroupRunner(move_groups=[move_group])

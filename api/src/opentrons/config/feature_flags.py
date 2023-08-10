@@ -53,3 +53,8 @@ def status_bar_enabled() -> bool:
 def tip_presence_detection_enabled() -> bool:
     """Whether tip presence is enabled on the Flex"""
     return not advs.get_setting_with_env_overload("disableTipPresenceDetection")
+
+
+def require_estop() -> bool:
+    """Whether the OT3 should allow gantry movements with no Estop plugged in."""
+    return not advs.get_setting_with_env_overload("estopNotRequired")
