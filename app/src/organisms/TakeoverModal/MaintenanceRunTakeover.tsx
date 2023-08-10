@@ -13,13 +13,13 @@ export function MaintenanceRunTakeover(
   props: MaintenanceRunTakeoverProps
 ): JSX.Element {
   const [
-    isODDMaintanenceInProgress,
-    setIsODDMaintanenceInProgress,
+    isODDMaintenanceInProgress,
+    setIsODDMaintenanceInProgress,
   ] = React.useState<boolean>(false)
   const maintenanceRunId = useCurrentMaintenanceRun({
     refetchInterval: 5000,
   }).data?.data.id
-  const isMaintanenceRunCurrent = maintenanceRunId != null
+  const isMaintenanceRunCurrent = maintenanceRunId != null
 
   const [
     showConfirmTerminateModal,
@@ -52,10 +52,10 @@ export function MaintenanceRunTakeover(
     <TakeoverModalContext.Provider
       value={{
         setODDMaintenanceFlowInProgress: () =>
-          setIsODDMaintanenceInProgress(true),
+          setIsODDMaintenanceInProgress(true),
       }}
     >
-      {!isODDMaintanenceInProgress && isMaintanenceRunCurrent && (
+      {!isODDMaintenanceInProgress && isMaintenanceRunCurrent && (
         <TakeoverModal
           confirmTerminate={handleCloseAndTerminate}
           showConfirmTerminateModal={showConfirmTerminateModal}

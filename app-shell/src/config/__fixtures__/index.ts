@@ -223,7 +223,7 @@ export const MOCK_CONFIG_V16: ConfigV16 = {
   version: 16,
   onDeviceDisplaySettings: {
     ...MOCK_CONFIG_V15.onDeviceDisplaySettings,
-    unfinishedUnboxingFlowRoute: '/welcome',
+    unfinishedUnboxingFlowRoute: null,
   },
 }
 
