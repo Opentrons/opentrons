@@ -443,6 +443,7 @@ async def _compute_protocol_sources(
             files=protocol_files,
             directory=Path(protocol_subdirectory),
             files_are_prevalidated=True,
+            flex_dev_compat=True,
         )
         sources_by_id[protocol_id] = protocol_source
 
