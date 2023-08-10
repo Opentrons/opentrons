@@ -25,6 +25,7 @@ interface SystemD {
   setRemoteDevToolsEnabled: (enabled: boolean) => Promise<string>
   getisRobotServerReady: () => Promise<boolean>
   restartApp: () => Promise<string>
+  updateBrightness: (text: string) => Promise<string>
 }
 
 const provideExports = (): SystemD => {
@@ -46,6 +47,10 @@ const provideExports = (): SystemD => {
         ).then(state => state.trim() === 'active'),
       restartApp: () =>
         promisifyProcess(`/bin/systemctl restart opentrons-robot-app`),
+      updateBrightness: text =>
+        promisifyProcess(
+          `echo "${text}" > /sys/class/backlight/backlight/device/backlight/backlight/brightness`
+        ),
     }
   } else {
     return {
@@ -57,6 +62,10 @@ const provideExports = (): SystemD => {
       getisRobotServerReady: () =>
         new Promise<boolean>(resolve => resolve(true)),
       restartApp: () => new Promise<string>(resolve => resolve('')),
+      updateBrightness: text =>
+        new Promise<string>(resolve =>
+          resolve(`fake brightness ${text} was set`)
+        ),
     }
   }
 }

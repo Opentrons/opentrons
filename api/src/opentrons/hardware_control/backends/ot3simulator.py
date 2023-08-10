@@ -297,13 +297,14 @@ class OT3Simulator:
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
-    ) -> None:
+    ) -> Dict[NodeId, float]:
 
         head_node = axis_to_node(Axis.by_mount(mount))
         pos = self._position
-        pos[head_node] = max_z_distance - 2
+        pos[head_node] += max_z_distance
         self._position.update(pos)
         self._encoder_position.update(pos)
+        return self._position
 
     @ensure_yield
     async def move(
@@ -373,6 +374,10 @@ class OT3Simulator:
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
     async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Raise an error if the given state doesn't match the physical state."""
+        pass
+
+    async def get_tip_present_state(self, mount: OT3Mount) -> int:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 

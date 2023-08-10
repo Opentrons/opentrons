@@ -13,6 +13,7 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
@@ -20,12 +21,19 @@ import { StepMeter } from '../../atoms/StepMeter'
 
 import estopImg from '../../assets/images/on-device-display/install_e_stop.png'
 
+const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
+
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  // Note (kk:06/28/2023) this IF is for test and it will be removed when the e-stop status check function
-  // I will add the function soon
-  const isEstopConnected = true
+
+  // Note here the touchscreen app is using status since status is linked to EstopPhysicalStatuses
+  // left notPresent + right disengaged => disengaged
+  // left notPresent + right notPresent => notPresent
+  const { data: estopStatusData } = useEstopQuery({
+    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL_MS,
+  })
+  const isEstopConnected = estopStatusData?.data?.status !== 'notPresent'
 
   return (
     <>

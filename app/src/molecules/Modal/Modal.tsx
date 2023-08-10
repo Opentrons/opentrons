@@ -11,9 +11,10 @@ import {
 import { BackgroundOverlay } from '../BackgroundOverlay'
 import { ModalHeader } from './ModalHeader'
 
+import type { StyleProps } from '@opentrons/components'
 import type { ModalHeaderBaseProps, ModalSize } from '../Modal/types'
 
-interface ModalProps {
+interface ModalProps extends StyleProps {
   /** clicking anywhere outside of the modal closes it  */
   onOutsideClick?: React.MouseEventHandler
   /** modal content */
@@ -24,7 +25,13 @@ interface ModalProps {
   header?: ModalHeaderBaseProps
 }
 export function Modal(props: ModalProps): JSX.Element {
-  const { modalSize = 'medium', onOutsideClick, children, header } = props
+  const {
+    modalSize = 'medium',
+    onOutsideClick,
+    children,
+    header,
+    ...styleProps
+  } = props
 
   let modalWidth: string = '45.625rem'
   switch (modalSize) {
@@ -50,7 +57,7 @@ export function Modal(props: ModalProps): JSX.Element {
         backgroundColor={COLORS.white}
         width={modalWidth}
         height="max-content"
-        maxHeight="33.5rem"
+        maxHeight="36.875rem"
         borderRadius={BORDERS.borderRadiusSize3}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing32}
@@ -61,13 +68,7 @@ export function Modal(props: ModalProps): JSX.Element {
         }}
       >
         {header != null ? (
-          <ModalHeader
-            title={header.title}
-            iconName={header.iconName}
-            iconColor={header.iconColor}
-            hasExitIcon={header.hasExitIcon}
-            onClick={onOutsideClick}
-          />
+          <ModalHeader {...header} onClick={onOutsideClick} />
         ) : null}
         <Flex
           backgroundColor={COLORS.white}
@@ -79,6 +80,8 @@ export function Modal(props: ModalProps): JSX.Element {
               ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
               : BORDERS.borderRadiusSize3
           }
+          maxHeight="30.625rem"
+          {...styleProps}
         >
           {children}
         </Flex>

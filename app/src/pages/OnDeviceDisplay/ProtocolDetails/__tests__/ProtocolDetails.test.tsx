@@ -103,7 +103,10 @@ describe('ODDProtocolDetails', () => {
       'mock missing hardware chip text'
     )
     mockUseOffsetCandidatesForAnalysis.mockReturnValue([])
-    mockUseMissingProtocolHardware.mockReturnValue([])
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: [],
+      isLoading: false,
+    })
     mockUseProtocolQuery.mockReturnValue({
       data: {
         data: {

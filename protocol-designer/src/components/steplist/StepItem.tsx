@@ -40,6 +40,7 @@ import {
   ThermocyclerProfileSubstepItem,
   WellIngredientNames,
 } from '../../steplist/types'
+import { MoveLabwareHeader } from './MoveLabwareHeader'
 
 export interface StepItemProps {
   description?: string | null
@@ -505,6 +506,19 @@ export const StepItemContents = (
         volume={rawForm.volume}
         times={rawForm.times}
         labwareNickname={labwareNicknamesById[mixLabwareId]}
+      />
+    )
+  }
+
+  if (stepType === 'moveLabware') {
+    const gripper = rawForm.useGripper
+    const labware = rawForm.labware
+    result.push(
+      <MoveLabwareHeader
+        key="moveLabware-header"
+        sourceLabwareNickname={labwareNicknamesById[labware]}
+        useGripper={gripper}
+        destinationSlot={rawForm.newLocation}
       />
     )
   }

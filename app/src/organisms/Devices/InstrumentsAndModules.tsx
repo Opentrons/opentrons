@@ -74,9 +74,9 @@ export function InstrumentsAndModules({
     setSubsystemToUpdate,
   ] = React.useState<Subsystem | null>(null)
 
-  const { data: attachedInstruments } = useInstrumentsQuery()
-  // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
-  // { refetchInterval: EQUIPMENT_POLL_MS, },
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
@@ -218,9 +218,9 @@ export function InstrumentsAndModules({
                     <Banner type="warning" marginBottom={SPACING.spacing4}>
                       <Trans
                         t={t}
-                        i18nKey="update_now"
+                        i18nKey="firmware_update_available_now"
                         components={{
-                          calLink: (
+                          updateLink: (
                             <StyledText
                               as="p"
                               css={BANNER_LINK_CSS}

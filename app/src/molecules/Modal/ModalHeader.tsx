@@ -14,7 +14,14 @@ import { StyledText } from '../../atoms/text'
 import type { ModalHeaderBaseProps } from '../Modal/types'
 
 export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
-  const { title, hasExitIcon, iconName, iconColor, onClick } = props
+  const {
+    title,
+    hasExitIcon,
+    iconName,
+    iconColor,
+    onClick,
+    ...styleProps
+  } = props
   return (
     <Flex
       backgroundColor={COLORS.white}
@@ -26,6 +33,7 @@ export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={`${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3} 0px 0px`}
+      {...styleProps}
     >
       <Flex flexDirection={DIRECTION_ROW}>
         {iconName != null && iconColor != null ? (

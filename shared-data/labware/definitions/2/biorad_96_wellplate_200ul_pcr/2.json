@@ -34,7 +34,7 @@
     "isMagneticModuleCompatible": true,
     "magneticModuleEngageHeight": 18
   },
-  "gripForce": 6,
+  "gripForce": 15,
   "gripHeightFromLabwareBottom": 10.14,
   "wells": {
     "H1": {

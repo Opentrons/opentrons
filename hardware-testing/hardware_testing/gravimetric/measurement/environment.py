@@ -7,6 +7,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     SensorResponseBad,
 )
 from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.drivers import asair_sensor
 
 
 @dataclass
@@ -21,7 +22,9 @@ class EnvironmentData:
     celsius_liquid: float
 
 
-def read_environment_data(mount: str, is_simulating: bool) -> EnvironmentData:
+def read_environment_data(
+    mount: str, is_simulating: bool, env_sensor: asair_sensor.AsairSensorBase
+) -> EnvironmentData:
     """Read blank environment data."""
     mnt = OT3Mount.LEFT if mount == "left" else OT3Mount.RIGHT
     try:
@@ -31,12 +34,12 @@ def read_environment_data(mount: str, is_simulating: bool) -> EnvironmentData:
         print(e)
         celsius_pipette = 25.0
         humidity_pipette = 50.0
-    # TODO: implement USB environmental sensors
+    env_data = env_sensor.get_reading()
     d = EnvironmentData(
         celsius_pipette=celsius_pipette,
         humidity_pipette=humidity_pipette,
-        celsius_air=25.0,
-        humidity_air=50.0,
+        celsius_air=env_data.temperature,
+        humidity_air=env_data.relative_humidity,
         pascals_air=1000,
         celsius_liquid=25.0,
     )

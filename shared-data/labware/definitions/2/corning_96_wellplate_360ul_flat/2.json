@@ -66,7 +66,7 @@
     "y": 0,
     "z": 0
   },
-  "gripForce": 10,
+  "gripForce": 15,
   "gripHeightFromLabwareBottom": 12.2,
   "wells": {
     "H1": {

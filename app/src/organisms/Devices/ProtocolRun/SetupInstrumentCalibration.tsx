@@ -21,6 +21,7 @@ import { isGripperInCommands } from '../../../resources/protocols/utils'
 import type { GripperData } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
+const EQUIPMENT_POLL_MS = 5000
 interface SetupInstrumentCalibrationProps {
   robotName: string
   runId: string
@@ -33,7 +34,9 @@ export function SetupInstrumentCalibration({
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
 
-  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery()
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const usesGripper = isGripperInCommands(

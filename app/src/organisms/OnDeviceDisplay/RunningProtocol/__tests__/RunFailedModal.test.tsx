@@ -16,12 +16,53 @@ const mockPush = jest.fn()
 const mockErrors = [
   {
     id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
-    errorType: 'ExceptionInProtocolError',
+    errorType: 'generalError',
     createdAt: '2023-04-09T21:41:51.333171+00:00',
-    detail:
-      'ProtocolEngineError [line 16]: ModuleNotAttachedError: No available',
+    detail: 'Error with code 4000 (lowest priority)',
+    errorInfo: {},
+    errorCode: '4000',
+    wrappedErrors: [
+      {
+        id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
+        errorType: 'roboticsInteractionError',
+        createdAt: '2023-04-09T21:41:51.333171+00:00',
+        detail: 'Error with code 3000 (second lowest priortiy)',
+        errorInfo: {},
+        errorCode: '3000',
+        wrappedErrors: [],
+      },
+      {
+        id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
+        errorType: 'roboticsControlError',
+        createdAt: '2023-04-09T21:41:51.333171+00:00',
+        detail: 'Error with code 2000 (second highest priority)',
+        errorInfo: {},
+        errorCode: '2000',
+        wrappedErrors: [
+          {
+            id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
+            errorType: 'hardwareCommunicationError',
+            createdAt: '2023-04-09T21:41:51.333171+00:00',
+            detail: 'Error with code 1000 (highest priority)',
+            errorInfo: {},
+            errorCode: '1000',
+            wrappedErrors: [],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'd0245210-dfb9-4f1c-8ad0-3416b603a7ba',
+    errorType: 'roboticsInteractionError',
+    createdAt: '2023-04-09T21:41:51.333171+00:00',
+    detail: 'Error with code 2001 (second highest priortiy)',
+    errorInfo: {},
+    errorCode: '2001',
+    wrappedErrors: [],
   },
 ]
+
 let mockStopRun: jest.Mock
 
 jest.mock('react-router-dom', () => {
@@ -60,12 +101,11 @@ describe('RunFailedModal', () => {
     mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
   })
 
-  it('should render text and button', () => {
+  it('should render the highest priority error', () => {
     const [{ getByText }] = render(props)
     getByText('Run failed')
-    getByText(
-      'ProtocolEngineError [line 16]: ModuleNotAttachedError: No available'
-    )
+    getByText('Error 1000: hardwareCommunicationError')
+    getByText('Error with code 1000 (highest priority)')
     getByText(
       'Download the run logs from the Opentrons App and send it to support@opentrons.com for assistance.'
     )
@@ -79,7 +119,4 @@ describe('RunFailedModal', () => {
     expect(mockStopRun).toHaveBeenCalled()
     expect(mockPush).toHaveBeenCalledWith('/dashboard')
   })
-  // ToDo (kj:04/12/2023) I made this test todo since we need the system update to align with the design.
-  // This test will be added when we can get error code and other information
-  it.todo('should render error code and message')
 })

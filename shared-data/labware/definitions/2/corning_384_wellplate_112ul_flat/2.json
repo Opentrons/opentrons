@@ -453,7 +453,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "corning_384_wellplate_112ul_flat"
   },
-  "gripForce": 10,
+  "gripForce": 15,
   "gripHeightFromLabwareBottom": 12.4,
   "wells": {
     "P1": {

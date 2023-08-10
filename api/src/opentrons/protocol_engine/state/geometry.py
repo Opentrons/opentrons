@@ -416,17 +416,24 @@ class GeometryView:
             self._modules.raise_if_module_in_location(location)
         return location
 
-    def get_labware_center(
+    def get_labware_grip_point(
         self,
         labware_id: str,
         location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     ) -> Point:
-        """Get the center point of the labware as placed on the given location.
+        """Get the grip point of the labware as placed on the given location.
 
-        Returns the absolute position of the labware as if it were placed on the
-        specified location. Labware offset not included.
+        Returns the absolute position of the labware's gripping point as if
+        it were placed on the specified location. Labware offset (LPC offset) not included.
+
+        Grip point is the location where critical point of the gripper should move to
+        in order to pick/drop the given labware in the specified location.
+        It is calculated as the xy center of the slot with z as the point indicated by
+        z-position of labware bottom + grip height from labware bottom.
         """
-        labware_dimensions = self._labware.get_dimensions(labware_id)
+        grip_height_from_labware_bottom = (
+            self._labware.get_grip_height_from_labware_bottom(labware_id)
+        )
         offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
 
@@ -452,7 +459,7 @@ class GeometryView:
         return Point(
             slot_center.x + offset.x,
             slot_center.y + offset.y,
-            slot_center.z + offset.z + labware_dimensions.z / 2,
+            slot_center.z + offset.z + grip_height_from_labware_bottom,
         )
 
     def get_extra_waypoints(

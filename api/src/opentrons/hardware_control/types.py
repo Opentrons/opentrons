@@ -59,7 +59,7 @@ class OT3AxisKind(enum.Enum):
     #: Gripper Z axis
     Q = 6
     #: High-throughput tip grabbing axis
-    OTHER = 5
+    OTHER = 6
     #: The internal axes of high throughput pipettes, for instance
 
     def __str__(self) -> str:

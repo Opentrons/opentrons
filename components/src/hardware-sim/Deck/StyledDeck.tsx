@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
+import { COLORS } from '../../ui-style-constants'
 import { DeckFromData } from './DeckFromData'
 import { FlexTrash } from './FlexTrash'
 
@@ -44,6 +45,7 @@ export function StyledDeck(
         <FlexTrash
           robotType={robotType}
           trashIconColor={deckFill}
+          backgroundColor={COLORS.light1}
           trashSlotName={trashSlotName}
         />
       ) : null}
