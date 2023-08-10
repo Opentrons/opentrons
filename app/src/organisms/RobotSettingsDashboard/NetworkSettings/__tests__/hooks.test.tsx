@@ -3,7 +3,10 @@ import { renderHook } from '@testing-library/react-hooks'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-import { getOnDeviceDisplaySettings } from '../../../../redux/config'
+import {
+  getIsOnDevice,
+  getOnDeviceDisplaySettings,
+} from '../../../../redux/config'
 import { useIsUnboxingFlowOngoing } from '../hooks'
 
 import type { Store } from 'redux'
@@ -13,6 +16,10 @@ jest.mock('../../../../redux/config')
 
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings
+>
+
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
 >
 
 const store: Store<State> = createStore(jest.fn(), {})
@@ -29,6 +36,7 @@ describe('useIsUnboxingFlowOngoing', () => {
   beforeEach(() => {
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockDisplaySettings)
+    mockGetIsOnDevice.mockReturnValue(true)
   })
 
   afterEach(() => {
