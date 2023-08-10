@@ -47,7 +47,7 @@ From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` d
    def run(protocol: protocol_api.ProtocolContext):
        protocol.comment('Hello, Flex!')
 
-Choose only one of these places to specify ``apiLevel``. If put it in neither or both places, you will not be able to simulate or run your protocol.
+Choose only one of these places to specify ``apiLevel``. If you put it in neither or both places, you will not be able to simulate or run your protocol.
 
 The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can't specify a lower version and then call ``HeaterShakerContext`` methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
