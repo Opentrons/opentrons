@@ -1436,6 +1436,7 @@ class OT3API(
         instrument = self._pipette_handler.get_pipette(checked_mount)
         if instrument.current_volume > 0:
             raise RuntimeError("cannot position plunger while holding liquid")
+        print(f"\n\nPLUNGER BOTTOM MM: {instrument.plunger_positions.bottom}\n\n")
         target_pos = target_position_from_plunger(
             OT3Mount.from_mount(mount),
             instrument.plunger_positions.bottom,
@@ -1505,6 +1506,7 @@ class OT3API(
         if not aspirate_spec:
             return
 
+        print(f"\n\nASPIRATE POS MM: {aspirate_spec.plunger_distance}\n\n")
         target_pos = target_position_from_plunger(
             realmount,
             aspirate_spec.plunger_distance,
@@ -1582,6 +1584,7 @@ class OT3API(
         blowout_distance = (
             instrument.plunger_positions.bottom + blowout_spec.plunger_distance
         )
+        print(f"\n\nBLOWOUT POS MM: {blowout_distance}\n\n")
         if blowout_distance > max_blowout_pos:
             raise ValueError(
                 f"Blow out distance exceeds plunger position limit: blowout dist = {blowout_distance}, "
