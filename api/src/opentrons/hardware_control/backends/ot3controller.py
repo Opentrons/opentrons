@@ -44,6 +44,7 @@ from .ot3utils import (
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
+    moving_axes_in_move_group,
 )
 
 try:
@@ -485,8 +486,7 @@ class OT3Controller:
         )
         mounts_moving = [
             k
-            for g in move_group
-            for k in g.keys()
+            for k in moving_axes_in_move_group(move_group)
             if k in [NodeId.pipette_left, NodeId.pipette_right]
         ]
         async with self._monitor_overpressure(mounts_moving):
@@ -660,8 +660,11 @@ class OT3Controller:
         self,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
+        stay_engaged: bool = True,
     ) -> None:
-        move_group = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
+        move_group = create_gripper_jaw_grip_group(
+            duty_cycle, stop_condition, stay_engaged
+        )
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)

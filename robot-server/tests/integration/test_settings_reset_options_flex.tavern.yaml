@@ -23,7 +23,11 @@ stages:
             description: !re_search 'Clear gripper offset calibrations'
           - id: runsHistory
             name: Clear Runs History
-            description: !re_search 'Erase this device''s stored history of protocols and runs.'
+            description: !re_search 'Erase this device''s stored history of protocols and runs'
+          - id: onDeviceDisplay
+            name: On-Device Display Configuration
+            description: !re_search 'on-device display'
+
   - name: POST Reset gripperOffsetCalibrations true on OT-3
     request:
       url: '{ot3_server_base_url}/settings/reset'
@@ -34,3 +38,10 @@ stages:
       status_code: 200
       json:
         message: "Options 'gripper_offset' were reset"
+
+  # POSTing bootScripts, pipetteOffsetCalibrations, and runsHistory are untested here because they
+  # should already be covered by the OT-2 test.
+
+  # POSTing onDeviceDisplay is untested here because it writes to a part of the filesystem outside
+  # of robot-server's control, which is not a good thing to do on a dev machine.
+  # We rely on manual end-to-end tests (with the Opentrons App) to cover it.

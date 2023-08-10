@@ -314,11 +314,8 @@ export const PipetteWizardFlows = (
     (selectedPipette === NINETY_SIX_CHANNEL &&
       currentStep.section === SECTIONS.DETACH_PIPETTE)
 
-  const isCalibrationErrorExiting =
-    currentStep.section === SECTIONS.ATTACH_PROBE && errorMessage != null
-
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal || isCalibrationErrorExiting) {
+  if (isRobotMoving || showUnskippableStepModal) {
     exitWizardButton = undefined
   } else if (is96ChannelUnskippableStep) {
     exitWizardButton = () => setIsUnskippableStep(true)

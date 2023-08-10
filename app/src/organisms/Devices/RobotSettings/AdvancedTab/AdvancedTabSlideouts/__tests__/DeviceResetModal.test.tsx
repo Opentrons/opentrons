@@ -5,11 +5,11 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import { resetConfig } from '../../../../../../redux/robot-admin'
 import { useDispatchApiRequest } from '../../../../../../redux/robot-api'
-
 import { DeviceResetModal } from '../DeviceResetModal'
 
 import type { DispatchApiRequestType } from '../../../../../../redux/robot-api'
 
+jest.mock('../../../../hooks')
 jest.mock('../../../../../../redux/robot-admin')
 jest.mock('../../../../../../redux/robot-api')
 

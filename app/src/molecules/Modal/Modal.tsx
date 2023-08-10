@@ -57,7 +57,7 @@ export function Modal(props: ModalProps): JSX.Element {
         backgroundColor={COLORS.white}
         width={modalWidth}
         height="max-content"
-        maxHeight="33.5rem"
+        maxHeight="36.875rem"
         borderRadius={BORDERS.borderRadiusSize3}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing32}
@@ -80,6 +80,7 @@ export function Modal(props: ModalProps): JSX.Element {
               ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
               : BORDERS.borderRadiusSize3
           }
+          maxHeight="30.625rem"
           {...styleProps}
         >
           {children}
