@@ -100,7 +100,10 @@ describe('RobotDashboard', () => {
     mockNavigation.mockReturnValue(<div>mock Navigation</div>)
     mockUseAllProtocolsQuery.mockReturnValue({} as any)
     mockUseAllRunsQuery.mockReturnValue({} as any)
-    mockUseMissingProtocolHardware.mockReturnValue([])
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: [],
+      isLoading: false,
+    })
     mockRecentRunProtocolCarousel.mockReturnValue(
       <div>mock RecentRunProtocolCarousel</div>
     )

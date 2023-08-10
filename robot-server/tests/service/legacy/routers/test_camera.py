@@ -15,7 +15,7 @@ def mock_take_picture():
 
 def test_camera_exception(mock_take_picture, api_client):
     async def raise_it(filename, loop=None):
-        raise camera.CameraException("No")
+        raise camera.CameraException("No", "sorry")
 
     mock_take_picture.side_effect = raise_it
 

@@ -3,8 +3,7 @@ import argparse
 import asyncio
 from pathlib import Path
 
-from hardware_testing.data import ui, get_git_description
-from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE, CSVResult
+from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis
 
@@ -15,34 +14,20 @@ async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
     test_name = Path(__file__).parent.name
     ui.print_title(test_name.replace("_", " ").upper())
-    report = build_report(test_name.replace("_", "-"))
-    report.set_version(get_git_description())
-    if not cfg.simulate:
-        report.set_operator(input("enter operator name: "))
-    else:
-        report.set_operator("simulation")
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=cfg.simulate,
         pipette_left="p1000_96_v3.4",
     )
-    report.set_robot_id(helpers_ot3.get_robot_serial_ot3(api))
 
-    # PIPETTE SERIAL NUMBER
-    mount = OT3Mount.LEFT
-    pipette = api.hardware_pipettes[mount.to_mount()]
-    assert pipette
-    pipette_id = str(pipette.pipette_id)
-    report.set_tag(pipette_id)
-    if not api.is_simulator:
-        barcode = input("scan pipette barcode: ").strip()
-        barcode_result = CSVResult(barcode == pipette_id)
-        report.set_device_id(pipette_id, barcode_result)
-    else:
-        report.set_device_id(pipette_id, CSVResult.PASS)
+    # CSV REPORT
+    report = build_report(test_name.replace("_", "-"))
+    dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
     # HOME and ATTACH
+    mount = OT3Mount.LEFT
     await api.home()
     home_pos = await api.gantry_position(mount)
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
@@ -71,12 +56,8 @@ async def _main(cfg: TestConfig) -> None:
     await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
 
     # SAVE REPORT
-    report_path = report.save_to_disk()
-    complete_msg = "complete" if report.completed else "incomplete"
-    print(f"done, {complete_msg} report -> {report_path}")
-    print("Overall Results:")
-    for line in report[RESULTS_OVERVIEW_TITLE].lines:
-        print(f" - {line.tag}: {line.result}")
+    report.save_to_disk()
+    report.print_results()
 
 
 if __name__ == "__main__":

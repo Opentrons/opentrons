@@ -18,7 +18,7 @@ PLUNGER_TOLERANCE_MM = 0.2
 
 GRIPPER_Z_ENDSTOP_RETRACT_MM = 0.5
 GRIPPER_GRIP_FORCE = 20
-GRIPPER_JAW_WIDTH_TOLERANCE_MM = 3.0  # FIXME: this is way too big
+GRIPPER_JAW_WIDTH_TOLERANCE_MM = 3.0
 
 GRIPPER_MAX_Z_TRAVEL_MM = 170.025
 GRIPPER_Z_NO_SKIP_TRAVEL_MM = GRIPPER_MAX_Z_TRAVEL_MM - 30  # avoid hitting clips
@@ -33,7 +33,6 @@ PROBE_SETTINGS = CapacitivePassSettings(
 )
 
 RELATIVE_MOVE_FROM_HOME_DELTA = Point(x=-500, y=-300)
-RELATIVE_MOVE_FROM_HOME_SPEED = 200
 
 
 PIPETTE_TESTS = {
@@ -62,20 +61,6 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     for t, d in GRIPPER_TESTS.items():
         tests.append(CSVLine(f"gripper-{t}", d))  # type: ignore[arg-type]
     return tests
-
-
-async def _get_pip_mounts(api: OT3API) -> List[OT3Mount]:
-    await api.reset()
-    pip_mounts = [
-        OT3Mount.from_mount(_m) for _m, _p in api.hardware_pipettes.items() if _p
-    ]
-    print(f"found pipettes: {pip_mounts}")
-    return pip_mounts
-
-
-async def _has_gripper(api: OT3API) -> bool:
-    await api.reset()
-    return api.has_gripper()
 
 
 async def _get_plunger_positions(api: OT3API, mount: OT3Mount) -> Tuple[float, float]:
@@ -151,12 +136,9 @@ async def _probe_mount_and_record_result(
 async def _test_pipette(
     api: OT3API, mount: OT3Mount, report: CSVReport, section: str
 ) -> None:
-    await api.cache_instruments()
     mnt_tag = mount.name.lower()
     pip = api.hardware_pipettes[mount.to_mount()]
-    if not pip:
-        ui.print_error(f"no pipette found on {mount.value} mount")
-        return
+    assert pip
     pip_id = helpers_ot3.get_pipette_serial_ot3(pip)
     pip_ax = Axis.of_main_tool_actuator(mount)
     top, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
@@ -201,9 +183,7 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     z_ax = Axis.by_mount(mount)
     jaw_ax = Axis.of_main_tool_actuator(mount)
     gripper = api._gripper_handler.gripper
-    if not gripper:
-        ui.print_error("no gripper found")
-        return
+    assert gripper
     gripper_id = gripper.gripper_id
     jaw_widths = gripper.config.geometry.jaw_width
 
@@ -216,43 +196,18 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     print(f"gripper: {gripper_id}, barcode: {user_id}")
     report(section, "gripper-id", [gripper_id, user_id, result])
 
-    # NO-SKIP
-    # FIXME: DVT units had encoders added, so change this test to use them
-    async def _z_is_hitting_endstop() -> bool:
-        if api.is_simulator:
-            return True
-        _switches = await api.get_limit_switches()
-        return _switches[z_ax]
-
-    async def _z_is_not_hitting_endstop() -> bool:
-        if api.is_simulator:
-            return True
-        return not await _z_is_hitting_endstop()
-
+    # CHECK FOR MISALIGNED ENCODER
+    result = CSVResult.FAIL
+    target_z = 100
+    await api.home([z_ax, Axis.G])
+    start_pos = await api.gantry_position(OT3Mount.GRIPPER)
+    await api.move_to(mount, start_pos._replace(z=target_z), _expect_stalls=True)
+    enc_pos = await api.encoder_current_position_ot3(OT3Mount.GRIPPER)
+    if abs(enc_pos[Axis.Z_G] - target_z) < 0.25:
+        await api.move_to(mount, start_pos, _expect_stalls=True)
+        if abs(enc_pos[Axis.Z_G] - target_z) < 0.25:
+            result = CSVResult.PASS
     await api.home([z_ax])
-    await api.move_rel(mount, Point(z=-5))
-    await api.home([z_ax])
-    try:
-        assert (
-            await _z_is_hitting_endstop()
-        ), "error: not hitting gripper Z endstop after homing"
-        await api.move_rel(mount, Point(z=-GRIPPER_Z_ENDSTOP_RETRACT_MM))
-        assert (
-            await _z_is_not_hitting_endstop()
-        ), "error: hitting gripper Z endstop after retracting"
-        await api.move_rel(mount, Point(z=-GRIPPER_Z_NO_SKIP_TRAVEL_MM))
-        await api.move_rel(mount, Point(z=GRIPPER_Z_NO_SKIP_TRAVEL_MM))
-        assert (
-            await _z_is_not_hitting_endstop()
-        ), "error: hitting gripper Z endstop after moving"
-        await api.move_rel(mount, Point(z=GRIPPER_Z_ENDSTOP_RETRACT_MM))
-        assert (
-            await _z_is_hitting_endstop()
-        ), "error: not hitting gripper Z endstop after moving"
-        result = CSVResult.PASS
-    except AssertionError as e:
-        print(str(e))
-        result = CSVResult.FAIL
     report(section, "gripper-no-skip", [result])
     await api.home([z_ax])
 
@@ -284,36 +239,28 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    print("homing")
-    await api.home()
+    print("homing...")
+    await api.home_z()
+
     print("moving to front of machine")
-    await api.move_rel(
-        OT3Mount.LEFT,
-        RELATIVE_MOVE_FROM_HOME_DELTA,
-        speed=RELATIVE_MOVE_FROM_HOME_SPEED,
-    )
+    slot_pos = helpers_ot3.get_slot_calibration_square_position_ot3(4)
+    current_pos = await api.gantry_position(OT3Mount.LEFT)
+    attach_pos = slot_pos._replace(z=current_pos.z)
+    await api.move_to(OT3Mount.LEFT, attach_pos)
 
     # PIPETTES
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
         ui.print_header(f"PIPETTE - {mount.name}")
-        if not api.is_simulator:
-            ui.get_user_ready(f"attached a pipette to the {mount.name} mount")
-        await _test_pipette(api, mount, report, section)
-    while not api.is_simulator and await _get_pip_mounts(api):
-        ui.get_user_ready("remove all pipettes")
+        if await helpers_ot3.wait_for_instrument_presence(api, mount, presence=True):
+            await _test_pipette(api, mount, report, section)
+            await helpers_ot3.wait_for_instrument_presence(api, mount, presence=False)
 
     # GRIPPER
     ui.print_header("GRIPPER")
-    if not api.is_simulator:
-        ui.get_user_ready("attach a gripper")
-    await _test_gripper(api, report, section)
-    # while not api.is_simulator and await _has_gripper(api):
-    #     ui.get_user_ready("remove the gripper")
-
-    print("moving back near home position")
-    await api.home([Axis.Z_L, Axis.Z_R])
-    await api.move_rel(
-        OT3Mount.LEFT,
-        RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,
-        speed=RELATIVE_MOVE_FROM_HOME_SPEED,
-    )
+    if await helpers_ot3.wait_for_instrument_presence(
+        api, OT3Mount.GRIPPER, presence=True
+    ):
+        await _test_gripper(api, report, section)
+        await helpers_ot3.wait_for_instrument_presence(
+            api, OT3Mount.GRIPPER, presence=False
+        )

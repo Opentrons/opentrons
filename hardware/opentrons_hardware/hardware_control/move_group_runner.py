@@ -301,6 +301,7 @@ class MoveGroupRunner:
             ),
             duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             encoder_position_um=Int32Field(int(step.encoder_position_um)),
+            stay_engaged=UInt8Field(int(step.stay_engaged)),
         )
         if step.move_type == MoveType.home:
             return GripperHomeRequest(payload=payload)

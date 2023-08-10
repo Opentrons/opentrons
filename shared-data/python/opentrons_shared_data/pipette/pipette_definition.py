@@ -1,3 +1,4 @@
+import re
 from typing import List, Dict, Tuple, Optional
 from pydantic import BaseModel, Field, validator
 from typing_extensions import Literal
@@ -7,6 +8,8 @@ from . import types as pip_types, dev_types
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
+
+NOZZLE_MAP_NAMES = re.compile(r"[A-Z]{1}[0-9]{1,2}")
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -269,6 +272,18 @@ class PipetteGeometryDefinition(BaseModel):
         description="The shared data relative path to the 3D representation of the pipette model.",
         alias="pathTo3D",
     )
+    nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+
+    @validator("nozzle_map", pre=True)
+    def check_nonempty_strings(
+        cls, v: Dict[str, List[float]]
+    ) -> Dict[str, List[float]]:
+        # Note, the key should be able to be a regex but I think
+        # we're not on a pydantic version that supports that.
+        for k in v.keys():
+            if not NOZZLE_MAP_NAMES.match(k):
+                raise ValueError("{k} is not a valid key entry for nozzle map.")
+        return v
 
 
 class PipetteLiquidPropertiesDefinition(BaseModel):

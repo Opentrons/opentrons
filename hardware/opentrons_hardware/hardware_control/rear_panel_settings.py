@@ -15,6 +15,15 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     EstopButtonPresentRequest,
     EstopButtonDetectionChange,
     Ack,
+    EngageSyncOut,
+    ReleaseSyncOut,
+    StartLightAction,
+    AddLightActionRequest,
+    BinaryMessageDefinition,
+    EstopStateRequest,
+    EstopStateChange,
+    SyncStateRequest,
+    SyncStateResponse,
     WriteEEPromRequest,
     ReadEEPromRequest,
     ReadEEPromResponse,
@@ -36,8 +45,9 @@ class RearPinState:
     aux2_aux_det: bool = False
     aux1_id_active: bool = False
     aux2_id_active: bool = False
-    etop_active: bool = False
+    estop_active: bool = False
     door_open: bool = False
+    sync_engaged: bool = False
 
 
 async def write_eeprom(
@@ -121,6 +131,55 @@ async def get_deck_light_state(messenger: Optional[BinaryMessenger]) -> bool:
     return bool(cast(GetDeckLightResponse, response).setting.value)
 
 
+async def set_sync_pin(setting: int, messenger: Optional[BinaryMessenger]) -> bool:
+    """Turn the sync pin on or off."""
+    if messenger is None:
+        # the EVT bots don't have rear panels...
+        return False
+    message: BinaryMessageDefinition = ReleaseSyncOut()
+    if setting:
+        message = EngageSyncOut()
+
+    response = await messenger.send_and_receive(
+        message=message,
+        response_type=Ack,
+    )
+    return response is not None
+
+
+def _clamp_rgb(val: int) -> int:
+    if val < 0:
+        val = 0
+    if val > 255:
+        val = 255
+    return val
+
+
+async def set_ui_color(
+    red: int, blue: int, green: int, white: int, messenger: Optional[BinaryMessenger]
+) -> bool:
+    """Command the UI light to set to a particular RGBW value."""
+    if messenger is None:
+        # the EVT bots don't have rear panels...
+        return False
+    response = await messenger.send_and_receive(
+        message=AddLightActionRequest(
+            red=utils.UInt8Field(_clamp_rgb(red)),
+            blue=utils.UInt8Field(_clamp_rgb(blue)),
+            green=utils.UInt8Field(_clamp_rgb(green)),
+            white=utils.UInt8Field(_clamp_rgb(white)),
+        ),
+        response_type=Ack,
+    )
+    if response is None:
+        return False
+    response = await messenger.send_and_receive(
+        message=StartLightAction(),
+        response_type=Ack,
+    )
+    return response is not None
+
+
 async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinState:
     """Returns the state of all IO GPIO pins on the rear panel."""
     current_state = RearPinState()
@@ -164,16 +223,25 @@ async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinStat
         current_state.aux2_id_active = bool(
             cast(AuxIDResponse, response).aux2_id_state.value
         )
-    # TODO add estop port detection request
-    """
-    #estop active pin
+    # estop active pin
     response = await messenger.send_and_receive(
-        message=EStopActiveRequeset(),
+        message=EstopStateRequest(),
         response_type=EstopStateChange,
     )
     if response is not None:
-        current_state.etop_active = bool(cast(EstopStateChange, response).engaged.value)
-    """
+        current_state.estop_active = bool(
+            cast(EstopStateChange, response).engaged.value
+        )
+
+    # sync out pin
+    response = await messenger.send_and_receive(
+        message=SyncStateRequest(),
+        response_type=SyncStateResponse,
+    )
+    if response is not None:
+        current_state.sync_engaged = bool(
+            cast(SyncStateResponse, response).engaged.value
+        )
     # door state
-    current_state.door_open = bool(get_door_state(messenger))
+    current_state.door_open = bool(await get_door_state(messenger))
     return current_state

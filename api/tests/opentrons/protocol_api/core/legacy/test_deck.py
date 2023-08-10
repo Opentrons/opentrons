@@ -20,6 +20,8 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
 )
 from opentrons.protocol_api.core.legacy.deck import Deck
 
+from opentrons.types import DeckSlotName
+
 
 @pytest.fixture(autouse=True)
 def use_mock_deck_conflict_check(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -117,7 +119,10 @@ def test_fixed_trash_conflict_checking(decoy: Decoy) -> None:
     subject = Deck(deck_type=STANDARD_OT2_DECK)
     decoy.verify(
         deck_conflict.check(
-            existing_items={}, new_location=12, new_item=EXPECTED_FIXED_TRASH
+            existing_items={},
+            new_location=DeckSlotName.FIXED_TRASH,
+            new_item=EXPECTED_FIXED_TRASH,
+            robot_type="OT-2 Standard",
         )
     )
 
@@ -134,14 +139,15 @@ def test_fixed_trash_conflict_checking(decoy: Decoy) -> None:
     subject["12"] = another_trash
     decoy.verify(
         deck_conflict.check(
-            existing_items={12: EXPECTED_FIXED_TRASH},
-            new_location=12,
+            existing_items={DeckSlotName.FIXED_TRASH: EXPECTED_FIXED_TRASH},
+            new_location=DeckSlotName.FIXED_TRASH,
             new_item=deck_conflict.Labware(
                 uri=LabwareUri("test/trash/1"),
                 highest_z=42,
                 is_fixed_trash=True,
                 name_for_errors="trash_load_name",
             ),
+            robot_type="OT-2 Standard",
         )
     )
 
@@ -168,15 +174,16 @@ def test_labware_conflict_checking(
     decoy.verify(
         deck_conflict.check(
             existing_items={
-                12: EXPECTED_FIXED_TRASH,
+                DeckSlotName.FIXED_TRASH: EXPECTED_FIXED_TRASH,
             },
-            new_location=4,
+            new_location=DeckSlotName.SLOT_4,
             new_item=deck_conflict.Labware(
                 uri=LabwareUri("legacy_labware_core_uri"),
                 highest_z=42,
                 is_fixed_trash=False,
                 name_for_errors="legacy_labware_core_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -196,15 +203,16 @@ def test_labware_conflict_checking(
     decoy.verify(
         deck_conflict.check(
             existing_items={
-                12: EXPECTED_FIXED_TRASH,
+                DeckSlotName.FIXED_TRASH: EXPECTED_FIXED_TRASH,
             },
-            new_location=4,
+            new_location=DeckSlotName.SLOT_4,
             new_item=deck_conflict.Labware(
                 uri=LabwareUri("labware_uri"),
                 highest_z=42,
                 is_fixed_trash=False,
                 name_for_errors="labware_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -229,14 +237,15 @@ def test_thermocycler_module_conflict_checking(
     decoy.verify(
         deck_conflict.check(
             existing_items={
-                12: EXPECTED_FIXED_TRASH,
+                DeckSlotName.FIXED_TRASH: EXPECTED_FIXED_TRASH,
             },
-            new_location=4,
+            new_location=DeckSlotName.SLOT_4,
             new_item=deck_conflict.ThermocyclerModule(
                 highest_z_including_labware=42,
                 name_for_errors="thermocycler_load_name",
                 is_semi_configuration=is_semi_configuration,
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -256,13 +265,14 @@ def test_heater_shaker_module_conflict_checking(
     decoy.verify(
         deck_conflict.check(
             existing_items={
-                12: EXPECTED_FIXED_TRASH,
+                DeckSlotName.FIXED_TRASH: EXPECTED_FIXED_TRASH,
             },
-            new_location=4,
+            new_location=DeckSlotName.SLOT_4,
             new_item=deck_conflict.HeaterShakerModule(
                 highest_z_including_labware=42,
                 name_for_errors="heater_shaker_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
@@ -282,13 +292,14 @@ def test_other_module_conflict_checking(
     decoy.verify(
         deck_conflict.check(
             existing_items={
-                12: EXPECTED_FIXED_TRASH,
+                DeckSlotName.FIXED_TRASH: EXPECTED_FIXED_TRASH,
             },
-            new_location=4,
+            new_location=DeckSlotName.SLOT_4,
             new_item=deck_conflict.OtherModule(
                 highest_z_including_labware=42,
                 name_for_errors="module_load_name",
             ),
+            robot_type="OT-2 Standard",
         ),
         times=1,
     )
