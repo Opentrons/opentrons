@@ -8,15 +8,6 @@
   background-color: white;
   margin: 0.4rem 0.125rem;
   color: var(--c-dark-gray);
-  cursor: pointer;
-}
-
-.sidebar_item:hover:not(.disabled) {
-  outline: var(--bd-width-default) solid var(--c-highlight);
-}
-
-.sidebar_item.titled_list_selected .title_bar {
-  background-color: var(--c-bg-selected);
 }
 
 .page_row {

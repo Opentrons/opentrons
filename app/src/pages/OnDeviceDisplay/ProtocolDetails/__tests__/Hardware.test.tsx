@@ -27,32 +27,35 @@ describe('Hardware', () => {
     }
     when(mockUseRequiredProtocolHardware)
       .calledWith(MOCK_PROTOCOL_ID)
-      .mockReturnValue([
-        {
-          hardwareType: 'pipette',
-          pipetteName: 'p10_single',
-          mount: 'left',
-          connected: true,
-        },
-        {
-          hardwareType: 'pipette',
-          pipetteName: 'p1000_single',
-          mount: 'right',
-          connected: false,
-        },
-        {
-          hardwareType: 'module',
-          moduleModel: 'heaterShakerModuleV1',
-          slot: '1',
-          connected: true,
-        },
-        {
-          hardwareType: 'module',
-          moduleModel: 'temperatureModuleV2',
-          slot: '3',
-          connected: false,
-        },
-      ])
+      .mockReturnValue({
+        requiredProtocolHardware: [
+          {
+            hardwareType: 'pipette',
+            pipetteName: 'p10_single',
+            mount: 'left',
+            connected: true,
+          },
+          {
+            hardwareType: 'pipette',
+            pipetteName: 'p1000_single',
+            mount: 'right',
+            connected: false,
+          },
+          {
+            hardwareType: 'module',
+            moduleModel: 'heaterShakerModuleV1',
+            slot: '1',
+            connected: true,
+          },
+          {
+            hardwareType: 'module',
+            moduleModel: 'temperatureModuleV2',
+            slot: '3',
+            connected: false,
+          },
+        ],
+        isLoading: false,
+      })
   })
   afterEach(() => {
     resetAllWhenMocks()
