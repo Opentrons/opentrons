@@ -28,8 +28,8 @@ interface Props extends StyleProps {
   subHeader?: string | JSX.Element
   isPending?: boolean
   /**
-   *  change justifyContent of OnDeviceDisplay buttons
-   *  TODO(jr, 8/9/23): this should really be refactored though so the
+   *  this prop is to change justifyContent of OnDeviceDisplay buttons
+   *  TODO(jr, 8/9/23): this SHOULD be refactored so the
    *  buttons' justifyContent is specified at the parent level
    */
   justifyContentForOddButton?: string
