@@ -65,8 +65,7 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
 
   return (
     <>
-      {estopStatus?.data.status !== DISENGAGED &&
-      isUnboxingFlowOngoing === false ? (
+      {estopStatus?.data.status !== DISENGAGED && !isUnboxingFlowOngoing ? (
         <TargetEstopModal />
       ) : null}
     </>
