@@ -15,7 +15,6 @@ from typing import (
     Set,
     Union,
     Mapping,
-    Iterator,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
