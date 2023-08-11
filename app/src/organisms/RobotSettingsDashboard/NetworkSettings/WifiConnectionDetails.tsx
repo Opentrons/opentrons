@@ -14,6 +14,7 @@ import {
   BORDERS,
   ALIGN_CENTER,
   DISPLAY_FLEX,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -91,9 +92,14 @@ export function WifiConnectionDetails({
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}
             >
-              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing24}
+                width="100%"
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+              >
                 <Flex gridGap={SPACING.spacing8} width="34.8125rem">
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
                     <Icon
                       name="wifi"
                       size="2.5rem"
@@ -112,17 +118,18 @@ export function WifiConnectionDetails({
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacing12}
+                  gridGap={SPACING.spacing12} // maybe need to add 10px as a const
                 >
                   <Icon
                     size="2.5rem"
                     name="info"
                     aria-label={`${activeSsid}_info_icon`}
+                    color={COLORS.darkBlack100}
                   />
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={COLORS.darkBlack70}
+                    color={COLORS.darkBlack100}
                   >
                     {t('view_details')}
                   </StyledText>
@@ -137,6 +144,7 @@ export function WifiConnectionDetails({
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.darkBlack70}
             paddingX={SPACING.spacing40}
+            marginBottom={SPACING.spacing8}
           >
             {t('other_networks')}
           </StyledText>

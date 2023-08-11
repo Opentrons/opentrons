@@ -130,6 +130,14 @@ function Input(props: InputFieldProps): JSX.Element {
     }
   `
 
+  const ERROR_TEXT_STYLE = css`
+    color: ${COLORS.errorEnabled};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: ${TYPOGRAPHY.fontSize22};
+      color: ${COLORS.red2};
+    }
+  `
+
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex css={INPUT_FIELD}>
@@ -161,7 +169,7 @@ function Input(props: InputFieldProps): JSX.Element {
         {props.secondaryCaption != null ? (
           <Flex paddingBottom={SPACING.spacing4}>{props.secondaryCaption}</Flex>
         ) : null}
-        <Flex color={COLORS.errorEnabled}>{props.error}</Flex>
+        <Flex css={ERROR_TEXT_STYLE}>{props.error}</Flex>
       </Flex>
     </Flex>
   )
