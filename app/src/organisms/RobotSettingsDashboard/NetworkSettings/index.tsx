@@ -54,6 +54,7 @@ export function NetworkSettings({
         onClickBack={() => setCurrentOption(null)}
       />
       <Flex
+        marginTop="7.75rem"
         paddingX={SPACING.spacing40}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}

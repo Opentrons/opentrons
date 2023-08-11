@@ -10,6 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  POSITION_FIXED,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -40,6 +41,11 @@ export function ChildNavigation({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       paddingX={SPACING.spacing40}
       paddingY={SPACING.spacing32}
+      position={POSITION_FIXED}
+      top="0"
+      left="0"
+      width="100%"
+      backgroundColor={COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
         <Btn onClick={onClickBack}>

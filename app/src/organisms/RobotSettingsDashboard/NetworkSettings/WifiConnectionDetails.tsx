@@ -69,7 +69,7 @@ export function WifiConnectionDetails({
           securityType={connectedWifiAuthType}
         />
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop="7.75rem">
         {activeSsid != null ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
