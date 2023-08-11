@@ -1,20 +1,19 @@
 import * as React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  OVERFLOW_HIDDEN,
+  POSITION_RELATIVE,
   SPACING,
   useSwipe,
-  COLORS,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_HIDDEN,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -22,7 +21,6 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
-import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
@@ -233,17 +231,6 @@ export function RunningProtocol(): JSX.Element {
             <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
           </Flex>
         </Flex>
-      </Flex>
-      {/* temporary */}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing24}
-        width="fit-content"
-        paddingRight={SPACING.spacing32}
-      >
-        <Link to="/dashboard">
-          <TertiaryButton>back to RobotDashboard</TertiaryButton>
-        </Link>
       </Flex>
     </>
   )
