@@ -7,6 +7,7 @@ import {
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 import {
   C_DARK_GRAY,
@@ -191,11 +192,12 @@ export const Module = (props: Props): JSX.Element => {
     />
   )
   if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-    moduleViz = (
-      <Thermocycler
-        {...(innerProps as React.ComponentProps<typeof Thermocycler>)}
-      />
-    )
+    const thermocyclerProps = {
+      ...innerProps,
+      model: def.model as ThermocyclerModuleModel,
+    }
+
+    moduleViz = <Thermocycler {...thermocyclerProps} />
   } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
     moduleViz = (
       <HeaterShaker
