@@ -4,6 +4,7 @@ from typing import List, Dict, Tuple
 from typing_extensions import Final
 from enum import Enum
 from opentrons.config.types import LiquidProbeSettings
+from opentrons.protocol_api.labware import Well
 
 
 class ConfigType(Enum):
@@ -32,6 +33,7 @@ class VolumetricConfig:
     user_volumes: bool
     kind: ConfigType
     extra: bool
+    jog: bool
 
 
 @dataclass
@@ -78,20 +80,122 @@ TIP_SPEED_WHILE_RETRACTING_DISPENSE = 50
 VIAL_SAFE_Z_OFFSET: Final = 25
 LABWARE_BOTTOM_CLEARANCE = 1.5
 
-DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
-    starting_mount_height=40,
-    max_z_distance=40,
-    min_z_distance=5,
-    mount_speed=10,
-    plunger_speed=5,
-    sensor_threshold_pascals=40,
-    expected_liquid_height=110,
-    log_pressure=True,
-    aspirate_while_sensing=False,
-    auto_zero_sensor=True,
-    num_baseline_reads=10,
-    data_file="/var/pressure_sensor_data.csv",
-)
+LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
+    50: {
+        1: {
+            50: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+        },
+        8: {
+            50: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+        },
+    },
+    1000: {
+        1: {
+            50: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+            200: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+            1000: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+        },
+        8: {
+            50: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+            200: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+            1000: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+        },
+        96: {
+            50: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+            200: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+            1000: {
+                "max_z_distance": 40,
+                "min_z_distance": 5,
+                "mount_speed": 10,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 40,
+            },
+        },
+    },
+}
+
+
+def _get_liquid_probe_settings(
+    cfg: VolumetricConfig, well: Well
+) -> LiquidProbeSettings:
+    lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[cfg.pipette_volume][
+        cfg.pipette_channels
+    ][cfg.tip_volume]
+    return LiquidProbeSettings(
+        starting_mount_height=well.top().point.z,
+        max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
+        min_z_distance=lqid_cfg["min_z_distance"],
+        mount_speed=lqid_cfg["mount_speed"],
+        plunger_speed=lqid_cfg["plunger_speed"],
+        sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
+        expected_liquid_height=110,
+        log_pressure=True,
+        aspirate_while_sensing=False,
+        auto_zero_sensor=True,
+        num_baseline_reads=10,
+        data_file="/var/pressure_sensor_data.csv",
+    )
+
 
 QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     1: {

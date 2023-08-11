@@ -15,6 +15,7 @@ from .helpers import (
     _calculate_stats,
     _get_channel_offset,
     _calculate_average,
+    _jog_to_find_liquid_height,
     _sense_liquid_height,
     _apply_labware_offsets,
     _pick_up_tip,
@@ -436,6 +437,22 @@ def _calculate_evaporation(
     return average_aspirate_evaporation_ul, average_dispense_evaporation_ul
 
 
+def _get_liquid_height(
+    resources: TestResources, cfg: config.GravimetricConfig, well: Well
+) -> float:
+    resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
+    if cfg.jog:
+        _liquid_height = _jog_to_find_liquid_height(
+            resources.ctx, resources.pipette, well
+        )
+    else:
+        _liquid_height = _sense_liquid_height(
+            resources.ctx, resources.pipette, well, cfg
+        )
+    resources.pipette.move_to(well.top().move(Point(0, 0, _minimum_z_height(cfg))))
+    return _liquid_height
+
+
 def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     """Run."""
     global _PREV_TRIAL_GRAMS
@@ -483,9 +500,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         resources.ctx._core.get_hardware().retract(mnt)
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
-        resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
-        _liquid_height = _sense_liquid_height(resources.ctx, resources.pipette, well)
-        resources.pipette.move_to(well.top().move(Point(0, 0, _minimum_z_height(cfg))))
+        _liquid_height = _get_liquid_height(resources, cfg, well)
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(
