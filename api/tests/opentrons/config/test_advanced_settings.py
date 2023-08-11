@@ -17,6 +17,15 @@ def mock_settings_values_ot2() -> Dict[str, Optional[bool]]:
 
 
 @pytest.fixture
+def mock_settings_values_ot2_all() -> Dict[str, Optional[bool]]:
+    return {
+        s.id: False
+        for s in advanced_settings.settings
+        if RobotTypeEnum.OT2 in s.robot_type
+    }
+
+
+@pytest.fixture
 def mock_settings_values_flex() -> Dict[str, Optional[bool]]:
     return {
         s.id: False
@@ -93,9 +102,9 @@ def test_get_advanced_setting_not_found(
 def test_get_advanced_setting_found(
     clear_cache: None,
     mock_read_settings_file_ot2: MagicMock,
-    mock_settings_values_ot2: Dict[str, Optional[bool]],
+    mock_settings_values_ot2_all: Dict[str, Optional[bool]],
 ) -> None:
-    for k, v in mock_settings_values_ot2.items():
+    for k, v in mock_settings_values_ot2_all.items():
         s = advanced_settings.get_adv_setting(k, RobotTypeEnum.OT2)
         assert s is not None
         assert s.value == v

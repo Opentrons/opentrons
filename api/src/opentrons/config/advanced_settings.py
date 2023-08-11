@@ -255,12 +255,14 @@ settings_by_old_id: Dict[str, SettingDefinition] = {
 
 def get_adv_setting(setting: str, robot_type: RobotTypeEnum) -> Optional[Setting]:
     setting = _clean_id(setting)
-    s = get_all_adv_settings(robot_type)
+    s = get_all_adv_settings(robot_type, include_internal=True)
     return s.get(setting, None)
 
 
 @lru_cache(maxsize=1)
-def get_all_adv_settings(robot_type: RobotTypeEnum) -> Dict[str, Setting]:
+def get_all_adv_settings(
+    robot_type: RobotTypeEnum, include_internal: bool = False
+) -> Dict[str, Setting]:
     """Get all the advanced setting values and definitions"""
     settings_file = CONFIG["feature_flags_file"]
 
@@ -271,7 +273,7 @@ def get_all_adv_settings(robot_type: RobotTypeEnum) -> Dict[str, Setting]:
         for key, value in values.items()
         if key in settings_by_id
         and robot_type in settings_by_id[key].robot_type
-        and not settings_by_id[key].internal_only
+        and not (include_internal and settings_by_id[key].internal_only)
     }
 
 
