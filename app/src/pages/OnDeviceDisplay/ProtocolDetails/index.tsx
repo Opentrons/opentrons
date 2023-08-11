@@ -26,14 +26,16 @@ import {
   useProtocolAnalysesQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import {
-  CompletedProtocolAnalysis,
-  ProtocolResource,
-} from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
+import {
+  ProtocolDetailsHeaderChipSkeleton,
+  ProcotolDetailsHeaderTitleSkeleton,
+  ProtocolDetailsSectionContentSkeleton,
+} from '../../../organisms/OnDeviceDisplay/ProtocolDetails'
 import { useMissingHardwareText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { Modal, SmallModalChildren } from '../../../molecules/Modal'
 import { useToaster } from '../../../organisms/ToasterOven'
@@ -48,26 +50,35 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 
+import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
-const ProtocolHeader = (props: {
-  title: string
+interface ProtocolHeaderProps {
+  title: string | null | undefined
   handleRunProtocol: () => void
   chipText: string
   isScrolled: boolean
-}): JSX.Element => {
+  isProtocolFetching: boolean
+}
+
+const ProtocolHeader = ({
+  title,
+  handleRunProtocol,
+  chipText,
+  isScrolled,
+  isProtocolFetching,
+}: ProtocolHeaderProps): JSX.Element => {
   const history = useHistory()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
-  const { title, handleRunProtocol, chipText, isScrolled } = props
   const [truncate, setTruncate] = React.useState<boolean>(true)
   const toggleTruncate = (): void => setTruncate(value => !value)
 
-  let displayedTitle = title
-  if (title.length > 92 && truncate) {
-    displayedTitle = truncateString(title, 80, 60)
+  let displayedTitle = title ?? null
+  if (displayedTitle !== null && displayedTitle.length > 92 && truncate) {
+    displayedTitle = truncateString(displayedTitle, 80, 60)
   }
 
   return (
@@ -102,25 +113,34 @@ const ProtocolHeader = (props: {
           maxWidth="42.625rem"
         >
           <Flex maxWidth="max-content">
-            <Chip
-              type={chipText === 'Ready to run' ? 'success' : 'warning'}
-              text={chipText}
-            />
+            {!isProtocolFetching ? (
+              <Chip
+                type={chipText === 'Ready to run' ? 'success' : 'warning'}
+                text={chipText}
+              />
+            ) : (
+              <ProtocolDetailsHeaderChipSkeleton />
+            )}
           </Flex>
-          <StyledText
-            as="h2"
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-            onClick={toggleTruncate}
-            overflowWrap="anywhere"
-          >
-            {displayedTitle}
-          </StyledText>
+          {!isProtocolFetching ? (
+            <StyledText
+              as="h2"
+              fontWeight={TYPOGRAPHY.fontWeightBold}
+              onClick={toggleTruncate}
+              overflowWrap="anywhere"
+            >
+              {displayedTitle}
+            </StyledText>
+          ) : (
+            <ProcotolDetailsHeaderTitleSkeleton />
+          )}
         </Flex>
       </Flex>
       <SmallButton
         buttonCategory="rounded"
         onClick={handleRunProtocol}
         buttonText={t('protocol_details:start_setup')}
+        disabled={isProtocolFetching}
       />
     </Flex>
   )
@@ -140,8 +160,11 @@ interface ProtocolSectionTabsProps {
   currentOption: TabOption
   setCurrentOption: (option: TabOption) => void
 }
-const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
-  const { currentOption, setCurrentOption } = props
+
+const ProtocolSectionTabs = ({
+  currentOption,
+  setCurrentOption,
+}: ProtocolSectionTabsProps): JSX.Element => {
   return (
     <Flex gridGap={SPACING.spacing8} marginX={SPACING.spacing16}>
       {protocolSectionTabOptions.map(option => {
@@ -159,12 +182,13 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
   )
 }
 
-const Summary = (props: {
+interface SummaryProps {
   author: string | null
   description: string | null
   date: string | null
-}): JSX.Element => {
-  const { author, description, date } = props
+}
+
+const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
   const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -205,21 +229,24 @@ const Summary = (props: {
 
 interface ProtocolSectionContentProps {
   protocolId: string
-  protocolData: ProtocolResource
+  protocolData: Protocol | null | undefined
   currentOption: TabOption
 }
-const ProtocolSectionContent = (
-  props: ProtocolSectionContentProps
-): JSX.Element => {
-  const { protocolId, protocolData, currentOption } = props
-  let protocolSection
+const ProtocolSectionContent = ({
+  protocolId,
+  protocolData,
+  currentOption,
+}: ProtocolSectionContentProps): JSX.Element => {
+  if (protocolData === null || protocolData === undefined) return <></>
+
+  let protocolSection = null
   switch (currentOption) {
     case 'Summary':
       protocolSection = (
         <Summary
-          author={protocolData.metadata.author ?? null}
-          date={protocolData.createdAt ?? null}
-          description={protocolData.metadata.description ?? null}
+          author={protocolData.data.metadata.author ?? null}
+          date={protocolData.data.createdAt ?? null}
+          description={protocolData.data.metadata.description ?? null}
         />
       )
       break
@@ -230,7 +257,7 @@ const ProtocolSectionContent = (
       protocolSection = <Labware protocolId={protocolId} />
       break
     case 'Liquids':
-      protocolSection = <Liquids protocolId={props.protocolId} />
+      protocolSection = <Liquids protocolId={protocolId} />
       break
     case 'Deck':
       protocolSection = <Deck protocolId={protocolId} />
@@ -257,7 +284,10 @@ export function ProtocolDetails(): JSX.Element | null {
     protocolSectionTabOptions[0]
   )
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
-  const { data: protocolRecord } = useProtocolQuery(protocolId, {
+  const {
+    data: protocolRecord,
+    isLoading: isProtocolFetching,
+  } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
 
@@ -267,7 +297,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
-  if (scrollRef.current) {
+  if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
 
@@ -354,48 +384,52 @@ export function ProtocolDetails(): JSX.Element | null {
     }
   }
 
-  if (protocolRecord == null) return null
   const displayName =
-    protocolRecord?.data.metadata.protocolName ??
-    protocolRecord?.data.files[0].name
+    isProtocolFetching === false && protocolRecord !== undefined
+      ? protocolRecord?.data.metadata.protocolName ??
+        protocolRecord?.data.files[0].name
+      : null
 
   const deleteModalHeader: ModalHeaderBaseProps = {
     title: 'Delete this protocol?',
     iconName: 'ot-alert',
     iconColor: COLORS.yellow2,
   }
+
   return (
     <>
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>
-          <Modal
-            modalSize="medium"
-            onOutsideClick={() => setShowConfirmationDeleteProtocol(false)}
-            header={deleteModalHeader}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-              <StyledText
-                as="h4"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                marginBottom={SPACING.spacing40}
-              >
-                {t('delete_protocol_perm', { name: displayName })}
-              </StyledText>
-              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-                <SmallButton
-                  onClick={() => setShowConfirmationDeleteProtocol(false)}
-                  buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
-                  width="50%"
-                />
-                <SmallButton
-                  onClick={handleDeleteClick}
-                  buttonText={t('shared:delete')}
-                  buttonType="alert"
-                  width="50%"
-                />
+          {isProtocolFetching === false ? (
+            <Modal
+              modalSize="medium"
+              onOutsideClick={() => setShowConfirmationDeleteProtocol(false)}
+              header={deleteModalHeader}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+                <StyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  marginBottom={SPACING.spacing40}
+                >
+                  {t('delete_protocol_perm', { name: displayName })}
+                </StyledText>
+                <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+                  <SmallButton
+                    onClick={() => setShowConfirmationDeleteProtocol(false)}
+                    buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
+                    width="50%"
+                  />
+                  <SmallButton
+                    onClick={handleDeleteClick}
+                    buttonText={t('shared:delete')}
+                    buttonType="alert"
+                    width="50%"
+                  />
+                </Flex>
               </Flex>
-            </Flex>
-          </Modal>
+            </Modal>
+          ) : null}
         </Flex>
       ) : null}
       <Flex
@@ -418,22 +452,32 @@ export function ProtocolDetails(): JSX.Element | null {
           handleRunProtocol={handleRunProtocol}
           chipText={chipText}
           isScrolled={isScrolled}
+          isProtocolFetching={isProtocolFetching}
         />
         <Flex flexDirection={DIRECTION_COLUMN}>
           <ProtocolSectionTabs
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
           />
-          <ProtocolSectionContent
-            protocolId={protocolId}
-            protocolData={protocolRecord.data}
-            currentOption={currentOption}
-          />
+          {isProtocolFetching === false ? (
+            <ProtocolSectionContent
+              protocolId={protocolId}
+              protocolData={protocolRecord}
+              currentOption={currentOption}
+            />
+          ) : (
+            <ProtocolDetailsSectionContentSkeleton />
+          )}
           <Flex
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing8}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            paddingTop={SPACING.spacing60}
+            paddingTop={
+              // Skeleton is large. Better UX not to scroll to see buttons while loading.
+              isProtocolFetching === false
+                ? SPACING.spacing60
+                : SPACING.spacing24
+            }
             marginX={SPACING.spacing16}
           >
             <MediumButton

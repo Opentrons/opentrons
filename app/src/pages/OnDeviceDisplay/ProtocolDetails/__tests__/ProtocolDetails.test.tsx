@@ -126,6 +126,7 @@ describe('ODDProtocolDetails', () => {
           key: '26ed5a82-502f-4074-8981-57cdda1d066d',
         },
       },
+      isLoading: false,
     } as any)
     mockUseProtocolAnalysesQuery.mockReturnValue({
       data: {
