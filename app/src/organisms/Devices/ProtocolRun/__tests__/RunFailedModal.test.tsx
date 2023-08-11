@@ -32,7 +32,7 @@ const render = (props: React.ComponentProps<typeof RunFailedModal>) => {
   })
 }
 
-describe('', () => {
+describe('RunFailedModal - DesktopApp', () => {
   let props: React.ComponentProps<typeof RunFailedModal>
 
   beforeEach(() => {
