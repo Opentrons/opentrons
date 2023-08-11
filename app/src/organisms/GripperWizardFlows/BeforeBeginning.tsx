@@ -2,7 +2,7 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -80,7 +80,7 @@ export const BeforeBeginning = (
     {
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT,
+        mount: EXTENSION,
       },
     },
   ]

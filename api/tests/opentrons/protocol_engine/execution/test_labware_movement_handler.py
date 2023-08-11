@@ -8,10 +8,7 @@ from decoy import Decoy, matchers
 from typing import TYPE_CHECKING, Union
 
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
-from opentrons_shared_data.gripper.constants import (
-    LABWARE_GRIP_FORCE,
-    IDLE_STATE_GRIP_FORCE,
-)
+from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import DeckSlotName, Point
 
@@ -184,17 +181,19 @@ async def test_move_labware_with_gripper(
     ).then_return(final_offset_data)
 
     decoy.when(
-        state_store.geometry.get_labware_center(
+        state_store.geometry.get_labware_grip_point(
             labware_id="my-teleporting-labware", location=from_location
         )
     ).then_return(Point(101, 102, 119.5))
 
     decoy.when(
-        state_store.geometry.get_labware_center(
+        state_store.geometry.get_labware_grip_point(
             labware_id="my-teleporting-labware", location=to_location
         )
     ).then_return(Point(201, 202, 219.5))
-
+    decoy.when(
+        state_store.labware.get_grip_force("my-teleporting-labware")
+    ).then_return(100)
     mock_tc_context_manager = decoy.mock()
     decoy.when(
         thermocycler_plate_lifter.lift_plate_for_labware_movement(
@@ -234,7 +233,7 @@ async def test_move_labware_with_gripper(
     decoy.verify(
         await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
         await mock_tc_context_manager.__aenter__(),
-        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
+        await ot3_hardware_api.grip(force_newtons=100),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[0]
         ),
@@ -242,15 +241,15 @@ async def test_move_labware_with_gripper(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[1]
         ),
-        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
+        await ot3_hardware_api.grip(force_newtons=100),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[2]
         ),
-        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
+        await ot3_hardware_api.grip(force_newtons=100),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[3]
         ),
-        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
+        await ot3_hardware_api.grip(force_newtons=100),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[4]
         ),
@@ -258,7 +257,9 @@ async def test_move_labware_with_gripper(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
-        await ot3_hardware_api.grip(force_newtons=IDLE_STATE_GRIP_FORCE),
+        await ot3_hardware_api.grip(
+            force_newtons=IDLE_STATE_GRIP_FORCE, stay_engaged=False
+        ),
     )
 
 

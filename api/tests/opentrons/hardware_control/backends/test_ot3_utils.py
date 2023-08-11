@@ -1,4 +1,7 @@
 from opentrons_hardware.hardware_control.motion_planning import Move
+from opentrons_hardware.hardware_control.motion import (
+    create_step,
+)
 from opentrons.hardware_control.backends import ot3utils
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.hardware_control.types import Axis, OT3Mount
@@ -32,6 +35,31 @@ def test_create_step() -> None:
     assert len(move_group) == 3
     for step in move_group:
         assert set(present_nodes) == set(step.keys())
+
+
+def test_get_moving_nodes() -> None:
+    """Test that we can filter out the nonmoving nodes."""
+    # Create a dummy group where X has velocity but no accel, and Y has accel but no velocity.
+    present_nodes = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
+    move_group = [
+        create_step(
+            distance={NodeId.gantry_x: f64(100), NodeId.gantry_y: f64(100)},
+            velocity={NodeId.gantry_x: f64(100), NodeId.gantry_y: f64(0)},
+            acceleration={NodeId.gantry_x: f64(0), NodeId.gantry_y: f64(100)},
+            duration=f64(1),
+            present_nodes=present_nodes,
+        )
+    ]
+    assert len(move_group[0]) == 4
+
+    print(move_group)
+
+    moving_nodes = ot3utils.moving_axes_in_move_group(move_group)
+    assert len(moving_nodes) == 2
+    assert NodeId.gantry_x in moving_nodes
+    assert NodeId.gantry_y in moving_nodes
+    assert NodeId.head_l not in moving_nodes
+    assert NodeId.head_r not in moving_nodes
 
 
 def test_filter_zero_duration_step() -> None:

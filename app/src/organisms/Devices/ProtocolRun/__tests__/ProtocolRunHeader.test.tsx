@@ -20,6 +20,7 @@ import {
   useModulesQuery,
   usePipettesQuery,
   useDismissCurrentRunMutation,
+  useEstopQuery,
 } from '@opentrons/react-api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
@@ -72,6 +73,13 @@ import { RunProgressMeter } from '../../../RunProgressMeter'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
+import {
+  DISENGAGED,
+  ENGAGED,
+  LOGICALLY_ENGAGED,
+  NOT_PRESENT,
+  PHYSICALLY_ENGAGED,
+} from '../../../EmergencyStop'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -176,6 +184,9 @@ const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
 >
+const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
+  typeof useEstopQuery
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -215,6 +226,14 @@ const mockMovingHeaterShaker = {
   },
   usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
+
+const mockEstopStatus = {
+  data: {
+    status: DISENGAGED,
+    leftEstopPhysicalStatus: DISENGAGED,
+    rightEstopPhysicalStatus: NOT_PRESENT,
+  },
+}
 
 const render = () => {
   return renderWithProviders(
@@ -321,6 +340,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
+    mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -795,5 +815,32 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText, getByLabelText }] = render()
     getByText('Run completed.')
     getByLabelText('ot-spinner')
+  })
+
+  it('renders banner when estop pressed - physicallyEngaged', () => {
+    mockEstopStatus.data.status = PHYSICALLY_ENGAGED
+    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
+
+    mockUseEstopQuery({ data: mockEstopStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Run failed.')
+  })
+
+  it('renders banner when estop pressed - logicallyEngaged', () => {
+    mockEstopStatus.data.status = LOGICALLY_ENGAGED
+    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
+
+    mockUseEstopQuery({ data: mockEstopStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Run failed.')
+  })
+
+  it('renders banner when estop pressed - notPresent', () => {
+    mockEstopStatus.data.status = NOT_PRESENT
+    mockEstopStatus.data.leftEstopPhysicalStatus = NOT_PRESENT
+
+    mockUseEstopQuery({ data: mockEstopStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Run failed.')
   })
 })

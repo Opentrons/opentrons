@@ -485,6 +485,8 @@ def mock_persistence_resetter(
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
                 "runsHistory": True,
+                # TODO(mm, 2023-08-04): Figure out how to test Flex-only options,
+                # then add gripperOffsetCalibrations and onDeviceDisplay.
             },
             {
                 ResetOptionId.boot_scripts,

@@ -52,10 +52,12 @@ class StopAction:
     After a StopAction, the engine status will be marked as stopped.
     """
 
+    from_estop: bool = False
+
 
 @dataclass(frozen=True)
 class FinishErrorDetails:
-    """Error details for the payload of a FinishAction."""
+    """Error details for the payload of a FinishAction or HardwareStoppedAction."""
 
     error: Exception
     error_id: str
@@ -64,21 +66,27 @@ class FinishErrorDetails:
 
 @dataclass(frozen=True)
 class FinishAction:
-    """Gracefully stop processing commands in the engine.
-
-    After a FinishAction, the engine status will be marked as `succeeded` or `failed`
-    if `set_run_status` is True. If False, status will be `stopped`.
-    """
+    """Gracefully stop processing commands in the engine."""
 
     set_run_status: bool = True
+    """Whether to set the engine status depending on `error_details`.
+
+    If True, the engine status will be marked `succeeded` or `failed`, depending on `error_details`.
+    If False, the engine status will be marked `stopped`.
+    """
+
     error_details: Optional[FinishErrorDetails] = None
+    """The fatal error that caused the run to fail."""
 
 
 @dataclass(frozen=True)
 class HardwareStoppedAction:
-    """An action dispatched after hardware has successfully been stopped."""
+    """An action dispatched after hardware has been stopped for good, for this engine instance."""
 
     completed_at: datetime
+
+    finish_error_details: Optional[FinishErrorDetails]
+    """The error that happened while doing post-run finish steps (homing and dropping tips)."""
 
 
 @dataclass(frozen=True)
