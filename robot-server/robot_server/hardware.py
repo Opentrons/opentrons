@@ -3,7 +3,16 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import Depends, status
-from typing import Callable, Union, TYPE_CHECKING, cast, Awaitable, Iterator, Iterable
+from typing import (
+    Callable,
+    Union,
+    TYPE_CHECKING,
+    cast,
+    Awaitable,
+    Iterator,
+    Iterable,
+    Tuple,
+)
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
 from traceback import format_exception_only, TracebackException
 from contextlib import contextmanager
@@ -57,8 +66,14 @@ from .robot.control.estop_handler import EstopHandler
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
-# Function that can be called when hardware initialization completes
-PostInitCallback = Callable[[AppState, HardwareControlAPI], Awaitable[None]]
+
+PostInitCallback = Tuple[
+    Callable[[AppState, HardwareControlAPI], Awaitable[None]], bool
+]
+"""Function to be called when hardware init completes.
+    - First item is the callback
+    - Second item is True if this should be called BEFORE the postinit
+    function, or False if this should be called AFTER the postinit function."""
 
 log = logging.getLogger(__name__)
 
@@ -252,7 +267,11 @@ async def get_deck_type() -> DeckType:
     return DeckType(guess_deck_type_from_global_config())
 
 
-async def _postinit_ot2_tasks(hardware: ThreadManagedHardware) -> None:
+async def _postinit_ot2_tasks(
+    hardware: ThreadManagedHardware,
+    app_state: AppState,
+    callbacks: Iterable[PostInitCallback],
+) -> None:
     """Tasks to run on an initialized OT-2 before it is ready to use."""
 
     async def _blink() -> None:
@@ -276,6 +295,9 @@ async def _postinit_ot2_tasks(hardware: ThreadManagedHardware) -> None:
             await blink_task
         except asyncio.CancelledError:
             pass
+        for callback in callbacks:
+            if not callback[1]:
+                await callback[0](app_state, hardware.wrapped())
 
 
 async def _home_on_boot(hardware: HardwareControlAPI) -> None:
@@ -321,7 +343,9 @@ async def _do_updates(
 
 
 async def _postinit_ot3_tasks(
-    hardware_tm: ThreadManagedHardware, app_state: AppState
+    hardware_tm: ThreadManagedHardware,
+    app_state: AppState,
+    callbacks: Iterable[PostInitCallback],
 ) -> None:
     """Tasks to run on an initialized OT-3 before it is ready to use."""
     update_manager = await get_firmware_update_manager(
@@ -336,8 +360,11 @@ async def _postinit_ot3_tasks(
         await _do_updates(hardware, update_manager)
         await hardware.cache_instruments()
         await _home_on_boot(hardware)
-        update_manager.mark_initialized()
         await hardware.set_status_bar_state(StatusBarState.ACTIVATION)
+        for callback in callbacks:
+            if not callback[1]:
+                await callback[0](app_state, hardware_tm.wrapped())
+
     except Exception:
         log.exception("Hardware initialization failure")
         raise
@@ -470,17 +497,18 @@ async def _initialize_hardware_api(
         _hw_api_accessor.set_on(app_state, hardware)
 
         for callback in callbacks:
-            await callback(app_state, hardware.wrapped())
+            if callback[1]:
+                await callback[0](app_state, hardware.wrapped())
 
         _systemd_notify(systemd_available)
 
         if should_use_ot3():
             postinit_task = asyncio.create_task(
-                _wrap_postinit(_postinit_ot3_tasks(hardware, app_state))
+                _wrap_postinit(_postinit_ot3_tasks(hardware, app_state, callbacks))
             )
         else:
             postinit_task = asyncio.create_task(
-                _wrap_postinit(_postinit_ot2_tasks(hardware))
+                _wrap_postinit(_postinit_ot2_tasks(hardware, app_state, callbacks))
             )
 
         postinit_task.add_done_callback(_postinit_done_handler)
