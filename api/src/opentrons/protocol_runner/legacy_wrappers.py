@@ -68,6 +68,7 @@ class LegacyFileReader:
     def read(
         protocol_source: ProtocolSource,
         labware_definitions: Iterable[LabwareDefinition],
+        flex_dev_compat: bool,
     ) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
@@ -93,6 +94,7 @@ class LegacyFileReader:
             extra_data={
                 data_path.name: data_path.read_bytes() for data_path in data_file_paths
             },
+            flex_dev_compat=flex_dev_compat,
         )
 
 

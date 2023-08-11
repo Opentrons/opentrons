@@ -173,13 +173,25 @@ class EngineStore:
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")
 
-        if isinstance(runner, (PythonAndLegacyRunner, JsonRunner)):
-            # FIXME(mm, 2022-12-21): This `await` introduces a concurrency hazard. If
-            # two requests simultaneously call this method, they will both "succeed"
-            # (with undefined results) instead of one raising EngineConflictError.
+        # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
+        # concurrency hazard. If two requests simultaneously call this method,
+        # they will both "succeed" (with undefined results) instead of one
+        # raising EngineConflictError.
+        if isinstance(runner, PythonAndLegacyRunner):
             assert (
                 protocol is not None
-            ), "A Python or JSON protocol should have a protocol source file."
+            ), "A Python protocol should have a protocol source file."
+            await runner.load(
+                protocol.source,
+                # Conservatively assume that we're re-running a protocol that
+                # was uploaded before we added stricter validation, and that
+                # doesn't conform to the new rules.
+                flex_dev_compat=True,
+            )
+        elif isinstance(runner, JsonRunner):
+            assert (
+                protocol is not None
+            ), "A JSON protocol should have a protocol source file."
             await runner.load(protocol.source)
         else:
             runner.prepare()
