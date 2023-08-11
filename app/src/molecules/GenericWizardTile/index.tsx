@@ -16,13 +16,22 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   RESPONSIVENESS,
-  ALIGN_FLEX_END,
   DISPLAY_INLINE_BLOCK,
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'
+
+const ALIGN_BUTTONS = css`
+  align-items: ${ALIGN_FLEX_END};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    align-items: ${ALIGN_CENTER};
+  }
+`
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -130,7 +139,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           {rightHandBody}
         </Flex>
       </Flex>
-      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
+      <Flex justifyContent={buttonPositioning} css={ALIGN_BUTTONS}>
         {back != null ? (
           <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
             <StyledText
