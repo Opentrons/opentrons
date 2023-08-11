@@ -21,6 +21,8 @@ Top, Bottom, and Center
 
 Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and whether the labware is on a module or in a deck slot. You can use these positions as-is or calculate other positions relative to them.
 
+.. tried bold instead of H4, not great
+
 Top
 ^^^
 
@@ -56,7 +58,7 @@ This is a good position to start for an :ref:`aspirate action <new-aspirate>` or
    plate['A1'].bottom(z=-1) # 1 mm below the bottom center of the well
                             # this may be dangerous!
 
-.. verifying this warning re: Flex
+.. Warning needs verification re: Flex. checking now. 
 
 .. warning::
 
@@ -79,18 +81,13 @@ As an example, lets look at the :py:meth:`.Well.center` method. It returns a pos
 .. _new-default-op-positions:
 
 Default Positions
------------------
+=================
 
-By default, the OT-2 will aspirate and dispense 1 mm above the bottom of wells, which may not be suitable for some labware geometries, liquids, or protocols. You can change this by using :py:meth:`.Well.bottom` with the ``z`` argument, although it can be cumbersome to do this repeatedly. If you need to change the aspiration or dispensing height for many operations, specify the distance from the well bottom with :py:obj:`.InstrumentContext.well_bottom_clearance`. This attribute has two sub-attributes: ``well_bottom_clearance.aspirate`` changes the height for aspiration, and ``well_bottom_clearance.dispense`` changes the height for dispensing.
+By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value by using the :py:meth:`.Well.bottom` method with the ``z`` argument, though it can be cumbersome to do so repeatedly.
 
-Changing these attributes will affect all subsequent aspirate and dispense actions performed by that pipette, even those executed as part of a :py:meth:`.transfer`.
+If you need to change the aspiration or dispensing height for multiple operations, specify the distance from the well bottom with the :py:obj:`.InstrumentContext.well_bottom_clearance` object. It has two attributes: ``well_bottom_clearance.aspirate`` and ``well_bottom_clearance.dispense``. These change the aspiration height and dispense height, respectively.
 
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api, types
-
-    metadata = {'apiLevel': '|apiLevel|'}
+Modifying these attributes will affect all subsequent aspirate and dispense actions performed by the attached pipette, even those executed as part of a :py:meth:`.transfer` operation. This snippet from a sample ``run()`` function demonstrates how to work with and change the default clearance::
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -119,11 +116,10 @@ Changing these attributes will affect all subsequent aspirate and dispense actio
 
 .. versionadded:: 2.0
 
-
 .. _using_lpc:
 
 Using Labware Position Check
-----------------------------
+============================
 
 All positions relative to labware are automatically adjusted based on the labware's offset, an x, y, z vector. The best way to calculate and apply these offsets is by using Labware Position Check when you run your protocol in the Opentrons App. As of version 6.0 of the app, you can apply previously calculated offsets — even across different protocols — as long as they are for the same type of labware in the same deck slot on the same robot.
 
