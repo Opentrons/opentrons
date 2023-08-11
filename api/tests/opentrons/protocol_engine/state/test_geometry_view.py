@@ -170,6 +170,67 @@ def test_get_labware_parent_position_on_module(
     assert result == Point(6, 8, 10)
 
 
+def test_get_stacked_labware_total_height(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    subject: GeometryView,
+) -> None:
+    """Should get the total height of stacked labware."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="bcd",
+        definitionUri=uri_from_details(namespace="a", load_name="bcd", version=1),
+        location=OnLabwareLocation(labwareId="bellow-id"),
+        offsetId=None,
+    )
+
+    bellow_labware_data = LoadedLabware(
+        id="bellow-id",
+        loadName="xxx",
+        definitionUri=uri_from_details(namespace="w", load_name="xyz", version=1),
+        location=OnLabwareLocation(labwareId="bottom-id"),
+        offsetId=None,
+    )
+
+    bottom_labware_data = LoadedLabware(
+        id="bottom-id",
+        loadName="xyz",
+        definitionUri=uri_from_details(namespace="w", load_name="xyz", version=1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
+    )
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+
+    decoy.when(labware_view.get_dimensions("bellow-id")).then_return(
+        Dimensions(x=123, y=456, z=5)
+    )
+
+    decoy.when(labware_view.get("bellow-id")).then_return(bellow_labware_data)
+
+    decoy.when(labware_view.get_dimensions("bottom-id")).then_return(
+        Dimensions(x=123, y=456, z=5)
+    )
+
+    decoy.when(labware_view.get("bottom-id")).then_return(bottom_labware_data)
+
+    decoy.when(
+        labware_view.get_labware_overlap_offsets("labware_id", "xxx")
+    ).then_return(OverlapOffset(x=1, y=2, z=2))
+
+    decoy.when(
+        labware_view.get_labware_overlap_offsets("bellow-id", "xyz")
+    ).then_return(OverlapOffset(x=1, y=2, z=2))
+
+    result = subject.get_stacked_labware_total_height(
+        "labware_id", labware_data.location
+    )
+
+    assert result == 6
+
+
 def test_get_labware_parent_position_on_labware(
     decoy: Decoy,
     labware_view: LabwareView,
