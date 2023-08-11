@@ -2,23 +2,30 @@ import * as Constants from './constants'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { BuildrootState, BuildrootUpdateSession } from './types'
+import type { RobotUpdateState, RobotUpdateSession } from './types'
 
-export const INITIAL_STATE: BuildrootState = {
-  seen: false,
-  version: null,
-  info: null,
-  downloadProgress: null,
-  downloadError: null,
+export const INITIAL_STATE: RobotUpdateState = {
+  flex: {
+    version: null,
+    releaseNotes: null,
+    downloadProgress: null,
+    downloadError: null,
+  },
+  ot2: {
+    version: null,
+    releaseNotes: null,
+    downloadProgress: null,
+    downloadError: null,
+  },
   session: null,
 }
 
 export const initialSession = (
   robotName: string,
-  session: BuildrootUpdateSession | null
-): BuildrootUpdateSession => ({
+  session: RobotUpdateSession | null
+): RobotUpdateSession => ({
   robotName,
-  userFileInfo: session?.userFileInfo || null,
+  fileInfo: session?.fileInfo || null,
   step: null,
   token: null,
   pathPrefix: null,
@@ -27,39 +34,68 @@ export const initialSession = (
   error: null,
 })
 
-export const buildrootReducer: Reducer<BuildrootState, Action> = (
+export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
   state = INITIAL_STATE,
   action
 ) => {
   switch (action.type) {
-    case Constants.BR_UPDATE_VERSION: {
-      return { ...state, version: action.payload }
+    case Constants.ROBOTUPDATE_UPDATE_VERSION: {
+      return {
+        ...state,
+        ...{
+          [action.payload.target]: {
+            ...state[action.payload.target],
+            version: action.payload.version,
+          },
+        },
+      }
     }
 
-    case Constants.BR_UPDATE_INFO: {
-      return { ...state, info: action.payload }
+    case Constants.ROBOTUPDATE_UPDATE_INFO: {
+      return {
+        ...state,
+        ...{
+          [action.payload.target]: {
+            ...state[action.payload.target],
+            version: action.payload.version,
+            releaseNotes: action.payload.releaseNotes,
+          },
+        },
+      }
     }
 
-    case Constants.BR_SET_UPDATE_SEEN: {
-      return { ...state, seen: true }
+    case Constants.ROBOTUPDATE_DOWNLOAD_PROGRESS: {
+      return {
+        ...state,
+        ...{
+          [action.payload.target]: {
+            ...state[action.payload.target],
+            downloadProgress: action.payload.progress,
+          },
+        },
+      }
     }
 
-    case Constants.BR_DOWNLOAD_PROGRESS: {
-      return { ...state, downloadProgress: action.payload }
+    case Constants.ROBOTUPDATE_DOWNLOAD_ERROR: {
+      return {
+        ...state,
+        ...{
+          [action.payload.target]: {
+            ...state[action.payload.target],
+            downloadError: action.payload.error,
+          },
+        },
+      }
     }
 
-    case Constants.BR_DOWNLOAD_ERROR: {
-      return { ...state, downloadError: action.payload }
-    }
-
-    case Constants.BR_START_UPDATE: {
+    case Constants.ROBOTUPDATE_START_UPDATE: {
       return {
         ...state,
         session: initialSession(action.payload.robotName, state.session),
       }
     }
 
-    case Constants.BR_CREATE_SESSION: {
+    case Constants.ROBOTUPDATE_CREATE_SESSION: {
       const { host } = action.payload
       const session = state.session || initialSession(host.name, null)
 
@@ -69,7 +105,7 @@ export const buildrootReducer: Reducer<BuildrootState, Action> = (
       }
     }
 
-    case Constants.BR_CREATE_SESSION_SUCCESS: {
+    case Constants.ROBOTUPDATE_CREATE_SESSION_SUCCESS: {
       const { host, pathPrefix, token } = action.payload
       const session = state.session || initialSession(host.name, null)
 
@@ -79,7 +115,7 @@ export const buildrootReducer: Reducer<BuildrootState, Action> = (
       }
     }
 
-    case Constants.BR_STATUS: {
+    case Constants.ROBOTUPDATE_STATUS: {
       if (!state.session) return state
 
       const { stage, progress, message } = action.payload
@@ -96,16 +132,16 @@ export const buildrootReducer: Reducer<BuildrootState, Action> = (
       }
     }
 
-    case Constants.BR_USER_FILE_INFO: {
+    case Constants.ROBOTUPDATE_FILE_INFO: {
       return state.session
         ? {
             ...state,
-            session: { ...state.session, userFileInfo: action.payload },
+            session: { ...state.session, fileInfo: action.payload },
           }
         : state
     }
 
-    case Constants.BR_START_PREMIGRATION: {
+    case Constants.ROBOTUPDATE_START_PREMIGRATION: {
       return state.session
         ? {
             ...state,
@@ -114,7 +150,7 @@ export const buildrootReducer: Reducer<BuildrootState, Action> = (
         : state
     }
 
-    case Constants.BR_PREMIGRATION_DONE: {
+    case Constants.ROBOTUPDATE_PREMIGRATION_DONE: {
       return state.session
         ? {
             ...state,
@@ -123,7 +159,7 @@ export const buildrootReducer: Reducer<BuildrootState, Action> = (
         : state
     }
 
-    case Constants.BR_UPLOAD_FILE: {
+    case Constants.ROBOTUPDATE_UPLOAD_FILE: {
       return state.session
         ? {
             ...state,
@@ -132,7 +168,7 @@ export const buildrootReducer: Reducer<BuildrootState, Action> = (
         : state
     }
 
-    case Constants.BR_FILE_UPLOAD_DONE: {
+    case Constants.ROBOTUPDATE_FILE_UPLOAD_DONE: {
       return state.session
         ? {
             ...state,
@@ -141,18 +177,18 @@ export const buildrootReducer: Reducer<BuildrootState, Action> = (
         : state
     }
 
-    case Constants.BR_SET_SESSION_STEP: {
+    case Constants.ROBOTUPDATE_SET_SESSION_STEP: {
       return state.session
         ? { ...state, session: { ...state.session, step: action.payload } }
         : state
     }
 
-    case Constants.BR_CLEAR_SESSION: {
+    case Constants.ROBOTUPDATE_CLEAR_SESSION: {
       return { ...state, session: null }
     }
 
-    case Constants.BR_PREMIGRATION_ERROR:
-    case Constants.BR_UNEXPECTED_ERROR: {
+    case Constants.ROBOTUPDATE_PREMIGRATION_ERROR:
+    case Constants.ROBOTUPDATE_UNEXPECTED_ERROR: {
       return state.session
         ? {
             ...state,

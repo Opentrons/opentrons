@@ -17,6 +17,10 @@ import type { ReleaseSetUrls } from './system-update/types'
 
 const log = createLogger('update')
 
+export const FLEX_MANIFEST_URL = _OPENTRONS_PROJECT_.includes('robot-stack')
+  ? 'https://builds.opentrons.com/ot3-oe/releases.json'
+  : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
+
 let LATEST_OT_SYSTEM_VERSION = _PKG_VERSION_
 
 const channelFinder = (version: string, channel: string): boolean => {
@@ -42,10 +46,9 @@ export const getLatestSystemUpdateUrls = (): Promise<ReleaseSetUrls | null> => {
 }
 
 export const updateLatestVersion = (): Promise<string> => {
-  const manifestURL = getConfig('robotSystemUpdate').manifestUrls.OT3
   const channel = getConfig('update').channel
 
-  return downloadAndCacheReleaseManifest(manifestURL)
+  return downloadAndCacheReleaseManifest(FLEX_MANIFEST_URL)
     .then(response => {
       const latestAvailableVersion = Object.keys(response.production)
         .sort((a, b) => {
@@ -57,10 +60,15 @@ export const updateLatestVersion = (): Promise<string> => {
         .find(verson => channelFinder(verson, channel))
 
       LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? _PKG_VERSION_
+      log.info(
+        `Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`
+      )
       return LATEST_OT_SYSTEM_VERSION
     })
     .catch((e: Error) => {
-      log.warn(`error fetching latest system version: ${e.message}`)
+      log.warn(
+        `Update: error fetching latest system version from ${FLEX_MANIFEST_URL}: ${e.message}, keeping latest version at ${LATEST_OT_SYSTEM_VERSION}`
+      )
       return LATEST_OT_SYSTEM_VERSION
     })
 }

@@ -8,14 +8,14 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { ConnectionTroubleshootingModal } from '../ConnectionTroubleshootingModal'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 
 import {
   mockUnreachableRobot,
   mockConnectedRobot,
 } from '../../../redux/discovery/__fixtures__'
 
-jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot-update/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../ChooseProtocolSlideout')
 jest.mock('../ConnectionTroubleshootingModal')
@@ -29,8 +29,8 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockConnectionTroubleshootingModal = ConnectionTroubleshootingModal as jest.MockedFunction<
   typeof ConnectionTroubleshootingModal
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 
 const render = (props: React.ComponentProps<typeof RobotOverflowMenu>) => {

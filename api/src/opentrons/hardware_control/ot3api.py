@@ -845,15 +845,11 @@ class OT3API(
 
         if refresh:
             await self.refresh_positions()
-
-        position_axes = [Axis.X, Axis.Y, Axis.by_mount(mount)]
-        valid_motor = self._current_position and self._backend.check_motor_status(
-            position_axes
-        )
-        if not valid_motor:
+        elif not self._current_position:
             raise MustHomeError(
-                f"Current position of {str(mount)} is invalid; please home motors."
+                f"Motor positions for {str(mount)} are missing; must first home motors."
             )
+        self._assert_motor_ok([Axis.X, Axis.Y, Axis.by_mount(mount)])
 
         return self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), self._current_position, critical_point
@@ -882,6 +878,22 @@ class OT3API(
             self._gripper_handler.set_jaw_displacement(self._encoder_position[Axis.G])
         return self._encoder_position
 
+    def _assert_motor_ok(self, axes: Sequence[Axis]) -> None:
+        invalid_axes = self._backend.get_invalid_motor_axes(axes)
+        if invalid_axes:
+            axes_str = ",".join([ax.name for ax in invalid_axes])
+            raise MustHomeError(
+                f"Motor position of axes ({axes_str}) is invalid; please home motors."
+            )
+
+    def _assert_encoder_ok(self, axes: Sequence[Axis]) -> None:
+        invalid_axes = self._backend.get_invalid_motor_axes(axes)
+        if invalid_axes:
+            axes_str = ",".join([ax.name for ax in invalid_axes])
+            raise MustHomeError(
+                f"Encoder position of axes ({axes_str}) is invalid; please home motors."
+            )
+
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -904,20 +916,17 @@ class OT3API(
         """
         if refresh:
             await self.refresh_positions()
+        elif not self._encoder_position:
+            raise MustHomeError(
+                f"Encoder positions for {str(mount)} are missing; must first home motors."
+            )
 
         if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
             raise GripperNotAttachedError(
                 f"Cannot return encoder position for {mount} if no gripper is attached"
             )
 
-        position_axes = [Axis.X, Axis.Y, Axis.by_mount(mount)]
-        valid_motor = self._encoder_position and self._backend.check_encoder_status(
-            position_axes
-        )
-        if not valid_motor:
-            raise MustHomeError(
-                f"Encoder position of {str(mount)} is invalid; please home motors."
-            )
+        self._assert_encoder_ok([Axis.X, Axis.Y, Axis.by_mount(mount)])
 
         ot3pos = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount),
@@ -996,10 +1005,8 @@ class OT3API(
         if not self._backend.check_encoder_status(axes_moving):
             # a moving axis has not been homed before, homing robot now
             await self.home()
-        elif not self._backend.check_motor_status(axes_moving):
-            raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
-            )
+        else:
+            self._assert_motor_ok(axes_moving)
 
         target_position = target_position_from_absolute(
             realmount,
@@ -1042,12 +1049,7 @@ class OT3API(
 
         if not self._backend.check_encoder_status(list(position.keys())):
             await self.home()
-
-        valid_motor = self._current_position and self._backend.check_motor_status(
-            list(position.keys())
-        )
-        if not valid_motor:
-            raise MustHomeError("Current position is invalid; please home motors.")
+        self._assert_motor_ok(list(position.keys()))
 
         absolute_positions: "OrderedDict[Axis, float]" = OrderedDict()
         current_position = self._current_position
@@ -1111,10 +1113,7 @@ class OT3API(
         await self._cache_current_position()
         await self._cache_encoder_position()
 
-        if not self._backend.check_motor_status([axis for axis in axes_moving]):
-            raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
-            )
+        self._assert_motor_ok([axis for axis in axes_moving])
 
         target_position = target_position_from_relative(
             realmount, delta, self._current_position

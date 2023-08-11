@@ -45,7 +45,7 @@ import {
   Link as LinkButton,
 } from '@opentrons/components'
 
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
@@ -473,7 +473,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robotName)
+      return getRobotUpdateDisplayInfo(state, robotName)
     })?.autoUpdateAction
   )
   const currentRunId = useCurrentRunId()

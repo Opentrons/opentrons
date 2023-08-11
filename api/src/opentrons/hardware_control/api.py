@@ -51,6 +51,8 @@ from .types import (
     PauseType,
     StatusBarState,
     EstopState,
+    SubSystem,
+    SubSystemState,
 )
 from .errors import (
     MustHomeError,
@@ -325,6 +327,9 @@ class API(
     @property
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
+
+    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return {}
 
     # Incidentals (i.e. not motion) API
 

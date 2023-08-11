@@ -55,7 +55,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_START,
   ANALYTICS_PROTOCOL_RUN_RESUME,
 } from '../../../../redux/analytics'
-import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
 import {
@@ -113,8 +113,8 @@ jest.mock('../../../ModuleCard/hooks')
 jest.mock('../../../RunProgressMeter')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/buildroot/selectors')
 jest.mock('../RunFailedModal')
+jest.mock('../../../../redux/robot-update/selectors')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -183,8 +183,8 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockRunFailedModal = RunFailedModal as jest.MockedFunction<
   typeof RunFailedModal
