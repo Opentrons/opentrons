@@ -9,6 +9,7 @@ RobotSchema = NewType("RobotSchema", Dict[str, Any])
 
 RobotType = Literal["OT-2 Standard", "OT-3 Standard"]
 
+
 class RobotTypeEnum(enum.Enum):
     OT2 = enum.auto()
     FLEX = enum.auto()
