@@ -226,7 +226,7 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
-        is-odd: false
+        is-odd: [false]
         include:
           - os: 'ubuntu-22.04'
             is-odd: true
