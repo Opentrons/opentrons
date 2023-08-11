@@ -259,6 +259,17 @@ def get_adv_setting(setting: str, robot_type: RobotTypeEnum) -> Optional[Setting
     return s.get(setting, None)
 
 
+def _filtered_key(
+    definition: SettingDefinition,
+    robot_type: RobotTypeEnum,
+    include_internal: bool,
+) -> bool:
+    if include_internal:
+        return robot_type in definition.robot_type
+    else:
+        return robot_type in definition.robot_type and not definition.internal_only
+
+
 @lru_cache(maxsize=1)
 def get_all_adv_settings(
     robot_type: RobotTypeEnum, include_internal: bool = False
@@ -271,9 +282,7 @@ def get_all_adv_settings(
     return {
         key: Setting(value=value, definition=settings_by_id[key])
         for key, value in values.items()
-        if key in settings_by_id
-        and robot_type in settings_by_id[key].robot_type
-        and not (include_internal and settings_by_id[key].internal_only)
+        if key in settings_by_id and _filtered_key(settings_by_id[key], robot_type, include_internal)
     }
 
 
