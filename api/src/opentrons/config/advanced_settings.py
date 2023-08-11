@@ -50,7 +50,7 @@ class SettingDefinition:
         old_id: Optional[str] = None,
         restart_required: bool = False,
         show_if: Optional[Tuple[str, bool]] = None,
-        interal_only: bool = False,
+        internal_only: bool = False,
     ):
         self.id = _id
         #: The id of the setting for programmatic access through
@@ -68,7 +68,7 @@ class SettingDefinition:
         #: to show this setting in http endpoints
         self.robot_type = robot_type
         #: A list of RobotTypeEnums that are compatible with this feature flag.
-        self.internal_only = interal_only
+        self.internal_only = internal_only
         #: A flag determining whether this setting is user-facing.
 
     def __repr__(self) -> str:
@@ -194,14 +194,14 @@ settings = [
         ),
         restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],
-        interal_only=True,
+        internal_only=True,
     ),
     SettingDefinition(
         _id="rearPanelIntegration",
         title="Enable robots with the new usb connected rear-panel board.",
         description="This is an Opentrons-internal setting to test new rear-panel.",
         robot_type=[RobotTypeEnum.FLEX],
-        interal_only=True,
+        internal_only=True,
     ),
     SettingDefinition(
         _id="disableStallDetection",
@@ -224,7 +224,7 @@ settings = [
             True,
         ),  # Configured so this only shows if it has been set by a user
         robot_type=[RobotTypeEnum.FLEX],
-        interal_only=True,
+        internal_only=True,
     ),
     SettingDefinition(
         _id="disableOverpressureDetection",
