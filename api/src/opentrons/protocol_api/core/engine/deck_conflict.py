@@ -11,6 +11,7 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     OnLabwareLocation,
     OFF_DECK_LOCATION,
+    LabwareLocation
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName
@@ -23,7 +24,7 @@ def check(
     existing_labware_ids: Collection[str],
     existing_module_ids: Collection[str],
     new_labware_id: str,
-    move_to_location: Optional[DeckSlotName] = None,
+    move_to_location: Optional[LabwareLocation] = None,
 ) -> None:
     pass
 
@@ -50,7 +51,7 @@ def check(
     # checking. Find a way to do deck conflict checking before the new item is loaded.
     new_labware_id: Optional[str] = None,
     new_module_id: Optional[str] = None,
-    move_to_location: Optional[DeckSlotName] = None,
+    move_to_location: Optional[LabwareLocation] = None,
 ) -> None:
     """Check for conflicts between items on the deck.
 
@@ -82,7 +83,12 @@ def check(
 
     new_location, new_item = new_location_and_item
     if move_to_location is not None:
-        new_location = move_to_location
+        if isinstance(move_to_location, DeckSlotLocation):
+            new_location = move_to_location.slotName
+        if isinstance(move_to_location, OnLabwareLocation):
+            # get slot name and update height to the total stacked height
+            parent_location = engine_state.labware.get_parent_location(move_to_location.labwareId)
+            # stacked_labware_height = engine_state.geometry.get_stacked_labware_total_height()
 
     all_existing_labware = (
         _map_labware(engine_state, labware_id) for labware_id in existing_labware_ids
