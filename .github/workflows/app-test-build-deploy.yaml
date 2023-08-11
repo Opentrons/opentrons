@@ -160,39 +160,39 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
-          if [[ "${{format('{0}', github.event_name == 'pull_request')}}" = "true" ]] ; then
+          if [[ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ]] ; then
             echo "No builds for pull requests"
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}'', startsWith(github.ref, 'refs/tags/ot3'))}}" = "true" ]] ; then
+          elif [[ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ]] ; then
             echo "internal-release release builds for ot3@ tags"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=release' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}', startsWith(github.ref, 'refs/tags/v'))}}" = "true" ]] ; then
+          elif [[ "${{ format('{0}', startsWith(github.ref, 'refs/tags/v')) }}" = "true" ]] ; then
             echo "release release builds for v tags"
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
             echo 'type=release' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}', startsWith(github.ref, 'refs/heads/internal-release'))}}" = "true" ]] ; then
+          elif [[ "${{ format('{0}', startsWith(github.ref, 'refs/heads/internal-release')) }}" = "true" ]] ; then
             echo "internal-release develop builds for internal-release branches"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}', (startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release'))" }} = "true"]] ; then
+          elif [[ "${{ format('{0}', (startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release'))" }} = "true"]] ; then
             echo "Release develop builds for release branches"
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}', github.ref == 'refs/heads/edge')}}" = "true" ]] ; then
+          elif [[ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ]] ; then
             echo "both develop builds for edge"
             echo 'variants=["release", "internal-release"]' >> GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}', endsWith(github.ref, 'app-build-internal'))}}" = "true" ]] ; then
+          elif [[ "${{ format('{0}', endsWith(github.ref, 'app-build-internal')) }}" = "true" ]] ; then
             echo "internal-release builds for app-build-internal suffixes"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}', endsWith(github.ref, 'app-build'))}}" = "true"]] ; then
+          elif [[ "${{ format('{0}', endsWith(github.ref, 'app-build')) }}" = "true"]] ; then
             echo "release develop builds for app-build suffixes"
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [[ "${{format('{0}', endsWith(github.ref, 'app-build-both'))}}" = "true" ]] ; then
+          elif [[ "${{ format('{0}', endsWith(github.ref, 'app-build-both')) }}" = "true" ]] ; then
             echo "Both develop builds for app-build-both suffixes"
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
