@@ -17,14 +17,14 @@ Position Relative to Labware
 When the robot positions itself relative to a piece of labware, the labware definition determines movement, distance, height, offsets, and the actions it can perform. This section describes how these positional components are calculated and how to change them.
 
 Top, Bottom, and Center
------------------------
+=======================
 
 Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and whether the labware is on a module or in a deck slot. You can use these positions as-is or calculate other positions relative to them.
 
 .. tried bold instead of H4, not great
 
 Top
-^^^
+---
 
 As an example, let's look at the :py:meth:`.Well.top` method. It returns a position level with the top of the well, centered in both horizontal directions.
 
@@ -42,7 +42,7 @@ This is a good position to use for a :ref:`blow out operation <new-blow-out>` or
 .. versionadded:: 2.0
 
 Bottom
-^^^^^^
+------
 
 As an example, lets look at the :py:meth:`.Well.bottom` method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
 
@@ -67,7 +67,7 @@ This is a good position to start for an :ref:`aspirate action <new-aspirate>` or
 .. versionadded:: 2.0
 
 Center
-^^^^^^
+------
 
 As an example, lets look at the :py:meth:`.Well.center` method. It returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
 
@@ -87,34 +87,25 @@ By default, your robot will aspirate and dispense 1 mm above the bottom of wells
 
 If you need to change the aspiration or dispensing height for multiple operations, specify the distance from the well bottom with the :py:obj:`.InstrumentContext.well_bottom_clearance` object. It has two attributes: ``well_bottom_clearance.aspirate`` and ``well_bottom_clearance.dispense``. These change the aspiration height and dispense height, respectively.
 
-Modifying these attributes will affect all subsequent aspirate and dispense actions performed by the attached pipette, even those executed as part of a :py:meth:`.transfer` operation. This snippet from a sample ``run()`` function demonstrates how to work with and change the default clearance::
+Modifying these attributes will affect all subsequent aspirate and dispense actions performed by the attached pipette, even those executed as part of a :py:meth:`.transfer` operation. This snippet from a sample protocol demonstrates how to work with and change the default clearance::
 
-    def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-        pipette = protocol.load_instrument(
-            'p300_single', 'right',
-            tip_racks = [tiprack])
-        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 3)
+    # aspirate 1 mm above the bottom of the well (default)
+    pipette.aspirate(50, plate['A1'])
+    # dispense 1 mm above the bottom of the well (default)
+    pipette.dispense(50, plate['A1'])
 
-        pipette.pick_up_tip()
+    # change clearance for aspiration to 2 mm
+    pipette.well_bottom_clearance.aspirate = 2
+    # aspirate 2 mm above the bottom of the well
+    pipette.aspirate(50, plate['A1'])
+    # still dispensing 1 mm above the bottom
+    pipette.dispense(50, plate['A1'])
 
-        # aspirate 1 mm above the bottom of the well (default)
-        pipette.aspirate(50, plate['A1'])
-        # dispense 1 mm above the bottom of the well (default)
-        pipette.dispense(50, plate['A1'])
-
-        # change clearance for aspiration to 2 mm
-        pipette.well_bottom_clearance.aspirate = 2
-        # aspirate 2 mm above the bottom of the well
-        pipette.aspirate(50, plate['A1'])
-        # still dispensing 1 mm above the bottom
-        pipette.dispense(50, plate['A1'])
-
-        pipette.aspirate(50, plate['A1'])
-        # change clearance for dispensing to 10 mm      
-        pipette.well_bottom_clearance.dispense = 10
-        # dispense high above the well
-        pipette.dispense(50, plate['A1'])
+    pipette.aspirate(50, plate['A1'])
+    # change clearance for dispensing to 10 mm      
+    pipette.well_bottom_clearance.dispense = 10
+    # dispense high above the well
+    pipette.dispense(50, plate['A1'])
 
 .. versionadded:: 2.0
 
