@@ -1,4 +1,4 @@
-// start a buildroot migration by POSTing the necessary wheel files to a robot
+// start a robot migration by POSTing the necessary wheel files to a robot
 // and restarting
 
 import path from 'path'
@@ -32,11 +32,11 @@ const PREMIGRATION_SERVER_WHL = path.join(
 const OT2_FILENAME = 'ot2-system.zip'
 const SYSTEM_FILENAME = 'system-update.zip'
 
-const getSystemFileName = (robotModel: RobotModel): string => {
-  if (robotModel === 'OT-2 Standard') {
-    return OT2_FILENAME
+const getSystemFileName = (robotModel: RobotModel | null): string => {
+  if (robotModel === 'OT-3 Standard') {
+    return SYSTEM_FILENAME
   }
-  return SYSTEM_FILENAME
+  return OT2_FILENAME
 }
 
 export function startPremigration(robot: RobotHost): Promise<unknown> {
@@ -71,7 +71,7 @@ export function uploadSystemFile(
 
   return postFile(
     url,
-    getSystemFileName(robot.robotModel),
+    getSystemFileName(robot?.robotModel || null),
     file,
     isUsbUpload
       ? {
