@@ -11,7 +11,6 @@ from opentrons_hardware.firmware_bindings.messages import (
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     PushTipPresenceNotificationPayload,
-    TipStatusQueryRequestPayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import SensorIdField
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
@@ -52,10 +51,7 @@ async def test_get_tip_ejector_state(
 
     # We should have sent a request
     mock_messenger.send.assert_called_once_with(
-        node_id=node,
-        message=message_definitions.TipStatusQueryRequest(
-            payload=TipStatusQueryRequestPayload(sensor_id=SensorIdField(SensorId.S0))
-        ),
+        node_id=node, message=message_definitions.TipStatusQueryRequest()
     )
 
     assert res

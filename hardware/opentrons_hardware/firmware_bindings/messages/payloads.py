@@ -565,13 +565,6 @@ class TipActionResponsePayload(MoveCompletedPayload):
 
 
 @dataclass(eq=False)
-class TipStatusQueryRequestPayload(EmptyPayload):
-    """A request to read tip presence status."""
-
-    sensor_id: SensorIdField
-
-
-@dataclass(eq=False)
 class PeripheralStatusResponsePayload(SensorPayload):
     """A response that sends back the initialization status of a peripheral device."""
 

@@ -7,17 +7,13 @@ from typing_extensions import Literal
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.messages.fields import SensorIdField
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    TipStatusQueryRequestPayload,
-)
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipStatusQueryRequest,
     PushTipPresenceNotification,
 )
 
-from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +21,6 @@ log = logging.getLogger(__name__)
 async def get_tip_ejector_state(
     can_messenger: CanMessenger,
     node: Literal[NodeId.pipette_left, NodeId.pipette_right],
-    sensor_id: SensorId = SensorId.S0,
 ) -> int:
     """Get the state of the tip presence interrupter.
 
@@ -49,14 +44,7 @@ async def get_tip_ejector_state(
         )
 
     can_messenger.add_listener(_listener, _filter)
-    await can_messenger.send(
-        node_id=node,
-        message=TipStatusQueryRequest(
-            payload=TipStatusQueryRequestPayload(
-                sensor_id=SensorIdField(sensor_id),
-            )
-        ),
-    )
+    await can_messenger.send(node_id=node, message=TipStatusQueryRequest())
 
     try:
         await asyncio.wait_for(event.wait(), 1.0)

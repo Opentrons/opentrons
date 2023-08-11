@@ -803,16 +803,12 @@ class SetGripperErrorTolerance(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class TipStatusQueryRequest(BaseMessage):
+class TipStatusQueryRequest(EmptyPayloadMessage):
     """Request to query the tip presence pin.
 
     The response should be a PushTipPresenceNotification.
     """
 
-    payload: payloads.TipStatusQueryRequestPayload
-    payload_type: Type[
-        payloads.TipStatusQueryRequestPayload
-    ] = payloads.TipStatusQueryRequestPayload
     message_id: Literal[
         MessageId.get_tip_status_request
     ] = MessageId.get_tip_status_request
