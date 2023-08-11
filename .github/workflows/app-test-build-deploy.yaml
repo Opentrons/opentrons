@@ -160,7 +160,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
-          if [[ "${{format('{0}', github.event_name == 'pull_request)}}" = "true" ]] ; then
+          if [[ "${{format('{0}', github.event_name == 'pull_request')}}" = "true" ]] ; then
             echo "No builds for pull requests"
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
