@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  Flex,
-  SPACING,
+  ALIGN_CENTER,
+  BORDERS,
+  Btn,
   COLORS,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Icon,
-  Btn,
-  BORDERS,
-  ALIGN_CENTER,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
