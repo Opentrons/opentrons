@@ -77,7 +77,10 @@ class SettingDefinition:
         """
         if not self.show_if:
             return True
-        return get_setting_with_env_overload(self.show_if[0], self.robot_type[0]) == self.show_if[1]
+        return (
+            get_setting_with_env_overload(self.show_if[0], self.robot_type[0])
+            == self.show_if[1]
+        )
 
     async def on_change(self, value: Optional[bool]) -> None:
         """
@@ -96,6 +99,7 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
             description="Prevent the robot from sending its logs to Opentrons"
             " for analysis. Opentrons uses these logs to"
             " troubleshoot robot issues and spot error trends.",
+            robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         )
 
     async def on_change(self, value: Optional[bool]) -> None:
@@ -129,7 +133,7 @@ settings = [
         old_id="short-fixed-trash",
         title="Short (55mm) fixed trash",
         description="Trash box is 55mm tall (rather than the 77mm default)",
-        robot_type=[RobotTypeEnum.OT2]
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="deckCalibrationDots",
@@ -137,14 +141,14 @@ settings = [
         title="Deck calibration to dots",
         description="Perform deck calibration to dots rather than crosses, for"
         " robots that do not have crosses etched on the deck",
-        robot_type=[RobotTypeEnum.OT2]
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="disableHomeOnBoot",
         old_id="disable-home-on-boot",
         title="Disable home on boot",
         description="Prevent robot from homing motors on boot",
-        robot_type=[RobotTypeEnum.OT2]
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="useOldAspirationFunctions",
@@ -153,7 +157,7 @@ settings = [
         " that were used before version 3.7.0. Use this if you"
         " need consistency with pre-v3.7.0 results. This only"
         " affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.",
-        robot_type=[RobotTypeEnum.OT2]
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="enableDoorSafetySwitch",
@@ -162,7 +166,7 @@ settings = [
         "Opening the robot door during a run will "
         "pause your robot only after it has completed its "
         "current motion.",
-        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="disableFastProtocolUpload",
@@ -175,7 +179,7 @@ settings = [
             "problems with the newer, faster protocol analysis method."
         ),
         restart_required=False,
-        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="enableOT3HardwareController",
@@ -185,25 +189,25 @@ settings = [
             "new hardware."
         ),
         restart_required=True,
-        robot_type=[RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="rearPanelIntegration",
         title="Enable robots with the new usb connected rear-panel board.",
         description="This is an Opentrons-internal setting to test new rear-panel.",
-        robot_type=[RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="disableStallDetection",
         title="Disable stall detection on the Flex.",
         description="This is an Opentrons-internal setting for hardware-testing.",
-        robot_type=[RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="disableStatusBar",
         title="Disable the LED status bar on the Flex.",
         description="This setting disables the LED status bar on the Flex.",
-        robot_type=[RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="estopNotRequired",
@@ -213,20 +217,20 @@ settings = [
             "estopNotRequired",
             True,
         ),  # Configured so this only shows if it has been set by a user
-        robot_type=[RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="disableOverpressureDetection",
         title="Disable overpressure detection on pipettes.",
         description="This setting disables overpressure detection on pipettes, do not turn this feature off unless recommended.",
-        robot_type=[RobotTypeEnum.FLEX]
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="disableTipPresenceDetection",
         title="Disable tip presence detection on pipettes.",
         description="This setting disables tip presence detection on pipettes, do not turn this feature off unless recommended.",
-        robot_type=[RobotTypeEnum.FLEX]
-    )
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
 ]
 
 if (

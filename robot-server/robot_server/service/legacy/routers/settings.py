@@ -56,7 +56,9 @@ router = APIRouter()
     },
 )
 async def post_settings(
-    update: AdvancedSettingRequest, hardware: HardwareControlAPI = Depends(get_hardware)
+    update: AdvancedSettingRequest,
+    hardware: HardwareControlAPI = Depends(get_hardware),
+    robot_type: str = Depends(get_robot_type),
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
@@ -69,7 +71,7 @@ async def post_settings(
         raise LegacyErrorResponse.from_exc(e).as_error(
             status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-    return _create_settings_response()
+    return _create_settings_response(robot_type)
 
 
 @router.get(
@@ -79,7 +81,9 @@ async def post_settings(
     response_model=AdvancedSettingsResponse,
     response_model_exclude_unset=True,
 )
-async def get_settings(robot_type: str = Depends(get_robot_type)) -> AdvancedSettingsResponse:
+async def get_settings(
+    robot_type: str = Depends(get_robot_type),
+) -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
     return _create_settings_response(robot_type)
 
