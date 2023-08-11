@@ -13,4 +13,3 @@ def run(context):
     assert module.parent == "1"
 
     context.move_labware(labware=labware, new_location=2)
-

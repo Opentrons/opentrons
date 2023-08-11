@@ -174,6 +174,23 @@ class GeometryView:
                 f"Either it has been loaded off-deck or its been moved off-deck."
             )
 
+    def get_stacked_labware_total_height(
+        self, labware_id: str, labware_location: LabwareLocation
+    ) -> float:
+        """Get stacked labware total height."""
+        if isinstance(labware_location, OnLabwareLocation):
+            on_labware = self._labware.get(labware_location.labwareId)
+            on_labware_dimensions = self._labware.get_dimensions(on_labware.id)
+            stacking_overlap = self._labware.get_labware_overlap_offsets(
+                labware_id=labware_id, below_labware_name=on_labware.loadName
+            )
+            labware_z_offset = on_labware_dimensions.z - stacking_overlap.z
+            return labware_z_offset + self.get_stacked_labware_total_height(
+                on_labware.id, on_labware.location
+            )
+        else:
+            return 0
+
     def _get_calibrated_module_offset(
         self, location: LabwareLocation
     ) -> ModuleOffsetVector:
