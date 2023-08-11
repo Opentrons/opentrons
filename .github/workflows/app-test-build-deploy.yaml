@@ -289,7 +289,7 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID }}
           HOST_PYTHON: python
-          OPENTRONS_PROJECT: ${{ ((matrix.variant == 'release') && robot-stack) || 'ot3' }}
+          OPENTRONS_PROJECT: ${{ ((matrix.variant == 'release') && 'robot-stack') || 'ot3' }}
           OT_APP_DEPLOY_BUCKET: ${{ ((matrix.variant == 'release') && env._APP_DEPLOY_BUCKET_ROBOTSTACK) || env._APP_DEPLOY_BUCKET_OT3   }}
           OT_APP_DEPLOY_FOLDER: ${{ ((matrix.variant == 'release') && env._APP_DEPLOY_FOLDER_ROBOTSTACK ) || env._APP_DEPLOY_FOLDER_OT3 }}
 
