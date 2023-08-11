@@ -157,68 +157,49 @@ jobs:
       type: ${{steps.determine-build-type.outputs.type}}
     steps:
       - id: determine-build-type
-        name: 'No app builds for pull requests'
-        # pull requests do not get app builds
         if: github.event_name == 'pull_request'
         run: |
-          echo 'variants=[]' >> $GITHUB_OUTPUT
-          echo 'type=develop' >> $GITHUB_OUTPUT
-      - id:  determine-build-type
-        name: 'Internal release builds for internal release tag ${{github.ref_name}}'
-        # internal release tags get internal release release builds only
-        if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/tags/ot3')
-        run: |
-          echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-          echo 'type=release' >> $GITHUB_OUTPUT
-      - id: determine-build-type
-        name: 'Release build for release tag ${{github.ref_name}}'
-        # release tags get release release builds only
-        if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/tags/v')
-        run: |
-          echo 'variants=["release"]' >> $GITHUB_OUTPUT
-          echo 'type=release' >> $GITHUB_OUTPUT
-      - id: determine-build-type
-        name: 'Internal release builds for internal-release branch ${{github.ref_name}}'
-        # branches associated with internal releases get internal release develop builds only
-        if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/internal-release')
-        run: |
-          echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-          echo 'type=develop' >> $GITHUB_OUTPUT
-      - id: determine-build-type
-        name: "Internal release build requested by branch name ${{github.ref_name}}"
-        # branches starting with app-build-internal get internal release develop builds only
-        if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/app-build-internal')
-        run: |
-          echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-          echo 'type=develop' >> $GITHUB_OUTPUT
-      - id: determine-build-type
-        name: "Release build for release branch ${{github.ref_name}}"
-        # branches associated with release get release develop builds only
-        if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release'))
-        run: |
-          echo 'variants=["release"]' >> $GITHUB_OUTPUT
-          echo 'type=develop' >> $GITHUB_OUTPUT
-      - id: determine-build-type
-        name: "Release build requested by branch name ${{github.ref_name}}"
-        # branches starting with app-build get release develop builds only
-        if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/app-build')
-        run: |
-          echo 'variants=["release"]' >> $GITHUB_OUTPUT
-          echo 'type=develop' >> $GITHUB_OUTPUT
-      - id: determine-build-type
-        name: "Release and internal-release builds because this is edge"
-        # our default branch gets both variants, develop builds
-        if: (github.event_name != 'pull_request') && (github.ref == 'refs/heads/edge')
-        run: |
-          echo 'variants=["release", "internal-release"]' >> GITHUB_OUTPUT
-          echo 'type=develop' >> $GITHUB_OUTPUT
-      - id: determine-build-type
-        name: "Release and internal-release builds requested by branch name ${{github.ref_name}}"
-        # branches beginning with app-build-both get both develop builds
-        if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/app-build-both')
-        run: |
-          echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-          echo 'type=develop' >> $GITHUB_OUTPUT
+          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
+          if [[ ${{github.event_name == 'pull_request' && "true" || "false"}} = "true" ]] ; then
+            echo "No builds for pull requests"
+            echo 'variants=[]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
+          elif [[ ${{startsWith(github.ref, 'refs/tags/ot3') && "true" || "false"}} = "true" ]] ; then
+            echo "internal-release release builds for ot3@ tags"
+            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
+            echo 'type=release' >> $GITHUB_OUTPUT
+          elif [[ ${{startsWith(github.ref, 'refs/tags/v') && "true" || "false"}} = "true" ]] ; then
+            echo "release release builds for v tags"
+            echo 'variants=["release"]' >> $GITHUB_OUTPUT
+            echo 'type=release' >> $GITHUB_OUTPUT
+          elif [[ ${{startsWith(github.ref, 'refs/heads/internal-release') && "true" || "false"}} ]] ; then
+            echo "internal-release develop builds for internal-release branches"
+            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
+          elif [[ ${{ ((startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release')) && "true" || "false" }} = "true"]] ; then
+            echo "Release develop builds for release branches"
+            echo 'variants=["release"]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
+          elif [[ ${{ (github.ref == 'refs/heads/edge') && "true" || "false" }} = "true" ]] ; then
+            echo "both develop builds for edge"
+            echo 'variants=["release", "internal-release"]' >> GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
+          elif [[ ${{endsWith(github.ref, 'app-build-internal') && "true" || "false"}} = "true" ]] ; then
+            echo "internal-release builds for app-build-internal suffixes"
+            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
+          elif [[ ${{ endsWith(github.ref, 'app-build') && "true" || "false" }} = "true"]] ; then
+            echo "release develop builds for app-build suffixes"
+            echo 'variants=["release"]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
+          elif [[ ${{ endsWith(github.ref, 'app-build-both') && "true" || "false" }} = "true" ]] ; then
+            echo "Both develop builds for app-build-both suffixes"
+            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
+          else
+            echo "::error Cannot determine builds for ref ${{github.ref}} and event ${{github.event_name}}, not building"
+            exit 1
+          fi
 
   build-app:
     needs: [determine-build-type]
