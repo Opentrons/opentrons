@@ -154,9 +154,13 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled ? null : (
-          <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
-        )}
+        <Icon
+          marginLeft={SPACING.spacing8}
+          name="more"
+          size="3rem"
+          // Required to prevent inconsistent component height.
+          style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
+        />
       </Flex>
     </Btn>
   )
@@ -299,7 +303,7 @@ function PrepareToRun({
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
-  if (scrollRef.current) {
+  if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
 
