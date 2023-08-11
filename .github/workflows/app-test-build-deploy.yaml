@@ -220,6 +220,7 @@ jobs:
     steps:
       - name: 'Get project name for variant'
         id: project
+        shell: bash
         run: |
           if [ "${{matrix.variant}}" = "release" ] ; then
              echo "Configuring project, bucket, and folder for robot-stack"
