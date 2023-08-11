@@ -6,8 +6,6 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..errors import LabwareDefinitionIsNotLabwareError
-from ..resources import labware_validation
 from ..types import LabwareLocation, OnLabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -103,13 +101,6 @@ class LoadLabwareImplementation(
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
         #   on the definition. In practice this will not cause any issues since they will raise protocol ending
         #   exception, but for correctness should be refactored to do this check beforehand.
-        if not labware_validation.validate_definition_is_labware(
-            loaded_labware.definition
-        ):
-            raise LabwareDefinitionIsNotLabwareError(
-                f"{params.loadName} is not defined as a labware."
-            )
-
         if isinstance(params.location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=loaded_labware.definition,
