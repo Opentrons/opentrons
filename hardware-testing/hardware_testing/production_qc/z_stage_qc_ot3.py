@@ -278,9 +278,12 @@ async def _force_gauge(
 
         LOG.info(f"max_results: {max_results}")
         LOG.info(f"avg_results: {avg_results}")
-        res = check_force(
-            mount, test_current, report, avg_results, max_results, 0, test["F_MAX"]
-        )
+        if not avg_results or not max_results:
+            res = False
+        else:
+            res = check_force(
+                mount, test_current, report, avg_results, max_results, 0, test["F_MAX"]
+            )
         if res:
             ui.print_header(f"CURRENT: {test_current} - PASS")
         else:
