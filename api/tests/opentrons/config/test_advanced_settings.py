@@ -12,7 +12,7 @@ def mock_settings_values_ot2() -> Dict[str, Optional[bool]]:
     return {
         s.id: False
         for s in advanced_settings.settings
-        if RobotTypeEnum.OT2 in s.robot_type
+        if RobotTypeEnum.OT2 in s.robot_type and not s.internal_only
     }
 
 
@@ -21,7 +21,7 @@ def mock_settings_values_flex() -> Dict[str, Optional[bool]]:
     return {
         s.id: False
         for s in advanced_settings.settings
-        if RobotTypeEnum.FLEX in s.robot_type
+        if RobotTypeEnum.FLEX in s.robot_type and not s.internal_only
     }
 
 

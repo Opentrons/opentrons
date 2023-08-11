@@ -50,6 +50,7 @@ class SettingDefinition:
         old_id: Optional[str] = None,
         restart_required: bool = False,
         show_if: Optional[Tuple[str, bool]] = None,
+        interal_only: bool = False,
     ):
         self.id = _id
         #: The id of the setting for programmatic access through
@@ -66,6 +67,9 @@ class SettingDefinition:
         #: A tuple of (other setting id, setting value) that must match reality
         #: to show this setting in http endpoints
         self.robot_type = robot_type
+        #: A list of RobotTypeEnums that are compatible with this feature flag.
+        self.internal_only = interal_only
+        #: A flag determining whether this setting is user-facing.
 
     def __repr__(self) -> str:
         return "{}: {}".format(self.__class__, self.id)
@@ -166,7 +170,7 @@ settings = [
         "Opening the robot door during a run will "
         "pause your robot only after it has completed its "
         "current motion.",
-        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="disableFastProtocolUpload",
@@ -190,12 +194,14 @@ settings = [
         ),
         restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],
+        interal_only=True,
     ),
     SettingDefinition(
         _id="rearPanelIntegration",
         title="Enable robots with the new usb connected rear-panel board.",
         description="This is an Opentrons-internal setting to test new rear-panel.",
         robot_type=[RobotTypeEnum.FLEX],
+        interal_only=True,
     ),
     SettingDefinition(
         _id="disableStallDetection",
@@ -218,6 +224,7 @@ settings = [
             True,
         ),  # Configured so this only shows if it has been set by a user
         robot_type=[RobotTypeEnum.FLEX],
+        interal_only=True,
     ),
     SettingDefinition(
         _id="disableOverpressureDetection",
@@ -262,7 +269,9 @@ def get_all_adv_settings(robot_type: RobotTypeEnum) -> Dict[str, Setting]:
     return {
         key: Setting(value=value, definition=settings_by_id[key])
         for key, value in values.items()
-        if key in settings_by_id and robot_type in settings_by_id[key].robot_type
+        if key in settings_by_id
+        and robot_type in settings_by_id[key].robot_type
+        and not settings_by_id[key].internal_only
     }
 
 
