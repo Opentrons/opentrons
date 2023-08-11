@@ -156,63 +156,63 @@ jobs:
       variants: ${{steps.determine-build-type.outputs.variants}}
       type: ${{steps.determine-build-type.outputs.type}}
     steps:
-      determine-build-type:
+      - id: determine-build-type
         name: 'No app builds for pull requests'
         # pull requests do not get app builds
         if: github.event_name == 'pull_request'
         run: |
           echo 'variants=[]' >> $GITHUB_OUTPUT
           echo 'type=develop' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id:  determine-build-type
         name: 'Internal release builds for internal release tag ${{github.ref_name}}'
         # internal release tags get internal release release builds only
         if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/tags/ot3')
         run: |
           echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
           echo 'type=release' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id: determine-build-type
         name: 'Release build for release tag ${{github.ref_name}}'
         # release tags get release release builds only
         if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/tags/v')
         run: |
           echo 'variants=["release"]' >> $GITHUB_OUTPUT
           echo 'type=release' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id: determine-build-type
         name: 'Internal release builds for internal-release branch ${{github.ref_name}}'
         # branches associated with internal releases get internal release develop builds only
         if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/internal-release')
         run: |
           echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
           echo 'type=develop' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id: determine-build-type
         name: "Internal release build requested by branch name ${{github.ref_name}}"
         # branches starting with app-build-internal get internal release develop builds only
         if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/app-build-internal')
         run: |
           echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
           echo 'type=develop' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id: determine-build-type
         name: "Release build for release branch ${{github.ref_name}}"
         # branches associated with release get release develop builds only
         if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release'))
         run: |
           echo 'variants=["release"]' >> $GITHUB_OUTPUT
           echo 'type=develop' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id: determine-build-type
         name: "Release build requested by branch name ${{github.ref_name}}"
         # branches starting with app-build get release develop builds only
         if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/app-build')
         run: |
           echo 'variants=["release"]' >> $GITHUB_OUTPUT
           echo 'type=develop' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id: determine-build-type
         name: "Release and internal-release builds because this is edge"
         # our default branch gets both variants, develop builds
-        if: $(github.event_name != 'pull_request') && (github.ref == 'refs/heads/edge')
+        if: (github.event_name != 'pull_request') && (github.ref == 'refs/heads/edge')
         run: |
           echo 'variants=["release", "internal-release"]' >> GITHUB_OUTPUT
           echo 'type=develop' >> $GITHUB_OUTPUT
-      determine-build-type:
+      - id: determine-build-type
         name: "Release and internal-release builds requested by branch name ${{github.ref_name}}"
         # branches beginning with app-build-both get both develop builds
         if: (github.event_name != 'pull_request') && startsWith(github.ref, 'refs/heads/app-build-both')
@@ -221,15 +221,15 @@ jobs:
           echo 'type=develop' >> $GITHUB_OUTPUT
 
   build-app:
-    needs: determine-build-type
+    needs: [determine-build-type]
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         is-odd: false
-      include:
-        - os: 'ubuntu-22.04'
-          is-odd: true
+        include:
+          - os: 'ubuntu-22.04'
+            is-odd: true
     runs-on: ${{ matrix.os }}
     name: 'Build ${{matrix.variant}} app on ${{matrix.os}}'
     steps:
@@ -276,7 +276,7 @@ jobs:
           make setup-js
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
-        if: !matrix.is-odd
+        if: ${{!matrix.is-odd}}
         timeout-minutes: 60
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
@@ -297,7 +297,7 @@ jobs:
           make -C app-shell dist-${{ matrix.os }}
 
       - name: 'upload github artifact'
-        if: !matrix.is-odd
+        if: ${{!matrix.is-odd}}
         uses: actions/upload-artifact@v3
         with:
           name: 'opentrons-${{matrix.variant}}-${{ matrix.os }}'
