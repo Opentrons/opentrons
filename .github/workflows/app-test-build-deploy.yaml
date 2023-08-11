@@ -308,7 +308,7 @@ jobs:
         name: 'build ODD app for linux'
         timeout-minutes: 60
         env:
-          OPENTRONS_PROJECT: ${{ ((matrix.variant == 'release') && robot-stack) || 'ot3' }}
+          OPENTRONS_PROJECT: ${{ ((matrix.variant == 'release') && 'robot-stack') || 'ot3' }}
         run: |
           make -C app-shell-odd dist-ot3
 
