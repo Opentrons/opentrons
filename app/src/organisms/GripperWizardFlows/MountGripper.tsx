@@ -9,6 +9,7 @@ import {
   RESPONSIVENESS,
   PrimaryButton,
   ALIGN_FLEX_END,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
@@ -28,6 +29,7 @@ import type { BadGripper, GripperData } from '@opentrons/api-client'
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   color: ${COLORS.darkGreyEnabled};
+  padding-left: ${SPACING.spacing32};
 
   &:hover {
     opacity: 70%;
@@ -36,13 +38,21 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-
+    padding-left: 0rem;
     &:hover {
       opacity: 100%;
     }
   }
 `
 const QUICK_GRIPPER_POLL_MS = 3000
+
+const ALIGN_BUTTONS = css`
+  align-items: ${ALIGN_FLEX_END};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    align-items: ${ALIGN_CENTER};
+  }
+`
 
 export const MountGripper = (
   props: GripperWizardStepProps
@@ -86,7 +96,7 @@ export const MountGripper = (
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_FLEX_END}
+        css={ALIGN_BUTTONS}
         gridGap={SPACING.spacing8}
       >
         <Btn onClick={() => setShowUnableToDetect(false)}>
