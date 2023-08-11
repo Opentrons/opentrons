@@ -157,7 +157,6 @@ jobs:
       type: ${{steps.determine-build-type.outputs.type}}
     steps:
       - id: determine-build-type
-        if: github.event_name == 'pull_request'
         run: |
           echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
           if [[ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ]] ; then
