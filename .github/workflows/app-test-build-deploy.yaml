@@ -165,7 +165,7 @@ jobs:
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           elif [[ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ]] ; then
-            echo "internal-release release builds for ot3@ tags"
+            echo "internal-release release builds for ot3 tags"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=release' >> $GITHUB_OUTPUT
           elif [[ "${{ format('{0}', startsWith(github.ref, 'refs/tags/v')) }}" = "true" ]] ; then
@@ -176,7 +176,7 @@ jobs:
             echo "internal-release develop builds for internal-release branches"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [[ "${{ format('{0}', (startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release'))" }} = "true"]] ; then
+          elif [[ "${{ format('{0}', (startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release')) }}" = "true"]] ; then
             echo "Release develop builds for release branches"
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
