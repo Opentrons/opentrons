@@ -2,12 +2,11 @@
 
 .. _robot-position:
 
-########################
-Position Within the OT-2
-########################
+##########################
+Labware and Deck Positions
+##########################
 
-Most of the time when executing a protocol, the Python Protocol API's methods take care of determining where the robot needs to go to perform the commands you've given. But sometimes you need to modify how the robot moves in order to achieve the purposes of your protocol. This document will cover the two main ways to define positions — relative to labware, or relative to the entire deck — as well as how to alter the robot's speed or trajectory as it moves to those positions.
-
+The API automatically determines how the robot needs to move when working with the instruments and labware in your protocol. But sometimes you need direct control over these activities. The API lets you do just that. Specifically, you can control movements relative to labware and deck locations. You can also manage the gantry’s speed and trajectory as it traverses the enclosure. This document explains how to use API commands to take direct control of the robot and position it exactly where you need it.
 
 .. _position-relative-labware:
 
@@ -15,20 +14,23 @@ Most of the time when executing a protocol, the Python Protocol API's methods ta
 Position Relative to Labware
 ============================
 
-When you instruct the robot to move to a position on a piece of labware, the exact point in space it moves to is calculated based on the labware definition, the type of action the robot will perform there, and labware offsets for the specific deck slot on your robot. This section describes how each of these components of a position are calculated and methods for modifying them.
+When the robot positions itself relative to a piece of labware, the labware definition determines movement, distance, height, offsets, and the actions it can perform. This section describes how these positional components are calculated and how to change them.
 
 Top, Bottom, and Center
 -----------------------
 
-Every well on every piece of labware you load has three addressable positions — top, bottom, and center — that are determined by the labware definition and whether the labware is on a module or directly on the deck. You can use these positions as-is or calculate other positions relative to them.
+Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and whether the labware is on a module or in a deck slot. You can use these positions as-is or calculate other positions relative to them.
 
-:py:meth:`.Well.top` returns a position level with the top of the well, centered in both horizontal directions. 
+Top
+^^^
+
+As an example, let's look at the :py:meth:`.Well.top` method. It returns a position level with the top of the well, centered in both horizontal directions.
 
 .. code-block:: python
+    
+    plate['A1'].top()  # the top center of the well
 
-   plate['A1'].top()     # the top center of the well
-
-This is a good position to use for :ref:`new-blow-out` or any other operation where you don't want the tip to contact the liquid. In addition, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, and negative ``z`` numbers move it down:
+This is a good position to use for a :ref:`blow out operation <new-blow-out>` or an activity where you don't want the tip to contact the liquid. In addition, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z`` numbers move it down.
 
 .. code-block:: python
 
@@ -37,13 +39,16 @@ This is a good position to use for :ref:`new-blow-out` or any other operation wh
 
 .. versionadded:: 2.0
 
-:py:meth:`.Well.bottom` returns a position level with the bottom of the well, centered in both horizontal directions. 
+Bottom
+^^^^^^
+
+As an example, lets look at the :py:meth:`.Well.bottom` method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
 
 .. code-block:: python
 
    plate['A1'].bottom()     # the bottom center of the well
 
-This is a good position to start for aspiration or any other operation where you want the tip to contact the liquid. The same as with :py:meth:`.Well.top`, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, and negative ``z``` numbers move it down:
+This is a good position to start for an :ref:`aspirate action <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z``` numbers move it down.
 
 .. code-block:: python
 
@@ -51,15 +56,18 @@ This is a good position to start for aspiration or any other operation where you
    plate['A1'].bottom(z=-1) # 1 mm below the bottom center of the well
                             # this may be dangerous!
 
+.. verifying this warning re: Flex
 
 .. warning::
 
-    Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to collide with the bottom of the well. The OT-2 has no sensors to detect this. A collision may bend the tip (affecting liquid handling) and the pipette may be higher on the z-axis than expected until it picks up another tip.
+    Negative ``z`` arguments to ``Well.bottom()`` may cause the tip to collide with the bottom of the well. The OT-2 has no sensors to detect this. A collision may bend the tip (affecting liquid handling) and the pipette may be higher on the z-axis than expected until it picks up another tip.
 
 .. versionadded:: 2.0
 
+Center
+^^^^^^
 
-:py:meth:`.Well.center` returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
+As an example, lets look at the :py:meth:`.Well.center` method. It returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
 
 .. code-block:: python
 
