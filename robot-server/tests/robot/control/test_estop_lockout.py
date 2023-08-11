@@ -1,6 +1,6 @@
 """Test the dependency for locking endpoints based on Estop."""
 
-from decoy import Decoy
+from decoy import Decoy, matchers
 import pytest
 from typing import TYPE_CHECKING, Optional
 
@@ -32,9 +32,7 @@ async def hardware_ot2(decoy: Decoy) -> API:
 @pytest.mark.ot3_only
 @pytest.fixture
 async def hardware_ot3(decoy: Decoy) -> "OT3API":
-    from opentrons.hardware_control.ot3api import OT3API
-
-    return decoy.mock(cls=OT3API)
+    return decoy.mock(cls="OT3API")
 
 
 @pytest.fixture
@@ -49,10 +47,8 @@ async def thread_manager_ot2(decoy: Decoy, hardware_ot2: API) -> ThreadManagedHa
 async def thread_manager_ot3(
     decoy: Decoy, hardware_ot3: "OT3API"
 ) -> ThreadManagedHardware:
-    from opentrons.hardware_control.ot3api import OT3API
-
     thread_manager = decoy.mock(cls=ThreadManagedHardware)
-    decoy.when(thread_manager.wraps_instance(OT3API)).then_return(True)
+    decoy.when(thread_manager.wraps_instance(matchers.Anything())).then_return(True)
     decoy.when(thread_manager.wrapped()).then_return(hardware_ot3)
     return thread_manager
 
