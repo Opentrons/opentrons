@@ -208,13 +208,30 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
-        is-odd: [false]
-        include:
-          - os: 'ubuntu-22.04'
-            is-odd: true
+        target: ['desktop', 'odd']
+        exclude:
+          - os: 'windows-2022'
+            target: 'odd'
+          - os: 'macos-11'
+            target: 'odd'
+
     runs-on: ${{ matrix.os }}
-    name: 'Build ${{matrix.variant}} app on ${{matrix.os}}'
+    name: 'Build ${{matrix.variant}} ${{matrix.target}} app on ${{matrix.os}}'
     steps:
+      - name: 'Get project name for variant'
+        id: project
+        run: |
+          if [[ ${{matrix.variant}} = "release" ]] ; then
+             echo "Configuring project, bucket, and folder for robot-stack"
+             echo "project=robot-stack" >> $GITHUB_OUTPUT
+             echo "bucket=${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}" >> $GITHUB_OUTPUT
+             echo "folder=${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}" >> $GITHUB_OUTPUT
+          else
+             echo "Configuring project, bucket, and folder for ot3"
+             echo "project=ot3" >> $GITHUB_OUTPUT
+             echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
+             echo "folder=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
+          fi
       - uses: 'actions/checkout@v3'
         with:
           fetch-depth: 0
@@ -258,7 +275,7 @@ jobs:
           make setup-js
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
-        if: ${{!matrix.is-odd}}
+        if: matrix.target == 'desktop'
         timeout-minutes: 60
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
@@ -271,26 +288,26 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID }}
           HOST_PYTHON: python
-          OPENTRONS_PROJECT: ${{ ((matrix.variant == 'release') && 'robot-stack') || 'ot3' }}
-          OT_APP_DEPLOY_BUCKET: ${{ ((matrix.variant == 'release') && env._APP_DEPLOY_BUCKET_ROBOTSTACK) || env._APP_DEPLOY_BUCKET_OT3   }}
-          OT_APP_DEPLOY_FOLDER: ${{ ((matrix.variant == 'release') && env._APP_DEPLOY_FOLDER_ROBOTSTACK ) || env._APP_DEPLOY_FOLDER_OT3 }}
+          OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
+          OT_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
+          OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
 
         run: |
           make -C app-shell dist-${{ matrix.os }}
 
       - name: 'upload github artifact'
-        if: ${{!matrix.is-odd}}
+        if: matrix.target == 'desktop'
         uses: actions/upload-artifact@v3
         with:
           name: 'opentrons-${{matrix.variant}}-${{ matrix.os }}'
           path: app-shell/dist/publish
 
       # build the ODD app
-      - if: matrix.is-odd
-        name: 'build ODD app for linux'
+      - if: matrix.target == 'odd'
+        name: 'build ${{matrix.variant}} ODD app'
         timeout-minutes: 60
         env:
-          OPENTRONS_PROJECT: ${{ ((matrix.variant == 'release') && 'robot-stack') || 'ot3' }}
+          OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
         run: |
           make -C app-shell-odd dist-ot3
 
