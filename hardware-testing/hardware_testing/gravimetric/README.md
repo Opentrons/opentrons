@@ -17,10 +17,12 @@ and substitute `internal-release` for whatever branch you're merging in to.
 `python hardware-testing/hardware_testing/scripts/update_patches.py --upstream origin/internal-release`
 
 ## Photometric tests
+
 python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96 --photometric --tip 50
 python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96 --photometric --tip 200
 
 ## Gravimetric tests
+
 ###P1000 single channel QC
 python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1
 python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --extra
