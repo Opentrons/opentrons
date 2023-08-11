@@ -22,6 +22,7 @@ describe('Toast', () => {
       buttonText: 'Close',
       onClose: jest.fn(),
       displayType: 'odd',
+      exitNow: false,
     }
   })
   afterEach(() => {
@@ -133,13 +134,18 @@ describe('Toast', () => {
     jest.useFakeTimers()
     props = {
       ...props,
+      disableTimeout: true,
       exitNow: true,
     }
     const { getByText } = render(props)
-    const toast = getByText('test message')
+    getByText('test message')
+    act(() => {
+      jest.advanceTimersByTime(100)
+    })
+    expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
       jest.advanceTimersByTime(TOAST_ANIMATION_DURATION)
     })
-    expect(toast).toBeInTheDocument()
+    expect(props.onClose).toHaveBeenCalled()
   })
 })
