@@ -11,14 +11,14 @@ Most of the time when executing a protocol, the Python Protocol API's methods ta
 
 .. _position-relative-labware:
 
-****************************
+
 Position Relative to Labware
-****************************
+============================
 
 When you instruct the robot to move to a position on a piece of labware, the exact point in space it moves to is calculated based on the labware definition, the type of action the robot will perform there, and labware offsets for the specific deck slot on your robot. This section describes how each of these components of a position are calculated and methods for modifying them.
 
 Top, Bottom, and Center
-=======================
+-----------------------
 
 Every well on every piece of labware you load has three addressable positions — top, bottom, and center — that are determined by the labware definition and whether the labware is on a module or directly on the deck. You can use these positions as-is or calculate other positions relative to them.
 
@@ -71,7 +71,7 @@ This is a good position to start for aspiration or any other operation where you
 .. _new-default-op-positions:
 
 Default Positions
-=================
+-----------------
 
 By default, the OT-2 will aspirate and dispense 1 mm above the bottom of wells, which may not be suitable for some labware geometries, liquids, or protocols. You can change this by using :py:meth:`.Well.bottom` with the ``z`` argument, although it can be cumbersome to do this repeatedly. If you need to change the aspiration or dispensing height for many operations, specify the distance from the well bottom with :py:obj:`.InstrumentContext.well_bottom_clearance`. This attribute has two sub-attributes: ``well_bottom_clearance.aspirate`` changes the height for aspiration, and ``well_bottom_clearance.dispense`` changes the height for dispensing.
 
@@ -115,7 +115,7 @@ Changing these attributes will affect all subsequent aspirate and dispense actio
 .. _using_lpc:
 
 Using Labware Position Check
-============================
+----------------------------
 
 All positions relative to labware are automatically adjusted based on the labware's offset, an x, y, z vector. The best way to calculate and apply these offsets is by using Labware Position Check when you run your protocol in the Opentrons App. As of version 6.0 of the app, you can apply previously calculated offsets — even across different protocols — as long as they are for the same type of labware in the same deck slot on the same robot.
 
@@ -173,10 +173,8 @@ Remember, you should only add ``.set_offset()`` commands to protocols run outsid
 
 .. _protocol-api-deck-coords:
 
-*****************************
 Position Relative to the Deck
-*****************************
-
+=============================
 
 The OT-2’s base coordinate system is known as *deck coordinates*. Many API functions use this coordinate system, and you can also reference it directly. It is a right-handed coordinate system always specified in mm, with the origin ``(0, 0, 0)`` at the front left of the robot. The positive ``x`` direction is to the right, the positive ``y`` direction is to the back, and the positive ``z`` direction is up. 
 
@@ -187,15 +185,14 @@ You can identify a point in this coordinate system with a :py:class:`.types.Loca
     There are technically multiple vertical axes: ``z`` is the axis of the left pipette mount and ``a`` is the axis of the right pipette mount. There are also pipette plunger axes: ``b`` (left) and ``c`` (right). You usually don't have to refer to these axes directly, since most motion commands are issued to a particular pipette and the OT-2 automatically selects the correct axis to move. Similarly, :py:class:`.types.Location` only deals with ``x``, ``y``, and ``z`` values. 
 
 
-********************
 Independent Movement
-********************
+====================
 
 For convenience, many methods have location arguments and incorporate movement automatically. This section will focus on moving the pipette independently, without performing other actions like ``aspirate()`` or ``dispense()``.
 
 
 Move To
-=======
+-------
 
 You can use the :py:meth:`.InstrumentContext.move_to` method to move a pipette to any reachable location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position. As with all movement in a protocol, the OT-2 calculates where to move in physical space by using its `pipette offset and tip length calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-tip-length-and-pipette-offset>`_ data.
 
@@ -232,7 +229,7 @@ Small, direct movements can be useful for working inside of a well, without havi
 
 
 Points and Locations
-====================
+--------------------
 
 When instructing the OT-2 to move, it's important to consider the difference between the :py:class:`~opentrons.types.Point` and :py:class:`~opentrons.types.Location` types. Points are ordered tuples or named tuples: ``Point(10, 20, 30)``, ``Point(x=10, y=20, z=30)``, and ``Point(z=30, y=20, x=10)`` are all equivalent. Locations are a higher-order tuple that combines a point with a reference object: a well, a piece of labware, or ``None`` (the deck).
 
@@ -280,16 +277,15 @@ This distinction is important for the :py:meth:`.Location.move` method, which op
 .. versionadded:: 2.0
 
 
-***************
 Movement Speeds
-***************
+===============
 
 In addition to instructing the OT-2 where to move a pipette, you can also control the speed at which it moves. Speed controls can be applied either to all pipette motions or to movement along a particular axis.
 
 .. _gantry_speed: 
 
 Gantry Speed
-============
+------------
 
 The OT-2's gantry usually moves as fast as it can given its construction: 400 mm/s. Moving at this speed saves time when executing protocols. However, some experiments or liquids may require slower movements. In this case, you can reduce the gantry speed for a specific pipette by setting :py:obj:`.InstrumentContext.default_speed`:
 
@@ -314,7 +310,7 @@ The OT-2's gantry usually moves as fast as it can given its construction: 400 mm
 .. _axis_speed_limits:
 
 Axis Speed Limits
-=================
+-----------------
 
 In addition to controlling the overall gantry speed, you can set speed limits for each of the individual axes: ``x`` (gantry left/right motion), ``y`` (gantry forward/back motion), ``z`` (left pipette up/down motion), and ``a`` (right pipette up/down motion). Unlike ``default_speed``, which is a pipette property, axis speed limits are stored in a protocol property :py:obj:`.ProtocolContext.max_speeds`; therefore the ``x`` and ``y`` values affect all movements by both pipettes. This property works like a dictionary, where the keys are axes, assigning a value to a key sets a max speed, and deleting a key or setting it to ``None`` resets that axis's limit to the default:
 
