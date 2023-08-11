@@ -13,7 +13,7 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
@@ -103,7 +103,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     useSelector((state: State) => {
       const value =
         selectedRobot != null
-          ? getBuildrootUpdateDisplayInfo(state, selectedRobot.name)
+          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
           : { autoUpdateAction: '' }
       return value
     })?.autoUpdateAction

@@ -12,10 +12,11 @@ import * as Constants from './constants'
 import type { State } from '../types'
 import type { ViewableRobot } from '../discovery/types'
 import type {
-  BuildrootUpdateInfo,
-  BuildrootUpdateSession,
-  BuildrootUpdateType,
+  RobotUpdateInfo,
+  RobotUpdateSession,
+  RobotUpdateType,
   RobotSystemType,
+  RobotUpdateTarget,
 } from './types'
 
 // TODO(mc, 2020-08-02): i18n
@@ -27,34 +28,61 @@ const NO_UPDATE_FILES =
   'Unable to retrieve update for this robot. Ensure your computer is connected to the internet and try again later.'
 const UNAVAILABLE = 'Update unavailable'
 
-export function getBuildrootUpdateVersion(state: State): string | null {
-  return state.buildroot.version || null
+export function getRobotUpdateTarget(
+  state: State,
+  robotName: string
+): RobotUpdateTarget | null {
+  const robot = getRobotByName(state, robotName)
+  if (robot === null) {
+    return null
+  }
+  const model = robot?.serverHealth?.robotModel ?? null
+  if (model === null) {
+    return 'ot2'
+  }
+  if (model.includes('OT-2')) {
+    return 'ot2'
+  }
+  return 'flex'
 }
 
-export function getBuildrootUpdateInfo(
-  state: State
-): BuildrootUpdateInfo | null {
-  return state.buildroot.info || null
+export function getRobotUpdateVersion(
+  state: State,
+  robotName: string
+): string | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  return target ? state.robotUpdate[target]?.version ?? null : null
 }
 
-export function getBuildrootTargetVersion(state: State): string | null {
-  return (
-    state.buildroot.session?.userFileInfo?.version ||
-    state.buildroot.version ||
-    null
-  )
+export function getRobotUpdateInfo(
+  state: State,
+  robotName: string
+): RobotUpdateInfo | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  const robotInfo = target ? state.robotUpdate[target] : null
+  if (target === null || robotInfo === null) {
+    return null
+  }
+  const { version, releaseNotes } = robotInfo
+  return version ? { target, version, releaseNotes } : null
 }
 
-export function getBuildrootUpdateSeen(state: State): boolean {
-  return state.buildroot.seen || false
+export function getRobotUpdateTargetVersion(
+  state: State,
+  robotName: string
+): string | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  const sessionVersion = state.robotUpdate.session?.fileInfo?.version
+  const systemVersion = target ? state.robotUpdate[target]?.version : null
+  return sessionVersion || systemVersion || null
 }
 
-export function getBuildrootUpdateInProgress(
+export function getRobotUpdateInProgress(
   state: State,
   robot: ViewableRobot
 ): boolean {
-  const session = getBuildrootSession(state)
-  const brRobot = getBuildrootRobot(state)
+  const session = getRobotUpdateSession(state)
+  const brRobot = getRobotUpdateRobot(state)
 
   return (
     robot === brRobot &&
@@ -63,29 +91,35 @@ export function getBuildrootUpdateInProgress(
   )
 }
 
-export function getBuildrootDownloadProgress(state: State): number | null {
-  return state.buildroot.downloadProgress
+export function getRobotUpdateDownloadProgress(
+  state: State,
+  robotName: string
+): number | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  return target ? state.robotUpdate[target].downloadProgress : null
 }
 
-export function getBuildrootDownloadError(state: State): string | null {
-  return state.buildroot.downloadError
+export function getRobotUpdateDownloadError(
+  state: State,
+  robotName: string
+): string | null {
+  const target = getRobotUpdateTarget(state, robotName)
+  return target ? state.robotUpdate[target].downloadError : null
 }
 
-export function getBuildrootSession(
-  state: State
-): BuildrootUpdateSession | null {
-  return state.buildroot.session
+export function getRobotUpdateSession(state: State): RobotUpdateSession | null {
+  return state.robotUpdate.session
 }
 
-export function getBuildrootRobotName(state: State): string | null {
-  return state.buildroot.session?.robotName || null
+export function getRobotUpdateSessionRobotName(state: State): string | null {
+  return state.robotUpdate.session?.robotName || null
 }
 
-export const getBuildrootRobot: (
+export const getRobotUpdateRobot: (
   state: State
 ) => ViewableRobot | null = createSelector(
   getViewableRobots,
-  getBuildrootRobotName,
+  getRobotUpdateSessionRobotName,
   (robots, robotName) => {
     if (robotName === null) return null
 
@@ -103,10 +137,10 @@ export const getBuildrootRobot: (
   }
 )
 
-const getBuildrootUpdateType = (
+const getRobotUpdateType = (
   currentVersion: string | null,
   updateVersion: string | null
-): BuildrootUpdateType | null => {
+): RobotUpdateType | null => {
   const validCurrent: string | null = semver.valid(currentVersion)
   const validUpdate: string | null = semver.valid(updateVersion)
   let type = null
@@ -124,17 +158,17 @@ const getBuildrootUpdateType = (
   return type
 }
 
-export function getBuildrootUpdateAvailable(
+export function getRobotUpdateAvailable(
   state: State,
   robot: ViewableRobot
-): BuildrootUpdateType | null {
+): RobotUpdateType | null {
   const currentVersion = getRobotApiVersion(robot)
-  const updateVersion = getBuildrootUpdateVersion(state)
+  const updateVersion = getRobotUpdateVersion(state, robot.name)
 
-  return getBuildrootUpdateType(currentVersion, updateVersion)
+  return getRobotUpdateType(currentVersion, updateVersion)
 }
 
-export const getBuildrootUpdateDisplayInfo: (
+export const getRobotUpdateDisplayInfo: (
   state: State,
   robotName: string
 ) => {
@@ -143,11 +177,11 @@ export const getBuildrootUpdateDisplayInfo: (
   updateFromFileDisabledReason: string | null
 } = createSelector(
   getRobotByName,
-  state => getBuildrootRobot(state),
-  state => getBuildrootUpdateVersion(state),
+  state => getRobotUpdateRobot(state),
+  (state, robotName) => getRobotUpdateVersion(state, robotName),
   (robot, currentUpdatingRobot, updateVersion) => {
     const robotVersion = robot ? getRobotApiVersion(robot) : null
-    const autoUpdateType = getBuildrootUpdateType(robotVersion, updateVersion)
+    const autoUpdateType = getRobotUpdateType(robotVersion, updateVersion)
     const autoUpdateAction = autoUpdateType ?? UNAVAILABLE
     let autoUpdateDisabledReason = null
     let updateFromFileDisabledReason = null
@@ -182,10 +216,10 @@ export function getRobotSystemType(
     const { capabilities } = serverHealth
 
     if (!capabilities || capabilities.balenaUpdate) {
-      return Constants.BALENA
+      return Constants.OT2_BALENA
     }
 
-    return Constants.BUILDROOT
+    return Constants.OT2_BUILDROOT
   }
 
   return null
