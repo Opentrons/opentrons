@@ -345,7 +345,7 @@ jobs:
           aws --profile=deploy s3 sync --acl=public-read to_upload_release/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
       - name: 'deploy internal-release release builds to s3'
         run: |
-          aws s3 --profile=deploy sync --acl=public-read to_upload_internal_release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+          aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
       - name: 'create GH release'
         uses: 'ncipollo/release-action@v1.12.0'
         if: needs.determine-build-type.outputs.type == 'release'
