@@ -196,8 +196,9 @@ jobs:
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           else
-            echo "::error Cannot determine builds for ref ${{github.ref}} and event ${{github.event_name}}, not building"
-            exit 1
+            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
+            echo 'variants=[]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
           fi
 
   build-app:
