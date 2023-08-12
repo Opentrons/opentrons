@@ -434,6 +434,7 @@ async def test_load_legacy_python(
         legacy_file_reader.read(
             protocol_source=legacy_protocol_source,
             labware_definitions=[labware_definition],
+            flex_dev_compat=True,
         )
     ).then_return(legacy_protocol)
     decoy.when(
@@ -444,7 +445,9 @@ async def test_load_legacy_python(
         )
     ).then_return(legacy_context)
 
-    await legacy_python_runner_subject.load(legacy_protocol_source)
+    await legacy_python_runner_subject.load(
+        legacy_protocol_source, flex_dev_compat=True
+    )
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
@@ -498,7 +501,9 @@ async def test_load_python_with_pe_papi_core(
     ).then_return([])
     decoy.when(
         legacy_file_reader.read(
-            protocol_source=legacy_protocol_source, labware_definitions=[]
+            protocol_source=legacy_protocol_source,
+            labware_definitions=[],
+            flex_dev_compat=True,
         )
     ).then_return(legacy_protocol)
     decoy.when(
@@ -507,7 +512,9 @@ async def test_load_python_with_pe_papi_core(
         )
     ).then_return(legacy_context)
 
-    await legacy_python_runner_subject.load(legacy_protocol_source)
+    await legacy_python_runner_subject.load(
+        legacy_protocol_source, flex_dev_compat=True
+    )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
 
@@ -553,6 +560,7 @@ async def test_load_legacy_json(
         legacy_file_reader.read(
             protocol_source=legacy_protocol_source,
             labware_definitions=[labware_definition],
+            flex_dev_compat=True,
         )
     ).then_return(legacy_protocol)
     decoy.when(
@@ -563,7 +571,9 @@ async def test_load_legacy_json(
         )
     ).then_return(legacy_context)
 
-    await legacy_python_runner_subject.load(legacy_protocol_source)
+    await legacy_python_runner_subject.load(
+        legacy_protocol_source, flex_dev_compat=True
+    )
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
