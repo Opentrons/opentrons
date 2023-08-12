@@ -157,6 +157,7 @@ def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonP
 
 def _parse_python(
     protocol_contents: str,
+    flex_dev_compat: bool,
     filename: Optional[str] = None,
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
@@ -196,7 +197,8 @@ def _parse_python(
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
-        _validate_v2_static_info(static_info)
+        if not flex_dev_compat:
+            _validate_v2_static_info(static_info)
     else:
         raise ApiDeprecationError(version)
 
@@ -216,16 +218,19 @@ def _parse_python(
     return result
 
 
-def _parse_bundle(bundle: ZipFile, filename: Optional[str] = None) -> PythonProtocol:
+def _parse_bundle(
+    bundle: ZipFile, flex_dev_compat: bool, filename: Optional[str] = None
+) -> PythonProtocol:
     """Parse a bundled Python protocol"""
     contents = extract_bundle(bundle)
 
     result = _parse_python(
-        contents.protocol,
-        filename,
-        contents.bundled_labware,
-        contents.bundled_data,
-        contents.bundled_python,
+        protocol_contents=contents.protocol,
+        flex_dev_compat=flex_dev_compat,
+        filename=filename,
+        bundled_labware=contents.bundled_labware,
+        bundled_data=contents.bundled_data,
+        bundled_python=contents.bundled_python,
     )
 
     if result.api_level < APIVersion(2, 0):
@@ -241,6 +246,9 @@ def parse(
     filename: Optional[str] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     extra_data: Optional[Dict[str, bytes]] = None,
+    # TODO(mm, 2023-08-10): Remove flex_dev_compat after the Flex launch, when the malformed
+    # protocols are no longer on any robots. https://opentrons.atlassian.net/browse/RSS-306
+    flex_dev_compat: bool = False,
 ) -> Protocol:
     """Parse a protocol from text.
 
@@ -255,6 +263,10 @@ def parse(
     :param extra_data: Any extra data files that should be provided to the
                        protocol. Ignored if the protocol is json or zipped
                        python.
+    :param flex_dev_compat: Use more lax validation rules to accept Opentrons-
+                            written protocols from Flex development and
+                            testing, before the exact rules for the
+                            `requirements` and `metadata` dicts were finalized.
     :return types.Protocol: The protocol holder, a named tuple that stores the
                         data in the protocol for later simulation or
                         execution.
@@ -266,7 +278,9 @@ def parse(
             )
 
         with ZipFile(BytesIO(protocol_file)) as bundle:
-            result = _parse_bundle(bundle, filename)
+            result = _parse_bundle(
+                bundle=bundle, flex_dev_compat=flex_dev_compat, filename=filename
+            )
         return result
     else:
         if isinstance(protocol_file, bytes):
@@ -278,8 +292,9 @@ def parse(
             return _parse_json(protocol_str, filename)
         elif filename and filename.endswith(".py"):
             return _parse_python(
-                protocol_str,
-                filename,
+                protocol_contents=protocol_str,
+                flex_dev_compat=flex_dev_compat,
+                filename=filename,
                 extra_labware=extra_labware,
                 bundled_data=extra_data,
             )
@@ -289,8 +304,9 @@ def parse(
             return _parse_json(protocol_str, filename)
         else:
             return _parse_python(
-                protocol_str,
-                filename,
+                protocol_contents=protocol_str,
+                flex_dev_compat=flex_dev_compat,
+                filename=filename,
                 extra_labware=extra_labware,
                 bundled_data=extra_data,
             )

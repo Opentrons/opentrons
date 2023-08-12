@@ -626,6 +626,17 @@ def test_parse_extra_contents(
             """,
             "robotType must be 'OT-2' or 'Flex', not 'flex'.",
         ),
+    ],
+)
+def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
+    with pytest.raises(MalformedPythonProtocolError, match=expected_message):
+        parse(dedent(bad_protocol))
+
+
+@pytest.mark.parametrize("flex_dev_compat", [True, False])
+@pytest.mark.parametrize(
+    ("questionable_protocol", "expected_message"),
+    [
         (
             # apiLevel in both metadata and requirements.
             """
@@ -654,12 +665,18 @@ def test_parse_extra_contents(
                 "RobotType": "Flex",
                 "foo": "bar",
             }
-            def run(cxt): pass
+            def run(ctx): pass
             """,
             "Unrecognized keys in requirements dict: 'APILevel', 'RobotType', 'foo'",
         ),
     ],
 )
-def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
-    with pytest.raises(MalformedPythonProtocolError, match=expected_message):
-        parse(dedent(bad_protocol))
+def test_flex_dev_compat(
+    questionable_protocol: str, flex_dev_compat: bool, expected_message: str
+) -> None:
+    if flex_dev_compat:
+        # Should not raise:
+        parse(dedent(questionable_protocol), flex_dev_compat=True)
+    else:
+        with pytest.raises(MalformedPythonProtocolError, match=expected_message):
+            parse(dedent(questionable_protocol), flex_dev_compat=False)
