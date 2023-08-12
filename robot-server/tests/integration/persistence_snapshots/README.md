@@ -39,7 +39,7 @@ The 2 protocols are to provide basic coverage of a python and json protocol. Eac
 
 Contains an invalid SQLite database file, to simulate a database that's been corrupted.
 
-### v6.2.0Large
+### v6.2.0_large
 
 1. Use the app installer to install the app version you are testing
 1. Reinstall the robot version to ensure matching version

@@ -52,7 +52,7 @@ snapshots: List[(Snapshot)] = [
     Snapshot(version="v6.1.0", expected_protocol_count=2, expected_run_count=2),
     Snapshot(version="v6.2.0", expected_protocol_count=2, expected_run_count=2),
     Snapshot(
-        version="v6.2.0Large",
+        version="v6.2.0_large",
         expected_protocol_count=17,
         expected_run_count=16,
         protocols_with_no_analyses=[
