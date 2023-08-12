@@ -147,10 +147,6 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
 # protocols. https://opentrons.atlassian.net/browse/RSS-306
-@pytest.mark.xfail(
-    # TODO(mm, 2023-08-12): Remove this xfail when we implement this special handling.
-    strict=True
-)
 async def test_rerun_flex_dev_compat() -> None:
     """Test re-running a stored protocol that has messed up requirements and metadata.
 

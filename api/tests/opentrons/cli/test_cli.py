@@ -151,10 +151,6 @@ def test_analysis_deck_definition(
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
 # protocols. https://opentrons.atlassian.net/browse/RSS-306
-@pytest.mark.xfail(
-    # TODO(mm, 2023-08-12): Remove xfail when we implement this special handling.
-    strict=True
-)
 def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     """It should apply strict validation to the metadata and requirements dicts.
 
