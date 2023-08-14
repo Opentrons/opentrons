@@ -46,9 +46,7 @@ export const labwareImages: Record<string, string[]> = {
   nest_1_reservoir_195ml: [
     require('../../images/nest_1_reservoir_195ml_three_quarters.jpg'),
   ],
-  nest_1_reservoir_290ml: [
-    require('../../images/nest_1_reservoir_290ml.jpg'),
-  ],
+  nest_1_reservoir_290ml: [require('../../images/nest_1_reservoir_290ml.jpg')],
   nest_12_reservoir_15ml: [
     require('../../images/nest_12_reservoir_15ml_three_quarters.jpg'),
   ],
