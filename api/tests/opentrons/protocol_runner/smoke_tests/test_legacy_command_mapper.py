@@ -155,9 +155,19 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 31
+    assert len(commands_result) == 32
 
-    assert commands_result[0] == commands.LoadLabware.construct(
+    assert commands_result[0] == commands.Home.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.HomeParams(axes=None),
+        result=commands.HomeResult(),
+    )
+    assert commands_result[1] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -172,7 +182,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=tiprack_1_result_captor,
     )
-    assert commands_result[1] == commands.LoadLabware.construct(
+    assert commands_result[2] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -187,7 +197,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=tiprack_2_result_captor,
     )
-    assert commands_result[2] == commands.LoadModule.construct(
+    assert commands_result[3] == commands.LoadModule.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -201,7 +211,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=module_1_result_captor,
     )
-    assert commands_result[3] == commands.LoadLabware.construct(
+    assert commands_result[4] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -216,7 +226,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=well_plate_1_result_captor,
     )
-    assert commands_result[4] == commands.LoadLabware.construct(
+    assert commands_result[5] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -232,7 +242,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         result=module_plate_1_result_captor,
     )
 
-    assert commands_result[5] == commands.LoadPipette.construct(
+    assert commands_result[6] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -245,7 +255,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         result=pipette_left_result_captor,
     )
 
-    assert commands_result[6] == commands.LoadPipette.construct(
+    assert commands_result[7] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -267,7 +277,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
     pipette_left_id = pipette_left_result_captor.value["pipetteId"]
     pipette_right_id = pipette_right_result_captor.value["pipetteId"]
 
-    assert commands_result[7] == commands.PickUpTip.construct(
+    assert commands_result[8] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -283,7 +293,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
-    assert commands_result[8] == commands.PickUpTip.construct(
+    assert commands_result[9] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -300,7 +310,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
     )
 
-    assert commands_result[9] == commands.DropTip.construct(
+    assert commands_result[10] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -315,7 +325,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         result=commands.DropTipResult(position=DeckPoint(x=0, y=0, z=0)),
     )
 
-    assert commands_result[10] == commands.PickUpTip.construct(
+    assert commands_result[11] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -331,7 +341,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
-    assert commands_result[11] == commands.Aspirate.construct(
+    assert commands_result[12] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -347,7 +357,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=40, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[12] == commands.Dispense.construct(
+    assert commands_result[13] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -363,7 +373,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=35, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[13] == commands.Aspirate.construct(
+    assert commands_result[14] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -379,7 +389,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=40, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[14] == commands.Dispense.construct(
+    assert commands_result[15] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -395,7 +405,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=35, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[15] == commands.BlowOut.construct(
+    assert commands_result[16] == commands.BlowOut.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -410,7 +420,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[16] == commands.Aspirate.construct(
+    assert commands_result[17] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -426,7 +436,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[17] == commands.Dispense.construct(
+    assert commands_result[18] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -442,7 +452,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[18] == commands.BlowOut.construct(
+    assert commands_result[19] == commands.BlowOut.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -457,7 +467,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[19] == commands.Aspirate.construct(
+    assert commands_result[20] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -473,7 +483,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=300, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[20] == commands.Dispense.construct(
+    assert commands_result[21] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -489,7 +499,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=300, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[21] == commands.BlowOut.construct(
+    assert commands_result[22] == commands.BlowOut.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -505,7 +515,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
     #   TODO:(jr, 15.08.2022): this should map to move_to when move_to is mapped in a followup ticket RSS-62
-    assert commands_result[22] == commands.Custom.construct(
+    assert commands_result[23] == commands.Custom.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -520,7 +530,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
     )
     #   TODO:(jr, 15.08.2022): aspirate commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[23] == commands.Custom.construct(
+    assert commands_result[24] == commands.Custom.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -535,7 +545,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
     )
     #   TODO:(jr, 15.08.2022): dispense commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[24] == commands.Custom.construct(
+    assert commands_result[25] == commands.Custom.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -550,7 +560,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
     )
     #   TODO:(jr, 15.08.2022): blow_out commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[25] == commands.Custom.construct(
+    assert commands_result[26] == commands.Custom.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -563,7 +573,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.CustomResult(),
     )
-    assert commands_result[26] == commands.Aspirate.construct(
+    assert commands_result[27] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -579,7 +589,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[27] == commands.Dispense.construct(
+    assert commands_result[28] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -597,7 +607,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
     )
     #   TODO:(jr, 15.08.2022): aspirate commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[28] == commands.Custom.construct(
+    assert commands_result[29] == commands.Custom.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -612,7 +622,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
     )
     #   TODO:(jr, 15.08.2022): dispense commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[29] == commands.Custom.construct(
+    assert commands_result[30] == commands.Custom.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -625,7 +635,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         ),
         result=commands.CustomResult(),
     )
-    assert commands_result[30] == commands.DropTip.construct(
+    assert commands_result[31] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -681,6 +691,7 @@ async def test_zero_volume_dispense_commands(
     )
 
     [
+        initial_home,
         load_tip_rack,
         load_well_plate,
         load_pipette,
@@ -689,6 +700,7 @@ async def test_zero_volume_dispense_commands(
         aspirate_1,
         aspirate_2_as_move_to_well,
     ] = result_commands
+    assert isinstance(initial_home, commands.Home)
     assert isinstance(load_tip_rack, commands.LoadLabware)
     assert isinstance(load_well_plate, commands.LoadLabware)
     assert isinstance(load_pipette, commands.LoadPipette)

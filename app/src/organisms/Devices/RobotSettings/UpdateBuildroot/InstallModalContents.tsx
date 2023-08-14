@@ -5,13 +5,14 @@ import { ProgressSpinner, ProgressBar } from './progress'
 import styles from './styles.css'
 
 import type {
-  BuildrootUpdateSession,
+  RobotUpdateSession,
   RobotSystemType,
-} from '../../../../redux/buildroot/types'
+} from '../../../../redux/robot-update/types'
+import { OT2_BALENA } from '../../../../redux/robot-update'
 
 export interface InstallModalContentsProps {
   robotSystemType: RobotSystemType | null
-  session: BuildrootUpdateSession
+  session: RobotUpdateSession
 }
 
 export function InstallModalContents(
@@ -50,7 +51,7 @@ export function InstallModalContents(
     restartMessage = 'Waiting for robot to restart to complete update'
   } else {
     title = `Robot ${
-      robotSystemType === 'balena' ? 'system ' : ''
+      robotSystemType === OT2_BALENA ? 'system ' : ''
     } update in progress…`
     restartMessage = 'Your robot will restart once the update is complete.'
   }

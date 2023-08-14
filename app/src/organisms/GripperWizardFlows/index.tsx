@@ -13,6 +13,7 @@ import {
 import {
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -69,19 +70,24 @@ export function GripperWizardFlows(
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
+    onSuccess: () => closeFlow(),
+    onError: () => closeFlow(),
+  })
+
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
       .then(() => {
+        deleteMaintenanceRun(maintenanceRunId)
         setIsExiting(false)
         props.onComplete?.()
-        closeFlow()
       })
       .catch(error => {
         console.error(error.message)
+        deleteMaintenanceRun(maintenanceRunId)
         setIsExiting(false)
         props.onComplete?.()
-        closeFlow()
       })
   }
 

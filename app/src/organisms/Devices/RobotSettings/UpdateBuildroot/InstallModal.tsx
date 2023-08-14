@@ -5,14 +5,15 @@ import { InstallModalContents } from './InstallModalContents'
 
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import type {
-  BuildrootUpdateSession,
+  RobotUpdateSession,
   RobotSystemType,
-} from '../../../../redux/buildroot/types'
+} from '../../../../redux/robot-update/types'
+import { OT2_BALENA } from '../../../../redux/robot-update'
 
 export interface InstallModalProps {
   robot: ViewableRobot
   robotSystemType: RobotSystemType | null
-  session: BuildrootUpdateSession
+  session: RobotUpdateSession
   close: () => unknown
 }
 
@@ -26,7 +27,7 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
 
   let heading: string
   // let heading: string = ''
-  if (robotSystemType === 'balena') {
+  if (robotSystemType === OT2_BALENA) {
     if (
       session.step === 'premigration' ||
       session.step === 'premigrationRestart'
@@ -35,13 +36,12 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
     } else {
       heading = 'Robot Update: Step 2 of 2'
     }
-  } else if (robotSystemType === 'buildroot') {
+  } else {
     heading = 'Robot Update'
   }
 
   return (
     <AlertModal
-      // @ts-expect-error use commented code above
       heading={heading}
       buttons={buttons}
       restrictOuterScroll={false}

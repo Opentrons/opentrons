@@ -15,7 +15,12 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
-from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    StateSummary,
+    Command,
+    commands as pe_commands,
+)
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -140,6 +145,10 @@ class PythonAndLegacyRunner(AbstractRunner):
             broker=broker,
             equipment_broker=equipment_broker,
         )
+        initial_home_command = pe_commands.HomeCreate(
+            params=pe_commands.HomeParams(axes=None)
+        )
+        self._protocol_engine.add_command(request=initial_home_command)
 
         self._task_queue.set_run_func(
             func=self._legacy_executor.execute,
@@ -156,7 +165,6 @@ class PythonAndLegacyRunner(AbstractRunner):
         if protocol_source:
             await self.load(protocol_source=protocol_source)
 
-        await self._hardware_api.home()
         self.play()
         self._task_queue.start()
         await self._task_queue.join()
@@ -227,6 +235,11 @@ class JsonRunner(AbstractRunner):
                 color=liquid.displayColor,
             )
             await _yield()
+        initial_home_command = pe_commands.HomeCreate(
+            params=pe_commands.HomeParams(axes=None)
+        )
+        self._protocol_engine.add_command(request=initial_home_command)
+
         for command in commands:
             self._protocol_engine.add_command(request=command)
             await _yield()
@@ -242,7 +255,6 @@ class JsonRunner(AbstractRunner):
         if protocol_source:
             await self.load(protocol_source)
 
-        await self._hardware_api.home()
         self.play()
         self._task_queue.start()
         await self._task_queue.join()

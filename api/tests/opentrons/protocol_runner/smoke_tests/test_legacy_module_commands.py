@@ -67,14 +67,24 @@ async def test_runner_with_modules_in_legacy_python(
     result = await subject.run(protocol_source)
     commands_result = result.commands
 
-    assert len(commands_result) == 5
+    assert len(commands_result) == 6
 
     temp_module_result_captor = matchers.Captor()
     mag_module_result_captor = matchers.Captor()
     thermocycler_result_captor = matchers.Captor()
     heater_shaker_result_captor = matchers.Captor()
 
-    assert commands_result[0] == commands.LoadLabware.construct(
+    assert commands_result[0] == commands.Home.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.HomeParams(axes=None),
+        result=commands.HomeResult(),
+    )
+    assert commands_result[1] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -85,7 +95,7 @@ async def test_runner_with_modules_in_legacy_python(
         result=matchers.Anything(),
     )
 
-    assert commands_result[1] == commands.LoadModule.construct(
+    assert commands_result[2] == commands.LoadModule.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -96,7 +106,7 @@ async def test_runner_with_modules_in_legacy_python(
         result=temp_module_result_captor,
     )
 
-    assert commands_result[2] == commands.LoadModule.construct(
+    assert commands_result[3] == commands.LoadModule.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -107,7 +117,7 @@ async def test_runner_with_modules_in_legacy_python(
         result=mag_module_result_captor,
     )
 
-    assert commands_result[3] == commands.LoadModule.construct(
+    assert commands_result[4] == commands.LoadModule.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -118,7 +128,7 @@ async def test_runner_with_modules_in_legacy_python(
         result=thermocycler_result_captor,
     )
 
-    assert commands_result[4] == commands.LoadModule.construct(
+    assert commands_result[5] == commands.LoadModule.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,

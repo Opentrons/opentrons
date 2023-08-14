@@ -18,14 +18,14 @@ import {
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../../organisms/RobotSettingsDashboard'
-import { getBuildrootUpdateAvailable } from '../../../../redux/buildroot'
+import { getRobotUpdateAvailable } from '../../../../redux/robot-update'
 import { useNetworkConnection } from '../../hooks'
 import { useLEDLights } from '../../../../organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '..'
 
 jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/buildroot')
+jest.mock('../../../../redux/robot-update')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/robot-settings')
 jest.mock('../../hooks/useNetworkConnection')
@@ -72,8 +72,8 @@ const mockUpdateChannel = UpdateChannel as jest.MockedFunction<
 const mockuseLEDLights = useLEDLights as jest.MockedFunction<
   typeof useLEDLights
 >
-const mockGetBuildrootUpdateAvailable = getBuildrootUpdateAvailable as jest.MockedFunction<
-  typeof getBuildrootUpdateAvailable
+const mockGetBuildrootUpdateAvailable = getRobotUpdateAvailable as jest.MockedFunction<
+  typeof getRobotUpdateAvailable
 >
 const mockUseNetworkConnection = useNetworkConnection as jest.MockedFunction<
   typeof useNetworkConnection

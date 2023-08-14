@@ -296,7 +296,6 @@ async def test_run_json_runner(
     assert json_runner_subject.was_started() is True
 
     decoy.verify(
-        await hardware_api.home(),
         protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
@@ -364,6 +363,9 @@ async def test_load_json_runner(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_liquid(
             id="water-id", name="water", description="water desc", color=None
+        ),
+        protocol_engine.add_command(
+            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
         protocol_engine.add_command(
             request=pe_commands.WaitForResumeCreate(
@@ -447,6 +449,9 @@ async def test_load_legacy_python(
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
+        protocol_engine.add_command(
+            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
+        ),
         task_queue.set_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
@@ -563,6 +568,9 @@ async def test_load_legacy_json(
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
+        protocol_engine.add_command(
+            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
+        ),
         task_queue.set_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
@@ -588,7 +596,6 @@ async def test_run_python_runner(
     assert legacy_python_runner_subject.was_started() is True
 
     decoy.verify(
-        await hardware_api.home(),
         protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
