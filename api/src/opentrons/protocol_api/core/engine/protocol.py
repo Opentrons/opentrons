@@ -165,6 +165,8 @@ class ProtocolCore(
             version=version,
             display_name=label,
         )
+        # FIXME(jbl, 2023-08-14) validating after loading the object issue
+        validation.ensure_definition_is_labware(load_result.definition)
 
         # FIXME(mm, 2023-02-21):
         #
@@ -220,6 +222,8 @@ class ProtocolCore(
             namespace=namespace,
             version=version,
         )
+        # FIXME(jbl, 2023-08-14) validating after loading the object issue
+        validation.ensure_definition_is_adapter(load_result.definition)
 
         # FIXME(jbl, 2023-06-23) read fixme above:
         deck_conflict.check(
