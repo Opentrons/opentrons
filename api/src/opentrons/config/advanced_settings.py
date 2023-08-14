@@ -282,7 +282,8 @@ def get_all_adv_settings(
     return {
         key: Setting(value=value, definition=settings_by_id[key])
         for key, value in values.items()
-        if key in settings_by_id and _filtered_key(settings_by_id[key], robot_type, include_internal)
+        if key in settings_by_id
+        and _filtered_key(settings_by_id[key], robot_type, include_internal)
     }
 
 

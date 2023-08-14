@@ -11,6 +11,11 @@ RobotType = Literal["OT-2 Standard", "OT-3 Standard"]
 
 
 class RobotTypeEnum(enum.Enum):
+    """An enum representing the active robot type."""
+
+    # TODO we should switch over to using Enums fully (if possible)
+    # to represent our robot types in code -- rather than having
+    # to string match everywhere.
     OT2 = enum.auto()
     FLEX = enum.auto()
 
