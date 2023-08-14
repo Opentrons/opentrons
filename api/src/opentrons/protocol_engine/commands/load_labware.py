@@ -6,9 +6,12 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..errors import LabwareDefinitionIsNotLabwareError
+from ..errors import (
+    LabwareDefinitionIsNotLabwareError,
+    LabwareIsNotAllowedInLocationError,
+)
 from ..resources import labware_validation
-from ..types import LabwareLocation, OnLabwareLocation
+from ..types import LabwareLocation, OnLabwareLocation, DeckSlotLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -92,6 +95,15 @@ class LoadLabwareImplementation(
 
     async def execute(self, params: LoadLabwareParams) -> LoadLabwareResult:
         """Load definition and calibration data necessary for a labware."""
+        if (
+            labware_validation.is_flex_trash(params.loadName)
+            and isinstance(params.location, DeckSlotLocation)
+            and self._state_view.geometry.get_slot_column(params.location.slotName) != 3
+        ):
+            raise LabwareIsNotAllowedInLocationError(
+                f"{params.loadName} is not allowed in slot {params.location}"
+            )
+
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
             namespace=params.namespace,

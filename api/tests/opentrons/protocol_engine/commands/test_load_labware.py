@@ -6,7 +6,10 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.errors import LabwareDefinitionIsNotLabwareError
+from opentrons.protocol_engine.errors import (
+    LabwareDefinitionIsNotLabwareError,
+    LabwareIsNotAllowedInLocationError,
+)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     OnLabwareLocation,
@@ -115,6 +118,28 @@ async def test_load_labware_raises_not_labware(
     ).then_return(False)
 
     with pytest.raises(LabwareDefinitionIsNotLabwareError):
+        await subject.execute(data)
+
+
+async def test_load_labware_raises_location_not_allowed(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    state_view: StateView,
+) -> None:
+    """A LoadLabware command should raise if the flex trash definition is not in a valid slot."""
+    subject = LoadLabwareImplementation(equipment=equipment, state_view=state_view)
+
+    data = LoadLabwareParams(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
+        loadName="some-load-name",
+        namespace="opentrons-test",
+        version=1,
+        displayName="My custom display name",
+    )
+
+    decoy.when(labware_validation.is_flex_trash("some-load-name")).then_return(True)
+
+    with pytest.raises(LabwareIsNotAllowedInLocationError):
         await subject.execute(data)
 
 
