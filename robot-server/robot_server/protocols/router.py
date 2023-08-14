@@ -307,7 +307,14 @@ async def get_protocols(
 
 @protocols_router.get(
     path="/protocols/ids",
-    summary="Get uploaded protocol ids",
+    summary="[Internal] Get uploaded protocol ids",
+    description=(
+        "Get the IDs of all protocols stored on the server."
+        "\n\n"
+        "**Warning:**"
+        " This is an experimental endpoint and is only meant for internal use by Opentrons."
+        " We might remove it or change its behavior without warning."
+    ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
 )
 async def get_protocol_ids(
