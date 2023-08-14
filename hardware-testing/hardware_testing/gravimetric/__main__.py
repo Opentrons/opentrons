@@ -7,7 +7,7 @@ from typing import List, Union
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.protocols import (
+from hardware_testing.protocols.volumetric import (
     gravimetric_ot3_p50_single,
     gravimetric_ot3_p50_multi_50ul_tip,
     gravimetric_ot3_p1000_single,
