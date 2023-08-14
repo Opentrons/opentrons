@@ -6,22 +6,19 @@
 Examples
 ########
 
-Some Intro Here
-===============
-
-
+This page provides you with a few basic, ready-made code samples that work on Flex or OT-2. Try changing a protocol and validating it in the Opentrons app. Adding different instruments, modules, labware, and actions can be an ideal way to grow and test the skills you've learned from the :ref:`tutorial <tutorial>`. The examples also make great basic templates. Copy and modify the code to create unique protocols that help automate your laboratory workflows. 
 
 Instruments and Labware
 =======================
 
 Before getting started, you'll want to have the right instruments and labware ready for your robot. 
 
-Pipettes used in the code samples vary by robot model but both are attached to the right mount. 
+Pipettes the code samples include the:
 
-* Flex code samples use the Flex 1-Channel Pipette (5-1000 µL). The API load name for this pipette is ``flex_1channel_1000``.
-* OT-2 code samples use the P300 Single-Channel GEN2 pipette (20-300 µL). The API load name for this pipette is ``p300_single_gen2``.
+* Flex 1-Channel Pipette (5-1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
+* P300 Single-Channel GEN2 pipette (20-300 µL) for the OT-2. The API load name for this pipette is ``p300_single_gen2``. 
 
-The following table lists the labware used in the examples. 
+The code samples also use the labware listed below: 
 
 .. list-table::
     :header-rows: 1
@@ -45,47 +42,62 @@ The following table lists the labware used in the examples.
 Basic Transfer
 ==============
 
-Moving 100 µL from one well to another:
+This example uses the :py:meth:`.ProtocolContext.load_labware` method to move 100 µL of liquid from one well to another.
 
-.. code-block:: python
-    :substitutions:
+.. tabs::
 
-    from opentrons import protocol_api
+    .. tab:: Flex
 
-    metadata = {'apiLevel': '|apiLevel|'}
+        .. code-block:: python
+            :substitutions:
 
-    def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+            from opentrons import protocol_api
 
-        p300.transfer(100, plate['A1'], plate['B1'])
+            some code here.
+    
+    .. tab:: OT-2
 
+        .. code-block:: python
 
-This accomplishes the same thing as the following basic commands:
+            from opentrons import protocol_api
 
-.. code-block:: python
-    :substitutions:
+            metadata = {'apiLevel': '|apiLevel|'}
 
-    from opentrons import protocol_api
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=1)
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=2)
+                p300 = protocol.load_instrument(
+                    instrument_name='p300_single',
+                    mount='left',
+                    tip_racks=[tiprack_1])
+                # transfer 100 from well A1 to well B1
+                p300.transfer(volume=100, plate['A1'], plate['B1'])
+    
+        The code above accomplishes the same thing as the following basic commands:
 
-    metadata = {'apiLevel': '|apiLevel|'}
+        ..code-block:: python
+            :substitutions:
 
-    def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+            from opentrons import protocol_api
 
-        p300.pick_up_tip()
-        p300.aspirate(100, plate['A1'])
-        p300.dispense(100, plate['B1'])
-        p300.drop_tip()
+            metadata = {'apiLevel': '|apiLevel|'}
 
-******************************
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
+                tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
+                p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
 
-*****
+                p300.pick_up_tip()
+                p300.aspirate(100, plate['A1'])
+                p300.dispense(100, plate['B1'])
+                p300.drop_tip()
+
 Loops
-*****
+=====
 
 Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``7``, and uses that loop's current value to transfer from all wells in a reservoir to each row of a plate:
 
@@ -109,11 +121,9 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
         for i in range(8):
             p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
 
-******************************
 
-*****************
 Multiple Air Gaps
-*****************
+=================
 
 The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
 
@@ -140,11 +150,10 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
 
         p300.return_tip()
 
-******************************
 
-********
+
 Dilution
-********
+========
 
 This example first spreads a diluent to all wells of a plate. It then dilutes 8 samples from the reservoir across the 8 columns of the plate.
 
@@ -178,11 +187,9 @@ This example first spreads a diluent to all wells of a plate. It then dilutes 8 
                 30, row[:11], row[1:],
                 mix_after=(3, 25))
 
-******************************
 
-*************
 Plate Mapping
-*************
+=============
 
 This example deposits various volumes of liquids into the same plate of wells and automatically refill the tip volume when it runs out.
 
