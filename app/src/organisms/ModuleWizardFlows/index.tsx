@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  useHost,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
@@ -11,6 +10,7 @@ import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
@@ -38,8 +38,9 @@ export const ModuleWizardFlows = (
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
 
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+
   const moduleCalibrationSteps = getModuleCalibrationSteps()
-  const host = useHost()
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
@@ -58,14 +59,11 @@ export const ModuleWizardFlows = (
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation(
-    {
-      onSuccess: response => {
-        setMaintenanceRunId(response.data.id)
-      },
+  } = useCreateMaintenanceRunMutation({
+    onSuccess: response => {
+      setMaintenanceRunId(response.data.id)
     },
-    host
-  )
+  })
 
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
@@ -115,6 +113,7 @@ export const ModuleWizardFlows = (
   }, [isCommandMutationLoading, isExiting])
 
   const calibrateBaseProps = {
+    attachedPipettes,
     chainRunCommands,
     isRobotMoving,
     proceed,
