@@ -7,11 +7,13 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import { useProtocolMetadata } from '../../Devices/hooks'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 
+jest.mock('../../../redux/config')
 jest.mock('../../Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
@@ -19,6 +21,9 @@ const mockEndPosition = { x: 9, y: 19, z: 29 }
 
 const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
   typeof useProtocolMetadata
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
@@ -62,6 +67,7 @@ describe('CheckItem', () => {
       isRobotMoving: false,
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
+    when(mockUseFeatureFlag).calledWith('lpcWithProbe').mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -111,7 +117,7 @@ describe('CheckItem', () => {
               pipetteId: 'pipetteId1',
               labwareId: 'labwareId1',
               wellName: 'A1',
-              wellLocation: { origin: 'top', offset: undefined },
+              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 0 } },
             },
           },
           { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
@@ -149,7 +155,7 @@ describe('CheckItem', () => {
             pipetteId: 'pipetteId1',
             labwareId: 'labwareId1',
             wellName: 'A1',
-            wellLocation: { origin: 'top', offset: undefined },
+            wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 0 } },
           },
         },
         {
@@ -375,7 +381,7 @@ describe('CheckItem', () => {
             pipetteId: 'pipetteId1',
             labwareId: 'labwareId1',
             wellName: 'A1',
-            wellLocation: { origin: 'top', offset: undefined },
+            wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 0 } },
           },
         },
         {
@@ -415,5 +421,79 @@ describe('CheckItem', () => {
       ],
       false
     )
+  })
+  it('executes correct chained commands when confirm placement CTA is clicked when using probe for LPC', async () => {
+    when(mockUseFeatureFlag).calledWith('lpcWithProbe').mockReturnValue(true)
+    when(mockChainRunCommands)
+      .calledWith(
+        [
+          {
+            commandType: 'moveLabware',
+            params: {
+              labwareId: 'labwareId1',
+              newLocation: { slotName: 'D1' },
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+          {
+            commandType: 'moveToWell',
+            params: {
+              pipetteId: 'pipetteId1',
+              labwareId: 'labwareId1',
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 44.5 } },
+            },
+          },
+          { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
+        ],
+        false
+      )
+      .mockImplementation(() =>
+        Promise.resolve([
+          {},
+          {},
+          {
+            data: {
+              commandType: 'savePosition',
+              result: { position: mockStartPosition },
+            },
+          },
+        ])
+      )
+    const { getByRole } = render(props)
+    await getByRole('button', { name: 'Confirm placement' }).click()
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: { slotName: 'D1' },
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+        {
+          commandType: 'moveToWell',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+            wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 44.5 } },
+          },
+        },
+        {
+          commandType: 'savePosition',
+          params: { pipetteId: 'pipetteId1' },
+        },
+      ],
+      false
+    )
+    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+      type: 'initialPosition',
+      labwareId: 'labwareId1',
+      location: { slotName: 'D1' },
+      position: mockStartPosition,
+    })
   })
 })

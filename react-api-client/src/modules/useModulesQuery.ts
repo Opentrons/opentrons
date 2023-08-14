@@ -20,6 +20,7 @@ export function useModulesQuery(
         } else {
           return {
             data: [],
+            meta: { totalLength: 0, cursor: 0 },
           }
         }
       }),

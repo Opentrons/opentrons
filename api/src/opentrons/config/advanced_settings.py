@@ -13,10 +13,12 @@ from typing import (
     Optional,
     NamedTuple,
     cast,
+    List,
 )
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 from opentrons.system import log_control
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -44,9 +46,11 @@ class SettingDefinition:
         _id: str,
         title: str,
         description: str,
+        robot_type: List[RobotTypeEnum],
         old_id: Optional[str] = None,
         restart_required: bool = False,
         show_if: Optional[Tuple[str, bool]] = None,
+        internal_only: bool = False,
     ):
         self.id = _id
         #: The id of the setting for programmatic access through
@@ -62,6 +66,10 @@ class SettingDefinition:
         self.show_if = show_if
         #: A tuple of (other setting id, setting value) that must match reality
         #: to show this setting in http endpoints
+        self.robot_type = robot_type
+        #: A list of RobotTypeEnums that are compatible with this feature flag.
+        self.internal_only = internal_only
+        #: A flag determining whether this setting is user-facing.
 
     def __repr__(self) -> str:
         return "{}: {}".format(self.__class__, self.id)
@@ -73,7 +81,10 @@ class SettingDefinition:
         """
         if not self.show_if:
             return True
-        return get_setting_with_env_overload(self.show_if[0]) == self.show_if[1]
+        return (
+            get_setting_with_env_overload(self.show_if[0], self.robot_type[0])
+            == self.show_if[1]
+        )
 
     async def on_change(self, value: Optional[bool]) -> None:
         """
@@ -92,6 +103,7 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
             description="Prevent the robot from sending its logs to Opentrons"
             " for analysis. Opentrons uses these logs to"
             " troubleshoot robot issues and spot error trends.",
+            robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         )
 
     async def on_change(self, value: Optional[bool]) -> None:
@@ -125,6 +137,7 @@ settings = [
         old_id="short-fixed-trash",
         title="Short (55mm) fixed trash",
         description="Trash box is 55mm tall (rather than the 77mm default)",
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="deckCalibrationDots",
@@ -132,12 +145,14 @@ settings = [
         title="Deck calibration to dots",
         description="Perform deck calibration to dots rather than crosses, for"
         " robots that do not have crosses etched on the deck",
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="disableHomeOnBoot",
         old_id="disable-home-on-boot",
         title="Disable home on boot",
         description="Prevent robot from homing motors on boot",
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="useOldAspirationFunctions",
@@ -146,6 +161,7 @@ settings = [
         " that were used before version 3.7.0. Use this if you"
         " need consistency with pre-v3.7.0 results. This only"
         " affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.",
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="enableDoorSafetySwitch",
@@ -154,6 +170,7 @@ settings = [
         "Opening the robot door during a run will "
         "pause your robot only after it has completed its "
         "current motion.",
+        robot_type=[RobotTypeEnum.OT2],
     ),
     SettingDefinition(
         _id="disableFastProtocolUpload",
@@ -166,6 +183,7 @@ settings = [
             "problems with the newer, faster protocol analysis method."
         ),
         restart_required=False,
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="enableOT3HardwareController",
@@ -175,21 +193,27 @@ settings = [
             "new hardware."
         ),
         restart_required=True,
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
     ),
     SettingDefinition(
         _id="rearPanelIntegration",
         title="Enable robots with the new usb connected rear-panel board.",
         description="This is an Opentrons-internal setting to test new rear-panel.",
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
     ),
     SettingDefinition(
         _id="disableStallDetection",
         title="Disable stall detection on the Flex.",
         description="This is an Opentrons-internal setting for hardware-testing.",
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="disableStatusBar",
         title="Disable the LED status bar on the Flex.",
         description="This setting disables the LED status bar on the Flex.",
+        robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="estopNotRequired",
@@ -199,6 +223,20 @@ settings = [
             "estopNotRequired",
             True,
         ),  # Configured so this only shows if it has been set by a user
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
+    SettingDefinition(
+        _id="disableOverpressureDetection",
+        title="Disable overpressure detection on pipettes.",
+        description="This setting disables overpressure detection on pipettes, do not turn this feature off unless recommended.",
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
+    SettingDefinition(
+        _id="disableTipPresenceDetection",
+        title="Disable tip presence detection on pipettes.",
+        description="This setting disables tip presence detection on pipettes, do not turn this feature off unless recommended.",
+        robot_type=[RobotTypeEnum.FLEX],
     ),
 ]
 
@@ -215,14 +253,27 @@ settings_by_old_id: Dict[str, SettingDefinition] = {
 }
 
 
-def get_adv_setting(setting: str) -> Optional[Setting]:
+def get_adv_setting(setting: str, robot_type: RobotTypeEnum) -> Optional[Setting]:
     setting = _clean_id(setting)
-    s = get_all_adv_settings()
+    s = get_all_adv_settings(robot_type, include_internal=True)
     return s.get(setting, None)
 
 
+def _filtered_key(
+    definition: SettingDefinition,
+    robot_type: RobotTypeEnum,
+    include_internal: bool,
+) -> bool:
+    if include_internal:
+        return robot_type in definition.robot_type
+    else:
+        return robot_type in definition.robot_type and not definition.internal_only
+
+
 @lru_cache(maxsize=1)
-def get_all_adv_settings() -> Dict[str, Setting]:
+def get_all_adv_settings(
+    robot_type: RobotTypeEnum, include_internal: bool = False
+) -> Dict[str, Setting]:
     """Get all the advanced setting values and definitions"""
     settings_file = CONFIG["feature_flags_file"]
 
@@ -232,6 +283,7 @@ def get_all_adv_settings() -> Dict[str, Setting]:
         key: Setting(value=value, definition=settings_by_id[key])
         for key, value in values.items()
         if key in settings_by_id
+        and _filtered_key(settings_by_id[key], robot_type, include_internal)
     }
 
 
@@ -695,12 +747,12 @@ def _ensure(data: Mapping[str, Any]) -> SettingsMap:
     return newdata
 
 
-def get_setting_with_env_overload(setting_name: str) -> bool:
+def get_setting_with_env_overload(setting_name: str, robot_type: RobotTypeEnum) -> bool:
     env_name = "OT_API_FF_" + setting_name
     if env_name in os.environ:
         return os.environ[env_name].lower() in {"1", "true", "on"}
     else:
-        s = get_adv_setting(setting_name)
+        s = get_adv_setting(setting_name, robot_type)
         return s.value is True if s is not None else False
 
 
