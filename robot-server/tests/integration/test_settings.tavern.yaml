@@ -48,30 +48,6 @@ stages:
             description: !re_search 'Use an older, slower method of analyzing uploaded protocols'
             restart_required: false
             value: !anything
-          - id: enableOT3HardwareController
-            old_id: Null
-            title: Enable experimental OT-3 hardware controller
-            description: !re_search 'Opentrons-internal setting to test new hardware'
-            restart_required: true
-            value: !anything
-          - id: rearPanelIntegration
-            old_id: Null
-            title: 'Enable robots with the new usb connected rear-panel board.'
-            description: !re_search 'This is an Opentrons-internal setting to test new rear-panel.'
-            restart_required: false
-            value: !anything
-          - id: disableStallDetection
-            old_id: Null
-            title: 'Disable stall detection on the Flex.'
-            description: !re_search 'This is an Opentrons-internal setting for hardware-testing.'
-            restart_required: false
-            value: !anything
-          - id: disableStatusBar
-            old_id: Null
-            title: 'Disable the LED status bar on the Flex.'
-            description: !re_search 'This setting disables the LED status bar on the Flex.'
-            restart_required: false
-            value: !anything
         links: !anydict
 
 ---
