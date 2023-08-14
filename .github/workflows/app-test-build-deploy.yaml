@@ -325,9 +325,11 @@ jobs:
       - name: 'separate release and internal-release artifacts'
         run: |
           for variant in release internal-release ; do
-              echo "Moving ${variant} builds ./artifacts/opentrons-${variant}-*/* to to_upload_${variant}"
+              variant_pattern="./artifacts/opentrons-${variant}-*"
+              ls ${variant_pattern}/ 2>/dev/null 1>/dev/null || break
+              echo "Moving ${variant} builds ${variant_pattern}/* to to_upload_${variant}"
               mkdir to_upload_${variant}
-              cp ./artifacts/opentrons-${variant}-*/* ./to_upload_${variant}
+              cp ./artifacts/${variant_pattern}/* ./to_upload_${variant}/
               echo "Moved $(ls ./to_upload_${variant})"
           done
       - name: 'configure s3 deploy creds'
