@@ -7,7 +7,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag = 'enableExtendedHardware'
+export type DevInternalFlag = 'enableExtendedHardware' | 'lpcWithProbe'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

@@ -2,6 +2,7 @@ import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
 import { getCheckSteps } from './utils/getCheckSteps'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwarePositionCheckStep } from './types'
+import { getGoldenCheckSteps } from './utils/getGoldenCheckSteps'
 
 export const getLabwarePositionCheckSteps = (
   protocolData: CompletedProtocolAnalysis
@@ -40,4 +41,20 @@ export const getLabwarePositionCheckSteps = (
   }
   console.error('expected pipettes to be in protocol data')
   return []
+}
+
+export const getGoldenLabwarePositionCheckSteps = (
+  protocolData: CompletedProtocolAnalysis
+): LabwarePositionCheckStep[] => {
+  if (protocolData != null && 'pipettes' in protocolData) {
+    if (protocolData.pipettes.length === 0) {
+      throw new Error(
+        'no pipettes loaded within protocol, labware position check cannot be performed'
+      )
+    }
+    return getGoldenCheckSteps(protocolData)
+  }
+  throw new Error(
+    'no pipettes found in protocol, labware position check cannot be performed'
+  )
 }
