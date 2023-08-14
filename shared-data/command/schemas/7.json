@@ -42,9 +42,6 @@
       "$ref": "#/definitions/LoadLabwareCreate"
     },
     {
-      "$ref": "#/definitions/LoadAdapterCreate"
-    },
-    {
       "$ref": "#/definitions/LoadLiquidCreate"
     },
     {
@@ -1056,80 +1053,6 @@
         },
         "params": {
           "$ref": "#/definitions/LoadLabwareParams"
-        },
-        "intent": {
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/CommandIntent"
-            }
-          ]
-        },
-        "key": {
-          "title": "Key",
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "type": "string"
-        }
-      },
-      "required": ["params"]
-    },
-    "LoadAdapterParams": {
-      "title": "LoadAdapterParams",
-      "description": "Payload required to load an adapter into a slot.",
-      "type": "object",
-      "properties": {
-        "location": {
-          "title": "Location",
-          "description": "Location the adapter should be loaded into.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/DeckSlotLocation"
-            },
-            {
-              "$ref": "#/definitions/ModuleLocation"
-            },
-            {
-              "enum": ["offDeck"],
-              "type": "string"
-            }
-          ]
-        },
-        "loadName": {
-          "title": "Loadname",
-          "description": "Name used to reference a labware definition.",
-          "type": "string"
-        },
-        "namespace": {
-          "title": "Namespace",
-          "description": "The namespace the labware definition belongs to.",
-          "type": "string"
-        },
-        "version": {
-          "title": "Version",
-          "description": "The labware definition version.",
-          "type": "integer"
-        },
-        "adapterId": {
-          "title": "Adapterid",
-          "description": "An optional ID to assign to this adapter. If None, an ID will be generated.",
-          "type": "string"
-        }
-      },
-      "required": ["location", "loadName", "namespace", "version"]
-    },
-    "LoadAdapterCreate": {
-      "title": "LoadAdapterCreate",
-      "description": "Load adapter command creation request.",
-      "type": "object",
-      "properties": {
-        "commandType": {
-          "title": "Commandtype",
-          "default": "loadAdapter",
-          "enum": ["loadAdapter"],
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/definitions/LoadAdapterParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

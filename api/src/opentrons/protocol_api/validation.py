@@ -14,11 +14,13 @@ from typing import (
 
 from typing_extensions import TypeGuard
 
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -57,6 +59,14 @@ class InvalidPipetteMountError(ValueError):
 
 class PipetteMountTypeError(TypeError):
     """An error raised when an invalid mount type is used for loading pipettes."""
+
+
+class LabwareDefinitionIsNotAdapterError(ValueError):
+    """An error raised when an adapter is attempted to be loaded as a labware."""
+
+
+class LabwareDefinitionIsNotLabwareError(ValueError):
+    """An error raised when a labware is not loaded using `load_labware`."""
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
@@ -160,6 +170,22 @@ def ensure_lowercase_name(name: str) -> str:
         raise TypeError(f"Value must be a string, but got {name}")
 
     return name.lower()
+
+
+def ensure_definition_is_adapter(definition: LabwareDefinition) -> None:
+    """Ensure that one of the definition's allowed roles is `adapter`."""
+    if LabwareRole.adapter not in definition.allowedRoles:
+        raise LabwareDefinitionIsNotAdapterError(
+            f"Labware {definition.parameters.loadName} is not an adapter."
+        )
+
+
+def ensure_definition_is_labware(definition: LabwareDefinition) -> None:
+    """Ensure that one of the definition's allowed roles is `labware` or that that field is empty."""
+    if definition.allowedRoles and LabwareRole.labware not in definition.allowedRoles:
+        raise LabwareDefinitionIsNotLabwareError(
+            f"Labware {definition.parameters.loadName} is not defined as a normal labware."
+        )
 
 
 _MODULE_ALIASES: Dict[str, ModuleModel] = {

@@ -1,10 +1,16 @@
 """Tests for Protocol API input validation."""
-from typing import List, Type, Union, Optional, Dict
+from typing import ContextManager, List, Type, Union, Optional, Dict, Any
+from contextlib import nullcontext as do_not_raise
 
 from decoy import Decoy
 import pytest
 
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareRole,
+    Parameters as LabwareDefinitionParameters,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.types import Mount, DeckSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -14,6 +20,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerStep,
 )
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import validation as subject, Well, Labware
@@ -139,6 +146,74 @@ def test_ensure_lowercase_name_invalid() -> None:
     """It should raise a ValueError if given an invalid name."""
     with pytest.raises(TypeError, match="must be a string"):
         subject.ensure_lowercase_name(101)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("definition", "expected_raise"),
+    [
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.labware],
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+            ),
+            do_not_raise(),
+        ),
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[],
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+            ),
+            do_not_raise(),
+        ),
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.adapter],
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+            ),
+            pytest.raises(subject.LabwareDefinitionIsNotLabwareError),
+        ),
+    ],
+)
+def test_ensure_definition_is_labware(
+    definition: LabwareDefinition, expected_raise: ContextManager[Any]
+) -> None:
+    """It should check if the Labware Definition is defined as a regular labware."""
+    with expected_raise:
+        subject.ensure_definition_is_labware(definition)
+
+
+@pytest.mark.parametrize(
+    ("definition", "expected_raise"),
+    [
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.adapter],
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+            ),
+            do_not_raise(),
+        ),
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[],
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+            ),
+            pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
+        ),
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.labware],
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+            ),
+            pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
+        ),
+    ],
+)
+def test_ensure_definition_is_adapter(
+    definition: LabwareDefinition, expected_raise: ContextManager[Any]
+) -> None:
+    """It should check if the Labware Definition is defined as an adapter."""
+    with expected_raise:
+        subject.ensure_definition_is_adapter(definition)
 
 
 @pytest.mark.parametrize(
