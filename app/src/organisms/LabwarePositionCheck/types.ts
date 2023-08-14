@@ -6,9 +6,12 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 export type LabwarePositionCheckStep =
   | BeforeBeginningStep
   | CheckTipRacksStep
+  | AttachProbeStep
   | PickUpTipStep
   | CheckLabwareStep
+  | CheckPositionsStep
   | ReturnTipStep
+  | DetachProbeStep
   | ResultsSummaryStep
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
@@ -19,11 +22,22 @@ export interface CheckTipRacksStep {
   labwareId: string
   location: LabwareOffsetLocation
 }
+export interface AttachProbeStep {
+  section: typeof SECTIONS.ATTACH_PROBE
+  pipetteId: string
+}
 export interface PickUpTipStep {
   section: typeof SECTIONS.PICK_UP_TIP
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+}
+export interface CheckPositionsStep {
+  section: typeof SECTIONS.CHECK_POSITIONS
+  pipetteId: string
+  labwareId: string
+  location: LabwareOffsetLocation
+  moduleId?: string
 }
 export interface CheckLabwareStep {
   section: typeof SECTIONS.CHECK_LABWARE
@@ -37,6 +51,10 @@ export interface ReturnTipStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+}
+export interface DetachProbeStep {
+  section: typeof SECTIONS.DETACH_PROBE
+  pipetteId: string
 }
 export interface ResultsSummaryStep {
   section: typeof SECTIONS.RESULTS_SUMMARY

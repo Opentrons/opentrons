@@ -9,6 +9,7 @@ export type DiscoveryCandidates = string[]
 
 export type DevInternalFlag =
   | 'enableExtendedHardware'
+  | 'lpcWithProbe'
   | 'enableModuleCalibration'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
