@@ -183,7 +183,7 @@ def ensure_definition_is_adapter(definition: LabwareDefinition) -> None:
 def ensure_definition_is_labware(definition: LabwareDefinition) -> None:
     """Ensure that one of the definition's allowed roles is `labware` or that that field is empty."""
     if definition.allowedRoles and LabwareRole.labware not in definition.allowedRoles:
-        raise LabwareNotAdapterError(
+        raise LabwareNotLabwareError(
             f"Labware {definition.parameters.loadName} is not defined as a labware in it's definition."
         )
 
