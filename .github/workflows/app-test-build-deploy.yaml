@@ -327,7 +327,7 @@ jobs:
           for variant in release internal-release ; do
               mkdir to_upload_${variant}
               variant_pattern="./artifacts/opentrons-${variant}-*"
-              ls ${variant_pattern}/ 2>/dev/null 1>/dev/null || break
+              ls ${variant_pattern}/ 2>/dev/null 1>/dev/null || continue
               echo "Moving ${variant} builds ${variant_pattern}/* to to_upload_${variant}"
               cp ./artifacts/${variant_pattern}/* ./to_upload_${variant}/
               echo "Moved $(ls ./to_upload_${variant})"
