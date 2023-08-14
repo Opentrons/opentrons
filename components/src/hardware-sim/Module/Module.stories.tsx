@@ -1,13 +1,16 @@
 import * as React from 'react'
 import {
+  getModuleDef2,
   LabwareDefinition2,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   ModuleModel,
+  OT2_STANDARD_DECKID,
+  OT3_STANDARD_DECKID,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
-  getModuleDef2,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
@@ -25,6 +28,7 @@ const moduleModels: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 ]
@@ -38,9 +42,10 @@ const Template: Story<{
   model: ModuleModel
   orientation: 'left' | 'right'
   hasLabware: boolean
+  deckType: typeof OT2_STANDARD_DECKID | typeof OT3_STANDARD_DECKID
 }> = args => {
   return (
-    <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
+    <RobotWorkSpace deckDef={getDeckDefinitions()[args.deckType]}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById[args.slot]
         return (
@@ -90,5 +95,12 @@ Module.argTypes = {
       type: 'boolean',
     },
     defaultValue: false,
+  },
+  deckType: {
+    control: {
+      type: 'select',
+      options: [OT2_STANDARD_DECKID, OT3_STANDARD_DECKID],
+    },
+    defaultValue: 'left',
   },
 }
