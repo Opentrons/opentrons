@@ -46,9 +46,9 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
   const handleOnClick = (): void => {
-    if (movement === REMOVE_PIN_FROM_REAR_JAW || maintenanceRunId == null) {
+    if (movement === REMOVE_PIN_FROM_REAR_JAW) {
       proceed()
-    } else {
+    } else if (maintenanceRunId != null) {
       const jaw = movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'
       createRunCommand({
         maintenanceRunId,
