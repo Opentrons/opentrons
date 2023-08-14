@@ -185,7 +185,7 @@ async def _main(is_simulating: bool) -> None:
     AXIS = Axis.Z_L
 
     # TIP_RACKS = args.tip_rack_num # default: 12
-    PICKUPS_PER_TIP = args.pick_up_num # default: 20
+    PICKUPS_PER_TIP = args.pick_up_num
     # COLUMNS = 12
     # ROWS = 8
     CYCLES = 1
@@ -472,7 +472,7 @@ if __name__ == "__main__":
     # parser.add_argument(
     #     "--mount", type=str, choices=list(mount_options.keys()), default="left"
     # )
-    parser.add_argument("--pick_up_num", type=int, default=20)
+    parser.add_argument("--pick_up_num", type=int, default=60)
     # parser.add_argument("--tip_rack_num", type=int, default=12)
     parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
