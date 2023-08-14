@@ -329,7 +329,7 @@ jobs:
               variant_pattern="./artifacts/opentrons-${variant}-*"
               ls ${variant_pattern}/ 2>/dev/null 1>/dev/null || continue
               echo "Moving ${variant} builds ${variant_pattern}/* to to_upload_${variant}"
-              cp ./artifacts/${variant_pattern}/* ./to_upload_${variant}/
+              cp ${variant_pattern}/* ./to_upload_${variant}/
               echo "Moved $(ls ./to_upload_${variant})"
           done
       - name: 'configure s3 deploy creds'
