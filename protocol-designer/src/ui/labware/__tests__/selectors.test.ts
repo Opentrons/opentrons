@@ -1,4 +1,6 @@
 import {
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
@@ -144,7 +146,12 @@ describe('labware selectors', () => {
       }
       expect(
         // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getLabwareOptions.resultFunc(labwareEntities, names, initialDeckSetup)
+        getLabwareOptions.resultFunc(
+          labwareEntities,
+          names,
+          initialDeckSetup,
+          {}
+        )
       ).toEqual([
         { name: 'Source Plate', value: 'wellPlateId' },
         { name: 'Trash', value: 'fixedTrash' },
@@ -197,6 +204,11 @@ describe('labware selectors', () => {
           id: 'tcPlateId',
           slot: 'thermocyclerId', // On thermocycler
         },
+        hsPlateId: {
+          ...otherLabware.wellPlateId,
+          id: 'hsPlateId',
+          slot: 'heaterShakerId', // On heater-shaker
+        },
       }
       const labwareEntities = { ...trash, ...labware }
       const initialDeckSetup = {
@@ -224,6 +236,12 @@ describe('labware selectors', () => {
             model: THERMOCYCLER_MODULE_V1,
             slot: SPAN7_8_10_11_SLOT,
           },
+          heaterShakerId: {
+            id: 'heaterShakerId',
+            type: HEATERSHAKER_MODULE_TYPE,
+            model: HEATERSHAKER_MODULE_V1,
+            slot: '6',
+          },
         },
       }
 
@@ -232,6 +250,7 @@ describe('labware selectors', () => {
         wellPlateId: 'Well Plate',
         tempPlateId: 'Temp Plate',
         tcPlateId: 'TC Plate',
+        hsPlateId: 'HS Plate',
       }
 
       expect(
@@ -239,12 +258,67 @@ describe('labware selectors', () => {
         getLabwareOptions.resultFunc(
           labwareEntities,
           nicknames,
-          initialDeckSetup
+          initialDeckSetup,
+          {}
         )
       ).toEqual([
-        { name: 'MAG Well Plate', value: 'wellPlateId' },
-        { name: 'TEMP Temp Plate', value: 'tempPlateId' },
-        { name: 'THERMO TC Plate', value: 'tcPlateId' },
+        { name: 'HS Plate in Heater-Shaker', value: 'hsPlateId' },
+        { name: 'TC Plate in Thermocycler', value: 'tcPlateId' },
+        { name: 'Temp Plate in Temperature Module', value: 'tempPlateId' },
+        { name: 'Well Plate in Magnetic Module', value: 'wellPlateId' },
+        { name: 'Trash', value: 'fixedTrash' },
+      ])
+    })
+
+    it('should return labware options with a labware moved off of the initial module slot', () => {
+      const labware = {
+        wellPlateId: {
+          ...otherLabware.wellPlateId,
+          slot: 'magModuleId', // On magnetic module
+        },
+      }
+      const labwareEntities = { ...trash, ...labware }
+      const initialDeckSetup = {
+        pipettes: {},
+        labware: {
+          ...trash,
+          ...labware,
+        },
+        modules: {
+          magModuleId: {
+            id: 'magModuleId',
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
+            slot: '1',
+          },
+        },
+      }
+
+      const nicknames: Record<string, string> = {
+        ...names,
+        wellPlateId: 'Well Plate',
+      }
+      const mockId = 'mockId'
+
+      const savedStep = {
+        [mockId]: {
+          stepType: 'moveLabware',
+          id: mockId,
+          labware: 'wellPlateId',
+          newLocation: '2',
+        },
+      }
+
+      expect(
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
+        getLabwareOptions.resultFunc(
+          labwareEntities,
+          nicknames,
+          initialDeckSetup,
+          savedStep
+        )
+      ).toEqual([
+        { name: 'Well Plate', value: 'wellPlateId' },
         { name: 'Trash', value: 'fixedTrash' },
       ])
     })

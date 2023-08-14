@@ -43,7 +43,14 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getPresavedStepForm,
-  (labwareEntities, nicknamesById, initialDeckSetup, presavedStepForm) => {
+  stepFormSelectors.getSavedStepForms,
+  (
+    labwareEntities,
+    nicknamesById,
+    initialDeckSetup,
+    presavedStepForm,
+    savedStepForms
+  ) => {
     const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
     const options = reduce(
       labwareEntities,
@@ -56,14 +63,18 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         const isAdapterOrAluminumBlock =
           isAdapter ||
           labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
-        const moduleOnDeck = getModuleUnderLabware(initialDeckSetup, labwareId)
+        const moduleOnDeck = getModuleUnderLabware(
+          initialDeckSetup,
+          savedStepForms,
+          labwareId
+        )
         const prefix = moduleOnDeck
           ? i18n.t(
               `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
             )
           : null
         const nickName = prefix
-          ? `${prefix} ${nicknamesById[labwareId]}`
+          ? `${nicknamesById[labwareId]} in ${prefix}`
           : nicknamesById[labwareId]
 
         if (!moveLabwarePresavedStep) {

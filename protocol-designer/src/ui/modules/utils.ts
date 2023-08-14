@@ -6,11 +6,13 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
-import {
+import type {
   ModuleOnDeck,
   LabwareOnDeck,
   InitialDeckSetup,
 } from '../../step-forms/types'
+import { SavedStepFormState } from '../../step-forms'
+
 export function getModuleOnDeckByType(
   initialDeckSetup: InitialDeckSetup,
   type: ModuleType
@@ -29,11 +31,25 @@ export function getLabwareOnModule(
 }
 export function getModuleUnderLabware(
   initialDeckSetup: InitialDeckSetup,
+  savedStepFormState: SavedStepFormState,
   labwareId: string
 ): ModuleOnDeck | null | undefined {
+  //  latest moveLabware step related to labwareId
+  const moveLabwareStep = Object.values(savedStepFormState)
+    .filter(
+      state =>
+        state.stepType === 'moveLabware' &&
+        labwareId != null &&
+        state.labware === labwareId
+    )
+    .reverse()[0]
+  const newLocation = moveLabwareStep?.newLocation
+
   return values(initialDeckSetup.modules).find(
     (moduleOnDeck: ModuleOnDeck) =>
-      initialDeckSetup.labware[labwareId]?.slot === moduleOnDeck.id
+      (newLocation != null
+        ? newLocation
+        : initialDeckSetup.labware[labwareId]?.slot) === moduleOnDeck.id
   )
 }
 export function getModuleLabwareOptions(
@@ -51,7 +67,7 @@ export function getModuleLabwareOptions(
     if (labware) {
       options = [
         {
-          name: `${prefix} ${nicknamesById[labware.id]}`,
+          name: `${nicknamesById[labware.id]} in ${prefix}`,
           value: moduleOnDeck.id,
         },
       ]

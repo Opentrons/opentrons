@@ -235,7 +235,7 @@
   margin-top: 0.5rem;
   font-size: var(--fs-body-1);
   overflow: hidden;
-  white-space: nowrap;
+  white-space: pre-wrap;
   text-overflow: ellipsis;
 }
 
