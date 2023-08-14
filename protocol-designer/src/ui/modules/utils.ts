@@ -60,21 +60,21 @@ export function getModuleLabwareOptions(
   const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
   const labware =
     moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
-  const prefix = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
+  const module = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
   let options: Options = []
 
   if (moduleOnDeck) {
     if (labware) {
       options = [
         {
-          name: `${nicknamesById[labware.id]} in ${prefix}`,
+          name: `${nicknamesById[labware.id]} in ${module}`,
           value: moduleOnDeck.id,
         },
       ]
     } else {
       options = [
         {
-          name: `${prefix} No labware on module`,
+          name: `${module} No labware on module`,
           value: moduleOnDeck.id,
         },
       ]

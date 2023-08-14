@@ -68,13 +68,13 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           savedStepForms,
           labwareId
         )
-        const prefix = moduleOnDeck
+        const module = moduleOnDeck
           ? i18n.t(
               `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
             )
           : null
-        const nickName = prefix
-          ? `${nicknamesById[labwareId]} in ${prefix}`
+        const nickName = module
+          ? `${nicknamesById[labwareId]} in ${module}`
           : nicknamesById[labwareId]
 
         if (!moveLabwarePresavedStep) {
