@@ -70,7 +70,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
   )
-
+  console.log('location', location)
   //  find labware on adapter's location
   const adapter = protocolData.labware.find(
     lab => lab.id === location.labwareId
@@ -282,7 +282,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         )
       })
   }
-
+  console.log('   adapterId ', adapterId)
   const moveLabwareOffDeck: CreateCommand[] =
     adapterId != null
       ? [

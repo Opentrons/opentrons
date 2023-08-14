@@ -184,6 +184,7 @@ export const LabwarePositionCheckComponent = (
     ? getGoldenCheckSteps(protocolData)
     : getLabwarePositionCheckSteps(protocolData)
   const totalStepCount = LPCSteps.length - 1
+  console.log('lpcSteps', LPCSteps)
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
 
@@ -261,6 +262,7 @@ export const LabwarePositionCheckComponent = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
+    console.log('curretnstep', currentStep.location)
     modalContent = <CheckItem {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'ATTACH_PROBE') {
     modalContent = <AttachProbe {...currentStep} {...movementStepProps} />

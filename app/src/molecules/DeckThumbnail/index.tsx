@@ -86,8 +86,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       {({ deckSlotsById }) => (
         <>
           {map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
-            if (slot.matingSurfaceUnitVector == null) return null // if slot has no mating surface, don't render anything in it
-
+            if (slot.matingSurfaceUnitVector == null) return null
             const moduleInSlot =
               slotId in initialLoadedModulesBySlot
                 ? initialLoadedModulesBySlot[slotId]
@@ -97,22 +96,19 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                 ? initialLoadedLabwareBySlot[slotId]
                 : null
 
-            // all things that can be in slots have been accounted for
-
-            const labwareInModule = // only labware loaded directly onto mods (include adapters)
+            const labwareInModule =
               moduleInSlot?.result?.moduleId != null &&
               moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
                 ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
                 : null
 
-            // could be a labware or adapter directly on deck
             let labwareId =
               labwareInSlot != null ? labwareInSlot.result?.labwareId : null
             let labwareInAdapterInMod = null
             let labwareInAdapter = null
             if (
               labwareInModule?.result != null &&
-              'labwareId' in labwareInModule.result && // this would be an adapter in mod, or labware directly in mod
+              'labwareId' in labwareInModule.result &&
               labwareInModule.result.labwareId in initialLoadedLabwareByAdapter
             ) {
               labwareInAdapter =

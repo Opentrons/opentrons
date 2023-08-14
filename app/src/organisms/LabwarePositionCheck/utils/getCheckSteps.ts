@@ -155,7 +155,8 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       )
     }
     const isTiprack = getIsTiprack(labwareDef)
-    if (isTiprack) return acc // skip any labware that is a tiprack
+    const adapter = labwareDef.metadata.displayCategory === 'adapter'
+    if (isTiprack || adapter) return acc // skip any labware that is a tiprack
 
     const labwareLocationCombos = getLabwareLocationCombos(
       commands,

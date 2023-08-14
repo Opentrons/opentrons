@@ -23,10 +23,6 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadLabware'
   params: LoadLabwareParams
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 22c4b5808e (refactor out loadAdapter and replace with loadLabware)
 export interface LoadLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     LoadLabwareCreateCommand {
@@ -107,10 +103,6 @@ interface LoadLabwareParams {
   displayName?: string
   labwareId?: string
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 22c4b5808e (refactor out loadAdapter and replace with loadLabware)
 interface LoadLabwareResult {
   labwareId: string
   definition: LabwareDefinition2
