@@ -85,10 +85,19 @@ export function Toast(props: ToastProps): JSX.Element {
       : closeButton === true
       ? t('close')
       : ''
+
+  const ANIMATION_OVERFLOW = `
+  overflow: hidden;
+  `
+  const ODD_ANIMATION_OPTIMIZATIONS = `
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: opacity, transform3d;
+  `
   const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidein;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
 
     @keyframes slidein {
       from {
@@ -102,7 +111,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const DESKTOP_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideout;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
 
     @keyframes slideout {
       from {
@@ -121,44 +130,51 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideup;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
 
     @keyframes slideup {
       from {
-        transform: translateY(100%);
+        transform: translate3d(0%, 50%, 0);
+        filter: opacity(0);
       }
       to {
-        transform: translateY(0%);
+        transform: translate3d(0%, 0%, 0);
+        filter: opacity(100%);
       }
     }
   `
   const ODD_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidedown;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
 
     @keyframes slidedown {
       from {
-        transform: translateY(0%);
+        transform: translate3d(0%, 0%, 0);
+        filter: opacity(100%);
       }
       to {
-        transform: translateY(100%);
+        transform: translate3d(0%, 50%, 0);
+        filter: opacity(0);
       }
     }
   `
   const ODD_ANIMATION_FADE_UP_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: fadeUpAndOut;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
 
     @keyframes fadeUpAndOut {
       from {
-        transform: translateY(0%);
-        opacity: 1;
+        transform: translate3d(0%, 0%, 0);
+        filter: opacity(100%);
       }
       to {
-        transform: translateY(-10%);
-        opacity: 0;
+        transform: translate3d(0%, -10%, 0);
+        filter: opacity(0%);
       }
     }
   `
