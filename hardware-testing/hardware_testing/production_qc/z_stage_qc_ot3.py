@@ -22,6 +22,7 @@ from hardware_testing.data.csv_report import (
 )
 
 from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
+from opentrons.config.advanced_settings import get_adv_setting, set_adv_setting
 
 import logging
 
@@ -219,9 +220,9 @@ async def _force_gauge(
     await api.home([z_ax])
     home_pos = await api.gantry_position(mount)
     LOG.info(f"Home Position: {home_pos}")
-    pre_test_pos = home_pos._replace(z=home_pos.z - 10)
+    pre_test_pos = home_pos._replace(z=home_pos.z - 110)
     LOG.info(f"Pre-Test Position: {pre_test_pos}")
-    press_pos = home_pos._replace(z=pre_test_pos.z - 12)
+    press_pos = home_pos._replace(z=pre_test_pos.z - 113)
     LOG.info(f"Press Position: {press_pos}")
 
     qc_pass = True
@@ -359,4 +360,14 @@ if __name__ == "__main__":
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
-    asyncio.run(_main(arg_parser.parse_args()))
+    old_stall_setting = get_adv_setting("disableStallDetection")
+    try:
+        asyncio.run(set_adv_setting("disableStallDetection", True))
+        asyncio.run(_main(arg_parser.parse_args()))
+    finally:
+        asyncio.run(
+            set_adv_setting(
+                "disableStallDetection",
+                False if old_stall_setting is None else old_stall_setting.value,
+            )
+        )
