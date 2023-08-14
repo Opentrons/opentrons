@@ -379,14 +379,14 @@ function PrepareToRun({
 
   const areInstrumentsReady = !isLoading
     ? getAreInstrumentsReady(
-        mostRecentAnalysis,
-        attachedInstruments,
-        allPipettesCalibrationData
+        mostRecentAnalysis!,
+        attachedInstruments!,
+        allPipettesCalibrationData!
       )
     : false
   const speccedInstrumentCount = !isLoading
-    ? mostRecentAnalysis.pipettes.length +
-      (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+    ? mostRecentAnalysis!.pipettes.length +
+      (getProtocolUsesGripper(mostRecentAnalysis!) ? 1 : 0)
     : 0
 
   const instrumentsDetail = t('instruments_connected', {
@@ -487,7 +487,7 @@ function PrepareToRun({
             gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
-            {!isLoading ? (
+            {isLoading ? (
               <>
                 <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
                   {t('prepare_to_run')}
@@ -527,7 +527,7 @@ function PrepareToRun({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing8}
       >
-        {!isLoading ? (
+        {isLoading ? (
           <>
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('instruments')}
