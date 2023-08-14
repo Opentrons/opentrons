@@ -15,7 +15,6 @@ from typing import (
     Set,
     Union,
     Mapping,
-    Iterator,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
@@ -255,21 +254,32 @@ class OT3Simulator:
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
-    def _get_motor_status(self, ax: Sequence[Axis]) -> Iterator[Optional[MotorStatus]]:
-        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+    def _get_motor_status(
+        self, axes: Sequence[Axis]
+    ) -> Dict[Axis, Optional[MotorStatus]]:
+        return {ax: self._motor_status.get(axis_to_node(ax)) for ax in axes}
+
+    def get_invalid_motor_axes(self, axes: Sequence[Axis]) -> List[Axis]:
+        """Get axes that currently do not have the motor-ok flag."""
+        return [
+            ax
+            for ax, status in self._get_motor_status(axes).items()
+            if not status or not status.motor_ok
+        ]
+
+    def get_invalid_encoder_axes(self, axes: Sequence[Axis]) -> List[Axis]:
+        """Get axes that currently do not have the encoder-ok flag."""
+        return [
+            ax
+            for ax, status in self._get_motor_status(axes).items()
+            if not status or not status.encoder_ok
+        ]
 
     def check_motor_status(self, axes: Sequence[Axis]) -> bool:
-        return all(
-            isinstance(status, MotorStatus) and status.motor_ok
-            for status in self._get_motor_status(axes)
-        )
+        return len(self.get_invalid_motor_axes(axes)) == 0
 
     def check_encoder_status(self, axes: Sequence[Axis]) -> bool:
-        """If any of the encoder statuses is ok, parking can proceed."""
-        return all(
-            isinstance(status, MotorStatus) and status.encoder_ok
-            for status in self._get_motor_status(axes)
-        )
+        return len(self.get_invalid_encoder_axes(axes)) == 0
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""

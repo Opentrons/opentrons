@@ -15,6 +15,7 @@ from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
+from robot_server.robot.control.dependencies import require_estop_in_good_state
 
 from robot_server.service.json_api import (
     RequestModel,
@@ -133,6 +134,7 @@ async def create_run(
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
+    check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
@@ -144,6 +146,7 @@ async def create_run(
         created_at: Timestamp to attach to created run.
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
+        check_estop: Dependency to verify the estop is in a valid state.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []

@@ -5,14 +5,14 @@ import { VersionInfoModal } from './VersionInfoModal'
 import { ViewUpdateModal } from './ViewUpdateModal'
 import { InstallModal } from './InstallModal'
 import {
-  startBuildrootUpdate,
-  setBuildrootUpdateSeen,
-  buildrootUpdateIgnored,
-  getBuildrootSession,
-  clearBuildrootSession,
+  startRobotUpdate,
+  setRobotUpdateSeen,
+  robotUpdateIgnored,
+  getRobotUpdateSession,
+  clearRobotUpdateSession,
   getRobotSystemType,
-  getBuildrootUpdateAvailable,
-} from '../../../../redux/buildroot'
+  getRobotUpdateAvailable,
+} from '../../../../redux/robot-update'
 
 import type { State, Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
@@ -26,16 +26,16 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   const { robot, close } = props
   const robotName = robot.name
   const [viewUpdateInfo, setViewUpdateInfo] = React.useState(false)
-  const session = useSelector(getBuildrootSession)
+  const session = useSelector(getRobotUpdateSession)
   const robotUpdateType = useSelector((state: State) =>
-    getBuildrootUpdateAvailable(state, robot)
+    getRobotUpdateAvailable(state, robot)
   )
   const dispatch = useDispatch<Dispatch>()
   const { step, error } = session || { step: null, error: null }
 
   // set update seen on component mount
   React.useEffect(() => {
-    dispatch(setBuildrootUpdateSeen(robotName))
+    dispatch(setRobotUpdateSeen(robotName))
   }, [dispatch, robotName])
 
   // TODO(bc, 2022-07-05): We are currently ignoring the 'finished' session state, but
@@ -43,7 +43,7 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   // clears buildroot state if session finished when initially mounted
   React.useEffect(() => {
     if (step === 'finished') {
-      dispatch(clearBuildrootSession())
+      dispatch(clearRobotUpdateSession())
     }
   }, [dispatch, step])
 
@@ -51,7 +51,7 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   React.useEffect(() => {
     if (step === 'finished' || error !== null) {
       return () => {
-        dispatch(clearBuildrootSession())
+        dispatch(clearRobotUpdateSession())
       }
     }
   }, [dispatch, step, error])
@@ -59,12 +59,12 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   const goToViewUpdate = React.useCallback(() => setViewUpdateInfo(true), [])
 
   const ignoreUpdate = React.useCallback(() => {
-    dispatch(buildrootUpdateIgnored(robotName))
+    dispatch(robotUpdateIgnored(robotName))
     close()
   }, [dispatch, robotName, close])
 
   const installUpdate = React.useCallback(
-    () => dispatch(startBuildrootUpdate(robotName)),
+    () => dispatch(startRobotUpdate(robotName)),
     [dispatch, robotName]
   )
 

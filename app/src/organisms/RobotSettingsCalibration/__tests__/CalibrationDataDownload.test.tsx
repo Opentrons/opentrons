@@ -3,6 +3,8 @@ import { saveAs } from 'file-saver'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
 import {
@@ -32,6 +34,7 @@ import {
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
 jest.mock('file-saver')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/analytics')
 jest.mock('../../../organisms/Devices/hooks')
 
@@ -49,6 +52,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
 
 let mockTrackEvent: jest.Mock
 const mockSetShowHowCalibrationWorksModal = jest.fn()
@@ -104,6 +110,9 @@ describe('CalibrationDataDownload', () => {
         mockTipLengthCalibration2,
         mockTipLengthCalibration3,
       ])
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [] },
+    } as any)
   })
 
   afterEach(() => {
@@ -137,6 +146,17 @@ describe('CalibrationDataDownload', () => {
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: {},
     })
+  })
+
+  it('renders a download calibration button for Flex when cal data is present', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [instrumentsResponseFixture.data[0]] },
+    } as any)
+    const [{ getByText }] = render()
+    const downloadButton = getByText('Download calibration data')
+    downloadButton.click()
+    expect(saveAs).toHaveBeenCalled()
   })
 
   it('renders a See how robot calibration works link', () => {
@@ -188,9 +208,8 @@ describe('CalibrationDataDownload', () => {
     expect(downloadButton).toBeDisabled()
   })
 
-  it('renders disabled button for OT-3 when pipettes are not calibrated', () => {
+  it('renders disabled button for Flex when no instrument is calibrated', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
-    when(mockUsePipetteOffsetCalibrations).calledWith().mockReturnValue([])
     const [{ getByRole, queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`

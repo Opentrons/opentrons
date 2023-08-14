@@ -2,14 +2,16 @@
 
 import json
 from dataclasses import dataclass
-import textwrap
 
+from decoy import Decoy
 import pytest
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocols import parse
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 from opentrons.protocol_reader.file_identifier import (
     FileIdentifier,
@@ -22,126 +24,46 @@ from opentrons.protocol_reader.file_reader_writer import BufferedFile
 from opentrons.protocol_reader.protocol_source import Metadata
 
 
-@dataclass
-class _ValidPythonProtocolSpec:
-    file_name: str
-    contents: str
-    expected_api_level: APIVersion
-    expected_robot_type: RobotType
-    expected_metadata: Metadata
+# TODO(mm, 2023-08-08): Make this autouse=True (apply to all test functions) when
+# FileReaderWriter delegates to opentrons.protocols.parse for JSON files.
+@pytest.fixture
+def use_mock_parse(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace opentrons.protocols.parse.parse() with a mock."""
+    mock_parse = decoy.mock(func=parse.parse)
+    monkeypatch.setattr(parse, "parse", mock_parse)
 
 
-@pytest.mark.parametrize(
-    "spec",
-    [
-        # Basic Python:
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "author": "Dr. Sy. N. Tist",
-                    "apiLevel": "2.11",
-                }
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "2.11"},
-        ),
-        # Python with a weirdly capitalized file extension:
-        _ValidPythonProtocolSpec(
-            file_name="foo.Py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        # Explicitly specified robotType:
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                requirements = {
-                    "robotType": "OT-2",
-                }
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                requirements = {
-                    "robotType": "Flex",
-                }
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-3 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    "apiLevel": "2.11",
-                }
-                requirements = {
-                    "robotType": "OT-3",
-                }
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-3 Standard",
-            expected_metadata={"apiLevel": "2.11"},
-        ),
-        # apiLevel in `requirements`, instead of `metadata`:
-        _ValidPythonProtocolSpec(
-            file_name="foo.py",
-            contents=textwrap.dedent(
-                """
-                requirements = {
-                    "apiLevel": "2.11",
-                }
-                """
-            ),
-            expected_api_level=APIVersion(2, 11),
-            expected_robot_type="OT-2 Standard",
-            expected_metadata={},
-        ),
-    ],
-)
-async def test_valid_python_protocol(spec: _ValidPythonProtocolSpec) -> None:
-    """It should identify the file as a Python main file and extract basic info."""
-    input_file = BufferedFile(
-        name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None
+@pytest.mark.parametrize("filename", ["protocol.py", "protocol.PY", "protocol.Py"])
+async def test_python_parsing(
+    decoy: Decoy, use_mock_parse: None, filename: str
+) -> None:
+    """It should use opentrons.protocols.parse() to extract basic ID info out of Python files."""
+    input_file = BufferedFile(name=filename, contents=b"contents", path=None)
+
+    decoy.when(parse.parse(b"contents", filename)).then_return(
+        PythonProtocol(
+            api_level=APIVersion(2, 1),
+            robot_type="OT-3 Standard",
+            metadata={"Hello": "World"},
+            text="",
+            filename="",
+            contents=None,
+            bundled_data=None,
+            bundled_labware=None,
+            bundled_python=None,
+            extra_labware=None,
+        )
     )
-    expected_result = IdentifiedPythonMain(
-        original_file=input_file,
-        api_level=spec.expected_api_level,
-        robot_type=spec.expected_robot_type,
-        metadata=spec.expected_metadata,
-    )
+
     subject = FileIdentifier()
     [result] = await subject.identify([input_file])
-    assert result == expected_result
+
+    assert result == IdentifiedPythonMain(
+        original_file=input_file,
+        api_level=APIVersion(2, 1),
+        robot_type="OT-3 Standard",
+        metadata={"Hello": "World"},
+    )
 
 
 @dataclass
@@ -153,6 +75,8 @@ class _ValidJsonProtocolSpec:
     expected_metadata: Metadata
 
 
+# todo(mm, 2021-09-13): Some of these tests overlap with opentrons.protocols.parse.
+# Delegate to opentrons.protocols.parse and test with mocks here.
 @pytest.mark.parametrize(
     "spec",
     [
@@ -306,135 +230,13 @@ class _InvalidInputSpec:
     expected_message: str
 
 
-# todo(mm, 2021-09-13): Some of these tests overlap with
-# opentrons.protocol_runner.parse.
-# Decide where this logic should canonically live, and deduplicate.
 @pytest.mark.parametrize(
     "spec",
     [
-        # Python syntax error:
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    'apiLevel': '123.456'
-                }
-
-                def run()  # Syntax error: missing colon.
-                    pass
-                """
-            ),
-            expected_message="Unable to parse",
-        ),
-        # Python with various kinds of invalid metadata dict or apiLevel:
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                # Metadata missing entirely.
-                """
-            ),
-            expected_message="apiLevel not declared in protocol.py",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                # Metadata provided, but not as a dict.
-                metadata = "Hello"
-                """
-            ),
-            expected_message="apiLevel not declared in protocol.py",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                # apiLevel missing from metadata.
-                metadata = {"Hello": "World"}
-                """
-            ),
-            expected_message="apiLevel not declared in protocol.py",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                # Metadata not statically parsable.
-                metadata = {"apiLevel": "123" + ".456"}
-                """
-            ),
-            expected_message="Unable to extract metadata from protocol.py",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                # apiLevel provided, but not as a string.
-                metadata = {"apiLevel": 123.456}
-                """
-            ),
-            # TODO(mm, 2021-09-13): bug in opentrons.protocols.parse.extract_metadata.
-            # It errors when a field isn't a string, even though its return type suggests
-            # suggests it should allow ints. This error message should be different.
-            expected_message="Unable to extract metadata from protocol.py",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                # apiLevel provided, but not as a well formatted string.
-                metadata = {"apiLevel": "123*456"}
-                """
-            ),
-            expected_message="is incorrectly formatted",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                # apiLevel provided, but not a valid version.
-                metadata = {"apiLevel": "123.456"}
-                """
-            ),
-            expected_message="API version 123.456 is not supported by this robot software. Please either reduce your requested API version or update your robot.",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {"apiLevel": "2.11"}
-                # robotType provided, but not a valid string.
-                requirements = {"robotType": "ot2"}
-                """
-            ),
-            expected_message="robotType must be 'OT-2' or 'Flex', not 'ot2'.",
-        ),
-        _InvalidInputSpec(
-            file_name="protocol.py",
-            contents=textwrap.dedent(
-                """
-                metadata = {"apiLevel": "2.11"}
-                # robotType provided, but not a valid string.
-                requirements = {"robotType": "flex"}
-                """
-            ),
-            expected_message="robotType must be 'OT-2' or 'Flex', not 'flex'.",
-        ),
         # Unrecognized file extension:
         _InvalidInputSpec(
             file_name="protocol.python",
-            contents=textwrap.dedent(
-                """
-                metadata = {
-                    'apiLevel': '123.456'
-                }
-
-                def run()  # Syntax error: missing colon.
-                    pass
-                """
-            ),
+            contents="",
             expected_message="protocol.python has an unrecognized file extension.",
         ),
         _InvalidInputSpec(
@@ -469,3 +271,48 @@ async def test_invalid_input(spec: _InvalidInputSpec) -> None:
     subject = FileIdentifier()
     with pytest.raises(FileIdentificationError, match=spec.expected_message):
         await subject.identify([input_file])
+
+
+async def test_invalid_python_api_level(decoy: Decoy, use_mock_parse: None) -> None:
+    """It should check the apiLevel and raise if it's not supported."""
+    input_file = BufferedFile(name="filename.py", contents=b"contents", path=None)
+
+    decoy.when(parse.parse(b"contents", "filename.py")).then_return(
+        PythonProtocol(
+            api_level=APIVersion(999, 999),
+            robot_type="OT-3 Standard",
+            metadata=None,
+            text="",
+            filename="",
+            contents=None,
+            bundled_data=None,
+            bundled_labware=None,
+            bundled_python=None,
+            extra_labware=None,
+        )
+    )
+
+    subject = FileIdentifier()
+
+    with pytest.raises(FileIdentificationError, match="999.999 is not supported"):
+        await subject.identify([input_file])
+
+
+async def test_malformed_python(decoy: Decoy, use_mock_parse: None) -> None:
+    """It should propagate errors that mean the Python file was malformed."""
+    input_file = BufferedFile(name="filename.py", contents=b"contents", path=None)
+
+    decoy.when(parse.parse(b"contents", "filename.py")).then_raise(
+        MalformedPythonProtocolError(
+            short_message="message 1", long_additional_message="message 2"
+        )
+    )
+
+    subject = FileIdentifier()
+
+    with pytest.raises(FileIdentificationError) as exc_info:
+        await subject.identify([input_file])
+
+    # TODO(mm, 2023-08-8): We probably want to propagate the longer message too, if there is one.
+    # Align with the app+UI team about how to do this safely.
+    assert str(exc_info.value) == "message 1"

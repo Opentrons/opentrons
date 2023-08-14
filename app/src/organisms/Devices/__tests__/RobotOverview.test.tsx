@@ -12,7 +12,7 @@ import { useAuthorization } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getConfig, useFeatureFlag } from '../../../redux/config'
 import {
   getRobotAddressesByName,
@@ -51,7 +51,7 @@ import type { State } from '../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/robot-controls')
-jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot-update/selectors')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../ProtocolUpload/hooks')
@@ -115,8 +115,8 @@ const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFu
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
