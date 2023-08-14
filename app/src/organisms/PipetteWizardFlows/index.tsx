@@ -110,7 +110,7 @@ export const PipetteWizardFlows = (
   const prevMaintenanceRunId = React.useRef<string | undefined>(
     maintenanceRunData?.data.id
   )
-  // maybe do this conditionally - only if maintenance run id doesn't equal null
+
   React.useEffect(() => {
     prevMaintenanceRunId.current = maintenanceRunData?.data.id
   }, [maintenanceRunData?.data.id])
