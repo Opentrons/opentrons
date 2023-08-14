@@ -377,17 +377,21 @@ function PrepareToRun({
     (protocolHasModules && attachedModules == null) ||
     allPipettesCalibrationData == null
 
-  const areInstrumentsReady = !isLoading
-    ? getAreInstrumentsReady(
-        mostRecentAnalysis!,
-        attachedInstruments!,
-        allPipettesCalibrationData!
-      )
-    : false
-  const speccedInstrumentCount = !isLoading
-    ? mostRecentAnalysis!.pipettes.length +
-      (getProtocolUsesGripper(mostRecentAnalysis!) ? 1 : 0)
-    : 0
+  const areInstrumentsReady =
+    mostRecentAnalysis != null &&
+    attachedInstruments != null &&
+    allPipettesCalibrationData != null
+      ? getAreInstrumentsReady(
+          mostRecentAnalysis,
+          attachedInstruments,
+          allPipettesCalibrationData
+        )
+      : false
+  const speccedInstrumentCount =
+    mostRecentAnalysis !== null
+      ? mostRecentAnalysis.pipettes.length +
+        (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+      : 0
 
   const instrumentsDetail = t('instruments_connected', {
     count: speccedInstrumentCount,
