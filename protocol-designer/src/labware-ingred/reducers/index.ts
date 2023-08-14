@@ -29,10 +29,7 @@ import {
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
 } from '../actions'
-import type {
-  LoadAdapterCreateCommand,
-  LoadLabwareCreateCommand,
-} from '@opentrons/shared-data'
+import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)

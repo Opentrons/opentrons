@@ -48,7 +48,6 @@ import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
-  LoadAdapterCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')

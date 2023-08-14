@@ -19,7 +19,6 @@ import {
   MAGNETIC_MODULE_V1,
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
-  LoadAdapterCreateCommand,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
@@ -1145,27 +1144,8 @@ export const labwareInvariantProperties: Reducer<
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
-      const loadAdapterCommands = Object.values(file.commands).filter(
-        (command): command is LoadAdapterCreateCommand =>
-          command.commandType === 'loadAdapter'
-      )
-
       const FIXED_TRASH_ID = 'fixedTrash'
       const labware = {
-        ...loadAdapterCommands.reduce(
-          (acc: NormalizedLabwareById, command: LoadAdapterCreateCommand) => {
-            const { adapterId } = command.params
-            const defUri = adapterId?.split(':')[1]
-            const id = adapterId ?? ''
-            return {
-              ...acc,
-              [id]: {
-                labwareDefURI: defUri ?? '',
-              },
-            }
-          },
-          {}
-        ),
         ...loadLabwareCommands.reduce(
           (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
             const { labwareId, loadName } = command.params
