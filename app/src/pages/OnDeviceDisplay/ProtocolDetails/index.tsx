@@ -74,6 +74,7 @@ const ProtocolHeader = ({
   const history = useHistory()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = React.useState<boolean>(true)
+  const [startSetup, setStartSetup] = React.useState<boolean>(false)
   const toggleTruncate = (): void => setTruncate(value => !value)
 
   let displayedTitle = title ?? null
@@ -138,9 +139,14 @@ const ProtocolHeader = ({
       </Flex>
       <SmallButton
         buttonCategory="rounded"
-        onClick={handleRunProtocol}
+        onClick={() => {
+          setStartSetup(true)
+          handleRunProtocol()
+        }}
         buttonText={t('protocol_details:start_setup')}
         disabled={isProtocolFetching}
+        iconName={startSetup ? 'ot-spinner' : undefined}
+        iconPlacement={'endIcon'}
       />
     </Flex>
   )
