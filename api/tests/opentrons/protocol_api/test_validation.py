@@ -177,7 +177,7 @@ def test_ensure_lowercase_name_invalid() -> None:
 def test_ensure_definition_is_labware(
     definition: LabwareDefinition, expected_raise: ContextManager[Any]
 ) -> None:
-    """It should check if the Labware Definition is defined as an adapter."""
+    """It should check if the Labware Definition is defined as a regular labware."""
     with expected_raise:
         subject.ensure_definition_is_labware(definition)
 

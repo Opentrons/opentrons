@@ -1196,7 +1196,7 @@ def test_get_all_labware_definition_empty() -> None:
     assert result == []
 
 
-def test_raise_if_labware_cannot_be_stacked_stacking_adapter() -> None:
+def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:
     """It should raise if the labware trying to be stacked is an adapter."""
     subject = get_labware_view()
 
