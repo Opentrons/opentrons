@@ -55,13 +55,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const robotType = getRobotTypeFromLoadedLabware(labware)
   const deckDef = getDeckDefFromRobotType(robotType)
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
-  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
-    commands
-  )
+  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
-  const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
-    commands
-  )
+  const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(commands)
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
     liquids != null ? liquids : [],
     commands
@@ -87,6 +83,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
         <>
           {map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
             if (slot.matingSurfaceUnitVector == null) return null // if slot has no mating surface, don't render anything in it
+
             const moduleInSlot =
               slotId in initialLoadedModulesBySlot
                 ? initialLoadedModulesBySlot[slotId]
@@ -95,32 +92,39 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               slotId in initialLoadedLabwareBySlot
                 ? initialLoadedLabwareBySlot[slotId]
                 : null
-            const labwareInModule =
+
+            // all things that can be in slots have been accounted for
+
+
+
+            const labwareInModule = // only labware loaded directly onto mods (include adapters)
               moduleInSlot?.result?.moduleId != null &&
-              moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
+                moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
                 ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
                 : null
-            let labwareId =
-              labwareInSlot != null ? labwareInSlot.result?.labwareId : null
+
+
+
+            // could be a labware or adapter directly on deck
+            let labwareId = labwareInSlot != null ? labwareInSlot.result?.labwareId : null
+
             let labwareInAdapter = null
             if (
               labwareInModule?.result != null &&
-              'labwareId' in labwareInModule.result
+              'labwareId' in labwareInModule.result && // this would be an adapter in mod, or labware directly in mod
+              labwareInModule.result.labwareId in initialLoadedLabwareByAdapter
             ) {
               labwareInAdapter =
                 initialLoadedLabwareByAdapter[labwareInModule?.result.labwareId]
-              labwareId =
-                labwareInAdapter != null
-                  ? labwareInAdapter.result?.labwareId
-                  : labwareInModule?.result.labwareId
+              labwareId = labwareInAdapter.result?.labwareId
             }
             const wellFill =
               labwareId != null && liquids != null
                 ? getWellFillFromLabwareId(
-                    labwareId,
-                    liquidsInLoadOrder,
-                    labwareByLiquidId
-                  )
+                  labwareId,
+                  liquidsInLoadOrder,
+                  labwareByLiquidId
+                )
                 : null
             return (
               <React.Fragment key={slotId}>
