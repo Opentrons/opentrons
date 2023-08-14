@@ -11,7 +11,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
   Module,
-  SlotLabels,
+  COLORS,
 } from '@opentrons/components'
 import {
   MODULES_WITH_COLLISION_ISSUES,
@@ -65,6 +65,7 @@ import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
+import { SlotLabels } from './SlotLabels'
 import styles from './DeckSetup.css'
 
 export const DECK_LAYER_BLOCKLIST = [
@@ -461,6 +462,7 @@ export const DeckSetup = (): JSX.Element => {
           width="100%"
           height="100%"
           trashSlotName={FLEX_TRASH_SLOT}
+          trashColor={COLORS.darkGreyEnabled}
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
             <>

@@ -2,7 +2,7 @@
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
+from typing import List, NamedTuple, Optional, Sequence, Type, Union
 
 from opentrons.ordered_set import OrderedSet
 
@@ -43,7 +43,8 @@ def get_command_view(
     running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
     queued_setup_command_ids: Sequence[str] = (),
-    errors_by_id: Optional[Dict[str, errors.ErrorOccurrence]] = None,
+    run_error: Optional[errors.ErrorOccurrence] = None,
+    finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
 ) -> CommandView:
@@ -62,11 +63,13 @@ def get_command_view(
         running_command_id=running_command_id,
         queued_command_ids=OrderedSet(queued_command_ids),
         queued_setup_command_ids=OrderedSet(queued_setup_command_ids),
-        errors_by_id=errors_by_id or {},
+        run_error=run_error,
+        finish_error=finish_error,
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
         run_started_at=run_started_at,
         latest_command_hash=latest_command_hash,
+        stopped_by_estop=False,
     )
 
     return CommandView(state=state)
@@ -450,14 +453,14 @@ def test_validate_action_allowed(
 
 def test_get_errors() -> None:
     """It should be able to pull all ErrorOccurrences from the store."""
-    error_1 = errors.ErrorOccurrence(
+    run_error = errors.ErrorOccurrence(
         id="error-1",
         createdAt=datetime(year=2021, month=1, day=1),
         errorType="ReallyBadError",
         detail="things could not get worse",
         errorCode="4321",
     )
-    error_2 = errors.ErrorOccurrence(
+    finish_error = errors.ErrorOccurrence(
         id="error-2",
         createdAt=datetime(year=2022, month=2, day=2),
         errorType="EvenWorseError",
@@ -465,9 +468,21 @@ def test_get_errors() -> None:
         errorCode="1234",
     )
 
-    subject = get_command_view(errors_by_id={"error-1": error_1, "error-2": error_2})
+    no_error_subject = get_command_view()
+    assert no_error_subject.get_error() is None
 
-    assert subject.get_all_errors() == [error_1, error_2]
+    just_run_error_subject = get_command_view(run_error=run_error)
+    assert just_run_error_subject.get_error() == run_error
+
+    just_finish_error_subject = get_command_view(finish_error=finish_error)
+    assert just_finish_error_subject.get_error() == finish_error
+
+    both_errors_subject = get_command_view(
+        run_error=run_error, finish_error=finish_error
+    )
+    both_errors_result = both_errors_subject.get_error()
+    assert both_errors_result is not None
+    assert both_errors_result.wrappedErrors == [run_error, finish_error]
 
 
 class GetStatusSpec(NamedTuple):
@@ -512,6 +527,19 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             run_result=RunResult.FAILED,
             run_completed_at=datetime(year=2021, day=1, month=1),
+        ),
+        expected_status=EngineStatus.FAILED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            run_result=RunResult.SUCCEEDED,
+            run_completed_at=datetime(year=2021, day=1, month=1),
+            finish_error=errors.ErrorOccurrence(
+                id="finish-error-id",
+                errorType="finish-error-type",
+                createdAt=datetime(year=2021, day=1, month=1),
+                detail="finish-error-detail",
+            ),
         ),
         expected_status=EngineStatus.FAILED,
     ),

@@ -99,8 +99,17 @@ stages:
         links: !anydict
         meta:
           cursor: 0
-          totalLength: 3
+          totalLength: 4
         data:
+          # Initial home
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
           # The labware load from our simulated Labware Position Check:
           - id: !anystr
             key: lpcLoadLabwareKey

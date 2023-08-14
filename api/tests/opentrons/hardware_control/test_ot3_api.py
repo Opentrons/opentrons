@@ -930,6 +930,7 @@ async def test_gripper_action_works_with_gripper(
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
         gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
+        stay_engaged=True,
     )
 
     await ot3_hardware.ungrip()

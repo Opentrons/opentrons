@@ -36,7 +36,7 @@ from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, feature_flags as ff
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -845,15 +845,11 @@ class OT3API(
 
         if refresh:
             await self.refresh_positions()
-
-        position_axes = [Axis.X, Axis.Y, Axis.by_mount(mount)]
-        valid_motor = self._current_position and self._backend.check_motor_status(
-            position_axes
-        )
-        if not valid_motor:
+        elif not self._current_position:
             raise MustHomeError(
-                f"Current position of {str(mount)} is invalid; please home motors."
+                f"Motor positions for {str(mount)} are missing; must first home motors."
             )
+        self._assert_motor_ok([Axis.X, Axis.Y, Axis.by_mount(mount)])
 
         return self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), self._current_position, critical_point
@@ -882,6 +878,22 @@ class OT3API(
             self._gripper_handler.set_jaw_displacement(self._encoder_position[Axis.G])
         return self._encoder_position
 
+    def _assert_motor_ok(self, axes: Sequence[Axis]) -> None:
+        invalid_axes = self._backend.get_invalid_motor_axes(axes)
+        if invalid_axes:
+            axes_str = ",".join([ax.name for ax in invalid_axes])
+            raise MustHomeError(
+                f"Motor position of axes ({axes_str}) is invalid; please home motors."
+            )
+
+    def _assert_encoder_ok(self, axes: Sequence[Axis]) -> None:
+        invalid_axes = self._backend.get_invalid_motor_axes(axes)
+        if invalid_axes:
+            axes_str = ",".join([ax.name for ax in invalid_axes])
+            raise MustHomeError(
+                f"Encoder position of axes ({axes_str}) is invalid; please home motors."
+            )
+
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -904,20 +916,17 @@ class OT3API(
         """
         if refresh:
             await self.refresh_positions()
+        elif not self._encoder_position:
+            raise MustHomeError(
+                f"Encoder positions for {str(mount)} are missing; must first home motors."
+            )
 
         if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
             raise GripperNotAttachedError(
                 f"Cannot return encoder position for {mount} if no gripper is attached"
             )
 
-        position_axes = [Axis.X, Axis.Y, Axis.by_mount(mount)]
-        valid_motor = self._encoder_position and self._backend.check_encoder_status(
-            position_axes
-        )
-        if not valid_motor:
-            raise MustHomeError(
-                f"Encoder position of {str(mount)} is invalid; please home motors."
-            )
+        self._assert_encoder_ok([Axis.X, Axis.Y, Axis.by_mount(mount)])
 
         ot3pos = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount),
@@ -996,10 +1005,8 @@ class OT3API(
         if not self._backend.check_encoder_status(axes_moving):
             # a moving axis has not been homed before, homing robot now
             await self.home()
-        elif not self._backend.check_motor_status(axes_moving):
-            raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
-            )
+        else:
+            self._assert_motor_ok(axes_moving)
 
         target_position = target_position_from_absolute(
             realmount,
@@ -1042,12 +1049,7 @@ class OT3API(
 
         if not self._backend.check_encoder_status(list(position.keys())):
             await self.home()
-
-        valid_motor = self._current_position and self._backend.check_motor_status(
-            list(position.keys())
-        )
-        if not valid_motor:
-            raise MustHomeError("Current position is invalid; please home motors.")
+        self._assert_motor_ok(list(position.keys()))
 
         absolute_positions: "OrderedDict[Axis, float]" = OrderedDict()
         current_position = self._current_position
@@ -1111,10 +1113,7 @@ class OT3API(
         await self._cache_current_position()
         await self._cache_encoder_position()
 
-        if not self._backend.check_motor_status([axis for axis in axes_moving]):
-            raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
-            )
+        self._assert_motor_ok([axis for axis in axes_moving])
 
         target_position = target_position_from_relative(
             realmount, delta, self._current_position
@@ -1438,10 +1437,12 @@ class OT3API(
         self._config = replace(self._config, **kwargs)
 
     @ExecutionManagerProvider.wait_for_running
-    async def _grip(self, duty_cycle: float) -> None:
+    async def _grip(self, duty_cycle: float, stay_engaged: bool = True) -> None:
         """Move the gripper jaw inward to close."""
         try:
-            await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
+            await self._backend.gripper_grip_jaw(
+                duty_cycle=duty_cycle, stay_engaged=stay_engaged
+            )
             await self._cache_encoder_position()
         except Exception:
             self._log.exception(
@@ -1474,12 +1475,14 @@ class OT3API(
             self._log.exception("Gripper set width failed")
             raise
 
-    async def grip(self, force_newtons: Optional[float] = None) -> None:
+    async def grip(
+        self, force_newtons: Optional[float] = None, stay_engaged: bool = True
+    ) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
         )
-        await self._grip(duty_cycle=dc)
+        await self._grip(duty_cycle=dc, stay_engaged=stay_engaged)
         self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
@@ -1814,7 +1817,10 @@ class OT3API(
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
 
-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
+            and ff.tip_presence_detection_enabled()
+        ):
             await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
@@ -1909,7 +1915,10 @@ class OT3API(
 
         await self._backend.set_active_current(spec.ending_current)
         # TODO: implement tip-detection sequence during drop-tip for 96ch
-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
+            and ff.tip_presence_detection_enabled()
+        ):
             await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
 
         # home mount axis

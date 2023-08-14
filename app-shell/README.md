@@ -114,15 +114,6 @@ Forces the devtools extensions to be re-installed. Make sure you enable **both**
 
 Sets the app's self-update channel. Options are `alpha`, `beta`, or `latest`. `alpha` is the least tested/stable, followed by `beta`, followed by `latest`. `alpha` and `beta` get new features earlier than `latest`.
 
-##### buildroot.manifestUrl
-
-- CLI argument: `--buildroot.manifestUrl`
-- Environment variable: `OT_APP_BUILDROOT__MANIFEST_URL`
-- JSON path: `buildroot.manifestUrl`
-- Default: `"https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json"`
-
-Sets the file that the app checks for its corresponding robot update.
-
 ##### log.level.file
 
 - CLI argument: `--log.level.file`

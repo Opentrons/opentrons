@@ -69,20 +69,22 @@ If you attempt to use the gripper to move labware in an OT-2 protocol, the API w
 Supported Labware
 =================
 
-You can manually move any standard or custom labware. Using the gripper to move the following types of labware is fully supported by Opentrons:
+You can manually move any standard or custom labware. Using the gripper to move the following labware is fully supported by Opentrons:
 
 .. list-table::
     :header-rows: 1
 
     * - Labware Type
-      - API Load Name
-    * - NEST 96 Deep Well Plate 2mL
-      - ``nest_96_wellplate_2ml_deep``
-    * - Armadillo 96 well plate 200 µL Full Skirt
-      - ``armadillo_96_wellplate_200ul_pcr_full_skirt``
-    * - NEST 96 Well Plate 200 µL Flat
-      - ``nest_96_wellplate_200ul_flat``
-    * - All Opentrons Flex 96 Tip Racks 
+      - API Load Names
+    * - Full-skirt PCR plates
+      - 
+          * ``armadillo_96_wellplate_200ul_pcr_full_skirt``
+          * ``opentrons_96_wellplate_200ul_pcr_full_skirt``
+    * - NEST well plates
+      - 
+          * ``nest_96_wellplate_200ul_flat``
+          * ``nest_96_wellplate_2ml_deep``
+    * - Opentrons Flex 96 Tip Racks 
       - 
           * ``opentrons_flex_96_tiprack_50ul``
           * ``opentrons_flex_96_tiprack_200ul``
@@ -95,7 +97,7 @@ The gripper may work with other ANSI/SLAS standard labware, but this is not reco
 
 .. note::
 
-    Labware definitions don't explicitly declare compatibility or incompatibility with the gripper. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
+    The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default values for labware definitions that don't include position and force information. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
 
 
 .. _movement-modules: 

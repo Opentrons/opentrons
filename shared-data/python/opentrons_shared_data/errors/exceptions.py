@@ -34,7 +34,19 @@ class EnumeratedError(Exception):
 
     def __str__(self) -> str:
         """Get a human-readable string."""
-        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}'
+        _node = self.detail.get("node")
+        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}{f" ({_node})" if _node else ""}'
+
+    def __eq__(self, other: object) -> bool:
+        """Compare if two enumerated errors match."""
+        if not isinstance(other, EnumeratedError):
+            return NotImplemented
+        return (
+            self.code == other.code
+            and self.message == other.message
+            and self.detail == other.detail
+            and self.wrapping == other.wrapping
+        )
 
 
 class CommunicationError(EnumeratedError):

@@ -1,12 +1,12 @@
 import * as React from 'react'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { LocationIcon } from '../../molecules'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'
-
 interface SlotLabelsProps {
   robotType: RobotType
   color?: string
@@ -20,7 +20,7 @@ export const SlotLabels = ({
   robotType,
   color,
 }: SlotLabelsProps): JSX.Element | null => {
-  return robotType === 'OT-3 Standard' ? (
+  return robotType === FLEX_ROBOT_TYPE ? (
     <>
       <RobotCoordsForeignObject
         width="2.5rem"

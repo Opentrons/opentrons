@@ -29,8 +29,8 @@ from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperP
 TEST_SLOT = 5
 PROBE_PREP_HEIGHT_MM = 5
 PROBE_POS_OFFSET = Point(13, 13, 0)
-JAW_ALIGNMENT_MM_X = 0.5
-JAW_ALIGNMENT_MM_Z = 0.5
+JAW_ALIGNMENT_MM_X = 2.0
+JAW_ALIGNMENT_MM_Z = 2.0
 PROBE_PF_MAX = 6.0
 DECK_PF_MIN = 9.0
 DECK_PF_MAX = 15.0

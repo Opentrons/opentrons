@@ -40,7 +40,7 @@ import { FloatingActionButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { Modal } from '../../molecules/Modal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
@@ -49,6 +49,7 @@ import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
+import type { UseQueryResult } from 'react-query'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
@@ -59,8 +60,7 @@ import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { UseQueryResult } from 'react-query'
-import { Modal } from '../../molecules/Modal'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -171,14 +171,19 @@ export function ProtocolSetupLabware({
     }
   }
 
+  const modalHeader: ModalHeaderBaseProps = {
+    title: t('map_view'),
+    hasExitIcon: true,
+  }
+
   return (
     <>
       <Portal level="top">
         {showDeckMapModal ? (
-          <LegacyModal
-            title={t('map_view')}
-            onClose={() => setShowDeckMapModal(false)}
-            fullPage
+          <Modal
+            header={modalHeader}
+            modalSize="large"
+            onOutsideClick={() => setShowDeckMapModal(false)}
           >
             <RobotWorkSpace
               deckDef={deckDef}
@@ -186,6 +191,7 @@ export function ProtocolSetupLabware({
               deckFill={COLORS.light1}
               trashSlotName="A3"
               id="LabwareSetup_deckMap"
+              trashColor={COLORS.darkGreyEnabled}
             >
               {() => (
                 <>
@@ -254,7 +260,7 @@ export function ProtocolSetupLabware({
                 </>
               )}
             </RobotWorkSpace>
-          </LegacyModal>
+          </Modal>
         ) : null}
         {showLabwareDetailsModal && selectedLabware != null ? (
           <Modal
