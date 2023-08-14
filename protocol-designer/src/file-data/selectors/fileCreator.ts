@@ -10,7 +10,7 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
-  OT3_STANDARD_DECKID,
+  FLEX_STANDARD_DECKID,
   PipetteName,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
@@ -298,7 +298,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       designerApplication,
       robot:
         robotType === FLEX_ROBOT_TYPE
-          ? { model: FLEX_ROBOT_TYPE, deckId: OT3_STANDARD_DECKID }
+          ? { model: FLEX_ROBOT_TYPE, deckId: FLEX_STANDARD_DECKID }
           : { model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID },
       liquids,
       labwareDefinitions,
