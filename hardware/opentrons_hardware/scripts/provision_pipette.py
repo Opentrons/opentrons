@@ -54,18 +54,28 @@ async def flash_serials(
             return
 
 
+def _read_input_and_confirm(prompt: str) -> str:
+    inp = input(prompt).strip()
+    if "y" in input(f"read serial '{inp}', write to pipette? (y/n): "):
+        return inp
+    else:
+        return _read_input_and_confirm(prompt)
+
+
 async def get_serial(
     prompt: str, base_log: logging.Logger
 ) -> Tuple[PipetteName, int, bytes]:
     """Get a serial number that is correct and parseable."""
     loop = asyncio.get_running_loop()
     while True:
-        serial = await loop.run_in_executor(None, lambda: input(prompt))
+        serial = await loop.run_in_executor(
+            None, lambda: _read_input_and_confirm(prompt)
+        )
         try:
             name, model, data = serials.info_from_serial_string(serial)
         except Exception as e:
             base_log.exception("invalid serial")
-            if isinstance(Exception, KeyboardInterrupt):
+            if isinstance(e, KeyboardInterrupt):
                 raise
             print(str(e))
         else:
@@ -120,7 +130,12 @@ async def update_serial_and_confirm(
                             base_log.info(f"serial confirmed on attempt {attempt}")
                             return
                         else:
-                            base_log.debug("message relevant serial NOT confirmed")
+                            raise RuntimeError(
+                                f"serial does not match expected "
+                                f"(name={message.payload.name}, "
+                                f"model={message.payload.model}, "
+                                f"serial={message.payload.serial})"
+                            )
                     base_log.debug(f"message {type(message)} is not relevant")
                     base_log.debug(
                         f"{(target-datetime.datetime.now()).total_seconds()} remaining in attempt {attempt}"

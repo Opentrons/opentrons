@@ -246,7 +246,7 @@ export function ProtocolDetails(): JSX.Element | null {
     'shared',
   ])
   const { protocolId } = useParams<OnDeviceRouteParams>()
-  const missingProtocolHardware = useMissingProtocolHardware(protocolId)
+  const { missingProtocolHardware } = useMissingProtocolHardware(protocolId)
   const chipText = useMissingHardwareText(missingProtocolHardware)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()

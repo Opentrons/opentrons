@@ -4,17 +4,17 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
 
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../redux/buildroot/selectors')
+jest.mock('../../../../../redux/robot-update/selectors')
 jest.mock('../../../hooks')
 
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 
 const mockOnUpdateStart = jest.fn()

@@ -1,0 +1,36 @@
+test_name: Upload and analyze a failed protocol
+
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+stages:
+  - name: Upload deck_coordinate_load protocol
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/deck_coordinate_load_fail.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+  - name: Retry until analyses status is completed and result is ok.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: not-ok
+            errors:
+              - detail: 'DeckConflictError [line 16]: thermocyclerModuleV2 in slot B1 prevents temperatureModuleV2 from using slot A1.'

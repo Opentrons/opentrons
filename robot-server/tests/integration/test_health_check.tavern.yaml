@@ -12,3 +12,19 @@ stages:
       status_code: 200
       verify_response_with:
         function: 'tests.integration.fixtures:check_health_response'
+
+---
+test_name: GET Health OT-3
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+stages:
+  - name: Health GET request returns correct info
+    request:
+      url: "{ot3_server_base_url}/health"
+      method: GET
+    response:
+      status_code: 200
+      verify_response_with:
+        function: 'tests.integration.fixtures:check_ot3_health_response'

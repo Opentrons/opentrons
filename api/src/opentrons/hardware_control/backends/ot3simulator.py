@@ -15,7 +15,6 @@ from typing import (
     Set,
     Union,
     Mapping,
-    Iterator,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
@@ -255,21 +254,32 @@ class OT3Simulator:
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
-    def _get_motor_status(self, ax: Sequence[Axis]) -> Iterator[Optional[MotorStatus]]:
-        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+    def _get_motor_status(
+        self, axes: Sequence[Axis]
+    ) -> Dict[Axis, Optional[MotorStatus]]:
+        return {ax: self._motor_status.get(axis_to_node(ax)) for ax in axes}
+
+    def get_invalid_motor_axes(self, axes: Sequence[Axis]) -> List[Axis]:
+        """Get axes that currently do not have the motor-ok flag."""
+        return [
+            ax
+            for ax, status in self._get_motor_status(axes).items()
+            if not status or not status.motor_ok
+        ]
+
+    def get_invalid_encoder_axes(self, axes: Sequence[Axis]) -> List[Axis]:
+        """Get axes that currently do not have the encoder-ok flag."""
+        return [
+            ax
+            for ax, status in self._get_motor_status(axes).items()
+            if not status or not status.encoder_ok
+        ]
 
     def check_motor_status(self, axes: Sequence[Axis]) -> bool:
-        return all(
-            isinstance(status, MotorStatus) and status.motor_ok
-            for status in self._get_motor_status(axes)
-        )
+        return len(self.get_invalid_motor_axes(axes)) == 0
 
     def check_encoder_status(self, axes: Sequence[Axis]) -> bool:
-        """If any of the encoder statuses is ok, parking can proceed."""
-        return all(
-            isinstance(status, MotorStatus) and status.encoder_ok
-            for status in self._get_motor_status(axes)
-        )
+        return len(self.get_invalid_encoder_axes(axes)) == 0
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
@@ -297,13 +307,14 @@ class OT3Simulator:
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
-    ) -> None:
+    ) -> Dict[NodeId, float]:
 
         head_node = axis_to_node(Axis.by_mount(mount))
         pos = self._position
-        pos[head_node] = max_z_distance - 2
+        pos[head_node] += max_z_distance
         self._position.update(pos)
         self._encoder_position.update(pos)
+        return self._position
 
     @ensure_yield
     async def move(
@@ -373,6 +384,10 @@ class OT3Simulator:
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
     async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Raise an error if the given state doesn't match the physical state."""
+        pass
+
+    async def get_tip_present_state(self, mount: OT3Mount) -> int:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 

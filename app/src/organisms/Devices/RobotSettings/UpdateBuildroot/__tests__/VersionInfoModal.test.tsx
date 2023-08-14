@@ -6,7 +6,11 @@ import {
   OutlineButton,
 } from '@opentrons/components'
 import { mockReachableRobot } from '../../../../../redux/discovery/__fixtures__'
-import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../../redux/buildroot'
+import {
+  UPGRADE,
+  DOWNGRADE,
+  REINSTALL,
+} from '../../../../../redux/robot-update'
 import * as Shell from '../../../../../redux/shell'
 import { Portal } from '../../../../../App/portal'
 import { UpdateAppModal } from '../../../../UpdateAppModal'

@@ -9,9 +9,7 @@ export const links = {
   protocolSteps: `https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps`,
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
   recommendedLabware:
-    'https://support.opentrons.com/en/articles/4168748-labware-and-module-compatibility',
-  // TODO: fill in real url when it exists
-  heaterShakerLabware: '#',
+    'https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules',
   pipetteGen1MultiModuleCollision:
     'https://support.opentrons.com/en/articles/4168741-module-placement',
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,

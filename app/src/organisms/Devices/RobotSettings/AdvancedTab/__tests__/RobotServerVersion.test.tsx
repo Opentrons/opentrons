@@ -4,22 +4,22 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { getRobotApiVersion } from '../../../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../../../hooks'
 import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
 jest.mock('../../../hooks')
-jest.mock('../../../../../redux/buildroot/selectors')
+jest.mock('../../../../../redux/robot-update/selectors')
 jest.mock('../../../../../redux/discovery/selectors')
 jest.mock('../../UpdateBuildroot')
 
 const mockGetRobotApiVersion = getRobotApiVersion as jest.MockedFunction<
   typeof getRobotApiVersion
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>

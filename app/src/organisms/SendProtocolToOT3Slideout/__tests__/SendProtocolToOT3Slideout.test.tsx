@@ -24,7 +24,7 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -40,14 +40,14 @@ import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ToasterOven')
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/protocol-storage/selectors')
 
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots

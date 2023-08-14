@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
@@ -54,6 +54,7 @@ export function CalibrationDataDownload({
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const tipLengthCalibrations = useTipLengthCalibrations()
+  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
 
   const downloadIsPossible =
     deckCalibrationData.isDeckCalibrated &&
@@ -64,8 +65,10 @@ export function CalibrationDataDownload({
 
   const ot3DownloadIsPossible =
     isOT3 &&
-    pipetteOffsetCalibrations != null &&
-    pipetteOffsetCalibrations.length > 0
+    attachedInstruments?.data.some(
+      instrument =>
+        instrument.ok && instrument.data.calibratedOffset.last_modified != null
+    )
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -77,7 +80,7 @@ export function CalibrationDataDownload({
       new Blob([
         isOT3
           ? JSON.stringify({
-              pipetteOffset: pipetteOffsetCalibrations,
+              instrumentData: attachedInstruments,
             })
           : JSON.stringify({
               deck: deckCalibrationData,

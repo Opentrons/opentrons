@@ -96,6 +96,10 @@ class PipetteDict(InstrumentDict):
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
 
 
+class PipetteStateDict(TypedDict):
+    tip_detected: bool
+
+
 class GripperDict(InstrumentDict):
     model: GripperModel
     gripper_id: str

@@ -5,6 +5,9 @@ from subprocess import run as run_subprocess, Popen, CalledProcessError
 from typing import List, Union, Optional, Dict
 from urllib.request import urlopen
 from time import time
+from typing import Tuple
+
+from opentrons_hardware.hardware_control.rear_panel_settings import set_ui_color
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import StatusBarState, DoorState
@@ -29,12 +32,37 @@ CAM_CMD_OT3 = (
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
 
-COLOR_TO_STATE: Dict[str, StatusBarState] = {
-    "off": StatusBarState.OFF,
-    "white": StatusBarState.IDLE,
-    "red": StatusBarState.SOFTWARE_ERROR,
-    "green": StatusBarState.RUN_COMPLETED,
-    "blue": StatusBarState.RUNNING,
+COLOR_TO_STATE: Dict[str, Tuple[int, int, int, int]] = {
+    "off": (
+        0,
+        0,
+        0,
+        0,
+    ),
+    "white": (
+        0,
+        0,
+        0,
+        255,
+    ),
+    "red": (
+        255,
+        0,
+        0,
+        0,
+    ),
+    "green": (
+        0,
+        255,
+        0,
+        0,
+    ),
+    "blue": (
+        0,
+        0,
+        255,
+        0,
+    ),
 }
 
 
@@ -174,11 +202,20 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # STATUS LIGHTS
     ui.print_header("STATUS LIGHT")
-    for color, state in COLOR_TO_STATE.items():
-        await api.set_status_bar_state(state)
-        result = _get_user_confirmation(f"is the STATUS-LIGHT {color}")
-        report(section, f"status-light-{color}", [CSVResult.from_bool(result)])
-    await api.set_status_bar_state(StatusBarState.IDLE)
+    try:
+        for color, state in COLOR_TO_STATE.items():
+            if not api.is_simulator:
+                await set_ui_color(
+                    state[0],  # red
+                    state[2],  # blue
+                    state[1],  # green
+                    state[3],  # white
+                    api._backend._usb_messenger,  # type: ignore[union-attr]
+                )
+            result = _get_user_confirmation(f"is the STATUS-LIGHT {color}")
+            report(section, f"status-light-{color}", [CSVResult.from_bool(result)])
+    finally:
+        await api.set_status_bar_state(StatusBarState.IDLE)
 
     # DOOR SWITCH
     # NOTE: we need to use asyncio while waiting, so that we don't
@@ -191,6 +228,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await asyncio.sleep(0.1)
         if time() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to close")
+            break
     print(api.door_state)
     is_closed = api.door_state == DoorState.CLOSED
     print("OPEN the front door")
@@ -199,6 +237,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await asyncio.sleep(0.1)
         if time() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to open")
+            break
     print(api.door_state)
     is_open = api.door_state == DoorState.OPEN
     report(section, "door-switch", [CSVResult.from_bool(is_closed and is_open)])

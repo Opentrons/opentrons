@@ -100,8 +100,11 @@ class AbstractModule(abc.ABC):
         self._execution_manager.register_cancellable_task(task)
 
     @abc.abstractmethod
-    async def deactivate(self) -> None:
-        """Deactivate the module."""
+    async def deactivate(self, must_be_running: bool = True) -> None:
+        """Deactivate the module.
+
+        Contains an override to the `wait_for_is_running` step in cases where the
+        module must be deactivated regardless of context."""
         pass
 
     @property

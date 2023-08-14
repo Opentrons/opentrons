@@ -137,7 +137,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
                     tabIndex={i}
                     name={`${moduleTypeAccessor}.model`}
                     options={MODELS_FOR_MODULE_TYPE[moduleType]}
-                    value={selectedModel}
+                    value={selectedModel ?? defaultModel}
                     onChange={onFieldChange}
                     onBlur={onBlur}
                   />

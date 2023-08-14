@@ -14,6 +14,7 @@ This is still pretty early in the process, so some things are known not to work,
 - All instrument flows should display errors properly now
 - Update robot flows don't say OT-2s anymore
 - There should be fewer surprise scroll bars on Windows
+- The configuration of the on-device display can be factory-reset, which lets you go back to the first-time setup flow
 
 
 

@@ -131,7 +131,7 @@ export function RobotSettingsNetworking({
           </StyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
-          {isOT3ConnectedViaWifi ? (
+          {wifi?.ipAddress != null ? (
             <>
               <Flex marginBottom={SPACING.spacing24}>
                 <Flex marginRight={SPACING.spacing8}>
@@ -214,7 +214,7 @@ export function RobotSettingsNetworking({
         </Flex>
         <Box paddingLeft="3.75rem">
           <Flex gridGap={SPACING.spacing16}>
-            {isOT3ConnectedViaEthernet ? (
+            {ethernet?.ipAddress != null ? (
               <>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}

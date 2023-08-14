@@ -3,22 +3,23 @@ import inspect
 from typing import Optional, Type, cast, Tuple
 
 import pytest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
     LabwareUri,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, Mount, MountType, Point
 from opentrons.protocol_api import OFF_DECK
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-)
+from opentrons.hardware_control.modules import AbstractModule, ModuleType
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     TemperatureModuleModel,
@@ -75,6 +76,22 @@ from opentrons.protocol_api.core.engine.module_core import (
 from opentrons.protocol_api import validation, MAX_SUPPORTED_VERSION
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.deck_type import (
+    STANDARD_OT2_DECK,
+    STANDARD_OT3_DECK,
+)
+
+
+@pytest.fixture(scope="session")
+def ot2_standard_deck_def() -> DeckDefinitionV3:
+    """Get the OT-2 standard deck definition."""
+    return load_deck(STANDARD_OT2_DECK, 3)
+
+
+@pytest.fixture(scope="session")
+def ot3_standard_deck_def() -> DeckDefinitionV3:
+    """Get the OT-2 standard deck definition."""
+    return load_deck(STANDARD_OT3_DECK, 3)
 
 
 @pytest.fixture(autouse=True)
@@ -150,12 +167,31 @@ def subject(
     )
 
 
+def _get_slot_def(
+    deck_def: DeckDefinitionV3, slot_name: DeckSlotName
+) -> Optional[SlotDefV3]:
+    slots_def = deck_def["locations"]["orderedSlots"]
+    for slot in slots_def:
+        if slot["id"] == slot_name.id:
+            return slot
+    return None
+
+
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_api_version(
     decoy: Decoy, subject: ProtocolCore, api_version: APIVersion
 ) -> None:
     """Should return the protocol version."""
     assert subject.api_version == api_version
+
+
+# def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV3, subject: ProtocolCore, decoy: Decoy) -> None:
+#     """It should return a deck slot's definition."""
+#     decoy.when(subject._engine_client.state.labware.get_slot_definition(5))
+#     result = subject.get_slot_definition(DeckSlotName.SLOT_6)
+#
+#     assert result["id"] == "6"
+#     assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
 
 
 def test_fixed_trash(subject: ProtocolCore) -> None:
@@ -812,42 +848,58 @@ def test_add_labware_definition(
         "requested_model",
         "engine_model",
         "expected_core_cls",
+        "deck_def",
+        "slot_name",
+        "robot_type",
     ),
     [
         (
             TemperatureModuleModel.TEMPERATURE_V1,
             EngineModuleModel.TEMPERATURE_MODULE_V1,
             TemperatureModuleCore,
+            lazy_fixture("ot2_standard_deck_def"),
+            DeckSlotName.SLOT_1,
+            "OT-2 Standard",
         ),
         (
             TemperatureModuleModel.TEMPERATURE_V2,
             EngineModuleModel.TEMPERATURE_MODULE_V2,
             TemperatureModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_D1,
+            "OT-3 Standard",
         ),
         (
             MagneticModuleModel.MAGNETIC_V1,
             EngineModuleModel.MAGNETIC_MODULE_V1,
             MagneticModuleCore,
-        ),
-        (
-            MagneticModuleModel.MAGNETIC_V2,
-            EngineModuleModel.MAGNETIC_MODULE_V2,
-            MagneticModuleCore,
+            lazy_fixture("ot2_standard_deck_def"),
+            DeckSlotName.SLOT_1,
+            "OT-2 Standard",
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V1,
             EngineModuleModel.THERMOCYCLER_MODULE_V1,
             ThermocyclerModuleCore,
+            lazy_fixture("ot2_standard_deck_def"),
+            DeckSlotName.SLOT_7,
+            "OT-2 Standard",
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V2,
             EngineModuleModel.THERMOCYCLER_MODULE_V2,
             ThermocyclerModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A1,
+            "OT-3 Standard",
         ),
         (
             HeaterShakerModuleModel.HEATER_SHAKER_V1,
             EngineModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A1,
+            "OT-3 Standard",
         ),
     ],
 )
@@ -859,6 +911,9 @@ def test_load_module(
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
+    deck_def: DeckDefinitionV3,
+    slot_name: DeckSlotName,
+    robot_type: RobotType,
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
@@ -872,10 +927,16 @@ def test_load_module(
         [mock_hw_mod_1, mock_hw_mod_2]
     )
 
+    decoy.when(subject.get_slot_definition(slot_name)).then_return(
+        _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
+    )
+
+    decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
+
     decoy.when(
         mock_engine_client.load_module(
             model=engine_model,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=slot_name),
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -888,7 +949,7 @@ def test_load_module(
 
     result = subject.load_module(
         model=requested_model,
-        deck_slot=DeckSlotName.SLOT_1,
+        deck_slot=slot_name,
         configuration=None,
     )
 
@@ -907,7 +968,7 @@ def test_load_module(
 
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
-            slot_name=DeckSlotName.SLOT_1,
+            slot_name=slot_name,
             allowed_labware_ids={"fixed-trash-123"},
             allowed_module_ids={"abc123"},
         )
@@ -918,8 +979,99 @@ def test_load_module(
         LabwareNotLoadedOnModuleError("oh no")
     )
 
-    assert subject.get_slot_item(DeckSlotName.SLOT_1) is result
+    assert subject.get_slot_item(slot_name) is result
     assert subject.get_labware_on_module(result) is None
+
+
+@pytest.mark.parametrize(
+    (
+        "requested_model",
+        "engine_model",
+        "expected_core_cls",
+        "deck_def",
+        "slot_name",
+        "robot_type",
+    ),
+    [
+        (
+            TemperatureModuleModel.TEMPERATURE_V2,
+            EngineModuleModel.TEMPERATURE_MODULE_V2,
+            TemperatureModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_D2,
+            "OT-3 Standard",
+        ),
+        (
+            MagneticModuleModel.MAGNETIC_V2,
+            EngineModuleModel.MAGNETIC_MODULE_V2,
+            MagneticModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A2,
+            "OT-3 Standard",
+        ),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            EngineModuleModel.THERMOCYCLER_MODULE_V1,
+            ThermocyclerModuleCore,
+            lazy_fixture("ot2_standard_deck_def"),
+            DeckSlotName.SLOT_1,
+            "OT-2 Standard",
+        ),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V2,
+            EngineModuleModel.THERMOCYCLER_MODULE_V2,
+            ThermocyclerModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A2,
+            "OT-3 Standard",
+        ),
+        (
+            HeaterShakerModuleModel.HEATER_SHAKER_V1,
+            EngineModuleModel.HEATER_SHAKER_MODULE_V1,
+            HeaterShakerModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A2,
+            "OT-3 Standard",
+        ),
+    ],
+)
+def test_load_module_raises_wrong_location(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware_api: SyncHardwareAPI,
+    requested_model: ModuleModel,
+    engine_model: EngineModuleModel,
+    expected_core_cls: Type[ModuleCore],
+    subject: ProtocolCore,
+    deck_def: DeckDefinitionV3,
+    slot_name: DeckSlotName,
+    robot_type: RobotType,
+) -> None:
+    """It should issue a load module engine command."""
+    mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
+    mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
+
+    decoy.when(mock_hw_mod_1.device_info).then_return({"serial": "abc123"})
+    decoy.when(mock_hw_mod_2.device_info).then_return({"serial": "xyz789"})
+    decoy.when(mock_sync_hardware_api.attached_modules).then_return(
+        [mock_hw_mod_1, mock_hw_mod_2]
+    )
+
+    decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
+
+    decoy.when(subject.get_slot_definition(slot_name)).then_return(
+        _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=f"A {ModuleType.from_model(requested_model).value} cannot be loaded into slot {slot_name}",
+    ):
+        subject.load_module(
+            model=requested_model,
+            deck_slot=slot_name,
+            configuration=None,
+        )
 
 
 def test_load_mag_block(
@@ -927,14 +1079,21 @@ def test_load_mag_block(
     mock_engine_client: EngineClient,
     mock_sync_hardware_api: SyncHardwareAPI,
     subject: ProtocolCore,
+    ot3_standard_deck_def: DeckDefinitionV3,
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
 
+    decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
+
+    decoy.when(subject.get_slot_definition(DeckSlotName.SLOT_A2)).then_return(
+        _get_slot_def(deck_def=ot3_standard_deck_def, slot_name=DeckSlotName.SLOT_A2)  # type: ignore[arg-type]
+    )
+
     decoy.when(
         mock_engine_client.load_module(
             model=EngineModuleModel.MAGNETIC_BLOCK_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -947,7 +1106,7 @@ def test_load_mag_block(
 
     result = subject.load_module(
         model=MagneticBlockModel.MAGNETIC_BLOCK_V1,
-        deck_slot=DeckSlotName.SLOT_1,
+        deck_slot=DeckSlotName.SLOT_A2,
         configuration=None,
     )
 
@@ -982,15 +1141,19 @@ def test_load_mag_block(
 
 
 @pytest.mark.parametrize(
-    ("requested_model", "engine_model"),
+    ("requested_model", "engine_model", "deck_def", "expected_slot"),
     [
         (
             ThermocyclerModuleModel.THERMOCYCLER_V1,
             EngineModuleModel.THERMOCYCLER_MODULE_V1,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_B1,
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V2,
             EngineModuleModel.THERMOCYCLER_MODULE_V2,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_B1,
         ),
     ],
 )
@@ -1001,6 +1164,8 @@ def test_load_module_thermocycler_with_no_location(
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
     subject: ProtocolCore,
+    deck_def: DeckDefinitionV3,
+    expected_slot: DeckSlotName,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
@@ -1008,11 +1173,15 @@ def test_load_module_thermocycler_with_no_location(
     mock_hw_mod = decoy.mock(cls=AbstractModule)
     decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
+    decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
+    decoy.when(subject.get_slot_definition(expected_slot)).then_return(
+        _get_slot_def(deck_def=deck_def, slot_name=expected_slot)  # type: ignore[arg-type]
+    )
 
     decoy.when(
         mock_engine_client.load_module(
             model=engine_model,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_7),
+            location=DeckSlotLocation(slotName=expected_slot),
         )
     ).then_return(
         commands.LoadModuleResult(

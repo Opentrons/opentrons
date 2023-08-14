@@ -2,7 +2,7 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
-import * as Buildroot from '../../../redux/buildroot'
+import * as Buildroot from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -10,11 +10,11 @@ import {
 import { UpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
 import { UpdateRobotBanner } from '..'
 
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('../../Devices/RobotSettings/UpdateBuildroot')
 
-const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof Buildroot.getBuildrootUpdateDisplayInfo
+const getRobotUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateDisplayInfo
 >
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
@@ -33,7 +33,7 @@ describe('UpdateRobotBanner', () => {
       robot: mockConnectableRobot,
     }
     mockUpdateBuildroot.mockReturnValue(<div>mockUpdateBuildroot</div>)
-    getBuildrootUpdateDisplayInfo.mockReturnValue({
+    getRobotUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
@@ -55,7 +55,7 @@ describe('UpdateRobotBanner', () => {
   })
 
   it('should render nothing if update is not available when autoUpdateAction returns reinstall', () => {
-    getBuildrootUpdateDisplayInfo.mockReturnValue({
+    getRobotUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
@@ -67,7 +67,7 @@ describe('UpdateRobotBanner', () => {
   })
 
   it('should render nothing if update is not available when autoUpdateAction returns downgrade', () => {
-    getBuildrootUpdateDisplayInfo.mockReturnValue({
+    getRobotUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'downgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,

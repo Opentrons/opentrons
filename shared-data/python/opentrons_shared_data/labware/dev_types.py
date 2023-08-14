@@ -136,3 +136,5 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     stackingOffsetWithModule: Dict[str, NamedOffset]
     allowedRoles: List[LabwareRoles]
     gripperOffsets: Dict[str, GripperOffsets]
+    gripForce: float
+    gripHeightFromLabwareBottom: float

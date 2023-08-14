@@ -1,7 +1,7 @@
 """ProtocolEngine class definition."""
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -13,7 +13,8 @@ from opentrons_shared_data.errors import (
     EnumeratedError,
 )
 
-from .errors import ProtocolCommandFailedError
+from .errors import ProtocolCommandFailedError, ErrorOccurrence
+from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
@@ -48,6 +49,7 @@ from .actions import (
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    FailCommandAction,
 )
 
 
@@ -222,6 +224,63 @@ class ProtocolEngine:
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
+    def estop(self, maintenance_run: bool) -> None:
+        """Signal to the engine that an estop event occurred.
+
+        If there are any queued commands for the engine, they will be marked
+        as failed due to the estop event. If there aren't any queued commands
+        *and* this is a maintenance run (which has commands queued one-by-one),
+        a series of actions will mark the engine as Stopped. In either case the
+        queue worker will be deactivated; the primary difference is that the former
+        case will expect the protocol runner to `finish()` the engine, whereas the
+        maintenance run will be put into a state wherein the engine can be discarded.
+        """
+        if self._state_store.commands.get_is_stopped():
+            return
+        current_id = (
+            self._state_store.commands.state.running_command_id
+            or self._state_store.commands.state.queued_command_ids.head(None)
+        )
+
+        if current_id is not None:
+            fail_action = FailCommandAction(
+                command_id=current_id,
+                error_id=self._model_utils.generate_id(),
+                failed_at=self._model_utils.get_timestamp(),
+                error=EStopActivatedError(message="Estop Activated"),
+            )
+            self._action_dispatcher.dispatch(fail_action)
+
+            # In the case where the running command was a setup command - check if there
+            # are any pending *run* commands and, if so, clear them all
+            current_id = self._state_store.commands.state.queued_command_ids.head(None)
+            if current_id is not None:
+                fail_action = FailCommandAction(
+                    command_id=current_id,
+                    error_id=self._model_utils.generate_id(),
+                    failed_at=self._model_utils.get_timestamp(),
+                    error=EStopActivatedError(message="Estop Activated"),
+                )
+                self._action_dispatcher.dispatch(fail_action)
+            self._queue_worker.cancel()
+        elif maintenance_run:
+            stop_action = self._state_store.commands.validate_action_allowed(
+                StopAction(from_estop=True)
+            )
+            self._action_dispatcher.dispatch(stop_action)
+            hardware_stop_action = HardwareStoppedAction(
+                completed_at=self._model_utils.get_timestamp(),
+                finish_error_details=FinishErrorDetails(
+                    error=EStopActivatedError(message="Estop Activated"),
+                    error_id=self._model_utils.generate_id(),
+                    created_at=self._model_utils.get_timestamp(),
+                ),
+            )
+            self._action_dispatcher.dispatch(hardware_stop_action)
+            self._queue_worker.cancel()
+        else:
+            _log.info("estop pressed before protocol was started, taking no action.")
+
     async def stop(self) -> None:
         """Stop execution immediately, halting all motion and cancelling future commands.
 
@@ -267,13 +326,13 @@ class ProtocolEngine:
             set_run_status: Whether to calculate a `success` or `failure` run status.
                 If `False`, will set status to `stopped`.
         """
+        if self._state_store.commands.state.stopped_by_estop:
+            drop_tips_and_home = False
+            if error is None:
+                error = EStopActivatedError(message="Estop was activated during a run")
         if error:
-            if (
-                isinstance(error, ProtocolCommandFailedError)
-                and error.original_error is not None
-                and self._code_in_exception_stack(
-                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
-                )
+            if isinstance(error, EnumeratedError) and self._code_in_exception_stack(
+                error=error, code=ErrorCodes.E_STOP_ACTIVATED
             ):
                 drop_tips_and_home = False
 
@@ -417,14 +476,34 @@ class ProtocolEngine:
 
     # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
     @staticmethod
-    def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
+    def _code_in_exception_stack(
+        error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
+    ) -> bool:
+        if isinstance(error, ErrorOccurrence):
+            # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
+            # code by a string value.
+            if error.errorCode == code.value.code:
+                return True
+            return any(
+                ProtocolEngine._code_in_exception_stack(wrapped, code)
+                for wrapped in error.wrappedErrors
+            )
+
+        # From here we have an exception, can just check the code + recurse to wrapped errors.
+        if error.code == code:
+            return True
+
         if (
             isinstance(error, ProtocolCommandFailedError)
             and error.original_error is not None
         ):
-            return any(
-                code.value.code == wrapped_error.errorCode
-                for wrapped_error in error.original_error.wrappedErrors
-            )
-        else:
-            return any(code == wrapped_error.code for wrapped_error in error.wrapping)
+            # For this specific EnumeratedError child, we recurse on the original_error field
+            # in favor of the general error.wrapping field.
+            return ProtocolEngine._code_in_exception_stack(error.original_error, code)
+
+        if len(error.wrapping) == 0:
+            return False
+        return any(
+            ProtocolEngine._code_in_exception_stack(wrapped_error, code)
+            for wrapped_error in error.wrapping
+        )

@@ -88,24 +88,29 @@ test-cov:
 
 .PHONY: test-photometric
 test-photometric:
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 5
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 5
+	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
+	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --extra --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank
 
 .PHONY: test-gravimetric-multi
 test-gravimetric-multi:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1 --extra --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1 --no-blank
+
+.PHONY: test-gravimetric-96
+test-gravimetric-96:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 1 --no-blank
 
 .PHONY: test-gravimetric
 test-gravimetric:
@@ -121,6 +126,10 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.gripper_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.ninety_six_assembly_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.stress_test_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.firmware_check --simulate
+	$(python) -m hardware_testing.production_qc.belt_calibration_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.z_stage_qc_ot3 --simulate
 
 .PHONY: test-examples
 test-examples:
@@ -302,4 +311,3 @@ setup-usb-module: sdist Pipfile.lock
 
 	# Lets extract the usb package to the usb device if given
 	$(if $(usb_dir), tar -xvf $(usb_file) -C $(usb_dir))
-

@@ -61,9 +61,9 @@ interface RunProgressMeterProps {
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, robotName, makeHandleJumpToStep, resumeRunHandler } = props
   const [
-    showInterventionModal,
-    setShowInterventionModal,
-  ] = React.useState<boolean>(false)
+    interventionModalCommandKey,
+    setInterventionModalCommandKey,
+  ] = React.useState<string | null>(null)
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -157,17 +157,22 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     )
   }
 
-  if (
-    lastRunCommand != null &&
-    isInterventionCommand(lastRunCommand) &&
-    !showInterventionModal
-  ) {
-    // this setTimeout is a hacky way to make sure the modal closes when we tell it to
-    // we can run into issues when there are 2 back to back move labware commands
-    // the modal never really un-renders and so the animations break after the first modal
-    // not really a fan of this, but haven't been able to fix the problem any other way
-    setTimeout(() => setShowInterventionModal(true), 0)
-  }
+  React.useEffect(() => {
+    if (
+      lastRunCommand != null &&
+      interventionModalCommandKey != null &&
+      lastRunCommand.key !== interventionModalCommandKey
+    ) {
+      // set intervention modal command key to null if different from current command key
+      setInterventionModalCommandKey(null)
+    } else if (
+      lastRunCommand?.key != null &&
+      isInterventionCommand(lastRunCommand) &&
+      interventionModalCommandKey === null
+    ) {
+      setInterventionModalCommandKey(lastRunCommand.key)
+    }
+  }, [lastRunCommand, interventionModalCommandKey])
 
   const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
     if (downloadIsDisabled) return false
@@ -178,7 +183,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   return (
     <>
-      {showInterventionModal &&
+      {interventionModalCommandKey != null &&
       lastRunCommand != null &&
       isInterventionCommand(lastRunCommand) &&
       analysisCommands != null &&
@@ -189,10 +194,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           <InterventionModal
             robotName={robotName}
             command={lastRunCommand}
-            onResume={() => {
-              setShowInterventionModal(false)
-              resumeRunHandler()
-            }}
+            onResume={resumeRunHandler}
             run={runData}
             analysis={analysis}
           />
