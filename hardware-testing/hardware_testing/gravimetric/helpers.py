@@ -153,8 +153,9 @@ def _sense_liquid_height(
     lps = config._get_liquid_probe_settings(cfg, well)
     print(f"lps settings {lps}")
     height = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
-    print(f"well top {well.top()} height {height}")
-    return height
+    depth = well.depth - height
+    print(f"well top {well.top().point} height {height} depth {depth}")
+    return depth
 
 
 def _calculate_average(volume_list: List[float]) -> float:
