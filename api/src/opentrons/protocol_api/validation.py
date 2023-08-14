@@ -125,10 +125,12 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from e
 
 
-def ensure_deck_slot(
-    deck_slot: Union[int, str], api_version: APIVersion
+def ensure_and_convert_deck_slot(
+    deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
 ) -> DeckSlotName:
     """Ensure that a primitive value matches a named deck slot.
+
+    Also, convert the deck slot to match the given `robot_type`.
 
     Params:
         deck_slot: The primitive value to validate. Valid values are like `5`, `"5"`, or `"C2"`.
@@ -139,6 +141,10 @@ def ensure_deck_slot(
         TypeError: If you provide something that's not an `int` or `str`.
         ValueError: If the value does not match a known deck slot.
         APIVersionError: If you provide a value like `"C2"`, but `api_version` is too old.
+
+    Returns:
+        A `DeckSlotName` appropriate for the given `robot_type`. For example, given `"5"`,
+        this will return `DeckSlotName.SLOT_C2` on a Flex.
     """
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
@@ -157,7 +163,7 @@ def ensure_deck_slot(
             f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
         )
 
-    return parsed_slot
+    return parsed_slot.to_equivalent_for_robot_type(robot_type)
 
 
 def internal_slot_to_public_string(

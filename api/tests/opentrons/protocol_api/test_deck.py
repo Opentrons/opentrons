@@ -81,9 +81,10 @@ def test_get_empty_slot(
     subject: Deck,
 ) -> None:
     """It should return None for slots if empty."""
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
     decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(None)
 
     assert subject[42] is None
@@ -96,12 +97,13 @@ def test_get_slot_invalid_key(
     subject: Deck,
 ) -> None:
     """It should map a ValueError from validation to a KeyError."""
-    decoy.when(mock_validation.ensure_deck_slot(1, api_version)).then_raise(
-        TypeError("uh oh")
-    )
-    decoy.when(mock_validation.ensure_deck_slot(2, api_version)).then_raise(
-        ValueError("oh no")
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(1, api_version, "OT-3 Standard")
+    ).then_raise(TypeError("uh oh"))
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(2, api_version, "OT-3 Standard")
+    ).then_raise(ValueError("oh no"))
 
     with pytest.raises(KeyError, match="1"):
         subject[1]
@@ -121,9 +123,10 @@ def test_get_slot_item(
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_labware = decoy.mock(cls=Labware)
 
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
     decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(
         mock_labware_core
     )
@@ -177,9 +180,10 @@ def test_get_slots(
     subject: Deck,
 ) -> None:
     """It should provide slot definitions."""
-    decoy.when(mock_validation.ensure_deck_slot(222, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
     decoy.when(mock_protocol_core.robot_type).then_return("OT-2 Standard")
     decoy.when(
         mock_validation.internal_slot_to_public_string(
@@ -216,9 +220,10 @@ def test_get_position_for(
     subject: Deck,
 ) -> None:
     """It should return a `Location` for a deck slot."""
-    decoy.when(mock_validation.ensure_deck_slot(333, api_version)).then_return(
-        DeckSlotName.SLOT_3
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(333, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_3)
     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
         mock_validation.internal_slot_to_public_string(
@@ -254,17 +259,19 @@ def test_right_of_and_left_of(
     left_labware = decoy.mock(cls=Labware)
     right_labware = decoy.mock(cls=Labware)
 
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+
     decoy.when(mock_adjacent_slots.get_east_slot(4)).then_return(111)
     decoy.when(mock_adjacent_slots.get_west_slot(4)).then_return(999)
-    decoy.when(mock_validation.ensure_deck_slot(444, api_version)).then_return(
-        DeckSlotName.SLOT_4
-    )
-    decoy.when(mock_validation.ensure_deck_slot(111, api_version)).then_return(
-        DeckSlotName.SLOT_1
-    )
-    decoy.when(mock_validation.ensure_deck_slot(999, api_version)).then_return(
-        DeckSlotName.SLOT_9
-    )
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(444, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_4)
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(111, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_1)
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(999, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_9)
 
     decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_1)).then_return(
         right_labware_core
@@ -321,9 +328,10 @@ def test_get_slot_center(
     subject: Deck,
 ) -> None:
     """It should get the geometric center of a slot."""
-    decoy.when(mock_validation.ensure_deck_slot(222, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
     decoy.when(mock_protocol_core.get_slot_center(DeckSlotName.SLOT_2)).then_return(
         Point(1, 2, 3)
     )
