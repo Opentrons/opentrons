@@ -483,4 +483,6 @@ def test_ensures_config() -> None:
         "disableStallDetection": None,
         "disableStatusBar": None,
         "estopNotRequired": None,
+        "disableTipPresenceDetection": None,
+        "disableOverpressureDetection": None,
     }
