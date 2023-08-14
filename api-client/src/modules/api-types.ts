@@ -1,6 +1,6 @@
 import { ModuleType } from '@opentrons/shared-data'
 
-import type { ModuleModel } from '@opentrons/shared-data'
+import type { Coordinates, ModuleModel } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {
@@ -8,6 +8,21 @@ interface PhysicalPort {
   port: number
   hub: boolean
   portGroup: PortGroup
+}
+
+type ModuleOffsetSource =
+  | 'default'
+  | 'factory'
+  | 'user'
+  | 'calibration_check'
+  | 'legacy'
+  | 'unknown'
+
+interface ModuleOffset {
+  offset: Coordinates
+  slot?: string
+  source?: ModuleOffsetSource
+  last_modified?: string
 }
 
 export interface ApiBaseModule {
@@ -19,6 +34,7 @@ export interface ApiBaseModule {
   firmwareVersion: string
   hasAvailableUpdate: boolean
   usbPort: PhysicalPort
+  moduleOffset?: ModuleOffset
 }
 
 export interface TemperatureData {

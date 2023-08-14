@@ -12,6 +12,7 @@ import instruments_dashboard from './instruments_dashboard.json'
 import labware_details from './labware_details.json'
 import labware_landing from './labware_landing.json'
 import labware_position_check from './labware_position_check.json'
+import module_wizard_flows from './module_wizard_flows.json'
 import more_network_and_system from './more_network_and_system.json'
 import more_panel from './more_panel.json'
 import pipette_wizard_flows from './pipette_wizard_flows.json'
@@ -43,6 +44,7 @@ export const en = {
   labware_details,
   labware_landing,
   labware_position_check,
+  module_wizard_flows,
   more_network_and_system,
   more_panel,
   pipette_wizard_flows,
