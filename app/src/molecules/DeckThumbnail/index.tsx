@@ -55,9 +55,13 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const robotType = getRobotTypeFromLoadedLabware(labware)
   const deckDef = getDeckDefFromRobotType(robotType)
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
-  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(commands)
+  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
+    commands
+  )
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
-  const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(commands)
+  const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
+    commands
+  )
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
     liquids != null ? liquids : [],
     commands
@@ -95,19 +99,16 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
 
             // all things that can be in slots have been accounted for
 
-
-
             const labwareInModule = // only labware loaded directly onto mods (include adapters)
               moduleInSlot?.result?.moduleId != null &&
-                moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
+              moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
                 ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
                 : null
 
-
-
             // could be a labware or adapter directly on deck
-            let labwareId = labwareInSlot != null ? labwareInSlot.result?.labwareId : null
-
+            let labwareId =
+              labwareInSlot != null ? labwareInSlot.result?.labwareId : null
+            let labwareInAdapterInMod = null
             let labwareInAdapter = null
             if (
               labwareInModule?.result != null &&
@@ -117,15 +118,27 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               labwareInAdapter =
                 initialLoadedLabwareByAdapter[labwareInModule?.result.labwareId]
               labwareId = labwareInAdapter.result?.labwareId
+            } else {
+              labwareInAdapterInMod =
+                labwareInModule?.result != null
+                  ? initialLoadedLabwareByModuleId[
+                      labwareInModule?.result.labwareId
+                    ]
+                  : null
+              labwareId =
+                labwareInAdapterInMod != null
+                  ? labwareInAdapterInMod.result?.labwareId
+                  : null
             }
             const wellFill =
               labwareId != null && liquids != null
                 ? getWellFillFromLabwareId(
-                  labwareId,
-                  liquidsInLoadOrder,
-                  labwareByLiquidId
-                )
+                    labwareId,
+                    liquidsInLoadOrder,
+                    labwareByLiquidId
+                  )
                 : null
+
             return (
               <React.Fragment key={slotId}>
                 {moduleInSlot != null ? (
@@ -144,7 +157,11 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   >
                     {labwareInModule?.result?.definition != null ? (
                       <LabwareRender
-                        definition={labwareInModule?.result?.definition}
+                        definition={
+                          labwareInAdapter?.result != null
+                            ? labwareInAdapter?.result?.definition
+                            : labwareInModule?.result?.definition
+                        }
                         wellFill={wellFill ?? undefined}
                       />
                     ) : null}
