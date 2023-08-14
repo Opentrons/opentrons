@@ -170,7 +170,7 @@ def test_ensure_lowercase_name_invalid() -> None:
                 allowedRoles=[LabwareRole.adapter],
                 parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
-            pytest.raises(subject.LabwareNotLabwareError),
+            pytest.raises(subject.LabwareDefinitionIsNotLabwareError),
         ),
     ],
 )
@@ -197,14 +197,14 @@ def test_ensure_definition_is_labware(
                 allowedRoles=[],
                 parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
-            pytest.raises(subject.LabwareNotAdapterError),
+            pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),
         (
             LabwareDefinition.construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.labware],
                 parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
-            pytest.raises(subject.LabwareNotAdapterError),
+            pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),
     ],
 )

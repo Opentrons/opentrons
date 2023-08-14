@@ -61,11 +61,11 @@ class PipetteMountTypeError(TypeError):
     """An error raised when an invalid mount type is used for loading pipettes."""
 
 
-class LabwareNotAdapterError(ValueError):
+class LabwareDefinitionIsNotAdapterError(ValueError):
     """An error raised when an adapter is attempted to be loaded as a labware."""
 
 
-class LabwareNotLabwareError(ValueError):
+class LabwareDefinitionIsNotLabwareError(ValueError):
     """An error raised when a labware is not loaded using `load_labware`."""
 
 
@@ -175,7 +175,7 @@ def ensure_lowercase_name(name: str) -> str:
 def ensure_definition_is_adapter(definition: LabwareDefinition) -> None:
     """Ensure that one of the definition's allowed roles is `adapter`."""
     if LabwareRole.adapter not in definition.allowedRoles:
-        raise LabwareNotAdapterError(
+        raise LabwareDefinitionIsNotAdapterError(
             f"Labware {definition.parameters.loadName} does not defined as an adapter."
         )
 
@@ -183,7 +183,7 @@ def ensure_definition_is_adapter(definition: LabwareDefinition) -> None:
 def ensure_definition_is_labware(definition: LabwareDefinition) -> None:
     """Ensure that one of the definition's allowed roles is `labware` or that that field is empty."""
     if definition.allowedRoles and LabwareRole.labware not in definition.allowedRoles:
-        raise LabwareNotLabwareError(
+        raise LabwareDefinitionIsNotLabwareError(
             f"Labware {definition.parameters.loadName} is not defined as a labware."
         )
 
