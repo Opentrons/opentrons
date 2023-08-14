@@ -101,7 +101,7 @@ class LoadLabwareImplementation(
             and self._state_view.geometry.get_slot_column(params.location.slotName) != 3
         ):
             raise LabwareIsNotAllowedInLocationError(
-                f"{params.loadName} is not allowed in slot {params.location}"
+                f"{params.loadName} is not allowed in slot {params.location.slotName}"
             )
 
         loaded_labware = await self._equipment.load_labware(
