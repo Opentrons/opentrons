@@ -42,7 +42,7 @@ The code samples also use the labware listed below:
 Basic Transfer
 ==============
 
-This example uses the :py:meth:`.ProtocolContext.load_labware` method to move 100 µL of liquid from one well to another.
+This example uses the :py:meth:`.InstrumentContext.transfer` method to move 100 µL of liquid from one well to another.
 
 .. tabs::
 
@@ -53,11 +53,52 @@ This example uses the :py:meth:`.ProtocolContext.load_labware` method to move 10
 
             from opentrons import protocol_api
 
-            some code here.
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location="D1")
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="D2")
+                pipette_1 = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000',
+                    mount='left',
+                    tip_racks=[tiprack_1])
+                # transfer 100 µL from well A1 to well B1
+                pipette_1.transfer(100, plate['A1'], plate['B1'])
+
+        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid around a well plate.
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location="D1")
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="D2")
+                pipette_1 = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000',
+                    mount='left',
+                tip_racks=[tiprack_1])
+
+                pipette_1.pick_up_tip()
+                pipette_1.aspirate(100, plate['A1'])
+                pipette_1.dispense(100, plate['B1'])
+                pipette_1.drop_tip()
     
     .. tab:: OT-2
 
         .. code-block:: python
+            :substitutions:
 
             from opentrons import protocol_api
 
@@ -74,12 +115,12 @@ This example uses the :py:meth:`.ProtocolContext.load_labware` method to move 10
                     instrument_name='p300_single',
                     mount='left',
                     tip_racks=[tiprack_1])
-                # transfer 100 from well A1 to well B1
+                # transfer 100 µL from well A1 to well B1
                 p300.transfer(volume=100, plate['A1'], plate['B1'])
     
-        The code above accomplishes the same thing as the following basic commands:
-
-        ..code-block:: python
+        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid around a well plate.
+        
+        .. code-block:: python
             :substitutions:
 
             from opentrons import protocol_api
@@ -87,9 +128,16 @@ This example uses the :py:meth:`.ProtocolContext.load_labware` method to move 10
             metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
-                plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-                tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-                p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=1)
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=2)
+                p300 = protocol.load_instrument(
+                    instrument_name='p300_single',
+                    mount='left',
+                    tip_racks=[tiprack_1])
 
                 p300.pick_up_tip()
                 p300.aspirate(100, plate['A1'])
