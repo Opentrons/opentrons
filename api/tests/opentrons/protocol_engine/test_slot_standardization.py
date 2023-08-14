@@ -12,7 +12,6 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     OnLabwareLocation,
     LabwareLocation,
-    NonStackedLocation,
     LabwareMovementStrategy,
     LabwareOffsetCreate,
     LabwareOffsetLocation,
@@ -129,74 +128,6 @@ def test_standardize_load_labware_command(
             version=123,
             labwareId="labwareId",
             displayName="displayName",
-        ),
-    )
-    assert subject.standardize_command(original, robot_type) == expected
-
-
-@pytest.mark.parametrize(
-    ("original_location", "robot_type", "expected_location"),
-    [
-        # DeckSlotLocations should have their slotName standardized.
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            "OT-2 Standard",
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-        ),
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            "OT-3 Standard",
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
-        ),
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
-            "OT-2 Standard",
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-        ),
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
-            "OT-3 Standard",
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
-        ),
-        # ModuleLocations and OFF_DECK_LOCATIONs should be left alone.
-        (
-            ModuleLocation(moduleId="module-id"),
-            "OT-3 Standard",
-            ModuleLocation(moduleId="module-id"),
-        ),
-        (
-            OFF_DECK_LOCATION,
-            "OT-3 Standard",
-            OFF_DECK_LOCATION,
-        ),
-    ],
-)
-def test_standardize_load_adapter_command(
-    original_location: NonStackedLocation,
-    robot_type: RobotType,
-    expected_location: NonStackedLocation,
-) -> None:
-    """It should convert deck slots in `LoadAdapterCreate`s."""
-    original = commands.LoadAdapterCreate(
-        intent=CommandIntent.SETUP,
-        key="key",
-        params=commands.LoadAdapterParams(
-            location=original_location,
-            loadName="loadName",
-            namespace="namespace",
-            version=123,
-            adapterId="labwareId",
-        ),
-    )
-    expected = commands.LoadAdapterCreate(
-        intent=CommandIntent.SETUP,
-        key="key",
-        params=commands.LoadAdapterParams(
-            location=expected_location,
-            loadName="loadName",
-            namespace="namespace",
-            version=123,
-            adapterId="labwareId",
         ),
     )
     assert subject.standardize_command(original, robot_type) == expected

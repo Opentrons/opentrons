@@ -479,7 +479,7 @@ def test_load_adapter(
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
 ) -> None:
-    """It should issue a LoadAdapter command."""
+    """It should issue a LoadLabware command for an adapter."""
     decoy.when(
         mock_engine_client.state.labware.find_custom_labware_load_params()
     ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
@@ -494,15 +494,15 @@ def test_load_adapter(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_adapter(
+        mock_engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_adapter",
             namespace="some_namespace",
             version=9001,
         )
     ).then_return(
-        commands.LoadAdapterResult(
-            adapterId="abc123",
+        commands.LoadLabwareResult(
+            labwareId="abc123",
             definition=LabwareDefinition.construct(),  # type: ignore[call-arg]
             offsetId=None,
         )

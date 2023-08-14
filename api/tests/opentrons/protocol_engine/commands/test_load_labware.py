@@ -6,7 +6,6 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.errors import LabwareDefinitionIsNotLabwareError
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     OnLabwareLocation,
@@ -75,47 +74,6 @@ async def test_load_labware_implementation(
         definition=well_plate_def,
         offsetId="labware-offset-id",
     )
-
-
-async def test_load_labware_raises_not_labware(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    equipment: EquipmentHandler,
-    state_view: StateView,
-) -> None:
-    """A LoadLabware command should raise if the definition is not validated as a labware."""
-    subject = LoadLabwareImplementation(equipment=equipment, state_view=state_view)
-
-    data = LoadLabwareParams(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        loadName="some-load-name",
-        namespace="opentrons-test",
-        version=1,
-        displayName="My custom display name",
-    )
-
-    decoy.when(
-        await equipment.load_labware(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            load_name="some-load-name",
-            namespace="opentrons-test",
-            version=1,
-            labware_id=None,
-        )
-    ).then_return(
-        LoadedLabwareData(
-            labware_id="labware-id",
-            definition=well_plate_def,
-            offsetId="labware-offset-id",
-        )
-    )
-
-    decoy.when(
-        labware_validation.validate_definition_is_labware(well_plate_def)
-    ).then_return(False)
-
-    with pytest.raises(LabwareDefinitionIsNotLabwareError):
-        await subject.execute(data)
 
 
 async def test_load_labware_on_labware(
