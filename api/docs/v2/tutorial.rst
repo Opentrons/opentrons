@@ -100,6 +100,8 @@ You can include any other information you like in the metadata dictionary. The f
 
 Note, if you have a Flex, or are using an OT-2 with API v2.15 (or higher), we recommend adding a ``requirements`` section to your code. See the Requirements section below.
 
+.. _tutorial-requirements:
+
 Requirements
 ^^^^^^^^^^^^
 

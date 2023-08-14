@@ -11,7 +11,7 @@ The Python Protocol API has its own versioning system, which is separate from th
 Major and Minor Versions
 ========================
 
-The API uses a major and minor version number and does not use patch version numbers. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers, so ``2.10`` indicates major version 2 and minor version 10, which is 9 minor versions newer than ``2.1``. The Python Protocol API version will only increase based on changes that affect protocol behavior.
+The API uses a major and minor version number and does not use patch version numbers. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers, so ``2.10`` indicates major version 2 and minor version 10. The Python Protocol API version will only increase based on changes that affect protocol behavior.
 
 The major version of the API increases whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because it required protocols to have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. Protocols written with major version 1 of the API will not run without modification in major version 2. A similar level of structural change would require a major version 3. This documentation only deals with features found in major version 2 of the API; see the `archived version 1 documentation <https://docs.opentrons.com/v1/index.html>`_ for information on older protocols.
 
@@ -132,7 +132,7 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
 
 - Flex features
 
-  - Write protocols for Opentrons Flex by declaring ``"robotType": "Flex"`` in the new ``requirements`` dictionary.
+  - Write protocols for Opentrons Flex by declaring ``"robotType": "Flex"`` in the new ``requirements`` dictionary. See the :ref:`examples in the Tutorial <tutorial-requirements>`.
   
   - :py:meth:`.load_instrument` supports loading Flex 1-, 8-, and 96-channel pipettes. See :ref:`new-create-pipette`.
   
