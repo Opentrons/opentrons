@@ -6,13 +6,44 @@
 Examples
 ########
 
-All examples on this page use a ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) in slot 1, and two ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_) in slots 2 and 3. They also require a P300 Single attached to the right mount. Some examples also use a ``'usascientific_12_reservoir_22ml'`` (`a USA Scientific 12-row reservoir <https://labware.opentrons.com/usascientific_12_reservoir_22ml>`_) in slot 4.
+Some Intro Here
+===============
 
-******************************
 
-**************
+
+Instruments and Labware
+=======================
+
+Before getting started, you'll want to have the right instruments and labware ready for your robot. 
+
+Pipettes used in the code samples vary by robot model but both are attached to the right mount. 
+
+* Flex code samples use the Flex 1-Channel Pipette (5-1000 µL). The API load name for this pipette is ``flex_1channel_1000``.
+* OT-2 code samples use the P300 Single-Channel GEN2 pipette (20-300 µL). The API load name for this pipette is ``p300_single_gen2``.
+
+The following table lists the labware used in the examples. 
+
+.. list-table::
+    :header-rows: 1
+
+    * - Labware type
+      - Labware name
+      - API load name
+    * - Reservoir
+      - USA Scientific 12-Well Reservoir 22 mL
+      - ``usascientific_12_reservoir_22ml``
+    * - Well plate
+      - Corning 96-Well Plate 360 µL Flat
+      - ``corning_96_wellplate_360ul_flat``
+    * - Flex tip rack
+      - Opentrons Flex 96 Tip Rack 200 µL
+      - ``opentrons_flex_96_tiprack_200ul``
+    * - OT-2 tip rack
+      - Opentrons 96 Tip Rack 300 µL
+      - ``opentrons_96_tiprack_300ul``
+
 Basic Transfer
-**************
+==============
 
 Moving 100 µL from one well to another:
 
