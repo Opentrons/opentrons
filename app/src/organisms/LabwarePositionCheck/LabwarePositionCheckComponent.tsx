@@ -20,7 +20,9 @@ import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice, useFeatureFlag } from '../../redux/config'
+import { AttachProbe } from './AttachProbe'
+import { DetachProbe } from './DetachProbe'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
@@ -32,6 +34,7 @@ import type { LabwareOffset } from '@opentrons/api-client'
 import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
+import { getGoldenCheckSteps } from './utils/getGoldenCheckSteps'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -137,6 +140,7 @@ export const LabwarePositionCheckComponent = (
     isCommandMutationLoading: isCommandChainLoading,
   } = useChainMaintenanceCommands(maintenanceRunId)
 
+  const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
@@ -176,7 +180,9 @@ export const LabwarePositionCheckComponent = (
     )
   }
   if (protocolData == null) return null
-  const LPCSteps = getLabwarePositionCheckSteps(protocolData)
+  const LPCSteps = goldenLPC
+    ? getGoldenCheckSteps(protocolData)
+    : getLabwarePositionCheckSteps(protocolData)
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
@@ -251,10 +257,15 @@ export const LabwarePositionCheckComponent = (
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
     modalContent = <IntroScreen {...movementStepProps} />
   } else if (
+    currentStep.section === 'CHECK_POSITIONS' ||
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
     modalContent = <CheckItem {...currentStep} {...movementStepProps} />
+  } else if (currentStep.section === 'ATTACH_PROBE') {
+    modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
+  } else if (currentStep.section === 'DETACH_PROBE') {
+    modalContent = <DetachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'RETURN_TIP') {
