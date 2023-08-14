@@ -14,8 +14,8 @@ import { robotControlsReducer } from './robot-controls/reducer'
 // robot settings state
 import { robotSettingsReducer } from './robot-settings/reducer'
 
-// robot buildroot update state
-import { buildrootReducer } from './buildroot/reducer'
+// robot robot update state
+import { robotUpdateReducer } from './robot-update/reducer'
 
 // pipettes state
 import { pipettesReducer } from './pipettes/reducer'
@@ -63,7 +63,7 @@ export const rootReducer: Reducer<State, Action> = combineReducers<
   robotAdmin: robotAdminReducer,
   robotControls: robotControlsReducer,
   robotSettings: robotSettingsReducer,
-  buildroot: buildrootReducer,
+  robotUpdate: robotUpdateReducer,
   pipettes: pipettesReducer,
   networking: networkingReducer,
   config: configReducer,

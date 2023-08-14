@@ -129,6 +129,7 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.stress_test_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.firmware_check --simulate
 	$(python) -m hardware_testing.production_qc.belt_calibration_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.z_stage_qc_ot3 --simulate
 
 .PHONY: test-examples
 test-examples:

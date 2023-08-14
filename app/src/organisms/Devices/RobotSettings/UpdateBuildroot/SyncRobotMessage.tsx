@@ -1,10 +1,10 @@
 import * as React from 'react'
 import styles from './styles.css'
-import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../redux/buildroot'
-import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
+import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../redux/robot-update'
+import type { RobotUpdateType } from '../../../../redux/robot-update/types'
 
 export interface SyncRobotMessageProps {
-  updateType: BuildrootUpdateType
+  updateType: RobotUpdateType
   version: string
 }
 

@@ -32,6 +32,8 @@ electron := yarn electron . \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
 
+OPENTRONS_PROJECT ?= robot-stack
+
 # standard targets
 #####################################################################
 
@@ -54,18 +56,18 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	OPENTRONS_PROJECT=ot3 webpack --profile
+	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) webpack --profile
 
 .PHONY: deps
 deps:
-	$(MAKE) -C $(ui_dir) OPENTRONS_PROJECT=ot3
+	$(MAKE) -C $(ui_dir) OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
 
 .PHONY: package-deps
 package-deps: clean lib deps
 
 .PHONY: dist-ot3
 dist-ot3: package-deps
-	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds OPENTRONS_PROJECT=ot3 $(builder) --linux --arm64
+	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) $(builder) --linux --arm64
 
 .PHONY: push-ot3
 push-ot3: dist-ot3

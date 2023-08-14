@@ -159,8 +159,17 @@ _dist-collect-artifacts:
 # development
 #####################################################################
 
+.PHONY: clean-dev-autoupdate
+clean-dev-autoupdate:
+	rm -f ./dev-app-update.yml
+
+dev-app-update.yml:
+	cp ./dev-app-update-$(OPENTRONS_PROJECT).yml ./dev-app-update.yml
+
+
 .PHONY: dev
 dev: export NODE_ENV := development
-dev:
+dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
+dev: clean-dev-autoupdate ./dev-app-update.yml
 	webpack
 	$(electron)

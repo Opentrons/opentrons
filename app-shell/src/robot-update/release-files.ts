@@ -14,11 +14,11 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 
 const VERSION_FILENAME = 'VERSION.json'
 
-const log = createLogger('buildroot/release-files')
+const log = createLogger('robotUpdate/release-files')
 const outPath = (dir: string, url: string): string =>
   path.join(dir, path.basename(url))
 
-// checks `directory` for buildroot files matching the given `urls`, and
+// checks `directory` for robot update files matching the given `urls`, and
 // download them if they can't be found
 export function getReleaseFiles(
   urls: ReleaseSetUrls,
@@ -31,7 +31,7 @@ export function getReleaseFiles(
       return []
     })
     .then((files: string[]) => {
-      log.debug('Files in buildroot download directory', { files })
+      log.debug('Files in robot update download directory', { files })
       const system = outPath(directory, urls.system)
       const releaseNotes = outPath(directory, urls.releaseNotes)
 
@@ -61,7 +61,7 @@ export function downloadReleaseFiles(
   const tempSystemPath = outPath(tempDir, urls.system)
   const tempNotesPath = outPath(tempDir, urls.releaseNotes)
 
-  log.debug('directory created for BR downloads', { tempDir })
+  log.debug('directory created for robot update downloads', { tempDir })
 
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously
@@ -82,7 +82,7 @@ export function downloadReleaseFiles(
   })
 }
 
-export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
+export function readUpdateFileInfo(systemFile: string): Promise<UserFileInfo> {
   const openZip = new Promise<StreamZip>((resolve, reject) => {
     const zip = new StreamZip({ file: systemFile, storeEntries: true })
       .once('ready', handleReady)

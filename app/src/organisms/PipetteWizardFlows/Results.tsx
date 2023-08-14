@@ -9,6 +9,7 @@ import {
   SPACING,
   PrimaryButton,
   SecondaryButton,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
   getPipetteNameSpecs,
@@ -206,6 +207,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       {buttonText}
     </PrimaryButton>
   )
+
   if (
     flowType === FLOWS.ATTACH &&
     requiredPipette != null &&
@@ -287,6 +289,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
       subHeader={subHeader}
       isPending={isFetching}
       width="100%"
+      justifyContentForOddButton={
+        isOnDevice && isSuccess ? ALIGN_FLEX_END : undefined
+      }
     >
       {button}
     </SimpleWizardBody>

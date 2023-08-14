@@ -70,8 +70,17 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 4
+          totalLength: 5
         data:
+          # Initial home
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadLabware

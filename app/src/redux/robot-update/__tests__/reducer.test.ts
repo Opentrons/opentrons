@@ -1,11 +1,11 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
-import { INITIAL_STATE, buildrootReducer } from '../reducer'
+import { INITIAL_STATE, robotUpdateReducer } from '../reducer'
 import type { Action } from '../../types'
-import type { BuildrootState } from '../types'
+import type { RobotUpdateState } from '../types'
 
 const BASE_SESSION = {
   robotName: mockRobot.name,
-  userFileInfo: null,
+  fileInfo: null,
   step: null,
   token: null,
   pathPrefix: null,
@@ -14,28 +14,63 @@ const BASE_SESSION = {
   error: null,
 }
 
-describe('buildroot reducer', () => {
+describe('robot update reducer', () => {
   const SPECS = [
     {
-      name: 'handles buildroot:UPDATE_INFO',
+      name: 'handles robotUpdate:UPDATE_INFO for flex',
       action: {
-        type: 'buildroot:UPDATE_INFO',
-        payload: { version: '1.0.0', releaseNotes: 'release notes' },
+        type: 'robotUpdate:UPDATE_INFO',
+        payload: {
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+          target: 'flex',
+        },
       },
-      initialState: { ...INITIAL_STATE, info: null },
+      initialState: {
+        ...INITIAL_STATE,
+        ...{
+          flex: { ...INITIAL_STATE.flex, releaseNotes: null, version: null },
+        },
+      },
       expected: {
         ...INITIAL_STATE,
-        info: { version: '1.0.0', releaseNotes: 'release notes' },
+        flex: {
+          ...INITIAL_STATE.flex,
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+        },
       },
     },
     {
-      name: 'handles buildroot:USER_FILE_INFO',
+      name: 'handles robotUpdate:UPDATE_INFO for ot2',
       action: {
-        type: 'buildroot:USER_FILE_INFO',
+        type: 'robotUpdate:UPDATE_INFO',
+        payload: {
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+          target: 'ot2',
+        },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        ...{ ot2: { ...INITIAL_STATE.ot2, releaseNotes: null, version: null } },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        ot2: {
+          ...INITIAL_STATE.ot2,
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+        },
+      },
+    },
+    {
+      name: 'handles robotUpdate:FILE_INFO',
+      action: {
+        type: 'robotUpdate:FILE_INFO',
         payload: {
           systemFile: '/path/to/system.zip',
           version: '1.0.0',
-          releaseNotes: 'release notes',
         },
       },
       initialState: {
@@ -46,45 +81,98 @@ describe('buildroot reducer', () => {
         ...INITIAL_STATE,
         session: {
           robotName: mockRobot.name,
-          userFileInfo: {
+          fileInfo: {
             systemFile: '/path/to/system.zip',
             version: '1.0.0',
-            releaseNotes: 'release notes',
           },
         },
       },
     },
     {
-      name: 'handles buildroot:SET_UPDATE_SEEN',
-      action: { type: 'buildroot:SET_UPDATE_SEEN' },
-      initialState: { ...INITIAL_STATE, seen: false },
-      expected: { ...INITIAL_STATE, seen: true },
-    },
-    {
-      name: 'handles buildroot:DOWNLOAD_PROGRESS',
-      action: { type: 'buildroot:DOWNLOAD_PROGRESS', payload: 42 },
-      initialState: { ...INITIAL_STATE, downloadProgress: null },
-      expected: { ...INITIAL_STATE, downloadProgress: 42 },
-    },
-    {
-      name: 'handles buildroot:DOWNLOAD_ERROR',
-      action: { type: 'buildroot:DOWNLOAD_ERROR', payload: 'AH' },
-      initialState: { ...INITIAL_STATE, downloadError: null },
-      expected: { ...INITIAL_STATE, downloadError: 'AH' },
-    },
-    {
-      name: 'handles buildroot:START_UPDATE',
+      name: 'handles robotUpdate:DOWNLOAD_PROGRESS for flex',
       action: {
-        type: 'buildroot:START_UPDATE',
+        type: 'robotUpdate:DOWNLOAD_PROGRESS',
+        payload: { progress: 42, target: 'flex' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        flex: {
+          ...INITIAL_STATE.flex,
+          downloadProgress: null,
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        flex: {
+          ...INITIAL_STATE.flex,
+          downloadProgress: 42,
+        },
+      },
+    },
+    {
+      name: 'handles robotUpdate:DOWNLOAD_PROGRESS for ot2',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_PROGRESS',
+        payload: { progress: 42, target: 'ot2' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        ot2: {
+          ...INITIAL_STATE.ot2,
+          downloadProgress: null,
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        ot2: {
+          ...INITIAL_STATE.ot2,
+          downloadProgress: 42,
+        },
+      },
+    },
+    {
+      name: 'handles robotUpdate:DOWNLOAD_ERROR for flex',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_ERROR',
+        payload: { error: 'AH', target: 'flex' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: null },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: 'AH' },
+      },
+    },
+    {
+      name: 'handles robotUpdate:DOWNLOAD_ERROR for flex',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_ERROR',
+        payload: { error: 'AH', target: 'flex' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: null },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        flex: { ...INITIAL_STATE.flex, downloadError: 'AH' },
+      },
+    },
+    {
+      name: 'handles robotUpdate:START_UPDATE',
+      action: {
+        type: 'robotUpdate:START_UPDATE',
         payload: { robotName: mockRobot.name },
       },
       initialState: { ...INITIAL_STATE, session: null },
       expected: { ...INITIAL_STATE, session: BASE_SESSION },
     },
     {
-      name: 'buildroot:START_UPDATE preserves user file info',
+      name: 'robotUpdate:START_UPDATE preserves file info',
       action: {
-        type: 'buildroot:START_UPDATE',
+        type: 'robotUpdate:START_UPDATE',
         payload: { robotName: mockRobot.name },
       },
       initialState: {
@@ -92,7 +180,10 @@ describe('buildroot reducer', () => {
         session: {
           ...BASE_SESSION,
           robotName: mockRobot.name,
-          userFileInfo: { systemFile: 'system.zip' },
+          fileInfo: {
+            systemFile: 'system.zip',
+            version: '1.0.0',
+          },
         },
       },
       expected: {
@@ -100,14 +191,17 @@ describe('buildroot reducer', () => {
         session: {
           ...BASE_SESSION,
           robotName: mockRobot.name,
-          userFileInfo: { systemFile: 'system.zip' },
+          fileInfo: {
+            systemFile: 'system.zip',
+            version: '1.0.0',
+          },
         },
       },
     },
     {
-      name: 'handles buildroot:START_PREMIGRATION',
+      name: 'handles robotUpdate:START_PREMIGRATION',
       action: {
-        type: 'buildroot:START_PREMIGRATION',
+        type: 'robotUpdate:START_PREMIGRATION',
         payload: { name: mockRobot.name, ip: '10.10.0.0', port: 31950 },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
@@ -117,8 +211,8 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:PREMIGRATION_DONE',
-      action: { type: 'buildroot:PREMIGRATION_DONE' },
+      name: 'handles robotUpdate:PREMIGRATION_DONE',
+      action: { type: 'robotUpdate:PREMIGRATION_DONE' },
       initialState: {
         ...INITIAL_STATE,
         session: { ...BASE_SESSION, step: 'premigration' },
@@ -129,9 +223,9 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:CREATE_SESSION',
+      name: 'handles robotUpdate:CREATE_SESSION',
       action: {
-        type: 'buildroot:CREATE_SESSION',
+        type: 'robotUpdate:CREATE_SESSION',
         payload: { host: mockRobot, sessionPath: '/session/update/begin' },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
@@ -141,9 +235,9 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:CREATE_SESSION_SUCCESS',
+      name: 'handles robotUpdate:CREATE_SESSION_SUCCESS',
       action: {
-        type: 'buildroot:CREATE_SESSION_SUCCESS',
+        type: 'robotUpdate:CREATE_SESSION_SUCCESS',
         payload: {
           host: mockRobot,
           pathPrefix: '/session/update',
@@ -168,9 +262,9 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:STATUS',
+      name: 'handles robotUpdate:STATUS',
       action: {
-        type: 'buildroot:STATUS',
+        type: 'robotUpdate:STATUS',
         payload: { stage: 'writing', progress: 10, message: 'Writing file' },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
@@ -180,9 +274,9 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:STATUS with error',
+      name: 'handles robotUpdate:STATUS with error',
       action: {
-        type: 'buildroot:STATUS',
+        type: 'robotUpdate:STATUS',
         payload: { stage: 'error', error: 'error-type', message: 'AH!' },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
@@ -192,12 +286,13 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:UPLOAD_FILE',
+      name: 'handles robotUpdate:UPLOAD_FILE',
       action: {
-        type: 'buildroot:UPLOAD_FILE',
+        type: 'robotUpdate:UPLOAD_FILE',
         payload: {
           host: { name: mockRobot.name },
           path: '/server/update/a-token/file',
+          systemFile: '/some/system/file/somewhere',
         },
         meta: { shell: true },
       },
@@ -211,8 +306,8 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:FILE_UPLOAD_DONE',
-      action: { type: 'buildroot:FILE_UPLOAD_DONE' },
+      name: 'handles robotUpdate:FILE_UPLOAD_DONE',
+      action: { type: 'robotUpdate:FILE_UPLOAD_DONE' },
       initialState: {
         ...INITIAL_STATE,
         session: {
@@ -229,15 +324,15 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:CLEAR_SESSION',
-      action: { type: 'buildroot:CLEAR_SESSION' },
+      name: 'handles robotUpdate:CLEAR_SESSION',
+      action: { type: 'robotUpdate:CLEAR_SESSION' },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: { ...INITIAL_STATE, session: null },
     },
     {
-      name: 'handles buildroot:UNEXPECTED_ERROR',
+      name: 'handles robotUpdate:UNEXPECTED_ERROR',
       action: {
-        type: 'buildroot:UNEXPECTED_ERROR',
+        type: 'robotUpdate:UNEXPECTED_ERROR',
         payload: { message: 'AH!' },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
@@ -247,9 +342,9 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles buildroot:PREMIGRATION_ERROR',
+      name: 'handles robotUpdate:PREMIGRATION_ERROR',
       action: {
-        type: 'buildroot:PREMIGRATION_ERROR',
+        type: 'robotUpdate:PREMIGRATION_ERROR',
         payload: { message: 'AH!' },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
@@ -264,7 +359,7 @@ describe('buildroot reducer', () => {
     const { name, action, initialState, expected } = spec
     it(name, () =>
       expect(
-        buildrootReducer(initialState as BuildrootState, action as Action)
+        robotUpdateReducer(initialState as RobotUpdateState, action as Action)
       ).toEqual(expected)
     )
   })
