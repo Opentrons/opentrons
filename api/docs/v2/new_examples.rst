@@ -6,7 +6,7 @@
 Examples
 ########
 
-This page provides you with a few basic, ready-made code samples that work on Flex or OT-2. Try changing a protocol and validating it in the Opentrons app. Adding different instruments, modules, labware, and actions can be an ideal way to grow and test the skills you've learned from the :ref:`tutorial <tutorial>`. The examples also make great basic templates. Copy and modify the code to create unique protocols that help automate your laboratory workflows. 
+This page provides you with a few basic, ready-made code samples that work on a Flex or OT-2. Try changing a protocol and validating it in the Opentrons app. Adding different instruments, modules, labware, and other actions is an ideal way to grow and test the skills you've learned from the :ref:`tutorial <tutorial>`. The examples also make great templates. Copy and modify this code to create unique protocols that help automate your laboratory workflows. 
 
 Instruments and Labware
 =======================
