@@ -1,5 +1,5 @@
 import first from 'lodash/first'
-import { OT3_STANDARD_MODEL } from '@opentrons/shared-data'
+import { FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
 
 type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
@@ -28,7 +28,7 @@ export function getProtocolDisplayName(
 export function getRobotTypeDisplayName(
   robotType: RobotType | null
 ): 'OT-2' | 'Opentrons Flex' {
-  if (robotType === OT3_STANDARD_MODEL) {
+  if (robotType === FLEX_STANDARD_MODEL) {
     return 'Opentrons Flex'
   } else {
     // defaults to OT-2 display name. may want to reconsider for protocols that fail analysis
@@ -39,7 +39,7 @@ export function getRobotTypeDisplayName(
 export function getIsOT3Protocol(
   protocolAnalysis?: ProtocolAnalysisOutput | null
 ): boolean {
-  if (protocolAnalysis?.robotType === OT3_STANDARD_MODEL) {
+  if (protocolAnalysis?.robotType === FLEX_STANDARD_MODEL) {
     return true
   } else {
     return false

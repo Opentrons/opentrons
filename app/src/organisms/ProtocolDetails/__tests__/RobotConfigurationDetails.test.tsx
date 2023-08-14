@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
-import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
+import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
@@ -102,7 +102,7 @@ describe('RobotConfigurationDetails', () => {
       requiredModuleDetails: null,
       extensionInstrumentName: null,
       isLoading: false,
-      robotType: OT3_STANDARD_MODEL,
+      robotType: FLEX_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('robot')
@@ -146,6 +146,14 @@ describe('RobotConfigurationDetails', () => {
       .calledWith('enableExtendedHardware')
       .mockReturnValue(true)
 
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: FLEX_STANDARD_MODEL,
+    }
     const { getByText } = render(props)
     getByText('extension mount')
   })
