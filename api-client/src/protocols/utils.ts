@@ -17,7 +17,6 @@ import type {
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
   LoadLiquidRunTimeCommand,
-  LoadAdapterRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 interface PipetteNamesByMount {
@@ -160,53 +159,19 @@ export function parseInitialLoadedLabwareByAdapter(
   )
 }
 
-interface LoadedAdapterBySlot {
-  [slotName: string]: LoadAdapterRunTimeCommand
-}
-export function parseInitialLoadAdapterBySlot(
-  commands: RunTimeCommand[]
-): LoadedAdapterBySlot {
-  const loadAdapterCommandsReversed = commands
-    .filter(
-      (command): command is LoadAdapterRunTimeCommand =>
-        command.commandType === 'loadAdapter'
-    )
-    .reverse()
-  return reduce<LoadAdapterRunTimeCommand, LoadedAdapterBySlot>(
-    loadAdapterCommandsReversed,
-    (acc, command) => {
-      if (
-        typeof command.params.location === 'object' &&
-        'slotName' in command.params.location
-      ) {
-        return { ...acc, [command.params.location.slotName]: command }
-      } else {
-        return acc
-      }
-    },
-    {}
-  )
-}
-
 interface LoadedLabwareByModuleId {
-  [moduleId: string]: LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand
+  [moduleId: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareByModuleId(
   commands: RunTimeCommand[]
 ): LoadedLabwareByModuleId {
   const loadLabwareCommandsReversed = commands
     .filter(
-      (
-        command
-      ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
-        command.commandType === 'loadLabware' ||
-        command.commandType === 'loadAdapter'
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
     )
     .reverse()
-  return reduce<
-    LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand,
-    LoadedLabwareByModuleId
-  >(
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareByModuleId>(
     loadLabwareCommandsReversed,
     (acc, command) =>
       typeof command.params.location === 'object' &&
@@ -221,23 +186,15 @@ export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
 ): LoadedLabware[] {
   const loadLabwareAndAdapterCommands = commands.filter(
-    (
-      command
-    ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
-      command.commandType === 'loadLabware' ||
-      command.commandType === 'loadAdapter'
+    (command): command is LoadLabwareRunTimeCommand =>
+      command.commandType === 'loadLabware'
   )
   const filterOutTrashCommands = loadLabwareAndAdapterCommands.filter(
     command => command.result?.definition?.metadata.displayCategory !== 'trash'
   )
   return filterOutTrashCommands.map(command => {
     const definition = command.result?.definition
-    let id = ''
-    if (command.commandType === 'loadAdapter') {
-      id = command.result?.adapterId ?? ''
-    } else if (command.commandType === 'loadLabware') {
-      id = command.result?.labwareId ?? ''
-    }
+    const id = command.result?.labwareId ?? ''
 
     return {
       id,

@@ -27,7 +27,6 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
-  LoadAdapterRunTimeCommand,
   LoadModuleRunTimeCommand,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
@@ -36,6 +35,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   RunTimeCommand,
+  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
@@ -105,12 +105,12 @@ export function LabwareListItem(
 
   if (initialLocation !== 'offDeck' && 'labwareId' in initialLocation) {
     const adapter = commands.find(
-      (command): command is LoadAdapterRunTimeCommand => {
-        return command.result?.adapterId === initialLocation.labwareId
+      (command): command is LoadLabwareRunTimeCommand => {
+        return command.result?.labwareId === initialLocation.labwareId
       }
     )
 
-    let location
+    let location = ''
     let name
     if (
       adapter?.params.location != null &&

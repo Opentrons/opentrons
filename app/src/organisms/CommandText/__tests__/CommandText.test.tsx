@@ -157,15 +157,15 @@ describe('CommandText', () => {
       getByText('Load Magnetic Module GEN2 in Slot 1')
     }
   })
-  it('renders correct text for loadAdapter in slot', () => {
-    const loadAdapterCommands = mockRobotSideAnalysis.commands.filter(
-      c => c.commandType === 'loadAdapter'
+  it('renders correct text for loadLabware that is category adapter in slot', () => {
+    const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
+      c => c.commandType === 'loadLabware'
     )
-    const loadAdapterCommand = loadAdapterCommands[0]
+    const loadLabwareCommand = loadLabwareCommands[0]
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
-        command={loadAdapterCommand}
+        command={loadLabwareCommand}
       />,
       { i18nInstance: i18n }
     )[0]
@@ -175,7 +175,7 @@ describe('CommandText', () => {
     const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
       c => c.commandType === 'loadLabware'
     )
-    const loadTipRackCommand = loadLabwareCommands[1]
+    const loadTipRackCommand = loadLabwareCommands[2]
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
@@ -189,7 +189,7 @@ describe('CommandText', () => {
     const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
       c => c.commandType === 'loadLabware'
     )
-    const loadOnModuleCommand = loadLabwareCommands[2]
+    const loadOnModuleCommand = loadLabwareCommands[3]
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
@@ -244,9 +244,9 @@ describe('CommandText', () => {
       c => c.commandType === 'loadLabware'
     )
     const loadOffDeckCommand = {
-      ...loadLabwareCommands[3],
+      ...loadLabwareCommands[4],
       params: {
-        ...loadLabwareCommands[3].params,
+        ...loadLabwareCommands[4].params,
         location: 'offDeck',
       },
     } as LoadLabwareRunTimeCommand
@@ -266,7 +266,7 @@ describe('CommandText', () => {
     const liquidId = 'zxcvbn'
     const labwareId = 'uytrew'
     const loadLiquidCommand = {
-      ...loadLabwareCommands[0],
+      ...loadLabwareCommands[1],
       commandType: 'loadLiquid',
       params: { liquidId, labwareId },
     } as LoadLiquidRunTimeCommand

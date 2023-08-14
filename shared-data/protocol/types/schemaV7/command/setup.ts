@@ -23,22 +23,11 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadLabware'
   params: LoadLabwareParams
 }
-
-export interface LoadAdapterCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'loadAdapter'
-  params: LoadAdapterParams
-}
 export interface LoadLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     LoadLabwareCreateCommand {
   result?: LoadLabwareResult
 }
-export interface LoadAdapterRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadAdapterCreateCommand {
-  result?: LoadAdapterResult
-}
-
 export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveLabware'
   params: MoveLabwareParams
@@ -76,7 +65,6 @@ export type SetupRunTimeCommand =
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
-  | LoadAdapterRunTimeCommand
 
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
@@ -84,7 +72,6 @@ export type SetupCreateCommand =
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
-  | LoadAdapterCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
@@ -116,25 +103,10 @@ interface LoadLabwareParams {
   displayName?: string
   labwareId?: string
 }
-interface LoadAdapterParams {
-  location: NonStackedLocation
-  version: number
-  namespace: string
-  loadName: string
-  displayName?: string
-  adapterId?: string
-}
-
 interface LoadLabwareResult {
   labwareId: string
   definition: LabwareDefinition2
   offset: LabwareOffset
-}
-
-interface LoadAdapterResult {
-  adapterId: string
-  definition: LabwareDefinition2
-  offsetId?: string
 }
 
 export type LabwareMovementStrategy =

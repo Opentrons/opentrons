@@ -3831,10 +3831,10 @@
     },
     {
       "key": "23a9c172-8f8d-4bef-b679-2e22ccaf7e56",
-      "commandType": "loadAdapter",
+      "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons 96 Flat Bottom Adapter",
-        "adapterId": "d95bb3be-b453-457c-a947-bd03dc8e56b9:opentrons/opentrons_96_flat_bottom_adapter/1",
+        "labwareId": "d95bb3be-b453-457c-a947-bd03dc8e56b9:opentrons/opentrons_96_flat_bottom_adapter/1",
         "loadName": "opentrons_96_flat_bottom_adapter",
         "namespace": "opentrons",
         "version": 1,

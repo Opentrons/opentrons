@@ -59,7 +59,6 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadLabware':
     case 'loadPipette':
     case 'loadModule':
-    case 'loadAdapter':
     case 'loadLiquid': {
       return (
         <StyledText as="p" {...styleProps}>

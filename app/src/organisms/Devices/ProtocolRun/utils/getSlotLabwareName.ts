@@ -1,6 +1,5 @@
 import {
   getLabwareDisplayName,
-  LoadAdapterRunTimeCommand,
   LoadLabwareRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -10,22 +9,13 @@ export function getSlotLabwareName(
   commands?: RunTimeCommand[]
 ): { slotName: string; labwareName: string } {
   const loadLabwareAndAdapterCommands = commands?.filter(
-    (
-      command
-    ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
-      command.commandType === 'loadLabware' ||
-      command.commandType === 'loadAdapter'
+    (command): command is LoadLabwareRunTimeCommand =>
+      command.commandType === 'loadLabware'
   )
 
-  const loadLabwareCommand = loadLabwareAndAdapterCommands?.find(command => {
-    let id
-    if (command.result != null && 'labwareId' in command?.result) {
-      id = command.result.labwareId
-    } else if (command.result != null && 'adapterId' in command?.result) {
-      id = command.result.adapterId
-    }
-    return id === labwareId
-  })
+  const loadLabwareCommand = loadLabwareAndAdapterCommands?.find(
+    command => command.result?.labwareId === labwareId
+  )
   const loadModuleCommands = commands?.filter(
     command => command.commandType === 'loadModule'
   )
@@ -55,8 +45,8 @@ export function getSlotLabwareName(
   } else {
     const adapterCommandLabwareIsOn = loadLabwareAndAdapterCommands?.find(
       command =>
-        command.result != null && 'adapterId' in command.result
-          ? command.result?.adapterId === labwareLocation.labwareId
+        command.result != null
+          ? command.result?.labwareId === labwareLocation.labwareId
           : ''
     )
     if (adapterCommandLabwareIsOn?.params == null) {

@@ -29,10 +29,7 @@ import {
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
 } from '../actions'
-import type {
-  LoadAdapterCreateCommand,
-  LoadLabwareCreateCommand,
-} from '@opentrons/shared-data'
+import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
@@ -216,11 +213,8 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
     ): SavedLabwareState => {
       const file = action.payload.file
       const loadLabwareAndAdapterCommands = Object.values(file.commands).filter(
-        (
-          command
-        ): command is LoadLabwareCreateCommand | LoadAdapterCreateCommand =>
-          command.commandType === 'loadLabware' ||
-          command.commandType === 'loadAdapter'
+        (command): command is LoadLabwareCreateCommand =>
+          command.commandType === 'loadLabware'
       )
 
       const labware = loadLabwareAndAdapterCommands.reduce(
@@ -235,13 +229,7 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
           >,
           command
         ) => {
-          const { displayName, loadName } = command.params
-          let id
-          if ('labwareId' in command.params) {
-            id = command.params.labwareId
-          } else if ('adapterId' in command.params) {
-            id = command.params.adapterId
-          }
+          const { displayName, loadName, labwareId } = command.params
           const location = command.params.location
           let slot
           if (location === 'offDeck') {
@@ -258,7 +246,7 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
             ...acc,
             [loadName]: {
               slot,
-              definitionId: id,
+              definitionId: labwareId,
               displayName: displayName,
             },
           }

@@ -361,7 +361,7 @@
     {
       "id": "7f344b13-6093-4cfa-b018-9f078994e3d3",
       "createdAt": "2023-01-31T21:53:07.239297+00:00",
-      "commandType": "loadAdapter",
+      "commandType": "loadLabware",
       "key": "abf85339-9dd9-45de-9ac8-8e4597fb7bba",
       "status": "succeeded",
       "params": {
@@ -373,7 +373,7 @@
         "version": 1
       },
       "result": {
-        "adapterId": "29444782-bdc8-4ad8-92fe-5e28872e85e5:opentrons/opentrons_96_flat_bottom_adapter/1",
+        "labwareId": "29444782-bdc8-4ad8-92fe-5e28872e85e5:opentrons/opentrons_96_flat_bottom_adapter/1",
         "definition": {
           "ordering": [],
           "brand": {

@@ -3,7 +3,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  LoadAdapterRunTimeCommand,
+  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import {
   getPipetteNameSpecs,
@@ -58,43 +58,6 @@ export const LoadCommandText = ({
         slot_name: command.params.location.slotName,
       })
     }
-    case 'loadAdapter': {
-      if (
-        command.params.location !== 'offDeck' &&
-        'moduleId' in command.params.location
-      ) {
-        const moduleModel = getModuleModel(
-          robotSideAnalysis,
-          command.params.location.moduleId
-        )
-        const moduleName =
-          moduleModel != null ? getModuleDisplayName(moduleModel) : ''
-
-        return t('load_labware_info_protocol_setup', {
-          count:
-            moduleModel != null
-              ? getOccludedSlotCountForModule(
-                  getModuleType(moduleModel),
-                  robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
-                )
-              : 1,
-          labware: command.result?.definition.metadata.displayName,
-          slot_name: getModuleDisplayLocation(
-            robotSideAnalysis,
-            command.params.location.moduleId
-          ),
-          module_name: moduleName,
-        })
-      } else {
-        const labware = command.result?.definition.metadata.displayName
-        return command.params.location === 'offDeck'
-          ? t('load_labware_info_protocol_setup_off_deck', { labware })
-          : t('load_labware_info_protocol_setup_no_module', {
-              labware,
-              slot_name: command.params.location?.slotName,
-            })
-      }
-    }
     case 'loadLabware': {
       if (
         command.params.location !== 'offDeck' &&
@@ -129,8 +92,8 @@ export const LoadCommandText = ({
         const labwareId = command.params.location.labwareId
         const labwareName = command.result?.definition.metadata.displayName
         const matchingAdapter = robotSideAnalysis.commands.find(
-          (command): command is LoadAdapterRunTimeCommand =>
-            command.result?.adapterId === labwareId
+          (command): command is LoadLabwareRunTimeCommand =>
+            command.result?.labwareId === labwareId
         )
         const adapterName =
           matchingAdapter?.result?.definition.metadata.displayName
@@ -149,7 +112,7 @@ export const LoadCommandText = ({
             adapter_name: adapterName,
             slot_name: adapterLocation,
           })
-        } else {
+        } else if (adapterLoc != null && 'moduleId' in adapterLoc) {
           const moduleModel = getModuleModel(
             robotSideAnalysis,
             adapterLoc?.moduleId ?? ''
@@ -166,6 +129,9 @@ export const LoadCommandText = ({
             module_name: moduleName,
             slot_name: adapterLocation,
           })
+        } else {
+          //  shouldn't reach here, adapter shouldn't have location  type labwareId
+          return null
         }
       } else {
         const labware = command.result?.definition.metadata.displayName

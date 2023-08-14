@@ -48,7 +48,6 @@ import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
-  LoadAdapterCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -203,16 +202,18 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
       {}
     )
+    // initiate "adapter" commands first so we can map through them to get the
+    //  labware that goes on top of it's location
     const loadAdapterCommands = reduce<
       RobotState['labware'],
-      LoadAdapterCreateCommand[]
+      LoadLabwareCreateCommand[]
     >(
       initialRobotState.labware,
       (
         acc,
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
-      ): LoadAdapterCreateCommand[] => {
+      ): LoadLabwareCreateCommand[] => {
         const { labwareDefURI, def } = labwareEntities[labwareId]
         const isAdapter = def.metadata.displayCategory === 'adapter'
         if (!isAdapter) return [...acc]
@@ -222,10 +223,10 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const version = def.version
         const loadAdapterCommands = {
           key: uuid(),
-          commandType: 'loadAdapter' as const,
+          commandType: 'loadLabware' as const,
           params: {
             displayName: def.metadata.displayName,
-            adapterId: labwareId,
+            labwareId,
             loadName,
             namespace: namespace,
             version: version,
@@ -256,7 +257,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const isOnAdapter =
           loadAdapterCommands.find(
-            command => command.params.adapterId === labware.slot
+            command => command.params.labwareId === labware.slot
           ) != null
         const namespace = def.namespace
         const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')

@@ -4,10 +4,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
-import type {
-  LoadLabwareRunTimeCommand,
-  LoadAdapterRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -38,31 +35,17 @@ export const getProtocolModulesInfo = (
       const moduleDef = getModuleDef2(module.model)
       const nestedLabwares = protocolData.commands
         .filter(
-          (
-            command
-          ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
-            command.commandType === 'loadLabware' ||
-            command.commandType === 'loadAdapter'
+          (command): command is LoadLabwareRunTimeCommand =>
+            command.commandType === 'loadLabware'
         )
         .find(
-          (command: LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand) =>
+          (command: LoadLabwareRunTimeCommand) =>
             typeof command.params.location === 'object' &&
             'moduleId' in command.params.location &&
             command.params.location.moduleId === module.id
         )
 
-      let nestedLabwareId: null | string = null
-      if (
-        nestedLabwares?.result != null &&
-        'labwareId' in nestedLabwares.result
-      ) {
-        nestedLabwareId = nestedLabwares?.result.labwareId
-      } else if (
-        nestedLabwares?.result != null &&
-        'adapterId' in nestedLabwares.result
-      ) {
-        nestedLabwareId = nestedLabwares?.result.adapterId
-      }
+      const nestedLabwareId = nestedLabwares?.result?.labwareId ?? null
       const nestedLabware = protocolData.labware.find(
         item => nestedLabwareId != null && item.id === nestedLabwareId
       )

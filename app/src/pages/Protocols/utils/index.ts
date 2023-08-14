@@ -43,9 +43,8 @@ export function getLabwareSetupItemGroups(
   const [offDeckItems, onDeckItems] = partition(
     commands.reduce<LabwareSetupItem[]>((acc, c) => {
       if (
-        (c.commandType === 'loadLabware' &&
-          c.result?.definition?.metadata?.displayCategory !== 'trash') ||
-        c.commandType === 'loadAdapter'
+        c.commandType === 'loadLabware' &&
+        c.result?.definition?.metadata?.displayCategory !== 'trash'
       ) {
         const { location, displayName } = c.params
         const { definition } = c.result ?? {}

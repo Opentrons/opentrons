@@ -9,7 +9,7 @@ import {
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import type {
   PickUpTipRunTimeCommand,
-  LoadAdapterRunTimeCommand,
+  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
   ProtocolAnalysisOutput,
@@ -172,8 +172,8 @@ export const getLabwareIdsInOrder = (
               .slotName
           } else if ('labwareId' in loc) {
             const matchingAdapter = commands.find(
-              (command): command is LoadAdapterRunTimeCommand =>
-                command.result?.adapterId === loc.labwareId
+              (command): command is LoadLabwareRunTimeCommand =>
+                command.result?.labwareId === loc.labwareId
             )
             const adapterLocation = matchingAdapter?.params.location
             if (adapterLocation === 'offDeck') {
@@ -216,8 +216,7 @@ export function getLabwareDefinitionsFromCommands(
 ): LabwareDefinition2[] {
   return commands.reduce<LabwareDefinition2[]>((acc, command) => {
     const isLoadingNewDef =
-      (command.commandType === 'loadLabware' ||
-        command.commandType === 'loadAdapter') &&
+      command.commandType === 'loadLabware' &&
       !acc.some(
         def =>
           command.result?.definition != null &&

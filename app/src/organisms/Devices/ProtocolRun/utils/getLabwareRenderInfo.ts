@@ -6,10 +6,7 @@ import {
   ProtocolAnalysisFile,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type {
-  LoadLabwareRunTimeCommand,
-  LoadAdapterRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -56,19 +53,11 @@ export const getLabwareRenderInfo = (
 ): LabwareRenderInfoById =>
   protocolData.commands
     .filter(
-      (
-        command
-      ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
-        command.commandType === 'loadLabware' ||
-        command.commandType === 'loadAdapter'
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
     )
     .reduce((acc, command) => {
-      let labwareId
-      if (command?.result != null && 'labwareId' in command?.result) {
-        labwareId = command.result.labwareId
-      } else if (command?.result != null && 'adapterId' in command?.result) {
-        labwareId = command.result.adapterId
-      }
+      const labwareId = command?.result?.labwareId
       const location = command.params.location
       const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition

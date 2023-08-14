@@ -1,7 +1,6 @@
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LoadLabwareRunTimeCommand,
-  LoadAdapterRunTimeCommand,
   LabwareLocation,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
@@ -19,13 +18,9 @@ export const getLabwareLocation = (
   }
 
   const locationCommand = commands.find(
-    (
-      command
-    ): command is LoadLabwareRunTimeCommand | LoadAdapterRunTimeCommand =>
-      (command.commandType === 'loadLabware' &&
-        command.result?.labwareId === labwareId) ||
-      (command.commandType === 'loadAdapter' &&
-        command.result?.adapterId === labwareId)
+    (command): command is LoadLabwareRunTimeCommand =>
+      command.commandType === 'loadLabware' &&
+      command.result?.labwareId === labwareId
   )
 
   if (locationCommand?.params?.location == null) {

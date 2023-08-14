@@ -35,7 +35,6 @@ import {
   parseInitialLoadedModulesBySlot,
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadAdapterBySlot,
   parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
 import { getGripperDisplayName } from '@opentrons/shared-data'
@@ -246,11 +245,6 @@ export function ProtocolDetails(
               : []
           ),
           ...parseInitialLoadedLabwareByAdapter(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-          ...parseInitialLoadAdapterBySlot(
             mostRecentAnalysis.commands != null
               ? mostRecentAnalysis.commands
               : []

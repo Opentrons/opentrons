@@ -19,7 +19,6 @@ import {
 import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadAdapterBySlot,
   parseInitialLoadedModulesBySlot,
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
@@ -59,7 +58,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     commands
   )
-  const initialLoadedAdapterBySlot = parseInitialLoadAdapterBySlot(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
     commands
@@ -97,16 +95,11 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               slotId in initialLoadedLabwareBySlot
                 ? initialLoadedLabwareBySlot[slotId]
                 : null
-            const adapterInSlot =
-              slotId in initialLoadedAdapterBySlot
-                ? initialLoadedAdapterBySlot[slotId]
-                : null
             const labwareInModule =
               moduleInSlot?.result?.moduleId != null &&
               moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
                 ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
                 : null
-            let labwareInAdapterInMod = null
             let labwareId =
               labwareInSlot != null ? labwareInSlot.result?.labwareId : null
             let labwareInAdapter = null
@@ -120,13 +113,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                 labwareInAdapter != null
                   ? labwareInAdapter.result?.labwareId
                   : labwareInModule?.result.labwareId
-            } else if (
-              labwareInModule?.result != null &&
-              'adapterId' in labwareInModule.result
-            ) {
-              labwareInAdapterInMod =
-                initialLoadedLabwareByAdapter[labwareInModule?.result.adapterId]
-              labwareId = labwareInAdapterInMod.result?.labwareId
             }
             const wellFill =
               labwareId != null && liquids != null
@@ -154,11 +140,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   >
                     {labwareInModule?.result?.definition != null ? (
                       <LabwareRender
-                        definition={
-                          labwareInAdapterInMod?.result != null
-                            ? labwareInAdapterInMod?.result?.definition
-                            : labwareInModule?.result?.definition
-                        }
+                        definition={labwareInModule?.result?.definition}
                         wellFill={wellFill ?? undefined}
                       />
                     ) : null}
@@ -174,16 +156,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                           ? labwareInAdapter.result.definition
                           : labwareInSlot.result.definition
                       }
-                      wellFill={wellFill ?? undefined}
-                    />
-                  </g>
-                ) : null}
-                {adapterInSlot?.result?.definition != null ? (
-                  <g
-                    transform={`translate(${slot.position[0]},${slot.position[1]})`}
-                  >
-                    <LabwareRender
-                      definition={adapterInSlot.result.definition}
                       wellFill={wellFill ?? undefined}
                     />
                   </g>

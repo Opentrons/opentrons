@@ -10,7 +10,6 @@ import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,
   LoadLabwareCreateCommand,
-  LoadAdapterCreateCommand,
   LabwareLocation,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV7'
@@ -22,8 +21,8 @@ import type {
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration removes pipettes, labware, and modules as top level keys and adds necessary
-// params to the load commands. Also, this introduces loadAdapter commands and migrates previous combined
-//  adapter + labware commands and definitions to their commands/definitions split up
+// params to the load commands. Also, this migrates previous combined
+//  adapter + labware commands to all labware commands and definitions to their commands/definitions split up
 const PD_VERSION = '7.0.0'
 const SCHEMA_VERSION = 7
 interface LabwareLocationUpdate {
@@ -75,9 +74,7 @@ export const migrateFile = (
       },
     }))
 
-  const loadAdapterAndLabwareCommands: Array<
-    LoadAdapterCreateCommand | LoadLabwareCreateCommand
-  > = commands
+  const loadAdapterAndLabwareCommands: LoadLabwareCreateCommand[] = commands
     .filter(
       (command): command is LoadLabwareCommandV6 =>
         command.commandType === 'loadLabware' &&
@@ -107,11 +104,11 @@ export const migrateFile = (
       const labwareLoadname = allLatestDefs[labwareDefUri].parameters.loadName
       const adapterId = `${uuid()}:${adapterUri}`
 
-      const loadAdapterCommand: LoadAdapterCreateCommand = {
+      const loadAdapterCommand: LoadLabwareCreateCommand = {
         key: uuid(),
-        commandType: 'loadAdapter',
+        commandType: 'loadLabware',
         params: {
-          adapterId,
+          labwareId: adapterId,
           loadName: adapterLoadname,
           namespace: 'opentrons',
           version: 1,
@@ -200,17 +197,10 @@ export const migrateFile = (
       ).reduce(
         (
           adapterAndLabwareAcc: LabwareLocationUpdate,
-          [id, command]: [
-            string,
-            LoadAdapterCreateCommand | LoadLabwareCreateCommand
-          ]
+          [id, command]: [string, LoadLabwareCreateCommand]
         ) => {
-          const { location } = command.params
-          let labId: string = ''
-          if ('adapterId' in command.params)
-            labId = command.params.adapterId ?? ''
-          else if ('labwareId' in command.params)
-            labId = command.params.labwareId ?? ''
+          const { location, labwareId } = command.params
+          const labId = labwareId ?? ''
 
           let locationString = ''
           if (location === 'offDeck') {
@@ -240,14 +230,9 @@ export const migrateFile = (
     for (const [labwareId, wellData] of Object.entries(ingredLocations)) {
       if (getIsAdapter(labwareId)) {
         const labwareIdUuid = labwareId.split(':')[0]
-        const matchingCommand = loadAdapterAndLabwareCommands
-          .filter(
-            (command): command is LoadLabwareCreateCommand =>
-              command.commandType === 'loadLabware'
-          )
-          .find(
-            command => command.params.labwareId?.split(':')[0] === labwareIdUuid
-          )
+        const matchingCommand = loadAdapterAndLabwareCommands.find(
+          command => command.params.labwareId?.split(':')[0] === labwareIdUuid
+        )
         const updatedLabwareId =
           matchingCommand != null ? matchingCommand.params.labwareId ?? '' : ''
         updatedIngredLocations[updatedLabwareId] = wellData
