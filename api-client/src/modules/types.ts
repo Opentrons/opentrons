@@ -12,8 +12,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import type { ResourceLinks } from '../types'
-
 import * as ApiTypes from './api-types'
 export * from './api-types'
 
@@ -54,7 +52,12 @@ export type AttachedModule =
   | ThermocyclerModule
   | HeaterShakerModule
 
+export interface ModulesMeta {
+  cursor: number
+  totalLength: number
+}
+
 export interface Modules {
-  links?: ResourceLinks
   data: AttachedModule[]
+  meta: ModulesMeta
 }
