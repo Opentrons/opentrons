@@ -374,6 +374,7 @@ jobs:
         run: |
           for variant in release internal-release ; do
               dir=./to_upload_${variant}
+              ls ${dir} 2>/dev/null 1>/dev/null || continue
               echo "Checking for ${variant} builds in ${dir}: $(ls to_upload_${variant})"
               _windows_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.exe))
               _mac_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.dmg))
