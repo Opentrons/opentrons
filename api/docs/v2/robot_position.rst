@@ -21,8 +21,6 @@ Top, Bottom, and Center
 
 Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and whether the labware is on a module or in a deck slot. You can use these positions as-is or calculate other positions relative to them.
 
-.. tried bold instead of H4, not great
-
 Top
 ---
 
@@ -48,9 +46,9 @@ As an example, lets look at the :py:meth:`.Well.bottom` method. It returns a pos
 
 .. code-block:: python
 
-   plate['A1'].bottom()     # the bottom center of the well
+   plate['A1'].bottom()  # the bottom center of the well
 
-This is a good position to start for an :ref:`aspirate action <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z``` numbers move it down.
+This is a good position to for :ref:`aspirating liquid <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z``` numbers move it down.
 
 .. code-block:: python
 
@@ -58,11 +56,9 @@ This is a good position to start for an :ref:`aspirate action <new-aspirate>` or
    plate['A1'].bottom(z=-1) # 1 mm below the bottom center of the well
                             # this may be dangerous!
 
-.. Warning needs verification re: Flex. checking now. 
-
 .. warning::
 
-    Negative ``z`` arguments to ``Well.bottom()`` may cause the tip to collide with the bottom of the well. The OT-2 has no sensors to detect this. A collision may bend the tip (affecting liquid handling) and the pipette may be higher on the z-axis than expected until it picks up another tip.
+    Negative ``z`` arguments to ``Well.bottom()`` can cause a pipette tip to collide with the bottom of the well. While Flex can detect collisions, the OT-2 has no sensors to detect an impact with a well bottom. For both robot types, a collision with a well bottom may bend the pipette's tip (affecting liquid handling) and the pipette may be higher on the z-axis than expected until it picks up another tip.
 
 .. versionadded:: 2.0
 
@@ -85,7 +81,7 @@ Default Positions
 
 By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value by using the :py:meth:`.Well.bottom` method with the ``z`` argument, though it can be cumbersome to do so repeatedly.
 
-If you need to change the aspiration or dispensing height for multiple operations, specify the distance from the well bottom with the :py:obj:`.InstrumentContext.well_bottom_clearance` object. It has two attributes: ``well_bottom_clearance.aspirate`` and ``well_bottom_clearance.dispense``. These change the aspiration height and dispense height, respectively.
+If you need to change the aspiration or dispensing height for multiple operations, specify the distance in mm from the well bottom with the :py:obj:`.InstrumentContext.well_bottom_clearance` object. It has two attributes: ``well_bottom_clearance.aspirate`` and ``well_bottom_clearance.dispense``. These change the aspiration height and dispense height, respectively.
 
 Modifying these attributes will affect all subsequent aspirate and dispense actions performed by the attached pipette, even those executed as part of a :py:meth:`.transfer` operation. This snippet from a sample protocol demonstrates how to work with and change the default clearance::
 
@@ -123,7 +119,7 @@ You shouldn't adjust labware offsets in your Python code if you plan to run your
 	3. Running Labware Position Check.
 	4. Adding the offsets to your protocol.
 	
-To prepare code written for Jupyter notebook so it can be run in the app, you need to include a metadata block and a ``run()`` function. To enable the Labware Position Check, you need to add a :py:meth:`.pick_up_tip` action for each pipette the protocol uses. For example, let's say you have a protocol that uses a Flex pipette, a tip rack, a 15 mL reservoir, and a 96-well plate. After importing this protocol to the Opentrons App, run Labware Position Check to get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware.
+To prepare code written for Jupyter notebook and run it in the app, you need to specify an API level (see the :ref:`tutorial`) and put your commands in a ``run()`` function. To enable the Labware Position Check, you need to add a :py:meth:`.pick_up_tip` action for each pipette the protocol uses. For example, say you have a protocol that uses a Flex pipette, a tip rack, a 15 mL reservoir, and a 96-well plate. After importing this protocol to the Opentrons App, run Labware Position Check to get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware.
 
 .. code-block:: python
 	
@@ -176,9 +172,9 @@ For convenience, many methods have location arguments and incorporate movement a
 Move To
 -------
 
-You can use the :py:meth:`.InstrumentContext.move_to` method to move a pipette to any reachable location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position. As with all movement in a protocol, the OT-2 calculates where to move in physical space by using its `pipette offset and tip length calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-tip-length-and-pipette-offset>`_ data.
+The :py:meth:`.InstrumentContext.move_to` method moves a pipette to any reachable location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position. As with all movement in a protocol, the robot calculates where to move in physical space by using its `pipette offset and tip length calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-tip-length-and-pipette-offset>`_ data.
 
-The argument of ``move_to()`` must be a :py:class:`.Location`, either one automatically generated by methods like :py:meth:`.Well.top` and :py:meth:`.Well.bottom` or one you've created yourself — you can't move to a well directly:
+The :py:meth:`~.InstrumentContext.move_to` method requires the :py:class:`.Location` argument. The location can be automatically generated by methods like ``Well.top()`` and ``Well.bottom()`` or one you've created yourself, but you can't move a pipette to a well directly:
 
 .. code-block:: python
 
@@ -198,7 +194,7 @@ When using ``move_to()``, by default the pipette will move in an arc: first upwa
 
     Moving without an arc runs the risk of the pipette colliding with objects on the deck. Be very careful when using this option, especially when moving longer distances.
 
-Small, direct movements can be useful for working inside of a well, without having the tip exit and re-enter the well. Here is how to move the pipette to a well, make direct movements inside that well, and then move on to a different well::
+Small, direct movements can be useful for working inside of a well, without having the tip exit and re-enter the well. This code sample demonstrates how to move the pipette to a well, make direct movements inside that well, and then move on to a different well::
 
     pipette.move_to(plate['A1'].top())
     pipette.move_to(plate['A1'].bottom(1), force_direct=True)
@@ -257,22 +253,17 @@ In addition to instructing the robot where to move a pipette, you can also contr
 
 Gantry Speed
 ------------
-.. removed 400 mm/s for a more generic "default speed"
-.. checking about flex default speed
-The robot's gantry usually moves as fast as it can given its construction. Moving at a default speed saves time when executing protocols. However, some experiments or liquids may require slower movements. In this case, you can reduce the gantry speed for a specific pipette by setting :py:obj:`.InstrumentContext.default_speed` like this::
-        
-	# move to the first well at default speed
-	pipette.move_to(plate['A1'].top())
-	# slow down the pipette
-	pipette.default_speed = 100
-	# move to the last well much more slowly
-	pipette.move_to(plate['D6'].top())
 
-.. check Flex gantry speed
+The robot's gantry usually moves as fast as it can given its construction. The default speed for Flex varies between 300 and 350 mm/s. The OT-2 default is 400 mm/s. However, some experiments or liquids may require slower movements. In this case, you can reduce the gantry speed for a specific pipette by setting :py:obj:`.InstrumentContext.default_speed` like this::
+        
+	
+	pipette.move_to(plate['A1'].top())  # move to the first well at default speed
+	pipette.default_speed = 100         # reduce pipette speed
+	pipette.move_to(plate['D6'].top())  # move to the last well at the slower speed
 
 .. warning::
 
-	The default of 400 mm/s was chosen because it is the maximum speed Opentrons knows will work with the gantry. Your specific robot may be able to move faster, but you shouldn't increase this value above 400 unless instructed by Opentrons Support.
+	These default speeds were chosen because they're the maximum speed Opentrons knows will work with the gantry. Your robot may be able to move faster, but you shouldn't increase this value unless instructed by Opentrons Support.
 
 
 .. versionadded:: 2.0
@@ -288,10 +279,10 @@ In addition to controlling the overall gantry speed, you can set speed limits fo
 .. code-block:: python
     :substitutions:
 
-	protocol.max_speeds['x'] = 50       # limit x-axis to 50 mm/s
-	del protocol.max_speeds['x']        # reset x-axis limit
-	protocol.max_speeds['a'] = 10       # limit a-axis to 10 mm/s
-	protocol.max_speeds['a'] = None     # reset a-axis limit
+	protocol.max_speeds['x'] = 50    # limit x-axis to 50 mm/s
+	del protocol.max_speeds['x']     # reset x-axis limit
+	protocol.max_speeds['a'] = 10    # limit a-axis to 10 mm/s
+	protocol.max_speeds['a'] = None  # reset a-axis limit
 
 
 Note that ``max_speeds`` can't set limits for the pipette plunger axes (``b`` and ``c``); instead, set the flow rates or plunger speeds as described in :ref:`new-plunger-flow-rates`.
