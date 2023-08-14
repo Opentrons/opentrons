@@ -211,7 +211,6 @@ async def _main(is_simulating: bool) -> None:
                 file_name = complete_dict['csv_name']
         else:
             print("Slot locations calibration file not found.\n")
-            calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
     else:
         file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
         header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups', 'Total Failures']
@@ -234,7 +233,7 @@ async def _main(is_simulating: bool) -> None:
         ROWS = 1
     else:
         print("Test requires a high-throughput load (96ch pipette)\n")
-        Print("Exiting script...\n")
+        print("Exiting script...\n")
         sys.exit()
         # if "single" in test_pip['name']:
         #     multi_pip = False
