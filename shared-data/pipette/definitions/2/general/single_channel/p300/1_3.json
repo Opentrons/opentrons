@@ -21,6 +21,7 @@
   "plungerPositionsConfigurations": {
     "top": 19.5,
     "bottom": 1.5,
+    "bottomLowVolume": 1.5,
     "blowout": -1.5,
     "drop": -5.5
   },
