@@ -2,11 +2,11 @@
 
 .. _robot-position:
 
-##########################
+**************************
 Labware and Deck Positions
-##########################
+**************************
 
-The API automatically determines how the robot needs to move when working with the instruments and labware in your protocol. But sometimes you need direct control over these activities. The API lets you do just that. Specifically, you can control movements relative to labware and deck locations. You can also manage the gantry’s speed and trajectory as it traverses the enclosure. This document explains how to use API commands to take direct control of the robot and position it exactly where you need it.
+The API automatically determines how the robot needs to move when working with the instruments and labware in your protocol. But sometimes you need direct control over these activities. The API lets you do just that. Specifically, you can control movements relative to labware and deck locations. You can also manage the gantry’s speed and trajectory as it traverses the working area. This document explains how to use API commands to take direct control of the robot and position it exactly where you need it.
 
 .. _position-relative-labware:
 
@@ -14,7 +14,7 @@ The API automatically determines how the robot needs to move when working with t
 Position Relative to Labware
 ============================
 
-When the robot positions itself relative to a piece of labware, the labware definition determines movement, distance, height, offsets, and the actions it can perform. This section describes how these positional components are calculated and how to change them.
+When the robot positions itself relative to a piece of labware, where it moves is determined by the labware definition, the actions you want it to perform, and the labware offsets for a specific deck slot. This section describes how these positional components are calculated and how to change them.
 
 Top, Bottom, and Center
 =======================
@@ -24,7 +24,7 @@ Every well on every piece of labware has three addressable positions: top, botto
 Top
 ---
 
-As an example, let's look at the :py:meth:`.Well.top` method. It returns a position level with the top of the well, centered in both horizontal directions.
+Let's look at the :py:meth:`.Well.top` method. It returns a position level with the top of the well, centered in both horizontal directions.
 
 .. code-block:: python
     
