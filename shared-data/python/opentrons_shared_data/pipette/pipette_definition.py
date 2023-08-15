@@ -132,7 +132,7 @@ class PlungerPositions(BaseModel):
     bottom_low_volume: float = Field(
         ...,
         description="The plunger position required for certain pipettes to dispense low volumes. Most of the time, this value should match the bottom position.",
-        alias="bottomLowVolume"
+        alias="bottomLowVolume",
     )
     blow_out: float = Field(
         ...,
@@ -188,8 +188,10 @@ class PartialTipDefinition(BaseModel):
         alias="perTipPickupCurrent",
     )
 
+
 class Volumes(BaseModel):
     """A definition containing the min and max volume of a pipette for a given volume constraint."""
+
     max_volume: int = Field(
         ...,
         description="The maximum supported volume of the pipette.",
@@ -204,8 +206,15 @@ class Volumes(BaseModel):
 
 class VolumeBreakPointsDefinition(BaseModel):
     """A definition of changing volume configurations based on plunger position constraints."""
-    default: Volumes = Field(..., description="The default volume configuration for a pipette.")
-    bottom_low_volume : Volumes = Field(..., description="The volume constraint for bottom low volume position.", alias="bottomLowVolume")
+
+    default: Volumes = Field(
+        ..., description="The default volume configuration for a pipette."
+    )
+    bottom_low_volume: Volumes = Field(
+        ...,
+        description="The volume constraint for bottom low volume position.",
+        alias="bottomLowVolume",
+    )
 
 
 class PipettePhysicalPropertiesDefinition(BaseModel):
@@ -333,9 +342,7 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         alias="defaultTipracks",
     )
     volume_breakpoints: VolumeBreakPointsDefinition = Field(
-        ...,
-        description="",
-        alias="volumeBreakpoints"
+        ..., description="", alias="volumeBreakpoints"
     )
 
     @validator("supported_tips", pre=True)
