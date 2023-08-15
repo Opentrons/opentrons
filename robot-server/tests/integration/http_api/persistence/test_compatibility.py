@@ -162,7 +162,7 @@ async def test_rerun_flex_dev_compat() -> None:
     async with RobotClient.make(
         base_url=f"http://localhost:{_PORT}", version="*"
     ) as client:
-        assert await client.wait_until_dead(), "Dev Robot is running and must not be."
+        assert await client.wait_until_dead(), "Dev Robot is running but it should not be."
         with DevServer(persistence_directory=snapshot.get_copy(), port=_PORT) as server:
             server.start()
             await client.wait_until_alive()
