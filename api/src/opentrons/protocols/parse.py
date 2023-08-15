@@ -50,8 +50,7 @@ MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
 API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
 
 
-# Matches the minimum version for the Protocol Engine PAPI core.
-_MIN_API_VERSION_FOR_FLEX = APIVersion(2, 14)
+_MIN_API_VERSION_FOR_FLEX = APIVersion(2, 15)
 
 
 class JSONSchemaVersionTooNewError(RuntimeError):

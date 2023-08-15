@@ -659,9 +659,9 @@ def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
             # Unrecognized keys in requirements.
             """
             requirements = {
-                "apiLevel": "2.14",
+                "apiLevel": "2.15",
                 "robotType": "Flex",
-                "APILevel": "2.14",
+                "APILevel": "2.15",
                 "RobotType": "Flex",
                 "foo": "bar",
             }
@@ -675,7 +675,7 @@ def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
             requirements = {"apiLevel": "2.13", "robotType": "Flex"}
             def run(cxt): pass
             """,
-            "The Opentrons Flex only supports apiLevel 2.14 or newer.",
+            "The Opentrons Flex only supports apiLevel 2.15 or newer.",
         ),
     ],
 )
