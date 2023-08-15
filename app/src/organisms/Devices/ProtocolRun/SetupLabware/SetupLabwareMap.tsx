@@ -73,6 +73,7 @@ export function SetupLabwareMap({
                     nestedLabwareDef,
                     nestedLabwareId,
                     nestedLabwareDisplayName,
+                    moduleId,
                   }) => {
                     const labwareInAdapterInMod =
                       nestedLabwareId != null
@@ -92,7 +93,7 @@ export function SetupLabwareMap({
 
                     return (
                       <Module
-                        key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                        key={`LabwareSetup_Module_${moduleId}_${x}${y}`}
                         x={x}
                         y={y}
                         orientation={inferModuleOrientationFromXCoordinate(x)}

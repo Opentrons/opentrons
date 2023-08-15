@@ -247,6 +247,7 @@ export function ProtocolSetupLabware({
                       moduleDef,
                       nestedLabwareDef,
                       nestedLabwareId,
+                      moduleId,
                     }) => {
                       const labwareInAdapterInMod =
                         nestedLabwareId != null
@@ -263,7 +264,7 @@ export function ProtocolSetupLabware({
 
                       return (
                         <Module
-                          key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                          key={`LabwareSetup_Module_${moduleId}_${x}${y}`}
                           x={x}
                           y={y}
                           orientation={inferModuleOrientationFromXCoordinate(x)}

@@ -105,6 +105,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 nestedLabwareDef,
                 nestedLabwareId,
                 nestedLabwareDisplayName,
+                moduleId,
               }) => {
                 const labwareInAdapterInMod =
                   nestedLabwareId != null
@@ -129,7 +130,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
 
                 return (
                   <Module
-                    key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                    key={`LabwareSetup_Module_${moduleId}_${x}${y}`}
                     x={x}
                     y={y}
                     orientation={inferModuleOrientationFromXCoordinate(x)}
