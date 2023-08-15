@@ -1,11 +1,14 @@
-name: 'Start Internal-Release OT-2 build'
+name: 'Start Flex build'
 on:
   push:
     branches:
       - edge
       - '*internal-release*'
+      - 'release'
+      - 'chore_release*'
     tags:
       - ot3@*
+      - v*
   pull_request:
     types:
       - opened
@@ -16,21 +19,21 @@ jobs:
   handle-push:
     runs-on: 'ubuntu-latest'
     if: github.event_name == 'push'
-    name: "Start an OT-2 build for a branch/tag push"
+    name: "Start a Flex build for a branch/tag push"
     steps:
       - name: 'start build'
         uses: octokit/request-action@v2.x
         env:
-          GITHUB_TOKEN: ${{ secrets.OT2_BUILD_CROSSREPO_ACCESS }}
+          GITHUB_TOKEN: ${{ secrets.OT3_BUILD_CROSSREPO_ACCESS }}
         with:
           route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
           owner: opentrons
-          repo: buildroot
-          workflow-id: build.yml
-          ref: opentrons-develop
+          repo: oe-core
+          workflow-id: build-ot3-actions.yml
+          ref: main
           inputs: |
             {
-              "buildroot-ref": "-",
+              "oe-core-ref": "-",
               "monorepo-ref": "${{ github.ref }}",
               "infra-stage": "stage-prod"
             }
@@ -38,22 +41,22 @@ jobs:
 
   handle-pr:
     runs-on: 'ubuntu-latest'
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons' && contains(github.event.pull_request.labels.*.name, 'ot2-build')
-    name: "Start an OT-2 build for a requested PR"
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons' && contains(github.event.pull_request.labels.*.name, 'ot3-build')
+    name: "Start a Flex build for a requested PR"
     steps:
       - name: 'start build'
         uses: octokit/request-action@v2.x
         env:
-          GITHUB_TOKEN: ${{ secrets.OT2_BUILD_CROSSREPO_ACCESS }}
+          GITHUB_TOKEN: ${{ secrets.OT3_BUILD_CROSSREPO_ACCESS }}
         with:
           route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
           owner: opentrons
-          repo: buildroot
-          workflow-id: build.yml
-          ref: opentrons-develop
+          repo: oe-core
+          workflow-id: build-ot3-actions.yml
+          ref: main
           inputs: |
             {
-              "buildroot-ref": "-",
+              "oe-core-ref": "-",
               "monorepo-ref": "refs/heads/${{ github.head_ref }}",
               "infra-stage": "stage-prod"
             }
