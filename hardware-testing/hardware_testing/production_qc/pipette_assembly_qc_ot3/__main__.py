@@ -800,15 +800,18 @@ async def _test_diagnostics_capacitive(
         not api.is_simulator
         and len(offsets) > 1
         and (
-            abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
-            and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
-            and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+            abs(offsets[0].x - offsets[1].x) <= PROBING_DECK_PRECISION_MM
+            and abs(offsets[0].y - offsets[1].y) <= PROBING_DECK_PRECISION_MM
+            and abs(offsets[0].z - offsets[1].z) <= PROBING_DECK_PRECISION_MM
         )
     ):
-        probe_slot_result = _bool_to_pass_fail(True)
+        probe_slot_pass = True
+
     else:
-        probe_slot_result = _bool_to_pass_fail(False)
+        probe_slot_pass = False
+    probe_slot_result = _bool_to_pass_fail(probe_slot_pass)
     print(f"probe-slot-result: {probe_slot_result}")
+    write_cb(["capacitive-probe-slot-result", None, probe_slot_result])
 
     probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     probe_pos += Point(13, 13, 0)
@@ -847,6 +850,7 @@ async def _test_diagnostics_capacitive(
         and capacitive_probe_attached_pass
         and capacitive_probing_pass
         and capacitive_square_pass
+        and probe_slot_pass
     )
 
 
