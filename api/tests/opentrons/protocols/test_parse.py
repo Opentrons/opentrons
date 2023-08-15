@@ -633,6 +633,9 @@ def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
         parse(dedent(bad_protocol))
 
 
+# TODO(mm, 2023-08-10): When we remove flex_dev_compat from parse(), remove this
+# flex_dev_compat=True parametrization and merge these tests with the other metadata/requirements
+# validation tests.
 @pytest.mark.parametrize("flex_dev_compat", [True, False])
 @pytest.mark.parametrize(
     ("questionable_protocol", "expected_message"),
@@ -673,13 +676,13 @@ def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
             # apiLevel too old to support the Flex.
             """
             requirements = {"apiLevel": "2.13", "robotType": "Flex"}
-            def run(cxt): pass
+            def run(ctx): pass
             """,
             "The Opentrons Flex only supports apiLevel 2.15 or newer.",
         ),
     ],
 )
-def test_flex_dev_compat(
+def test_flex_dev_compat_conditional_errors(
     questionable_protocol: str, flex_dev_compat: bool, expected_message: str
 ) -> None:
     if flex_dev_compat:
