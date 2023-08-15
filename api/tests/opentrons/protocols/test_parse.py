@@ -688,3 +688,38 @@ def test_flex_dev_compat(
     else:
         with pytest.raises(MalformedPythonProtocolError, match=expected_message):
             parse(dedent(questionable_protocol), flex_dev_compat=False)
+
+
+# TODO(mm, 2023-08-10): Remove these tests when we remove flex_dev_compat from parse().
+# https://opentrons.atlassian.net/browse/RSS-306
+@pytest.mark.parametrize(
+    ("protocol_source", "expected_api_level"),
+    [
+        (
+            """
+            metadata = {"apiLevel": "2.15"}
+            requirements = {"apiLevel": "2.14"}
+            def run(ctx): pass
+            """,
+            APIVersion(2, 14),
+        ),
+        (
+            """
+            requirements = {"apiLevel": "2.14"}
+            metadata = {"apiLevel": "2.15"}
+            def run(ctx): pass
+            """,
+            APIVersion(2, 14),
+        ),
+    ],
+)
+def test_flex_dev_compat_apilevel_override(
+    protocol_source: str, expected_api_level: APIVersion
+) -> None:
+    """An apiLevel in requirements should override an apiLevel in metadata.
+
+    This only matters in flex_dev_compat=True mode. With stricter validation,
+    it's impossible to put apiLevel in both dicts in the first place.
+    """
+    parsed = parse(dedent(protocol_source), flex_dev_compat=True)
+    assert parsed.api_level == expected_api_level
