@@ -303,6 +303,97 @@ Dilution
 
 This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, it dilutes eight samples from the reservoir across all 8 columns of the plate.
 
+.. tabs::
+
+    .. tab:: Flex
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {'robotType':'Flex', 'apiLevel': '2.15'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location="D2")
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="C1")
+                tiprack_2 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="C2")
+                reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location="D1")
+                pipette_1 = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000',
+                    mount='left',
+                    tip_racks=[tiprack_1, tiprack_2])
+                # Dispense diluent
+                pipette_1.distribute(50, reservoir['A12'], plate.wells())
+
+                # loop through each row
+                for i in range(8):
+                    # save the source well and destination column to variables
+                    source = reservoir.wells()[i]
+                    row = plate.rows()[i]
+
+                # transfer 30uL of source to first well in column
+                pipette_1.transfer(30, source, row[0], mix_after=(3, 25))
+
+                # dilute the sample down the column
+                pipette_1.transfer(
+                    30, row[:11], row[1:],
+                    mix_after=(3, 25))
+    
+    .. tab:: OT-2
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '2.15'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=1)
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=2)
+                tiprack_2 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=3)
+            reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location=4)
+            p300 = protocol.load_instrument(
+                    instrument_name='p300_single',
+                    mount='right',
+                    tip_racks=[tiprack_1, tiprack_2])
+            # Dispense diluent
+            p300.distribute(50, reservoir['A12'], plate.wells())
+
+            # loop through each row
+            for i in range(8):
+                # save the source well and destination column to variables
+                source = reservoir.wells()[i]
+                source = reservoir.wells()[i]
+                row = plate.rows()[i]
+
+            # transfer 30uL of source to first well in column
+            p300.transfer(30, source, row[0], mix_after=(3, 25))
+
+            # dilute the sample down the column
+            p300.transfer(
+                30, row[:11], row[1:],
+                mix_after=(3, 25))
+
+Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see Loops and Air Gaps above. The :ref:`tutorial-commands` section of the Tutorial as well. 
+
 .. code-block:: python
     :substitutions:
 
