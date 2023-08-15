@@ -59,7 +59,7 @@ DEFAULT_SLOT_RESERVOIR = 8
 DEFAULT_SLOT_PLATE = 2
 DEFAULT_SLOT_TRASH = 12
 
-PROBING_DECK_PRECISION_MM = 0.25
+PROBING_DECK_PRECISION_MM = 0.3
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
@@ -811,7 +811,7 @@ async def _test_diagnostics_capacitive(
         probe_slot_pass = False
     probe_slot_result = _bool_to_pass_fail(probe_slot_pass)
     print(f"probe-slot-result: {probe_slot_result}")
-    write_cb(["capacitive-probe-slot-result", None, probe_slot_result])
+    write_cb(["capacitive-probe-slot-result", probe_slot_result])
 
     probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     probe_pos += Point(13, 13, 0)
