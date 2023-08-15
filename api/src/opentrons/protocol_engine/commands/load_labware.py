@@ -95,6 +95,9 @@ class LoadLabwareImplementation(
 
     async def execute(self, params: LoadLabwareParams) -> LoadLabwareResult:
         """Load definition and calibration data necessary for a labware."""
+        # TODO (tz, 8-15-2023): extend column validation to column 1 when working
+        # on https://opentrons.atlassian.net/browse/RSS-258 and completing
+        # https://opentrons.atlassian.net/browse/RSS-255
         if (
             labware_validation.is_flex_trash(params.loadName)
             and isinstance(params.location, DeckSlotLocation)
