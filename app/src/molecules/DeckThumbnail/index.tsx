@@ -87,6 +87,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
         <>
           {map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
             if (slot.matingSurfaceUnitVector == null) return null
+
             const moduleInSlot =
               slotId in initialLoadedModulesBySlot
                 ? initialLoadedModulesBySlot[slotId]
@@ -95,7 +96,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               slotId in initialLoadedLabwareBySlot
                 ? initialLoadedLabwareBySlot[slotId]
                 : null
-
             const labwareInModule =
               moduleInSlot?.result?.moduleId != null &&
               moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
@@ -104,27 +104,23 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
 
             let labwareId =
               labwareInSlot != null ? labwareInSlot.result?.labwareId : null
-            let labwareInAdapterInMod = null
             let labwareInAdapter = null
-            if (
-              labwareInModule?.result != null &&
-              'labwareId' in labwareInModule.result &&
-              labwareInModule.result.labwareId in initialLoadedLabwareByAdapter
-            ) {
-              labwareInAdapter =
-                initialLoadedLabwareByAdapter[labwareInModule?.result.labwareId]
-              labwareId = labwareInAdapter.result?.labwareId
-            } else {
-              labwareInAdapterInMod =
-                labwareInModule?.result != null
-                  ? initialLoadedLabwareByModuleId[
-                      labwareInModule?.result.labwareId
-                    ]
-                  : null
-              labwareId =
-                labwareInAdapterInMod != null
-                  ? labwareInAdapterInMod.result?.labwareId
-                  : null
+
+            if (labwareInModule != null) {
+              if (
+                labwareInModule?.result != null &&
+                'labwareId' in labwareInModule.result &&
+                labwareInModule.result.labwareId in
+                  initialLoadedLabwareByAdapter
+              ) {
+                labwareInAdapter =
+                  initialLoadedLabwareByAdapter[
+                    labwareInModule?.result.labwareId
+                  ]
+                labwareId = labwareInAdapter.result?.labwareId
+              } else {
+                labwareId = labwareInModule.params.labwareId
+              }
             }
             const wellFill =
               labwareId != null && liquids != null
@@ -134,7 +130,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     labwareByLiquidId
                   )
                 : null
-
             return (
               <React.Fragment key={slotId}>
                 {moduleInSlot != null ? (
@@ -168,11 +163,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     transform={`translate(${slot.position[0]},${slot.position[1]})`}
                   >
                     <LabwareRender
-                      definition={
-                        labwareInAdapter?.result != null
-                          ? labwareInAdapter.result.definition
-                          : labwareInSlot.result.definition
-                      }
+                      definition={labwareInSlot.result.definition}
                       wellFill={wellFill ?? undefined}
                     />
                   </g>

@@ -53,6 +53,9 @@ const getLabwareEntity = (
   return state.labwareEntities[id] || null
 }
 
+const getIsAdapter = (id: string): boolean =>
+  id.includes('opentrons_96_well_aluminum_block') || id.includes('adapter')
+
 const getLabwareLocation = (
   state: InvariantContext,
   newLocationString: string
@@ -61,8 +64,9 @@ const getLabwareLocation = (
     return 'offDeck'
   } else if (newLocationString in state.moduleEntities) {
     return { moduleId: newLocationString }
+  } else if (newLocationString != null && getIsAdapter(newLocationString)) {
+    return { labwareId: newLocationString }
   } else {
-    // assume it is a slot
     return { slotName: newLocationString }
   }
 }

@@ -94,7 +94,7 @@ const getMoveLabwareError = (
     const adapterValueDefUri = newLocation.labwareId.split(':')[1]
     const adapterAllowList =
       COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterValueDefUri]
-    errorString = !adapterAllowList.includes(selectedLabwareDefUri)
+    errorString = !adapterAllowList?.includes(selectedLabwareDefUri)
       ? i18n.t(
           'form.step_edit_form.labwareLabel.errors.labwareIncompatibleWithAdapter'
         )
