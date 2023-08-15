@@ -437,8 +437,16 @@
     "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
     "opentrons/opentrons_96_filtertiprack_20ul/1": 8.25
   },
-  "maxVolume": 20,
-  "minVolume": 1.0,
+  "volumeBreakpoints": {
+    "default": {
+      "maxVolume": 20,
+      "minVolume": 1.0
+    },
+    "bottomLowVolume": {
+      "maxVolume": 20,
+      "minVolume": 1.0
+    }
+  },
   "defaultTipracks": [
     "opentrons/opentrons_96_tiprack_20ul/1",
     "opentrons/opentrons_96_filtertiprack_20ul/1",

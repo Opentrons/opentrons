@@ -286,10 +286,10 @@ class CheckCalibrationUserFlow:
                 info = PipetteInfo(
                     channels=pip.config.channels,
                     rank=PipetteRank.first,
-                    max_volume=pip.config.max_volume,
+                    max_volume=pip.volumes.max_volume,
                     mount=mount,
                     tip_rack=self._get_tiprack_by_pipette_volume(
-                        pip.config.max_volume, pip_calibration
+                        pip.volumes.max_volume, pip_calibration
                     ),
                     default_tipracks=uf.get_default_tipracks(
                         pip.config.default_tipracks
@@ -303,26 +303,26 @@ class CheckCalibrationUserFlow:
         l_calibration = self._get_stored_pipette_offset_cal(left_pip, Mount.LEFT)
         r_info = PipetteInfo(
             channels=right_pip.config.channels,
-            max_volume=right_pip.config.max_volume,
+            max_volume=right_pip.volumes.max_volume,
             rank=PipetteRank.first,
             mount=Mount.RIGHT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                right_pip.config.max_volume, r_calibration
+                right_pip.volumes.max_volume, r_calibration
             ),
             default_tipracks=uf.get_default_tipracks(right_pip.config.default_tipracks),
         )
         l_info = PipetteInfo(
             channels=left_pip.config.channels,
-            max_volume=left_pip.config.max_volume,
+            max_volume=left_pip.volumes.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                left_pip.config.max_volume, l_calibration
+                left_pip.volumes.max_volume, l_calibration
             ),
             default_tipracks=uf.get_default_tipracks(left_pip.config.default_tipracks),
         )
         if (
-            left_pip.config.max_volume > right_pip.config.max_volume
+            left_pip.volumes.max_volume > right_pip.volumes.max_volume
             or right_pip.config.channels > left_pip.config.channels
         ):
             r_info.rank = PipetteRank.second

@@ -98,6 +98,8 @@ _MAP_KEY_TO_V2: Dict[str, Dict[str, str]] = {
     },
     "dropTipSpeed": {"top_level_name": "dropTipConfigurations", "nested_name": "speed"},
     "tipLength": {"top_level_name": "supportedTips", "nested_name": "defaultTipLength"},
+    "minVolume": {"top_level_name": "volumeBreakpoints", "nested_name": "minVolume"},
+    "maxVolume": {"top_level_name": "volumeBreakpoints", "nested_name": "maxVolume"},
 }
 
 

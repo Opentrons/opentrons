@@ -212,8 +212,6 @@ class PipetteHandlerProvider:
         if instr:
             configs = [
                 "name",
-                "min_volume",
-                "max_volume",
                 "aspirate_flow_rate",
                 "dispense_flow_rate",
                 "pipette_id",
@@ -268,6 +266,8 @@ class PipetteHandlerProvider:
             result[
                 "default_blow_out_volume"
             ] = instr.active_tip_settings.default_blowout_volume
+            result["min_volume"] = instr.volumes.min_volume
+            result["max_volume"] = instr.volumes.max_volume
         return cast(PipetteDict, result)
 
     @property
@@ -462,13 +462,13 @@ class PipetteHandlerProvider:
     def plunger_speed(
         self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
+        mm_per_s = ul_per_s / instr.ul_per_mm(instr.volumes.max_volume, action)
         return round(mm_per_s, 6)
 
     def plunger_flowrate(
         self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
+        ul_per_s = mm_per_s * instr.ul_per_mm(instr.volumes.max_volume, action)
         return round(ul_per_s, 6)
 
     def plunger_acceleration(self, instr: Pipette, ul_per_s_per_s: float) -> float:

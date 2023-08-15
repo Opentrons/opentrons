@@ -157,6 +157,10 @@ def update_pipette_configuration(
                     # all tips.
                     for k in dict_of_base_model[new_names["top_level_name"]].keys():
                         dict_of_base_model[top_name][k][nested_name] = v
+                elif lookup_key == "minVolume" or lookup_key == "maxVolume":
+                    # TODO we should be able to update this value by
+                    # default or some other configuration value.
+                    dict_of_base_model[top_name]["default"][nested_name] = v
                 else:
                     # isinstances are needed for type checking.
                     dict_of_base_model[top_name][nested_name] = v

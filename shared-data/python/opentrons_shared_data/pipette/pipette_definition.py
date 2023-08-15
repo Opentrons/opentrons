@@ -188,6 +188,25 @@ class PartialTipDefinition(BaseModel):
         alias="perTipPickupCurrent",
     )
 
+class Volumes(BaseModel):
+    """A definition containing the min and max volume of a pipette for a given volume constraint."""
+    max_volume: int = Field(
+        ...,
+        description="The maximum supported volume of the pipette.",
+        alias="maxVolume",
+    )
+    min_volume: float = Field(
+        ...,
+        description="The minimum supported volume of the pipette.",
+        alias="minVolume",
+    )
+
+
+class VolumeBreakPointsDefinition(BaseModel):
+    """A definition of changing volume configurations based on plunger position constraints."""
+    default: Volumes = Field(..., description="The default volume configuration for a pipette.")
+    bottom_low_volume : Volumes = Field(..., description="The volume constraint for bottom low volume position.", alias="bottomLowVolume")
+
 
 class PipettePhysicalPropertiesDefinition(BaseModel):
     """The physical properties definition of a pipette."""
@@ -307,21 +326,16 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         description="The default tip overlap associated with this tip type.",
         alias="defaultTipOverlapDictionary",
     )
-    max_volume: int = Field(
-        ...,
-        description="The maximum supported volume of the pipette.",
-        alias="maxVolume",
-    )
-    min_volume: float = Field(
-        ...,
-        description="The minimum supported volume of the pipette.",
-        alias="minVolume",
-    )
     default_tipracks: List[str] = Field(
         ...,
         description="A list of default tiprack paths.",
         regex="opentrons/[a-z0-9._]+/[0-9]",
         alias="defaultTipracks",
+    )
+    volume_breakpoints: VolumeBreakPointsDefinition = Field(
+        ...,
+        description="",
+        alias="volumeBreakpoints"
     )
 
     @validator("supported_tips", pre=True)

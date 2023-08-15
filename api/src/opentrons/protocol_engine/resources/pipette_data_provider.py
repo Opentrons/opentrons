@@ -45,13 +45,13 @@ def get_virtual_pipette_static_config(
     )
 
     tip_configuration = config.supported_tips[
-        pip_types.PipetteTipType(config.max_volume)
+        pip_types.PipetteTipType(config.volume_breakpoints.default.max_volume)
     ]
     return LoadedStaticPipetteData(
         model=str(pipette_model),
         display_name=config.display_name,
-        min_volume=config.min_volume,
-        max_volume=config.max_volume,
+        min_volume=config.volume_breakpoints.default.min_volume,
+        max_volume=config.volume_breakpoints.default.max_volume,
         channels=config.channels,
         home_position=config.mount_configurations.homePosition,
         nozzle_offset_z=config.nozzle_offset[2],

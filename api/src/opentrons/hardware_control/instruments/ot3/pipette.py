@@ -15,6 +15,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     TipHandlingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
+    Volumes,
 )
 from ..instrument_abc import AbstractInstrument
 from ..instrument_helpers import (
@@ -73,6 +74,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._max_channels = self._config.channels
         self._backlash_distance = config.backlash_distance
 
+        self._volume_configurations = config.volume_breakpoints
+        self._volumes = self._volume_configurations.default
+
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
         self._pipette_name = PipetteNameType(
             pipette_type=config.pipette_type,
@@ -87,7 +91,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self._volumes.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
@@ -104,7 +108,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         #: True if ready to aspirate
         self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._config.max_volume)
+            pip_types.PipetteTipType(self._volumes.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
@@ -186,6 +190,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def active_tip_settings(self) -> SupportedTipsDefinition:
         return self._active_tip_settings
 
+    @property
+    def volumes(self) -> Volumes:
+        return self._volumes
+
     def act_as(self, name: PipetteName) -> None:
         """Reconfigure to act as ``name``. ``name`` must be either the
         actual name of the pipette, or a name in its back-compatibility
@@ -212,14 +220,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def reset_state(self) -> None:
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self._volumes.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._config.max_volume)
+            pip_types.PipetteTipType(self._volumes.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
@@ -435,9 +443,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @working_volume.setter
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
-        self._working_volume = min(self.config.max_volume, tip_volume)
+        self._working_volume = min(self._volumes.max_volume, tip_volume)
         tip_size_type = pip_types.PipetteTipType.check_and_return_type(
-            int(self._working_volume), self.config.max_volume
+            int(self._working_volume), self._volumes.max_volume
         )
         self._active_tip_settings = self._config.supported_tips[tip_size_type]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length

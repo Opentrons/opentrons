@@ -248,8 +248,16 @@
       "defaultBlowoutVolume": 3.534
     }
   },
-  "maxVolume": 20,
-  "minVolume": 1.0,
+  "volumeBreakpoints": {
+    "default": {
+      "maxVolume": 20,
+      "minVolume": 1.0
+    },
+    "bottomLowVolume": {
+      "maxVolume": 20,
+      "minVolume": 1.0
+    }
+  },
   "defaultTipOverlapDictionary": {
     "default": 8.25,
     "opentrons/opentrons_96_tiprack_10ul/1": 8.25,

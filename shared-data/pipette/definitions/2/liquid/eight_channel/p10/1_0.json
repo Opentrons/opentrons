@@ -48,8 +48,16 @@
     "opentrons/geb_96_tiprack_10ul/1": 6.2,
     "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1.0
   },
-  "maxVolume": 10,
-  "minVolume": 1.0,
+  "volumeBreakpoints": {
+    "default": {
+      "maxVolume": 10,
+      "minVolume": 1.0
+    },
+    "bottomLowVolume": {
+      "maxVolume": 10,
+      "minVolume": 1.0
+    }
+  },
   "defaultTipracks": [
     "opentrons/opentrons_96_tiprack_10ul/1",
     "opentrons/opentrons_96_filtertiprack_10ul/1",

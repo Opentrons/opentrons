@@ -15,6 +15,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     TipHandlingConfigurations,
     PipetteModelVersionType,
     PipetteNameType,
+    Volumes,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
@@ -99,9 +100,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             pipette_channels=config.channels,
             pipette_version=config.version,
         )
+
+        self._volume_configurations = config.volume_breakpoints
+        self._volumes = self._volume_configurations.default
+
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self._volumes.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
@@ -118,7 +123,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         #: True if ready to aspirate
 
         self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._config.max_volume)
+            pip_types.PipetteTipType(self._volumes.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._aspirate_flow_rates_lookup = (
@@ -164,11 +169,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             name.pipette_type, name.pipette_channels, name.get_version()
         )
         # TODO need to grab name config here to deal with act as test
-        self.working_volume = liquid_model.max_volume
+        self.working_volume = liquid_model.volume_breakpoints.default.max_volume
+        self.volumes = liquid_model.volume_breakpoints.default
         self.update_config_item(
             {
-                "min_volume": liquid_model.min_volume,
-                "max_volume": liquid_model.max_volume,
+                "min_volume": self.volumes.min_volume,
+                "max_volume": self.volumes.max_volume,
             }
         )
 
@@ -222,6 +228,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def active_tip_settings(self) -> SupportedTipsDefinition:
         return self._active_tip_settings
 
+    @property
+    def volumes(self) -> Volumes:
+        return self._volumes
+
+    @volumes.setter
+    def volumes(self, volumes: Volumes) -> None:
+        self._volumes = volumes
+
     def update_config_item(self, elements: Dict[str, Any]) -> None:
         self._log.info(f"updated config: {elements}")
         self._config = load_pipette_data.update_pipette_configuration(
@@ -240,7 +254,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def reset_state(self) -> None:
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self._volumes.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
@@ -429,9 +443,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @working_volume.setter
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
-        self._working_volume = min(self.config.max_volume, tip_volume)
+        self._working_volume = min(self._volumes.max_volume, tip_volume)
         tip_size_type = pip_types.PipetteTipType.check_and_return_type(
-            int(self._working_volume), self.config.max_volume
+            int(self._working_volume), self._volumes.max_volume
         )
         self._active_tip_settings = self._config.supported_tips[tip_size_type]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
