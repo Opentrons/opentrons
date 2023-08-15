@@ -139,7 +139,7 @@ export function ProtocolRunHeader({
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
-    runRecord?.data?.errors != null
+    runRecord?.data.errors?.[0] != null
       ? getHighestPriorityError(runRecord?.data?.errors)
       : undefined
   const { data: estopStatus } = useEstopQuery({

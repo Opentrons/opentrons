@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import { format } from 'date-fns'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -21,7 +22,6 @@ import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { useMaintenanceRunTakeover } from '../TakeoverModal'
-import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
 import type { InstrumentData } from '@opentrons/api-client'
@@ -128,8 +128,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               label={t('last_calibrated')}
               value={
                 instrument.data.calibratedOffset?.last_modified != null
-                  ? formatTimestamp(
-                      instrument.data.calibratedOffset?.last_modified
+                  ? format(
+                      new Date(instrument.data.calibratedOffset?.last_modified),
+                      'M/d/yy HH:mm'
                     )
                   : i18n.format(t('no_cal_data'), 'capitalize')
               }
