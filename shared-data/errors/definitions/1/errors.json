@@ -106,6 +106,14 @@
       "detail": "Unmatched tip presence states",
       "category": "roboticsControlError"
     },
+    "2013": {  
+      "detail": "Position Unknown",
+      "category": "roboticsControlError"
+    },
+    "2014": {
+      "detail": "Execution Cancelled",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"

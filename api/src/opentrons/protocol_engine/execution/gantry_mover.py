@@ -6,7 +6,7 @@ from opentrons.types import Point, Mount
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis as HardwareAxis
-from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
@@ -95,7 +95,7 @@ class HardwareGantryMover(GantryMover):
         Args:
             pipette_id: Pipette ID to get location data for.
             current_well: Optional parameter for getting pipette location data, effects critical point.
-            fail_on_not_homed: Raise HardwareMustHomeError if gantry position is not known.
+            fail_on_not_homed: Raise PositionUnknownError if gantry position is not known.
         """
         pipette_location = self._state_view.motion.get_pipette_location(
             pipette_id=pipette_id,
@@ -107,7 +107,7 @@ class HardwareGantryMover(GantryMover):
                 critical_point=pipette_location.critical_point,
                 fail_on_not_homed=fail_on_not_homed,
             )
-        except HardwareMustHomeError as e:
+        except PositionUnknownError as e:
             raise MustHomeError(str(e)) from e
 
     def get_max_travel_z(self, pipette_id: str) -> float:
@@ -167,7 +167,7 @@ class HardwareGantryMover(GantryMover):
                 critical_point=critical_point,
                 fail_on_not_homed=True,
             )
-        except HardwareMustHomeError as e:
+        except PositionUnknownError as e:
             raise MustHomeError(str(e)) from e
 
         return point

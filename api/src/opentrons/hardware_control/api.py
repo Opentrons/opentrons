@@ -20,6 +20,10 @@ from typing import (
     cast,
 )
 
+from opentrons_shared_data.errors.exceptions import (
+    PositionUnknownError,
+    UnsupportedHardwareCommand,
+)
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
@@ -53,10 +57,6 @@ from .types import (
     EstopState,
     SubSystem,
     SubSystemState,
-)
-from .errors import (
-    MustHomeError,
-    NotSupportedByHardware,
 )
 from . import modules
 from .robot_calibration import (
@@ -602,8 +602,8 @@ class API(
         # can still explicitly specify an OT3 axis even when working on an OT2.
         # Adding this check in order to prevent misuse of axes types.
         if axes and any(axis not in Axis.ot2_axes() for axis in axes):
-            raise NotSupportedByHardware(
-                f"At least one axis in {axes} is not supported on the OT2."
+            raise UnsupportedHardwareCommand(
+                message=f"At least one axis in {axes} is not supported on the OT2."
             )
         self._reset_last_mount()
         # Initialize/update current_position
@@ -645,12 +645,14 @@ class API(
             not self._backend.is_homed([ot2_axis_to_string(a) for a in position_axes])
             or not self._current_position
         ):
-            raise MustHomeError(
-                f"Current position of {str(mount)} pipette is unknown, please home."
+            raise PositionUnknownError(
+                message=f"Current position of {str(mount)} pipette is unknown, please home."
             )
 
         elif not self._current_position and not refresh:
-            raise MustHomeError("Current position is unknown; please home motors.")
+            raise PositionUnknownError(
+                message="Current position is unknown; please home motors."
+            )
         async with self._motion_lock:
             if refresh:
                 smoothie_pos = await self._backend.update_position()
@@ -730,7 +732,9 @@ class API(
         The effector of the x,y axis is the center of the carriage.
         The effector of the pipette mount axis are the mount critical points but only in z.
         """
-        raise NotSupportedByHardware("move_axes is not supported on the OT-2.")
+        raise UnsupportedHardwareCommand(
+            message="move_axes is not supported on the OT-2."
+        )
 
     async def move_rel(
         self,
@@ -748,8 +752,8 @@ class API(
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
         # really want to fix it when we're not gearing up for a release.
-        mhe = MustHomeError(
-            "Cannot make a relative move because absolute position is unknown"
+        mhe = PositionUnknownError(
+            message="Cannot make a relative move because absolute position is unknown"
         )
         if not self._current_position:
             if fail_on_not_homed:
@@ -937,7 +941,7 @@ class API(
         Prepare the pipette for aspiration.
         """
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE)
+        self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE, mount)
 
         if instrument.current_volume == 0:
             speed = self.plunger_speed(
