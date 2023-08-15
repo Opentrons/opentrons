@@ -129,6 +129,11 @@ class PlungerPositions(BaseModel):
         ...,
         description="The plunger position that describes min available volume of a pipette in mm.",
     )
+    bottom_low_volume: float = Field(
+        ...,
+        description="The plunger position required for certain pipettes to dispense low volumes. Most of the time, this value should match the bottom position.",
+        alias="bottomLowVolume"
+    )
     blow_out: float = Field(
         ...,
         description="The plunger position past 0 volume to blow out liquid.",
