@@ -6,10 +6,7 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..errors import (
-    LabwareDefinitionIsNotLabwareError,
-    LabwareIsNotAllowedInLocationError,
-)
+from ..errors import LabwareIsNotAllowedInLocationError
 from ..resources import labware_validation
 from ..types import LabwareLocation, OnLabwareLocation, DeckSlotLocation
 
