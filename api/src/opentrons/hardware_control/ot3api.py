@@ -1832,11 +1832,28 @@ class OT3API(
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 pipette_axis
             ]
-            clamp_move_target = pipette_spec.pick_up_distance
-            clamp_moves = self._build_moves(
-                {Axis.Q: gear_origin_float}, {Axis.Q: clamp_move_target}
+
+            prep_move_speed_mm_sec = 10
+            clamp_move_speed_mm_sec = 5
+
+            prep_move_target = {Axis.Q: pipette_spec.pick_up_distance - 10}
+            clamp_move_target = {Axis.Q: pipette_spec.pick_up_distance}
+
+            #
+            move_target_start = MoveTarget.build(
+                position=prep_move_target,
+                max_speed=prep_move_speed_mm_sec,
             )
-            await self._backend.tip_action(moves=clamp_moves[0])
+            move_target_finish = MoveTarget.build(
+                position=clamp_move_target,
+                max_speed=clamp_move_speed_mm_sec,
+            )
+            _, moves = self._move_manager.plan_motion(
+                origin={Axis.Q: gear_origin_float}, target_list=[move_target_start, move_target_finish]
+            )
+
+            #
+            await self._backend.tip_action(moves=moves[0])
 
             await self.home_gear_motors()
 
