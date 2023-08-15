@@ -35,6 +35,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroupSingleAxisStep,
     MoveStopCondition,
     create_home_step,
+    create_backoff_step,
 )
 
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
@@ -277,11 +278,10 @@ async def home(messenger, node,args):
     home_runner = MoveGroupRunner(
         move_groups=[
             [
-                create_home_step(
-                    {node: float64(100.0)},
-                    {node: float64(-5)}
-                )
-            ]
+                create_backoff_step(
+                    {node: float64(5)}
+                ),
+            ],
         ]
     )
     current = args.current#0.8

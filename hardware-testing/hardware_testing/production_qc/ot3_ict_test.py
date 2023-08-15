@@ -37,7 +37,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 
 from opentrons_hardware.hardware_control.motion import (
     MoveGroupSingleAxisStep,
-    create_home_step,
+    create_backoff_step,
 )
 
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
@@ -203,7 +203,7 @@ async def home(
 ) -> NodeDict[Tuple[float, float, bool, bool]]:
     """Homes axis passed to this function."""
     home_runner = MoveGroupRunner(
-        move_groups=[[create_home_step({node: float64(100.0)}, {node: float64(-5)})]]
+        move_groups=[[create_backoff_step({node: float64(5)})]]
     )
     axis_dict = await home_runner.run(can_messenger=messenger)
     return axis_dict
