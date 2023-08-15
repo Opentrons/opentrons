@@ -348,4 +348,9 @@ describe('ProtocolSetup', () => {
     getByRole('button', { name: 'play' }).click()
     getByText('mock ConfirmAttachedModal')
   })
+  it('should render a loading skeleton while awaiting a response from the server', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
+    const [{ getAllByTestId }] = render(`/runs/${RUN_ID}/setup/`)
+    expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+  })
 })
