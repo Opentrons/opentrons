@@ -97,10 +97,10 @@
   "volumeBreakpoints": {
     "default": {
       "maxVolume": 50,
-      "minVolume": 0.5
+      "minVolume": 5
     },
     "bottomLowVolume": {
-      "maxVolume": 50,
+      "maxVolume": 45,
       "minVolume": 0.5
     }
   },
