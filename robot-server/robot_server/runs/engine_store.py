@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
 )
+from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_runner import (
     AnyRunner,
     JsonRunner,
@@ -186,7 +187,7 @@ class EngineStore:
                 # Conservatively assume that we're re-running a protocol that
                 # was uploaded before we added stricter validation, and that
                 # doesn't conform to the new rules.
-                flex_dev_compat=True,
+                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
             )
         elif isinstance(runner, JsonRunner):
             assert (

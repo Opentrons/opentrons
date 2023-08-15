@@ -102,7 +102,7 @@ class FileIdentifier:
 
     @staticmethod
     async def identify(
-        files: Sequence[BufferedFile], flex_dev_compat: bool
+        files: Sequence[BufferedFile], python_parse_mode: parse.PythonParseMode
     ) -> Sequence[IdentifiedFile]:
         """Identify the type and extract basic information from each file.
 
@@ -111,15 +111,19 @@ class FileIdentifier:
         and validating protocols can take 10-100x longer, so that's left to other units,
         for only when it's really needed.
         """
-        return [await _identify(file, flex_dev_compat) for file in files]
+        return [await _identify(file, python_parse_mode) for file in files]
 
 
-async def _identify(file: BufferedFile, flex_dev_compat: bool) -> IdentifiedFile:
+async def _identify(
+    file: BufferedFile, python_parse_mode: parse.PythonParseMode
+) -> IdentifiedFile:
     lower_file_name = file.name.lower()
     if lower_file_name.endswith(".json"):
         return await _analyze_json(json_file=file)
     elif lower_file_name.endswith(".py"):
-        return _analyze_python_protocol(py_file=file, flex_dev_compat=flex_dev_compat)
+        return _analyze_python_protocol(
+            py_file=file, python_parse_mode=python_parse_mode
+        )
     elif lower_file_name.endswith(".csv") or lower_file_name.endswith(".txt"):
         return IdentifiedData(original_file=file)
     else:
@@ -203,13 +207,13 @@ def _analyze_json_protocol(
 
 def _analyze_python_protocol(
     py_file: BufferedFile,
-    flex_dev_compat: bool,
+    python_parse_mode: parse.PythonParseMode,
 ) -> IdentifiedPythonMain:
     try:
         parsed = parse.parse(
             protocol_file=py_file.contents,
             filename=py_file.name,
-            flex_dev_compat=flex_dev_compat,
+            python_parse_mode=python_parse_mode,
         )
     except MalformedPythonProtocolError as e:
         raise FileIdentificationError(e.short_message) from e

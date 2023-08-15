@@ -2,6 +2,8 @@
 from pathlib import Path
 from typing import Optional, Sequence
 
+from opentrons.protocols.parse import PythonParseMode
+
 from .file_identifier import (
     FileIdentifier,
     IdentifiedFile,
@@ -72,7 +74,7 @@ class ProtocolReader:
                 could not be validated as a protocol.
         """
         identified_files = await self._file_identifier.identify(
-            files, flex_dev_compat=False
+            files, python_parse_mode=PythonParseMode.NORMAL
         )
         role_analysis = self._role_analyzer.analyze(identified_files)
         await self._file_format_validator.validate(role_analysis.all_files)
@@ -103,7 +105,7 @@ class ProtocolReader:
         files: Sequence[Path],
         directory: Optional[Path],
         files_are_prevalidated: bool = False,
-        flex_dev_compat: bool = False,
+        python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> ProtocolSource:
         """Compute a `ProtocolSource` from protocol source files on the filesystem.
 
@@ -119,8 +121,7 @@ class ProtocolReader:
                 stuff for the `ProtocolSource`. This can be 10-100x faster, but you
                 should only do it with protocols that have already been validated
                 by this module.
-            flex_dev_compat: See the parameter of the same name in
-                `opentrons.protocols.parse.parse()`.
+            python_parse_mode: See the documentation in `PythonParseMode`.
 
         Returns:
             A `ProtocolSource` describing the validated protocol.
@@ -132,7 +133,7 @@ class ProtocolReader:
         buffered_files = await self._file_reader_writer.read(files)
         identified_files = await self._file_identifier.identify(
             files=buffered_files,
-            flex_dev_compat=flex_dev_compat,
+            python_parse_mode=python_parse_mode,
         )
         role_analysis = self._role_analyzer.analyze(identified_files)
         if not files_are_prevalidated:

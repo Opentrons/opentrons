@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.parse import PythonParseMode
 
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -126,7 +127,7 @@ async def test_save(
     decoy.when(
         await file_identifier.identify(
             [buffered_main_file, buffered_labware_file, buffered_data_file],
-            flex_dev_compat=False,
+            python_parse_mode=PythonParseMode.NORMAL,
         )
     ).then_return([main_file, labware_file, data_file])
     decoy.when(role_analyzer.analyze([main_file, labware_file, data_file])).then_return(
@@ -234,7 +235,7 @@ async def test_read_saved(
     decoy.when(
         await file_identifier.identify(
             [buffered_main_file, buffered_labware_file, buffered_data_file],
-            flex_dev_compat=False,
+            python_parse_mode=PythonParseMode.NORMAL,
         )
     ).then_return([main_file, labware_file, data_file])
     decoy.when(role_analyzer.analyze([main_file, labware_file, data_file])).then_return(

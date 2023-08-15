@@ -3,6 +3,7 @@ opentrons.protocols.parse: functions and state for parsing protocols
 """
 
 import ast
+import enum
 import functools
 import itertools
 import json
@@ -64,6 +65,46 @@ class JSONSchemaVersionTooNewError(RuntimeError):
             f" JSONv{self.attempted_schema_version} protocol,"
             f" which is not supported by this software version."
         )
+
+
+class PythonParseMode(enum.Enum):
+    """Configure optional rules for when `opentrons.protocols.parse.parse()` parses Python files.
+
+    This is an August 2023 temporary measure to let us add more validation to Python files without
+    disrupting our many internal users testing the Flex.
+    https://opentrons.atlassian.net/browse/RSS-306
+    """
+
+    NORMAL = enum.auto()
+    """Enforce the normal, strict, officially customer-facing rules.
+
+    You should use this mode when handling protocol files that are not already on a robot.
+    """
+
+    ALLOW_LEGACY_METADATA_AND_REQUIREMENTS = enum.auto()
+    """Disable enforcement of certain rules, allowing more questionable protocol files.
+
+    You should use this mode when handling protocol files that are already stored on a robot.
+
+    Certain rules were added late in Flex development, after protocol files that disobey them
+    were already put on internal testing robots. robot-server and the app generally do not
+    gracefully handle it when files that are already on a robot suddenly fail to parse; it currently
+    requires a disruptive factory-reset to get the robot usable again. To avoid making all our
+    internal users do that, we have this mode, as a temporary measure.
+
+    The specific differences from normal mode are:
+
+    1. Normally, if a protocol is for the Flex, it's an error to specify `apiLevel` 2.14 or older.
+       In this mode, the parser will allow those older `apiLevel`s. Actually running one of those
+       protocols may happen to work, or it may have obscure problems.
+
+    2. Normally, it's an error to specify unrecognized fields in the `requirements` dict.
+       In this mode, the parser ignores unrecognized fields.
+
+    3. Normally, it's an error to specify `apiLevel` in both the `metadata` and `requirements`
+       dicts simultaneously. You need to choose just one. In this mode, it's allowed, and
+       `requirements` will override `metadata` if they're different.
+    """
 
 
 def _validate_v2_ast(protocol_ast: ast.Module) -> None:
@@ -170,7 +211,7 @@ def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonP
 
 def _parse_python(
     protocol_contents: str,
-    flex_dev_compat: bool,
+    python_parse_mode: PythonParseMode,
     filename: Optional[str] = None,
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
@@ -210,7 +251,7 @@ def _parse_python(
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
-        if not flex_dev_compat:
+        if python_parse_mode != PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS:
             _validate_v2_static_info(static_info)
             _validate_robot_type_at_version(robot_type, version)
     else:
@@ -233,14 +274,14 @@ def _parse_python(
 
 
 def _parse_bundle(
-    bundle: ZipFile, flex_dev_compat: bool, filename: Optional[str] = None
+    bundle: ZipFile, python_parse_mode: PythonParseMode, filename: Optional[str] = None
 ) -> PythonProtocol:
     """Parse a bundled Python protocol"""
     contents = extract_bundle(bundle)
 
     result = _parse_python(
         protocol_contents=contents.protocol,
-        flex_dev_compat=flex_dev_compat,
+        python_parse_mode=python_parse_mode,
         filename=filename,
         bundled_labware=contents.bundled_labware,
         bundled_data=contents.bundled_data,
@@ -260,9 +301,9 @@ def parse(
     filename: Optional[str] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     extra_data: Optional[Dict[str, bytes]] = None,
-    # TODO(mm, 2023-08-10): Remove flex_dev_compat after the Flex launch, when the malformed
+    # TODO(mm, 2023-08-10): Remove python_parse_mode after the Flex launch, when the malformed
     # protocols are no longer on any robots. https://opentrons.atlassian.net/browse/RSS-306
-    flex_dev_compat: bool = False,
+    python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
 ) -> Protocol:
     """Parse a protocol from text.
 
@@ -277,10 +318,7 @@ def parse(
     :param extra_data: Any extra data files that should be provided to the
                        protocol. Ignored if the protocol is json or zipped
                        python.
-    :param flex_dev_compat: Use more lax validation rules to accept Opentrons-
-                            written protocols from Flex development and
-                            testing, before the exact rules for the
-                            `requirements` and `metadata` dicts were finalized.
+    :param python_parse_mode: See `PythonParseMode`.
     :return types.Protocol: The protocol holder, a named tuple that stores the
                         data in the protocol for later simulation or
                         execution.
@@ -293,7 +331,7 @@ def parse(
 
         with ZipFile(BytesIO(protocol_file)) as bundle:
             result = _parse_bundle(
-                bundle=bundle, flex_dev_compat=flex_dev_compat, filename=filename
+                bundle=bundle, python_parse_mode=python_parse_mode, filename=filename
             )
         return result
     else:
@@ -307,7 +345,7 @@ def parse(
         elif filename and filename.endswith(".py"):
             return _parse_python(
                 protocol_contents=protocol_str,
-                flex_dev_compat=flex_dev_compat,
+                python_parse_mode=python_parse_mode,
                 filename=filename,
                 extra_labware=extra_labware,
                 bundled_data=extra_data,
@@ -319,7 +357,7 @@ def parse(
         else:
             return _parse_python(
                 protocol_contents=protocol_str,
-                flex_dev_compat=flex_dev_compat,
+                python_parse_mode=python_parse_mode,
                 filename=filename,
                 extra_labware=extra_labware,
                 bundled_data=extra_data,

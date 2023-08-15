@@ -6,6 +6,7 @@ import pytest
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.parse import (
+    PythonParseMode,
     _get_protocol_schema_version,
     validate_json,
     parse,
@@ -633,10 +634,9 @@ def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
         parse(dedent(bad_protocol))
 
 
-# TODO(mm, 2023-08-10): When we remove flex_dev_compat from parse(), remove this
-# flex_dev_compat=True parametrization and merge these tests with the other metadata/requirements
-# validation tests.
-@pytest.mark.parametrize("flex_dev_compat", [True, False])
+# TODO(mm, 2023-08-10): When we remove python_parse_mode from parse(), remove this
+# parametrization and merge these tests with the other metadata/requirements validation tests.
+@pytest.mark.parametrize("python_parse_mode", PythonParseMode)
 @pytest.mark.parametrize(
     ("questionable_protocol", "expected_message"),
     [
@@ -682,18 +682,20 @@ def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
         ),
     ],
 )
-def test_flex_dev_compat_conditional_errors(
-    questionable_protocol: str, flex_dev_compat: bool, expected_message: str
+def test_errors_conditional_on_legacy_mode(
+    questionable_protocol: str,
+    python_parse_mode: PythonParseMode,
+    expected_message: str,
 ) -> None:
-    if flex_dev_compat:
+    if python_parse_mode == PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS:
         # Should not raise:
-        parse(dedent(questionable_protocol), flex_dev_compat=True)
+        parse(dedent(questionable_protocol), python_parse_mode=python_parse_mode)
     else:
         with pytest.raises(MalformedPythonProtocolError, match=expected_message):
-            parse(dedent(questionable_protocol), flex_dev_compat=False)
+            parse(dedent(questionable_protocol), python_parse_mode=python_parse_mode)
 
 
-# TODO(mm, 2023-08-10): Remove these tests when we remove flex_dev_compat from parse().
+# TODO(mm, 2023-08-10): Remove these tests when we remove python_parse_mode from parse().
 # https://opentrons.atlassian.net/browse/RSS-306
 @pytest.mark.parametrize(
     ("protocol_source", "expected_api_level"),
@@ -716,13 +718,16 @@ def test_flex_dev_compat_conditional_errors(
         ),
     ],
 )
-def test_flex_dev_compat_apilevel_override(
+def test_legacy_apilevel_override(
     protocol_source: str, expected_api_level: APIVersion
 ) -> None:
     """An apiLevel in requirements should override an apiLevel in metadata.
 
-    This only matters in flex_dev_compat=True mode. With stricter validation,
-    it's impossible to put apiLevel in both dicts in the first place.
+    This only matters with `PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS`.
+    With stricter validation, it's impossible to put apiLevel in both dicts in the first place.
     """
-    parsed = parse(dedent(protocol_source), flex_dev_compat=True)
+    parsed = parse(
+        dedent(protocol_source),
+        python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+    )
     assert parsed.api_level == expected_api_level
