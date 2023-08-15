@@ -2,23 +2,23 @@
 
 .. _new-examples:
 
-########
-Examples
-########
+*****************
+Protocol Examples
+*****************
 
-This page provides you with a few ready-made code samples that work on a Flex or OT-2. Try changing a protocol and validating it in the Opentrons app. Adding different instruments, modules, labware, and commands is an ideal way to grow and test the skills you've learned from the :ref:`Tutorial <tutorial>`. The examples also make great templates. Copy and modify this code to create unique protocols that help automate your laboratory workflows. 
+This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity, along with your Python skills, in the Opentrons app. 
 
 Instruments and Labware
 =======================
 
 Before getting started, you'll want to have the right instruments and labware ready for your robot. 
 
-Pipettes the code samples include the:
+Code samples use the following pipettes:
 
 * Flex 1-Channel Pipette (5-1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
 * P300 Single-Channel GEN2 pipette (20-300 µL) for the OT-2. The API load name for this pipette is ``p300_single_gen2``. 
 
-The code samples also use the labware listed below: 
+Code samples also use the labware listed below: 
 
 .. list-table::
     :header-rows: 1
@@ -68,8 +68,9 @@ This example uses the :py:meth:`.InstrumentContext.transfer` method to move 100 
                     tip_racks=[tiprack_1])
                 # transfer 100 µL from well A1 to well B1
                 pipette_1.transfer(100, plate['A1'], plate['B1'])
+                pipette_1.drop_tip()
 
-        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid around a well plate.
+        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid between well plates. However, the following commands are useful because they give you exceptionally precise control over your robot.
 
         .. code-block:: python
             :substitutions:
@@ -117,8 +118,9 @@ This example uses the :py:meth:`.InstrumentContext.transfer` method to move 100 
                     tip_racks=[tiprack_1])
                 # transfer 100 µL from well A1 to well B1
                 p300.transfer(volume=100, plate['A1'], plate['B1'])
+                p300.drop_tip()
     
-        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid around a well plate.
+        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid between well plates. However, the following commands are useful because they give you exceptionally precise control over your robot.
         
         .. code-block:: python
             :substitutions:
