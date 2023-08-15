@@ -6,7 +6,7 @@
 Protocol Examples
 *****************
 
-This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity, along with your Python skills, in the Opentrons app. 
+This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity in the Opentrons app. 
 
 Instruments and Labware
 =======================
@@ -149,27 +149,75 @@ This example uses the :py:meth:`.InstrumentContext.transfer` method to move 100 
 Loops
 =====
 
-Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``7``, and uses that loop's current value to transfer from all wells in a reservoir to each row of a plate:
+In Python, a loop is an instruction that keeps repeating an action until a specific condition is met. 
 
-.. code-block:: python
-    :substitutions:
+When used in a protocol, loops automate repetitive steps such as aspirating and dispensing liquids from a reservoir to a a range of wells, or all the wells, in a well plate. For example, this code sample loops through the numbers 0 to 7, and uses the loop's current value to transfer liquid from all the wells in a reservoir to all the wells in a 96-well plate.
 
-    from opentrons import protocol_api
+Notice too how `Python's range class <https://docs.python.org/3/library/stdtypes.html#range>`_ (e.g., ``range(8)``) determines how many times the code loops. In Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7. 
 
-    metadata = {'apiLevel': '|apiLevel|'}
+.. tabs::
 
-    def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
-        # distribute 20uL from reservoir:A1 -> plate:row:1
-        # distribute 20uL from reservoir:A2 -> plate:row:2
-        # etc...
+    .. tab:: Flex
 
-        # range() starts at 0 and stops before 8, creating a range of 0-7
-        for i in range(8):
-            p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location="D1")
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="D2")
+                reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location="D3")
+                pipette_1 = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000',
+                    mount='left',
+                    tip_racks=[tiprack_1])
+                
+                # distribute 20uL from reservoir:A1 -> plate:row:1
+                # distribute 20uL from reservoir:A2 -> plate:row:2
+                # etc...
+                # range() starts at 0 and stops before 8, creating a range of 0-7
+                for i in range(8):
+                    pipette_1.distribute(200, reservoir.wells()[i], plate.rows()[i])
+
+    .. tab:: OT-2
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=1)
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=2)
+                reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location=4)
+                p300 = protocol.load_instrument(
+                    instrument_name='p300_single',
+                    mount='left',
+                    tip_racks=[tiprack_1])
+                
+                # distribute 20uL from reservoir:A1 -> plate:row:1
+                # distribute 20uL from reservoir:A2 -> plate:row:2
+                # etc...
+                # range() starts at 0 and stops before 8, creating a range of 0-7
+                for i in range(8):
+                    p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
 
 
 Multiple Air Gaps
