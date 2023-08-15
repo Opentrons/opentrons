@@ -132,11 +132,10 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
-        slot_name = validation.ensure_deck_slot_string(
-            _get_slot_name(slot, self._api_version, self._protocol_core.robot_type),
-            self._protocol_core.robot_type,
+        slot_name = _get_slot_name(
+            slot, self._api_version, self._protocol_core.robot_type
         )
-        return self._slot_definitions_by_name[slot_name]
+        return self._slot_definitions_by_name[slot_name.id]
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_center(self, slot: DeckLocation) -> Point:
