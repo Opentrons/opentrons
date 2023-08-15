@@ -25,7 +25,7 @@ import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {
-  requiredLabwareDetails: LoadLabwareRunTimeCommand[]
+  requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null
 }
 
 export const ProtocolLabwareDetails = (
@@ -52,6 +52,7 @@ export const ProtocolLabwareDetails = (
             .values(),
         ]
       : []
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

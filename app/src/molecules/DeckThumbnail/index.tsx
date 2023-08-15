@@ -86,7 +86,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       {({ deckSlotsById }) => (
         <>
           {map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
-            if (slot.matingSurfaceUnitVector == null) return null
+            if (slot.matingSurfaceUnitVector == null) return null // if slot has no mating surface, don't render anything in it
 
             const moduleInSlot =
               slotId in initialLoadedModulesBySlot

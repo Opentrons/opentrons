@@ -33,25 +33,25 @@ export const getProtocolModulesInfo = (
   if (protocolData != null && 'modules' in protocolData) {
     return protocolData.modules.reduce<ProtocolModuleInfo[]>((acc, module) => {
       const moduleDef = getModuleDef2(module.model)
-      const nestedLabwares = protocolData.commands
-        .filter(
-          (command): command is LoadLabwareRunTimeCommand =>
-            command.commandType === 'loadLabware'
-        )
-        .find(
-          (command: LoadLabwareRunTimeCommand) =>
-            typeof command.params.location === 'object' &&
-            'moduleId' in command.params.location &&
-            command.params.location.moduleId === module.id
-        )
-
-      const nestedLabwareId = nestedLabwares?.result?.labwareId ?? null
+      const nestedLabwareId =
+        protocolData.commands
+          .filter(
+            (command): command is LoadLabwareRunTimeCommand =>
+              command.commandType === 'loadLabware'
+          )
+          .find(
+            (command: LoadLabwareRunTimeCommand) =>
+              typeof command.params.location === 'object' &&
+              'moduleId' in command.params.location &&
+              command.params.location.moduleId === module.id
+          )?.result?.labwareId ?? null
       const nestedLabware = protocolData.labware.find(
         item => nestedLabwareId != null && item.id === nestedLabwareId
       )
       const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
         protocolData.commands
       )
+
       const nestedLabwareDef =
         nestedLabware != null
           ? labwareDefinitionsByUri[nestedLabware.definitionUri]

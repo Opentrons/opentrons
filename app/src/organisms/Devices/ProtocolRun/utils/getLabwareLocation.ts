@@ -16,18 +16,17 @@ export const getLabwareLocation = (
   if (labwareId === TRASH_ID) {
     return { slotName: '12' }
   }
-
-  const locationCommand = commands.find(
-    (command): command is LoadLabwareRunTimeCommand =>
+  const labwareLocation = commands.find(
+    (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
       command.commandType === 'loadLabware' &&
       command.result?.labwareId === labwareId
-  )
+  )?.params?.location
 
-  if (locationCommand?.params?.location == null) {
+  if (labwareLocation == null) {
     throw new Error(
-      'Expected to be able to find labware location, but could not'
+      'expected to be able to find labware location, but could not'
     )
   }
 
-  return locationCommand.params.location
+  return labwareLocation
 }

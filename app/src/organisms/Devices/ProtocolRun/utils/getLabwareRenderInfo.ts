@@ -57,7 +57,7 @@ export const getLabwareRenderInfo = (
         command.commandType === 'loadLabware'
     )
     .reduce((acc, command) => {
-      const labwareId = command?.result?.labwareId
+      const labwareId = command.result?.labwareId
       const location = command.params.location
       const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
