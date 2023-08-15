@@ -47,6 +47,7 @@ describe('MovePin', () => {
           createRunCommand={mockCreateRunCommand}
           errorMessage={null}
           setErrorMessage={mockSetErrorMessage}
+          isExiting={false}
           {...props}
         />,
         { i18nInstance: i18n }
