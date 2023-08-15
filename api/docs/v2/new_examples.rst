@@ -70,7 +70,7 @@ This example uses the :py:meth:`.InstrumentContext.transfer` method to move 100 
                 pipette_1.transfer(100, plate['A1'], plate['B1'])
                 pipette_1.drop_tip()
 
-        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid between well plates. However, the following commands are useful because they give you exceptionally precise control over your robot.
+        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid between well plates. However, the following protocol can be useful because the methods is uses gives you exceptionally precise control over your robot.
 
         .. code-block:: python
             :substitutions:
@@ -120,7 +120,7 @@ This example uses the :py:meth:`.InstrumentContext.transfer` method to move 100 
                 p300.transfer(volume=100, plate['A1'], plate['B1'])
                 p300.drop_tip()
     
-        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid between well plates. However, the following commands are useful because they give you exceptionally precise control over your robot.
+        The code above accomplishes the same thing as the sample below but perhaps a little more efficiently. It doesn't require the :ref:`basic commands <v2-atomic-commands>` such as :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, or :py:meth:`~.InstrumentContext.dispense` to move liquid between well plates. However, the following protocol can be useful because the methods is uses gives you exceptionally precise control over your robot.
         
         .. code-block:: python
             :substitutions:
@@ -151,9 +151,7 @@ Loops
 
 In Python, a loop is an instruction that keeps repeating an action until a specific condition is met. 
 
-When used in a protocol, loops automate repetitive steps such as aspirating and dispensing liquids from a reservoir to a a range of wells, or all the wells, in a well plate. For example, this code sample loops through the numbers 0 to 7, and uses the loop's current value to transfer liquid from all the wells in a reservoir to all the wells in a 96-well plate.
-
-Notice too how `Python's range class <https://docs.python.org/3/library/stdtypes.html#range>`_ (e.g., ``range(8)``) determines how many times the code loops. In Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7. 
+When used in a protocol, loops automate repetitive steps such as aspirating and dispensing liquids from a reservoir to a a range of wells, or all the wells, in a well plate. For example, this code sample loops through the numbers 0 to 7, and uses the loop's current value to transfer liquid from all the wells in a reservoir to all the wells in a 96-well plate. 
 
 .. tabs::
 
@@ -219,41 +217,91 @@ Notice too how `Python's range class <https://docs.python.org/3/library/stdtypes
                 for i in range(8):
                     p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
 
+Notice here how `Python's range class <https://docs.python.org/3/library/stdtypes.html#range>`_ (e.g., ``range(8)``) determines how many times the code loops. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
 
 Multiple Air Gaps
 =================
 
-The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
+Opentrons electronic pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The protocol shown below shows you how to aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
 
-.. code-block:: python
-    :substitutions:
+.. tabs::
 
-    from opentrons import protocol_api
+    .. tab:: Flex
 
-    metadata = {'apiLevel': '|apiLevel|'}
+        .. code-block:: python
+            :substitutions:
 
-    def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+            from opentrons import protocol_api
 
-        p300.pick_up_tip()
+            requirements = {'robotType': 'Flex', 'apiLevel':'2.15'}
 
-        for well in reservoir.wells()[:4]:
-            p300.aspirate(35, well)
-            p300.air_gap(10)
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location="D1")
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="D2")
+                reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location="C1")
+                pipette_1 = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000', 
+                    mount='left',
+                    tip_racks=[tiprack_1])
+
+                pipette_1.pick_up_tip()
+
+                # aspirate from the first 5 wells
+                for well in reservoir.wells()[:4]:
+                    pipette_1.aspirate(volume=35, location=well)
+                    pipette_1.air_gap(10)
         
-        p300.dispense(225, plate['A1'])
+                pipette_1.dispense(225, plate['A1'])
 
-        p300.return_tip()
+                pipette_1.return_tip()
 
+    .. tab:: OT-2
 
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=1)
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=2)
+                reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location=4)
+                p300 = protocol.load_instrument(
+                    instrument_name='p300_single', 
+                    mount='right',
+                    tip_racks=[tiprack_1])
+
+                p300.pick_up_tip()
+
+                # aspirate from the first 5 wells
+                for well in reservoir.wells()[:4]:
+                    p300.aspirate(volume=35, location=well)
+                    p300.air_gap(10)
+        
+                p300.dispense(225, plate['A1'])
+
+                p300.return_tip()
+
+Notice here how `Python's slice class <https://docs.python.org/3/library/functions.html#slice>`_ (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
 Dilution
 ========
 
-This example first spreads a diluent to all wells of a plate. It then dilutes 8 samples from the reservoir across the 8 columns of the plate.
+This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, it dilutes eight samples from the reservoir across all 8 columns of the plate.
 
 .. code-block:: python
     :substitutions:
