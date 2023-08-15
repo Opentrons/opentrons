@@ -274,6 +274,7 @@ async def _force_gauge(
             # we expect a stall has happened during pick up, so we want to
             # update the motor estimation
             await api._update_position_estimation([Axis.by_mount(mount)])
+            await api.refresh_positions()
 
             await api.move_to(mount=mount, abs_position=pre_test_pos)
 
