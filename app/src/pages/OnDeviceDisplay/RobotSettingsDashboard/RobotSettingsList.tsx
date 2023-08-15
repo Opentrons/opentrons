@@ -1,15 +1,33 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  Btn,
+  COLORS,
+  BORDERS,
+  DISPLAY_FLEX,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
+  TYPOGRAPHY,
+  Icon,
+  ALIGN_FLEX_START,
+  JUSTIFY_CENTER,
+} from '@opentrons/components'
 
 import { getLocalRobot, getRobotApiVersion } from '../../../redux/discovery'
 import { getRobotUpdateAvailable } from '../../../redux/robot-update'
 import {
+  DEV_INTERNAL_FLAGS,
   getApplyHistoricOffsets,
   getDevtoolsEnabled,
+  getFeatureFlags,
+  toggleDevInternalFlag,
 } from '../../../redux/config'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
@@ -18,8 +36,9 @@ import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from '../hooks'
 import { RobotSettingButton } from './RobotSettingButton'
 
-import type { State } from '../../../redux/types'
+import type { Dispatch, State } from '../../../redux/types'
 import type { SetSettingOption } from './'
+import { StyledText } from '../../../atoms/text'
 
 interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
@@ -124,7 +143,70 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           enabledDevTools
           devToolsOn={devToolsOn}
         />
+        {devToolsOn ? <FeatureFlags /> : null}
       </Flex>
     </Flex>
+  )
+}
+
+function FeatureFlags(): JSX.Element {
+  const { t } = useTranslation('app_settings')
+  const devInternalFlags = useSelector(getFeatureFlags)
+  const dispatch = useDispatch<Dispatch>()
+  return (
+    <>
+      {DEV_INTERNAL_FLAGS.map(flag => (
+        <Btn
+          key={flag}
+          width="100%"
+          marginBottom={SPACING.spacing8}
+          backgroundColor={COLORS.light1}
+          padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
+          borderRadius={BORDERS.borderRadiusSize4}
+          display={DISPLAY_FLEX}
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing24}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+          onClick={() => {
+            console.log('CLICKED TOGGLE flag', flag)
+            dispatch(toggleDevInternalFlag(flag))
+          }}
+        >
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing24}
+            alignItems={ALIGN_CENTER}
+          >
+            <Icon name="alert-circle" size="3rem" color={COLORS.darkBlack100} />
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing2}
+              alignItems={ALIGN_FLEX_START}
+              justifyContent={JUSTIFY_CENTER}
+              width="46.25rem"
+            >
+              <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                {t(`__dev_internal__${flag}`)}
+              </StyledText>
+            </Flex>
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing12}
+            alignItems={ALIGN_CENTER}
+            backgroundColor={COLORS.transparent}
+            padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+            borderRadius={BORDERS.borderRadiusSize4}
+          >
+            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+              {Boolean(devInternalFlags?.[flag])
+                ? t('shared:on')
+                : t('shared:off')}
+            </StyledText>
+          </Flex>
+        </Btn>
+      ))}
+    </>
   )
 }

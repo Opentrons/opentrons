@@ -33,6 +33,32 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
+  - name: Make sure the new protocol is present in GET /protocols
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{protocol_id}'
+        meta:
+          cursor: 0
+          totalLength: 1
+  - name: Make sure the new protocol is present in GET /protocols/ids
+    request:
+      url: '{ot2_server_base_url}/protocols/ids'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          - '{protocol_id}'
+        meta:
+          cursor: 0
+          totalLength: 1
   - name: Retry until analyses status is completed and result is ok.
     max_retries: 5
     delay_after: 1

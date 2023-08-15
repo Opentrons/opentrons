@@ -165,8 +165,8 @@ export const MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM = 53
 
 export const OT2_STANDARD_MODEL: 'OT-2 Standard' = 'OT-2 Standard'
 export const OT2_STANDARD_DECKID: 'ot2_standard' = 'ot2_standard'
-export const OT3_STANDARD_MODEL: 'OT-3 Standard' = 'OT-3 Standard'
-export const OT3_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
+export const FLEX_STANDARD_MODEL: 'OT-3 Standard' = 'OT-3 Standard'
+export const FLEX_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
 
 export const SINGLE_CHANNEL: 'Single-Channel' = 'Single-Channel'
 export const EIGHT_CHANNEL: '8-Channel' = '8-Channel'
