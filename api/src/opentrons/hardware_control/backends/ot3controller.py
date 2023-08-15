@@ -642,12 +642,11 @@ class OT3Controller:
             positions = await asyncio.gather(*coros)
         # TODO(CM): default gear motor homing routine to have some acceleration
         if Axis.Q in checked_axes:
-            await self.tip_action(
+            await self.home_gear_motors(
                 distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
                 velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     Axis.to_kind(Axis.Q)
                 ],
-                tip_action="home",
             )
         for position in positions:
             self._handle_motor_status_response(position)
@@ -665,26 +664,33 @@ class OT3Controller:
             )
         return new_group
 
+    async def home_gear_motors(
+        self,
+        distance: float,
+        velocity: float,
+        back_off: bool = True,
+    ) -> None:
+        move_group = create_gear_motor_home_group(
+            float(distance), float(velocity), back_off
+        )
+
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+        )
+        positions = await runner.run(can_messenger=self._messenger)
+        if NodeId.pipette_left in positions:
+            self._gear_motor_position = {
+                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+            }
+        else:
+            log.debug("no position returned from NodeId.pipette_left")
+
     async def tip_action(
         self,
-        moves: Optional[List[Move[Axis]]] = None,
-        distance: Optional[float] = None,
-        velocity: Optional[float] = None,
-        tip_action: str = "home",
-        back_off: Optional[bool] = False,
+        moves: List[Move[Axis]],
     ) -> None:
-        # TODO: split this into two functions for homing and 'clamp'
-        move_group = []
-        # make sure either moves or distance and velocity is not None
-        assert bool(moves) ^ (bool(distance) and bool(velocity))
-        if moves is not None:
-            move_group = create_tip_action_group(
-                moves, [NodeId.pipette_left], tip_action
-            )
-        elif distance is not None and velocity is not None:
-            move_group = create_gear_motor_home_group(
-                float(distance), float(velocity), back_off
-            )
+        move_group = create_tip_action_group(moves, [NodeId.pipette_left], "clamp")
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
