@@ -23,39 +23,25 @@ export function ProtocolSetupTitleSkeleton(): JSX.Element {
   )
 }
 
+const SetupSkeleton = (): JSX.Element => {
+  return (
+    <Skeleton
+      height="5.5rem"
+      width="100%"
+      backgroundSize="99rem"
+      borderRadius={BORDERS.borderRadiusSize3}
+    />
+  )
+}
+
 export function ProtocolSetupStepSkeleton(): JSX.Element {
   return (
     <>
-      <Skeleton
-        height="5.5rem"
-        width="100%"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusSize3}
-      />
-      <Skeleton
-        height="5.5rem"
-        width="100%"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusSize3}
-      />
-      <Skeleton
-        height="5.5rem"
-        width="100%"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusSize3}
-      />
-      <Skeleton
-        height="5.5rem"
-        width="100%"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusSize3}
-      />
-      <Skeleton
-        height="5.5rem"
-        width="100%"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusSize3}
-      />
+      <SetupSkeleton />
+      <SetupSkeleton />
+      <SetupSkeleton />
+      <SetupSkeleton />
+      <SetupSkeleton />
     </>
   )
 }
