@@ -491,7 +491,7 @@ function PrepareToRun({
             gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
-            {isLoading ? (
+            {!isLoading ? (
               <>
                 <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
                   {t('prepare_to_run')}
@@ -531,7 +531,7 @@ function PrepareToRun({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing8}
       >
-        {isLoading ? (
+        {!isLoading ? (
           <>
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('instruments')}
