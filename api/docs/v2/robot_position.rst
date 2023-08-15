@@ -19,7 +19,7 @@ When the robot positions itself relative to a piece of labware, the labware defi
 Top, Bottom, and Center
 =======================
 
-Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and whether the labware is on a module or in a deck slot. You can use these positions as-is or calculate other positions relative to them.
+Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and what the labware is loaded on top of. You can use these positions as-is or calculate other positions relative to them.
 
 Top
 ---
@@ -48,7 +48,7 @@ As an example, lets look at the :py:meth:`.Well.bottom` method. It returns a pos
 
    plate['A1'].bottom()  # the bottom center of the well
 
-This is a good position to for :ref:`aspirating liquid <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z``` numbers move it down.
+This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z``` numbers move it down.
 
 .. code-block:: python
 
@@ -110,9 +110,9 @@ Modifying these attributes will affect all subsequent aspirate and dispense acti
 Using Labware Position Check
 ============================
 
-All positions relative to labware are adjusted automatically based on the labware's x, y, z axis offset. The best way to calculate and apply these offsets is by using Labware Position Check when you run your protocol in the Opentrons App. With v6.0 of the app, you can apply previously calculated offsets on the same robot for the same labware type and deck slot, even with different protocols.
+All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
 
-You shouldn't adjust labware offsets in your Python code if you plan to run your protocol in the app. However, if you are running your protocol in Jupyter notebook or with ``opentrons_execute``, the Labware Position Check is not directly available. For these applications, you can calculate and apply labware offsets by:
+You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter notebook or with ``opentrons_execute``. This is because you can't run Labware Position Check from Jupyter or the command line. For these applications, calculate and apply labware offsets by:
 	
 	1. Creating a "dummy" protocol that loads your labware and has each used pipette pick up a tip from a tip rack.
 	2. Importing the dummy protocol to the Opentrons App.
@@ -263,7 +263,7 @@ The robot's gantry usually moves as fast as it can given its construction. The d
 
 .. warning::
 
-	These default speeds were chosen because they're the maximum speed Opentrons knows will work with the gantry. Your robot may be able to move faster, but you shouldn't increase this value unless instructed by Opentrons Support.
+	These default speeds were chosen because they're the maximum speeds that Opentrons knows will work with the gantry. Your robot may be able to move faster, but you shouldn't increase this value unless instructed by Opentrons Support.
 
 
 .. versionadded:: 2.0
