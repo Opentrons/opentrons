@@ -136,7 +136,7 @@ And because we already loaded a tip rack via the ``rack`` variable, the robot au
 Dropping a Tip
 --------------
 
-You tell the robot to discard a used tip by calling the :py:meth:`.InstrumentContext.drop_tip` method. This method automatically drops a tip in the on-deck trash bin. It also lets you set a specific drop location. This code builds on the pick up command by including ``drop_tip()``.
+You tell the robot to discard a used tip by calling the :py:meth:`.InstrumentContext.drop_tip` method. This method automatically drops a tip in the on-deck trash bin. The optional ``location`` argument also lets you set a specific tip drop position. This code builds on the pick up command by including ``drop_tip()``.
 
 .. code-block:: python
 
@@ -145,8 +145,11 @@ You tell the robot to discard a used tip by calling the :py:meth:`.InstrumentCon
     pipette.pick_up_tip()         # pick up from rack location B1
     pipette.drop_tip(rack['B1'])  # drop tip in rack location B1
     
-
 .. versionadded:: 2.0
+
+If you don't specify a location, the robot will drop tips in different spots within the trash container. This behavior helps prevent tips from stacking up in a single location.
+
+.. versionchanged:: 2.15
 
 .. _pipette-return-tip:
 
