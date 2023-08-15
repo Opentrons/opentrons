@@ -12,6 +12,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
   RunTimeCommand,
@@ -77,21 +78,21 @@ export function SetupLabwareMap({
                       nestedLabwareId != null
                         ? initialLoadedLabwareByAdapter[nestedLabwareId]
                         : null
-                    const definition =
+                    //  only rendering the labware on top most layer so
+                    //  either the adapter or the labware are rendered but not both
+                    const topLabwareDefinition =
                       labwareInAdapterInMod?.result?.definition ??
                       nestedLabwareDef
-                    const labwareIdToUse =
+                    const topLabwareId =
                       labwareInAdapterInMod?.result?.labwareId ??
                       nestedLabwareId
-                    const displayNameToUse =
+                    const topLabwareDisplayName =
                       labwareInAdapterInMod?.result?.definition.metadata
                         .displayName ?? nestedLabwareDisplayName
 
                     return (
                       <Module
-                        key={`LabwareSetup_Module_${String(
-                          moduleDef.model
-                        )}_${x}${y}`}
+                        key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
                         x={x}
                         y={y}
                         orientation={inferModuleOrientationFromXCoordinate(x)}
@@ -102,17 +103,17 @@ export function SetupLabwareMap({
                             : {}
                         }
                       >
-                        {definition != null &&
-                        displayNameToUse != null &&
-                        labwareIdToUse != null ? (
+                        {topLabwareDefinition != null &&
+                        topLabwareDisplayName != null &&
+                        topLabwareId != null ? (
                           <React.Fragment
-                            key={`LabwareSetup_Labware_${displayNameToUse}_${x}${y}`}
+                            key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
                           >
-                            <LabwareRender definition={definition} />
+                            <LabwareRender definition={topLabwareDefinition} />
                             <LabwareInfoOverlay
-                              definition={definition}
-                              labwareId={labwareIdToUse}
-                              displayName={displayNameToUse}
+                              definition={topLabwareDefinition}
+                              labwareId={topLabwareId}
+                              displayName={topLabwareDisplayName}
                               runId={runId}
                             />
                           </React.Fragment>
@@ -126,26 +127,26 @@ export function SetupLabwareMap({
                   ({ x, y, labwareDef, displayName }, labwareId) => {
                     const labwareInAdapter =
                       initialLoadedLabwareByAdapter[labwareId]
-                    const definition =
+                    //  only rendering the labware on top most layer so
+                    //  either the adapter or the labware are rendered but not both
+                    const topLabwareDefinition =
                       labwareInAdapter?.result?.definition ?? labwareDef
-                    const labwareIdToUse =
+                    const topLabwareId =
                       labwareInAdapter?.result?.labwareId ?? labwareId
-                    const displayNameToUse =
+                    const topLabwareDisplayName =
                       labwareInAdapter?.result?.definition.metadata
                         .displayName ?? displayName
 
                     return (
                       <React.Fragment
-                        key={`LabwareSetup_Labware_${String(
-                          displayNameToUse
-                        )}_${x}${y}`}
+                        key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
                       >
                         <g transform={`translate(${x},${y})`}>
-                          <LabwareRender definition={definition} />
+                          <LabwareRender definition={topLabwareDefinition} />
                           <LabwareInfoOverlay
-                            definition={definition}
-                            labwareId={labwareIdToUse}
-                            displayName={displayNameToUse}
+                            definition={topLabwareDefinition}
+                            labwareId={topLabwareId}
+                            displayName={topLabwareDisplayName}
                             runId={runId}
                           />
                         </g>
@@ -161,7 +162,7 @@ export function SetupLabwareMap({
         </Box>
         <OffDeckLabwareList
           labwareItems={offDeckItems}
-          isOt3={robotType === 'OT-3 Standard'}
+          isOt3={robotType === FLEX_ROBOT_TYPE}
           commands={commands}
         />
       </Flex>

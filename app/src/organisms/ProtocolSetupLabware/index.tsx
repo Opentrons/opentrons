@@ -24,6 +24,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -49,7 +50,6 @@ import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -105,7 +105,7 @@ export function ProtocolSetupLabware({
   >(null)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
     mostRecentAnalysis?.commands ?? []
   )
@@ -247,27 +247,23 @@ export function ProtocolSetupLabware({
                       moduleDef,
                       nestedLabwareDef,
                       nestedLabwareId,
-                      nestedLabwareDisplayName,
                     }) => {
                       const labwareInAdapterInMod =
                         nestedLabwareId != null
                           ? initialLoadedLabwareByAdapter[nestedLabwareId]
                           : null
-                      const definition =
+                      //  only rendering the labware on top most layer so
+                      //  either the adapter or the labware are rendered but not both
+                      const topLabwareDefinition =
                         labwareInAdapterInMod?.result?.definition ??
                         nestedLabwareDef
-                      const labwareIdToUse =
+                      const topLabwareId =
                         labwareInAdapterInMod?.result?.labwareId ??
                         nestedLabwareId
-                      const displayNameToUse =
-                        labwareInAdapterInMod?.result?.definition.metadata
-                          .displayName ?? nestedLabwareDisplayName
 
                       return (
                         <Module
-                          key={`LabwareSetup_Module_${String(
-                            moduleDef.model
-                          )}_${x}${y}`}
+                          key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
                           x={x}
                           y={y}
                           orientation={inferModuleOrientationFromXCoordinate(x)}
@@ -278,16 +274,18 @@ export function ProtocolSetupLabware({
                               : {}
                           }
                         >
-                          {definition != null &&
-                          displayNameToUse != null &&
-                          labwareIdToUse != null ? (
+                          {topLabwareDefinition != null &&
+                          topLabwareId != null ? (
                             <React.Fragment
-                              key={`LabwareSetup_Labware_${displayNameToUse}_${x}${y}`}
+                              key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
                             >
                               <LabwareRender
-                                definition={definition}
+                                definition={topLabwareDefinition}
                                 onLabwareClick={() =>
-                                  handleLabwareClick(definition, labwareIdToUse)
+                                  handleLabwareClick(
+                                    topLabwareDefinition,
+                                    topLabwareId
+                                  )
                                 }
                               />
                             </React.Fragment>
@@ -296,35 +294,34 @@ export function ProtocolSetupLabware({
                       )
                     }
                   )}
-                  {map(
-                    labwareRenderInfo,
-                    ({ x, y, labwareDef, displayName }, labwareId) => {
-                      const labwareInAdapter =
-                        initialLoadedLabwareByAdapter[labwareId]
-                      const definition =
-                        labwareInAdapter?.result?.definition ?? labwareDef
-                      const labwareIdToUse =
-                        labwareInAdapter?.result?.labwareId ?? labwareId
-                      const displayNameToUse =
-                        labwareInAdapter?.result?.definition.metadata
-                          .displayName ?? displayName
-                      return (
-                        <React.Fragment
-                          key={`LabwareSetup_Labware_${displayNameToUse}_${x}${y}`}
-                        >
-                          <g transform={`translate(${x},${y})`}>
-                            <LabwareRender
-                              definition={definition}
-                              onLabwareClick={() =>
-                                handleLabwareClick(definition, labwareIdToUse)
-                              }
-                            />
-                          </g>
-                        </React.Fragment>
-                      )
-                    }
-                  )}
-                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
+                  {map(labwareRenderInfo, ({ x, y, labwareDef }, labwareId) => {
+                    const labwareInAdapter =
+                      initialLoadedLabwareByAdapter[labwareId]
+                    //  only rendering the labware on top most layer so
+                    //  either the adapter or the labware are rendered but not both
+                    const topLabwareDefinition =
+                      labwareInAdapter?.result?.definition ?? labwareDef
+                    const topLabwareId =
+                      labwareInAdapter?.result?.labwareId ?? labwareId
+                    return (
+                      <React.Fragment
+                        key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
+                      >
+                        <g transform={`translate(${x},${y})`}>
+                          <LabwareRender
+                            definition={topLabwareDefinition}
+                            onLabwareClick={() =>
+                              handleLabwareClick(
+                                topLabwareDefinition,
+                                topLabwareId
+                              )
+                            }
+                          />
+                        </g>
+                      </React.Fragment>
+                    )
+                  })}
+                  <SlotLabels robotType={FLEX_ROBOT_TYPE} />
                 </>
               )}
             </RobotWorkSpace>
