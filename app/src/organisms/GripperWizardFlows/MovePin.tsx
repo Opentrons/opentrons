@@ -213,7 +213,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     return (
       <InProgressModal
         description={
-          errorMessage == null
+          errorMessage == null && !isExiting
             ? inProgressText
             : t('shared:stand_back_robot_is_in_motion')
         }
