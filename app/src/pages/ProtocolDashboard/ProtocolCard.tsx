@@ -171,7 +171,7 @@ export function ProtocolCard(props: {
             : t('no_history')}
         </StyledText>
       </Flex>
-      <Flex width="11.8125rem">
+      <Flex width="11.9125rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
           {t('shared:utc', {
             timeStamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),

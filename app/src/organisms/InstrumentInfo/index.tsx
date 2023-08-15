@@ -34,7 +34,7 @@ interface InstrumentInfoProps {
   instrument: InstrumentData | null
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
-  const { t, i18n } = useTranslation('instruments_dashboard')
+  const { t, i18n } = useTranslation(['instruments_dashboard', 'shared'])
   const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
@@ -128,10 +128,14 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               label={t('last_calibrated')}
               value={
                 instrument.data.calibratedOffset?.last_modified != null
-                  ? format(
-                      new Date(instrument.data.calibratedOffset?.last_modified),
-                      'M/d/yy HH:mm'
-                    )
+                  ? t('shared:utc', {
+                      timeStamp: format(
+                        new Date(
+                          instrument.data.calibratedOffset?.last_modified
+                        ),
+                        'M/d/yy HH:mm'
+                      ),
+                    })
                   : i18n.format(t('no_cal_data'), 'capitalize')
               }
             />

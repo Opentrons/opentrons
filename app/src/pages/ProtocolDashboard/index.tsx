@@ -210,7 +210,7 @@ export function ProtocolDashboard(): JSX.Element {
                     onClick={handleSortByName}
                   />
                 </Flex>
-                <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
+                <Flex justifyContent={JUSTIFY_CENTER} width="10rem">
                   <SmallButton
                     buttonText={t('last_run')}
                     buttonType={
@@ -229,7 +229,7 @@ export function ProtocolDashboard(): JSX.Element {
                     onClick={handleSortByLastRun}
                   />
                 </Flex>
-                <Flex justifyContent={JUSTIFY_CENTER} width="14.625rem">
+                <Flex justifyContent={JUSTIFY_CENTER} width="14rem">
                   <SmallButton
                     buttonText={t('date_added')}
                     buttonType={
