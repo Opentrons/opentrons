@@ -4,7 +4,7 @@ on:
     branches:
       - edge
       - '*internal-release*'
-      - 'release'
+      - 'release*'
       - 'chore_release*'
     tags:
       - ot3@*
