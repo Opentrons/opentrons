@@ -393,11 +393,15 @@ class OT3Simulator:
 
     async def tip_action(
         self,
-        moves: Optional[List[Move[Axis]]] = None,
-        distance: Optional[float] = None,
-        velocity: Optional[float] = None,
-        tip_action: str = "home",
-        back_off: Optional[bool] = False,
+        moves: List[Move[Axis]],
+    ) -> None:
+        pass
+
+    async def home_gear_motors(
+        self,
+        distance: float,
+        velocity: float,
+        back_off: bool = True,
     ) -> None:
         pass
 
