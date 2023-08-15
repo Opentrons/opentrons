@@ -249,7 +249,7 @@ const PLAY_BUTTON_STYLE = css`
 `
 interface PlayButtonProps {
   ready: boolean
-  onPlay: () => void
+  onPlay?: () => void
   disabled?: boolean
 }
 
@@ -519,7 +519,7 @@ function PrepareToRun({
             />
             <PlayButton
               disabled={isLoading}
-              onPlay={!isLoading ? onPlay : () => {}}
+              onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
             />
           </Flex>
@@ -573,7 +573,7 @@ function PrepareToRun({
               detail={labwareDetail}
               subDetail={labwareSubDetail}
               status="general"
-              disabled={labwareDetail === null}
+              disabled={labwareDetail == null}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('liquids')}

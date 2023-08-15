@@ -57,7 +57,7 @@ import type { OnDeviceRouteParams } from '../../../App/types'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 interface ProtocolHeaderProps {
-  title: string | null | undefined
+  title?: string | null
   handleRunProtocol: () => void
   chipText: string
   isScrolled: boolean
@@ -146,7 +146,7 @@ const ProtocolHeader = ({
         buttonText={t('protocol_details:start_setup')}
         disabled={isProtocolFetching}
         iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement={'endIcon'}
+        iconPlacement="endIcon"
       />
     </Flex>
   )
@@ -235,17 +235,17 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
 
 interface ProtocolSectionContentProps {
   protocolId: string
-  protocolData: Protocol | null | undefined
+  protocolData?: Protocol | null
   currentOption: TabOption
 }
 const ProtocolSectionContent = ({
   protocolId,
   protocolData,
   currentOption,
-}: ProtocolSectionContentProps): JSX.Element => {
-  if (protocolData === null || protocolData === undefined) return <></>
+}: ProtocolSectionContentProps): JSX.Element | null => {
+  if (protocolData == null) return null
 
-  let protocolSection = null
+  let protocolSection: JSX.Element | null = null
   switch (currentOption) {
     case 'Summary':
       protocolSection = (
@@ -391,7 +391,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const displayName =
-    isProtocolFetching === false && protocolRecord !== undefined
+    !isProtocolFetching && protocolRecord != null
       ? protocolRecord?.data.metadata.protocolName ??
         protocolRecord?.data.files[0].name
       : null
@@ -406,7 +406,7 @@ export function ProtocolDetails(): JSX.Element | null {
     <>
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>
-          {isProtocolFetching === false ? (
+          {!isProtocolFetching ? (
             <Modal
               modalSize="medium"
               onOutsideClick={() => setShowConfirmationDeleteProtocol(false)}
@@ -465,7 +465,7 @@ export function ProtocolDetails(): JSX.Element | null {
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
           />
-          {isProtocolFetching === false ? (
+          {!isProtocolFetching ? (
             <ProtocolSectionContent
               protocolId={protocolId}
               protocolData={protocolRecord}
@@ -480,7 +480,7 @@ export function ProtocolDetails(): JSX.Element | null {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             paddingTop={
               // Skeleton is large. Better UX not to scroll to see buttons while loading.
-              isProtocolFetching === false
+              !isProtocolFetching
                 ? SPACING.spacing60
                 : SPACING.spacing24
             }
