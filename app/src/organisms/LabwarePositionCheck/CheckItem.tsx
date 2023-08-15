@@ -71,10 +71,11 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     pipette => pipette.id === pipetteId
   )
   //  find labware on adapter's location
-  const adapter = protocolData.labware.find(
-    lab => lab.id === location.labwareId
-  )
-  const adapterId = adapter?.id ?? null
+  const adapterId =
+    Object.values(protocolData.labware).find(
+      lab => lab.definitionUri === location.definitionUri
+    )?.id ?? null
+
   const adapterDisplayName =
     adapterId != null
       ? getLabwareDef(adapterId, protocolData)?.metadata.displayName

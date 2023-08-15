@@ -169,13 +169,13 @@ function resolveAdapterLocation(
     adapterLocation =
       resolvedModuleLocation != null
         ? {
-            labwareId,
+            definitionUri: labwareId.split(':')[1],
             ...resolvedModuleLocation,
           }
         : null
   } else {
     adapterLocation = {
-      labwareId,
+      definitionUri: labwareId.split(':')[1],
       slotName: labwareEntity.location.slotName,
     }
   }
