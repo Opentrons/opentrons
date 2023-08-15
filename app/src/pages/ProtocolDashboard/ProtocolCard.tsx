@@ -137,7 +137,7 @@ export function ProtocolCard(props: {
       ref={longpress.ref}
     >
       <Flex
-        width="30.75rem"
+        width="28.9375rem"
         overflowWrap="anywhere"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
@@ -171,9 +171,11 @@ export function ProtocolCard(props: {
             : t('no_history')}
         </StyledText>
       </Flex>
-      <Flex width="10rem">
+      <Flex width="11.8125rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
-          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
+          {t('shared:utc', {
+            timeStamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
+          })}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal

@@ -69,7 +69,7 @@ export function PinnedProtocol(props: {
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'shared'])
 
   const handleProtocolClick = (
     longpress: UseLongPressResult,
@@ -124,7 +124,9 @@ export function PinnedProtocol(props: {
             : t('no_history')}
         </StyledText>
         <StyledText as="p">
-          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
+          {t('shared:utc', {
+            timeStamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
+          })}
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (

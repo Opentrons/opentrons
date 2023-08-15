@@ -4,26 +4,27 @@ import { useParams, useHistory, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  COLORS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_HIDDEN,
   ALIGN_FLEX_END,
-  POSITION_ABSOLUTE,
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_STRETCH,
   ALIGN_FLEX_START,
+  ALIGN_STRETCH,
   BORDERS,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_HIDDEN,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
   SIZE_2,
-  Btn,
+  SPACING,
+  TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
@@ -60,7 +61,7 @@ import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'shared'])
   const history = useHistory()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const runStatus = runRecord?.data.status ?? null
@@ -206,10 +207,12 @@ export function RunSummary(): JSX.Element {
                 <SummaryHeader>{headerText}</SummaryHeader>
               </Flex>
               <ProtocolName>{protocolName}</ProtocolName>
-              <Flex gridGap={SPACING.spacing8}>
-                <SummaryDatum>{`${t(
-                  'run'
-                )}: ${createdAtTimestamp}`}</SummaryDatum>
+              <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
+                <SummaryDatum>
+                  {t('shared:utc', {
+                    timeStamp: `${t('run')}: ${createdAtTimestamp}`,
+                  })}
+                </SummaryDatum>
                 <SummaryDatum>
                   {`${t('duration')}: `}
                   <RunTimer
@@ -222,12 +225,16 @@ export function RunSummary(): JSX.Element {
                     style={DURATION_TEXT_STYLE}
                   />
                 </SummaryDatum>
-                <SummaryDatum>{`${t(
-                  'start'
-                )}: ${startedAtTimestamp}`}</SummaryDatum>
-                <SummaryDatum>{`${t(
-                  'end'
-                )}: ${completedAtTimestamp}`}</SummaryDatum>
+                <SummaryDatum>
+                  {t('shared:utc', {
+                    timeStamp: `${t('start')}: ${startedAtTimestamp}`,
+                  })}
+                </SummaryDatum>
+                <SummaryDatum>
+                  {t('shared:utc', {
+                    timeStamp: `${t('end')}: ${completedAtTimestamp}`,
+                  })}
+                </SummaryDatum>
               </Flex>
             </Flex>
             <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
