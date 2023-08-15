@@ -480,9 +480,7 @@ export function ProtocolDetails(): JSX.Element | null {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             paddingTop={
               // Skeleton is large. Better UX not to scroll to see buttons while loading.
-              !isProtocolFetching
-                ? SPACING.spacing60
-                : SPACING.spacing24
+              !isProtocolFetching ? SPACING.spacing60 : SPACING.spacing24
             }
             marginX={SPACING.spacing16}
           >
