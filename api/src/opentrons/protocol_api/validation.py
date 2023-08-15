@@ -160,7 +160,15 @@ def ensure_deck_slot(
     return parsed_slot
 
 
-def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+def internal_slot_to_public_string(
+    slot_name: DeckSlotName, robot_type: RobotType
+) -> str:
+    """Convert an internal `DeckSlotName` to a user-facing Python Protocol API string.
+
+    This normalizes the string to the robot type's native format, like "5" for OT-2s or "C2" for
+    Flexes. This probably won't change anything because the internal `DeckSlotName` should already
+    match the robot's native format, but it's nice to have an explicit interface barrier.
+    """
     return slot_name.to_equivalent_for_robot_type(robot_type).id
 
 

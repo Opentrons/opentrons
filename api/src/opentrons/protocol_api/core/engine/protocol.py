@@ -579,7 +579,7 @@ class ProtocolCore(
             labware_core.labware_id
         )
         if isinstance(labware_location, DeckSlotLocation):
-            return validation.ensure_deck_slot_string(
+            return validation.internal_slot_to_public_string(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
         elif isinstance(labware_location, ModuleLocation):

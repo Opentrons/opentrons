@@ -182,7 +182,9 @@ def test_get_slots(
     )
     decoy.when(mock_protocol_core.robot_type).then_return("OT-2 Standard")
     decoy.when(
-        mock_validation.ensure_deck_slot_string(DeckSlotName.SLOT_2, "OT-2 Standard")
+        mock_validation.internal_slot_to_public_string(
+            DeckSlotName.SLOT_2, "OT-2 Standard"
+        )
     ).then_return("fee")
 
     assert subject.slots == [
@@ -219,7 +221,9 @@ def test_get_position_for(
     )
     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
-        mock_validation.ensure_deck_slot_string(DeckSlotName.SLOT_3, "OT-3 Standard")
+        mock_validation.internal_slot_to_public_string(
+            DeckSlotName.SLOT_3, "OT-3 Standard"
+        )
     ).then_return("foo")
 
     result = subject.position_for(333)
