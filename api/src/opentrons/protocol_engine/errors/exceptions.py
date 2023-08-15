@@ -689,6 +689,19 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwareIsNotAllowedInLocationError(ProtocolEngineError):
+    """Raised when attempting an illegal labware load into slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsNotAllowedInLocationError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LocationIsOccupiedError(ProtocolEngineError):
     """Raised when attempting to place labware in a non-empty location."""
 
