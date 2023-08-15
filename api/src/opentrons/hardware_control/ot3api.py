@@ -814,6 +814,40 @@ class OT3API(
                 checked_mount, rate=1.0, acquire_lock=False
             )
 
+    async def home_gear_motors(self) -> None:
+        homing_velocity = self._config.motion_settings.max_speed_discontinuity[
+            GantryLoad.HIGH_THROUGHPUT
+        ][OT3AxisKind.Q]
+
+        if not any(self._backend.gear_motor_position):
+            await self._backend.home_gear_motors(
+                distance=self._backend.axis_bounds[Axis.Q][1],
+                velocity=homing_velocity,
+            )
+            return
+
+        current_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+            Axis.P_L
+        ]
+
+        if current_pos_float > self._config.safe_home_distance:
+            fast_home_moves = self._build_moves(
+                {Axis.Q: current_pos_float}, {Axis.Q: self._config.safe_home_distance}
+            )
+            # move toward home until a safe distance
+            await self._backend.tip_action(moves=fast_home_moves[0])
+
+            # update current position
+            current_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+                Axis.P_L
+            ]
+
+        # move until the limit switch is triggered, with no acceleration
+        await self._backend.home_gear_motors(
+            distance=(current_pos_float + self._config.safe_home_distance),
+            velocity=homing_velocity,
+        )
+
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
         return top_types.Point(*self._config.carriage_offset)
@@ -1790,17 +1824,10 @@ class OT3API(
                 self._current_position,
             )
             await self._move(target_down)
-            homing_velocity = self._config.motion_settings.max_speed_discontinuity[
-                GantryLoad.HIGH_THROUGHPUT
-            ][OT3AxisKind.Q]
             # check if position is known before pick up tip
             if not any(self._backend.gear_motor_position):
                 # home gear motor if position not known
-                await self._backend.tip_action(
-                    distance=self._backend.axis_bounds[Axis.Q][1],
-                    velocity=homing_velocity,
-                    tip_action="home",
-                )
+                await self.home_gear_motors()
             pipette_axis = Axis.of_main_tool_actuator(mount)
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 pipette_axis
@@ -1809,23 +1836,9 @@ class OT3API(
             clamp_moves = self._build_moves(
                 {Axis.Q: gear_origin_float}, {Axis.Q: clamp_move_target}
             )
-            await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
+            await self._backend.tip_action(moves=clamp_moves[0])
 
-            gear_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-                Axis.P_L
-            ]
-
-            fast_home_moves = self._build_moves(
-                {Axis.Q: gear_pos_float}, {Axis.Q: self._config.safe_home_distance}
-            )
-            # move toward home until a safe distance
-            await self._backend.tip_action(moves=fast_home_moves[0], tip_action="clamp")
-            # move the rest of the way home with no acceleration
-            await self._backend.tip_action(
-                distance=(self._config.safe_home_distance + pipette_spec.home_buffer),
-                velocity=homing_velocity,
-                tip_action="home",
-            )
+            await self.home_gear_motors()
 
     async def pick_up_tip(
         self,
@@ -1894,9 +1907,6 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
 
-        homing_velocity = self._config.motion_settings.max_speed_discontinuity[
-            GantryLoad.HIGH_THROUGHPUT
-        ][OT3AxisKind.Q]
         for move in spec.drop_moves:
             await self._backend.set_active_current(move.current)
 
@@ -1905,11 +1915,7 @@ class OT3API(
                 # Not sure why
                 if not any(self._backend.gear_motor_position):
                     # home gear motor if position not known
-                    await self._backend.tip_action(
-                        distance=self._backend.axis_bounds[Axis.Q][1],
-                        velocity=homing_velocity,
-                        tip_action="home",
-                    )
+                    await self.home_gear_motors()
 
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
@@ -1917,25 +1923,9 @@ class OT3API(
                 drop_moves = self._build_moves(
                     {Axis.Q: gear_start_position}, {Axis.Q: move.target_position}
                 )
-                await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
+                await self._backend.tip_action(moves=drop_moves[0])
 
-                gear_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-                    Axis.P_L
-                ]
-
-                fast_home_moves = self._build_moves(
-                    {Axis.Q: gear_pos_float}, {Axis.Q: self._config.safe_home_distance}
-                )
-                # move toward home until a safe distance
-                await self._backend.tip_action(
-                    moves=fast_home_moves[0], tip_action="clamp"
-                )
-                # move the rest of the way home with no acceleration
-                await self._backend.tip_action(
-                    distance=(self._config.safe_home_distance + move.home_buffer),
-                    velocity=homing_velocity,
-                    tip_action="home",
-                )
+                await self.home_gear_motors()
 
             else:
                 target_pos = target_position_from_plunger(
