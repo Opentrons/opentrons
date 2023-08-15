@@ -16,6 +16,8 @@ The major version of the API increases whenever there are significant structural
 
 The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API.
 
+.. _specifying-versions:
+
 Specifying Versions
 -------------------
 
