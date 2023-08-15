@@ -91,7 +91,7 @@ const ProtocolHeader = (props: {
         <Btn
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
-          onClick={() => history.goBack()}
+          onClick={() => history.push('/protocols')}
           width="3rem"
         >
           <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
@@ -342,10 +342,10 @@ export function ProtocolDetails(): JSX.Element | null {
           Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
         .then(() => deleteProtocol(host, protocolId))
-        .then(() => history.goBack())
+        .then(() => history.push('/protocols'))
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
-          history.goBack()
+          history.push('/protocols')
         })
     } else {
       console.error(

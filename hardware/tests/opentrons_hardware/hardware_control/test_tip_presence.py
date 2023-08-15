@@ -12,8 +12,9 @@ from opentrons_hardware.firmware_bindings.messages import (
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     PushTipPresenceNotificationPayload,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import SensorIdField
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
 from tests.conftest import CanLoopback
 
 
@@ -33,7 +34,8 @@ async def test_get_tip_ejector_state(
                     NodeId.host,
                     message_definitions.PushTipPresenceNotification(
                         payload=PushTipPresenceNotificationPayload(
-                            ejector_flag_status=UInt8Field(1)
+                            ejector_flag_status=UInt8Field(1),
+                            sensor_id=SensorIdField(SensorId.S0),
                         )
                     ),
                     node,

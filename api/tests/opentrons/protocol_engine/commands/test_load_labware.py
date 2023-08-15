@@ -6,10 +6,12 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
+
 from opentrons.protocol_engine.errors import (
     LabwareDefinitionIsNotLabwareError,
     LabwareIsNotAllowedInLocationError,
 )
+
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     OnLabwareLocation,

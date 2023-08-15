@@ -538,10 +538,41 @@ class GripperErrorTolerancePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
-class PushTipPresenceNotificationPayload(EmptyPayload):
+class _PushTipPresenceNotificationPayloadBase(EmptyPayload):
+    ejector_flag_status: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class PushTipPresenceNotificationPayload(_PushTipPresenceNotificationPayloadBase):
     """A notification that the ejector flag status has changed."""
 
-    ejector_flag_status: utils.UInt8Field
+    @classmethod
+    def build(cls, data: bytes) -> "PushTipPresenceNotificationPayload":
+        """Build a response payload from incoming bytes."""
+        consumed_by_super = _PushTipPresenceNotificationPayloadBase.get_size()
+        superdict = asdict(_PushTipPresenceNotificationPayloadBase.build(data))
+        message_index = superdict.pop("message_index")
+
+        # we want to parse this by adding extra 0s that may not be necessary,
+        # which is annoying and complex, so let's wrap it in an iterator
+        def _data_for_optionals(consumed: int, buf: bytes) -> Iterator[bytes]:
+            extended = buf + b"\x00\x00"
+            yield extended[consumed:]
+            consumed += 2
+            extended = extended + b"\x00"
+            yield extended[consumed : consumed + 1]
+
+        optionals_yielder = _data_for_optionals(consumed_by_super, data)
+        inst = cls(
+            **superdict,
+            sensor_id=SensorIdField.build(
+                int.from_bytes(next(optionals_yielder), "big")
+            ),
+        )
+        inst.message_index = message_index
+        return inst
+
+    sensor_id: SensorIdField
 
 
 @dataclass(eq=False)
