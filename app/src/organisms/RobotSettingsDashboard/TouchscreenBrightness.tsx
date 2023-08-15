@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import clamp from 'lodash/clamp'
 
 import {
@@ -18,7 +18,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
@@ -27,16 +26,6 @@ import {
 
 import type { Dispatch } from '../../redux/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-
-const BUTTON_STYLE = css`
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-  }
-
-  &:active {
-    color: ${COLORS.darkBlack40};
-  }
-`
 
 interface BrightnessTileProps {
   isActive: boolean
@@ -100,7 +89,6 @@ export function TouchscreenBrightness({
           disabled={brightness === LOWEST_BRIGHTNESS}
           onClick={() => handleClick('down')}
           data-testid="TouchscreenBrightness_decrease"
-          css={BUTTON_STYLE}
         >
           <Icon size="5rem" name="minus" />
         </Btn>
@@ -121,7 +109,6 @@ export function TouchscreenBrightness({
           disabled={brightness === HIGHEST_BRIGHTNESS}
           onClick={() => handleClick('up')}
           data-testid="TouchscreenBrightness_increase"
-          css={BUTTON_STYLE}
         >
           <Icon size="5rem" name="plus" />
         </Btn>

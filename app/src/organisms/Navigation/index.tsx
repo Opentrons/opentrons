@@ -18,9 +18,9 @@ import {
   POSITION_STICKY,
   POSITION_STATIC,
   BORDERS,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { useNetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
 import { getLocalRobot } from '../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
@@ -157,6 +157,14 @@ const TouchNavLink = styled(NavLink)`
   &.active > div {
     background-color: ${COLORS.highlightPurple1};
   }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `
 
 const IconButton = styled('button')`
@@ -164,18 +172,15 @@ const IconButton = styled('button')`
   max-height: 100%;
   background-color: ${COLORS.white};
 
-  &:hover {
-    background-color: ${COLORS.darkBlack20};
-  }
-  &:active,
-  &:focus {
-    background-color: ${COLORS.darkBlack20};
-  }
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
-  }
   &:disabled {
     background-color: transparent;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 `

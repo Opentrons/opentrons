@@ -34,6 +34,10 @@ const SETTING_BUTTON_STYLE = css`
   background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
+
+  &:active {
+    background-color: ${COLORS.darkBlack40};
+  }
 `
 
 interface RobotSettingButtonProps {
