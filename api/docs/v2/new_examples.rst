@@ -105,15 +105,15 @@ This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the r
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
-                load_name='corning_96_wellplate_360ul_flat',
-                location=1)
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=1)
             tiprack_1 = protocol.load_labware(
-                load_name='opentrons_96_tiprack_300ul',
-                location=2)
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=2)
             p300 = protocol.load_instrument(
-                instrument_name='p300_single',
-                mount='left',
-                tip_racks=[tiprack_1])
+                    instrument_name='p300_single',
+                    mount='left',
+                    tip_racks=[tiprack_1])
 
             p300.pick_up_tip()
             p300.aspirate(100, plate['A1'])
