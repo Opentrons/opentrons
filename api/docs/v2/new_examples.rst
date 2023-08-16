@@ -6,7 +6,7 @@
 Protocol Examples
 *****************
 
-This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity in the Opentrons app.
+This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons app.
 
 Using These Protocols
 =====================
@@ -80,10 +80,10 @@ This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the r
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location="D1")
+                    location='D1')
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="D2")
+                    location='D2')
                 pipette_1 = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
@@ -134,15 +134,15 @@ This protocol accomplishes the same thing as the previous example, but does it a
 
             from opentrons import protocol_api
 
-            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location="D1")
+                    location='D1')
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="D2")
+                    location='D2')
                 pipette_1 = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
@@ -197,13 +197,13 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location="D1")
+                    location='D1')
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="D2")
+                    location='D2')
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
-                    location="D3")
+                    location='D3')
                 pipette_1 = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
@@ -252,7 +252,7 @@ Notice here how `Python's range class <https://docs.python.org/3/library/stdtype
 Multiple Air Gaps
 =================
 
-Opentrons electronic pipettes can do some things that a human cannot do with a pipette, like accurately alternate between liquid and air aspirations to creating gaps within the same tip. The protocol shown below shows you how to aspirate from the first five wells in the reservoir and create an air gap between each sample.
+Opentrons electronic pipettes can do some things that a human cannot do with a pipette, like accurately alternate between liquid and air aspirations that create gaps within the same tip. The protocol shown below shows you how to aspirate from the first five wells in the reservoir and create an air gap between each sample.
 
 .. tabs::
 
@@ -268,13 +268,13 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location="D1")
+                    location='D1')
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="D2")
+                    location='D2')
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
-                    location="C1")
+                    location='D3')
                 pipette_1 = protocol.load_instrument(
                     instrument_name='flex_1channel_1000', 
                     mount='left',
@@ -309,7 +309,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
                     location=2)
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
-                    location=4)
+                    location=3)
                 p300 = protocol.load_instrument(
                     instrument_name='p300_single', 
                     mount='right',
@@ -326,7 +326,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
                 p300.return_tip()
 
-Notice here how Python's `slice functionality <https://docs.python.org/3/library/functions.html#slice>`_ (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
+Notice here how Python's `slice functionality <https://docs.python.org/3/library/functions.html#slice>`_ (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well used, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
 Dilution
 ========
@@ -347,16 +347,16 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location="D2")
+                    location='D1')
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="C1")
+                    location='D2')
                 tiprack_2 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="C2")
+                    location='D3')
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
-                    location="D1")
+                    location='C1')
                 pipette_1 = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
@@ -422,7 +422,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                 30, row[:11], row[1:],
                 mix_after=(3, 25))
 
-Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see Loops and Air Gaps above. See also, the :ref:`tutorial-commands` section of the Tutorial.
+Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see the Loops and Air Gaps examples above. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
 Plate Mapping
 =============
@@ -443,16 +443,16 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
-                    location="D1")
+                    location='D1')
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="C1")
+                    location='D2')
                 tiprack_2 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
-                    location="C2")
+                    location='D3')
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
-                    location=4)
+                    location='C1')
                 pipette_1 = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='right',
