@@ -567,7 +567,6 @@ def _reload_and_check_skip(
     # TODO this can potentially be removed in a follow-up refactor.
     if (
         new_config == attached_instr.config
-        and pipette_offset == attached_instr._pipette_offset
     ):
         # Same config, good enough
         return attached_instr, True

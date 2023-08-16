@@ -244,7 +244,6 @@ def _reload_gripper(
     # Returns a gripper object
     if (
         new_config == attached_instr.config
-        and cal_offset == attached_instr._calibration_offset
     ):
         # Same config, good enough
         return attached_instr, True
