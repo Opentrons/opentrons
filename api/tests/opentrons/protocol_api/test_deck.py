@@ -173,7 +173,29 @@ def test_slot_keys_iter(subject: Deck) -> None:
         },
     ],
 )
-def test_get_slots(
+def test_slots_property(subject: Deck) -> None:
+    """It should provide slot definitions."""
+    assert subject.slots == [
+        {"id": "fee"},
+        {"id": "foe"},
+        {"id": "fum"},
+    ]
+
+
+@pytest.mark.parametrize(
+    "deck_definition",
+    [
+        {
+            "locations": {
+                "orderedSlots": [
+                    {"id": DeckSlotName.SLOT_2.id, "displayName": "foobar"},
+                ],
+                "calibrationPoints": [],
+            }
+        },
+    ],
+)
+def test_get_slot_definition(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
     api_version: APIVersion,
@@ -184,20 +206,11 @@ def test_get_slots(
     decoy.when(
         mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
     ).then_return(DeckSlotName.SLOT_2)
-    decoy.when(mock_protocol_core.robot_type).then_return("OT-2 Standard")
-    decoy.when(
-        mock_validation.internal_slot_to_public_string(
-            DeckSlotName.SLOT_2, "OT-2 Standard"
-        )
-    ).then_return("fee")
 
-    assert subject.slots == [
-        {"id": "fee"},
-        {"id": "foe"},
-        {"id": "fum"},
-    ]
-
-    assert subject.get_slot_definition(222) == {"id": "fee"}
+    assert subject.get_slot_definition(222) == {
+        "id": DeckSlotName.SLOT_2.id,
+        "displayName": "foobar",
+    }
 
 
 @pytest.mark.parametrize(
