@@ -6,17 +6,24 @@ from opentrons_shared_data.deck.dev_types import SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckLocation, DeckSlotName, Location, Point
 from opentrons_shared_data.robot.dev_types import RobotType
 
+
 from .core.common import ProtocolCore
 from .core.core_map import LoadedCoreMap
+from .core.module import AbstractModuleCore
 from .labware import Labware
 from .module_contexts import ModuleContext
+from ._types import OFF_DECK
 from . import validation
 
 
 DeckItem = Union[Labware, ModuleContext]
+
+
+_DELITEM_VERSION_GATE = APIVersion(2, 15)
 
 
 @dataclass(frozen=True)
@@ -90,6 +97,34 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         item = self._core_map.get(item_core)
 
         return item
+
+    def __delitem__(self, key: DeckLocation) -> None:
+        if self._api_version < _DELITEM_VERSION_GATE:
+            raise APIVersionError(
+                f"Deleting deck elements is not supported with apiLevel {self._api_version}."
+                f" Try increasing your apiLevel to {_DELITEM_VERSION_GATE}."
+            )
+
+        slot_name = _get_slot_name(
+            key, self._api_version, self._protocol_core.robot_type
+        )
+        item_core = self._protocol_core.get_slot_item(slot_name)
+
+        if item_core is None:
+            raise TypeError(f"Slot {repr(key)} doesn't contain anything to delete.")
+        elif isinstance(item_core, AbstractModuleCore):
+            raise TypeError(
+                f"Slot {repr(key)} contains a module, {item_core.get_display_name()}."
+                f" You can only delete labware, not modules."
+            )
+        else:
+            self._protocol_core.move_labware(
+                item_core,
+                new_location=OFF_DECK,
+                use_gripper=False,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
 
     def __iter__(self) -> Iterator[str]:
         """Iterate through all deck slots."""
