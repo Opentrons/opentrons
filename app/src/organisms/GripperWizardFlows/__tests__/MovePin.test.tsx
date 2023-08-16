@@ -47,6 +47,7 @@ describe('MovePin', () => {
           createRunCommand={mockCreateRunCommand}
           errorMessage={null}
           setErrorMessage={mockSetErrorMessage}
+          isExiting={false}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -166,6 +167,15 @@ describe('MovePin', () => {
     const { getByText } = render({
       isRobotMoving: true,
       movement: REMOVE_PIN_FROM_REAR_JAW,
+    })[0]
+    getByText('Stand Back, Robot is in Motion')
+  })
+
+  it('renders correct loader for early exiting', () => {
+    const { getByText } = render({
+      isRobotMoving: true,
+      isExiting: true,
+      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
     getByText('Stand Back, Robot is in Motion')
   })

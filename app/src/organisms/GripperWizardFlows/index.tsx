@@ -106,6 +106,7 @@ export function GripperWizardFlows(
       createRunCommand={createMaintenanceCommand}
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
+      isExiting={isExiting}
     />
   )
 }
@@ -122,6 +123,7 @@ interface GripperWizardProps {
   >
   isCreateLoading: boolean
   isRobotMoving: boolean
+  isExiting: boolean
   setErrorMessage: (message: string | null) => void
   errorMessage: string | null
   handleCleanUpAndClose: () => void
@@ -148,6 +150,7 @@ export const GripperWizard = (
     createRunCommand,
     setErrorMessage,
     errorMessage,
+    isExiting,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
@@ -218,7 +221,7 @@ export const GripperWizard = (
       <MovePin
         {...currentStep}
         {...sharedProps}
-        {...{ setFrontJawOffset, frontJawOffset, createRunCommand }}
+        {...{ setFrontJawOffset, frontJawOffset, createRunCommand, isExiting }}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_GRIPPER) {
