@@ -13,7 +13,7 @@ Using These Protocols
 
 These sample protocols are designed for anyone using an Opentrons Flex or OT-2 liquid handling robot. 
 
-For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we’ve formatted the samples with line breaks to show method arguments clearly and to avoid horizontal scrolling. Additionally, the methods use named arguments (instead of positional arguments). For example::
+For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we’ve formatted the samples with line breaks to show method arguments clearly and to avoid horizontal scrolling. Additionally, the methods use named arguments (or `named parameters <https://en.wikipedia.org/wiki/Named_parameter>`_) instead of positional arguments. For example::
 
     # This code uses named arguments
     tiprack_1 = protocol.load_labware(
@@ -23,21 +23,19 @@ For our users with little to no Python experience, we’ve taken some liberties 
     # This code uses positional arguments
     tiprack_1 = protocol.load_labware('opentrons_flex_96_tiprack_200ul','D2')   
 
-Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit about what's going on.
+Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit. It uses the parameter name to identify the argument's value. This can be helpful to see when you're unsure about what's going on in a protocol code sample.
 
 Python developers with more experience should feel free to ignore the code styling used here and work with these examples as you like.
 
 Instruments and Labware
 =======================
 
-Before getting started, you'll want to have the right instruments and labware ready for your robot. 
-
-Code samples use the following pipettes:
+The sample protocols all use the following pipettes:
 
 * Flex 1-Channel Pipette (5-1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
 * P300 Single-Channel GEN2 pipette (20-300 µL) for the OT-2. The API load name for this pipette is ``p300_single_gen2``. 
 
-Code samples also use the labware listed below: 
+They also use the labware listed below: 
 
 .. list-table::
     :header-rows: 1
@@ -66,7 +64,7 @@ These protocols demonstrate how to move 100 µL of liquid from one well to anoth
 Basic Method
 ------------
 
-This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the robot, explicitly, where to go to aspirate and dispense liquid. These include the :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, and :py:meth:`~.InstrumentContext.dispense` methods.
+This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, and :py:meth:`~.InstrumentContext.dispense` methods.
 
 .. tabs::
 
@@ -254,7 +252,7 @@ Notice here how `Python's range class <https://docs.python.org/3/library/stdtype
 Multiple Air Gaps
 =================
 
-Opentrons electronic pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The protocol shown below shows you how to aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
+Opentrons electronic pipettes can do some things that a human cannot do with a pipette, like accurately alternate between liquid and air aspirations to creating gaps within the same tip. The protocol shown below shows you how to aspirate from the first five wells in the reservoir and create an air gap between each sample.
 
 .. tabs::
 
@@ -328,7 +326,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
                 p300.return_tip()
 
-Notice here how `Python's slice class <https://docs.python.org/3/library/functions.html#slice>`_ (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
+Notice here how Python's `slice functionality <https://docs.python.org/3/library/functions.html#slice>`_ (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
 Dilution
 ========
