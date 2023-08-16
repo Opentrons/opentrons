@@ -40,21 +40,17 @@ export function getLabwareLocationCombos(
             })
       } else if ('labwareId' in command.params.location) {
         const { labwareId } = command.params.location
-        const adapterLocation = resolveAdapterLocation(
-          labware,
-          modules,
-          labwareId
-        )
-        const moduleId = Object.values(modules).find(
-          mod => mod.model === adapterLocation?.moduleModel
-        )?.id
-        return adapterLocation == null
+        const {
+          adapterOffsetLocation,
+          moduleIdUnderAdapter,
+        } = resolveAdapterLocation(labware, modules, labwareId)
+        return adapterOffsetLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
-              location: adapterLocation,
+              location: adapterOffsetLocation,
               definitionUri,
               labwareId: command.result.labwareId,
-              moduleId,
+              moduleId: moduleIdUnderAdapter,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
@@ -87,17 +83,21 @@ export function getLabwareLocationCombos(
               moduleId: command.params.newLocation.moduleId,
             })
       } else if ('labwareId' in command.params.newLocation) {
-        const adapterLocation = resolveAdapterLocation(
+        const {
+          adapterOffsetLocation,
+          moduleIdUnderAdapter,
+        } = resolveAdapterLocation(
           labware,
           modules,
           command.params.newLocation.labwareId
         )
-        return adapterLocation == null
+        return adapterOffsetLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
-              location: adapterLocation,
+              location: adapterOffsetLocation,
               definitionUri: labwareEntity.definitionUri,
               labwareId: command.params.newLocation.labwareId,
+              moduleId: moduleIdUnderAdapter,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
@@ -142,31 +142,37 @@ function resolveModuleLocation(
   }
 }
 
+interface ResolveAdapterLocation {
+  adapterOffsetLocation: LabwareOffsetLocation | null
+  moduleIdUnderAdapter?: string
+}
 function resolveAdapterLocation(
   labware: ProtocolAnalysisOutput['labware'],
   modules: ProtocolAnalysisOutput['modules'],
   labwareId: string
-): LabwareOffsetLocation | null {
+): ResolveAdapterLocation {
   const labwareEntity = labware.find(l => l.id === labwareId)
   if (labwareEntity == null) {
     console.warn(
       `command specified an adapter ${labwareId} that could not be found in the labware entities`
     )
-    return null
+    return { adapterOffsetLocation: null }
   }
-  let adapterLocation: LabwareOffsetLocation | null = null
+  let moduleIdUnderAdapter: undefined | string = undefined
+  let adapterOffsetLocation: LabwareOffsetLocation | null = null
   if (labwareEntity.location === 'offDeck') {
-    return null
+    return { adapterOffsetLocation: null }
     // can't have adapter on top of an adapter
   } else if ('labwareId' in labwareEntity.location) {
-    return null
+    return { adapterOffsetLocation: null }
   } else if ('moduleId' in labwareEntity.location) {
     const moduleId = labwareEntity.location.moduleId
     const resolvedModuleLocation: LabwareOffsetLocation | null = resolveModuleLocation(
       modules,
       moduleId
     )
-    adapterLocation =
+    moduleIdUnderAdapter = moduleId
+    adapterOffsetLocation =
       resolvedModuleLocation != null
         ? {
             definitionUri: labwareId.split(':')[1],
@@ -174,10 +180,13 @@ function resolveAdapterLocation(
           }
         : null
   } else {
-    adapterLocation = {
+    adapterOffsetLocation = {
       definitionUri: labwareId.split(':')[1],
       slotName: labwareEntity.location.slotName,
     }
   }
-  return adapterLocation
+  return {
+    adapterOffsetLocation: adapterOffsetLocation,
+    moduleIdUnderAdapter,
+  }
 }
