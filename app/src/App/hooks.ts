@@ -51,7 +51,7 @@ export function useProtocolReceiptToast(): void {
   const protocolIdsRef = React.useRef(protocolIds)
   const hasRefetched = React.useRef(true)
 
-  if (protocolIdsQuery.isRefetching === true) {
+  if (protocolIdsQuery.isRefetching) {
     hasRefetched.current = false
   }
 
@@ -87,7 +87,6 @@ export function useProtocolReceiptToast(): void {
               {
                 closeButton: true,
                 disableTimeout: true,
-                allowOneToastOnlyODD: true,
               }
             )
           })

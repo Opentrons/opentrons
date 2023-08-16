@@ -6,9 +6,7 @@ import type { SnackbarProps } from '../../atoms/Snackbar'
 export type MakeToastOptions = Omit<
   ToastProps,
   'id' | 'message' | 'type' | 'exitNow'
-> & {
-  allowOneToastOnlyODD?: boolean
-}
+>
 
 type MakeToast = (
   message: string,

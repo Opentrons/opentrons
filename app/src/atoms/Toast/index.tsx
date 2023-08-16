@@ -60,7 +60,7 @@ export function Toast(props: ToastProps): JSX.Element {
     closeButton,
     onClose,
     disableTimeout = false,
-    duration = 8000,
+    duration = 7000,
     heading,
     displayType,
     exitNow = false,

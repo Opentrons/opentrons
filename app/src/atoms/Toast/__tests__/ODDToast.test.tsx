@@ -112,7 +112,7 @@ describe('Toast', () => {
     expect(props.onClose).not.toHaveBeenCalled()
   })
 
-  it('should not stay more than 7 seconds when disabledTimeout is false', async () => {
+  it('should not stay more than 7 seconds when disableTimeout is false', async () => {
     jest.useFakeTimers()
     props = {
       ...props,
@@ -130,7 +130,7 @@ describe('Toast', () => {
     expect(props.onClose).toHaveBeenCalled()
   })
 
-  it('should dismiss when exitNow is true', async () => {
+  it('should dismiss when a second toast appears', async () => {
     jest.useFakeTimers()
     props = {
       ...props,
