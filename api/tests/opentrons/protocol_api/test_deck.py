@@ -237,7 +237,6 @@ def test_get_position_for(
     decoy.when(
         mock_validation.ensure_and_convert_deck_slot(333, api_version, "OT-3 Standard")
     ).then_return(DeckSlotName.SLOT_3)
-    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
         mock_validation.internal_slot_to_public_string(
             DeckSlotName.SLOT_3, "OT-3 Standard"
