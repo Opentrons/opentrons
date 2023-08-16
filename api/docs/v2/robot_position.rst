@@ -17,12 +17,12 @@ Position Relative to Labware
 When the robot positions itself relative to a piece of labware, where it moves is determined by the labware definition, the actions you want it to perform, and the labware offsets for a specific deck slot. This section describes how these positional components are calculated and how to change them.
 
 Top, Bottom, and Center
-=======================
+-----------------------
 
 Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and what the labware is loaded on top of. You can use these positions as-is or calculate other positions relative to them.
 
 Top
----
+^^^^
 
 Let's look at the :py:meth:`.Well.top` method. It returns a position level with the top of the well, centered in both horizontal directions.
 
@@ -40,7 +40,7 @@ This is a good position to use for a :ref:`blow out operation <new-blow-out>` or
 .. versionadded:: 2.0
 
 Bottom
-------
+^^^^^^
 
 As an example, lets look at the :py:meth:`.Well.bottom` method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
 
@@ -63,7 +63,7 @@ This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activi
 .. versionadded:: 2.0
 
 Center
-------
+^^^^^^
 
 As an example, lets look at the :py:meth:`.Well.center` method. It returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
 
@@ -77,7 +77,7 @@ As an example, lets look at the :py:meth:`.Well.center` method. It returns a pos
 .. _new-default-op-positions:
 
 Default Positions
-=================
+-----------------
 
 By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value by using the :py:meth:`.Well.bottom` method with the ``z`` argument, though it can be cumbersome to do so repeatedly.
 
