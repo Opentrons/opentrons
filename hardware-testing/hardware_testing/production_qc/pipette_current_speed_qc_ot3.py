@@ -71,10 +71,6 @@ def _includes_result(current: float, speed: float) -> bool:
 
 
 def _build_csv_report(trials: int) -> CSVReport:
-    _line_with_result = {
-        True: [float, float, float, float, CSVResult],
-        False: [float, float, float, float],
-    }
     _report = CSVReport(
         test_name="pipette-current-speed-qc-ot3",
         sections=[
@@ -83,7 +79,9 @@ def _build_csv_report(trials: int) -> CSVReport:
                 lines=[
                     CSVLine(
                         _get_test_tag(current, speed, trial, direction, pos),
-                        _line_with_result[_includes_result(current, speed)],
+                        [float, float, float, float, CSVResult]
+                        if _includes_result(current, speed)
+                        else [float, float, float, float],
                     )
                     for speed in sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
                     for trial in range(trials)
@@ -164,7 +162,7 @@ async def _record_plunger_alignment(
     # NOTE: only tests that are required to PASS need to show a results in the file
     data = [round(current, 2), round(speed, 2), round(est, 2), round(enc, 2)]
     if _includes_result(current, speed):
-        data.append(CSVResult.from_bool(_did_pass))
+        data.append(CSVResult.from_bool(_did_pass))  # type: ignore[arg-type]
     report(
         _get_section_tag(current),
         _get_test_tag(current, speed, trial, direction, position),
