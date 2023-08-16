@@ -256,8 +256,19 @@ async def calibrate_tiprack(api, home_position, mount):
         presses = 1,
         increment = 0,
         motor_pick_up = False)
-    await api.home_z(mount)
+    # await api.remove_tip(mount)
+    # cp = CriticalPoint.NOZZLE
+    # await update_pick_up_current(api, mount, 1.5)
+    # await update_pick_up_speed(api, mount, 2)
+    # await move_to_point(api, mount, pickup_loc, cp)
+    # await api.pick_up_tip(mount,
+    #                         tip_length=tip_length[args.tip_size],
+    #                         presses = 1,
+    #                         increment = 0,
+    #                         motor_pick_up = False)
+    await api.home([Axis.Z_L])
     cp = CriticalPoint.TIP
+    await asyncio.sleep(1)
     home_with_tip = await api.current_position(mount, cp)
     print("Calibrate Drop Tip Position")
     drop_tip_loc = await jog(api, home_with_tip, cp)
@@ -275,12 +286,14 @@ async def calibrate_tiprack(api, home_position, mount):
 
 async def _main() -> None:
     today = datetime.date.today()
-    tips_to_use = 96
+
     hw_api = await build_async_ot3_hardware_api(
         is_simulating=args.simulate, use_defaults=True
     )
+    await asyncio.sleep(1)
+    await hw_api.cache_instruments()
     pipette_model = hw_api.get_all_attached_instr()[OT3Mount.LEFT]["pipette_id"]
-
+    # pipette_model = 'P1000H'
     dial_data = {"Column_1": None, "Column_2": None, "Column_3": None, "Column_4": None, "Column_5": None, "Column_6": None,
                 "Column_7": None, "Column_8": None, "Column_9": None, "Column_10": None, "Column_11": None, "Column_12": None}
     m_current = float(input("motor_current in amps: "))
@@ -358,7 +371,10 @@ async def _main() -> None:
         trough_loc = Point(trough_loc[Axis.X],
                             trough_loc[Axis.Y],
                             trough_loc[Axis.by_mount(mount)])
-
+    num_of_columns = int(input("How many Columns: "))
+    num_of_rows = int(input("Number of Rows: "))
+    tips_to_use = (num_of_rows * num_of_columns)
+    # tips_to_use = (num_of_columns * 8)
     try:
         while True:
             measurements = []
@@ -379,7 +395,7 @@ async def _main() -> None:
                     print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
                     print("\r", end="")
                     measurements.append(tip_measurement)
-                    if tip_count % 12 == 0:
+                    if tip_count % num_of_columns == 0:
                         d_str = ''
                         for m in measurements:
                             d_str += str(m) + ','
@@ -390,21 +406,23 @@ async def _main() -> None:
                         measurements = []
                         print("\r\n")
                     x_offset -= 9
-                    if tip_count % 12 == 0:
+                    # if tip_count % num_of_column == 0:
+                    if tip_count % num_of_columns == 0:
                         y_offset += 9
-                    if tip_count % 12 == 0:
+                    if tip_count % num_of_columns == 0:
                         x_offset = 0
 
             if args.trough:
                 await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.prepare_for_aspirate(Mount.LEFT)
-                await hw_api.aspirate(Mount.LEFT, test_volume)
-                await hw_api.home_z(Mount.LEFT)
+                await hw_api.prepare_for_aspirate(mount)
+                await hw_api.aspirate(mount, test_volume)
+                await hw_api.home_z(mount)
                 await countdown(leak_test_time)
                 await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.dispense(Mount.LEFT)
-                await hw_api.home_z(Mount.LEFT)
+                await hw_api.dispense(mount)
+                await hw_api.home_z(mount)
                 #await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
+            await hw_api.home_z(mount)
             hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
             await update_drop_tip_speed(hw_api, mount, hw_api.clamp_drop_tip_speed )
             cp = CriticalPoint.TIP
@@ -417,6 +435,10 @@ async def _main() -> None:
             # Pick up distance i originally used was 16.5
             pick_up_distance = float(input("pick up distance in mm: "))
             hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
+            num_of_columns = int(input("How many Columns: "))
+            num_of_rows = int(input("Number of Rows: "))
+            tips_to_use = (num_of_rows * num_of_columns)
+            # tips_to_use = num_of_columns * 8
             await update_pick_up_current(hw_api, mount, m_current)
             await update_pick_up_speed(hw_api, mount, pick_up_speed)
             await update_pick_up_distance(hw_api, mount, pick_up_distance)
@@ -428,16 +450,16 @@ async def _main() -> None:
                                     presses = 1,
                                     increment = 0,
                                     motor_pick_up = False)
-            await hw_api.remove_tip(mount)
-            cp = CriticalPoint.NOZZLE
-            await update_pick_up_current(hw_api, mount, 1.5)
-            await update_pick_up_speed(hw_api, mount, 2)
+            # await hw_api.remove_tip(mount)
+            # cp = CriticalPoint.NOZZLE
+            # await update_pick_up_current(hw_api, mount, 1.5)
+            # await update_pick_up_speed(hw_api, mount, 2)
             # await move_to_point(hw_api, mount, pickup_loc, cp)
-            await hw_api.pick_up_tip(mount,
-                                    tip_length=tip_length[args.tip_size],
-                                    presses = 1,
-                                    increment = 0,
-                                    motor_pick_up = False)
+            # await hw_api.pick_up_tip(mount,
+            #                         tip_length=tip_length[args.tip_size],
+            #                         presses = 1,
+            #                         increment = 0,
+            #                         motor_pick_up = False)
             await hw_api.home_z(mount.LEFT)
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)

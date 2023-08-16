@@ -627,6 +627,7 @@ class PipetteHandlerProvider:
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
+        motor_pick_up: Optional[bool],
     ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
 
         # Prechecks: ready for pickup tip and press/increment are valid
@@ -665,29 +666,30 @@ class PipetteHandlerProvider:
                 yield (press_dist, backup_dist)
 
         if instrument.channels == 96:
-            return (
-                PickUpTipSpec(
-                    plunger_prep_pos=instrument.plunger_positions.bottom,
-                    plunger_currents={
-                        Axis.of_main_tool_actuator(
-                            mount
-                        ): instrument.plunger_motor_current.run,
-                    },
-                    presses=[],
-                    shake_off_list=[],
-                    retract_target=instrument.pick_up_configurations.distance,
-                    pick_up_motor_actions=TipMotorPickUpTipSpec(
-                        # Move onto the posts
-                        tiprack_down=top_types.Point(0, 0, -7),
-                        tiprack_up=top_types.Point(0, 0, 2),
-                        pick_up_distance=instrument.pick_up_configurations.distance,
-                        speed=instrument.pick_up_configurations.speed,
-                        currents={Axis.Q: instrument.pick_up_configurations.current},
-                        home_buffer=10,
+            if motor_pick_up:
+                return (
+                    PickUpTipSpec(
+                        plunger_prep_pos=instrument.plunger_positions.bottom,
+                        plunger_currents={
+                            Axis.of_main_tool_actuator(
+                                mount
+                            ): instrument.plunger_motor_current.run,
+                        },
+                        presses=[],
+                        shake_off_list=[],
+                        retract_target=instrument.pick_up_configurations.distance,
+                        pick_up_motor_actions=TipMotorPickUpTipSpec(
+                            # Move onto the posts
+                            tiprack_down=top_types.Point(0, 0, -7),
+                            tiprack_up=top_types.Point(0, 0, 2),
+                            pick_up_distance=instrument.pick_up_configurations.distance,
+                            speed=instrument.pick_up_configurations.speed,
+                            currents={Axis.Q: instrument.pick_up_configurations.current},
+                            home_buffer=10,
+                        ),
                     ),
-                ),
-                add_tip_to_instr,
-            )
+                    add_tip_to_instr,
+                )
         return (
             PickUpTipSpec(
                 plunger_prep_pos=instrument.plunger_positions.bottom,

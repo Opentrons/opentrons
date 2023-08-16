@@ -1654,6 +1654,7 @@ class OT3API(
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
     ) -> None:
+        print(f'presses: {pipette_spec.presses}')
         for press in pipette_spec.presses:
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
@@ -1674,6 +1675,7 @@ class OT3API(
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
     ) -> None:
+        print(f'presses: {pipette_spec.currents}')
         async with self._backend.restore_current():
             await self._backend.set_active_current(
                 {axis: current for axis, current in pipette_spec.currents.items()}
@@ -1731,20 +1733,23 @@ class OT3API(
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
+        motor_pick_up: bool = True,
         prep_after: bool = True,
     ) -> None:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
+        print(f'motor_pick_up: {motor_pick_up}')
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
-            realmount, tip_length, presses, increment
+            realmount, tip_length, presses, increment, motor_pick_up
         )
-
-        await self._move_to_plunger_bottom(realmount, rate=1.0)
-        if spec.pick_up_motor_actions:
+        print(f'pipette spec: {spec}')
+        # await self._move_to_plunger_bottom(realmount, rate=1.0)
+        if motor_pick_up == True:
+            print("Motor Pick up")
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
+            print("Force Pick up!")
             await self._force_pick_up_tip(realmount, spec)
-
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
@@ -1754,8 +1759,8 @@ class OT3API(
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
 
-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
-            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+        # if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+        #     await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
 

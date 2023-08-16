@@ -5,7 +5,7 @@
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
     "current": 1.5,
-    "presses": 0.0,
+    "presses": 1.0,
     "speed": 5.5,
     "increment": 0.0,
     "distance": 19.0
