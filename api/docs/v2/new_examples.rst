@@ -395,30 +395,30 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                 tiprack_2 = protocol.load_labware(
                     load_name='opentrons_96_tiprack_300ul',
                     location=3)
-            reservoir = protocol.load_labware(
+                reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
                     location=4)
-            p300 = protocol.load_instrument(
+                p300 = protocol.load_instrument(
                     instrument_name='p300_single',
                     mount='right',
                     tip_racks=[tiprack_1, tiprack_2])
-            # Dispense diluent
-            p300.distribute(50, reservoir['A12'], plate.wells())
+                # Dispense diluent
+                p300.distribute(50, reservoir['A12'], plate.wells())
 
-            # loop through each row
-            for i in range(8):
-                # save the source well and destination column to variables
-                source = reservoir.wells()[i]
-                source = reservoir.wells()[i]
-                row = plate.rows()[i]
+                # loop through each row
+                for i in range(8):
+                    # save the source well and destination column to variables
+                    source = reservoir.wells()[i]
+                    source = reservoir.wells()[i]
+                    row = plate.rows()[i]
 
-            # transfer 30 µL of source to first well in column
-            p300.transfer(30, source, row[0], mix_after=(3, 25))
+                # transfer 30 µL of source to first well in column
+                p300.transfer(30, source, row[0], mix_after=(3, 25))
 
-            # dilute the sample down the column
-            p300.transfer(
-                30, row[:11], row[1:],
-                mix_after=(3, 25))
+                # dilute the sample down the column
+                p300.transfer(
+                    30, row[:11], row[1:],
+                    mix_after=(3, 25))
 
 Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see the Loops and Air Gaps examples above. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
