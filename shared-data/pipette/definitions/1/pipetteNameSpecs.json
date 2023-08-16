@@ -529,7 +529,7 @@
       }
     },
     "channels": 1,
-    "minVolume": 100,
+    "minVolume": 5,
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
@@ -574,7 +574,7 @@
       }
     },
     "channels": 8,
-    "minVolume": 1,
+    "minVolume": 5,
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
@@ -660,7 +660,7 @@
       }
     },
     "channels": 96,
-    "minVolume": 1,
+    "minVolume": 5,
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,

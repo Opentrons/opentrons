@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Mapping, Optional, Union
 
-from opentrons_shared_data.errors.exceptions import EnumeratedError
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
 from opentrons.ordered_set import OrderedSet
 
@@ -140,21 +140,29 @@ class CommandState:
     run_result: Optional[RunResult]
     """Whether the run is done and succeeded, failed, or stopped.
 
-    Once set, this status cannot be unset.
+    This doesn't include the post-run finish steps (homing and dropping tips).
+
+    Once set, this status is immutable.
     """
 
-    errors_by_id: Dict[str, ErrorOccurrence]
-    """All fatal error occurrences, mapped by their unique IDs.
+    run_error: Optional[ErrorOccurrence]
+    """The run's fatal error occurrence, if there was one.
 
     Individual command errors, which may or may not be fatal,
     are stored on the individual commands themselves.
     """
+
+    finish_error: Optional[ErrorOccurrence]
+    """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
     latest_command_hash: Optional[str]
     """The latest hash value received in a QueueCommandAction.
 
     This value can be used to generate future hashes.
     """
+
+    stopped_by_estop: bool
+    """If this is set to True, the engine was stopped by an estop event."""
 
 
 class CommandStore(HasState[CommandState], HandlesActions):
@@ -179,10 +187,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
             queued_command_ids=OrderedSet(),
             queued_setup_command_ids=OrderedSet(),
             commands_by_id=OrderedDict(),
-            errors_by_id={},
+            run_error=None,
+            finish_error=None,
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
+            stopped_by_estop=False,
         )
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
@@ -318,6 +328,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
+                if action.from_estop:
+                    self._state.stopped_by_estop = True
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
@@ -332,34 +344,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.run_result = RunResult.STOPPED
 
                 if action.error_details:
-                    error_id = action.error_details.error_id
-                    created_at = action.error_details.created_at
-                    if (
-                        isinstance(
-                            action.error_details.error, ProtocolCommandFailedError
-                        )
-                        and action.error_details.error.original_error is not None
-                    ):
-                        self._state.errors_by_id[
-                            error_id
-                        ] = action.error_details.error.original_error
-                    else:
-                        if isinstance(
-                            action.error_details.error,
-                            EnumeratedError,
-                        ):
-                            error = action.error_details.error
-                        else:
-                            error = UnexpectedProtocolError(
-                                message=str(action.error_details.error),
-                                wrapping=[action.error_details.error],
-                            )
-
-                        self._state.errors_by_id[
-                            error_id
-                        ] = ErrorOccurrence.from_failed(
-                            id=error_id, createdAt=created_at, error=error
-                        )
+                    self._state.run_error = self._map_run_exception_to_error_occurrence(
+                        action.error_details.error_id,
+                        action.error_details.created_at,
+                        action.error_details.error,
+                    )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
@@ -367,6 +356,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.run_completed_at = (
                 self._state.run_completed_at or action.completed_at
             )
+
+            if action.finish_error_details:
+                self._state.finish_error = (
+                    self._map_finish_exception_to_error_occurrence(
+                        action.finish_error_details.error_id,
+                        action.finish_error_details.created_at,
+                        action.finish_error_details.error,
+                    )
+                )
 
         elif isinstance(action, DoorChangeAction):
             if self._config.block_on_door_open:
@@ -376,6 +374,44 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         self._state.queue_status = QueueStatus.PAUSED
                 elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
+
+    @staticmethod
+    def _map_run_exception_to_error_occurrence(
+        error_id: str, created_at: datetime, exception: Exception
+    ) -> ErrorOccurrence:
+        """Map a fatal exception from the main part of the run to an ErrorOccurrence."""
+        if (
+            isinstance(exception, ProtocolCommandFailedError)
+            and exception.original_error is not None
+        ):
+            return exception.original_error
+        elif isinstance(exception, EnumeratedError):
+            return ErrorOccurrence.from_failed(
+                id=error_id, createdAt=created_at, error=exception
+            )
+        else:
+            enumerated_wrapper = UnexpectedProtocolError(
+                message=str(exception),
+                wrapping=[exception],
+            )
+            return ErrorOccurrence.from_failed(
+                id=error_id, createdAt=created_at, error=enumerated_wrapper
+            )
+
+    @staticmethod
+    def _map_finish_exception_to_error_occurrence(
+        error_id: str, created_at: datetime, exception: Exception
+    ) -> ErrorOccurrence:
+        """Map a fatal exception from the finish phase (drop tip & home) to an ErrorOccurrence."""
+        if isinstance(exception, EnumeratedError):
+            return ErrorOccurrence.from_failed(
+                id=error_id, createdAt=created_at, error=exception
+            )
+        else:
+            enumerated_wrapper = PythonException(exc=exception)
+            return ErrorOccurrence.from_failed(
+                id=error_id, createdAt=created_at, error=enumerated_wrapper
+            )
 
 
 class CommandView(HasState[CommandState]):
@@ -445,9 +481,31 @@ class CommandView(HasState[CommandState]):
             total_length=total_length,
         )
 
-    def get_all_errors(self) -> List[ErrorOccurrence]:
-        """Get a list of all errors that have occurred."""
-        return list(self._state.errors_by_id.values())
+    def get_error(self) -> Optional[ErrorOccurrence]:
+        """Get the run's fatal error, if there was one."""
+        run_error = self._state.run_error
+        finish_error = self._state.finish_error
+
+        if run_error and finish_error:
+            combined_error = ErrorOccurrence.construct(
+                id=finish_error.id,
+                createdAt=finish_error.createdAt,
+                errorType="RunAndFinishFailed",
+                detail=(
+                    "The run had a fatal error,"
+                    " and another error happened while doing post-run cleanup."
+                ),
+                # TODO(mm, 2023-07-31): Consider adding a low-priority error code so clients can
+                # deemphasize this root node, in favor of its children in wrappedErrors.
+                errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                wrappedErrors=[
+                    run_error,
+                    finish_error,
+                ],
+            )
+            return combined_error
+        else:
+            return run_error or finish_error
 
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
@@ -625,18 +683,28 @@ class CommandView(HasState[CommandState]):
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         if self._state.run_result:
-            if not self.get_is_stopped():
+            # The main part of the run is over, or will be over soon.
+            # Have we also completed the post-run finish steps (homing and dropping tips)?
+            if self.get_is_stopped():
+                # Post-run finish steps have completed. Calculate the engine's final status,
+                # taking into account any failures in the run or the post-run finish steps.
+                if (
+                    self._state.run_result == RunResult.FAILED
+                    or self._state.finish_error is not None
+                ):
+                    return EngineStatus.FAILED
+                elif self._state.run_result == RunResult.SUCCEEDED:
+                    return EngineStatus.SUCCEEDED
+                else:
+                    return EngineStatus.STOPPED
+            else:
+                # Post-run finish steps have not yet completed,
+                # and we may even still be executing commands.
                 return (
                     EngineStatus.STOP_REQUESTED
                     if self._state.run_result == RunResult.STOPPED
                     else EngineStatus.FINISHING
                 )
-            elif self._state.run_result == RunResult.FAILED:
-                return EngineStatus.FAILED
-            elif self._state.run_result == RunResult.SUCCEEDED:
-                return EngineStatus.SUCCEEDED
-            else:
-                return EngineStatus.STOPPED
 
         elif self._state.queue_status == QueueStatus.RUNNING:
             return EngineStatus.RUNNING

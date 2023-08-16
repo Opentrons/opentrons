@@ -69,9 +69,8 @@ class BundleContents(NamedTuple):
     bundled_python: Dict[str, str]
 
 
-PROTOCOL_MALFORMED = """
-
-A Python protocol for the OT2 must define a function called 'run' that takes a
+RUN_FUNCTION_MESSAGE = """\
+A Python protocol must define a function called 'run' that takes a
 single argument: the protocol context to call functions on. For instance, a run
 function might look like this:
 
@@ -79,7 +78,6 @@ def run(ctx):
     ctx.comment('hello, world')
 
 This function is called by the robot when the robot executes the protocol.
-This function is not present in the current protocol and must be added.
 """
 
 PYTHON_API_VERSION_DEPRECATED = """
@@ -98,16 +96,38 @@ through the downgrade process.
 """
 
 
-class MalformedProtocolError(Exception):
-    def __init__(self, message: str) -> None:
-        self.message = message
-        super().__init__(message)
+# TODO(mm, 2023-08-07): Align with the app team on how to surface errors like this,
+# and probably make this an EnumeratedError.
+class MalformedPythonProtocolError(Exception):
+    def __init__(
+        self, short_message: str, long_additional_message: Optional[str] = None
+    ) -> None:
+        """Raised when a user's Python protocol file is malformed.
+
+        "Malformed" in this case means it's either syntactically invalid as standard Python, or it
+        doesn't conform to the Python Protocol API's structural requirements, like having a `run()`
+        function and declaring an `apiLevel`. This does not cover runtime or analysis errors such as
+        aspirating from a nonexistent well or running out of tips.
+
+        Params:
+            short_message: A short (~1-2 sentences), self-contained message describing what's wrong
+                with the file. This should not contain internal newlines or indentation.
+
+            long_additional_message: Longer context, in addition to `short_message`. This may
+                contain internal newlines and indentation.
+        """
+        self.short_message = short_message
+        self.long_additional_message = long_additional_message
+        super().__init__(short_message, long_additional_message)
 
     def __str__(self) -> str:
-        return self.message + PROTOCOL_MALFORMED
+        if self.long_additional_message is not None:
+            return self.short_message + "\n\n" + self.long_additional_message
+        else:
+            return self.short_message
 
     def __repr__(self) -> str:
-        return "<{}: {}>".format(self.__class__.__name__, self.message)
+        return "<{}: {}>".format(self.__class__.__name__, self.short_message)
 
 
 class ApiDeprecationError(Exception):

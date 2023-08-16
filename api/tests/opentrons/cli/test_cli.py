@@ -121,8 +121,7 @@ def test_analysis_deck_definition(
 
     assert exit_code == 0
 
-    [load_labware_command, comment_command] = analysis_output_json["commands"]
-    _ = load_labware_command
+    [_, _, comment_command] = analysis_output_json["commands"]
 
     # todo(mm, 2023-05-12): When protocols emit true Protocol Engine comment commands instead
     # of legacy commands, "legacyCommandText" should change to "message".

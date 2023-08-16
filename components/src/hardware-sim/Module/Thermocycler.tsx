@@ -3,7 +3,12 @@
 
 import * as React from 'react'
 
-import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
+import {
+  ModuleDefinition,
+  THERMOCYCLER_MODULE_V1,
+  ThermocyclerModuleModel,
+  getModuleDef2,
+} from '@opentrons/shared-data'
 
 import { C_MED_LIGHT_GRAY } from '../../styles'
 import { COLORS, BORDERS } from '../../ui-style-constants'
@@ -13,13 +18,43 @@ import { ModuleFromDef } from './ModuleFromDef'
 
 const ROOM_TEMPERATURE_C = 23 // value taken from TC firmware
 export interface ThermocyclerVizProps {
-  lidMotorState: 'open' | 'closed' | 'unknown'
-  blockTargetTemp: number | null
+  lidMotorState?: 'open' | 'closed' | 'unknown'
+  blockTargetTemp?: number | null
+  model: ThermocyclerModuleModel
+}
+
+const getLayerBlockList = (
+  def: ModuleDefinition,
+  lidMotorState: ThermocyclerVizProps['lidMotorState']
+): string[] => {
+  if (def.model === THERMOCYCLER_MODULE_V1) {
+    return def.twoDimensionalRendering.children.reduce<string[]>(
+      (layerBlockList, layer) => {
+        const { id } = layer.attributes
+        if (id?.startsWith(lidMotorState === 'open' ? 'closed' : 'open')) {
+          return [...layerBlockList, id]
+        }
+        return layerBlockList
+      },
+      []
+    )
+  }
+
+  return def.twoDimensionalRendering.children.reduce<string[]>(
+    (layerBlockList, layer) => {
+      const { id } = layer.attributes
+      if (id != null && lidMotorState === 'closed' && id === 'open') {
+        return [...layerBlockList, id]
+      }
+      return layerBlockList
+    },
+    []
+  )
 }
 
 export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
-  const { lidMotorState, blockTargetTemp } = props
-  const def = getModuleDef2(THERMOCYCLER_MODULE_V1)
+  const { lidMotorState, blockTargetTemp, model } = props
+  const def = getModuleDef2(model)
   if (lidMotorState === 'unknown') {
     // just a rectangle if we don't know the state of the lid
     return (
@@ -36,19 +71,7 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
       />
     )
   }
-  const layerBlocklist = def.twoDimensionalRendering.children.reduce<string[]>(
-    (layerBlockList, layer) => {
-      const { id } = layer.attributes
-      if (
-        id != null &&
-        id.startsWith(lidMotorState === 'open' ? 'closed' : 'open')
-      ) {
-        return [...layerBlockList, id]
-      }
-      return layerBlockList
-    },
-    []
-  )
+
   let ledLightOverlay = null
   if (blockTargetTemp != null) {
     ledLightOverlay = (
@@ -72,7 +95,10 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
 
   return (
     <>
-      <ModuleFromDef def={def} layerBlocklist={layerBlocklist} />
+      <ModuleFromDef
+        def={def}
+        layerBlocklist={getLayerBlockList(def, lidMotorState)}
+      />
       {ledLightOverlay}
     </>
   )

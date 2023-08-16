@@ -14,18 +14,21 @@ import { MixFields } from '../../fields/MixFields'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
+  getTouchTipNotSupportedLabware,
 } from '../../utils'
-
-import { FormData } from '../../../../form-types'
-import { StepFieldName } from '../../../../steplist/fieldLevel'
-import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
+
+import type { FormData } from '../../../../form-types'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import type { LabwareDefByDefURI } from '../../../../labware-defs'
+import type { FieldPropsByName } from '../../types'
 
 interface SourceDestFieldsProps {
   className?: string | null
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   formData: FormData
+  allLabware: LabwareDefByDefURI
 }
 
 const makeAddFieldNamePrefix = (prefix: string) => (
@@ -33,10 +36,9 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
-  const { className, formData, prefix, propsForFields } = props
+  const { className, formData, prefix, propsForFields, allLabware } = props
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
-
   const getDelayFields = (): JSX.Element => (
     <DelayFields
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
@@ -115,10 +117,32 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             {getMixFields()}
           </React.Fragment>
         )}
+
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
+          tooltipContent={
+            getTouchTipNotSupportedLabware(
+              allLabware,
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('touchTip_mmFromBottom')
+                )
+              ]
+            )
+              ? i18n.t('tooltip.step_fields.touchTip.disabled')
+              : propsForFields[addFieldNamePrefix('touchTip_checkbox')]
+                  .tooltipContent
+          }
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
+          disabled={getTouchTipNotSupportedLabware(
+            allLabware,
+            formData[
+              getLabwareFieldForPositioningField(
+                addFieldNamePrefix('touchTip_mmFromBottom')
+              )
+            ]
+          )}
         >
           <TipPositionField
             {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}

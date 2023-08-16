@@ -18,6 +18,8 @@ class StateSummary(BaseModel):
     """Data from a protocol run."""
 
     status: EngineStatus
+    # errors is a list for historical reasons. (This model needs to stay compatible with
+    # robot-server's database.) It shouldn't have more than 1 element.
     errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]

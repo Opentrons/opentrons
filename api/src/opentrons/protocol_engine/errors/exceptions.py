@@ -210,32 +210,6 @@ class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
-class LabwareDefinitionIsNotLabwareError(ProtocolEngineError):
-    """Raised when trying to load a labware via loadLabware that is not a labware."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a LabwareDefinitionIsNotLabwareError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
-class LabwareDefinitionIsNotAdapterError(ProtocolEngineError):
-    """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a LabwareDefinitionIsNotAdapterError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
 class LabwareCannotBeStackedError(ProtocolEngineError):
     """Raised when trying to load labware onto another labware it is not defined to be loaded onto."""
 
@@ -684,7 +658,9 @@ class HardwareNotSupportedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a HardwareNotSupportedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )
 
 
 class GripperNotAttachedError(ProtocolEngineError):
@@ -710,6 +686,19 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareMovementNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsNotAllowedInLocationError(ProtocolEngineError):
+    """Raised when attempting an illegal labware load into slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsNotAllowedInLocationError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -789,3 +778,18 @@ class EStopActivatedError(ProtocolEngineError):
     ) -> None:
         """Build an EStopActivatedError."""
         super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+
+
+class NotSupportedOnRobotType(ProtocolEngineError):
+    """Raised when attempting to perform an action that is not supported for the given robot type."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NotSupportedOnRobotType exception."""
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )

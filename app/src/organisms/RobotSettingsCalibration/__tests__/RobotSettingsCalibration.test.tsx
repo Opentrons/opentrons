@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
-
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
 import { useFeatureFlag } from '../../../redux/config'
@@ -36,6 +36,7 @@ import { RobotSettingsCalibration } from '..'
 
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
+jest.mock('@opentrons/react-api-client/src/instruments/useInstrumentsQuery')
 jest.mock('../../../organisms/CalibrationStatusCard')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/sessions/selectors')
@@ -54,6 +55,9 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
 } as any
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
+>
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
@@ -121,6 +125,16 @@ describe('RobotSettingsCalibration', () => {
       left: null,
       right: null,
     })
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            ok: true,
+            instrumentType: 'gripper',
+          } as any,
+        ],
+      },
+    } as any)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,

@@ -310,6 +310,8 @@ def store_serial_numbers(
     liquid: str,
 ) -> None:
     """Report serial numbers."""
+    report.set_robot_id(robot)
+    report.set_device_id(pipette, pipette)
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
     report("SERIAL-NUMBERS", "tips", [tips])

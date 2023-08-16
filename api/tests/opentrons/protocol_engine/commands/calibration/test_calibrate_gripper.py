@@ -29,6 +29,8 @@ from opentrons.protocol_engine.commands.calibration.calibrate_gripper import (
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.types import Vec3f
 
+from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
+
 if TYPE_CHECKING:
     # Support environments without OT-3 hardware control dependencies.
     from opentrons.hardware_control.ot3api import OT3API
@@ -119,9 +121,9 @@ async def test_calibrate_gripper_does_not_save_during_error(
         await ot3_calibration.calibrate_gripper_jaw(
             ot3_hardware_api, probe=GripperProbe.REAR
         )
-    ).then_raise(ot3_calibration.EarlyCapacitiveSenseTrigger(5.0, 3.0))
+    ).then_raise(EarlyCapacitiveSenseTrigger(5.0, 3.0))
 
-    with pytest.raises(ot3_calibration.EarlyCapacitiveSenseTrigger):
+    with pytest.raises(EarlyCapacitiveSenseTrigger):
         await subject.execute(params)
 
     decoy.verify(

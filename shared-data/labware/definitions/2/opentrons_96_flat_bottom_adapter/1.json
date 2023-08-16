@@ -34,8 +34,8 @@
   "schemaVersion": 2,
   "allowedRoles": ["adapter"],
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
+    "x": 8.5,
+    "y": 5.5,
     "z": 0
   }
 }

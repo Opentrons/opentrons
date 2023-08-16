@@ -19,7 +19,7 @@ LABWARE_DIR = "labware"
 DATA_DIR = "data"
 
 
-def _has_files_at_root(zipFile):
+def _has_files_at_root(zipFile: ZipFile) -> bool:
     for zipInfo in zipFile.infolist():
         if zipInfo.filename.count("/") == 0:
             return True
@@ -76,7 +76,7 @@ def extract_bundle(bundle: ZipFile) -> BundleContents:  # noqa: C901
     return BundleContents(py_protocol, bundled_labware, bundled_data, bundled_python)
 
 
-def create_bundle(contents: BundleContents, into_file: BinaryIO):
+def create_bundle(contents: BundleContents, into_file: BinaryIO) -> None:
     """Create a bundle from assumed-good contents"""
     with ZipFile(into_file, mode="w") as zf:
         zf.writestr(MAIN_PROTOCOL_FILENAME, contents.protocol)

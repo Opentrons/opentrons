@@ -19,9 +19,9 @@ import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
-  getBuildrootUpdateDisplayInfo,
-  startBuildrootUpdate,
-} from '../../../../redux/buildroot'
+  getRobotUpdateDisplayInfo,
+  startRobotUpdate,
+} from '../../../../redux/robot-update'
 
 import type { State, Dispatch } from '../../../../redux/types'
 
@@ -45,7 +45,7 @@ export function UpdateRobotSoftware({
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
-    return getBuildrootUpdateDisplayInfo(state, robotName)
+    return getRobotUpdateDisplayInfo(state, robotName)
   })
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
@@ -54,7 +54,7 @@ export function UpdateRobotSoftware({
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
     if (files?.length === 1 && !updateDisabled) {
-      dispatch(startBuildrootUpdate(robotName, files[0].path))
+      dispatch(startRobotUpdate(robotName, files[0].path))
       onUpdateStart()
     }
   }

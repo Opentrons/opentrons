@@ -34,6 +34,35 @@ def check_health_response(response: Response) -> None:
     assert response.json() == expected
 
 
+def check_ot3_health_response(response: Response) -> None:
+    expected = {
+        "name": "opentrons-dev",
+        "api_version": __version__,
+        "fw_version": "0",
+        "board_revision": "UNKNOWN",
+        "logs": [
+            "/logs/serial.log",
+            "/logs/api.log",
+            "/logs/server.log",
+            "/logs/touchscreen.log",
+        ],
+        "system_version": config.OT_SYSTEM_VERSION,
+        "robot_model": "OT-3 Standard",
+        "minimum_protocol_api_version": minimum_version,
+        "maximum_protocol_api_version": maximum_version,
+        "links": {
+            "apiLog": "/logs/api.log",
+            "serialLog": "/logs/serial.log",
+            "apiSpec": "/openapi.json",
+            "oddLog": "/logs/touchscreen.log",
+            "systemTime": "/system/time",
+            "serverLog": "/logs/server.log",
+        },
+    }
+
+    assert response.json() == expected
+
+
 def get_module_id(response: Response, module_model: ModuleModel) -> Box:
     """Get the first module id that matches module_model."""
     modules = response.json()["data"]

@@ -11,6 +11,7 @@ For more details about this release, please see the full [technical change log][
 - Return tip heights and some other pipette behaviors are now properly executed based on the kind of tip being used
 - Release Flex robot software builds are now cryptographically signed. If you run a release build, you can only install other properly signed release builds. Note that if the robot was previously on a non-release build this won't latch; remove the update server config file at ``/var/lib/otupdate/config.json`` to go back to signed builds only. 
 - Error handling has been overhauled; all errors now display with an error code for easier reporting. Many of those error codes are the 4000 catchall still but this will improve over time.
+- If there's an error during the post-run cleanup steps, where the robot homes and drops tips, the run should no longer get stuck in a permanent "finishing" state. It should get marked as failed.
 - Further updates to Flex motion control parameters from hardware testing for both gantry and plunger speeds and acceleration
 - Pipette overpressure detection is now integrated.
 - All instrument flows should now show errors if they occur instead of skipping a step
@@ -19,6 +20,7 @@ For more details about this release, please see the full [technical change log][
 - Support for PVT (v1.1) grippers
 - Update progress should get displayed after restart for firmware updates
 - Removed `use_pick_up_location_lpc_offset` and `use_drop_location_lpc_offset` from `protocol_context.move_labware` arguments. So they should be removed from any protocols that used them. This change also requires resetting the protocol run database on the robot.
+- Added 'contextual' gripper offsets to deck, labware and module definitions. So, any labware movement offsets that were previously being specified in the protocol should now be removed or adjusted or they will get added twice.
 
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them

@@ -65,15 +65,35 @@ export function DeviceReset({
     'runsHistory',
     'bootScripts',
   ]
-  const availableOptions = options.sort(
-    (a, b) =>
-      targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
-  )
+  const availableOptions = options
+    // filtering out ODD setting because this gets implicitly cleared if all settings are selected
+    .filter(o => o.id !== 'onDeviceDisplay')
+    .sort(
+      (a, b) =>
+        targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
+    )
   const dispatch = useDispatch<Dispatch>()
 
   const handleClick = (): void => {
     if (resetOptions != null) {
-      dispatchRequest(resetConfig(robotName, resetOptions))
+      const totalOptionsSelected = Object.values(resetOptions).filter(
+        selected => selected === true
+      ).length
+
+      const isEveryOptionSelected =
+        totalOptionsSelected > 0 &&
+        totalOptionsSelected === availableOptions.length
+
+      if (isEveryOptionSelected) {
+        dispatchRequest(
+          resetConfig(robotName, {
+            ...resetOptions,
+            onDeviceDisplay: true,
+          })
+        )
+      } else {
+        dispatchRequest(resetConfig(robotName, resetOptions))
+      }
     }
   }
 

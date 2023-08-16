@@ -177,6 +177,13 @@ const mockLiquids = [
 ]
 
 const mockPlay = jest.fn()
+const mockOffset = {
+  id: 'fake_labware_offset',
+  createdAt: 'timestamp',
+  definitionUri: 'fake_def_uri',
+  location: { slotName: 'A1' },
+  vector: { x: 1, y: 2, z: 3 },
+}
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
@@ -223,7 +230,14 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(ot3StandardDeckDef as any)
     when(mockUseRunQuery)
       .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({ data: { data: { protocolId: PROTOCOL_ID } } } as any)
+      .mockReturnValue({
+        data: {
+          data: {
+            protocolId: PROTOCOL_ID,
+            labwareOffsets: [mockOffset],
+          },
+        },
+      } as any)
     when(mockUseProtocolQuery)
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .mockReturnValue({
@@ -321,7 +335,8 @@ describe('ProtocolSetup', () => {
   it('should launch LPC when clicked', () => {
     mockUseLPCDisabledReason.mockReturnValue(null)
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
-    getByText('Recommended')
+    getByText(/Recommended/)
+    getByText(/1 offset applied/)
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
     getByText('mock LPC Wizard')

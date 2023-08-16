@@ -16,7 +16,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
-import { getBuildrootSession } from '../../../../redux/buildroot'
+import { getRobotUpdateSession } from '../../../../redux/robot-update'
 
 jest.mock('../../../../organisms/RobotSettingsCalibration')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
@@ -24,7 +24,7 @@ jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../redux/discovery/selectors')
-jest.mock('../../../../redux/buildroot')
+jest.mock('../../../../redux/robot-update')
 
 const mockRobotSettingsCalibration = RobotSettingsCalibration as jest.MockedFunction<
   typeof RobotSettingsCalibration
@@ -40,8 +40,8 @@ const mockRobotSettingsPrivacy = RobotSettingsPrivacy as jest.MockedFunction<
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
-const mockGetBuildrootSession = getBuildrootSession as jest.MockedFunction<
-  typeof getBuildrootSession
+const mockGetRobotUpdateSession = getRobotUpdateSession as jest.MockedFunction<
+  typeof getRobotUpdateSession
 >
 
 const render = (path = '/') => {
@@ -101,11 +101,11 @@ describe('RobotSettings', () => {
     getByText('mock device details')
   })
 
-  it('does NOT redirect to device details if robot is null but a buildroot session is active', () => {
+  it('does NOT redirect to device details if robot is null but a robot update session is active', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(null)
-    mockGetBuildrootSession.mockReturnValue({
+    mockGetRobotUpdateSession.mockReturnValue({
       robotName: 'some robot',
-      userFileInfo: null,
+      fileInfo: null,
       token: null,
       pathPrefix: null,
       step: null,

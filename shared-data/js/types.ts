@@ -21,6 +21,7 @@ import {
   RIGHT,
   GRIPPER_V1,
   GRIPPER_V1_1,
+  GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
@@ -212,7 +213,10 @@ export type ModuleModel =
   | HeaterShakerModuleModel
   | MagneticBlockModel
 
-export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
+export type GripperModel =
+  | typeof GRIPPER_V1
+  | typeof GRIPPER_V1_1
+  | typeof GRIPPER_V1_2
 
 export type ModuleModelWithLegacy =
   | ModuleModel
@@ -468,6 +472,8 @@ export type MotorAxis =
   | 'rightZ'
   | 'leftPlunger'
   | 'rightPlunger'
+  | 'extensionZ'
+  | 'extensionJaw'
 
 export type MotorAxes = MotorAxis[]
 

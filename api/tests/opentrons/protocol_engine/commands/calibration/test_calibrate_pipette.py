@@ -20,6 +20,8 @@ from opentrons.types import MountType, Point
 
 from opentrons.hardware_control import ot3_calibration as calibration
 
+from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
+
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
@@ -77,9 +79,9 @@ async def test_calibrate_pipette_does_not_save_during_error(
         await calibration.find_pipette_offset(
             hcapi=ot3_hardware_api, mount=OT3Mount.LEFT, slot=5
         )
-    ).then_raise(calibration.EarlyCapacitiveSenseTrigger(5.0, 3.0))
+    ).then_raise(EarlyCapacitiveSenseTrigger(5.0, 3.0))
 
-    with pytest.raises(calibration.EarlyCapacitiveSenseTrigger):
+    with pytest.raises(EarlyCapacitiveSenseTrigger):
         await subject.execute(params)
 
     decoy.verify(

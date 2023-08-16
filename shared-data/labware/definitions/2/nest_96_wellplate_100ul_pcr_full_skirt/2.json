@@ -29,6 +29,8 @@
     "yDimension": 85.48,
     "zDimension": 15.7
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 10.65,
   "wells": {
     "A1": {
       "depth": 14.78,
@@ -1020,6 +1022,11 @@
       "x": 0,
       "y": 0,
       "z": 10.2
+    },
+    "opentrons_96_well_aluminum_block": {
+      "x": 0,
+      "y": 0,
+      "z": 12.66
     }
   }
 }

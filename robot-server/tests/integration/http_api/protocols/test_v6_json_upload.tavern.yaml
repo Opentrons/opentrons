@@ -125,6 +125,16 @@ stages:
                 location:
                   slotName: '1'
             commands:
+              # Initial home
+              - id: !anystr
+                createdAt: !anystr
+                commandType: home
+                key: !anystr
+                status: succeeded
+                params: { }
+                result: { }
+                startedAt: !anystr
+                completedAt: !anystr
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadPipette

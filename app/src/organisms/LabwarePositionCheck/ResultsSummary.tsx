@@ -288,7 +288,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
 
 // Very similar to the OffsetTable, but abbreviates certain things to be optimized
 // for smaller screens
-const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
+export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
   const { offsets, labwareDefinitions } = props
   const { i18n, t } = useTranslation('labware_position_check')
   return (

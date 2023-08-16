@@ -11,6 +11,7 @@ IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
     LogIdentifier.serial: "opentrons-api-serial",
     LogIdentifier.server: "uvicorn",
     LogIdentifier.api_server: "opentrons-robot-server",
+    LogIdentifier.odd: "opentrons-robot-app",
 }
 
 

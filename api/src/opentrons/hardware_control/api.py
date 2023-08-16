@@ -50,6 +50,9 @@ from .types import (
     MotionChecks,
     PauseType,
     StatusBarState,
+    EstopState,
+    SubSystem,
+    SubSystemState,
 )
 from .errors import (
     MustHomeError,
@@ -324,6 +327,9 @@ class API(
     @property
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
+
+    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return {}
 
     # Incidentals (i.e. not motion) API
 
@@ -1158,3 +1164,6 @@ class API(
         self, input_map: Dict[Axis, "API.MapPayload"]
     ) -> Dict[str, "API.MapPayload"]:
         return {ot2_axis_to_string(k): v for k, v in input_map.items()}
+
+    def get_estop_state(self) -> EstopState:
+        return EstopState.DISENGAGED

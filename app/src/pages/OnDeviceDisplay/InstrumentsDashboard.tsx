@@ -27,9 +27,13 @@ export const InstrumentsDashboard = (): JSX.Element => {
   const isNinetySixChannel = leftInstrument?.data?.channels === 96
 
   return (
-    <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex
+        paddingX={SPACING.spacing40}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+      >
         {isNinetySixChannel ? (
           <AttachedInstrumentMountItem
             mount="left"

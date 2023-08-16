@@ -1,3 +1,4 @@
+import re
 from typing import List, Dict, Tuple, Optional
 from pydantic import BaseModel, Field, validator
 from typing_extensions import Literal
@@ -7,6 +8,8 @@ from . import types as pip_types, dev_types
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
+
+NOZZLE_MAP_NAMES = re.compile(r"[A-Z]{1}[0-9]{1,2}")
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -79,6 +82,11 @@ class SupportedTipsDefinition(BaseModel):
         ...,
         description="The flowrate used in blowouts by default.",
         alias="defaultBlowOutFlowRate",
+    )
+    default_flow_acceleration: float = Field(
+        float("inf"),  # no default works for all pipettes
+        description="The acceleration used during aspirate/dispense/blowout in ul/s^2.",
+        alias="defaultFlowAcceleration",
     )
     default_tip_length: float = Field(
         ...,
@@ -168,6 +176,11 @@ class PartialTipDefinition(BaseModel):
         default=None,
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
+    )
+    per_tip_pickup_current: float = Field(
+        default=0.5,
+        description="A current scale for pick up tip in a partial tip configuration",
+        alias="perTipPickupCurrent",
     )
 
 
@@ -264,6 +277,18 @@ class PipetteGeometryDefinition(BaseModel):
         description="The shared data relative path to the 3D representation of the pipette model.",
         alias="pathTo3D",
     )
+    nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+
+    @validator("nozzle_map", pre=True)
+    def check_nonempty_strings(
+        cls, v: Dict[str, List[float]]
+    ) -> Dict[str, List[float]]:
+        # Note, the key should be able to be a regex but I think
+        # we're not on a pydantic version that supports that.
+        for k in v.keys():
+            if not NOZZLE_MAP_NAMES.match(k):
+                raise ValueError("{k} is not a valid key entry for nozzle map.")
+        return v
 
 
 class PipetteLiquidPropertiesDefinition(BaseModel):
