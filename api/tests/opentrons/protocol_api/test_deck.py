@@ -219,7 +219,7 @@ def test_get_slot_definition(
         {
             "locations": {
                 "orderedSlots": [
-                    {"id": "foo", "position": [1.0, 2.0, 3.0]},
+                    {"id": DeckSlotName.SLOT_3.id, "position": [1.0, 2.0, 3.0]},
                 ],
                 "calibrationPoints": [],
             }
