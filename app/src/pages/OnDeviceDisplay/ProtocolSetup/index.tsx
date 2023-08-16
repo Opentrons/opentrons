@@ -28,7 +28,6 @@ import {
 import {
   useProtocolQuery,
   useRunQuery,
-  useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 import {
@@ -317,9 +316,6 @@ function PrepareToRun({
   })
 
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const {
-    data: allPipettesCalibrationData,
-  } = useAllPipetteOffsetCalibrationsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
@@ -357,12 +353,16 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
+  const areInstrumentsReady =
+    mostRecentAnalysis != null && attachedInstruments != null
+      ? getAreInstrumentsReady(mostRecentAnalysis, attachedInstruments)
+      : false
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingPipCalForOdd: allPipettesCalibrationData == null,
+    hasMissingCalForOdd: !areInstrumentsReady,
   })
 
   const [
@@ -374,19 +374,8 @@ function PrepareToRun({
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules == null) ||
-    allPipettesCalibrationData == null
+    (protocolHasModules && attachedModules == null)
 
-  const areInstrumentsReady =
-    mostRecentAnalysis != null &&
-    attachedInstruments != null &&
-    allPipettesCalibrationData != null
-      ? getAreInstrumentsReady(
-          mostRecentAnalysis,
-          attachedInstruments,
-          allPipettesCalibrationData
-        )
-      : false
   const speccedInstrumentCount =
     mostRecentAnalysis !== null
       ? mostRecentAnalysis.pipettes.length +
