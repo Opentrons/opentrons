@@ -717,6 +717,7 @@ def test_dispense_with_location(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
+            push_out=None,
         ),
         times=1,
     )
@@ -754,6 +755,7 @@ def test_dispense_with_well_location(
             volume=42.0,
             rate=1.23,
             flow_rate=3.0,
+            push_out=None,
         ),
         times=1,
     )
@@ -783,7 +785,7 @@ def test_dispense_with_well(
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
-    subject.dispense(volume=42.0, location=input_location, rate=1.23)
+    subject.dispense(volume=42.0, location=input_location, rate=1.23, push_out=None)
 
     decoy.verify(
         mock_instrument_core.dispense(
@@ -793,6 +795,7 @@ def test_dispense_with_well(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
+            push_out=None,
         ),
         times=1,
     )
