@@ -124,10 +124,15 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     # and remove it from this class. Jira RSS-236.
     def position_for(self, slot: DeckLocation) -> Location:
         """Get the absolute location of a deck slot's front-left corner."""
-        slot_definition = self.get_slot_definition(slot)
+        slot_name = _get_slot_name(
+            slot, self._api_version, self._protocol_core.robot_type
+        )
+        slot_definition = self._slot_definitions_by_name[slot_name.id]
         x, y, z = slot_definition["position"]
-
-        return Location(point=Point(x, y, z), labware=slot_definition["id"])
+        normalized_slot_name = validation.internal_slot_to_public_string(
+            slot_name, self._protocol_core.robot_type
+        )
+        return Location(point=Point(x, y, z), labware=normalized_slot_name)
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
