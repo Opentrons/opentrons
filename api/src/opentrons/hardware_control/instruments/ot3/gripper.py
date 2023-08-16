@@ -242,9 +242,7 @@ def _reload_gripper(
     # are similar enough that we might skip, see if the configs
     # match closely enough.
     # Returns a gripper object
-    if (
-        new_config == attached_instr.config
-    ):
+    if new_config == attached_instr.config:
         # Same config, good enough
         return attached_instr, True
     else:

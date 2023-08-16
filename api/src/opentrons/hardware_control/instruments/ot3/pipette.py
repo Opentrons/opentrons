@@ -565,9 +565,7 @@ def _reload_and_check_skip(
     # match closely enough.
     # Returns a pipette object and True if we may skip hw reconfig
     # TODO this can potentially be removed in a follow-up refactor.
-    if (
-        new_config == attached_instr.config
-    ):
+    if new_config == attached_instr.config:
         # Same config, good enough
         return attached_instr, True
     else:
