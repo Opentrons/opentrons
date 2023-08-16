@@ -26,6 +26,7 @@ interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void
   frontJawOffset: Coordinates | null
   createRunCommand: CreateMaintenaceCommand
+  isExiting: boolean
 }
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
@@ -39,6 +40,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     createRunCommand,
     errorMessage,
     setErrorMessage,
+    isExiting,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
@@ -211,11 +213,13 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     return (
       <InProgressModal
         description={
-          errorMessage == null
+          errorMessage == null && !isExiting
             ? inProgressText
             : t('shared:stand_back_robot_is_in_motion')
         }
-        alternativeSpinner={errorMessage == null ? inProgressImage : undefined}
+        alternativeSpinner={
+          errorMessage == null && !isExiting ? inProgressImage : undefined
+        }
       />
     )
   return errorMessage != null ? (
