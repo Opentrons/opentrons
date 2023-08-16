@@ -113,6 +113,18 @@ export function ProtocolSetupStep({
     }
   }
 
+  const PUSHED_STATE_STYLING = css`
+    &:active {
+      background-color: ${!disabled
+        ? status === 'general'
+          ? COLORS.darkBlack40
+          : status === 'ready'
+          ? COLORS.green3Pressed
+          : COLORS.yellow3Pressed
+        : ''};
+    }
+  `
+
   return (
     <Btn
       onClick={() =>
@@ -128,6 +140,7 @@ export function ProtocolSetupStep({
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
+        css={PUSHED_STATE_STYLING}
       >
         {status !== 'general' && !disabled ? (
           <Icon
@@ -299,7 +312,7 @@ function PrepareToRun({
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
-  if (scrollRef.current) {
+  if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
 
