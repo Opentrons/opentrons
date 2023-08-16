@@ -909,6 +909,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def deck(self) -> Deck:
         """An interface to provide information about what's currently loaded on the deck.
+        This object is useful for determining if a slot in the deck is free.
 
         This object behaves like a dictionary whose keys are the deck slot names.
         For instance, ``protocol.deck[1]``, ``protocol.deck["1"]``, and ``protocol.deck["D1"]``
@@ -918,14 +919,26 @@ class ProtocolContext(CommandPublisher):
         labware, a :py:obj:`~opentrons.protocol_api.ModuleContext` if the slot contains a hardware
         module, or ``None`` if the slot doesn't contain anything.
 
-        This object is useful for determining if a slot in the deck is free.
-
         Rather than filtering the objects in the deck map yourself,
-        you can also use :py:attr:`loaded_labwares` to see a dict of labwares
-        and :py:attr:`loaded_modules` to see a dict of modules.
+        you can also use :py:attr:`loaded_labwares` to get a dict of labwares
+        and :py:attr:`loaded_modules` to get a dict of modules.
 
-        For advanced control, you can delete an item of labware from the deck
-        with e.g. ``del protocol.deck['1']`` to free a slot for new labware.
+        For :ref:`advanced-control` `only`, you can delete an element of the ``deck`` dict.
+        This only works for deck slots that contain labware objects. For example, if slot 
+        1 contains a labware, ``del protocol.deck['1']`` will free the slot so you can 
+        load another labware there.
+        
+        .. warning::
+            Do not delete labware from a deck slot for protocols run in the Opentrons App 
+            or on the Flex touchscreen. The protocol will continue immediately without 
+            giving you a chance to physically remove the labware. 
+            Use :py:meth:`.move_labware` instead.
+        
+        .. versionchanged:: 2.14
+           Deleting deck elements raises an error.
+
+        .. versionchanged:: 2.15
+           ``del`` sets the labware location to ``OFF_DECK`` instead of deleting it.
         """
         return self._deck
 
