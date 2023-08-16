@@ -1,7 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -21,12 +19,8 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { InlineNotification } from '../../../atoms/InlineNotification'
-import { toggleDevtools, toggleHistoricOffsets } from '../../../redux/config'
 
 import type { IconName } from '@opentrons/components'
-import type { Dispatch } from '../../../redux/types'
-import type { SettingOption, SetSettingOption } from '../RobotSettingsDashboard'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -39,54 +33,22 @@ const SETTING_BUTTON_STYLE = css`
 interface RobotSettingButtonProps {
   settingName: string
   iconName: IconName
+  onClick: React.MouseEventHandler
   settingInfo?: string
-  currentOption?: SettingOption
-  setCurrentOption?: SetSettingOption
-  robotName?: string
-  isUpdateAvailable?: boolean
-  enabledDevTools?: boolean
-  enabledHistoricOffests?: boolean
-  devToolsOn?: boolean
-  historicOffsetsOn?: boolean
-  ledLights?: boolean
-  lightsOn?: boolean
-  toggleLights?: () => void
+  rightElement?: React.ReactNode
 }
 
 export function RobotSettingButton({
   settingName,
-  settingInfo,
-  currentOption,
-  setCurrentOption,
-  isUpdateAvailable,
   iconName,
-  enabledDevTools,
-  enabledHistoricOffests,
-  devToolsOn,
-  historicOffsetsOn,
-  ledLights,
-  lightsOn,
-  toggleLights,
+  onClick,
+  settingInfo,
+  rightElement
 }: RobotSettingButtonProps): JSX.Element {
-  const { t, i18n } = useTranslation(['app_settings', 'shared'])
-  const dispatch = useDispatch<Dispatch>()
-
-  const handleClick = (): void => {
-    if (currentOption != null && setCurrentOption != null) {
-      setCurrentOption(currentOption)
-    } else if (Boolean(enabledDevTools)) {
-      dispatch(toggleDevtools())
-    } else if (Boolean(enabledHistoricOffests)) {
-      dispatch(toggleHistoricOffsets())
-    } else if (Boolean(ledLights)) {
-      if (toggleLights != null) toggleLights()
-    }
-  }
-
   return (
     <Btn
       css={SETTING_BUTTON_STYLE}
-      onClick={handleClick}
+      onClick={onClick}
       display={DISPLAY_FLEX}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing24}
@@ -121,62 +83,13 @@ export function RobotSettingButton({
           ) : null}
         </Flex>
       </Flex>
-      {enabledDevTools != null ? (
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing12}
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.borderRadiusSize4}
-        >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {Boolean(devToolsOn) ? t('shared:on') : t('shared:off')}
-          </StyledText>
-        </Flex>
-      ) : null}
-      {enabledHistoricOffests != null ? (
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing12}
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.borderRadiusSize4}
-        >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {Boolean(historicOffsetsOn) ? t('shared:on') : t('shared:off')}
-          </StyledText>
-        </Flex>
-      ) : null}
-      {ledLights != null ? (
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing12}
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.borderRadiusSize4}
-        >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {Boolean(lightsOn) ? t('shared:on') : t('shared:off')}
-          </StyledText>
-        </Flex>
-      ) : null}
-      <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
-        {isUpdateAvailable ?? false ? (
-          <InlineNotification
-            type="alert"
-            heading={i18n.format(t('update_available'), 'capitalize')}
-            hug={true}
-          />
-        ) : null}
-        {enabledDevTools == null &&
-        enabledHistoricOffests == null &&
-        ledLights == null ? (
-          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
-        ) : null}
-      </Flex>
+      {rightElement != null
+        ? rightElement : (
+          <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+            <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
+          </Flex>
+        )
+      }
     </Btn>
   )
 }
