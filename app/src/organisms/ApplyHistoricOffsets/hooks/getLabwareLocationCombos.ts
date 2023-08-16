@@ -158,7 +158,7 @@ function resolveAdapterLocation(
     )
     return { adapterOffsetLocation: null }
   }
-  let moduleIdUnderAdapter: undefined | string = undefined
+  let moduleIdUnderAdapter
   let adapterOffsetLocation: LabwareOffsetLocation | null = null
   if (labwareEntity.location === 'offDeck') {
     return { adapterOffsetLocation: null }
