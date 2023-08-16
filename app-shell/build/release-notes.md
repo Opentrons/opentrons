@@ -6,6 +6,35 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.0.0
+
+Welcome to the v7.0.0 release of the Opentrons App! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
+
+### New Features
+
+- Opentrons Flex features
+  - Connect to Opentrons Flex robots via Wi-Fi, Ethernet, or USB.
+  - Send a protocol to Opentrons Flex. Protocols are stored on the Flex robot and can be run from the touchscreen.
+  - Run protocols that automatically move labware with the Flex Gripper, including onto and off of the new Magnetic Block.
+  - Attach, detach, and run automated calibration for Flex pipettes and the Flex Gripper.
+  - 
+- Opentrons Flex and OT-2 features
+  - Manually move labware around the deck during protocols. The app shows animated instructions for which labware to move, and lets you resume the protocol when movement is complete.
+  - See when your protocol will pause. During a run, marks on the protocol timeline show all pauses that require user attention, including labware movement.
+
+### Improved Features
+
+- Biggest improvement.
+- Smaller improvement.
+
+### Bug Fixes
+
+- Biggest fix.
+- Medium fix.
+- Smaller fix.
+
+---
+
 ## Opentrons App Changes in 6.3.1
 
 Welcome to the v6.3.1 release of the Opentrons App!

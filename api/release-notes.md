@@ -5,6 +5,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+
+## Opentrons Robot Software Changes in 7.0.0
+
+Welcome to the v7.0.0 release of the Opentrons robot software! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
+
+### New Features
+
+- Flex touchscreen
+- Flex features
+- OT-2 features
+
+---
+
 ## OT-2 Software Changes in 6.3.1
 
 Welcome to the v6.3.1 release of the OT-2 software! This hotfix release addresses a few problems.
