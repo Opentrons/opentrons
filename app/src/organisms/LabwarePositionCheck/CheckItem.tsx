@@ -30,9 +30,12 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
+import { useFeatureFlag } from '../../redux/config'
+
+const PROBE_LENGTH_MM = 44.5
 
 interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
-  section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
+  section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'CHECK_POSITIONS'
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
@@ -59,6 +62,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     existingOffsets,
     setFatalError,
   } = props
+  const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(
@@ -177,7 +181,12 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             pipetteId: pipetteId,
             labwareId: labwareId,
             wellName: 'A1',
-            wellLocation: { origin: 'top' as const },
+            wellLocation: {
+              origin: 'top' as const,
+              offset: goldenLPC
+                ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
+                : IDENTITY_VECTOR,
+            },
           },
         },
         { commandType: 'savePosition', params: { pipetteId } },

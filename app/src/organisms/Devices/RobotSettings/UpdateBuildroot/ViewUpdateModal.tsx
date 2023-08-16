@@ -2,25 +2,27 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  BALENA,
+  OT2_BALENA,
   UPGRADE,
-  getBuildrootUpdateInfo,
-  getBuildrootDownloadProgress,
-  getBuildrootDownloadError,
-} from '../../../../redux/buildroot'
+  getRobotUpdateInfo,
+  getRobotUpdateDownloadProgress,
+  getRobotUpdateDownloadError,
+} from '../../../../redux/robot-update'
 
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { DownloadUpdateModal } from './DownloadUpdateModal'
 import { ReleaseNotesModal } from './ReleaseNotesModal'
 
 import type {
-  BuildrootUpdateType,
+  RobotUpdateType,
   RobotSystemType,
-} from '../../../../redux/buildroot/types'
+} from '../../../../redux/robot-update/types'
+
+import type { State } from '../../../../redux/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
-  robotUpdateType: BuildrootUpdateType | null
+  robotUpdateType: RobotUpdateType | null
   robotSystemType: RobotSystemType | null
   close: () => unknown
   proceed: () => unknown
@@ -30,14 +32,20 @@ export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
-  const updateInfo = useSelector(getBuildrootUpdateInfo)
-  const downloadProgress = useSelector(getBuildrootDownloadProgress)
-  const downloadError = useSelector(getBuildrootDownloadError)
+  const updateInfo = useSelector((state: State) =>
+    getRobotUpdateInfo(state, robotName)
+  )
+  const downloadProgress = useSelector((state: State) =>
+    getRobotUpdateDownloadProgress(state, robotName)
+  )
+  const downloadError = useSelector((state: State) =>
+    getRobotUpdateDownloadError(state, robotName)
+  )
 
   const [
     showMigrationWarning,
     setShowMigrationWarning,
-  ] = React.useState<boolean>(robotSystemType === BALENA)
+  ] = React.useState<boolean>(robotSystemType === OT2_BALENA)
 
   const notNowButton = {
     onClick: close,
@@ -70,7 +78,7 @@ export function ViewUpdateModal(
       <ReleaseNotesModal
         robotName={robotName}
         notNowButton={notNowButton}
-        releaseNotes={updateInfo.releaseNotes}
+        releaseNotes={updateInfo.releaseNotes ?? ''}
         systemType={robotSystemType}
         proceed={proceed}
       />

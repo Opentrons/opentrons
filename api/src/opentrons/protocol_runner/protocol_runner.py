@@ -15,7 +15,13 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
-from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    StateSummary,
+    Command,
+    commands as pe_commands,
+)
+from opentrons.protocols.parse import PythonParseMode
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -111,7 +117,9 @@ class PythonAndLegacyRunner(AbstractRunner):
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
-    async def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(
+        self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode
+    ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
@@ -123,7 +131,9 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
         # the event loop. Jira RSS-165.
-        protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
+        protocol = self._legacy_file_reader.read(
+            protocol_source, labware_definitions, python_parse_mode
+        )
         broker = None
         equipment_broker = None
 
@@ -140,6 +150,10 @@ class PythonAndLegacyRunner(AbstractRunner):
             broker=broker,
             equipment_broker=equipment_broker,
         )
+        initial_home_command = pe_commands.HomeCreate(
+            params=pe_commands.HomeParams(axes=None)
+        )
+        self._protocol_engine.add_command(request=initial_home_command)
 
         self._task_queue.set_run_func(
             func=self._legacy_executor.execute,
@@ -150,13 +164,15 @@ class PythonAndLegacyRunner(AbstractRunner):
     async def run(  # noqa: D102
         self,
         protocol_source: Optional[ProtocolSource] = None,
+        python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
-            await self.load(protocol_source=protocol_source)
+            await self.load(
+                protocol_source=protocol_source, python_parse_mode=python_parse_mode
+            )
 
-        await self._hardware_api.home()
         self.play()
         self._task_queue.start()
         await self._task_queue.join()
@@ -227,6 +243,11 @@ class JsonRunner(AbstractRunner):
                 color=liquid.displayColor,
             )
             await _yield()
+        initial_home_command = pe_commands.HomeCreate(
+            params=pe_commands.HomeParams(axes=None)
+        )
+        self._protocol_engine.add_command(request=initial_home_command)
+
         for command in commands:
             self._protocol_engine.add_command(request=command)
             await _yield()
@@ -242,7 +263,6 @@ class JsonRunner(AbstractRunner):
         if protocol_source:
             await self.load(protocol_source)
 
-        await self._hardware_api.home()
         self.play()
         self._task_queue.start()
         await self._task_queue.join()

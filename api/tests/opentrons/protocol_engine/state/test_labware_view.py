@@ -1196,6 +1196,24 @@ def test_get_all_labware_definition_empty() -> None:
     assert result == []
 
 
+def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:
+    """It should raise if the labware trying to be stacked is an adapter."""
+    subject = get_labware_view()
+
+    with pytest.raises(
+        errors.LabwareCannotBeStackedError, match="defined as an adapter"
+    ):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(  # type: ignore[call-arg]
+                    loadName="name"
+                ),
+                allowedRoles=[LabwareRole.adapter],
+            ),
+            bottom_labware_id="labware-id",
+        )
+
+
 def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
     """It should raise if the labware name is not in the definition stacking overlap."""
     subject = get_labware_view(
@@ -1209,7 +1227,9 @@ def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
         },
     )
 
-    with pytest.raises(errors.LabwareCannotBeStackedError):
+    with pytest.raises(
+        errors.LabwareCannotBeStackedError, match="loaded onto labware test"
+    ):
         subject.raise_if_labware_cannot_be_stacked(
             top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
                 parameters=Parameters.construct(  # type: ignore[call-arg]
@@ -1277,7 +1297,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
         },
     )
 
-    with pytest.raises(errors.LabwareCannotBeStackedError, match="adapter"):
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="on top of adapter"):
         subject.raise_if_labware_cannot_be_stacked(
             top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
                 parameters=Parameters.construct(  # type: ignore[call-arg]

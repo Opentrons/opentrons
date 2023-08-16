@@ -22,7 +22,7 @@ import {
   OPENTRONS_USB,
 } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
-import { getBuildrootSession } from '../../../redux/buildroot'
+import { getRobotUpdateSession } from '../../../redux/robot-update'
 import { getDevtoolsEnabled } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
@@ -48,7 +48,7 @@ export function RobotSettings(): JSX.Element | null {
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
   )
-  const buildrootUpdateSession = useSelector(getBuildrootSession)
+  const robotUpdateSession = useSelector(getRobotUpdateSession)
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
     if (isRobotBusy) setShowRobotBusyBanner(true)
@@ -85,7 +85,7 @@ export function RobotSettings(): JSX.Element | null {
     (robot == null ||
       robot?.status === UNREACHABLE ||
       (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')) &&
-    buildrootUpdateSession == null
+    robotUpdateSession == null
   ) {
     return <Redirect to={`/devices/${robotName}`} />
   }

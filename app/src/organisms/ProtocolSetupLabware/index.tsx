@@ -191,6 +191,7 @@ export function ProtocolSetupLabware({
               deckFill={COLORS.light1}
               trashSlotName="A3"
               id="LabwareSetup_deckMap"
+              trashColor={COLORS.darkGreyEnabled}
             >
               {() => (
                 <>

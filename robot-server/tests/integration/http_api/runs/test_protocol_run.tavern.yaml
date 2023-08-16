@@ -154,8 +154,16 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 1
+          totalLength: 2
         data:
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -171,7 +179,7 @@ stages:
             completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
       save:
         json:
-          load_labware_command_id: data[0].id
+          load_labware_command_id: data[1].id
 
   - name: Get full details of the load labware command and make sure the offset applied
     request:

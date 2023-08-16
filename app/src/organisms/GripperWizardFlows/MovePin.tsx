@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import { LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
@@ -26,6 +26,7 @@ interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void
   frontJawOffset: Coordinates | null
   createRunCommand: CreateMaintenaceCommand
+  isExiting: boolean
 }
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
@@ -39,6 +40,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     createRunCommand,
     errorMessage,
     setErrorMessage,
+    isExiting,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
@@ -51,7 +53,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         command: {
           commandType: 'home' as const,
           params: {
-            axes: [], // TODO: use gripper motor axis const here
+            axes: ['extensionZ', 'extensionJaw'],
           },
         },
         waitUntilComplete: true,
@@ -81,7 +83,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                 command: {
                   commandType: 'calibration/moveToMaintenancePosition' as const,
                   params: {
-                    mount: LEFT,
+                    mount: EXTENSION,
                   },
                 },
                 waitUntilComplete: true,
@@ -211,11 +213,13 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     return (
       <InProgressModal
         description={
-          errorMessage == null
+          errorMessage == null && !isExiting
             ? inProgressText
             : t('shared:stand_back_robot_is_in_motion')
         }
-        alternativeSpinner={errorMessage == null ? inProgressImage : undefined}
+        alternativeSpinner={
+          errorMessage == null && !isExiting ? inProgressImage : undefined
+        }
       />
     )
   return errorMessage != null ? (

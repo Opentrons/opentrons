@@ -51,6 +51,7 @@ from opentrons.hardware_control.types import (
     UpdateState,
     TipStateType,
     FailedTipStateCheck,
+    EstopState,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -73,6 +74,14 @@ from opentrons_hardware.hardware_control.tools.types import (
     PipetteInformation,
     GripperInformation,
 )
+
+from opentrons.hardware_control.estop_state import EstopStateMachine
+
+from opentrons_shared_data.errors.exceptions import (
+    EStopActivatedError,
+    EStopNotPresentError,
+)
+
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 
@@ -248,6 +257,16 @@ def mock_subsystem_manager(
         controller, "_subsystem_manager", decoy.mock(cls=SubsystemManager)
     ) as mock_subsystem:
         yield mock_subsystem
+
+
+@pytest.fixture
+def mock_estop_state_machine(
+    controller: OT3Controller, decoy: Decoy
+) -> Iterator[EstopStateMachine]:
+    with mock.patch.object(
+        controller, "_estop_state_machine", decoy.mock(cls=EstopStateMachine)
+    ) as mock_estop_state:
+        yield mock_estop_state
 
 
 @pytest.fixture
@@ -1070,3 +1089,26 @@ async def test_get_tip_present(
     ):
         with expectation:
             await controller.get_tip_present(mount, tip_state_type)
+
+
+@pytest.mark.parametrize(
+    "estop_state, expectation",
+    [
+        [EstopState.DISENGAGED, does_not_raise()],
+        [EstopState.NOT_PRESENT, pytest.raises(EStopNotPresentError)],
+        [EstopState.PHYSICALLY_ENGAGED, pytest.raises(EStopActivatedError)],
+        [EstopState.LOGICALLY_ENGAGED, pytest.raises(EStopActivatedError)],
+    ],
+)
+async def test_requires_estop(
+    controller: OT3Controller,
+    mock_estop_state_machine: EstopStateMachine,
+    decoy: Decoy,
+    estop_state: EstopState,
+    expectation: ContextManager[None],
+) -> None:
+    """Test that the estop state machine raises properly."""
+    decoy.when(mock_estop_state_machine.state).then_return(estop_state)
+
+    with expectation:
+        await controller.home([Axis.X, Axis.Y], gantry_load=GantryLoad.LOW_THROUGHPUT)

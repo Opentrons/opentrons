@@ -68,6 +68,7 @@ import type {
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -95,7 +96,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
-  const [showWizard, setShowWizard] = React.useState<boolean>(false)
+  const [
+    showAttachmentWizard,
+    setShowAttachmentWizard,
+  ] = React.useState<boolean>(false)
+  const [showCalibrateWizard, setShowCalibrateWizard] = React.useState<boolean>(
+    false
+  )
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
@@ -205,8 +212,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowTestShake(true)
   }
 
-  const handleWizardClick = (): void => {
-    setShowWizard(true)
+  const handleInstructionsClick = (): void => {
+    setShowAttachmentWizard(true)
+  }
+
+  const handleCalibrateClick = (): void => {
+    setShowCalibrateWizard(true)
   }
 
   return (
@@ -216,12 +227,22 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
-        <HeaterShakerWizard
-          onCloseClick={() => setShowWizard(false)}
+      {showCalibrateWizard ? (
+        <ModuleWizardFlows
           attachedModule={module}
+          slotName="A1"
+          closeFlow={() => {
+            setShowCalibrateWizard(false)
+          }}
         />
-      )}
+      ) : null}
+      {showAttachmentWizard &&
+        module.moduleType === HEATERSHAKER_MODULE_TYPE && (
+          <HeaterShakerWizard
+            onCloseClick={() => setShowAttachmentWizard(false)}
+            attachedModule={module}
+          />
+        )}
       {showSlideout && (
         <ModuleSlideout
           module={module}
@@ -409,7 +430,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               isLoadedInRun={isLoadedInRun}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
-              handleWizardClick={handleWizardClick}
+              handleInstructionsClick={handleInstructionsClick}
+              handleCalibrateClick={handleCalibrateClick}
             />
           </Box>
           {menuOverlay}

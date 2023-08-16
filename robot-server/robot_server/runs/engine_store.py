@@ -5,6 +5,13 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import (
+    EstopState,
+    HardwareEvent,
+    EstopStateNotification,
+    HardwareEventHandler,
+)
+from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_runner import (
     AnyRunner,
     JsonRunner,
@@ -20,7 +27,6 @@ from opentrons.protocol_engine import (
     StateSummary,
     create_protocol_engine,
 )
-
 
 from robot_server.protocols import ProtocolResource
 
@@ -39,6 +45,20 @@ class RunnerEnginePair(NamedTuple):
     run_id: str
     runner: AnyRunner
     engine: ProtocolEngine
+
+
+def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
+    """Create a callback for estop events."""
+
+    def _callback(event: HardwareEvent) -> None:
+        if isinstance(event, EstopStateNotification):
+            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+                return
+            if engine_store.current_run_id is None:
+                return
+            engine_store.engine.estop(maintenance_run=False)
+
+    return _callback
 
 
 class EngineStore:
@@ -63,6 +83,7 @@ class EngineStore:
         self._deck_type = deck_type
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
+        hardware_api.register_callback(get_estop_listener(self))
 
     @property
     def engine(self) -> ProtocolEngine:
@@ -153,13 +174,25 @@ class EngineStore:
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")
 
-        if isinstance(runner, (PythonAndLegacyRunner, JsonRunner)):
-            # FIXME(mm, 2022-12-21): This `await` introduces a concurrency hazard. If
-            # two requests simultaneously call this method, they will both "succeed"
-            # (with undefined results) instead of one raising EngineConflictError.
+        # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
+        # concurrency hazard. If two requests simultaneously call this method,
+        # they will both "succeed" (with undefined results) instead of one
+        # raising EngineConflictError.
+        if isinstance(runner, PythonAndLegacyRunner):
             assert (
                 protocol is not None
-            ), "A Python or JSON protocol should have a protocol source file."
+            ), "A Python protocol should have a protocol source file."
+            await runner.load(
+                protocol.source,
+                # Conservatively assume that we're re-running a protocol that
+                # was uploaded before we added stricter validation, and that
+                # doesn't conform to the new rules.
+                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+            )
+        elif isinstance(runner, JsonRunner):
+            assert (
+                protocol is not None
+            ), "A JSON protocol should have a protocol source file."
             await runner.load(protocol.source)
         else:
             runner.prepare()

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -19,6 +19,7 @@ import { SleepScreen } from '../atoms/SleepScreen'
 import { ToasterOven } from '../organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
+import { EstopTakeover } from '../organisms/EmergencyStop'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
@@ -43,6 +44,7 @@ import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
 import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
+
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
 import type { Dispatch } from '../redux/types'
@@ -261,27 +263,30 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
           {isIdle ? (
             <SleepScreen />
           ) : (
-            <MaintenanceRunTakeover>
-              <FirmwareUpdateTakeover />
-              <ToasterOven>
-                <ProtocolReceiptToasts />
-                <Switch>
-                  {onDeviceDisplayRoutes.map(
-                    ({ Component, exact, path }: RouteProps) => {
-                      return (
-                        <Route key={path} exact={exact} path={path}>
-                          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                            <ModalPortalRoot />
-                            <Component />
-                          </Box>
-                        </Route>
-                      )
-                    }
-                  )}
-                  <Redirect exact from="/" to={'/loading'} />
-                </Switch>
-              </ToasterOven>
-            </MaintenanceRunTakeover>
+            <>
+              <EstopTakeover />
+              <MaintenanceRunTakeover>
+                <FirmwareUpdateTakeover />
+                <ToasterOven>
+                  <ProtocolReceiptToasts />
+                  <Switch>
+                    {onDeviceDisplayRoutes.map(
+                      ({ Component, exact, path }: RouteProps) => {
+                        return (
+                          <Route key={path} exact={exact} path={path}>
+                            <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                              <ModalPortalRoot />
+                              <Component />
+                            </Box>
+                          </Route>
+                        )
+                      }
+                    )}
+                    <Redirect exact from="/" to={'/loading'} />
+                  </Switch>
+                </ToasterOven>
+              </MaintenanceRunTakeover>
+            </>
           )}
         </Box>
       </ErrorBoundary>
@@ -291,11 +296,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 }
 
 function TopLevelRedirects(): JSX.Element | null {
-  const runRouteMatch = useRouteMatch({ path: '/runs/:runId' })
   const currentRunRoute = useCurrentRunRoute()
-
-  if (runRouteMatch != null && currentRunRoute == null)
-    return <Redirect to="/dashboard" />
   return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
 }
 

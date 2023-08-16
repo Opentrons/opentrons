@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
@@ -56,7 +56,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   ] = React.useState<boolean>(false)
 
   const { autoUpdateAction } = useSelector((state: State) => {
-    return getBuildrootUpdateDisplayInfo(state, robot.name)
+    return getRobotUpdateDisplayInfo(state, robot.name)
   })
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'

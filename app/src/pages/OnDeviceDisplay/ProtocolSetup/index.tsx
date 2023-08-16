@@ -28,7 +28,6 @@ import {
 import {
   useProtocolQuery,
   useRunQuery,
-  useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 import {
@@ -38,7 +37,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
-import { Skeleton } from '../../../atoms/Skeleton'
+import {
+  ProtocolSetupTitleSkeleton,
+  ProtocolSetupStepSkeleton,
+} from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import { useMaintenanceRunTakeover } from '../../../organisms/TakeoverModal'
 import {
@@ -154,9 +156,13 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled ? null : (
-          <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
-        )}
+        <Icon
+          marginLeft={SPACING.spacing8}
+          name="more"
+          size="3rem"
+          // Required to prevent inconsistent component height.
+          style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
+        />
       </Flex>
     </Btn>
   )
@@ -242,7 +248,7 @@ const PLAY_BUTTON_STYLE = css`
 `
 interface PlayButtonProps {
   ready: boolean
-  onPlay: () => void
+  onPlay?: () => void
   disabled?: boolean
 }
 
@@ -299,7 +305,7 @@ function PrepareToRun({
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
-  if (scrollRef.current) {
+  if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
 
@@ -310,9 +316,6 @@ function PrepareToRun({
   })
 
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const {
-    data: allPipettesCalibrationData,
-  } = useAllPipetteOffsetCalibrationsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
@@ -350,12 +353,16 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
+  const areInstrumentsReady =
+    mostRecentAnalysis != null && attachedInstruments != null
+      ? getAreInstrumentsReady(mostRecentAnalysis, attachedInstruments)
+      : false
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingPipCalForOdd: allPipettesCalibrationData == null,
+    hasMissingCalForOdd: !areInstrumentsReady,
   })
 
   const [
@@ -363,23 +370,18 @@ function PrepareToRun({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  if (
+  // True if any sever request is still pending.
+  const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules == null) ||
-    allPipettesCalibrationData == null
-  ) {
-    return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
-  }
+    (protocolHasModules && attachedModules == null)
 
-  const areInstrumentsReady = getAreInstrumentsReady(
-    mostRecentAnalysis,
-    attachedInstruments,
-    allPipettesCalibrationData
-  )
   const speccedInstrumentCount =
-    mostRecentAnalysis.pipettes.length +
-    (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+    mostRecentAnalysis !== null
+      ? mostRecentAnalysis.pipettes.length +
+        (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+      : 0
+
   const instrumentsDetail = t('instruments_connected', {
     count: speccedInstrumentCount,
   })
@@ -478,29 +480,36 @@ function PrepareToRun({
             gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
-              {t('prepare_to_run')}
-            </StyledText>
-            <StyledText
-              as="h4"
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              overflowWrap="anywhere"
-            >
-              {truncateString(protocolName as string, 100)}
-            </StyledText>
+            {!isLoading ? (
+              <>
+                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                  {t('prepare_to_run')}
+                </StyledText>
+                <StyledText
+                  as="h4"
+                  color={COLORS.darkGreyEnabled}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  overflowWrap="anywhere"
+                >
+                  {truncateString(protocolName as string, 100)}
+                </StyledText>
+              </>
+            ) : (
+              <ProtocolSetupTitleSkeleton />
+            )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
-            <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton
-              disabled={
-                mostRecentAnalysis == null ||
-                attachedInstruments == null ||
-                (protocolHasModules && attachedModules == null) ||
-                allPipettesCalibrationData == null
+            <CloseButton
+              onClose={
+                !isLoading
+                  ? () => setShowConfirmCancelModal(true)
+                  : onConfirmCancelClose
               }
-              onPlay={onPlay}
-              ready={isReadyToRun}
+            />
+            <PlayButton
+              disabled={isLoading}
+              onPlay={!isLoading ? onPlay : undefined}
+              ready={!isLoading ? isReadyToRun : false}
             />
           </Flex>
         </Flex>
@@ -511,59 +520,67 @@ function PrepareToRun({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing8}
       >
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('instruments')}
-          title={t('instruments')}
-          detail={instrumentsDetail}
-          status={instrumentsStatus}
-          disabled={speccedInstrumentCount === 0}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('modules')}
-          title={t('modules')}
-          detail={modulesDetail}
-          status={modulesStatus}
-          disabled={protocolModulesInfo.length === 0}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => {
-            setODDMaintenanceFlowInProgress()
-            launchLPC()
-          }}
-          title={t('labware_position_check')}
-          detail={t(
-            lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
-          )}
-          subDetail={
-            latestCurrentOffsets.length > 0
-              ? t('offsets_applied', { count: latestCurrentOffsets.length })
-              : null
-          }
-          status="general"
-          disabled={lpcDisabledReason != null}
-          disabledReason={lpcDisabledReason}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('labware')}
-          title={t('labware')}
-          detail={labwareDetail}
-          subDetail={labwareSubDetail}
-          status="general"
-          disabled={labwareDetail === null}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('liquids')}
-          title={t('liquids')}
-          status="general"
-          detail={
-            liquidsInProtocol.length > 0
-              ? t('initial_liquids_num', {
-                  count: liquidsInProtocol.length,
-                })
-              : t('liquids_not_in_setup')
-          }
-          disabled={liquidsInProtocol.length === 0}
-        />
+        {!isLoading ? (
+          <>
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('instruments')}
+              title={t('instruments')}
+              detail={instrumentsDetail}
+              status={instrumentsStatus}
+              disabled={speccedInstrumentCount === 0}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('modules')}
+              title={t('modules')}
+              detail={modulesDetail}
+              status={modulesStatus}
+              disabled={protocolModulesInfo.length === 0}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => {
+                setODDMaintenanceFlowInProgress()
+                launchLPC()
+              }}
+              title={t('labware_position_check')}
+              detail={t(
+                lpcDisabledReason != null
+                  ? 'currently_unavailable'
+                  : 'recommended'
+              )}
+              subDetail={
+                latestCurrentOffsets.length > 0
+                  ? t('offsets_applied', { count: latestCurrentOffsets.length })
+                  : null
+              }
+              status="general"
+              disabled={lpcDisabledReason != null}
+              disabledReason={lpcDisabledReason}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('labware')}
+              title={t('labware')}
+              detail={labwareDetail}
+              subDetail={labwareSubDetail}
+              status="general"
+              disabled={labwareDetail == null}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('liquids')}
+              title={t('liquids')}
+              status="general"
+              detail={
+                liquidsInProtocol.length > 0
+                  ? t('initial_liquids_num', {
+                      count: liquidsInProtocol.length,
+                    })
+                  : t('liquids_not_in_setup')
+              }
+              disabled={liquidsInProtocol.length === 0}
+            />
+          </>
+        ) : (
+          <ProtocolSetupStepSkeleton />
+        )}
       </Flex>
       {LPCWizard}
       {showConfirmCancelModal ? (
@@ -652,35 +669,5 @@ export function ProtocolSetup(): JSX.Element {
         {setupComponentByScreen[setupScreen]}
       </Flex>
     </>
-  )
-}
-
-interface ProtocolSetupSkeletonProps {
-  cancelAndClose: () => void
-}
-function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing40}
-      marginTop={SPACING.spacing40}
-    >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-          <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
-          <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
-        </Flex>
-        <Flex gridGap={SPACING.spacing24}>
-          <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton onPlay={() => {}} ready={false} />
-        </Flex>
-      </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-      </Flex>
-    </Flex>
   )
 }

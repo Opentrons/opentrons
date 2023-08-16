@@ -13,9 +13,6 @@ const OUTPUT_PATH = path.join(__dirname, 'lib')
 
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
-const robotUpdateConfigElement = () =>
-  project === 'robot-stack' ? 'OT2' : 'OT3'
-
 module.exports = async () => {
   const version = await versionForProject(project)
 
@@ -26,9 +23,7 @@ module.exports = async () => {
         _PKG_VERSION_: JSON.stringify(version),
         _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
-        _DEFAULT_ROBOT_UPDATE_SOURCE_CONFIG_SELECTION_: JSON.stringify(
-          robotUpdateConfigElement()
-        ),
+        _OPENTRONS_PROJECT_: JSON.stringify(project),
       }),
     ],
   }

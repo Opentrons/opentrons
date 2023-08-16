@@ -19,6 +19,7 @@ import { DesktopApp } from '../DesktopApp'
 
 jest.mock('../../organisms/Alerts')
 jest.mock('../../organisms/Breadcrumbs')
+jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/AppSettings/GeneralSettings')
 jest.mock('../../pages/Devices/CalibrationDashboard')
 jest.mock('../../pages/Devices/DeviceDetails')

@@ -1,7 +1,11 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
 import { Flex, POSITION_RELATIVE } from '@opentrons/components'
+
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { useFeatureFlag } from '../../redux/config'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import {
   useIsOT3,
@@ -17,7 +21,8 @@ interface ModuleOverflowMenuProps {
   handleSlideoutClick: () => void
   handleAboutClick: () => void
   handleTestShakeClick: () => void
-  handleWizardClick: () => void
+  handleInstructionsClick: () => void
+  handleCalibrateClick: () => void
   isLoadedInRun: boolean
   robotName: string
   runId?: string
@@ -33,9 +38,12 @@ export const ModuleOverflowMenu = (
     handleSlideoutClick,
     handleAboutClick,
     handleTestShakeClick,
-    handleWizardClick,
+    handleInstructionsClick,
+    handleCalibrateClick,
     isLoadedInRun,
   } = props
+
+  const { t } = useTranslation('module_wizard_flows')
 
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunStill } = useRunStatuses()
@@ -43,6 +51,8 @@ export const ModuleOverflowMenu = (
   const isOT3 = useIsOT3(robotName)
   const isIncompatibleWithOT3 =
     isOT3 && module.moduleModel === 'thermocyclerModuleV1'
+
+  const enableModuleCalibration = useFeatureFlag('enableModuleCalibration')
 
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -59,7 +69,7 @@ export const ModuleOverflowMenu = (
     module,
     handleAboutClick,
     handleTestShakeClick,
-    handleWizardClick,
+    handleInstructionsClick,
     handleSlideoutClick,
     isDisabled,
     isIncompatibleWithOT3
@@ -68,14 +78,15 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
+        {enableModuleCalibration ? (
+          <MenuItem onClick={handleCalibrateClick}>{t('calibrate')}</MenuItem>
+        ) : null}
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
               <React.Fragment key={`${index}_${String(module.moduleType)}`}>
                 <MenuItem
-                  key={`${index}_${String(module.moduleModel)}`}
                   onClick={() => item.onClick(item.isSecondary)}
-                  data-testid={`module_setting_${String(module.moduleModel)}`}
                   disabled={item.disabledReason || isDisabled}
                   whiteSpace="nowrap"
                 >

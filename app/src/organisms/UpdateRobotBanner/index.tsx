@@ -12,7 +12,7 @@ import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { UNREACHABLE } from '../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { UpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
 import type { StyleProps } from '@opentrons/components'
@@ -30,7 +30,7 @@ export function UpdateRobotBanner(
   const { t } = useTranslation('device_settings')
 
   const { autoUpdateAction } = useSelector((state: State) => {
-    return getBuildrootUpdateDisplayInfo(state, robot?.name)
+    return getRobotUpdateDisplayInfo(state, robot?.name)
   })
   const [
     showSoftwareUpdateModal,

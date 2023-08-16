@@ -1,0 +1,75 @@
+import { isEqual } from 'lodash'
+import { SECTIONS } from '../constants'
+import {
+  CompletedProtocolAnalysis,
+  LoadedPipette,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
+import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+
+import type { LabwarePositionCheckStep, CheckPositionsStep } from '../types'
+import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+
+function getPrimaryPipetteId(pipettes: LoadedPipette[]): string {
+  if (pipettes.length < 1) {
+    throw new Error(
+      'no pipettes in protocol, cannot determine primary pipette for LPC'
+    )
+  }
+  return pipettes.reduce((acc, pip) => {
+    return (getPipetteNameSpecs(acc.pipetteName)?.channels ?? 0) >
+      (getPipetteNameSpecs(pip.pipetteName)?.channels ?? 0)
+      ? pip
+      : acc
+  }, pipettes[0]).id
+}
+
+export const getGoldenCheckSteps = (
+  protocolData: CompletedProtocolAnalysis
+): LabwarePositionCheckStep[] => {
+  return [
+    { section: SECTIONS.BEFORE_BEGINNING },
+    {
+      section: SECTIONS.ATTACH_PROBE,
+      pipetteId: getPrimaryPipetteId(protocolData.pipettes),
+    },
+    ...getAllCheckSectionSteps(protocolData),
+    {
+      section: SECTIONS.DETACH_PROBE,
+      pipetteId: getPrimaryPipetteId(protocolData.pipettes),
+    },
+    { section: SECTIONS.RESULTS_SUMMARY },
+  ]
+}
+
+function getAllCheckSectionSteps(
+  protocolData: CompletedProtocolAnalysis
+): CheckPositionsStep[] {
+  const { pipettes, commands, labware, modules = [] } = protocolData
+  const labwareLocationCombos = getLabwareLocationCombos(
+    commands,
+    labware,
+    modules
+  )
+  const labwareLocations = labwareLocationCombos.reduce<LabwareLocationCombo[]>(
+    (acc, labwareLocationCombo) => {
+      // remove duplicate definitionUri in same location
+      const comboAlreadyExists = acc.some(
+        accLocationCombo =>
+          labwareLocationCombo.definitionUri ===
+            accLocationCombo.definitionUri &&
+          isEqual(labwareLocationCombo.location, accLocationCombo.location)
+      )
+      return comboAlreadyExists ? acc : [...acc, labwareLocationCombo]
+    },
+    []
+  )
+
+  return labwareLocations.map(({ location, labwareId, moduleId }) => ({
+    section: SECTIONS.CHECK_POSITIONS,
+    labwareId: labwareId,
+    pipetteId: getPrimaryPipetteId(pipettes),
+    location,
+    moduleId,
+  }))
+}

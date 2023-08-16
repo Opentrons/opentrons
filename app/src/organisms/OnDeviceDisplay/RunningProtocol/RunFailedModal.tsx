@@ -141,7 +141,11 @@ const SCROLL_BAR_STYLE = css`
 `
 
 const _getHighestPriorityError = (error: RunError): RunError => {
-  if (error.wrappedErrors.length === 0) {
+  if (
+    error == null ||
+    error.wrappedErrors == null ||
+    error.wrappedErrors.length === 0
+  ) {
     return error
   }
 

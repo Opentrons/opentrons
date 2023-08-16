@@ -72,6 +72,21 @@ async def start_light_control_task(
     return None
 
 
+async def mark_light_control_startup_finished(
+    app_state: AppState,
+    hardware_api: HardwareControlAPI,
+) -> None:
+    """Should be called once the hardware initialization finishes.
+
+    The task bar's animations change once the hardware is initialized, so it needs a way
+    to be notified that the hardware init is complete.
+    """
+    light_controller = _light_control_accessor.get_from(app_state)
+    if light_controller is None:
+        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+    light_controller.mark_initialization_done()
+
+
 async def get_light_controller(
     app_state: AppState = Depends(get_app_state),
 ) -> LightController:
