@@ -20,7 +20,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
-TEST_TAG = "CURRENTS-SPEEDS"
+DEFAULT_TRIALS = 5
 
 DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
@@ -42,30 +42,43 @@ MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
 MAX_SPEED = max(TEST_SPEEDS)
 
 
-def _get_test_tag(current: float, speed: float, direction: str, pos: str) -> str:
-    return f"current-{current}-speed-{speed}-{direction}-{pos}"
+def _get_test_tag(
+    current: float, speed: float, trial: int, direction: str, pos: str
+) -> str:
+    return f"current-{current}-speed-trial-{trial}-{speed}-{direction}-{pos}"
 
 
-def _build_csv_report() -> CSVReport:
+def _get_section_tag(current: float) -> str:
+    return f"CURRENT-{current}-AMPS"
+
+
+def _includes_result(current: float, speed: float) -> bool:
+    # TODO: figure out what pass/fail is
+    return current > 0.4
+
+
+def _build_csv_report(trials: int) -> CSVReport:
+    _line_with_result = {
+        True: [float, float, float, float, CSVResult],
+        False: [float, float, float, float],
+    }
     _report = CSVReport(
         test_name="pipette-current-speed-qc-ot3",
         sections=[
             CSVSection(
-                title="OVERALL", lines=[CSVLine("failing-current", [float, CSVResult])]
-            ),
-            CSVSection(
-                title=TEST_TAG,
+                title=_get_section_tag(current),
                 lines=[
                     CSVLine(
-                        _get_test_tag(current, speed, direction, pos),
-                        [float, float, float, float, CSVResult],
+                        _get_test_tag(current, speed, trial, direction, pos),
+                        _line_with_result[_includes_result(current, speed)],
                     )
-                    for current, speeds in PLUNGER_CURRENTS_SPEED.items()
-                    for speed in speeds
+                    for speed in sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
+                    for trial in range(trials)
                     for direction in ["down", "up"]
                     for pos in ["start", "end"]
                 ],
-            ),
+            )
+            for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
         ],
     )
     return _report
@@ -112,6 +125,7 @@ async def _record_plunger_alignment(
     api: OT3API,
     mount: types.OT3Mount,
     report: CSVReport,
+    trial: int,
     current: float,
     speed: float,
     direction: str,
@@ -126,13 +140,16 @@ async def _record_plunger_alignment(
     else:
         enc = est
     _stalled_mm = est - enc
-    print(f"{position}: motor={est}, encoder={enc}")
+    print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
     _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
-    _tag = _get_test_tag(current, speed, direction, position)
+    # NOTE: only tests that are required to PASS need to show a results in the file
+    data = [round(current, 2), round(speed, 2), round(est, 2), round(enc, 2)]
+    if _includes_result(current, speed):
+        data.append(CSVResult.from_bool(_did_pass))
     report(
-        TEST_TAG,
-        _tag,
-        [current, speed, est, enc, CSVResult.from_bool(_did_pass)],
+        _get_section_tag(current),
+        _get_test_tag(current, speed, trial, direction, position),
+        data,
     )
     return _did_pass
 
@@ -141,6 +158,7 @@ async def _test_direction(
     api: OT3API,
     mount: types.OT3Mount,
     report: CSVReport,
+    trial: int,
     current: float,
     speed: float,
     acceleration: float,
@@ -150,7 +168,7 @@ async def _test_direction(
     top, bottom, blowout, drop_tip = plunger_poses
     # check that encoder/motor align
     aligned = await _record_plunger_alignment(
-        api, mount, report, current, speed, direction, "start"
+        api, mount, report, trial, current, speed, direction, "start"
     )
     if not aligned:
         return False
@@ -160,7 +178,7 @@ async def _test_direction(
         await _move_plunger(api, mount, _plunger_target, speed, current, acceleration)
         # check that encoder/motor still align
         aligned = await _record_plunger_alignment(
-            api, mount, report, current, speed, direction, "end"
+            api, mount, report, trial, current, speed, direction, "end"
         )
     except StallOrCollisionDetectedError as e:
         print(e)
@@ -176,26 +194,37 @@ async def _unstick_plunger(api: OT3API, mount: types.OT3Mount) -> None:
     await _home_plunger(api, mount)
 
 
-async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -> float:
+async def _test_plunger(
+    api: OT3API, mount: types.OT3Mount, report: CSVReport, trials: int
+) -> float:
     ui.print_header("UNSTICK PLUNGER")
     await _unstick_plunger(api, mount)
     # start at HIGHEST (easiest) current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
     for current in currents:
+        ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
         speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
         for speed in speeds:
-            ui.print_header(f"CURRENT = {current}; SPEED = {speed}")
-            await _home_plunger(api, mount)
-            for direction in ["down", "up"]:
-                _pass = await _test_direction(
-                    api, mount, report, current, speed, TEST_ACCELERATION, direction
-                )
-                if not _pass:
-                    ui.print_error(
-                        f"failed moving {direction} at {current} amps and {speed} mm/sec"
+            for trial in range(trials):
+                ui.print_header(f"SPEED = {speed}: TRIAL = {trial + 1}/{trials}")
+                await _home_plunger(api, mount)
+                for direction in ["down", "up"]:
+                    _pass = await _test_direction(
+                        api,
+                        mount,
+                        report,
+                        trial,
+                        current,
+                        speed,
+                        TEST_ACCELERATION,
+                        direction,
                     )
-                    return current
+                    if not _pass:
+                        ui.print_error(
+                            f"failed moving {direction} at {current} amps and {speed} mm/sec"
+                        )
+                        return current
     return 0.0
 
 
@@ -224,7 +253,7 @@ async def _reset_gantry(api: OT3API) -> None:
     )
 
 
-async def _main(is_simulating: bool) -> None:
+async def _main(is_simulating: bool, trials: int) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
         pipette_left="p1000_single_v3.4",
@@ -239,16 +268,11 @@ async def _main(is_simulating: bool) -> None:
         if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
             continue
 
-        report = _build_csv_report()
+        report = _build_csv_report(trials=trials)
         dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
         helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
-        failing_current = await _test_plunger(api, mount, report)
-        report(
-            "OVERALL",
-            "failing-current",
-            [failing_current, CSVResult.from_bool(failing_current < MUST_PASS_CURRENT)],
-        )
+        await _test_plunger(api, mount, report, trials=trials)
         if api.is_simulator:
             break
 
@@ -256,5 +280,6 @@ async def _main(is_simulating: bool) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--trials", type=int, default=DEFAULT_TRIALS)
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate))
+    asyncio.run(_main(args.simulate, args.trials))
