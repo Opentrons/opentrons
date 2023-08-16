@@ -1,5 +1,5 @@
 import uniqBy from 'lodash/uniqBy'
-import { LabwareLocation, ModuleType } from '@opentrons/shared-data'
+import { LabwareLocation } from '@opentrons/shared-data'
 import { THERMOCYCLER_PROFILE } from '../../constants'
 import { i18n } from '../../localization'
 import {
@@ -7,7 +7,7 @@ import {
   COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER,
 } from '../../utils/labwareModuleCompatibility'
 import { PROFILE_STEP, ProfileStepItem } from '../../form-types'
-import { LabwareEntity } from '@opentrons/step-generation'
+import { InvariantContext, LabwareEntity } from '@opentrons/step-generation'
 
 // TODO: real HydratedFormData type
 type HydratedFormData = any
@@ -74,24 +74,26 @@ export const getProfileFormErrors = (
 
 const getMoveLabwareError = (
   labware: LabwareEntity,
-  newLocation: LabwareLocation
+  newLocation: LabwareLocation,
+  invariantContext: InvariantContext
 ): string | null => {
   let errorString: string | null = null
   if (labware == null || newLocation == null || newLocation === 'offDeck')
     return null
   const selectedLabwareDefUri = labware?.labwareDefURI
   if ('moduleId' in newLocation) {
-    const loadName = selectedLabwareDefUri.split('/')[1].split('/')[0]
-    const modValueDefUri = newLocation.moduleId.split(':')[1] as ModuleType
-    const modAllowList =
-      COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[modValueDefUri]
+    const loadName = labware?.def.parameters.loadName
+    const moduleType =
+      invariantContext.moduleEntities[newLocation.moduleId].type
+    const modAllowList = COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
     errorString = !modAllowList.includes(loadName)
       ? i18n.t(
           'form.step_edit_form.labwareLabel.errors.labwareIncompatibleWithMod'
         )
       : null
   } else if ('labwareId' in newLocation) {
-    const adapterValueDefUri = newLocation.labwareId.split(':')[1]
+    const adapterValueDefUri =
+      invariantContext.labwareEntities[newLocation.labwareId].labwareDefURI
     const adapterAllowList =
       COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterValueDefUri]
     errorString = !adapterAllowList?.includes(selectedLabwareDefUri)
@@ -104,7 +106,8 @@ const getMoveLabwareError = (
 }
 
 export const getMoveLabwareProfileFormErrors = (
-  hydratedForm: HydratedFormData
+  hydratedForm: HydratedFormData,
+  invariantContext: InvariantContext
 ): ProfileFormError[] => {
   if (hydratedForm.stepType !== 'moveLabware') {
     return []
@@ -113,7 +116,11 @@ export const getMoveLabwareProfileFormErrors = (
   const labware = hydratedForm.labware as LabwareEntity
   const newLocation = hydratedForm.newLocation as LabwareLocation
 
-  const errorString = getMoveLabwareError(labware, newLocation)
+  const errorString = getMoveLabwareError(
+    labware,
+    newLocation,
+    invariantContext
+  )
 
   return errorString != null
     ? ([

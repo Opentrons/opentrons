@@ -158,6 +158,8 @@ function resolveAdapterLocation(
     )
     return { adapterOffsetLocation: null }
   }
+  const labwareDefUri = labwareEntity.definitionUri
+
   let moduleIdUnderAdapter
   let adapterOffsetLocation: LabwareOffsetLocation | null = null
   if (labwareEntity.location === 'offDeck') {
@@ -171,17 +173,18 @@ function resolveAdapterLocation(
       modules,
       moduleId
     )
+
     moduleIdUnderAdapter = moduleId
     adapterOffsetLocation =
       resolvedModuleLocation != null
         ? {
-            definitionUri: labwareId.split(':')[1],
+            definitionUri: labwareDefUri,
             ...resolvedModuleLocation,
           }
         : null
   } else {
     adapterOffsetLocation = {
-      definitionUri: labwareId.split(':')[1],
+      definitionUri: labwareDefUri,
       slotName: labwareEntity.location.slotName,
     }
   }

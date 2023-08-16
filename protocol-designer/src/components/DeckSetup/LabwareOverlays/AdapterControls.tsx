@@ -40,6 +40,7 @@ interface OP {
   slot: DeckSlotDefinition & { id: DeckSlot }
   //    labwareId is the adapter's labwareId
   labwareId: string
+  allLabware: LabwareOnDeck[]
   onDeck: boolean
   selectedTerminalItemId?: TerminalItemId | null
   handleDragHover?: () => unknown
@@ -71,6 +72,7 @@ export const AdapterControlsComponents = (
     labwareId,
     customLabwareDefs,
     onDeck,
+    allLabware,
   } = props
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
@@ -90,7 +92,11 @@ export const AdapterControlsComponents = (
   } else if (
     isOver &&
     draggedDef != null &&
-    !getAdapterLabwareIsAMatch(labwareId, draggedDef.parameters.loadName)
+    !getAdapterLabwareIsAMatch(
+      labwareId,
+      allLabware,
+      draggedDef.parameters.loadName
+    )
   ) {
     slotBlocked = 'Labware incompatible with this adapter'
   }
@@ -178,6 +184,7 @@ const slotTarget = {
       return (
         getAdapterLabwareIsAMatch(
           props.labwareId,
+          props.allLabware,
           draggedDef.parameters.loadName
         ) || isCustomLabware
       )

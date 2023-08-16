@@ -53,9 +53,9 @@ export function createSnippet(
         loadStatement = `labware_${labwareCount} = ${moduleVariable}.load_labware("${String(
           loadName
         )}")`
-        //  load labware on adapter
       } else if ('labwareId' in command.params.location) {
-        loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="${command.params.location.labwareId}")`
+        //  TODO: (jr, 8/16/23): THIS SHOULDN"T BE labwareId!!! Need to update to the python variable
+        //  we are storing the LabwareContext of the loaded adapter onto
       }
 
       const labwareDefUri = getLabwareDefinitionUri(

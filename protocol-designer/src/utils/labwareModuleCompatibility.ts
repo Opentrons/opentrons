@@ -119,9 +119,12 @@ export const getLabwareIsCustom = (
 
 export const getAdapterLabwareIsAMatch = (
   labwareId: string,
+  allLabware: LabwareOnDeck[],
   draggedLabwareLoadname: string
 ): boolean => {
-  const labwareDefUri = labwareId.split(':')[1]
+  const labwareDefUri = Object.values(allLabware).find(
+    lab => lab.id === labwareId
+  )?.labwareDefURI
 
   const deepWellPair =
     labwareDefUri === 'opentrons/opentrons_96_deep_well_adapter/1' &&

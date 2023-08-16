@@ -214,12 +214,12 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
       ): LoadLabwareCreateCommand[] => {
-        const { labwareDefURI, def } = labwareEntities[labwareId]
+        const { def } = labwareEntities[labwareId]
         const isAdapter = def.metadata.displayCategory === 'adapter'
         if (!isAdapter) return [...acc]
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const namespace = def.namespace
-        const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
+        const loadName = def.parameters.loadName
         const version = def.version
         const loadAdapterCommands = {
           key: uuid(),
@@ -251,7 +251,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
       ): LoadLabwareCreateCommand[] => {
-        const { labwareDefURI, def } = labwareEntities[labwareId]
+        const { def } = labwareEntities[labwareId]
         const isAdapter = def.metadata.displayCategory === 'adapter'
         if (labwareId === FIXED_TRASH_ID || isAdapter) return [...acc]
         const isOnTopOfModule = labware.slot in initialRobotState.modules
@@ -260,7 +260,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             command => command.params.labwareId === labware.slot
           ) != null
         const namespace = def.namespace
-        const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
+        const loadName = def.parameters.loadName
         const version = def.version
         const loadLabwareCommands = {
           key: uuid(),
