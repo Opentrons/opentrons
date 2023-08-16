@@ -23,7 +23,7 @@ For our users with little to no Python experience, we’ve taken some liberties 
     # This code uses positional arguments
     tiprack_1 = protocol.load_labware('opentrons_flex_96_tiprack_200ul','D2')   
 
-Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit. It uses the parameter name to identify the argument's value. This can be helpful to see when you're unsure about what's going on in a protocol code sample.
+Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit. It shows the parameter name and it's value together (e.g. ``location='D2'``), which may be helpful when you're unsure about what's going on in a protocol code sample.
 
 Python developers with more experience should feel free to ignore the code styling used here and work with these examples as you like.
 
