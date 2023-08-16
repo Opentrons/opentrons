@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
-MINIMUM_DISPLACEMENT = 0.05
+MINIMUM_DISPLACEMENT = 0.01
 
 
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
