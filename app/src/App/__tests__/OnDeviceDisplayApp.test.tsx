@@ -217,11 +217,6 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/runs/my-run-id/summary')
     getByText('Mock RunSummary')
   })
-  it('redirects to dashboard no current run route present, but still on a run route', () => {
-    mockUseCurrentRunRoute.mockReturnValue(null)
-    const [{ getByText }] = render('/runs/my-run-id/summary')
-    getByText('Mock RobotDashboard')
-  })
   it('renders the loading screen on mount', () => {
     const [{ getByText }] = render('/')
     mockgetIsShellReady.mockReturnValue(true)

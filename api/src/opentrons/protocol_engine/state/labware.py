@@ -31,7 +31,6 @@ from ..resources import DeckFixedLabware, labware_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
-    LoadAdapterResult,
     MoveLabwareResult,
 )
 from ..types import (
@@ -174,7 +173,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
-        if isinstance(command.result, (LoadLabwareResult, LoadAdapterResult)):
+        if isinstance(command.result, LoadLabwareResult):
             # If the labware load refers to an offset, that offset must actually exist.
             if command.result.offsetId is not None:
                 assert command.result.offsetId in self._state.labware_offsets_by_id
@@ -187,20 +186,15 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             self._state.definitions_by_uri[definition_uri] = command.result.definition
 
-            if isinstance(command.result, LoadLabwareResult):
-                deck_item_id = command.result.labwareId
-                display_name = command.params.displayName
-            else:
-                deck_item_id = command.result.adapterId
-                display_name = None
-
-            self._state.labware_by_id[deck_item_id] = LoadedLabware.construct(
-                id=deck_item_id,
+            self._state.labware_by_id[
+                command.result.labwareId
+            ] = LoadedLabware.construct(
+                id=command.result.labwareId,
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
-                displayName=display_name,
+                displayName=command.params.displayName,
             )
 
         elif isinstance(command.result, MoveLabwareResult):
@@ -690,6 +684,11 @@ class LabwareView(HasState[LabwareState]):
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
         """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
+        if labware_validation.validate_definition_is_adapter(top_labware_definition):
+            raise errors.LabwareCannotBeStackedError(
+                f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"
+                " on other labware."
+            )
         below_labware = self.get(bottom_labware_id)
         if not labware_validation.validate_labware_can_be_stacked(
             top_labware_definition=top_labware_definition,

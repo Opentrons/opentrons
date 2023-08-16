@@ -165,6 +165,8 @@ class ProtocolCore(
             version=version,
             display_name=label,
         )
+        # FIXME(jbl, 2023-08-14) validating after loading the object issue
+        validation.ensure_definition_is_labware(load_result.definition)
 
         # FIXME(mm, 2023-02-21):
         #
@@ -214,18 +216,19 @@ class ProtocolCore(
         namespace, version = load_labware_params.resolve(
             load_name, namespace, version, custom_labware_params
         )
-
-        load_result = self._engine_client.load_adapter(
+        load_result = self._engine_client.load_labware(
             load_name=load_name,
             location=load_location,
             namespace=namespace,
             version=version,
         )
+        # FIXME(jbl, 2023-08-14) validating after loading the object issue
+        validation.ensure_definition_is_adapter(load_result.definition)
 
         # FIXME(jbl, 2023-06-23) read fixme above:
         deck_conflict.check(
             engine_state=self._engine_client.state,
-            new_labware_id=load_result.adapterId,
+            new_labware_id=load_result.labwareId,
             # It's important that we don't fetch these IDs from Protocol Engine, and
             # use our own bookkeeping instead. If we fetched these IDs from Protocol
             # Engine, it would have leaked state from Labware Position Check in the
@@ -237,7 +240,7 @@ class ProtocolCore(
         )
 
         labware_core = LabwareCore(
-            labware_id=load_result.adapterId,
+            labware_id=load_result.labwareId,
             engine_client=self._engine_client,
         )
 
