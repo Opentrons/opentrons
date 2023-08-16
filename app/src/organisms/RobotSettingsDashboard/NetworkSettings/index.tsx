@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -97,6 +98,14 @@ function NetworkSettingButton({
   networkName,
   onClick,
 }: NetworkSettingButtonProps): JSX.Element {
+  const PUSHED_STATE_STYLING = css`
+    &:active {
+      background-color: ${chipText === 'connected'
+        ? COLORS.green3Pressed
+        : COLORS.darkBlack40};
+    }
+  `
+
   return (
     <Btn
       width="100%"
@@ -104,6 +113,7 @@ function NetworkSettingButton({
       paddingY={SPACING.spacing20}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadiusSize3}
+      css={PUSHED_STATE_STYLING}
       onClick={onClick}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>

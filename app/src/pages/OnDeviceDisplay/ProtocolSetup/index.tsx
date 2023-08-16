@@ -113,15 +113,23 @@ export function ProtocolSetupStep({
     }
   }
 
+  let backgroundColor: string
+  if (!disabled) {
+    switch (status) {
+      case 'general':
+        backgroundColor = COLORS.darkBlack40
+        break
+      case 'ready':
+        backgroundColor = COLORS.green3Pressed
+        break
+      default:
+        backgroundColor = COLORS.yellow3Pressed
+    }
+  } else backgroundColor = ''
+
   const PUSHED_STATE_STYLING = css`
     &:active {
-      background-color: ${!disabled
-        ? status === 'general'
-          ? COLORS.darkBlack40
-          : status === 'ready'
-          ? COLORS.green3Pressed
-          : COLORS.yellow3Pressed
-        : ''};
+      background-color: ${backgroundColor};
     }
   `
 
