@@ -160,10 +160,6 @@ const TouchNavLink = styled(NavLink)`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     cursor: default;
-
-    &:hover {
-      cursor: pointer;
-    }
   }
 `
 
@@ -178,9 +174,5 @@ const IconButton = styled('button')`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     cursor: default;
-
-    &:hover {
-      cursor: pointer;
-    }
   }
 `
