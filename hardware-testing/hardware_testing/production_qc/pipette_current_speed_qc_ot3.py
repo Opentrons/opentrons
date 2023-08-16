@@ -38,10 +38,10 @@ TEST_SPEEDS = [
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
 ]
 PLUNGER_CURRENTS_SPEED = {
-    0.35: TEST_SPEEDS,
-    0.45: TEST_SPEEDS,
-    0.55: TEST_SPEEDS,
-    1.0: TEST_SPEEDS,
+    0.3: TEST_SPEEDS,
+    0.4: TEST_SPEEDS,
+    0.5: TEST_SPEEDS,
+    DEFAULT_CURRENT: TEST_SPEEDS,
 }
 
 MAX_SPEED = max(TEST_SPEEDS)
@@ -63,8 +63,11 @@ def _get_section_tag(current: float) -> str:
 
 
 def _includes_result(current: float, speed: float) -> bool:
-    # TODO: figure out what pass/fail is
-    return current >= MUST_PASS_CURRENT
+    # TODO: figure out the current/speed thresholds
+    #       for what should be considered an overall PASS or FAIL.
+    #       Until then, give everything a PASS or FAIL, so we can
+    #       review the results more easily
+    return True
 
 
 def _build_csv_report(trials: int) -> CSVReport:
@@ -88,7 +91,7 @@ def _build_csv_report(trials: int) -> CSVReport:
                     for pos in ["start", "end"]
                 ],
             )
-            for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
+            for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
         ],
     )
     return _report
@@ -98,7 +101,7 @@ async def _home_plunger(api: OT3API, mount: types.OT3Mount) -> None:
     # restore default current/speed before homing
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-        api, pipette_ax, run_current=DEFAULT_CURRENT
+        api, pipette_ax, run_current=1.0
     )
     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
         api,
@@ -181,7 +184,7 @@ async def _test_direction(
     direction: str,
 ) -> bool:
     plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    top, bottom, blowout, drop_tip = plunger_poses
+    top, _, bottom, _ = plunger_poses
     # check that encoder/motor align
     aligned = await _record_plunger_alignment(
         api, mount, report, trial, current, speed, direction, "start"
@@ -189,7 +192,7 @@ async def _test_direction(
     if not aligned:
         return False
     # move the plunger
-    _plunger_target = {"down": blowout, "up": top}[direction]
+    _plunger_target = {"down": bottom, "up": top + 1.0}[direction]
     try:
         await _move_plunger(api, mount, _plunger_target, speed, current, acceleration)
         # check that encoder/motor still align
@@ -203,13 +206,6 @@ async def _test_direction(
     return aligned
 
 
-async def _unstick_plunger(api: OT3API, mount: types.OT3Mount) -> None:
-    plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    top, bottom, blowout, drop_tip = plunger_poses
-    await _move_plunger(api, mount, bottom, 10, 1.0, DEFAULT_ACCELERATION)
-    await _home_plunger(api, mount)
-
-
 async def _test_plunger(
     api: OT3API,
     mount: types.OT3Mount,
@@ -217,10 +213,8 @@ async def _test_plunger(
     trials: int,
     continue_after_stall: bool,
 ) -> float:
-    ui.print_header("UNSTICK PLUNGER")
-    await _unstick_plunger(api, mount)
     # start at HIGHEST (easiest) current
-    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
+    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
@@ -228,7 +222,11 @@ async def _test_plunger(
         speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
         for speed in speeds:
             for trial in range(trials):
-                ui.print_header(f"SPEED = {speed}: TRIAL = {trial + 1}/{trials}")
+                ui.print_header(
+                    f"CURRENT = {current}: "
+                    f"SPEED = {speed}: "
+                    f"TRIAL = {trial + 1}/{trials}"
+                )
                 await _home_plunger(api, mount)
                 for direction in ["down", "up"]:
                     _pass = await _test_direction(
@@ -267,7 +265,14 @@ async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
 
 
 async def _reset_gantry(api: OT3API) -> None:
-    await api.home()
+    await api.home(
+        [
+            types.Axis.Z_L,
+            types.Axis.Z_R,
+            types.Axis.X,
+            types.Axis.Y,
+        ]
+    )
     home_pos = await api.gantry_position(
         types.OT3Mount.RIGHT, types.CriticalPoint.MOUNT
     )
