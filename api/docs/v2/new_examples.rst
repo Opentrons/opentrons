@@ -6,14 +6,14 @@
 Protocol Examples
 *****************
 
-This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons app.
+This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
 
 Using These Protocols
 =====================
 
 These sample protocols are designed for anyone using an Opentrons Flex or OT-2 liquid handling robot. 
 
-For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we’ve formatted the samples with line breaks to show method arguments clearly and to avoid horizontal scrolling. Additionally, the methods use named arguments (or `named parameters <https://en.wikipedia.org/wiki/Named_parameter>`_) instead of positional arguments. For example::
+For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we’ve formatted the samples with line breaks to show method arguments clearly and to avoid horizontal scrolling. Additionally, the methods use `named arguments <https://en.wikipedia.org/wiki/Named_parameter>`_ instead of positional arguments. For example::
 
     # This code uses named arguments
     tiprack_1 = protocol.load_labware(
@@ -23,7 +23,7 @@ For our users with little to no Python experience, we’ve taken some liberties 
     # This code uses positional arguments
     tiprack_1 = protocol.load_labware('opentrons_flex_96_tiprack_200ul','D2')   
 
-Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit. It shows the parameter name and it's value together (e.g. ``location='D2'``), which may be helpful when you're unsure about what's going on in a protocol code sample.
+Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit. It shows the parameter name and its value together (e.g. ``location='D2'``), which may be helpful when you're unsure about what's going on in a protocol code sample.
 
 Python developers with more experience should feel free to ignore the code styling used here and work with these examples as you like.
 
@@ -32,8 +32,8 @@ Instruments and Labware
 
 The sample protocols all use the following pipettes:
 
-* Flex 1-Channel Pipette (5-1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
-* P300 Single-Channel GEN2 pipette (20-300 µL) for the OT-2. The API load name for this pipette is ``p300_single_gen2``. 
+* Flex 1-Channel Pipette (5–1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
+* P300 Single-Channel GEN2 pipette for the OT-2. The API load name for this pipette is ``p300_single_gen2``. 
 
 They also use the labware listed below: 
 
@@ -149,7 +149,6 @@ This protocol accomplishes the same thing as the previous example, but does it a
                     tip_racks=[tiprack_1])
                 # transfer 100 µL from well A1 to well B1
                 pipette_1.transfer(100, plate['A1'], plate['B1'])
-                pipette_1.drop_tip()
     
     .. tab:: OT-2
 
@@ -172,8 +171,7 @@ This protocol accomplishes the same thing as the previous example, but does it a
                 mount='left',
                 tip_racks=[tiprack_1])
             # transfer 100 µL from well A1 to well B1
-            p300.transfer(volume=100, plate['A1'], plate['B1'])
-            p300.drop_tip()
+            p300.transfer(100, plate['A1'], plate['B1'])
 
 
 Loops
@@ -247,7 +245,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
                 for i in range(8):
                     p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
 
-Notice here how `Python's range class <https://docs.python.org/3/library/stdtypes.html#range>`_ (e.g., ``range(8)``) determines how many times the code loops. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
+Notice here how Python's :py:class:`range` class (e.g., ``range(8)``) determines how many times the code loops. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
 
 Multiple Air Gaps
 =================
@@ -326,12 +324,12 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
                 p300.return_tip()
 
-Notice here how Python's `slice functionality <https://docs.python.org/3/library/functions.html#slice>`_ (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well used, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
+Notice here how Python's :py:class:`slice` functionality (in the code sample as ``[:4]``) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well used, which is E1=4. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
 Dilution
 ========
 
-This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, it dilutes eight samples from the reservoir across all 8 columns of the plate.
+This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, it dilutes 8 samples from the reservoir across all 8 columns of the plate.
 
 .. tabs::
 
@@ -474,7 +472,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
                     89, 90, 91, 92, 93, 94, 95, 96
                     ]
 
-                    pipette_1.distribute(water_volumes, reservoir['A12'], plate.wells())
+                pipette_1.distribute(water_volumes, reservoir['A12'], plate.wells())
 
     .. tab:: OT-2
         
@@ -518,4 +516,4 @@ This protocol dispenses different volumes of liquids to a well plate and automat
                     89, 90, 91, 92, 93, 94, 95, 96
                     ]
 
-                    p300.distribute(water_volumes, reservoir['A12'], plate.wells())
+                p300.distribute(water_volumes, reservoir['A12'], plate.wells())
