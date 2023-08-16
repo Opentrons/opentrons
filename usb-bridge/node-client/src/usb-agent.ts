@@ -117,6 +117,42 @@ class SerialPortSocket extends SerialPort {
   unref(): void {}
   setTimeout(): void {}
   ref(): void {}
+
+  // log emit
+  emit(type: string, ...args: any): boolean {
+    console.log('serialport emitted', type, args)
+    return super.emit(type, ...args)
+  }
+
+  // log on
+  on(event: string, listener: any): this {
+    console.log('serialport on event', event)
+    return super.on(event, listener)
+  }
+
+  // log read
+  read(...args: any[]): any {
+    console.log('serialport read', args)
+    return super.read(...args)
+  }
+
+  // log pipe
+  pipe(...args: any[]): any {
+    console.log('serialport pipe', args)
+    return super.pipe(...args)
+  }
+
+  // log pause
+  pause(...args: any[]): any {
+    console.log('serialport pause', args)
+    return super.pause(...args)
+  }
+
+  // log resume
+  resume(...args: any[]): any {
+    console.log('serialport resume', args)
+    return super.resume(...args)
+  }
 }
 
 interface SerialPortHttpAgentOptions extends AgentOptions {
@@ -165,12 +201,49 @@ class SerialPortHttpAgent extends http.Agent {
       this.options.logger[level](msg, meta)
   }
 
+  // log request within addRequest
+  addRequest(req: http.ClientRequest, ...args: any): any {
+    const agentLog = this.log
+    agentLog('info', `addRequest req.path ${req.path}`)
+
+    const oldOn = req.on.bind(req)
+    req.on = function (event: string, listener: any) {
+      agentLog('info', `req.on event ${event}`)
+      return oldOn(event, listener)
+    }
+
+    const oldEmit = req.emit.bind(req)
+    req.emit = function (event: string, ...args: any[]) {
+      agentLog('info', `req.emit event ${event}`)
+      return oldEmit(event, ...args)
+    }
+
+    return super.addRequest(req, ...args)
+  }
+
   // copied from _http_agent.js, replacing this.createConnection
   createSocket(
     req: http.ClientRequest,
     options: NodeJS.Dict<unknown>,
     cb: Function
   ): void {
+    // const oldEmit = req.emit.bind(req)
+    // const oldOn = req.on.bind(req)
+
+    // const agentLog = this.log
+
+    // req.emit = function (event: string, ...args: any[]) {
+    //   agentLog('info', `req.emit event' ${event}`)
+    //   return oldEmit(event, ...args)
+    // }
+    // req.emit.bind(req)
+
+    // req.on = function (event: string, listener: any) {
+    //   agentLog('info', `req.on event' ${event}`)
+    //   return oldOn(event, listener)
+    // }
+    // req.on.bind(req)
+
     this.log('info', `creating usb socket at ${this.options.path}`)
     options = { __proto__: null, ...options, ...this.options }
     const name = this.getName(options)
@@ -196,11 +269,19 @@ class SerialPortHttpAgent extends http.Agent {
     const socket = new SerialPortSocket({
       path: this.options.path,
       baudRate: 115200,
+      // 100MB
+      highWaterMark: 1024 * 1024 * 100,
+      // endOnClose: true,
     })
     if (!socket.isOpen && !socket.opening) {
       socket.open()
     }
     if (socket != null) oncreate(null, socket)
+    // setTimeout(
+    //   () =>
+    //     this.log('info', `readableFlowing ${String(socket.readableFlowing)}`),
+    //   1000
+    // )
   }
 }
 
@@ -257,7 +338,9 @@ function installListeners(
   s.on('timeout', onTimeout)
 
   function onLineParserData(line: string): void {
-    agent.log('info', line)
+    // agent.log('info', line)
+    // suggested by https://github.com/serialport/node-serialport/issues/2117
+    // s.resume()
   }
   // TODO(bh, 2023-05-05): determine delimiter for end of response body or use different parser
   const parser = s.pipe(new ReadlineParser())
@@ -268,6 +351,18 @@ function installListeners(
     s.close()
   }
   s.on('finish', onFinish)
+
+  // s.on('aborted', () => agent.log('debug', 'CLIENT socket aborted'))
+  s.on('error', () => agent.log('debug', 'CLIENT socket errored'))
+  // s.on('end', () => agent.log('debug', 'CLIENT socket end'))
+  // s.on('pause', () => agent.log('debug', 'CLIENT socket pause'))
+  // s.on('resume', () => agent.log('debug', 'CLIENT socket resume'))
+  // s.on('readable', () => agent.log('debug', 'CLIENT socket readable'))
+
+  setTimeout(
+    () => agent.log('info', `readableFlowing ${String(s.readableFlowing)}`),
+    1000
+  )
 
   if (agent[kOnKeylog] != null) {
     s.on('keylog', agent[kOnKeylog])
@@ -283,7 +378,7 @@ function installListeners(
     s.removeListener('close', onClose)
     s.removeListener('free', onFree)
     s.removeListener('timeout', onTimeout)
-    parser.removeListener('data', onLineParserData)
+    // parser.removeListener('data', onLineParserData)
     s.removeListener('finish', onFinish)
     s.removeListener('agentRemove', onRemove)
     if (agent[kOnKeylog] != null) {

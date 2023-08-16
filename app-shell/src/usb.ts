@@ -40,7 +40,7 @@ export function createSerialPortHttpAgent(path: string): void {
     maxSockets: 1,
     maxTotalSockets: 1,
     keepAlive: true,
-    keepAliveMsecs: 10000,
+    keepAliveMsecs: 1000000,
     path,
     logger: usbLog,
   })
@@ -96,14 +96,16 @@ async function usbListener(
     const response = await axios.request({
       httpAgent: usbHttpAgent,
       ...config,
+      // responseType: 'stream',
       data,
       headers: { ...config.headers, ...formHeaders },
     })
-    return {
+    console.log('usb response done to', config.url)
+    return Promise.resolve({
       data: response.data,
       status: response.status,
       statusText: response.statusText,
-    }
+    })
   } catch (e) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     usbLog.debug(`usbListener error ${e?.message ?? 'unknown'}`)

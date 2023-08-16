@@ -1,7 +1,7 @@
 import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from './request'
 
-export interface HostConfig {
+export interface HostConfig extends AxiosRequestConfig {
   hostname: string
   requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
   port?: number | null
