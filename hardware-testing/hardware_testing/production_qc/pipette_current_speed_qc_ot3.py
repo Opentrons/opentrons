@@ -21,25 +21,35 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
 DEFAULT_TRIALS = 5
+STALL_THRESHOLD_MM = 0.1
+TEST_ACCELERATION = 1500  # used during gravimetric tests
 
 DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
 
-MUST_PASS_CURRENT = DEFAULT_CURRENT * 0.6  # the target spec (must pass here)
-STALL_THRESHOLD_MM = 0.1
-TEST_SPEEDS = [DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]]
+MUST_PASS_CURRENT = 0.4  # the target spec (must pass here)
+assert (
+    MUST_PASS_CURRENT < DEFAULT_CURRENT
+), "must-pass current must be less than default current"
+TEST_SPEEDS = [
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
+]
 PLUNGER_CURRENTS_SPEED = {
-    round(MUST_PASS_CURRENT - 0.3, 1): TEST_SPEEDS,
-    round(MUST_PASS_CURRENT - 0.2, 1): TEST_SPEEDS,
-    round(MUST_PASS_CURRENT - 0.1, 1): TEST_SPEEDS,
-    round(MUST_PASS_CURRENT, 1): TEST_SPEEDS,
-    DEFAULT_CURRENT: TEST_SPEEDS,
+    0.35: TEST_SPEEDS,
+    0.45: TEST_SPEEDS,
+    0.55: TEST_SPEEDS,
+    1.0: TEST_SPEEDS,
 }
-TEST_ACCELERATION = 1500  # used during gravimetric tests
 
-MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
 MAX_SPEED = max(TEST_SPEEDS)
+MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
+assert MAX_CURRENT == DEFAULT_CURRENT, (
+    f"do not test current ({MAX_CURRENT}) "
+    f"above the software's default current ({DEFAULT_CURRENT})"
+)
 
 
 def _get_test_tag(
@@ -54,7 +64,7 @@ def _get_section_tag(current: float) -> str:
 
 def _includes_result(current: float, speed: float) -> bool:
     # TODO: figure out what pass/fail is
-    return current > 0.4
+    return current >= MUST_PASS_CURRENT
 
 
 def _build_csv_report(trials: int) -> CSVReport:
@@ -91,7 +101,10 @@ async def _home_plunger(api: OT3API, mount: types.OT3Mount) -> None:
         api, pipette_ax, run_current=DEFAULT_CURRENT
     )
     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-        api, pipette_ax, default_max_speed=DEFAULT_SPEED
+        api,
+        pipette_ax,
+        default_max_speed=DEFAULT_SPEED / 2,
+        acceleration=DEFAULT_ACCELERATION,
     )
     await api.home([pipette_ax])
 
@@ -107,7 +120,7 @@ async def _move_plunger(
     # set max currents/speeds, to make sure we're not accidentally limiting ourselves
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-        api, pipette_ax, run_current=MAX_CURRENT
+        api, pipette_ax, run_current=c
     )
     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
         api,
@@ -141,7 +154,10 @@ async def _record_plunger_alignment(
         enc = est
     _stalled_mm = est - enc
     print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
-    _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
+    if not api.is_simulator:
+        _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
+    else:
+        _did_pass = speed < MAX_SPEED
     # NOTE: only tests that are required to PASS need to show a results in the file
     data = [round(current, 2), round(speed, 2), round(est, 2), round(enc, 2)]
     if _includes_result(current, speed):
@@ -195,12 +211,17 @@ async def _unstick_plunger(api: OT3API, mount: types.OT3Mount) -> None:
 
 
 async def _test_plunger(
-    api: OT3API, mount: types.OT3Mount, report: CSVReport, trials: int
+    api: OT3API,
+    mount: types.OT3Mount,
+    report: CSVReport,
+    trials: int,
+    continue_after_stall: bool,
 ) -> float:
     ui.print_header("UNSTICK PLUNGER")
     await _unstick_plunger(api, mount)
     # start at HIGHEST (easiest) current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
+    max_failed_current = 0.0
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
@@ -224,8 +245,12 @@ async def _test_plunger(
                         ui.print_error(
                             f"failed moving {direction} at {current} amps and {speed} mm/sec"
                         )
-                        return current
-    return 0.0
+                        max_failed_current = max(max_failed_current, current)
+                        if continue_after_stall:
+                            break
+                        else:
+                            return max_failed_current
+    return max_failed_current
 
 
 async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
@@ -253,7 +278,7 @@ async def _reset_gantry(api: OT3API) -> None:
     )
 
 
-async def _main(is_simulating: bool, trials: int) -> None:
+async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
         pipette_left="p1000_single_v3.4",
@@ -272,7 +297,12 @@ async def _main(is_simulating: bool, trials: int) -> None:
         dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
         helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
-        await _test_plunger(api, mount, report, trials=trials)
+        await _test_plunger(
+            api, mount, report, trials=trials, continue_after_stall=continue_after_stall
+        )
+        ui.print_title("DONE")
+        report.save_to_disk()
+        report.print_results()
         if api.is_simulator:
             break
 
@@ -281,5 +311,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--trials", type=int, default=DEFAULT_TRIALS)
+    parser.add_argument("--continue-after-stall", action="store_true")
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate, args.trials))
+    asyncio.run(_main(args.simulate, args.trials, args.continue_after_stall))
