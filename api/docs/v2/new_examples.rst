@@ -179,8 +179,8 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
                     mount='left',
                     tip_racks=[tiprack_1])
                 
-                # distribute 20uL from reservoir:A1 -> plate:row:1
-                # distribute 20uL from reservoir:A2 -> plate:row:2
+                # distribute 20 µL from reservoir:A1 -> plate:row:1
+                # distribute 20 µL from reservoir:A2 -> plate:row:2
                 # etc...
                 # range() starts at 0 and stops before 8, creating a range of 0-7
                 for i in range(8):
@@ -210,8 +210,8 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
                     mount='left',
                     tip_racks=[tiprack_1])
                 
-                # distribute 20uL from reservoir:A1 -> plate:row:1
-                # distribute 20uL from reservoir:A2 -> plate:row:2
+                # distribute 20 µL from reservoir:A1 -> plate:row:1
+                # distribute 20 µL from reservoir:A2 -> plate:row:2
                 # etc...
                 # range() starts at 0 and stops before 8, creating a range of 0-7
                 for i in range(8):
@@ -340,7 +340,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                     source = reservoir.wells()[i]
                     row = plate.rows()[i]
 
-                # transfer 30uL of source to first well in column
+                # transfer 30 µL of source to first well in column
                 pipette_1.transfer(30, source, row[0], mix_after=(3, 25))
 
                 # dilute the sample down the column
@@ -384,7 +384,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                 source = reservoir.wells()[i]
                 row = plate.rows()[i]
 
-            # transfer 30uL of source to first well in column
+            # transfer 30 µL of source to first well in column
             p300.transfer(30, source, row[0], mix_after=(3, 25))
 
             # dilute the sample down the column
@@ -392,41 +392,101 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                 30, row[:11], row[1:],
                 mix_after=(3, 25))
 
-Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see Loops and Air Gaps above. The :ref:`tutorial-commands` section of the Tutorial as well. 
+Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see Loops and Air Gaps above. See also, the :ref:`tutorial-commands` section of the Tutorial.
 
 Plate Mapping
 =============
 
-This example deposits various volumes of liquids into the same plate of wells and automatically refill the tip volume when it runs out.
+This protocol dispenses different volumes of liquids to a well plate and automatically refills the pipette when empty.
 
-.. code-block:: python
-    :substitutions:
+.. tabs::
 
-    from opentrons import protocol_api
+    .. tab:: Flex
 
-    metadata = {'apiLevel': '|apiLevel|'}
+        .. code-block:: python
+            :substitutions:
 
-    def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1, tiprack_2])
+            from opentrons import protocol_api
 
-        # these uL values were created randomly for this example
-        water_volumes = [
-            1,  2,  3,  4,  5,  6,  7,  8,
-            9,  10, 11, 12, 13, 14, 15, 16,
-            17, 18, 19, 20, 21, 22, 23, 24,
-            25, 26, 27, 28, 29, 30, 31, 32,
-            33, 34, 35, 36, 37, 38, 39, 40,
-            41, 42, 43, 44, 45, 46, 47, 48,
-            49, 50, 51, 52, 53, 54, 55, 56,
-            57, 58, 59, 60, 61, 62, 63, 64,
-            65, 66, 67, 68, 69, 70, 71, 72,
-            73, 74, 75, 76, 77, 78, 79, 80,
-            81, 82, 83, 84, 85, 86, 87, 88,
-            89, 90, 91, 92, 93, 94, 95, 96
-          ]
+            requirements = {'robotType': 'Flex', 'apiLevel': '2.15'}
+                
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location="D1")
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="C1")
+                tiprack_2 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_200ul',
+                    location="C2")
+                reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location=4)
+                pipette_1 = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000',
+                    mount='right',
+                tip_racks=[tiprack_1, tiprack_2])
 
-        p300.distribute(water_volumes, reservoir['A12'], plate.wells())
+                # Volume amounts are for demonstration purposes only
+                water_volumes = [
+                    1,  2,  3,  4,  5,  6,  7,  8,
+                    9,  10, 11, 12, 13, 14, 15, 16,
+                    17, 18, 19, 20, 21, 22, 23, 24,
+                    25, 26, 27, 28, 29, 30, 31, 32,
+                    33, 34, 35, 36, 37, 38, 39, 40,
+                    41, 42, 43, 44, 45, 46, 47, 48,
+                    49, 50, 51, 52, 53, 54, 55, 56,
+                    57, 58, 59, 60, 61, 62, 63, 64,
+                    65, 66, 67, 68, 69, 70, 71, 72,
+                    73, 74, 75, 76, 77, 78, 79, 80,
+                    81, 82, 83, 84, 85, 86, 87, 88,
+                    89, 90, 91, 92, 93, 94, 95, 96
+                    ]
+
+                    pipette_1.distribute(water_volumes,
+                        reservoir['A12'], plate.wells())
+
+    .. tab:: OT-2
+        
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+            metadata = {'apiLevel': '|apiLevel|'}
+                
+            def run(protocol: protocol_api.ProtocolContext):
+                plate = protocol.load_labware(
+                    load_name='corning_96_wellplate_360ul_flat',
+                    location=1)
+                tiprack_1 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=2)
+                tiprack_2 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_300ul',
+                    location=3)
+                reservoir = protocol.load_labware(
+                    load_name='usascientific_12_reservoir_22ml',
+                    location=4)
+                p300 = protocol.load_instrument(
+                    instrument_name='p300_single', 
+                    mount='right',
+                    tip_racks=[tiprack_1, tiprack_2])
+
+                # Volume amounts are for demonstration purposes only
+                water_volumes = [
+                    1,  2,  3,  4,  5,  6,  7,  8,
+                    9,  10, 11, 12, 13, 14, 15, 16,
+                    17, 18, 19, 20, 21, 22, 23, 24,
+                    25, 26, 27, 28, 29, 30, 31, 32,
+                    33, 34, 35, 36, 37, 38, 39, 40,
+                    41, 42, 43, 44, 45, 46, 47, 48,
+                    49, 50, 51, 52, 53, 54, 55, 56,
+                    57, 58, 59, 60, 61, 62, 63, 64,
+                    65, 66, 67, 68, 69, 70, 71, 72,
+                    73, 74, 75, 76, 77, 78, 79, 80,
+                    81, 82, 83, 84, 85, 86, 87, 88,
+                    89, 90, 91, 92, 93, 94, 95, 96
+                    ]
+
+                    p300.distribute(water_volumes, reservoir['A12'], plate.wells())
