@@ -23,6 +23,7 @@ from hardware_testing.data.csv_report import (
 
 from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
 from opentrons.config.advanced_settings import get_adv_setting, set_adv_setting
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 import logging
 
@@ -364,7 +365,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
-    old_stall_setting = get_adv_setting("disableStallDetection")
+    old_stall_setting = get_adv_setting("disableStallDetection", RobotTypeEnum.FLEX)
     try:
         asyncio.run(set_adv_setting("disableStallDetection", True))
         asyncio.run(_main(arg_parser.parse_args()))
