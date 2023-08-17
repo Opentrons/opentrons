@@ -25,7 +25,7 @@ Access the OT-2’s Jupyter Notebook by either:
 Once you've launched Jupyter Notebook, you can create a notebook file or edit an existing one. These notebook files are stored on the OT-2 itself. If you want to save code from a notebook to your computer, go to **File > Download As** in the notebook interface.
 
 Protocol Structure
-++++++++++++++++++
+^^^^^^^^^^^^^^^^^^
 
 Jupyter Notebook is structured around `cells`: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single ``run`` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol. 
 
@@ -42,7 +42,7 @@ The first command you execute should always be :py:meth:`~opentrons.protocol_api
 You should use the same :py:class:`.ProtocolContext` throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call :py:meth:`~opentrons.execute.get_protocol_api` again to get a new :py:class:`.ProtocolContext`.
 
 Running a Previously Written Protocol
-+++++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can also use Jupyter to run a protocol that you have already written. To do so, first copy the entire text of the protocol into a cell and run that cell:
 
@@ -61,14 +61,79 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
     protocol = opentrons.execute.get_protocol_api('2.13')
     run(protocol)  # your protocol will now run
 
+.. _using_lpc:
+
+Setting Labware Offsets
+-----------------------
+
+All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
+
+You shouldn't adjust labware offsets in your Python code if you plan to run your protocol in the app or on the touchscreen. However, if you are running your code in Jupyter Notebook or with ``opentrons_execute``, you need to set your own offsets because you can't perform run setup and Labware Position Check there. For these applications, do the following to calculate and apply labware offsets:
+	
+	1. Create a "dummy" protocol that loads your labware and has each used pipette pick up a tip from a tip rack.
+	2. Import the dummy protocol to the Opentrons App.
+	3. Run Labware Position Check from the app or touchscreen.
+	4. Add the offsets to your code with :py:meth:`.set_offset`.
+	
+Creating the dummy protocol requires you to:
+
+    1. Use the ``metadata`` or ``requirements`` dictionary to specify the API version. (See :ref:`v2-versioning` for details.) Use the same API version as you did in :py:meth:`opentrons.execute.get_protocol_api`.
+    2. Define a ``run()`` function.
+    3. Load all of your labware in their initial locations.
+    4. Load your smallest capacity pipette and specify its ``tipracks``.
+    5. Call ``pick_up_tip()``. Labware Position Check can't run if you don't pick up a tip.
+    
+For example, the following dummy protocol will use a Flex 50 µL pipette to enable Labware Position Check for a Flex tip rack, NEST reservoir, and NEST flat well plate.
+
+.. code-block:: python
+
+    requirements = {'apiLevel': '|apiLevel|', 'robotType': 'Flex'}
+
+    def run(protocol):
+        tips = protocol.load_labware('opentrons_flex_96_tiprack_50ul', 'D1')
+        reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
+        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
+        pipette = protocol.load_instrument('flex_1channel_50', 'left', tip_racks=[tips])
+        pipette.pick_up_tip()
+        pipette.return_tip()
+
+After importing this protocol to the Opentrons App, run Labware Position Check to get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware.
+
+.. code-block:: python
+	
+    labware_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", location="D1")
+    labware_1.set_offset(x=0.00, y=0.00, z=0.00)
+
+    labware_2 = protocol.load_labware("nest_12_reservoir_15ml", location="D2")
+    labware_2.set_offset(x=0.10, y=0.20, z=0.30)
+
+    labware_3 = protocol.load_labware("nest_96_wellplate_200ul_flat", location="D3")
+    labware_3.set_offset(x=0.10, y=0.20, z=0.30)
+    
+This automatically generated code uses generic names for the loaded labware. If you want to match the labware names already in your protocol, change the labware names to match your original code:
+
+.. code-block:: python
+
+    reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
+    reservoir.set_offset(x=0.10, y=0.20, z=0.30)
+    
+.. versionadded:: 2.12
+
+Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot D2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
+
+Remember, you should only add ``.set_offset()`` commands to protocols run outside of the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware* in the *same deck slot* on the *same robot*.
+
+.. warning::
+
+	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against other labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``.set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
 
 Using Custom Labware
-++++++++++++++++++++
+--------------------
 
 If you have custom labware definitions you want to use with Jupyter, make a new directory called ``labware`` in Jupyter and put the definitions there. These definitions will be available when you call :py:meth:`~opentrons.protocol_api.ProtocolContext.load_labware`.
 
 Using Modules
-+++++++++++++
+-------------
 
 If your protocol uses :ref:`new_modules`, you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
 

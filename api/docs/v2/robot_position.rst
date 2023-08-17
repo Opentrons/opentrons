@@ -105,51 +105,12 @@ Modifying these attributes will affect all subsequent aspirate and dispense acti
 
 .. versionadded:: 2.0
 
-.. _using_lpc:
-
 Using Labware Position Check
 ============================
 
 All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
 
-You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter notebook or with ``opentrons_execute``. This is because you can't run Labware Position Check from Jupyter or the command line. For these applications, calculate and apply labware offsets by:
-	
-	1. Creating a "dummy" protocol that loads your labware and has each used pipette pick up a tip from a tip rack.
-	2. Importing the dummy protocol to the Opentrons App.
-	3. Running Labware Position Check.
-	4. Adding the offsets to your protocol.
-	
-To prepare code written for Jupyter notebook and run it in the app, you need to specify an API level (see :ref:`specifying-versions`) and put your commands in a ``run()`` function. To enable Labware Position Check, you need to add a :py:meth:`.pick_up_tip` action for each pipette the protocol uses. For example, say you have a protocol that uses a Flex pipette, a tip rack, a 15 mL reservoir, and a 96-well plate. After importing this protocol to the Opentrons App, run Labware Position Check to get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware.
-
-.. code-block:: python
-	
-    labware_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", location="D1")
-    labware_1.set_offset(x=0.00, y=0.00, z=0.00)
-
-    labware_2 = protocol.load_labware("nest_12_reservoir_15ml", location="D2")
-    labware_2.set_offset(x=0.10, y=0.20, z=0.30)
-
-    labware_3 = protocol.load_labware("nest_96_wellplate_200ul_flat", location="D3")
-    labware_3.set_offset(x=0.10, y=0.20, z=0.30)
-    
-You'll notice that this code uses generic names for the loaded labware. If you want to match the labware names already in your protocol, add your own ``.set_offset()`` calls using the arguments provided by Labware Position Check:
-
-.. code-block:: python
-
-    reservoir = protocol.load_labware('nest_12_reservoir_15ml', "D2")
-    reservoir.set_offset(x=0.10, y=0.20, z=0.30)
-    
-.. versionadded:: 2.12
-
-Once you've executed this code in Jupyter notebook, all subsequent positional calculations for this reservoir in slot D2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
-
-Remember, you should only add ``.set_offset()`` commands to protocols run outside of the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware* in the *same deck slot* on the *same robot*.
-
-.. warning::
-
-	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against other labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``.set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
-
-.. _protocol-api-deck-coords:
+You should only adjust labware offsets in your Python code if you plan to run your protocol in the Opentrons App. However, if you're running a protocol in Jupyter Notebook, see :ref:`using_lpc`.
 
 Position Relative to the Deck
 =============================
