@@ -31,6 +31,7 @@ class PipettingHandler(TypingProtocol):
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> float:
         """Set flow-rate and dispense."""
 
@@ -88,6 +89,7 @@ class HardwarePipettingHandler(PipettingHandler):
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> float:
         """Dispense liquid without moving the pipette."""
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
@@ -96,7 +98,9 @@ class HardwarePipettingHandler(PipettingHandler):
         )
 
         with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
-            await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
+            await self._hardware_api.dispense(
+                mount=hw_pipette.mount, volume=volume, push_out=push_out
+            )
 
         return volume
 
@@ -195,6 +199,7 @@ class VirtualPipettingHandler(PipettingHandler):
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> float:
         """Virtually dispense (no-op)."""
         self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
