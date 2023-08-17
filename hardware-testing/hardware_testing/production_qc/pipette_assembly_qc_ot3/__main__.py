@@ -1365,6 +1365,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             subsystem = SubSystem.of_mount(mount)
             pcba_version = api.attached_subsystems[subsystem].pcba_revision
 
+        print(f"PCBA version: {pcba_version}")
         # add metadata to CSV
         # FIXME: create a set of CSV helpers, such that you can define a test-report
         #        schema/format/line-length/etc., before having to fill its contents.
