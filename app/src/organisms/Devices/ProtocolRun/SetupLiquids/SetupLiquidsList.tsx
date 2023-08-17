@@ -49,6 +49,13 @@ const HIDE_SCROLLBAR = css`
   }
 `
 
+const LIQUID_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.medGreyEnabled};
+  border-radius: ${BORDERS.radiusSoftCorners};
+`
+
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
   const { runId } = props
   const protocolData = useMostRecentCompletedAnalysis(runId)
@@ -261,7 +268,7 @@ export const LiquidsListItemDetails = (
   return (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex
-        css={BORDERS.cardOutlineBorder}
+        css={LIQUID_BORDER_STYLE}
         padding={SPACING.spacing12}
         height="max-content"
         backgroundColor={COLORS.white}

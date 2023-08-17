@@ -17,6 +17,9 @@ import {
   getModuleDisplayName,
   getModuleDef2,
   MAGNETIC_BLOCK_V1,
+  THERMOCYCLER_MODULE_V2,
+  getModuleType,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
@@ -58,7 +61,13 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
-      flexProps={{ padding: SPACING.spacing16 }}
+      flexProps={{
+        padding: SPACING.spacing16,
+        backgroundColor:
+          moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
+            ? COLORS.white
+            : COLORS.transparent,
+      }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
