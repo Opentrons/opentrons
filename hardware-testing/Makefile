@@ -254,11 +254,11 @@ push-ot3-fixture:
 
 
 .PHONY: apply-patches-fixture
-apply-patches-gravimetric:
+apply-patches-fixture:
 	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --allow-empty
 
 .PHONY: remove-patches-fixture
-remove-patches-gravimetric:
+remove-patches-fixture:
 	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --reverse --allow-empty
 
 
