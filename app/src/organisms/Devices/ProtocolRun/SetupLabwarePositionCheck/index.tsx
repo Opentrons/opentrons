@@ -77,7 +77,7 @@ export function SetupLabwarePositionCheck(
           }}
           id="LabwareSetup_checkLabwarePositionsButton"
           {...targetProps}
-          // disabled={lpcDisabledReason !== null}
+          disabled={lpcDisabledReason !== null}
         >
           {t('run_labware_position_check')}
         </SecondaryButton>
