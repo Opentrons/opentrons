@@ -121,7 +121,7 @@ This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the r
 Advanced Method
 ---------------
 
-This protocol accomplishes the same thing as the previous example, but does it a little more efficiently. Notice how it uses the :py:meth:`.InstrumentContext.transfer` method to move liquid between well plates. The ``aspirate`` and ``dispense`` arguments are part of ``transfer()`` method parameters. 
+This protocol accomplishes the same thing as the previous example, but does it a little more efficiently. Notice how it uses the :py:meth:`.InstrumentContext.transfer` method to move liquid between well plates. The source and destination well  arguments (e.g., ``plate['A1'], plate['B1']``) are part of ``transfer()`` method parameters. You don't need separate calls to ``aspirate`` or ``dispense`` here. 
 
 .. tabs::
 
