@@ -28,11 +28,11 @@ import type { TrashSlotName } from './FlexTrash'
 
 const getModulePosition = (
   orderedSlots: DeckSlot[],
-  slotId: DeckSlotId,
+  moduleId: string,
   loadedModules: LoadedModule[],
   deckId: DeckDefinition['otId']
 ): Coordinates | null => {
-  const loadedModule = loadedModules.find(m => m.id === slotId)
+  const loadedModule = loadedModules.find(m => m.id === moduleId)
   if (loadedModule == null) return null
   const modSlot = orderedSlots.find(
     s => s.id === loadedModule.location.slotName
@@ -67,55 +67,33 @@ function getLabwareCoordinates({
   } else if ('labwareId' in location) {
     const loadedAdapter = loadedLabware.find(l => l.id === location.labwareId)
     if (loadedAdapter == null) return null
-    const loadedAdapterSlot = orderedSlots.find(s => {
-      let adapterSlot = null
-      const loadedAdapterLocation = loadedAdapter.location
-      if (loadedAdapterLocation === 'offDeck') {
-        adapterSlot = null
-      } else if ('moduleId' in loadedAdapterLocation) {
-        adapterSlot = loadedAdapterLocation.moduleId
-      } else if ('slotName' in loadedAdapterLocation) {
-        adapterSlot = loadedAdapterLocation.slotName
-      }
-      if (adapterSlot == null) return null
-      return s.id === adapterSlot
-    })
-    if (loadedAdapterSlot == null) return null
+    const loadedAdapterLocation = loadedAdapter.location
+
+    if (loadedAdapterLocation === 'offDeck' || 'labwareId' in loadedAdapterLocation) return null
     //  adapter on module
-    const isOnModule = Object.values(loadedModules).find(
-      mod => mod.id === loadedAdapterSlot.id
-    )
-    if (isOnModule) {
-      return getModulePosition(
-        orderedSlots,
-        loadedAdapterSlot.id,
-        loadedModules,
-        deckId
-      )
+    if ('moduleId' in loadedAdapterLocation) {
+      return getModulePosition(orderedSlots, loadedAdapterLocation.moduleId, loadedModules, deckId)
     }
+
     //  adapter on deck
-    return {
+    const loadedAdapterSlot = orderedSlots.find(s => s.id === loadedAdapterLocation.slotName)
+    return loadedAdapterSlot != null ? {
       x: loadedAdapterSlot.position[0],
       y: loadedAdapterSlot.position[1],
       z: loadedAdapterSlot.position[2],
-    }
+    } : null
   } else if ('slotName' in location) {
     const slotCoordinateTuple =
       orderedSlots.find(s => s.id === location.slotName)?.position ?? null
     return slotCoordinateTuple != null
       ? {
-          x: slotCoordinateTuple[0],
-          y: slotCoordinateTuple[1],
-          z: slotCoordinateTuple[2],
-        }
+        x: slotCoordinateTuple[0],
+        y: slotCoordinateTuple[1],
+        z: slotCoordinateTuple[2],
+      }
       : null
   } else {
-    return getModulePosition(
-      orderedSlots,
-      location.moduleId,
-      loadedModules,
-      deckId
-    )
+    return getModulePosition(orderedSlots, location.moduleId, loadedModules, deckId)
   }
 }
 
@@ -264,8 +242,8 @@ export function MoveLabwareOnDeck(
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedG = styled(animated.g)<any>``
-const AnimatedSvg = styled(animated.svg)<any>``
+const AnimatedG = styled(animated.g) <any>``
+const AnimatedSvg = styled(animated.svg) <any>``
 
 interface WellProps {
   wellDef: LabwareWell

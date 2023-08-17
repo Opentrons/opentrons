@@ -20,14 +20,27 @@ export const MoveLabwareOnDeck: Story = {
       movedLabwareDef={fixture_96_plate as LabwareDefinition2}
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
-      loadedModules={[]}
-      loadedLabware={[]}
+      loadedModules={[{
+        id: 'mod',
+        model: 'heaterShakerModuleV1',
+        location: { slotName: "D1" },
+        serialNumber: 'frerfe'
+      }
+      ]}
+      loadedLabware={[
+       {
+        id: 'something',
+        loadName: 'opentrons_96_flat_bottom_adapter',
+        definitionUri: 'opentrons/opentrons_96_flat_bottom_adapter/1',
+        location: {moduleId: 'mod'} 
+       } 
+      ]}
       robotType={args.robotType}
     />
   ),
   args: {
-    initialLabwareLocation: { slotName: 'A1' },
-    finalLabwareLocation: 'offDeck',
+    initialLabwareLocation: { labwareId: 'something' },
+    finalLabwareLocation: {slotName: 'A2'},
     robotType: FLEX_ROBOT_TYPE,
   },
 }
