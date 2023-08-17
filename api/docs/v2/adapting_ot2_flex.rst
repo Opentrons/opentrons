@@ -27,15 +27,18 @@ You also need to specify ``'robotType': 'Flex'``. If you omit ``robotType`` in t
 Pipettes and Tip-rack Load Names
 ================================
 
-Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. Choose pipettes of the same capacity or larger (or whatever you’ve outfitted your Flex with). See the :ref:`list of pipette API load names <new-pipette-models>` for the valid values of ``instrument_name`` in Flex protocols. And check `Labware Library <https://labware.opentrons.com>`_ or the Opentrons App for the list of Flex tip racks.
+Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. If possible, load Flex pipettes of the same capacity or larger than the OT-2 pipettes. See the :ref:`list of pipette API load names <new-pipette-models>` for the valid values of ``instrument_name`` in Flex protocols. And check `Labware Library <https://labware.opentrons.com>`_ or the Opentrons App for the load names of Flex tip racks.
+
+.. note::
+    If you use smaller capacity tips than in the OT-2 protocol, you may need to make further adjustments to avoid running out of tips. Also, the protocol may have more steps and take longer to execute.
 
 This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and 300 µL tips to Flex code that uses a Flex 1-Channel 1000 µL pipette and 1000 µL tips.
 
 .. TK code tabs here
 
 
-Deck Slot Names
-===============
+Deck Slot Labels
+================
 
 It's good practice to update numeric labels for :ref:`deck-slots` (which match the labels on an OT-2) to coordinate ones (which match the labels on Flex). This is an optional step, since the two formats are interchangeable.
 
@@ -50,7 +53,7 @@ If your OT-2 protocol uses older generations of the Temperature Module or Thermo
     * ``temperature module gen2``
     * ``thermocycler module gen2`` or ``thermocyclerModuleV2``
     
-The Heater-Shaker Module only has one generation, which is compatible with Flex and OT-2.
+The Heater-Shaker Module only has one generation, ``heaterShakerModuleV1``, which is compatible with Flex and OT-2.
 
 The Magnetic Module is not compatible with Flex. For protocols that load ``magnetic module``, ``magdeck``, or ``magnetic module gen2``, you will need to make further modifications to use the :ref:`magnetic-block` and Flex Gripper instead. This will require reworking some of your protocol steps, and you should verify that your new protocol design achieves similar results.
 
