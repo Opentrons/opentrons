@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import {
+  DefaultTheme,
+  FlattenSimpleInterpolation,
+  ThemedCssFunction,
+  css,
+} from 'styled-components'
 
 import {
   Flex,
@@ -179,7 +184,25 @@ export function Toast(props: ToastProps): JSX.Element {
     }
   `
 
-  const oddAnimation = isClosed
+  const ODD_ANIMATION_NONE = css``
+
+  let oddAnimation: FlattenSimpleInterpolation | ThemedCssFunction<DefaultTheme>
+
+  if (isClosed) {
+    if (exitNow) {
+      oddAnimation = ODD_ANIMATION_FADE_UP_AND_OUT
+    } else {
+      oddAnimation = ODD_ANIMATION_SLIDE_DOWN_AND_OUT
+    }
+  } else {
+    if (exitNow) {
+      oddAnimation = ODD_ANIMATION_NONE
+    } else {
+      oddAnimation = ODD_ANIMATION_SLIDE_UP_AND_IN
+    }
+  }
+
+  oddAnimation = isClosed
     ? exitNow
       ? ODD_ANIMATION_FADE_UP_AND_OUT
       : ODD_ANIMATION_SLIDE_DOWN_AND_OUT
