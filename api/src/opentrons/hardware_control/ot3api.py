@@ -998,8 +998,14 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
 
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT and realmount == OT3Mount.RIGHT:
-            raise RuntimeError("unable to move RIGHT mount while 96CH is attached")
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and realmount == OT3Mount.RIGHT
+        ):
+            raise RuntimeError(
+                f"unable to move {realmount.name} "
+                f"with {self.gantry_load.name} gantry load"
+            )
 
         # Cache current position from backend
         if not self._current_position:
@@ -1109,8 +1115,14 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
 
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT and realmount == OT3Mount.RIGHT:
-            raise RuntimeError("unable to move RIGHT mount while 96CH is attached")
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and realmount == OT3Mount.RIGHT
+        ):
+            raise RuntimeError(
+                f"unable to move {realmount.name} "
+                f"with {self.gantry_load.name} gantry load"
+            )
 
         if not self._backend.check_encoder_status(axes_moving):
             await self.home()
@@ -1345,7 +1357,10 @@ class OT3API(
             if not axes:
                 checked_axes.remove(Axis.Z_R)
             elif Axis.Z_R in axes:
-                raise RuntimeError("unable to home RIGHT mount while 96CH is attached")
+                raise RuntimeError(
+                    f"unable to home {Axis.Z_R.name} axis"
+                    f"with {self.gantry_load.name} gantry load"
+                )
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1395,7 +1410,10 @@ class OT3API(
         will call home if the stepper position is inaccurate.
         """
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R:
-            raise RuntimeError("unable to retract RIGHT mount while 96CH is attached")
+            raise RuntimeError(
+                f"unable to retract {Axis.Z_R.name} axis"
+                f"with {self.gantry_load.name} gantry load"
+            )
 
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
