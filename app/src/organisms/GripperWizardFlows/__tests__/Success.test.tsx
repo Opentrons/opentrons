@@ -47,7 +47,7 @@ describe('Success', () => {
     const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
     })[0]
-    getByText('Flex Gripper Successfully Attached and Calibrated')
+    getByText('Flex Gripper successfully attached and calibrated')
     getByRole('button', { name: 'exit' })
   })
 
@@ -55,7 +55,7 @@ describe('Success', () => {
     const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_CALIBRATED,
     })[0]
-    getByText('Flex Gripper Successfully Calibrated')
+    getByText('Flex Gripper successfully calibrated')
     getByRole('button', { name: 'exit' })
   })
 
@@ -63,7 +63,7 @@ describe('Success', () => {
     const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_ATTACHED,
     })[0]
-    getByText('Flex Gripper Successfully Attached')
+    getByText('Gripper successfully attached')
     getByRole('button', { name: 'Calibrate gripper' })
   })
 
@@ -71,7 +71,7 @@ describe('Success', () => {
     const { getByText, getByRole } = render({
       successfulAction: SUCCESSFULLY_DETACHED,
     })[0]
-    getByText('Flex Gripper Successfully Detached')
+    getByText('Flex Gripper successfully detached')
     getByRole('button', { name: 'exit' })
   })
 })

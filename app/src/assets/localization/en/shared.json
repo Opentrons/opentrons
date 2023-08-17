@@ -62,7 +62,7 @@
   "robot_was_seen_but_is_unreachable": "This robot has been seen recently, but is currently not reachable at IP address {{hostname}}",
   "something_went_wrong": "something went wrong",
   "sort_by": "Sort by",
-  "stand_back_robot_is_in_motion": "Stand Back, Robot is in Motion",
+  "stand_back_robot_is_in_motion": "Stand back, robot is in motion",
   "start": "start",
   "starting": "starting",
   "step": "Step {{current}} / {{max}}",

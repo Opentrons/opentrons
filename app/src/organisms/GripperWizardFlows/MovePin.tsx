@@ -163,7 +163,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
-      buttonText: t('continue'),
+      buttonText: t('continue_calibration'),
       prepImage: (
         <video
           css={css`
