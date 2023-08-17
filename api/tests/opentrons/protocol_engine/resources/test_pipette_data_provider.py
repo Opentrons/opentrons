@@ -40,6 +40,8 @@ def test_get_virtual_pipette_static_config() -> None:
             "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
+        default_push_out_volume=3.534,
+        push_out=None,
     )
 
 
@@ -81,8 +83,7 @@ def test_get_pipette_static_config(
         "default_dispense_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_blow_out_volume": 10,
-        "default_force_push": 3,
-        "force_push": None,
+        "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
     }
 
@@ -109,4 +110,6 @@ def test_get_pipette_static_config(
         # https://opentrons.atlassian.net/browse/RCORE-655
         nozzle_offset_z=0,
         home_position=0,
+        push_out=None,
+        default_push_out_volume=3,
     )

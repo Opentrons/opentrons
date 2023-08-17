@@ -614,6 +614,8 @@ def test_add_pipette_config(
                 nominal_tip_overlap={"default": 5},
                 home_position=8.9,
                 nozzle_offset_z=10.11,
+                push_out=3,
+                default_push_out_volume=5,
             ),
         )
     )
@@ -628,7 +630,7 @@ def test_add_pipette_config(
         tip_configuration_lookup_table={4: supported_tip_fixture},
         nominal_tip_overlap={"default": 5},
         home_position=8.9,
-        nozzle_offset_z=10.11,
+        nozzle_offset_z=10.11
     )
     assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
         default_aspirate={"a": 1},

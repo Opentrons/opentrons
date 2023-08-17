@@ -12,6 +12,8 @@ from opentrons_shared_data.pipette import (
 
 from opentrons.hardware_control.dev_types import PipetteDict
 
+# from opentrons.hardware_control.instruments.ot3 import pipette
+
 from ..types import FlowRates
 
 
@@ -31,7 +33,7 @@ class LoadedStaticPipetteData:
         float, pipette_definition.SupportedTipsDefinition
     ]
     nominal_tip_overlap: Dict[str, float]
-    force_push: Optional[float]
+    push_out: Optional[float]
     default_push_out_volume: Optional[float]
 
 
@@ -49,6 +51,7 @@ def get_virtual_pipette_static_config(
     tip_configuration = config.supported_tips[
         pip_types.PipetteTipType(config.max_volume)
     ]
+    print(tip_configuration)
     return LoadedStaticPipetteData(
         model=str(pipette_model),
         display_name=config.display_name,
@@ -67,6 +70,7 @@ def get_virtual_pipette_static_config(
         ),
         nominal_tip_overlap=config.tip_overlap_dictionary,
         default_push_out_volume=tip_configuration.default_push_out_volume,
+        push_out=None,  # need to extract from pipette.push_out_volume,
     )
 
 
@@ -92,4 +96,5 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         home_position=0,
         nozzle_offset_z=0,
         default_push_out_volume=pipette_dict["default_push_out_volume"],
+        push_out=None,  # need to extract from pipette.push_out_volume,
     )
