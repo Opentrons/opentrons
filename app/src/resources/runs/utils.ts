@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { CreateMaintenaceCommand, CreateRunCommand } from './hooks'
+import type { CreateMaintenanceCommand, CreateRunCommand } from './hooks'
 
 export const chainRunCommandsRecursive = (
   commands: CreateCommand[],
@@ -46,7 +46,7 @@ export const chainRunCommandsRecursive = (
 export const chainMaintenanceCommandsRecursive = (
   maintenanceRunId: string,
   commands: CreateCommand[],
-  createMaintenanceCommand: CreateMaintenaceCommand,
+  createMaintenanceCommand: CreateMaintenanceCommand,
   continuePastCommandFailure: boolean = true,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<CommandData[]> => {

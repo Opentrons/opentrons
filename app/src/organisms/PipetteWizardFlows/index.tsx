@@ -40,8 +40,8 @@ import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { PipetteWizardFlow, SelectablePipettes } from './types'
 import type { CommandData } from '@opentrons/api-client'
+import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 

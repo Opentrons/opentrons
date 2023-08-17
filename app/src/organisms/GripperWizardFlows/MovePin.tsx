@@ -19,14 +19,14 @@ import calibratingFrontJaw from '../../assets/videos/gripper-wizards/CALIBRATING
 import calibratingRearJaw from '../../assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { Coordinates } from '@opentrons/shared-data'
-import type { CreateMaintenaceCommand } from '../../resources/runs/hooks'
+import type { CreateMaintenanceCommand } from '../../resources/runs/hooks'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void
   frontJawOffset: Coordinates | null
-  createRunCommand: CreateMaintenaceCommand
   isExiting: boolean
+  createRunCommand: CreateMaintenanceCommand
 }
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {

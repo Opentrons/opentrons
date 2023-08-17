@@ -65,7 +65,7 @@ export function GripperWizardFlows(
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({})
+  } = useCreateMaintenanceRunMutation()
 
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
@@ -91,8 +91,9 @@ export function GripperWizardFlows(
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) closeFlow()
-    else {
+    if (maintenanceRunData?.data.id == null) {
+      closeFlow()
+    } else {
       chainRunCommands(
         maintenanceRunData?.data.id,
         [{ commandType: 'home' as const, params: {} }],

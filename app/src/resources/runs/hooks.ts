@@ -17,7 +17,7 @@ export type CreateRunCommand = (
   options?: Parameters<CreateCommandMutate>[1]
 ) => ReturnType<CreateCommandMutate>
 
-export type CreateMaintenaceCommand = ReturnType<
+export type CreateMaintenanceCommand = ReturnType<
   typeof useCreateMaintenanceCommandMutation
 >['createMaintenanceCommand']
 
