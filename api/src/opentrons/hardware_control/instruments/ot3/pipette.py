@@ -427,16 +427,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._flow_acceleration = new_flow_acceleration
 
     @property
-    def push_out_volume(self) -> Optional[float]:
-        return self._push_out_volume
-
-    @push_out_volume.setter
-    def push_out_volume(self, new_volume: float) -> None:
-        # make sure the new volume is above 0 and bellow the max volume the plunger can go
-        assert new_volume > 0
-        self._push_out_volume = new_volume
-
-    @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
         return self._aspirate_flow_rates_lookup
 
