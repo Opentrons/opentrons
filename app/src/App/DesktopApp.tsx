@@ -26,7 +26,7 @@ import { Navbar } from './Navbar'
 import { EstopTakeover, EmergencyStopContext } from '../organisms/EmergencyStop'
 import { OPENTRONS_USB } from '../redux/discovery'
 import { appShellRequestor } from '../redux/shell/remote'
-import { useRobot } from '../organisms/Devices/hooks'
+import { useRobot, useIsOT3 } from '../organisms/Devices/hooks'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps, DesktopRouteParams } from './types'
@@ -141,6 +141,10 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
+  const isOT3 = useIsOT3(robotName)
+
+  // E-stop is not supported on OT2
+  if (isOT3) return null
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
