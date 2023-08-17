@@ -202,14 +202,6 @@ export function Toast(props: ToastProps): JSX.Element {
     }
   }
 
-  oddAnimation = isClosed
-    ? exitNow
-      ? ODD_ANIMATION_FADE_UP_AND_OUT
-      : ODD_ANIMATION_SLIDE_DOWN_AND_OUT
-    : exitNow
-    ? css``
-    : ODD_ANIMATION_SLIDE_UP_AND_IN
-
   const toastStyleByType: {
     [k in ToastType]: {
       iconName: IconName
