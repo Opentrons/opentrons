@@ -292,7 +292,6 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
-        await self._hardware_stopper.do_halt()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.

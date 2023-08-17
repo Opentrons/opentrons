@@ -61,17 +61,6 @@ def subject(
     )
 
 
-async def test_hardware_halt(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    subject: HardwareStopper,
-) -> None:
-    """It should halt the hardware API."""
-    await subject.do_halt()
-
-    decoy.verify(await hardware_api.halt())
-
-
 async def test_hardware_stopping_sequence(
     decoy: Decoy,
     state_store: StateStore,

@@ -643,7 +643,6 @@ async def test_stop(
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
         queue_worker.cancel(),
-        await hardware_stopper.do_halt(),
     )
 
 

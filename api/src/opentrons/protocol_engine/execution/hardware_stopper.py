@@ -87,14 +87,6 @@ class HardwareStopper:
                 # should not happen during an actual run
                 log.debug(f"Pipette ID {pipette_id} no longer attached.")
 
-    async def do_halt(self) -> None:
-        """Issue a halt signal to the hardware API.
-
-        After issuing a halt, you must call do_stop_and_recover after
-        anything using the HardwareAPI has settled.
-        """
-        await self._hardware_api.halt()
-
     async def do_stop_and_recover(self, drop_tips_and_home: bool = False) -> None:
         """Stop and reset the HardwareAPI, optionally dropping tips and homing."""
         if drop_tips_and_home:
