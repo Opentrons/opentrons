@@ -8,7 +8,7 @@ Adapting OT-2 Protocols for Flex
 
 Python protocols designed to run on the OT-2 can't be directly run on Flex without some modifications. This page describes the minimal steps that you need to take to get OT-2 protocols analyzing and running on Flex.
 
-Adapting a protocol for Flex lets you have parity across different Opentrons robots in yoru lab, or you can extend older protocols to take advantage of new features only available on Flex. Depending on your application, you may need to do additional verification of your adapted protocol.
+Adapting a protocol for Flex lets you have parity across different Opentrons robots in your lab, or you can extend older protocols to take advantage of new features only available on Flex. Depending on your application, you may need to do additional verification of your adapted protocol.
 
 Examples on this page are in tabs so you can quickly move back and forth to see the differences between OT-2 and Flex code.
 
@@ -16,6 +16,9 @@ Metadata and Requirements
 =========================
 
 Flex requires you to specify an ``apiLevel`` of 2.15 or higher. If your OT-2 protocol specified ``apiLevel`` in the ``metadata`` dictionary, it's best to move it to the ``requirements`` dictionary. You can't specify it in both places, or the API will raise an error.
+
+.. note::
+    Consult the list of :ref:`version-notes` to see what effect raising the ``apiLevel`` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
 
 You also need to specify ``'robotType': 'Flex'``. If you omit ``robotType`` in the ``requirements`` dictionary, the API will assume the protocol is designed for the OT-2.
 
@@ -42,13 +45,12 @@ It's good practice to update numeric labels for :ref:`deck-slots` (which match t
 Module Load Names
 =================
 
-If your OT-2 uses older generations of the Temperature Module or Thermocycler Module, 
-update the load names you pass to :py:meth:`.load_module` to ones compatible with Flex:
+If your OT-2 protocol uses older generations of the Temperature Module or Thermocycler Module, update the load names you pass to :py:meth:`.load_module` to ones compatible with Flex:
 
     * ``temperature module gen2``
     * ``thermocycler module gen2`` or ``thermocyclerModuleV2``
     
-The Heater-Shaker Module only has one generation,  which is compatible with Flex and OT-2.
+The Heater-Shaker Module only has one generation, which is compatible with Flex and OT-2.
 
 The Magnetic Module is not compatible with Flex. For protocols that load ``magnetic module``, ``magdeck``, or ``magnetic module gen2``, you will need to make further modifications to use the :ref:`magnetic-block` and Flex Gripper instead. This will require reworking some of your protocol steps, and you should verify that your new protocol design achieves similar results.
 
