@@ -184,29 +184,30 @@ export function ProtocolSetupLabware({
     typeof selectedLabware.location === 'object' &&
     'labwareId' in selectedLabware?.location
   ) {
+    //  TODO(jr, 8/14/23): add adapter location icon when we have one
     const adapterId = selectedLabware.location.labwareId
-    const adapter = mostRecentAnalysis?.commands.find(
-      (command): command is LoadLabwareRunTimeCommand => {
-        return command.result?.labwareId === adapterId
-      }
-    )
-    if (
-      adapter?.params.location != null &&
-      adapter?.params.location !== 'offDeck'
-    ) {
-      if ('slotName' in adapter?.params?.location) {
-        location = <LocationIcon slotName={adapter?.params.location.slotName} />
-      } else if ('moduleId' in adapter?.params?.location) {
-        const module = attachedProtocolModuleMatches.find(
-          //  @ts-expect-error: jr, 8/14/23: for some reason ts isn't type narrowing this
-          module => module.moduleId === adapter?.params?.location.moduleId
+    const adapterLocation = mostRecentAnalysis?.commands.find(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware' &&
+        command.result?.labwareId === adapterId
+    )?.params.location
+    if (adapterLocation != null && adapterLocation !== 'offDeck') {
+      if ('slotName' in adapterLocation) {
+        location = <LocationIcon slotName={adapterLocation.slotName} />
+      } else if ('moduleId' in adapterLocation) {
+        const moduleUnderAdapter = attachedProtocolModuleMatches.find(
+          module => module.moduleId === adapterLocation.moduleId
         )
-        if (module != null) {
+        if (moduleUnderAdapter != null) {
           location = (
             <>
-              <LocationIcon slotName={module.slotName} />
+              <LocationIcon slotName={moduleUnderAdapter.slotName} />
               <LocationIcon
-                iconName={MODULE_ICON_NAME_BY_TYPE[module.moduleDef.moduleType]}
+                iconName={
+                  MODULE_ICON_NAME_BY_TYPE[
+                    moduleUnderAdapter.moduleDef.moduleType
+                  ]
+                }
               />
             </>
           )
@@ -380,10 +381,10 @@ export function ProtocolSetupLabware({
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
           <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
-            <StyledText>{'Location'}</StyledText>
+            <StyledText>{t('location')}</StyledText>
           </Flex>
           <Flex>
-            <StyledText>{'Labware Name'}</StyledText>
+            <StyledText>{t('labware_name')}</StyledText>
           </Flex>
         </Flex>
         {[...onDeckItems, ...offDeckItems].map((labware, i) => {
@@ -596,30 +597,31 @@ function RowLabware({
       </>
     )
   } else if ('labwareId' in initialLocation) {
+    //  TODO(jr, 8/14/23): add adapter location icon when we have one
     const adapterId = initialLocation.labwareId
-    const adapter =
-      commands != null
-        ? commands.find((command): command is LoadLabwareRunTimeCommand => {
-            return command.result?.labwareId === adapterId
-          })
-        : null
-    if (
-      adapter?.params.location != null &&
-      adapter?.params.location !== 'offDeck'
-    ) {
-      if ('slotName' in adapter?.params?.location) {
-        location = <LocationIcon slotName={adapter?.params.location.slotName} />
-      } else if ('moduleId' in adapter?.params?.location) {
-        const module = attachedProtocolModules.find(
-          //  @ts-expect-error: jr, 8/7/23: for some reason TS isn't type narrowing this
-          module => module.moduleId === adapter?.params?.location.moduleId
+    const adapterLocation = commands?.find(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware' &&
+        command.result?.labwareId === adapterId
+    )?.params.location
+
+    if (adapterLocation != null && adapterLocation !== 'offDeck') {
+      if ('slotName' in adapterLocation) {
+        location = <LocationIcon slotName={adapterLocation.slotName} />
+      } else if ('moduleId' in adapterLocation) {
+        const moduleUnderAdapter = attachedProtocolModules.find(
+          module => module.moduleId === adapterLocation.moduleId
         )
-        if (module != null) {
+        if (moduleUnderAdapter != null) {
           location = (
             <>
-              <LocationIcon slotName={module.slotName} />
+              <LocationIcon slotName={moduleUnderAdapter.slotName} />
               <LocationIcon
-                iconName={MODULE_ICON_NAME_BY_TYPE[module.moduleDef.moduleType]}
+                iconName={
+                  MODULE_ICON_NAME_BY_TYPE[
+                    moduleUnderAdapter.moduleDef.moduleType
+                  ]
+                }
               />
             </>
           )

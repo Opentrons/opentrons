@@ -4,9 +4,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
+import { getLabwareDef } from './labware'
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
 import type { TFunction } from 'i18next'
-import { getLabwareDef } from './labware'
 
 export function getDisplayLocation(
   location: LabwareOffsetLocation,
@@ -37,7 +37,10 @@ export function getDisplayLocation(
       const { moduleModel } = location
       const moduleDisplayName = getModuleDisplayName(moduleModel)
       if (getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
-        return moduleDisplayName
+        return t('adapter_in_tc', {
+          adapter: adapterDisplayName,
+          module: moduleDisplayName,
+        })
       } else {
         return t('adapter_in_mod_in_slot', {
           adapter: adapterDisplayName,

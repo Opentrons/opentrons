@@ -127,7 +127,7 @@ export const AdapterControlsComponents = (
           <a className={styles.overlay_button} onClick={addLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
             {i18n.t(
-              `deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`
+              `deck.overlay.slot.${isOver ? 'place_here' : 'add_adapter'}`
             )}
           </a>
           <a className={styles.overlay_button} onClick={deleteLabware}>

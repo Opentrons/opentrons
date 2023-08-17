@@ -82,7 +82,10 @@ function getLabwareCoordinates({
     })
     if (loadedAdapterSlot == null) return null
     //  adapter on module
-    if (loadedAdapterSlot.displayName.includes('GEN')) {
+    const isOnModule = Object.values(loadedModules).find(
+      mod => mod.id === loadedAdapterSlot.id
+    )
+    if (isOnModule) {
       return getModulePosition(
         orderedSlots,
         loadedAdapterSlot.id,

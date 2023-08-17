@@ -173,6 +173,7 @@ export const getLabwareIdsInOrder = (
           } else if ('labwareId' in loc) {
             const matchingAdapter = commands.find(
               (command): command is LoadLabwareRunTimeCommand =>
+                command.commandType === 'loadLabware' &&
                 command.result?.labwareId === loc.labwareId
             )
             const adapterLocation = matchingAdapter?.params.location

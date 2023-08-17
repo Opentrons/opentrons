@@ -178,6 +178,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             </StyledText>
           </Flex>
           {labwareByLiquidId[liquidId].map((labware, index) => {
+            //  TODO: (jr, 8/16/23): show adapter and module name here
             const { slotName, labwareName } = getSlotLabwareName(
               labware.labwareId,
               commands

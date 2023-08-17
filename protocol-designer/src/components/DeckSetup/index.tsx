@@ -62,9 +62,13 @@ import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
 import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
-import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
+import {
+  AdapterControls,
+  SlotControls,
+  LabwareControls,
+  DragPreview,
+} from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
-import { AdapterControls } from './LabwareOverlays/AdapterControls'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
 import { SlotLabels } from './SlotLabels'
 import styles from './DeckSetup.css'
@@ -308,6 +312,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 {isAdapter ? (
                   //  @ts-expect-error
                   <AdapterControls
+                    allLabware={allLabware}
                     onDeck={false}
                     labwareId={labwareLoadedOnModule.id}
                     key={slot.id}
@@ -424,6 +429,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 <>
                   {/* @ts-expect-error */}
                   <AdapterControls
+                    allLabware={allLabware}
                     onDeck={true}
                     labwareId={labware.id}
                     key={slot.id}

@@ -93,24 +93,22 @@ export const LoadCommandText = ({
         const labwareName = command.result?.definition.metadata.displayName
         const matchingAdapter = robotSideAnalysis.commands.find(
           (command): command is LoadLabwareRunTimeCommand =>
+            command.commandType === 'loadLabware' &&
             command.result?.labwareId === labwareId
         )
         const adapterName =
           matchingAdapter?.result?.definition.metadata.displayName
         const adapterLoc = matchingAdapter?.params.location
-        let adapterLocation: string | null = null
         if (adapterLoc === 'offDeck') {
-          adapterLocation = 'offDeck'
           return t('load_labware_info_protocol_setup_adapter_off_deck', {
             labware: labwareName,
             adapter_name: adapterName,
           })
         } else if (adapterLoc != null && 'slotName' in adapterLoc) {
-          adapterLocation = adapterLoc?.slotName
           return t('load_labware_info_protocol_setup_adapter', {
             labware: labwareName,
             adapter_name: adapterName,
-            slot_name: adapterLocation,
+            slot_name: adapterLoc?.slotName,
           })
         } else if (adapterLoc != null && 'moduleId' in adapterLoc) {
           const moduleModel = getModuleModel(
@@ -119,15 +117,14 @@ export const LoadCommandText = ({
           )
           const moduleName =
             moduleModel != null ? getModuleDisplayName(moduleModel) : ''
-          adapterLocation = getModuleDisplayLocation(
-            robotSideAnalysis,
-            adapterLoc?.moduleId ?? ''
-          )
           return t('load_labware_info_protocol_setup_adapter_module', {
             labware: labwareName,
             adapter_name: adapterName,
             module_name: moduleName,
-            slot_name: adapterLocation,
+            slot_name: getModuleDisplayLocation(
+              robotSideAnalysis,
+              adapterLoc?.moduleId ?? ''
+            ),
           })
         } else {
           //  shouldn't reach here, adapter shouldn't have location  type labwareId

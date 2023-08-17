@@ -1,12 +1,11 @@
+import { getLabwareLocation } from './getLabwareLocation'
+import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
-import {
+import type {
   LoadedModule,
   LoadedLabware,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from './getLabwareLocation'
-import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
-
 // this logic to derive the LabwareOffsetLocation from the LabwareLocation
 // is required because the backend needs to know a module's model (not its ID)
 // in order to apply offsets. This logic should be removed once the backend can
@@ -39,7 +38,10 @@ export const getLabwareOffsetLocation = (
     } else if (adapter.location === 'offDeck') {
       location = null
     } else if ('slotName' in adapter.location) {
-      location = adapter.location
+      location = {
+        slotName: adapter.location.slotName,
+        definitionUri: adapter.definitionUri,
+      }
     } else if ('moduleId' in adapter.location) {
       const adapterModLocation = adapter.location.moduleId
       const module = modules.find(module => module.id === adapterModLocation)
@@ -48,7 +50,7 @@ export const getLabwareOffsetLocation = (
         adapter.location.moduleId,
         commands
       ).location.slotName
-      location = { slotName, moduleModel }
+      location = { slotName, moduleModel, definitionUri: adapter.definitionUri }
     }
   } else {
     location = labwareLocation

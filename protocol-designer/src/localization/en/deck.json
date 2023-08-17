@@ -28,7 +28,8 @@
     "slot": {
       "add_labware": "Add Labware",
       "drag_to_new_slot": "Drag To New Slot",
-      "place_here": "Place Here"
+      "place_here": "Place Here",
+      "add_adapter": "Add Adapter"
     }
   },
   "inactive_deck": "hover on a step to see deck state"

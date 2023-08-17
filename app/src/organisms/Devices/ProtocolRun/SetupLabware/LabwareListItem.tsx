@@ -104,37 +104,29 @@ export function LabwareListItem(
     | HeaterShakerCloseLatchCreateCommand
 
   if (initialLocation !== 'offDeck' && 'labwareId' in initialLocation) {
-    const adapter = commands.find(
-      (command): command is LoadLabwareRunTimeCommand => {
-        return command.result?.labwareId === initialLocation.labwareId
-      }
+    const loadedAdapter = commands.find(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware' &&
+        command.result?.labwareId === initialLocation.labwareId
     )
+    const loadedAdapterLocation = loadedAdapter?.params.location
 
-    let location = ''
-    let name
-    if (
-      adapter?.params.location != null &&
-      adapter?.params.location !== 'offDeck'
-    ) {
-      if ('slotName' in adapter?.params?.location) {
-        location = adapter?.params.location.slotName
-        name = adapter?.result?.definition.metadata.displayName
+    if (loadedAdapterLocation != null && loadedAdapterLocation !== 'offDeck') {
+      if ('slotName' in loadedAdapterLocation) {
         slotInfo = t('adapter_slot_location', {
-          slotName: location,
-          adapterName: name,
+          slotName: loadedAdapterLocation.slotName,
+          adapterName: loadedAdapter?.result?.definition.metadata.displayName,
         })
-      } else if ('moduleId' in adapter?.params?.location) {
+      } else if ('moduleId' in loadedAdapterLocation) {
         const module = commands.find(
           (command): command is LoadModuleRunTimeCommand =>
-            //  @ts-expect-error: jr, 8/7/23: for some reason TS isn't type narrowing this
-            command.params.moduleId === adapter?.params.location.moduleId
+            command.commandType === 'loadModule' &&
+            command.params.moduleId === loadedAdapterLocation.moduleId
         )
         if (module != null) {
-          location = module.params.location.slotName
-          name = adapter?.result?.definition.metadata.displayName
           slotInfo = t('adapter_slot_location_module', {
-            slotName: location,
-            adapterName: name,
+            slotName: module.params.location.slotName,
+            adapterName: loadedAdapter?.result?.definition.metadata.displayName,
             moduleName: getModuleDisplayName(module.params.model),
           })
         }

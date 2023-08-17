@@ -1,6 +1,7 @@
 {
   "adapter_in_mod_in_slot": "{{adapter}} in {{module}} in {slot}}",
   "adapter_in_slot": "{{adapter}} in {{slot}}",
+  "adapter_in_tc": "{{adapter}} in {{module}}",
   "all_modules_and_labware_from_protocol": "All modules and labware used in the protocol",
   "applied_offset_data": "Applied Labware Offset data",
   "apply_offset_data": "Apply Labware Offset data",
