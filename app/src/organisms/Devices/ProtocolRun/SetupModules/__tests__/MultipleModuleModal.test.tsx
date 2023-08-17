@@ -25,7 +25,9 @@ describe('MultipleModulesModal', () => {
 
   it('should render the correct header', () => {
     const { getByRole } = render(props)
-    getByRole('heading', { name: 'Setting up multiple modules of the same type' })
+    getByRole('heading', {
+      name: 'Setting up multiple modules of the same type',
+    })
   })
   it('should render the correct body', () => {
     const { getByText, getByAltText } = render(props)
