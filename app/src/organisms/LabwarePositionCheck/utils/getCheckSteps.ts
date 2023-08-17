@@ -166,7 +166,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     return [
       ...acc,
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
-        (innerAcc, { location, labwareId, moduleId }) => {
+        (innerAcc, { location, labwareId, moduleId, adapterId }) => {
           if (labwareId !== currentLabware.id) {
             return innerAcc
           }
@@ -179,6 +179,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
               pipetteId: primaryPipetteId,
               location,
               moduleId,
+              adapterId,
             },
           ]
         },
