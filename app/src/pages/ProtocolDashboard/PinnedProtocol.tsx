@@ -125,7 +125,7 @@ export function PinnedProtocol(props: {
         </StyledText>
         <StyledText as="p">
           {t('shared:utc', {
-            timeStamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
+            timestamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
           })}
         </StyledText>
       </Flex>

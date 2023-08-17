@@ -129,7 +129,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               value={
                 instrument.data.calibratedOffset?.last_modified != null
                   ? t('shared:utc', {
-                      timeStamp: format(
+                      timestamp: format(
                         new Date(
                           instrument.data.calibratedOffset?.last_modified
                         ),

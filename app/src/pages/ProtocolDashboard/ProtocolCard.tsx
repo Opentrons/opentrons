@@ -174,7 +174,7 @@ export function ProtocolCard(props: {
       <Flex width="11.9125rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
           {t('shared:utc', {
-            timeStamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
+            timestamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
           })}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (

@@ -210,7 +210,7 @@ export function RunSummary(): JSX.Element {
               <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
                 <SummaryDatum>
                   {t('shared:utc', {
-                    timeStamp: `${t('run')}: ${createdAtTimestamp}`,
+                    timestamp: `${t('run')}: ${createdAtTimestamp}`,
                   })}
                 </SummaryDatum>
                 <SummaryDatum>
@@ -227,12 +227,12 @@ export function RunSummary(): JSX.Element {
                 </SummaryDatum>
                 <SummaryDatum>
                   {t('shared:utc', {
-                    timeStamp: `${t('start')}: ${startedAtTimestamp}`,
+                    timestamp: `${t('start')}: ${startedAtTimestamp}`,
                   })}
                 </SummaryDatum>
                 <SummaryDatum>
                   {t('shared:utc', {
-                    timeStamp: `${t('end')}: ${completedAtTimestamp}`,
+                    timestamp: `${t('end')}: ${completedAtTimestamp}`,
                   })}
                 </SummaryDatum>
               </Flex>

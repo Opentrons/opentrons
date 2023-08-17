@@ -226,7 +226,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         <StyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null
             ? t('shared:utc', {
-                timeStamp: format(new Date(date), 'MM/dd/yy k:mm'),
+                timestamp: format(new Date(date), 'MM/dd/yy k:mm'),
               })
             : t('shared:no_data')
         }`}</StyledText>
