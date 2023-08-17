@@ -50,51 +50,53 @@ export const getLabwareRenderInfo = (
     | CompletedProtocolAnalysis
     | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
-): LabwareRenderInfoById =>
-  protocolData.commands
+): LabwareRenderInfoById => {
+  const loadLabwareCommands = protocolData.commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
         command.commandType === 'loadLabware'
     )
-    .reduce((acc, command) => {
-      const labwareId = command.result?.labwareId
-      const location = command.params.location
-      const displayName = command.params.displayName ?? null
-      const labwareDef = command.result?.definition
-      if (
-        location === 'offDeck' ||
-        'moduleId' in location ||
-        'labwareId' in location
-      )
-        return acc
-      if (labwareId == null) {
-        throw new Error('expected to find labware id but could not')
-      }
-      if (labwareDef == null) {
-        throw new Error(
-          `expected to find labware def for labware id ${String(
-            labwareId
-          )} but could not`
-        )
-      }
-      const slotName = location.slotName.toString()
-      const slotPosition = getSlotPosition(deckDef, slotName)
 
-      const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
-        deckDef,
-        slotName
+  return loadLabwareCommands.reduce((acc, command) => {
+    const labwareId = command.result?.labwareId
+    const location = command.params.location
+    const displayName = command.params.displayName ?? null
+    const labwareDef = command.result?.definition
+    if (
+      location === 'offDeck' ||
+      'moduleId' in location ||
+      'labwareId' in location
+    )
+      return acc
+    if (labwareId == null) {
+      throw new Error('expected to find labware id but could not')
+    }
+    if (labwareDef == null) {
+      throw new Error(
+        `expected to find labware def for labware id ${String(
+          labwareId
+        )} but could not`
       )
+    }
+    const slotName = location.slotName.toString()
+    const slotPosition = getSlotPosition(deckDef, slotName)
 
-      return slotHasMatingSurfaceVector
-        ? {
-            ...acc,
-            [labwareId]: {
-              x: slotPosition[0],
-              y: slotPosition[1],
-              z: slotPosition[2],
-              labwareDef,
-              displayName,
-            },
-          }
-        : { ...acc }
-    }, {})
+    const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
+      deckDef,
+      slotName
+    )
+
+    return slotHasMatingSurfaceVector
+      ? {
+        ...acc,
+        [labwareId]: {
+          x: slotPosition[0],
+          y: slotPosition[1],
+          z: slotPosition[2],
+          labwareDef,
+          displayName,
+        },
+      }
+      : { ...acc }
+  }, {})
+}

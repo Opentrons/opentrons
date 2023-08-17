@@ -113,6 +113,7 @@ export function ProtocolSetupLabware({
     mostRecentAnalysis != null
       ? getLabwareRenderInfo(mostRecentAnalysis, deckDef)
       : {}
+  console.log(labwareRenderInfo)
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL,
   })
@@ -221,7 +222,7 @@ export function ProtocolSetupLabware({
     hasExitIcon: true,
   }
 
-  console.log(labwareRenderInfo)
+  const selectedLabwareLocation = selectedLabware?.location
   return (
     <>
       <Portal level="top">
@@ -360,8 +361,14 @@ export function ProtocolSetupLabware({
                 <StyledText as="p" color={COLORS.darkBlack70}>
                   {selectedLabware.nickName}
                   {
-                    typeof selectedLabware.location === 'object' && 'labwareId' in selectedLabware.location
-                      ? t('on_adapter', { adapterName: getLabwareDisplayName(labwareRenderInfo[selectedLabware.location.labwareId]?.labwareDef) })
+                    selectedLabwareLocation != null
+                    && selectedLabwareLocation !== 'offDeck' 
+                    && 'labwareId' in selectedLabwareLocation
+                      ? t('on_adapter', { 
+                        adapterName: mostRecentAnalysis?.labware.find(l => (
+                          l.id === selectedLabwareLocation.labwareId
+                        ))?.displayName
+                      })
                       : null
                   }
                 </StyledText>
