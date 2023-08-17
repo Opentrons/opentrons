@@ -496,4 +496,6 @@ describe('CheckItem', () => {
       position: mockStartPosition,
     })
   })
+
+  it.todo('TODO(jr, 8/17/23): add test coverage for when there is an adapter')
 })

@@ -16,11 +16,10 @@ export const getLabwareOffsetLocation = (
   modules: LoadedModule[],
   labware: LoadedLabware[]
 ): LabwareOffsetLocation | null => {
-  let location: LabwareOffsetLocation | null = null
   const labwareLocation = getLabwareLocation(labwareId, commands)
 
   if (labwareLocation === 'offDeck') {
-    location = null
+    return null
   } else if ('moduleId' in labwareLocation) {
     const module = modules.find(
       module => module.id === labwareLocation.moduleId
@@ -30,30 +29,30 @@ export const getLabwareOffsetLocation = (
       labwareLocation.moduleId,
       commands
     ).location.slotName
-    location = { slotName, moduleModel }
+    return { slotName, moduleModel }
   } else if ('labwareId' in labwareLocation) {
     const adapter = labware.find(lw => lw.id === labwareLocation.labwareId)
-    if (adapter == null) {
-      location = null
-    } else if (adapter.location === 'offDeck') {
-      location = null
+    if (adapter == null || adapter.location === 'offDeck') {
+      return null
     } else if ('slotName' in adapter.location) {
-      location = {
+      return {
         slotName: adapter.location.slotName,
         definitionUri: adapter.definitionUri,
       }
     } else if ('moduleId' in adapter.location) {
-      const adapterModLocation = adapter.location.moduleId
-      const module = modules.find(module => module.id === adapterModLocation)
-      const moduleModel = module?.model
+      const moduleIdUnderAdapter = adapter.location.moduleId
+      const moduleModel = modules.find(
+        module => module.id === moduleIdUnderAdapter
+      )?.model
+      if (moduleModel == null) return null
       const slotName = getModuleInitialLoadInfo(
         adapter.location.moduleId,
         commands
       ).location.slotName
-      location = { slotName, moduleModel, definitionUri: adapter.definitionUri }
+      return { slotName, moduleModel, definitionUri: adapter.definitionUri }
     }
   } else {
-    location = labwareLocation
+    return { slotName: labwareLocation.slotName }
   }
-  return location
+  return null
 }

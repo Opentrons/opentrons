@@ -71,5 +71,5 @@ describe('getLabwareOffsetLocation', () => {
     ).toEqual({ slotName: MOCK_SLOT, moduleModel: TCModelInProtocol })
   })
 
-  //  TODO(jr, 8/7/23): add test cases for labware on adapter
+  it.todo('TODO(jr, 8/7/23): add test cases for labware on adapter')
 })

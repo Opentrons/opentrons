@@ -74,5 +74,5 @@ describe('getSlotLabwareName', () => {
       expected
     )
   })
-  //  TODO(jr, 8/16/23): add test cases for adapter and module name
+  it.todo('TODO(jr, 8/16/23): add test cases for adapter and module name')
 })

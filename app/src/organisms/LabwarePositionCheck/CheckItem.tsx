@@ -22,6 +22,7 @@ import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useFeatureFlag } from '../../redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -32,7 +33,6 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
-import { useFeatureFlag } from '../../redux/config'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -70,12 +70,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
   )
-  //  find labware on adapter's location
   const adapterId =
-    Object.values(protocolData.labware).find(
+    protocolData.labware.find(
       lab => lab.definitionUri === location.definitionUri
     )?.id ?? null
-
   const adapterDisplayName =
     adapterId != null
       ? getLabwareDef(adapterId, protocolData)?.metadata.displayName
@@ -139,6 +137,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const isTiprack = getIsTiprack(labwareDef)
   const displayLocation = getDisplayLocation(location, protocolData, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
+
   let placeItemInstruction: JSX.Element = (
     <Trans
       t={t}
