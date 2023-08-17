@@ -735,26 +735,27 @@ class OT3API(
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    async def stop_motors(self) -> None:
+    async def _stop_motors(self) -> None:
         """Immediately stop motors."""
         await self._backend.halt()
 
-    def stop_modules(self) -> None:
+    async def _stop_modules(self) -> None:
         """Immediately stop modules."""
-        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
+        await self._execution_manager.cancel()
 
     async def halt(self) -> None:
         """Immediately disengage all present motors and clear motor and module tasks."""
-        await self.disengage_axes(
-            [ax for ax in Axis if self._backend.axis_is_present(ax)]
-        )
-        await self.stop_motors()
-        self.stop_modules()
+        # TODO (spp): check if disengaging motors is really required
+        # await self.disengage_axes(
+        #     [ax for ax in Axis if self._backend.axis_is_present(ax)]
+        # )
+        await self._stop_motors()
+        await self._stop_modules()
 
     async def stop(self, home_after: bool = True) -> None:
         """Stop motion as soon as possible, reset, and optionally home."""
-        await self.stop_motors()
-        self._log.info("Recovering from halt")
+        await self.halt()
+        self._log.info("Resetting OT3API")
         await self.reset()
 
         if home_after:
