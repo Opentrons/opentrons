@@ -232,6 +232,14 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def commands(self) -> List[str]:
+        """Return the run log.
+
+        This is a list of human-readable strings representing what's been done in the protocol so
+        far. For example, "Aspirating 123 µL from well A1 of 96 well plate in slot 1."
+
+        The exact format of these entries is not guaranteed. The format here may differ from other
+        places that show the run log, such as the Opentrons App.
+        """
         return self._commands
 
     @requires_version(2, 0)
