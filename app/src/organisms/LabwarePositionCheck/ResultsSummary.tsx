@@ -247,6 +247,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           )
           const labwareDisplayName =
             labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
+
           return (
             <TableRow key={index}>
               <TableDatum>
@@ -254,7 +255,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, protocolData, t)}
+                  {getDisplayLocation(location, getLabwareDefinitionsFromCommands(protocolData.commands), t)}
                 </StyledText>
               </TableDatum>
               <TableDatum>
@@ -321,7 +322,7 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                   <LocationIcon
                     iconName={
                       MODULE_ICON_NAME_BY_TYPE[
-                        getModuleType(location.moduleModel)
+                      getModuleType(location.moduleModel)
                       ]
                     }
                   />

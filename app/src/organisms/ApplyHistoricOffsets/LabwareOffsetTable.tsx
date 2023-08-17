@@ -1,11 +1,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import { formatTimestamp } from '../Devices/utils'
 import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
+import { getDisplayLocation } from '../LabwarePositionCheck/utils/getDisplayLocation'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -32,12 +33,13 @@ const OffsetTableDatum = styled('td')`
 
 interface LabwareOffsetTableProps {
   offsetCandidates: OffsetCandidate[]
+  labwareDefinitions: LabwareDefinition2[]
 }
 
 export function LabwareOffsetTable(
   props: LabwareOffsetTableProps
 ): JSX.Element | null {
-  const { offsetCandidates } = props
+  const { offsetCandidates, labwareDefinitions } = props
   const { t } = useTranslation('labware_position_check')
   return (
     <OffsetTable>
@@ -53,12 +55,7 @@ export function LabwareOffsetTable(
         {offsetCandidates.map(offset => (
           <OffsetTableRow key={offset.id}>
             <OffsetTableDatum>
-              {t('slot', { slotName: offset.location.slotName })}
-              {offset.location.moduleModel != null
-                ? ` - ${String(
-                    getModuleDisplayName(offset.location.moduleModel)
-                  )}`
-                : null}
+              {getDisplayLocation(offset.location, labwareDefinitions, t)}
             </OffsetTableDatum>
             <OffsetTableDatum>
               {formatTimestamp(offset.runCreatedAt)}

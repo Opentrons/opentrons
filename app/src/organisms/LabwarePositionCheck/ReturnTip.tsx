@@ -11,7 +11,7 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
+import { getLabwareDef, getLabwareDefinitionsFromCommands } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getDisplayLocation } from './utils/getDisplayLocation'
@@ -44,7 +44,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
 
-  const displayLocation = getDisplayLocation(location, protocolData, t)
+  const displayLocation = getDisplayLocation(location, getLabwareDefinitionsFromCommands(protocolData.commands), t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [

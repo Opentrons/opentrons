@@ -18,7 +18,7 @@ import {
   MoveLabwareCreateCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
+import { getLabwareDef, getLabwareDefinitionsFromCommands } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { useChainRunCommands } from '../../resources/runs/hooks'
@@ -33,6 +33,7 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
+import { omit } from 'lodash'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -129,10 +130,12 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
 
   if (pipetteName == null || labwareDef == null || pipetteMount == null)
     return null
+
+  const labwareDefs = getLabwareDefinitionsFromCommands(protocolData.commands)
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
   const isTiprack = getIsTiprack(labwareDef)
-  const displayLocation = getDisplayLocation(location, protocolData, t)
+  const displayLocation = getDisplayLocation(location, labwareDefs, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   let placeItemInstruction: JSX.Element = (
@@ -169,7 +172,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         tOptions={{
           adapter: adapterDisplayName,
           labware: labwareDisplayName,
-          location: displayLocation,
+          location: getDisplayLocation(omit(location, ['definitionUri']), labwareDefs, t)
         }}
         components={{
           bold: (
@@ -375,14 +378,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       [
         ...modulePrepCommands,
         { commandType: 'home', params: {} },
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabwareOffDeck
       ],
       false
     )

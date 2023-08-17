@@ -30,6 +30,8 @@ import type {
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
+import { getDisplayLocation } from '../../../LabwarePositionCheck/utils/getDisplayLocation'
+import { getLabwareDefinitionsFromCommands } from '../../../LabwarePositionCheck/utils/labware'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -90,10 +92,7 @@ export function CurrentOffsetsTable(
           return (
             <OffsetTableRow key={offset.id}>
               <OffsetTableDatum>
-                {t('slot', { slotName: offset.location.slotName })}
-                {offset.location.moduleModel != null
-                  ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
-                  : null}
+                {getDisplayLocation(offset.location, getLabwareDefinitionsFromCommands(commands), t)}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
               <OffsetTableDatum>
