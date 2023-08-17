@@ -11,6 +11,7 @@ export interface LabwareLocationCombo {
   definitionUri: string
   labwareId: string
   moduleId?: string
+  adapterId?: string
 }
 export function getLabwareLocationCombos(
   commands: RunTimeCommand[],
@@ -39,11 +40,10 @@ export function getLabwareLocationCombos(
               moduleId,
             })
       } else if ('labwareId' in command.params.location) {
-        const { labwareId } = command.params.location
         const {
           adapterOffsetLocation,
           moduleIdUnderAdapter,
-        } = resolveAdapterLocation(labware, modules, labwareId)
+        } = resolveAdapterLocation(labware, modules, command.params.location.labwareId)
         return adapterOffsetLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {
@@ -51,6 +51,7 @@ export function getLabwareLocationCombos(
               definitionUri,
               labwareId: command.result.labwareId,
               moduleId: moduleIdUnderAdapter,
+              adapterId: command.params.location.labwareId,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
@@ -96,8 +97,9 @@ export function getLabwareLocationCombos(
           : appendLocationComboIfUniq(acc, {
               location: adapterOffsetLocation,
               definitionUri: labwareEntity.definitionUri,
-              labwareId: command.params.newLocation.labwareId,
+              labwareId: command.params.labwareId,
               moduleId: moduleIdUnderAdapter,
+              adapterId: command.params.newLocation.labwareId,
             })
       } else {
         return appendLocationComboIfUniq(acc, {
