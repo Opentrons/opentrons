@@ -98,9 +98,9 @@ export function ProtocolSetupLabware({
   ] = React.useState<boolean>(false)
   const [selectedLabware, setSelectedLabware] = React.useState<
     | (LabwareDefinition2 & {
-        location: LabwareLocation
-        nickName: string | null
-      })
+      location: LabwareLocation
+      nickName: string | null
+    })
     | null
   >(null)
 
@@ -205,7 +205,7 @@ export function ProtocolSetupLabware({
               <LocationIcon
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
-                    moduleUnderAdapter.moduleDef.moduleType
+                  moduleUnderAdapter.moduleDef.moduleType
                   ]
                 }
               />
@@ -221,6 +221,7 @@ export function ProtocolSetupLabware({
     hasExitIcon: true,
   }
 
+  console.log(labwareRenderInfo)
   return (
     <>
       <Portal level="top">
@@ -277,7 +278,7 @@ export function ProtocolSetupLabware({
                           }
                         >
                           {topLabwareDefinition != null &&
-                          topLabwareId != null ? (
+                            topLabwareId != null ? (
                             <React.Fragment
                               key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
                             >
@@ -358,6 +359,11 @@ export function ProtocolSetupLabware({
                 </StyledText>
                 <StyledText as="p" color={COLORS.darkBlack70}>
                   {selectedLabware.nickName}
+                  {
+                    typeof selectedLabware.location === 'object' && 'labwareId' in selectedLabware.location
+                      ? t('on_adapter', { adapterName: getLabwareDisplayName(labwareRenderInfo[selectedLabware.location.labwareId]?.labwareDef) })
+                      : null
+                  }
                 </StyledText>
               </Flex>
             </Flex>
@@ -564,15 +570,15 @@ function RowLabware({
 
   const matchedModule =
     initialLocation !== 'offDeck' &&
-    'moduleId' in initialLocation &&
-    attachedProtocolModules.length > 0
+      'moduleId' in initialLocation &&
+      attachedProtocolModules.length > 0
       ? attachedProtocolModules.find(
-          mod => mod.moduleId === initialLocation.moduleId
-        )
+        mod => mod.moduleId === initialLocation.moduleId
+      )
       : null
   const matchingHeaterShaker =
     matchedModule?.attachedModuleMatch != null &&
-    matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
+      matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
       ? matchedModule.attachedModuleMatch
       : null
 
@@ -619,7 +625,7 @@ function RowLabware({
               <LocationIcon
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
-                    moduleUnderAdapter.moduleDef.moduleType
+                  moduleUnderAdapter.moduleDef.moduleType
                   ]
                 }
               />
