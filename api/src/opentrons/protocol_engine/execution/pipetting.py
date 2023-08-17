@@ -95,6 +95,10 @@ class HardwarePipettingHandler(PipettingHandler):
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
+        if push_out and (
+            push_out < 0
+        ):  # or push_out > (bottom position + blow_out) conversion to ul
+            raise ValueError("push out value cannot have a negative value.")
         with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
             await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
 
