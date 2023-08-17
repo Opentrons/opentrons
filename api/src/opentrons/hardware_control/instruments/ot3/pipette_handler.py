@@ -305,13 +305,6 @@ class PipetteHandlerProvider:
         )
         instr.working_volume = tip_volume
 
-    def set_pipette_push_out_volume(
-        self,
-        mount: OT3Mount,
-        volume: float,
-    ) -> None:
-        self.get_pipette(mount).push_out_volume = volume
-
     def calibrate_plunger(
         self,
         mount: OT3Mount,
