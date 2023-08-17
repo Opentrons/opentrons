@@ -648,6 +648,7 @@ async def _run_xy_motion(
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     LOG.info(XY_AXIS_SETTINGS)
     for setting in XY_AXIS_SETTINGS:
+        await api.home()
         print_motion_settings(
             "X",
             setting[Axis.X].max_speed,
