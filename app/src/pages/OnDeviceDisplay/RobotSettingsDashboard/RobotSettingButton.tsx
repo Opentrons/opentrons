@@ -94,7 +94,6 @@ export function RobotSettingButton({
     } else if (Boolean(ledLights)) {
       if (toggleLights != null) toggleLights()
     } else if (Boolean(enabledHomeGantry) && robotName != null) {
-      // Todo add a function
       dispatch(updateSetting(robotName, settingId, !settingValue))
     }
   }
