@@ -32,7 +32,7 @@ async def get_logs(
         LogFormat.json: ("json", "application/json"),
         LogFormat.text: ("short-precise", "text/plain"),
     }
-    format_type, media_type = modes[format]
+    format_type, media_type = modes[LogFormat.json]
     output = await log_control.get_records_dumb(syslog_id, records, format_type)
     return Response(
         content=output.decode("utf-8"),
