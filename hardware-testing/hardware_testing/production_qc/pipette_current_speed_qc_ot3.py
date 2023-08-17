@@ -20,7 +20,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
-DEFAULT_TRIALS = 10
+DEFAULT_TRIALS = 5
 STALL_THRESHOLD_MM = 0.1
 TEST_ACCELERATION = 1500  # used during gravimetric tests
 
@@ -33,6 +33,7 @@ assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
 TEST_SPEEDS = [
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] - 20,
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
@@ -41,6 +42,7 @@ PLUNGER_CURRENTS_SPEED = {
     0.3: TEST_SPEEDS,
     0.4: TEST_SPEEDS,
     0.5: TEST_SPEEDS,
+    0.75: TEST_SPEEDS,
     DEFAULT_CURRENT: TEST_SPEEDS,
 }
 
