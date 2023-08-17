@@ -19,7 +19,11 @@ from opentrons_hardware.firmware_bindings.messages.messages import MessageDefini
 from opentrons_hardware.firmware_bindings.constants import SensorType
 
 from opentrons.config.types import LiquidProbeSettings
-from opentrons.hardware_control.types import TipStateType, FailedTipStateCheck
+from opentrons.hardware_control.types import (
+    TipStateType,
+    FailedTipStateCheck,
+    SubSystem,
+)
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
@@ -59,7 +63,7 @@ DEFAULT_SLOT_RESERVOIR = 8
 DEFAULT_SLOT_PLATE = 2
 DEFAULT_SLOT_TRASH = 12
 
-PROBING_DECK_PRECISION_MM = 0.1
+PROBING_DECK_PRECISION_MM = 0.3
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
@@ -800,15 +804,18 @@ async def _test_diagnostics_capacitive(
         not api.is_simulator
         and len(offsets) > 1
         and (
-            abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
-            and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
-            and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+            abs(offsets[0].x - offsets[1].x) <= PROBING_DECK_PRECISION_MM
+            and abs(offsets[0].y - offsets[1].y) <= PROBING_DECK_PRECISION_MM
+            and abs(offsets[0].z - offsets[1].z) <= PROBING_DECK_PRECISION_MM
         )
     ):
-        probe_slot_result = _bool_to_pass_fail(True)
+        probe_slot_pass = True
+
     else:
-        probe_slot_result = _bool_to_pass_fail(False)
+        probe_slot_pass = False
+    probe_slot_result = _bool_to_pass_fail(probe_slot_pass)
     print(f"probe-slot-result: {probe_slot_result}")
+    write_cb(["capacitive-probe-slot-result", probe_slot_result])
 
     probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     probe_pos += Point(13, 13, 0)
@@ -847,6 +854,7 @@ async def _test_diagnostics_capacitive(
         and capacitive_probe_attached_pass
         and capacitive_probing_pass
         and capacitive_square_pass
+        and probe_slot_pass
     )
 
 
@@ -1359,6 +1367,12 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         # cache the pressure-data header
         csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
 
+        if api.is_simulator:
+            pcba_version = "C2"
+        else:
+            subsystem = SubSystem.of_mount(mount)
+            pcba_version = api.attached_subsystems[subsystem].pcba_revision
+
         # add metadata to CSV
         # FIXME: create a set of CSV helpers, such that you can define a test-report
         #        schema/format/line-length/etc., before having to fill its contents.
@@ -1373,6 +1387,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         csv_cb.write(["simulating" if test_config.simulate else "live"])
         csv_cb.write(["version", data.get_git_description()])
         csv_cb.write(["firmware", api.fw_version])
+        csv_cb.write(["pcba-revision", pcba_version])
         # add test configurations to CSV
         csv_cb.write(["-------------------"])
         csv_cb.write(["TEST-CONFIGURATIONS"])
