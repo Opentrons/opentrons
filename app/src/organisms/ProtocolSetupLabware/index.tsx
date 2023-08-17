@@ -113,7 +113,6 @@ export function ProtocolSetupLabware({
     mostRecentAnalysis != null
       ? getLabwareRenderInfo(mostRecentAnalysis, deckDef)
       : {}
-  console.log(labwareRenderInfo)
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL,
   })
