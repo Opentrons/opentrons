@@ -32,7 +32,7 @@ class LoadedStaticPipetteData:
     ]
     nominal_tip_overlap: Dict[str, float]
     force_push: Optional[float]
-    default_force_push: Optional[float]
+    default_push_out_volume: Optional[float]
 
 
 def get_virtual_pipette_static_config(
@@ -66,7 +66,7 @@ def get_virtual_pipette_static_config(
             default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
         ),
         nominal_tip_overlap=config.tip_overlap_dictionary,
-        default_force_push=config.default_force_push,
+        default_push_out_volume=tip_configuration.default_push_out_volume,
     )
 
 
@@ -91,5 +91,5 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
         nozzle_offset_z=0,
-        default_force_push=pipette_dict["default_force_push"],
+        default_push_out_volume=pipette_dict["default_push_out_volume"],
     )

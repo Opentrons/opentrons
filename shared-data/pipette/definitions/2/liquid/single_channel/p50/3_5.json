@@ -87,6 +87,7 @@
           ]
         }
       },
+      "defaultPushOutVolume": 2.0,
       "defaultBlowoutVolume": 1.5
     }
   },

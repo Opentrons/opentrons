@@ -268,6 +268,9 @@ class PipetteHandlerProvider:
             result[
                 "default_blow_out_volume"
             ] = instr.active_tip_settings.default_blowout_volume
+            result[
+                "default_push_out_volume"
+            ] = instr.active_tip_settings.default_push_out_volume
         return cast(PipetteDict, result)
 
     @property
@@ -300,6 +303,13 @@ class PipetteHandlerProvider:
             f"{mount}, tip volume: {tip_volume} ul"
         )
         instr.working_volume = tip_volume
+
+    def set_pipette_push_out_volume(
+        self,
+        mount: OT3Mount,
+        volume: float,
+    ) -> None:
+        self.get_pipette(mount).push_out_volume = volume
 
     def calibrate_plunger(
         self,

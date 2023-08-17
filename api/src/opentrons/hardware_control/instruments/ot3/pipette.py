@@ -128,6 +128,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
+        self._push_out_volume = self._active_tip_settings.default_push_out_volume
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
@@ -233,6 +234,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
+        self._push_out_volume = self._active_tip_settings.default_push_out_volume
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
@@ -414,6 +416,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def flow_acceleration(self, new_flow_acceleration: float) -> None:
         assert new_flow_acceleration > 0
         self._flow_acceleration = new_flow_acceleration
+
+    @property
+    def push_out_volume(self) -> float:
+        return self._push_out_volume
+
+    @push_out_volume.setter
+    def push_out_volume(self, new_volume: float) -> None:
+        assert 0 <= new_volume <= self.blow_out_working_volume, \
+            f"push-out volume of {new_volume} uL is out of range"
+        self._push_out_volume = new_volume
 
     @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:

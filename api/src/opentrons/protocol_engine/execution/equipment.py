@@ -212,6 +212,7 @@ class EquipmentHandler:
             )
 
             serial_number = pipette_dict["pipette_id"]
+            pipette_dict
             static_pipette_config = pipette_data_provider.get_pipette_static_config(
                 pipette_dict
             )
