@@ -3,16 +3,16 @@
   "supportedTips": {
     "t50": {
       "defaultAspirateFlowRate": {
-        "default": 8,
-        "valuesByApiLevel": { "2.14": 8 }
+        "default": 35,
+        "valuesByApiLevel": { "2.14": 35 }
       },
       "defaultDispenseFlowRate": {
-        "default": 8,
-        "valuesByApiLevel": { "2.14": 8 }
+        "default": 57,
+        "valuesByApiLevel": { "2.14": 57 }
       },
       "defaultBlowOutFlowRate": {
-        "default": 4,
-        "valuesByApiLevel": { "2.14": 4 }
+        "default": 57,
+        "valuesByApiLevel": { "2.14": 57 }
       },
       "defaultFlowAcceleration": 1200.0,
       "defaultTipLength": 57.9,
@@ -92,12 +92,7 @@
     "default": 10.5,
     "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5
   },
-<<<<<<< HEAD
   "maxVolume": 50,
-  "minVolume": 5,
-=======
-  "maxVolume": 5,
   "minVolume": 0.5,
->>>>>>> nest values by liquid class and support this change in the definitions
   "defaultTipracks": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
 }
