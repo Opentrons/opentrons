@@ -18,6 +18,11 @@ PipetteModelMajorVersionType = Literal[1, 2, 3]
 PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5, 6]
 
 
+class LiquidClasses(enum.Enum):
+    default = enum.auto()
+    lowVolumeBottom = enum.auto()
+
+
 class PipetteTipType(enum.Enum):
     t10 = 10
     t20 = 20
