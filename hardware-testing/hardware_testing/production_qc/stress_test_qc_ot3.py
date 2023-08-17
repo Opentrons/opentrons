@@ -796,7 +796,7 @@ async def get_test_metadata(
 ) -> Tuple[str, str]:
     """Get the operator name and robot serial number."""
     if arguments.no_input:
-        _operator = "None"
+        _operator = args.operator if isinstance(args.operator, str) else "None"
         _robot_id = api._backend.eeprom_data.serial_number
         if not _robot_id:
             ui.print_error("no serial number saved on this robot")
@@ -810,7 +810,10 @@ async def get_test_metadata(
             if not _robot_id:
                 ui.print_error("no serial number saved on this robot")
                 _robot_id = input("enter ROBOT SERIAL number: ").strip()
-            _operator = input("enter OPERATOR name: ")
+            if isinstance(args.operator, str):
+                _operator = args.operator
+            else:
+                _operator = input("enter OPERATOR name: ")
 
     return (_operator, _robot_id)
 
@@ -927,6 +930,7 @@ async def _main(arguments: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--operator", type=str, default=None)
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--cycles", type=int, default=20)
     parser.add_argument("--skip_bowtie", action="store_true")
