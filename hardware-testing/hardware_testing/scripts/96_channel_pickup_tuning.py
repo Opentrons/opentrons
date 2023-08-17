@@ -312,6 +312,7 @@ async def _main() -> None:
                                                 num_baseline_reads = 10,
                                                 data_file = lp_file_name,
                                                 )
+    await hw_api.cache_instruments() 
     await hw_api.home()
     await asyncio.sleep(1)
     await hw_api.home_plunger(mount)
