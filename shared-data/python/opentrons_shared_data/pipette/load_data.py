@@ -138,7 +138,10 @@ def load_liquid_model(
     version: PipetteVersionType,
 ) -> Dict[str, PipetteLiquidPropertiesDefinition]:
     liquid_dict = _liquid(channels, model, version)
-    return {k: PipetteLiquidPropertiesDefinition.parse_obj(v) for k, v in liquid_dict.items()}
+    return {
+        k: PipetteLiquidPropertiesDefinition.parse_obj(v)
+        for k, v in liquid_dict.items()
+    }
 
 
 def _change_to_camel_case(c: str) -> str:
