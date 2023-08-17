@@ -246,6 +246,22 @@ endef
 sync-sw-ot3: push-ot3
 	cd .. && $(MAKE) push-ot3 host=$(host)
 
+.PHONY: push-ot3-fixture
+push-ot3-fixture:
+	$(MAKE) apply-patches-fixture
+	-$(MAKE) sync-sw-ot3
+	$(MAKE) remove-patches-fixture
+
+
+.PHONY: apply-patches-fixture
+apply-patches-fixture:
+	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --allow-empty
+
+.PHONY: remove-patches-fixture
+remove-patches-fixture:
+	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --reverse --allow-empty
+
+
 .PHONY: sync-fw-ot3
 sync-fw-ot3:
 	$(call push-and-update-fw,$(host),$(zip))
