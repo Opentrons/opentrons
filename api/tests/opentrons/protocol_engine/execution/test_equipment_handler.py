@@ -146,6 +146,7 @@ def loaded_static_pipette_data(
         nominal_tip_overlap={"default": 9.87},
         home_position=10.11,
         nozzle_offset_z=12.13,
+        default_push_out_volume=5,
     )
 
 
