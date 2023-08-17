@@ -128,10 +128,10 @@ describe('RobotSettingsDashboard', () => {
     getByText('Touchscreen Brightness')
     getByText('Device Reset')
     getByText('Update Channel')
-    getByText('Apply labware offsets')
+    getByText('Apply Labware Offsets')
     getByText('Use stored data when setting up a protocol.')
-    getByText('Enable Developer Tools')
-    getByText('Enable additional logging and allow access to feature flags.')
+    getByText('Developer Tools')
+    getByText('Access additional logging and feature flags.')
     expect(getAllByText('Off').length).toBe(3) // LED & DEV tools & historic offsets
   })
 

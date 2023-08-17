@@ -89,7 +89,7 @@ export function RobotSystemVersion({
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >{`${t('device_details:current_version')}:`}</StyledText>
+              >{`${t('device_details:current_version')}`}</StyledText>
               <StyledText as="p">{currentVersion}</StyledText>
             </Flex>
           </Flex>
