@@ -131,14 +131,14 @@ export interface LabwareBrand {
 
 export type LabwareWellShapeProperties =
   | {
-      shape: 'circular'
-      diameter: number
-    }
+    shape: 'circular'
+    diameter: number
+  }
   | {
-      shape: 'rectangular'
-      xDimension: number
-      yDimension: number
-    }
+    shape: 'rectangular'
+    xDimension: number
+    yDimension: number
+  }
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -168,6 +168,8 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
+
 // NOTE: must be synced with shared-data/labware/schemas/2.json
 export interface LabwareDefinition2 {
   version: number
@@ -181,6 +183,7 @@ export interface LabwareDefinition2 {
   ordering: string[][]
   wells: LabwareWellMap
   groups: LabwareWellGroup[]
+  allowedRoles?: LabwareRoles[]
 }
 
 export type ModuleType =

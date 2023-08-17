@@ -1,4 +1,5 @@
 import * as React from 'react'
+import omit from 'lodash/omit'
 import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
@@ -33,7 +34,6 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
-import { omit } from 'lodash'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -119,7 +119,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   React.useEffect(() => {
     if (initialPosition == null && modulePrepCommands.length > 0) {
       chainRunCommands(modulePrepCommands, false)
-        .then(() => {})
+        .then(() => { })
         .catch((e: Error) => {
           setFatalError(
             `CheckItem module prep commands failed with message: ${e?.message}`
@@ -172,7 +172,11 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         tOptions={{
           adapter: adapterDisplayName,
           labware: labwareDisplayName,
-          location: getDisplayLocation(omit(location, ['definitionUri']), labwareDefs, t)
+          location: getDisplayLocation(
+            omit(location, ['definitionUri']), // only want the adapter's location here
+            labwareDefs,
+            t
+          )
         }}
         components={{
           bold: (
@@ -284,33 +288,33 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const moveLabwareOffDeck: CreateCommand[] =
     adapterId != null
       ? [
-          {
-            commandType: 'moveLabware' as const,
-            params: {
-              labwareId: labwareId,
-              newLocation: 'offDeck',
-              strategy: 'manualMoveWithoutPause',
-            },
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
           },
-          {
-            commandType: 'moveLabware' as const,
-            params: {
-              labwareId: adapterId,
-              newLocation: 'offDeck',
-              strategy: 'manualMoveWithoutPause',
-            },
+        },
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: adapterId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
           },
-        ]
+        },
+      ]
       : [
-          {
-            commandType: 'moveLabware' as const,
-            params: {
-              labwareId: labwareId,
-              newLocation: 'offDeck',
-              strategy: 'manualMoveWithoutPause',
-            },
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
           },
-        ]
+        },
+      ]
 
   const handleConfirmPosition = (): void => {
     let confirmPositionCommands: CreateCommand[] = [

@@ -4,11 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
 
-import {
-  getLabwareDisplayName,
-  getLoadedLabwareDefinitionsByUri,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+import { getLabwareDisplayName, getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import {
   Flex,
   DIRECTION_COLUMN,
