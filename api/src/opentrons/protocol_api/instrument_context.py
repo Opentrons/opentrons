@@ -238,6 +238,7 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
@@ -267,6 +268,9 @@ class InstrumentContext(publisher.CommandPublisher):
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
                      If not specified, defaults to 1.0.
         :type rate: float
+        :param push_out: Continue past the plunger bottom to guarantee all liquid
+                        leaves the tip. Specified in microliters. By default, this value is None.
+        :type push_out: float
 
         :returns: This instance.
 
@@ -279,6 +283,10 @@ class InstrumentContext(publisher.CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
+        if self.api_version < APIVersion(2, 15) and push_out:
+            raise ValueError(
+                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+            )
         _log.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -340,6 +348,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
+                push_out=push_out,
             )
 
         return self

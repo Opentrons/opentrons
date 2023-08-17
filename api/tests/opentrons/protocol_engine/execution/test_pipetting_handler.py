@@ -153,9 +153,7 @@ async def test_dispense_in_place(
     )
 
     result = await hardware_subject.dispense_in_place(
-        pipette_id="pipette-id",
-        volume=25,
-        flow_rate=2.5,
+        pipette_id="pipette-id", volume=25, flow_rate=2.5, push_out=None
     )
 
     assert result == 25
@@ -164,7 +162,7 @@ async def test_dispense_in_place(
         mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
         ),
-        await mock_hardware_api.dispense(mount=Mount.RIGHT, volume=25),
+        await mock_hardware_api.dispense(mount=Mount.RIGHT, volume=25, push_out=None),
         mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=1.23, dispense=4.56, blow_out=7.89
         ),
@@ -331,7 +329,7 @@ async def test_dispense_in_place_virtual(
     )
 
     result = await subject.dispense_in_place(
-        pipette_id="pipette-id", volume=3, flow_rate=5
+        pipette_id="pipette-id", volume=3, flow_rate=5, push_out=None
     )
     assert result == 3
 
@@ -379,4 +377,6 @@ async def test_validate_tip_attached_in_dispense(
     with pytest.raises(
         TipNotAttachedError, match="Cannot perform dispense without a tip attached"
     ):
-        await subject.dispense_in_place("pipette-id", volume=20, flow_rate=1)
+        await subject.dispense_in_place(
+            "pipette-id", volume=20, flow_rate=1, push_out=None
+        )
