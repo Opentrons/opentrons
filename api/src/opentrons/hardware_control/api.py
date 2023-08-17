@@ -20,7 +20,9 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.pipette import name_config
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons import types as top_types
@@ -48,6 +50,9 @@ from .types import (
     MotionChecks,
     PauseType,
     StatusBarState,
+    EstopState,
+    SubSystem,
+    SubSystemState,
 )
 from .errors import (
     MustHomeError,
@@ -323,6 +328,9 @@ class API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
+    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return {}
+
     # Incidentals (i.e. not motion) API
 
     async def set_lights(
@@ -409,11 +417,10 @@ class API(
         self._log.info("Updating instrument model cache")
         checked_require = require or {}
         for mount, name in checked_require.items():
-            if name not in name_config():
+            if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
             found = await self._backend.get_attached_instruments(checked_require)
-
         for mount, instrument_data in found.items():
             config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)
@@ -428,7 +435,10 @@ class API(
             )
             self._attached_instruments[mount] = p
             if req_instr and p:
-                p.act_as(req_instr)
+                converted_name = pipette_load_name.convert_to_pipette_name_type(
+                    req_instr
+                )
+                p.act_as(converted_name)
 
             if may_skip:
                 self._log.info(f"Skipping configuration on {mount.name}")
@@ -557,14 +567,16 @@ class API(
                 await stack.enter_async_context(self._motion_lock)
             with self._backend.save_current():
                 self._backend.set_active_current(
-                    {checked_axis: instr.config.plunger_current}
+                    {checked_axis: instr.plunger_motor_current.run}
                 )
                 await self._backend.home([ot2_axis_to_string(checked_axis)])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
                 target_pos = target_position_from_plunger(
-                    checked_mount, instr.config.bottom, self._current_position
+                    checked_mount,
+                    instr.plunger_positions.bottom,
+                    self._current_position,
                 )
                 await self._move(
                     target_pos,
@@ -929,7 +941,7 @@ class API(
             speed = self.plunger_speed(
                 instrument, instrument.blow_out_flow_rate, "aspirate"
             )
-            bottom = instrument.config.bottom
+            bottom = instrument.plunger_positions.bottom
             target = target_position_from_plunger(mount, bottom, self._current_position)
             await self._move(
                 target,
@@ -1152,3 +1164,6 @@ class API(
         self, input_map: Dict[Axis, "API.MapPayload"]
     ) -> Dict[str, "API.MapPayload"]:
         return {ot2_axis_to_string(k): v for k, v in input_map.items()}
+
+    def get_estop_state(self) -> EstopState:
+        return EstopState.DISENGAGED

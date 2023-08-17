@@ -22,6 +22,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     PydanticResponse,
 )
+from robot_server.robot.control.dependencies import require_estop_in_good_state
 
 from ..run_models import RunCommandSummary
 from ..run_data_manager import RunDataManager
@@ -175,6 +176,7 @@ async def create_run_command(
         ),
     ),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
+    check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -187,6 +189,7 @@ async def create_run_command(
             Comes from a query parameter in the URL.
         protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
+        check_estop: Dependency to verify the estop is in a valid state.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it

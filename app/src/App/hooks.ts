@@ -8,6 +8,7 @@ import {
   useAllProtocolIdsQuery,
   useAllRunsQuery,
   useHost,
+  useRunQuery,
 } from '@opentrons/react-api-client'
 import {
   getProtocol,
@@ -118,25 +119,39 @@ export function useCurrentRunRoute(): string | null {
         ) // trim link path down to only runId
       : null
 
-  const status = currentRun?.status
-  const actions = currentRun?.actions
-  if (status == null || actions == null || currentRun == null) return null
+  const currentRunId = currentRun?.id ?? null
 
-  const hasBeenStarted = actions?.some(
+  const { data: runRecord } = useRunQuery(currentRunId, {
+    staleTime: Infinity,
+    enabled: currentRunId != null,
+  })
+
+  const runStatus = runRecord?.data.status
+  const runActions = runRecord?.data.actions
+
+  if (runRecord == null || runStatus == null || runActions == null) return null
+  // grabbing run id off of the run query to have all routing info come from one source of truth
+  const runId = runRecord.data.id
+
+  const hasBeenStarted = runActions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
   if (
-    status === RUN_STATUS_SUCCEEDED ||
-    status === RUN_STATUS_STOPPED ||
-    status === RUN_STATUS_FAILED
+    runStatus === RUN_STATUS_SUCCEEDED ||
+    // don't want to route to the run summary page if the run has been cancelled before starting
+    (runStatus === RUN_STATUS_STOPPED && hasBeenStarted) ||
+    runStatus === RUN_STATUS_FAILED
   ) {
-    return `/runs/${currentRun.id}/summary`
+    return `/runs/${runId}/summary`
   } else if (
-    status === RUN_STATUS_IDLE ||
-    (!hasBeenStarted && status === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    runStatus === RUN_STATUS_IDLE ||
+    (!hasBeenStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
   ) {
-    return `/runs/${currentRun.id}/setup`
+    return `/runs/${runId}/setup`
+    // don't want to route to the run page if the run hasn't started
+  } else if (hasBeenStarted) {
+    return `/runs/${runId}/run`
   } else {
-    return `/runs/${currentRun.id}/run`
+    return null
   }
 }

@@ -1008,7 +1008,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1032,7 +1032,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1057,7 +1057,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1081,7 +1081,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1123,7 +1123,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1165,7 +1165,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1191,7 +1191,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1232,7 +1232,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1257,7 +1257,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1281,7 +1281,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1342,7 +1342,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1366,7 +1366,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1408,7 +1408,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1450,7 +1450,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1476,7 +1476,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1517,7 +1517,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1542,7 +1542,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1566,7 +1566,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1624,7 +1624,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1672,7 +1672,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1696,7 +1696,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1721,7 +1721,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1745,7 +1745,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1787,7 +1787,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1829,7 +1829,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1855,7 +1855,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1896,7 +1896,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1921,7 +1921,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1945,7 +1945,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2007,7 +2007,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2031,7 +2031,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2073,7 +2073,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2115,7 +2115,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2140,7 +2140,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2181,7 +2181,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2206,7 +2206,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2230,7 +2230,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2289,7 +2289,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2357,7 +2357,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2381,7 +2381,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2406,7 +2406,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2430,7 +2430,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2472,7 +2472,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2514,7 +2514,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2540,7 +2540,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2581,7 +2581,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2606,7 +2606,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2630,7 +2630,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2692,7 +2692,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2716,7 +2716,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2758,7 +2758,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2800,7 +2800,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2826,7 +2826,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2867,7 +2867,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2892,7 +2892,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2916,7 +2916,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2975,7 +2975,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3042,7 +3042,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3066,7 +3066,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3091,7 +3091,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3115,7 +3115,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3157,7 +3157,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3199,7 +3199,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3225,7 +3225,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3266,7 +3266,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3291,7 +3291,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3315,7 +3315,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3374,7 +3374,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: { seconds: 11 },
         },
@@ -3418,7 +3418,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3442,7 +3442,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3484,7 +3484,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3526,7 +3526,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3552,7 +3552,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3593,7 +3593,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3618,7 +3618,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3642,7 +3642,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3701,7 +3701,7 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,

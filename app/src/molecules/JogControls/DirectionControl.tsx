@@ -282,14 +282,16 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
             handlers={[
               ...CONTROLS_CONTENTS_BY_PLANE.vertical.controls,
               ...CONTROLS_CONTENTS_BY_PLANE.horizontal.controls,
-            ].map(({ keyName, shiftKey, axis, sign }) => ({
-              key: keyName,
-              shiftKey,
-              onPress: () => {
-                setCurrentPlane(shiftKey ? 'vertical' : 'horizontal')
-                jog(axis, sign, stepSize)
-              },
-            }))}
+            ]
+              .filter(control => !control.disabled)
+              .map(({ keyName, shiftKey, axis, sign }) => ({
+                key: keyName,
+                shiftKey,
+                onPress: () => {
+                  setCurrentPlane(shiftKey ? 'vertical' : 'horizontal')
+                  jog(axis, sign, stepSize)
+                },
+              }))}
           >
             <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
           </HandleKeypress>

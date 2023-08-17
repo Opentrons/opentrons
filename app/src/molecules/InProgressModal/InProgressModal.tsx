@@ -45,7 +45,7 @@ const MODAL_STYLE = css`
   padding: ${SPACING.spacing32};
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 31.5625rem;
+    height: 29.5rem;
   }
 `
 const SPINNER_STYLE = css`

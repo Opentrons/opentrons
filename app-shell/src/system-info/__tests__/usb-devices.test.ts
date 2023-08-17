@@ -19,14 +19,14 @@ describe('app-shell::system-info::usb-devices', () => {
     jest.resetAllMocks()
   })
 
-  it('can create a usb device monitor', async () => {
+  it('can create a usb device monitor', () => {
     expect(usbDetection.startMonitoring).toHaveBeenCalledTimes(0)
-    await createUsbDeviceMonitor()
+    createUsbDeviceMonitor()
     expect(usbDetection.startMonitoring).toHaveBeenCalledTimes(1)
   })
 
-  it('usb device monitor can be stopped', async () => {
-    const monitor = await createUsbDeviceMonitor()
+  it('usb device monitor can be stopped', () => {
+    const monitor = createUsbDeviceMonitor()
     monitor.stop()
     expect(usbDetection.stopMonitoring).toHaveBeenCalledTimes(1)
   })
@@ -40,24 +40,24 @@ describe('app-shell::system-info::usb-devices', () => {
 
     usbDetectionFind.mockResolvedValueOnce(mockDevices)
 
-    const monitor = await createUsbDeviceMonitor()
+    const monitor = createUsbDeviceMonitor()
     const result = monitor.getAllDevices()
 
     await expect(result).resolves.toEqual(mockDevices)
   })
 
-  it('can notify when devices are added', async () => {
+  it('can notify when devices are added', () => {
     const onDeviceAdd = jest.fn()
-    await createUsbDeviceMonitor({ onDeviceAdd })
+    createUsbDeviceMonitor({ onDeviceAdd })
 
     usbDetection.emit('add', mockDevice)
 
     expect(onDeviceAdd).toHaveBeenCalledWith(mockDevice)
   })
 
-  it('can notify when devices are removed', async () => {
+  it('can notify when devices are removed', () => {
     const onDeviceRemove = jest.fn()
-    await createUsbDeviceMonitor({ onDeviceRemove })
+    createUsbDeviceMonitor({ onDeviceRemove })
 
     usbDetection.emit('remove', mockDevice)
 

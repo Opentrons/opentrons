@@ -29,6 +29,8 @@ from opentrons.protocol_engine.types import (
     DropTipWellLocation,
     MotorAxis,
     Liquid,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
 )
 
 
@@ -141,43 +143,6 @@ def test_load_labware(
     assert result == expected_result
 
 
-def test_load_adapter(
-    decoy: Decoy,
-    transport: ChildThreadTransport,
-    adapter_def: LabwareDefinition,
-    subject: SyncClient,
-) -> None:
-    """It should execute a load labware command."""
-    expected_request = commands.LoadAdapterCreate(
-        params=commands.LoadAdapterParams(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            loadName="some_adapter",
-            namespace="opentrons",
-            version=1,
-            adapterId=None,
-        )
-    )
-
-    expected_result = commands.LoadAdapterResult(
-        adapterId="abc123",
-        definition=adapter_def,
-        offsetId=None,
-    )
-
-    decoy.when(transport.execute_command(request=expected_request)).then_return(
-        expected_result
-    )
-
-    result = subject.load_adapter(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-        load_name="some_adapter",
-        namespace="opentrons",
-        version=1,
-    )
-
-    assert result == expected_result
-
-
 def test_load_module(
     decoy: Decoy,
     transport: ChildThreadTransport,
@@ -233,6 +198,35 @@ def test_load_pipette(
     )
 
     assert result == expected_result
+
+
+def test_move_labware(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move labware command."""
+    request = commands.MoveLabwareCreate(
+        params=commands.MoveLabwareParams(
+            labwareId="movable-labware-id",
+            newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            strategy=LabwareMovementStrategy.USING_GRIPPER,
+            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+            dropOffset=LabwareOffsetVector(x=10, y=20, z=30),
+        )
+    )
+
+    response = commands.MoveLabwareResult(offsetId="offset-id")
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_labware(
+        labware_id="movable-labware-id",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+        pick_up_offset=LabwareOffsetVector(x=1, y=2, z=3),
+        drop_offset=LabwareOffsetVector(x=10, y=20, z=30),
+    )
+    assert result == response
 
 
 def test_move_to_well(

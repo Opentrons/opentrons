@@ -17,7 +17,6 @@ from ..types import (
     DeckPoint,
     DeckSlotLocation,
     LabwareLocation,
-    NonStackedLocation,
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
@@ -119,34 +118,12 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
-    def load_adapter(
-        self,
-        location: NonStackedLocation,
-        load_name: str,
-        namespace: str,
-        version: int,
-    ) -> commands.LoadAdapterResult:
-        """Execute a LoadLabware command and return the result."""
-        request = commands.LoadAdapterCreate(
-            params=commands.LoadAdapterParams(
-                location=location,
-                loadName=load_name,
-                namespace=namespace,
-                version=version,
-            )
-        )
-        result = self._transport.execute_command(request=request)
-
-        return cast(commands.LoadAdapterResult, result)
-
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_id: str,
         new_location: LabwareLocation,
         strategy: LabwareMovementStrategy,
-        use_pick_up_location_lpc_offset: bool,
-        use_drop_location_lpc_offset: bool,
         pick_up_offset: Optional[LabwareOffsetVector],
         drop_offset: Optional[LabwareOffsetVector],
     ) -> commands.MoveLabwareResult:
@@ -156,8 +133,6 @@ class SyncClient:
                 labwareId=labware_id,
                 newLocation=new_location,
                 strategy=strategy,
-                usePickUpLocationLpcOffset=use_pick_up_location_lpc_offset,
-                useDropLocationLpcOffset=use_drop_location_lpc_offset,
                 pickUpOffset=pick_up_offset,
                 dropOffset=drop_offset,
             )

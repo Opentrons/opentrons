@@ -18,8 +18,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
-import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-
+import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { TemperatureModule } from '../../redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {

@@ -6,6 +6,12 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import (
+    EstopState,
+    HardwareEvent,
+    EstopStateNotification,
+    HardwareEventHandler,
+)
 from opentrons.protocol_runner import LiveRunner, RunResult
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
@@ -34,6 +40,20 @@ class RunnerEnginePair(NamedTuple):
     engine: ProtocolEngine
 
 
+def get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEventHandler:
+    """Create a callback for estop events."""
+
+    def _callback(event: HardwareEvent) -> None:
+        if isinstance(event, EstopStateNotification):
+            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+                return
+            if engine_store.current_run_id is None:
+                return
+            engine_store.engine.estop(maintenance_run=True)
+
+    return _callback
+
+
 class MaintenanceEngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
@@ -55,6 +75,15 @@ class MaintenanceEngineStore:
         self._robot_type = robot_type
         self._deck_type = deck_type
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
+        hardware_api.register_callback(get_estop_listener(self))
+
+    def _estop_listener(self, event: HardwareEvent) -> None:
+        if isinstance(event, EstopStateNotification):
+            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+                return
+            if self._runner_engine_pair is None:
+                return
+            self._runner_engine_pair.engine.estop(maintenance_run=True)
 
     @property
     def engine(self) -> ProtocolEngine:

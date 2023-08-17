@@ -31,9 +31,9 @@ async def test_get_attached_instruments(subject: Controller):
     """It should get the attached instruments."""
     instruments = await subject.get_attached_instruments({})
     assert instruments[Mount.RIGHT]["id"] == "P20SV202020070101"
-    assert instruments[Mount.RIGHT]["config"].name == "p20_single_gen2"
+    assert instruments[Mount.RIGHT]["config"].display_name == "P20 Single-Channel GEN2"
     assert instruments[Mount.LEFT]["id"] == "P3HMV202020041605"
-    assert instruments[Mount.LEFT]["config"].name == "p20_multi_gen2"
+    assert instruments[Mount.LEFT]["config"].display_name == "P20 8-Channel GEN2"
 
 
 async def test_move(subject: Controller):

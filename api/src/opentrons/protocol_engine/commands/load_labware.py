@@ -6,9 +6,10 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..errors import LabwareDefinitionIsNotLabwareError
+from ..errors import LabwareIsNotAllowedInLocationError
 from ..resources import labware_validation
-from ..types import LabwareLocation, OnLabwareLocation
+from ..types import LabwareLocation, OnLabwareLocation, DeckSlotLocation
+
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -92,6 +93,18 @@ class LoadLabwareImplementation(
 
     async def execute(self, params: LoadLabwareParams) -> LoadLabwareResult:
         """Load definition and calibration data necessary for a labware."""
+        # TODO (tz, 8-15-2023): extend column validation to column 1 when working
+        # on https://opentrons.atlassian.net/browse/RSS-258 and completing
+        # https://opentrons.atlassian.net/browse/RSS-255
+        if (
+            labware_validation.is_flex_trash(params.loadName)
+            and isinstance(params.location, DeckSlotLocation)
+            and self._state_view.geometry.get_slot_column(params.location.slotName) != 3
+        ):
+            raise LabwareIsNotAllowedInLocationError(
+                f"{params.loadName} is not allowed in slot {params.location.slotName}"
+            )
+
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
             namespace=params.namespace,
@@ -103,13 +116,6 @@ class LoadLabwareImplementation(
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
         #   on the definition. In practice this will not cause any issues since they will raise protocol ending
         #   exception, but for correctness should be refactored to do this check beforehand.
-        if not labware_validation.validate_definition_is_labware(
-            loaded_labware.definition
-        ):
-            raise LabwareDefinitionIsNotLabwareError(
-                f"{params.loadName} is not defined as a labware."
-            )
-
         if isinstance(params.location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=loaded_labware.definition,

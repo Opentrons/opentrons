@@ -1,15 +1,15 @@
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
-import { UPGRADE } from '../../../../redux/buildroot'
+import { UPGRADE } from '../../../../redux/robot-update'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
-import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
+import type { RobotUpdateType } from '../../../../redux/robot-update/types'
 
 export interface MigrationWarningModalProps {
   notNowButton: ButtonProps
-  updateType: BuildrootUpdateType | null
+  updateType: RobotUpdateType | null
   proceed: () => unknown
 }
 

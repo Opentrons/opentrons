@@ -56,6 +56,7 @@ class LiquidActionSpec:
     volume: float
     plunger_distance: float
     speed: float
+    acceleration: float
     instr: Pipette
     current: float
 
@@ -213,7 +214,6 @@ class PipetteHandlerProvider:
                 "name",
                 "min_volume",
                 "max_volume",
-                "channels",
                 "aspirate_flow_rate",
                 "dispense_flow_rate",
                 "pipette_id",
@@ -230,6 +230,7 @@ class PipetteHandlerProvider:
                 "default_blow_out_flow_rates",
                 "default_dispense_flow_rates",
                 "back_compat_names",
+                "supported_tips",
             ]
 
             instr_dict = instr.as_dict()
@@ -237,7 +238,7 @@ class PipetteHandlerProvider:
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
-            result["channels"] = instr._max_channels.as_int
+            result["channels"] = instr._max_channels
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
             result["aspirate_speed"] = self.plunger_speed(
@@ -250,29 +251,19 @@ class PipetteHandlerProvider:
                 instr, instr.blow_out_flow_rate, "dispense"
             )
             result["ready_to_aspirate"] = instr.ready_to_aspirate
-            # TODO (12-5-2022) Not really sure what this is supposed to
-            # be for.... revisit when we separate out static configs and
-            # stateful configs.
+
             result["default_blow_out_speeds"] = {
-                "2.0": self.plunger_speed(
-                    instr,
-                    instr.active_tip_settings.default_dispense_flowrate,
-                    "dispense",
-                )
+                alvl: self.plunger_speed(instr, fr, "blowout")
+                for alvl, fr in instr.blow_out_flow_rates_lookup.items()
             }
+
             result["default_dispense_speeds"] = {
-                "2.0": self.plunger_speed(
-                    instr,
-                    instr.active_tip_settings.default_dispense_flowrate,
-                    "dispense",
-                )
+                alvl: self.plunger_speed(instr, fr, "dispense")
+                for alvl, fr in instr.dispense_flow_rates_lookup.items()
             }
             result["default_aspirate_speeds"] = {
-                "2.0": self.plunger_speed(
-                    instr,
-                    instr._active_tip_settings.default_aspirate_flowrate,
-                    "aspirate",
-                )
+                alvl: self.plunger_speed(instr, fr, "aspirate")
+                for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
             result[
                 "default_blow_out_volume"
@@ -344,8 +335,7 @@ class PipetteHandlerProvider:
             pos_dict["blow_out"] = blow_out
         if drop_tip is not None:
             pos_dict["drop_tip"] = drop_tip
-        for key in pos_dict.keys():
-            instr.update_config_item(key, pos_dict[key])
+        instr.update_config_item(pos_dict)
 
     def set_flow_rate(
         self,
@@ -481,6 +471,12 @@ class PipetteHandlerProvider:
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
 
+    def plunger_acceleration(self, instr: Pipette, ul_per_s_per_s: float) -> float:
+        # using nominal ul/mm, to make sure accelerations are always the same
+        # regardless of volume being aspirated/dispensed
+        mm_per_s_per_s = ul_per_s_per_s / instr.config.shaft_ul_per_mm
+        return round(mm_per_s_per_s, 6)
+
     def plan_check_aspirate(
         self,
         mount: OT3Mount,
@@ -526,12 +522,16 @@ class PipetteHandlerProvider:
         speed = self.plunger_speed(
             instrument, instrument.aspirate_flow_rate * rate, "aspirate"
         )
+        acceleration = self.plunger_acceleration(
+            instrument, instrument.flow_acceleration
+        )
 
         return LiquidActionSpec(
             axis=Axis.of_main_tool_actuator(mount),
             volume=asp_vol,
             plunger_distance=dist,
             speed=speed,
+            acceleration=acceleration,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
         )
@@ -582,11 +582,15 @@ class PipetteHandlerProvider:
         speed = self.plunger_speed(
             instrument, instrument.dispense_flow_rate * rate, "dispense"
         )
+        acceleration = self.plunger_acceleration(
+            instrument, instrument.flow_acceleration
+        )
         return LiquidActionSpec(
             axis=Axis.of_main_tool_actuator(mount),
             volume=disp_vol,
             plunger_distance=dist,
             speed=speed,
+            acceleration=acceleration,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
         )
@@ -598,6 +602,9 @@ class PipetteHandlerProvider:
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
+        acceleration = self.plunger_acceleration(
+            instrument, instrument.flow_acceleration
+        )
         if volume is None:
             ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
         else:
@@ -609,6 +616,7 @@ class PipetteHandlerProvider:
             volume=0,
             plunger_distance=distance_mm,
             speed=speed,
+            acceleration=acceleration,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
         )
@@ -675,7 +683,7 @@ class PipetteHandlerProvider:
                 backup_dist = -press_dist
                 yield (press_dist, backup_dist)
 
-        if instrument.channels.value == 96:
+        if instrument.channels == 96:
             return (
                 PickUpTipSpec(
                     plunger_prep_pos=instrument.plunger_positions.bottom,
@@ -791,7 +799,7 @@ class PipetteHandlerProvider:
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
 
-        is_96_chan = instrument.channels.value == 96
+        is_96_chan = instrument.channels == 96
 
         bottom = instrument.plunger_positions.bottom
         droptip = (

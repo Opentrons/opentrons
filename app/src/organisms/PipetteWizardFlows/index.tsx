@@ -18,7 +18,7 @@ import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
@@ -314,11 +314,8 @@ export const PipetteWizardFlows = (
     (selectedPipette === NINETY_SIX_CHANNEL &&
       currentStep.section === SECTIONS.DETACH_PIPETTE)
 
-  const isCalibrationErrorExiting =
-    currentStep.section === SECTIONS.ATTACH_PROBE && errorMessage != null
-
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal || isCalibrationErrorExiting) {
+  if (isRobotMoving || showUnskippableStepModal) {
     exitWizardButton = undefined
   } else if (is96ChannelUnskippableStep) {
     exitWizardButton = () => setIsUnskippableStep(true)

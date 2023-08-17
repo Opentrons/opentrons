@@ -18,7 +18,7 @@ describe('MovePin', () => {
     props?: Partial<React.ComponentProps<typeof MovePin>>
   ) => ReturnType<typeof renderWithProviders>
   let mockCreateRunCommand: jest.Mock
-  let mockSetShowErrorMessage: jest.Mock
+  let mockSetErrorMessage: jest.Mock
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
@@ -46,7 +46,7 @@ describe('MovePin', () => {
           frontJawOffset={{ x: 0, y: 0, z: 0 }}
           createRunCommand={mockCreateRunCommand}
           errorMessage={null}
-          setShowErrorMessage={mockSetShowErrorMessage}
+          setErrorMessage={mockSetErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -62,7 +62,10 @@ describe('MovePin', () => {
     const { getByRole } = render()[0]
     await getByRole('button', { name: 'Begin calibration' }).click()
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
-      command: { commandType: 'home', params: { axes: [] } },
+      command: {
+        commandType: 'home',
+        params: { axes: ['extensionZ', 'extensionJaw'] },
+      },
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
@@ -75,7 +78,7 @@ describe('MovePin', () => {
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
-        params: { mount: 'left' },
+        params: { mount: 'extension' },
       },
       waitUntilComplete: true,
     })
@@ -113,7 +116,10 @@ describe('MovePin', () => {
     await getByRole('button', { name: 'Continue' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
-      command: { commandType: 'home', params: { axes: [] } },
+      command: {
+        commandType: 'home',
+        params: { axes: ['extensionZ', 'extensionJaw'] },
+      },
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
@@ -129,7 +135,7 @@ describe('MovePin', () => {
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
-        params: { mount: 'left' },
+        params: { mount: 'extension' },
       },
       waitUntilComplete: true,
     })

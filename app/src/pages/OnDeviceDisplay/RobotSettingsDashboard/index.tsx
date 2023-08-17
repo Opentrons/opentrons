@@ -18,7 +18,7 @@ import {
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../organisms/RobotSettingsDashboard'
-import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
+import { getRobotUpdateAvailable } from '../../../redux/robot-update'
 import {
   getLocalRobot,
   getRobotApiVersion,
@@ -65,7 +65,7 @@ export function RobotSettingsDashboard(): JSX.Element {
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
-      ? getBuildrootUpdateAvailable(state, localRobot)
+      ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'

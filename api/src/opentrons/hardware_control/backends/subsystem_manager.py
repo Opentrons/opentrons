@@ -266,7 +266,7 @@ class SubsystemManager:
                 usb_messenger=self._usb_messenger,
                 update_details=update_details,
                 retry_count=60,
-                timeout_seconds=1,
+                timeout_seconds=5,
                 erase=True,
             )
 

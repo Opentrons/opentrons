@@ -60,7 +60,7 @@ export function downloadReleaseFiles(
   const tempSystemPath = outPath(tempDir, urls.system)
   const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')
 
-  log.debug('directory created for BR downloads', { tempDir })
+  log.debug('directory created for robot update downloads', { tempDir })
 
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously

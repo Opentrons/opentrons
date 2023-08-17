@@ -20,6 +20,7 @@ import {
   useModulesQuery,
   usePipettesQuery,
   useDismissCurrentRunMutation,
+  useEstopQuery,
 } from '@opentrons/react-api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
@@ -54,7 +55,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_START,
   ANALYTICS_PROTOCOL_RUN_RESUME,
 } from '../../../../redux/analytics'
-import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
 import {
@@ -72,6 +73,14 @@ import { RunProgressMeter } from '../../../RunProgressMeter'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
+import { RunFailedModal } from '../RunFailedModal'
+import {
+  DISENGAGED,
+  ENGAGED,
+  LOGICALLY_ENGAGED,
+  NOT_PRESENT,
+  PHYSICALLY_ENGAGED,
+} from '../../../EmergencyStop'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -104,7 +113,8 @@ jest.mock('../../../ModuleCard/hooks')
 jest.mock('../../../RunProgressMeter')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/buildroot/selectors')
+jest.mock('../RunFailedModal')
+jest.mock('../../../../redux/robot-update/selectors')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -173,8 +183,14 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
+>
+const mockRunFailedModal = RunFailedModal as jest.MockedFunction<
+  typeof RunFailedModal
+>
+const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
+  typeof useEstopQuery
 >
 
 const ROBOT_NAME = 'otie'
@@ -215,6 +231,14 @@ const mockMovingHeaterShaker = {
   },
   usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
+
+const mockEstopStatus = {
+  data: {
+    status: DISENGAGED,
+    leftEstopPhysicalStatus: DISENGAGED,
+    rightEstopPhysicalStatus: NOT_PRESENT,
+  },
+}
 
 const render = () => {
   return renderWithProviders(
@@ -300,7 +324,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
     when(mockUseRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: mockIdleUnstartedRun },
       } as UseQueryResult<Run>)
@@ -321,7 +345,10 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
+    mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
+    mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
   })
+
   afterEach(() => {
     resetAllWhenMocks()
     jest.restoreAllMocks()
@@ -663,13 +690,18 @@ describe('ProtocolRunHeader', () => {
     getByText('Close robot door to resume run')
   })
 
-  it('renders a clear protocol banner when run has failed', () => {
+  it('renders a error detail link banner when run has failed', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockFailedRun },
+      } as UseQueryResult<Run>)
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
-    const [{ getByTestId, getByText }] = render()
+    const [{ getByText }] = render()
 
-    getByText('Run failed.')
-    getByTestId('Banner_close-button').click()
+    getByText('View error').click()
     expect(mockCloseCurrentRun).toBeCalled()
+    getByText('mock RunFailedModal')
   })
 
   it('renders a clear protocol banner when run has been canceled', () => {
@@ -683,6 +715,11 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a clear protocol banner when run has succeeded', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
@@ -778,13 +815,20 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
     getByText('Protocol analysis failed.')
   })
+
   it('renders the devices page when robot is not viewable but protocol is loaded', async () => {
     mockUseIsRobotViewable.mockReturnValue(false)
     waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/devices')
     })
   })
+
   it('renders banner with spinner if currently closing current run', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_SUCCEEDED)
@@ -795,5 +839,32 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText, getByLabelText }] = render()
     getByText('Run completed.')
     getByLabelText('ot-spinner')
+  })
+
+  it('renders banner when estop pressed - physicallyEngaged', () => {
+    mockEstopStatus.data.status = PHYSICALLY_ENGAGED
+    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
+
+    mockUseEstopQuery({ data: mockEstopStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Run failed.')
+  })
+
+  it('renders banner when estop pressed - logicallyEngaged', () => {
+    mockEstopStatus.data.status = LOGICALLY_ENGAGED
+    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
+
+    mockUseEstopQuery({ data: mockEstopStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Run failed.')
+  })
+
+  it('renders banner when estop pressed - notPresent', () => {
+    mockEstopStatus.data.status = NOT_PRESENT
+    mockEstopStatus.data.leftEstopPhysicalStatus = NOT_PRESENT
+
+    mockUseEstopQuery({ data: mockEstopStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Run failed.')
   })
 })

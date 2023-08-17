@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
-import * as Buildroot from '../../../redux/buildroot'
+import * as Buildroot from '../../../redux/robot-update'
 import { restartRobot } from '../../../redux/robot-admin'
 import {
   mockConnectableRobot,
@@ -27,7 +27,7 @@ import type { State } from '../../../redux/types'
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
 jest.mock('../hooks')
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('../../../resources/networking/hooks')
 jest.mock(
   '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
@@ -39,8 +39,8 @@ jest.mock('../RobotSettings/UpdateBuildroot')
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockGetBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof Buildroot.getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateDisplayInfo
 >
 const mockHome = home as jest.MockedFunction<typeof home>
 const mockRestartRobot = restartRobot as jest.MockedFunction<

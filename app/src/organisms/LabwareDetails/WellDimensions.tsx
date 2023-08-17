@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
-import { Box, SPACING } from '@opentrons/components'
+import { Box, SPACING, getMeasurementDiagram } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import { getMeasurementDiagram } from './measurementGuide'
 
 import type {
   LabwareWellGroupProperties,
