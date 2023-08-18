@@ -923,22 +923,19 @@ class ProtocolContext(CommandPublisher):
         you can also use :py:attr:`loaded_labwares` to get a dict of labwares
         and :py:attr:`loaded_modules` to get a dict of modules.
 
-        For :ref:`advanced-control` `only`, you can delete an element of the ``deck`` dict.
+        For :ref:`advanced-control` *only*, you can delete an element of the ``deck`` dict.
         This only works for deck slots that contain labware objects. For example, if slot 
         1 contains a labware, ``del protocol.deck['1']`` will free the slot so you can 
         load another labware there.
         
         .. warning::
-            Do not delete labware from a deck slot for protocols run in the Opentrons App 
-            or on the Flex touchscreen. The protocol will continue immediately without 
-            giving you a chance to physically remove the labware. 
-            Use :py:meth:`.move_labware` instead.
+            Deleting labware from a deck slot does not pause the protocol. Subsequent 
+            commands continue immediately. If you need to physically move the labware to 
+            reflect the new deck state, add a :py:meth:`.pause` or use 
+            :py:meth:`.move_labware` instead. 
         
-        .. versionchanged:: 2.14
-           Deleting deck elements raises an error.
-
         .. versionchanged:: 2.15
-           ``del`` sets the labware location to ``OFF_DECK`` instead of deleting it.
+           ``del`` sets the corresponding labware's location to ``OFF_DECK``.
         """
         return self._deck
 
