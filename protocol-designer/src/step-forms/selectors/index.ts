@@ -29,7 +29,7 @@ import {
   ProfileFormError,
   getProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
-import { getMoveLabwareFormErrors } from '../../steplist/formLevel/MoveLabwareFormErrors'
+import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
