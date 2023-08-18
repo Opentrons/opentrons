@@ -105,18 +105,18 @@ This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the r
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
                     location=1)
-            tiprack_1 = protocol.load_labware(
-                    load_name='opentrons_96_tiprack_300ul',
-                    location=2)
-            p300 = protocol.load_instrument(
-                    instrument_name='p300_single',
-                    mount='left',
-                    tip_racks=[tiprack_1])
+                tiprack_1 = protocol.load_labware(
+                        load_name='opentrons_96_tiprack_300ul',
+                        location=2)
+                p300 = protocol.load_instrument(
+                        instrument_name='p300_single',
+                        mount='left',
+                        tip_racks=[tiprack_1])
 
-            p300.pick_up_tip()
-            p300.aspirate(100, plate['A1'])
-            p300.dispense(100, plate['B1'])
-            p300.drop_tip()
+                p300.pick_up_tip()
+                p300.aspirate(100, plate['A1'])
+                p300.dispense(100, plate['B1'])
+                p300.drop_tip()
 
 Advanced Method
 ---------------
@@ -161,15 +161,15 @@ This protocol accomplishes the same thing as the previous example, but does it a
                 plate = protocol.load_labware(
                     load_name='corning_96_wellplate_360ul_flat',
                     location=1)
-            tiprack_1 = protocol.load_labware(
-                    load_name='opentrons_96_tiprack_300ul',
-                    location=2)
-            p300 = protocol.load_instrument(
-                instrument_name='p300_single',
-                mount='left',
-                tip_racks=[tiprack_1])
-            # transfer 100 µL from well A1 to well B1
-            p300.transfer(100, plate['A1'], plate['B1'])
+                tiprack_1 = protocol.load_labware(
+                        load_name='opentrons_96_tiprack_300ul',
+                        location=2)
+                p300 = protocol.load_instrument(
+                    instrument_name='p300_single',
+                    mount='left',
+                    tip_racks=[tiprack_1])
+                # transfer 100 µL from well A1 to well B1
+                p300.transfer(100, plate['A1'], plate['B1'])
 
 
 Loops
