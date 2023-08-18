@@ -55,18 +55,25 @@ MUTABLE_CONFIGS_V2 = [
 RESTRICTED_MUTABLE_CONFIG_KEYS = [*VALID_QUIRKS, "model"]
 
 _MAP_KEY_TO_V2: Dict[str, Dict[str, str]] = {
-    "top": {"top_level_name": "plungerPositionsConfigurations", "nested_name": "top"},
+    "top": {
+        "top_level_name": "plungerPositionsConfigurations",
+        "nested_name": "top",
+        "liquid_class": "default",
+    },
     "bottom": {
         "top_level_name": "plungerPositionsConfigurations",
         "nested_name": "bottom",
+        "liquid_class": "default",
     },
     "blowout": {
         "top_level_name": "plungerPositionsConfigurations",
         "nested_name": "blowout",
+        "liquid_class": "default",
     },
     "dropTip": {
         "top_level_name": "plungerPositionsConfigurations",
         "nested_name": "drop",
+        "liquid_class": "default",
     },
     "pickUpCurrent": {
         "top_level_name": "pickUpTipConfigurations",

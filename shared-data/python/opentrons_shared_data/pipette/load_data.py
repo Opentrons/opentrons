@@ -215,6 +215,10 @@ def update_pipette_configuration(
     dict_of_base_model["liquid_properties"] = {
         k.name: v for k, v in dict_of_base_model["liquid_properties"].items()
     }
+    dict_of_base_model["plungerPositionsConfigurations"] = {
+        k.name: v
+        for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
+    }
     return PipetteConfigurations.parse_obj(dict_of_base_model)
 
 
