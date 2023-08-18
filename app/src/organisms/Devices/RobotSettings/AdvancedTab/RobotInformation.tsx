@@ -37,10 +37,10 @@ export function RobotInformation({
   const formatApiVersionMinMax = (): string => {
     if (minProtocolApiVersion === maxProtocolApiVersion) {
       return `v${minProtocolApiVersion}`
+    } else if (minProtocolApiVersion != null && maxProtocolApiVersion != null) {
+      return `v${minProtocolApiVersion} - v${maxProtocolApiVersion}`
     } else {
-      return minProtocolApiVersion != null && maxProtocolApiVersion != null
-        ? `v${minProtocolApiVersion} - v${maxProtocolApiVersion}`
-        : t('robot_settings_advanced_unknown')
+      return t('robot_settings_advanced_unknown')
     }
   }
 
@@ -75,11 +75,7 @@ export function RobotInformation({
           <StyledText css={TYPOGRAPHY.pSemiBold}>
             {t('supported_protocol_api_versions')}
           </StyledText>
-          <StyledText as="p">
-            {formatApiVersionMinMax() != null
-              ? formatApiVersionMinMax()
-              : t('robot_settings_advanced_unknown')}
-          </StyledText>
+          <StyledText as="p">{formatApiVersionMinMax()}</StyledText>
         </Flex>
       </Flex>
     </Box>
