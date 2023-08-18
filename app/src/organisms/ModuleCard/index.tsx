@@ -11,7 +11,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   useOnClickOutside,
-  Btn,
   IconProps,
   useHoverTooltip,
   COLORS,
@@ -40,6 +39,7 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
+import { UpdateBanner } from './UpdateBanner'
 import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
@@ -58,6 +58,7 @@ import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
+import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
@@ -68,19 +69,28 @@ import type {
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
 interface ModuleCardProps {
   module: AttachedModule
   robotName: string
   isLoadedInRun: boolean
+  attachPipetteRequired?: boolean
+  updatePipetteFWRequired?: boolean
   runId?: string
   slotName?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, robotName, isLoadedInRun, runId, slotName } = props
+  const {
+    module,
+    robotName,
+    isLoadedInRun,
+    runId,
+    slotName,
+    attachPipetteRequired,
+    updatePipetteFWRequired,
+  } = props
   const dispatch = useDispatch<Dispatch>()
   const {
     menuOverlay,
@@ -95,14 +105,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [hasSecondary, setHasSecondary] = React.useState(false)
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
-  const [
-    showAttachmentWizard,
-    setShowAttachmentWizard,
-  ] = React.useState<boolean>(false)
-  const [showCalibrateWizard, setShowCalibrateWizard] = React.useState<boolean>(
-    false
-  )
+  const [showHSWizard, setShowHSWizard] = React.useState<boolean>(false)
+  const [showFWBanner, setshowFWBanner] = React.useState<boolean>(true)
+  const [showCalBanner, setshowCalBanner] = React.useState<boolean>(true)
+  const [showCalModal, setshowCalModal] = React.useState<boolean>(false)
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
@@ -113,6 +120,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
+  const requireModuleCalibration = module.moduleOffset === undefined
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -122,16 +130,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       dispatch(dismissRequest(latestRequestId))
     }
   }
-  const handleUpdateClick = (): void => {
+
+  const handleFirmwareUpdateClick = (): void => {
     robotName &&
       dispatchApiRequest(updateModule(robotName, module.serialNumber))
   }
+
   const { makeToast } = useToaster()
   React.useEffect(() => {
-    if (
-      module.hasAvailableUpdate === false &&
-      latestRequest?.status === SUCCESS
-    ) {
+    if (!module.hasAvailableUpdate && latestRequest?.status === SUCCESS) {
       makeToast(t('firmware_update_installation_successful'), SUCCESS_TOAST)
     }
   }, [module.hasAvailableUpdate, latestRequest?.status, makeToast, t])
@@ -213,11 +220,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleInstructionsClick = (): void => {
-    setShowAttachmentWizard(true)
+    setShowHSWizard(true)
   }
 
   const handleCalibrateClick = (): void => {
-    setShowCalibrateWizard(true)
+    setshowCalModal(true)
   }
 
   return (
@@ -227,22 +234,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showCalibrateWizard ? (
+      {showCalModal ? (
         <ModuleWizardFlows
           attachedModule={module}
-          slotName="A1"
-          closeFlow={() => {
-            setShowCalibrateWizard(false)
-          }}
+          closeFlow={() => setshowCalModal(false)}
         />
       ) : null}
-      {showAttachmentWizard &&
-        module.moduleType === HEATERSHAKER_MODULE_TYPE && (
-          <HeaterShakerWizard
-            onCloseClick={() => setShowAttachmentWizard(false)}
-            attachedModule={module}
-          />
-        )}
+      {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
+        <HeaterShakerWizard
+          onCloseClick={() => setShowHSWizard(false)}
+          attachedModule={module}
+        />
+      )}
       {showSlideout && (
         <ModuleSlideout
           module={module}
@@ -256,7 +259,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module}
           isExpanded={showAboutModule}
           onCloseClick={() => setShowAboutModule(false)}
-          firmwareUpdateClick={handleUpdateClick}
+          firmwareUpdateClick={handleFirmwareUpdateClick}
         />
       )}
       {showTestShake && (
@@ -289,30 +292,31 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 errorMessage={getErrorResponseMessage(latestRequest.error)}
               />
             )}
-            {module.hasAvailableUpdate && showBanner && !isPending ? (
-              <Flex
-                paddingBottom={SPACING.spacing4}
-                width="100%"
-                flexDirection={DIRECTION_COLUMN}
-                data-testid={`ModuleCard_firmware_update_banner_${module.serialNumber}`}
-              >
-                <Banner
-                  type="warning"
-                  onCloseClick={() => setShowBanner(false)}
-                >
-                  <Flex flexDirection={DIRECTION_COLUMN}>
-                    {t('firmware_update_available')}
-                    <Btn
-                      textAlign={ALIGN_START}
-                      fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                      onClick={() => handleUpdateClick()}
-                    >
-                      {t('update_now')}
-                    </Btn>
-                  </Flex>
-                </Banner>
-              </Flex>
+            {attachPipetteRequired != null &&
+            updatePipetteFWRequired != null &&
+            requireModuleCalibration &&
+            showCalBanner &&
+            !isPending ? (
+              <UpdateBanner
+                updateType="calibration"
+                serialNumber={module.serialNumber}
+                setShowBanner={setshowCalBanner}
+                handleUpdateClick={() => setshowCalModal(true)}
+                attachPipetteRequired={attachPipetteRequired}
+                updatePipetteFWRequired={updatePipetteFWRequired}
+              />
+            ) : null}
+            {/* Calibration performs firmware updates, so only show calibration if both true. */}
+            {!requireModuleCalibration &&
+            module.hasAvailableUpdate &&
+            showFWBanner &&
+            !isPending ? (
+              <UpdateBanner
+                updateType="firmware"
+                serialNumber={module.serialNumber}
+                setShowBanner={setshowFWBanner}
+                handleUpdateClick={handleFirmwareUpdateClick}
+              />
             ) : null}
             {isTooHot ? (
               <Flex

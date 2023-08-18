@@ -77,6 +77,7 @@ export function InstrumentsAndModules({
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
+
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
@@ -90,6 +91,7 @@ export function InstrumentsAndModules({
       (i): i is PipetteData =>
         i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
     ) ?? null
+  // A pipette is bad if it requires a firmware update.
   const badLeftPipette =
     attachedInstruments?.data?.find(
       (i): i is BadPipette =>
@@ -112,6 +114,10 @@ export function InstrumentsAndModules({
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
+  const attachPipetteRequired = attachedLeftPipette == null
+  const updatePipetteFWRequired =
+    badLeftPipette != null || badRightPipette != null
+
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // split modules in half and map into each column separately to avoid
@@ -215,7 +221,7 @@ export function InstrumentsAndModules({
                   label={t('mount', { side: 'left' })}
                   description={t('instrument_attached')}
                   banner={
-                    <Banner type="warning" marginBottom={SPACING.spacing4}>
+                    <Banner type="error" marginBottom={SPACING.spacing4}>
                       <Trans
                         t={t}
                         i18nKey="firmware_update_available_now"
@@ -272,6 +278,8 @@ export function InstrumentsAndModules({
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
+                  attachPipetteRequired={attachPipetteRequired}
+                  updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}
             </Flex>
@@ -301,15 +309,15 @@ export function InstrumentsAndModules({
               )}
               {badRightPipette != null && (
                 <InstrumentCard
-                  label={t('mount', { side: 'right' })}
+                  label={t('mount', { side: 'error' })}
                   description={t('instrument_attached')}
                   banner={
-                    <Banner type="warning" marginBottom={SPACING.spacing4}>
+                    <Banner type="error" marginBottom={SPACING.spacing4}>
                       <Trans
                         t={t}
-                        i18nKey="update_now"
+                        i18nKey="firmware_update_available_now"
                         components={{
-                          calLink: (
+                          updateLink: (
                             <StyledText
                               as="p"
                               css={BANNER_LINK_CSS}
@@ -332,6 +340,8 @@ export function InstrumentsAndModules({
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
+                  attachPipetteRequired={attachPipetteRequired}
+                  updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}
             </Flex>
