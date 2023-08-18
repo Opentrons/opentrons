@@ -20,7 +20,10 @@ import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
-import { getLabwareDef, getLabwareDefinitionsFromCommands } from './utils/labware'
+import {
+  getLabwareDef,
+  getLabwareDefinitionsFromCommands,
+} from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { Jog } from '../../molecules/JogControls/types'
@@ -74,7 +77,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     location,
     getLabwareDefinitionsFromCommands(protocolData.commands),
     t
-    )
+  )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   const instructions = [
     t('clear_all_slots'),

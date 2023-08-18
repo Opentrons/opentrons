@@ -34,6 +34,7 @@ import {
   RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
@@ -58,12 +59,11 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
 } from '@opentrons/shared-data'
-import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
+import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
-import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -98,9 +98,9 @@ export function ProtocolSetupLabware({
   ] = React.useState<boolean>(false)
   const [selectedLabware, setSelectedLabware] = React.useState<
     | (LabwareDefinition2 & {
-      location: LabwareLocation
-      nickName: string | null
-    })
+        location: LabwareLocation
+        nickName: string | null
+      })
     | null
   >(null)
 
@@ -205,7 +205,7 @@ export function ProtocolSetupLabware({
               <LocationIcon
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
-                  moduleUnderAdapter.moduleDef.moduleType
+                    moduleUnderAdapter.moduleDef.moduleType
                   ]
                 }
               />
@@ -278,7 +278,7 @@ export function ProtocolSetupLabware({
                           }
                         >
                           {topLabwareDefinition != null &&
-                            topLabwareId != null ? (
+                          topLabwareId != null ? (
                             <React.Fragment
                               key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
                             >
@@ -359,17 +359,15 @@ export function ProtocolSetupLabware({
                 </StyledText>
                 <StyledText as="p" color={COLORS.darkBlack70}>
                   {selectedLabware.nickName}
-                  {
-                    selectedLabwareLocation != null
-                    && selectedLabwareLocation !== 'offDeck' 
-                    && 'labwareId' in selectedLabwareLocation
-                      ? t('on_adapter', { 
-                        adapterName: mostRecentAnalysis?.labware.find(l => (
-                          l.id === selectedLabwareLocation.labwareId
-                        ))?.displayName
+                  {selectedLabwareLocation != null &&
+                  selectedLabwareLocation !== 'offDeck' &&
+                  'labwareId' in selectedLabwareLocation
+                    ? t('on_adapter', {
+                        adapterName: mostRecentAnalysis?.labware.find(
+                          l => l.id === selectedLabwareLocation.labwareId
+                        )?.displayName,
                       })
-                      : null
-                  }
+                    : null}
                 </StyledText>
               </Flex>
             </Flex>
@@ -576,15 +574,15 @@ function RowLabware({
 
   const matchedModule =
     initialLocation !== 'offDeck' &&
-      'moduleId' in initialLocation &&
-      attachedProtocolModules.length > 0
+    'moduleId' in initialLocation &&
+    attachedProtocolModules.length > 0
       ? attachedProtocolModules.find(
-        mod => mod.moduleId === initialLocation.moduleId
-      )
+          mod => mod.moduleId === initialLocation.moduleId
+        )
       : null
   const matchingHeaterShaker =
     matchedModule?.attachedModuleMatch != null &&
-      matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
+    matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
       ? matchedModule.attachedModuleMatch
       : null
 
@@ -631,7 +629,7 @@ function RowLabware({
               <LocationIcon
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
-                  moduleUnderAdapter.moduleDef.moduleType
+                    moduleUnderAdapter.moduleDef.moduleType
                   ]
                 }
               />

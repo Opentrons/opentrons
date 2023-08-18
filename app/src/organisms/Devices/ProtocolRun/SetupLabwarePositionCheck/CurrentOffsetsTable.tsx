@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
 
-import { getLabwareDisplayName, getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
+} from '@opentrons/shared-data'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -88,7 +91,11 @@ export function CurrentOffsetsTable(
           return (
             <OffsetTableRow key={offset.id}>
               <OffsetTableDatum>
-                {getDisplayLocation(offset.location, getLabwareDefinitionsFromCommands(commands), t)}
+                {getDisplayLocation(
+                  offset.location,
+                  getLabwareDefinitionsFromCommands(commands),
+                  t
+                )}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
               <OffsetTableDatum>

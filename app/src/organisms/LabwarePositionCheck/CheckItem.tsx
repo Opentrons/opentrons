@@ -19,7 +19,10 @@ import {
   MoveLabwareCreateCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareDef, getLabwareDefinitionsFromCommands } from './utils/labware'
+import {
+  getLabwareDef,
+  getLabwareDefinitionsFromCommands,
+} from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { useChainRunCommands } from '../../resources/runs/hooks'
@@ -119,7 +122,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   React.useEffect(() => {
     if (initialPosition == null && modulePrepCommands.length > 0) {
       chainRunCommands(modulePrepCommands, false)
-        .then(() => { })
+        .then(() => {})
         .catch((e: Error) => {
           setFatalError(
             `CheckItem module prep commands failed with message: ${e?.message}`
@@ -176,7 +179,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             omit(location, ['definitionUri']), // only want the adapter's location here
             labwareDefs,
             t
-          )
+          ),
         }}
         components={{
           bold: (
@@ -288,33 +291,33 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const moveLabwareOffDeck: CreateCommand[] =
     adapterId != null
       ? [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
           },
-        },
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: adapterId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: adapterId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
           },
-        },
-      ]
+        ]
       : [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
           },
-        },
-      ]
+        ]
 
   const handleConfirmPosition = (): void => {
     let confirmPositionCommands: CreateCommand[] = [
@@ -382,7 +385,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       [
         ...modulePrepCommands,
         { commandType: 'home', params: {} },
-        ...moveLabwareOffDeck
+        ...moveLabwareOffDeck,
       ],
       false
     )

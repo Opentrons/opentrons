@@ -30,23 +30,22 @@ import {
   ALIGN_FLEX_END,
   LocationIcon,
 } from '@opentrons/components'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
 } from '../../redux/config'
+import { SmallButton } from '../../atoms/buttons'
+import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type {
   LabwareOffset,
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { SmallButton } from '../../atoms/buttons'
-
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
@@ -255,7 +254,11 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, getLabwareDefinitionsFromCommands(protocolData.commands), t)}
+                  {getDisplayLocation(
+                    location,
+                    getLabwareDefinitionsFromCommands(protocolData.commands),
+                    t
+                  )}
                 </StyledText>
               </TableDatum>
               <TableDatum>
@@ -322,7 +325,7 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                   <LocationIcon
                     iconName={
                       MODULE_ICON_NAME_BY_TYPE[
-                      getModuleType(location.moduleModel)
+                        getModuleType(location.moduleModel)
                       ]
                     }
                   />

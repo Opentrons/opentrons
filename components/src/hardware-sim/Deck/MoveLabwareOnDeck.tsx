@@ -8,7 +8,6 @@ import {
   getDeckDefFromRobotType,
   getModuleDef2,
   LoadedLabware,
-  DeckSlotId,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../ui-style-constants'
@@ -69,31 +68,49 @@ function getLabwareCoordinates({
     if (loadedAdapter == null) return null
     const loadedAdapterLocation = loadedAdapter.location
 
-    if (loadedAdapterLocation === 'offDeck' || 'labwareId' in loadedAdapterLocation) return null
+    if (
+      loadedAdapterLocation === 'offDeck' ||
+      'labwareId' in loadedAdapterLocation
+    )
+      return null
     //  adapter on module
     if ('moduleId' in loadedAdapterLocation) {
-      return getModulePosition(orderedSlots, loadedAdapterLocation.moduleId, loadedModules, deckId)
+      return getModulePosition(
+        orderedSlots,
+        loadedAdapterLocation.moduleId,
+        loadedModules,
+        deckId
+      )
     }
 
     //  adapter on deck
-    const loadedAdapterSlot = orderedSlots.find(s => s.id === loadedAdapterLocation.slotName)
-    return loadedAdapterSlot != null ? {
-      x: loadedAdapterSlot.position[0],
-      y: loadedAdapterSlot.position[1],
-      z: loadedAdapterSlot.position[2],
-    } : null
+    const loadedAdapterSlot = orderedSlots.find(
+      s => s.id === loadedAdapterLocation.slotName
+    )
+    return loadedAdapterSlot != null
+      ? {
+          x: loadedAdapterSlot.position[0],
+          y: loadedAdapterSlot.position[1],
+          z: loadedAdapterSlot.position[2],
+        }
+      : null
   } else if ('slotName' in location) {
     const slotCoordinateTuple =
       orderedSlots.find(s => s.id === location.slotName)?.position ?? null
     return slotCoordinateTuple != null
       ? {
-        x: slotCoordinateTuple[0],
-        y: slotCoordinateTuple[1],
-        z: slotCoordinateTuple[2],
-      }
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
+        }
       : null
   } else {
-    return getModulePosition(orderedSlots, location.moduleId, loadedModules, deckId)
+    return getModulePosition(
+      orderedSlots,
+      location.moduleId,
+      loadedModules,
+      deckId
+    )
   }
 }
 
@@ -242,8 +259,8 @@ export function MoveLabwareOnDeck(
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedG = styled(animated.g) <any>``
-const AnimatedSvg = styled(animated.svg) <any>``
+const AnimatedG = styled(animated.g)<any>``
+const AnimatedSvg = styled(animated.svg)<any>``
 
 interface WellProps {
   wellDef: LabwareWell

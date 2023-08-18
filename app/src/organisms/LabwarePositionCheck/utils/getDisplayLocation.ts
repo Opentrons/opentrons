@@ -1,3 +1,4 @@
+import capitalize from 'lodash/capitalize'
 import {
   getModuleDisplayName,
   getModuleType,
@@ -14,8 +15,11 @@ export function getDisplayLocation(
   t: TFunction
 ): string {
   const slotDisplayLocation = t('slot_name', { slotName: location.slotName })
+
   if ('definitionUri' in location && location.definitionUri != null) {
-    const adapterDisplayName = labwareDefinitions.find(def => getLabwareDefURI(def) === location.definitionUri)?.metadata.displayName
+    const adapterDisplayName = labwareDefinitions.find(
+      def => getLabwareDefURI(def) === location.definitionUri
+    )?.metadata.displayName
 
     if ('moduleModel' in location && location.moduleModel != null) {
       const { moduleModel } = location
@@ -50,6 +54,6 @@ export function getDisplayLocation(
       })
     }
   } else {
-    return slotDisplayLocation
+    return capitalize(slotDisplayLocation)
   }
 }

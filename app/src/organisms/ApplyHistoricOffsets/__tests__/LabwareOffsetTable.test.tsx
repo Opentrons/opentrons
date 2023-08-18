@@ -42,6 +42,7 @@ describe('LabwareOffsetTable', () => {
     render = () =>
       renderWithProviders<React.ComponentProps<typeof LabwareOffsetTable>>(
         <LabwareOffsetTable
+          labwareDefinitions={[]}
           offsetCandidates={[
             mockFirstCandidate,
             mockSecondCandidate,
@@ -81,11 +82,12 @@ describe('LabwareOffsetTable', () => {
     getByText('5.00')
     getByText('6.00')
     // third candidate on module
-    getByText('Slot 3 - Heater-Shaker Module GEN1')
+    getByText('Heater-Shaker Module GEN1 in slot 3')
     getByText(/5\/11\/2022/i)
     getByText('Third Fake Labware Display Name')
     getByText('7.00')
     getByText('8.00')
     getByText('9.00')
   })
+  it.todo('add test coverage for labware offset on adapters')
 })

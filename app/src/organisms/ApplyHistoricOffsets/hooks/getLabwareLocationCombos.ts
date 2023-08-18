@@ -4,7 +4,7 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { LabwareOffsetLocation } from '@opentrons/api-client'
+import type { LabwareOffsetLocation } from '@opentrons/api-client'
 
 export interface LabwareLocationCombo {
   location: LabwareOffsetLocation
@@ -43,7 +43,11 @@ export function getLabwareLocationCombos(
         const {
           adapterOffsetLocation,
           moduleIdUnderAdapter,
-        } = resolveAdapterLocation(labware, modules, command.params.location.labwareId)
+        } = resolveAdapterLocation(
+          labware,
+          modules,
+          command.params.location.labwareId
+        )
         return adapterOffsetLocation == null
           ? acc
           : appendLocationComboIfUniq(acc, {

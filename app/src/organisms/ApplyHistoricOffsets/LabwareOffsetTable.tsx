@@ -5,8 +5,8 @@ import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import { formatTimestamp } from '../Devices/utils'
-import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
 import { getDisplayLocation } from '../LabwarePositionCheck/utils/getDisplayLocation'
+import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
