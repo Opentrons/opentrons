@@ -39,7 +39,7 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
-import { UpdateBanner } from './UpdateBanner'
+import { UpdateBanner } from '../../molecules/UpdateBanner'
 import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'

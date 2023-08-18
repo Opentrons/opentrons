@@ -2,7 +2,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { UpdateBanner } from '../UpdateBanner'
+import { UpdateBanner } from '..'
 
 const render = (props: React.ComponentProps<typeof UpdateBanner>) => {
   return renderWithProviders(<UpdateBanner {...props} />, {
@@ -31,7 +31,17 @@ describe('Module Update Banner', () => {
     getByLabelText('icon_error')
     expect(queryByLabelText('close_icon')).not.toBeInTheDocument()
   })
-  it('renders a warning banner if a firmware update is required with an exit button that dismisses the banner', () => {
+  it('renders an error banner if a mandatory firmware update is required with no exit button', () => {
+    props = {
+      ...props,
+      updateType: 'firmware_important',
+    }
+    const { getByLabelText, queryByLabelText } = render(props)
+
+    getByLabelText('icon_error')
+    expect(queryByLabelText('close_icon')).not.toBeInTheDocument()
+  })
+  it('renders a warning banner if an optional firmware update is needed with an exit button that dismisses the banner', () => {
     props = {
       ...props,
       updateType: 'firmware',

@@ -13,7 +13,7 @@ import {
 import { Banner } from '../../atoms/Banner'
 
 interface UpdateBannerProps {
-  updateType: 'calibration' | 'firmware'
+  updateType: 'calibration' | 'firmware' | 'firmware_important'
   setShowBanner: (arg0: boolean) => void
   handleUpdateClick: () => void
   serialNumber: string
@@ -49,7 +49,8 @@ export const UpdateBanner = ({
         ? t('calibrate_now')
         : ''
   } else {
-    bannerType = 'warning'
+    bannerType = updateType === 'firmware' ? 'warning' : 'error'
+    closeButtonRendered = updateType === 'firmware' ? undefined : false
     bannerMessage = t('firmware_update_available')
     hyperlinkText = t('update_now')
   }

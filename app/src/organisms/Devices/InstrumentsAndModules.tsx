@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -24,6 +23,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
+import { UpdateBanner } from '../../molecules/UpdateBanner'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
@@ -48,12 +48,6 @@ const FETCH_PIPETTE_CAL_POLL = 30000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
-
-const BANNER_LINK_CSS = css`
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: ${SPACING.spacing8};
-`
 
 export function InstrumentsAndModules({
   robotName,
@@ -221,23 +215,18 @@ export function InstrumentsAndModules({
                   label={t('mount', { side: 'left' })}
                   description={t('instrument_attached')}
                   banner={
-                    <Banner type="error" marginBottom={SPACING.spacing4}>
-                      <Trans
-                        t={t}
-                        i18nKey="firmware_update_available_now"
-                        components={{
-                          updateLink: (
-                            <StyledText
-                              as="p"
-                              css={BANNER_LINK_CSS}
-                              onClick={() =>
-                                setSubsystemToUpdate('pipette_left')
-                              }
-                            />
-                          ),
-                        }}
-                      />
-                    </Banner>
+                    <UpdateBanner
+                      serialNumber={
+                        attachedLeftPipette != null
+                          ? attachedLeftPipette.serialNumber
+                          : 'no_left_pipette'
+                      }
+                      setShowBanner={() => null}
+                      updateType="firmware_important"
+                      handleUpdateClick={() =>
+                        setSubsystemToUpdate('pipette_left')
+                      }
+                    />
                   }
                 />
               )}
@@ -252,21 +241,16 @@ export function InstrumentsAndModules({
                   label={t('shared:extension_mount')}
                   description={t('instrument_attached')}
                   banner={
-                    <Banner type="warning" marginBottom={SPACING.spacing4}>
-                      <Trans
-                        t={t}
-                        i18nKey="firmware_update_available_now"
-                        components={{
-                          updateLink: (
-                            <StyledText
-                              as="p"
-                              css={BANNER_LINK_CSS}
-                              onClick={() => setSubsystemToUpdate('gripper')}
-                            />
-                          ),
-                        }}
-                      />
-                    </Banner>
+                    <UpdateBanner
+                      serialNumber={
+                        attachedGripper != null
+                          ? attachedGripper.serialNumber
+                          : 'no_gripper'
+                      }
+                      setShowBanner={() => null}
+                      updateType="firmware"
+                      handleUpdateClick={() => setSubsystemToUpdate('gripper')}
+                    />
                   }
                 />
               )}
@@ -312,23 +296,16 @@ export function InstrumentsAndModules({
                   label={t('mount', { side: 'error' })}
                   description={t('instrument_attached')}
                   banner={
-                    <Banner type="error" marginBottom={SPACING.spacing4}>
-                      <Trans
-                        t={t}
-                        i18nKey="firmware_update_available_now"
-                        components={{
-                          updateLink: (
-                            <StyledText
-                              as="p"
-                              css={BANNER_LINK_CSS}
-                              onClick={() =>
-                                setSubsystemToUpdate('pipette_right')
-                              }
-                            />
-                          ),
-                        }}
-                      />
-                    </Banner>
+                    <UpdateBanner
+                      serialNumber={
+                        attachedRightPipette != null
+                          ? attachedRightPipette.serialNumber
+                          : 'no_right_pipette'
+                      }
+                      setShowBanner={() => null}
+                      updateType="firmware_important"
+                      handleUpdateClick={() => setSubsystemToUpdate('gripper')}
+                    />
                   }
                 />
               )}
