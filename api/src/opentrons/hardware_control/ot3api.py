@@ -997,6 +997,15 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
 
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and realmount == OT3Mount.RIGHT
+        ):
+            raise RuntimeError(
+                f"unable to move {realmount.name} "
+                f"with {self.gantry_load.name} gantry load"
+            )
+
         # Cache current position from backend
         if not self._current_position:
             await self.refresh_positions()
@@ -1104,6 +1113,15 @@ class OT3API(
 
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
+
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and realmount == OT3Mount.RIGHT
+        ):
+            raise RuntimeError(
+                f"unable to move {realmount.name} "
+                f"with {self.gantry_load.name} gantry load"
+            )
 
         if not self._backend.check_encoder_status(axes_moving):
             await self.home()
@@ -1339,6 +1357,15 @@ class OT3API(
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(Axis.Q)
+            # NOTE: Z_R current is dropped very low when 96CH attached,
+            #       so trying to home it would cause timeout error
+            if not axes:
+                checked_axes.remove(Axis.Z_R)
+            elif Axis.Z_R in axes:
+                raise RuntimeError(
+                    f"unable to home {Axis.Z_R.name} axis"
+                    f"with {self.gantry_load.name} gantry load"
+                )
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1387,6 +1414,12 @@ class OT3API(
         the behaviors between the two robots similar, retract_axis on the FLEX
         will call home if the stepper position is inaccurate.
         """
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R:
+            raise RuntimeError(
+                f"unable to retract {Axis.Z_R.name} axis"
+                f"with {self.gantry_load.name} gantry load"
+            )
+
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
 
