@@ -55,7 +55,7 @@ export function LabwareOffsetTable(
         {offsetCandidates.map(offset => (
           <OffsetTableRow key={offset.id}>
             <OffsetTableDatum>
-              {getDisplayLocation(offset.location, labwareDefinitions, t)}
+              {getDisplayLocation(offset.location, labwareDefinitions, t, true)}
             </OffsetTableDatum>
             <OffsetTableDatum>
               {formatTimestamp(offset.runCreatedAt)}

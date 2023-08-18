@@ -12,7 +12,10 @@ import type { TFunction } from 'i18next'
 export function getDisplayLocation(
   location: LabwareOffsetLocation,
   labwareDefinitions: LabwareDefinition2[],
-  t: TFunction
+  t: TFunction,
+  //  TODO: (jr, 8/18/23): perhaps find a new route here and refactor this,
+  //  only some instances of slot need to be capitalized depending on the parent component
+  capitalizeSlot?: boolean
 ): string {
   const slotDisplayLocation = t('slot_name', { slotName: location.slotName })
 
@@ -54,6 +57,8 @@ export function getDisplayLocation(
       })
     }
   } else {
-    return capitalize(slotDisplayLocation)
+    return capitalizeSlot
+      ? capitalize(slotDisplayLocation)
+      : slotDisplayLocation
   }
 }

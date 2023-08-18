@@ -94,7 +94,8 @@ export function CurrentOffsetsTable(
                 {getDisplayLocation(
                   offset.location,
                   getLabwareDefinitionsFromCommands(commands),
-                  t
+                  t,
+                  true // capitalize Slot
                 )}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>

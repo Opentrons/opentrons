@@ -41,11 +41,12 @@ import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/uti
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
-import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type {
   LabwareOffset,
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
+import type { ResultsSummaryStep, WorkingOffset } from './types'
+
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
