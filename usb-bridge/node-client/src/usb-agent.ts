@@ -136,6 +136,12 @@ class SerialPortSocket extends SerialPort {
     return super.read(...args)
   }
 
+  // log _read
+  _read(...args: any[]): any {
+    console.log('serialport _read', args)
+    return super._read(...args)
+  }
+
   // log pipe
   pipe(...args: any[]): any {
     console.log('serialport pipe', args)
@@ -152,6 +158,12 @@ class SerialPortSocket extends SerialPort {
   resume(...args: any[]): any {
     console.log('serialport resume', args)
     return super.resume(...args)
+  }
+
+  // log push
+  push(...args: any[]): any {
+    console.log('serialport push', args)
+    return super.push(...args)
   }
 }
 
@@ -214,8 +226,23 @@ class SerialPortHttpAgent extends http.Agent {
 
     const oldEmit = req.emit.bind(req)
     req.emit = function (event: string, ...args: any[]) {
-      agentLog('info', `req.emit event ${event}`)
+      agentLog(
+        'info',
+        `req.emit event ${event} req.destroyed ${
+          req.destroyed
+        } req.res.complete ${
+          req.res?.complete
+        } req.res _readableState ${Object.entries(
+          req.res?._readableState ?? {}
+        )}`
+      )
       return oldEmit(event, ...args)
+    }
+
+    const oldOnSocket = req.onSocket.bind(req)
+    req.onSocket = function (...args: any[]) {
+      agentLog('info', `req.onSocket req.destroyed ${req.destroyed}`)
+      return oldOnSocket(...args)
     }
 
     return super.addRequest(req, ...args)
