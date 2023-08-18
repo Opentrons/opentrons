@@ -33,6 +33,7 @@ assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
 TEST_SPEEDS = [
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] - 20,
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
