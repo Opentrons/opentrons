@@ -88,9 +88,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._max_channels = self._config.channels
         self._backlash_distance = config.backlash_distance
 
-        self._liquid_class = self._config.liquid_properties[
-            pip_types.LiquidClasses.default
-        ]
+        self._liquid_class_name = pip_types.LiquidClasses.default
+        self._liquid_class = self._config.liquid_properties[self._liquid_class_name]
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
         self._pipette_name = PipetteNameType(
@@ -210,7 +209,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def plunger_positions(self) -> PlungerPositions:
-        return self._config.plunger_positions_configurations
+        return self._config.plunger_positions_configurations[self._liquid_class_name]
 
     @property
     def plunger_motor_current(self) -> MotorConfigurations:

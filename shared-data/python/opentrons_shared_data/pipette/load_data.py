@@ -196,8 +196,13 @@ def update_pipette_configuration(
                 new_names = _MAP_KEY_TO_V2[lookup_key]
                 top_name = new_names["top_level_name"]
                 nested_name = new_names["nested_name"]
-                # isinstances are needed for type checking.
-                dict_of_base_model[top_name][nested_name] = v
+                if new_names.get("liquid_class"):
+                    # isinstances are needed for type checking.
+                    liquid_class = LiquidClasses[new_names["liquid_class"]]
+                    dict_of_base_model[top_name][liquid_class][nested_name] = v
+                else:
+                    # isinstances are needed for type checking.
+                    dict_of_base_model[top_name][nested_name] = v
     dict_of_base_model["quirks"] = list(
         set(dict_of_base_model["quirks"]) - set(quirks_list)
     )
