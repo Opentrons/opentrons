@@ -55,4 +55,15 @@ describe('useIsOT3 hook', () => {
 
     expect(result.current).toEqual(true)
   })
+  it('returns true when given a discoverable OT-3 robot name with an Opentrons Flex model', () => {
+    when(mockGetRobotModelByName)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue('Opentrons Flex')
+
+    const { result } = renderHook(() => useIsOT3('otie'), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual(true)
+  })
 })

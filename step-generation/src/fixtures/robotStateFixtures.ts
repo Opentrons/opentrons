@@ -221,11 +221,52 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
   },
   moduleLocations: {},
 })
+export const makeStateArgsLabwareOffDeck = (): StandardMakeStateArgs => ({
+  pipetteLocations: {
+    [DEFAULT_PIPETTE]: {
+      mount: 'left',
+    },
+    [MULTI_PIPETTE]: {
+      mount: 'right',
+    },
+  },
+  labwareLocations: {
+    tiprack1Id: {
+      slot: 'B1',
+    },
+    tiprack2Id: {
+      slot: 'A2',
+    },
+    sourcePlateId: {
+      slot: 'offDeck',
+    },
+    destPlateId: {
+      slot: 'C2',
+    },
+    fixedTrash: {
+      slot: 'A3',
+    },
+  },
+  moduleLocations: {},
+})
 export const getInitialRobotStateStandard = (
   invariantContext: InvariantContext
 ): RobotState => {
   const initialRobotState = makeState({
     ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: {
+      tiprack1Id: true,
+      tiprack2Id: true,
+    },
+  })
+  return initialRobotState
+}
+export const getInitialRobotStateWithOffDeckLabwareStandard = (
+  invariantContext: InvariantContext
+): RobotState => {
+  const initialRobotState = makeState({
+    ...makeStateArgsLabwareOffDeck(),
     invariantContext,
     tiprackSetting: {
       tiprack1Id: true,

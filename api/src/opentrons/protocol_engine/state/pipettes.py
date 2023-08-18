@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Tuple
 
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
@@ -28,7 +29,9 @@ from ..commands import (
     MoveRelativeResult,
     PickUpTipResult,
     DropTipResult,
+    DropTipInPlaceResult,
     HomeResult,
+    RetractAxisResult,
     BlowOutResult,
     TouchTipResult,
     thermocycler,
@@ -68,7 +71,10 @@ class StaticPipetteConfig:
     display_name: str
     min_volume: float
     max_volume: float
-    return_tip_scale: float
+    channels: int
+    tip_configuration_lookup_table: Dict[
+        float, pipette_definition.SupportedTipsDefinition
+    ]
     nominal_tip_overlap: Dict[str, float]
     home_position: float
     nozzle_offset_z: float
@@ -120,14 +126,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 display_name=config.display_name,
                 min_volume=config.min_volume,
                 max_volume=config.max_volume,
-                return_tip_scale=config.return_tip_scale,
+                channels=config.channels,
+                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
                 nominal_tip_overlap=config.nominal_tip_overlap,
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
             )
             self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
 
-    def _handle_command(self, command: Command) -> None:
+    def _handle_command(self, command: Command) -> None:  # noqa: ANN101, C901
         self._update_current_well(command)
         self._update_deck_point(command)
 
@@ -167,11 +174,37 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.attached_tip_by_id[pipette_id] = attached_tip
             self._state.aspirated_volume_by_id[pipette_id] = 0
 
-        elif isinstance(command.result, DropTipResult):
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            if static_config:
+                try:
+                    tip_configuration = static_config.tip_configuration_lookup_table[
+                        attached_tip.volume
+                    ]
+                except KeyError:
+                    tip_configuration = static_config.tip_configuration_lookup_table[
+                        static_config.max_volume
+                    ]
+                self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                )
+
+        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
 
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            if static_config:
+                tip_configuration = static_config.tip_configuration_lookup_table[
+                    static_config.max_volume
+                ]
+                self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                )
         elif isinstance(command.result, BlowOutResult):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
@@ -206,6 +239,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             command.result,
             (
                 HomeResult,
+                RetractAxisResult,
                 MoveToCoordinatesResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
@@ -273,6 +307,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             command.result,
             (
                 HomeResult,
+                RetractAxisResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
             ),
@@ -401,6 +436,10 @@ class PipetteView(HasState[PipetteState]):
     def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
         """Get the currently aspirated volume of a pipette by ID.
 
+        Returns:
+            The volume the pipette has aspirated.
+            None, after blow-out and the plunger is in an unsafe position or drop-tip and there is no tip attached.
+
         Raises:
             PipetteNotLoadedError: pipette ID does not exist.
             TipNotAttachedError: if no tip is attached to the pipette.
@@ -494,7 +533,20 @@ class PipetteView(HasState[PipetteState]):
 
     def get_return_tip_scale(self, pipette_id: str) -> float:
         """Return the given pipette's return tip height scale."""
-        return self.get_config(pipette_id).return_tip_scale
+        max_volume = self.get_maximum_volume(pipette_id)
+        working_volume = max_volume
+        if self.get_attached_tip(pipette_id):
+            working_volume = self.get_working_volume(pipette_id)
+
+        if working_volume in self.get_config(pipette_id).tip_configuration_lookup_table:
+            tip_lookup = self.get_config(pipette_id).tip_configuration_lookup_table[
+                working_volume
+            ]
+        else:
+            tip_lookup = self.get_config(pipette_id).tip_configuration_lookup_table[
+                max_volume
+            ]
+        return tip_lookup.default_return_tip_height
 
     def get_flow_rates(self, pipette_id: str) -> FlowRates:
         """Get the default flow rates for the pipette."""

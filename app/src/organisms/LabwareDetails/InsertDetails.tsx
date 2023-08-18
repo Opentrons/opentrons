@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Box, SPACING, BORDERS, TYPOGRAPHY } from '@opentrons/components'
+import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { getUniqueWellProperties } from './helpers/labwareInference'
 import { getWellLabel } from './helpers/labels'
 import { WellProperties } from './WellProperties'
 import { WellDimensions } from './WellDimensions'
@@ -27,12 +27,12 @@ export function InsertDetails(props: InsertDetailsProps): JSX.Element {
           <Box
             border={BORDERS.lineBorder}
             key={index}
-            marginY={SPACING.spacing4}
+            marginY={SPACING.spacing16}
           >
-            <Box padding={SPACING.spacing4}>
+            <Box padding={SPACING.spacing16}>
               <StyledText
                 css={TYPOGRAPHY.h2SemiBold}
-                paddingBottom={SPACING.spacing3}
+                paddingBottom={SPACING.spacing8}
               >
                 {wellProps.metadata.displayName}
               </StyledText>

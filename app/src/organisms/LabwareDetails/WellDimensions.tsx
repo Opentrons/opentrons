@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
-import { Box, SPACING } from '@opentrons/components'
+import { Box, SPACING, getMeasurementDiagram } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import { getMeasurementDiagram } from './measurementGuide'
 
 import type {
   LabwareWellGroupProperties,
@@ -63,7 +62,7 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   })?.map((src, index) => <img width="250px" src={src} key={index} />)
 
   return (
-    <Box marginBottom={SPACING.spacing4}>
+    <Box marginBottom={SPACING.spacing16}>
       <ExpandingTitle
         label={`${t(wellLabel)} ${t('measurements')} ${
           labelSuffix != null ? labelSuffix : ''

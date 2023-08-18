@@ -27,9 +27,9 @@ export function getProtocolDisplayName(
 
 export function getRobotTypeDisplayName(
   robotType: RobotType | null
-): 'OT-2' | 'OT-3' {
+): 'OT-2' | 'Opentrons Flex' {
   if (robotType === OT3_STANDARD_MODEL) {
-    return 'OT-3'
+    return 'Opentrons Flex'
   } else {
     // defaults to OT-2 display name. may want to reconsider for protocols that fail analysis
     return 'OT-2'

@@ -30,7 +30,7 @@ interface AboutModuleSlideoutProps {
 
 const ALERT_ITEM_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
-  margin-bottom: ${SPACING.spacing4};
+  margin-bottom: ${SPACING.spacing16};
 `
 
 export const AboutModuleSlideout = (
@@ -70,7 +70,7 @@ export const AboutModuleSlideout = (
       }
     >
       {module.hasAvailableUpdate && !isDisabled && showBanner ? (
-        <Flex paddingBottom={SPACING.spacing4}>
+        <Flex paddingBottom={SPACING.spacing16}>
           <Banner
             data-testid={`alert_item_firmware_update_${String(
               module.moduleModel
@@ -82,7 +82,7 @@ export const AboutModuleSlideout = (
             {t('firmware_update_available')}
             <Btn
               textAlign={ALIGN_START}
-              paddingLeft={SPACING.spacing2}
+              paddingLeft={SPACING.spacing4}
               fontSize={TYPOGRAPHY.fontSizeP}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={handleFirmwareUpdateClick}
@@ -100,13 +100,13 @@ export const AboutModuleSlideout = (
             color={COLORS.darkGreyEnabled}
           >
             <StyledText as="h6">{t('current_version')}</StyledText>
-            <StyledText as="p" paddingTop={SPACING.spacing2}>
+            <StyledText as="p" paddingTop={SPACING.spacing4}>
               {t('version', { version: module.firmwareVersion })}
             </StyledText>
           </Flex>
         </Flex>
         <StyledText
-          paddingTop={SPACING.spacing4}
+          paddingTop={SPACING.spacing16}
           as="h6"
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel
@@ -117,7 +117,7 @@ export const AboutModuleSlideout = (
         </StyledText>
         <StyledText
           as="h6"
-          paddingTop={SPACING.spacing2}
+          paddingTop={SPACING.spacing4}
           data-testid={`alert_item_serial_${String(module.moduleModel)}`}
         >
           {module.serialNumber}

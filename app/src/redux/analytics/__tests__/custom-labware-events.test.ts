@@ -2,6 +2,7 @@ import { makeEvent } from '../make-event'
 
 import * as CustomLabware from '../../custom-labware'
 import * as LabwareFixtures from '../../custom-labware/__fixtures__'
+import { ANALYTICS_ADD_CUSTOM_LABWARE } from '../constants'
 
 import type { State, Action } from '../../types'
 import type { AnalyticsEvent } from '../types'
@@ -17,7 +18,7 @@ const SPECS: EventSpec[] = [
     name: 'addCustomLabware success',
     action: CustomLabware.customLabwareList([], CustomLabware.ADD_LABWARE),
     expected: {
-      name: 'addCustomLabware',
+      name: ANALYTICS_ADD_CUSTOM_LABWARE,
       properties: { success: true, overwrite: false, error: '' },
       superProperties: { customLabwareCount: 0 },
     },
@@ -29,7 +30,7 @@ const SPECS: EventSpec[] = [
       CustomLabware.OVERWRITE_LABWARE
     ),
     expected: {
-      name: 'addCustomLabware',
+      name: ANALYTICS_ADD_CUSTOM_LABWARE,
       properties: { success: true, overwrite: true, error: '' },
       superProperties: { customLabwareCount: 0 },
     },
@@ -40,7 +41,7 @@ const SPECS: EventSpec[] = [
       LabwareFixtures.mockInvalidLabware
     ),
     expected: {
-      name: 'addCustomLabware',
+      name: ANALYTICS_ADD_CUSTOM_LABWARE,
       properties: {
         success: false,
         overwrite: false,
@@ -52,7 +53,7 @@ const SPECS: EventSpec[] = [
     name: 'addCustomLabware failure with system error',
     action: CustomLabware.addCustomLabwareFailure(null, 'AH'),
     expected: {
-      name: 'addCustomLabware',
+      name: ANALYTICS_ADD_CUSTOM_LABWARE,
       properties: { success: false, overwrite: false, error: 'AH' },
     },
   },

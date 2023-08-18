@@ -34,15 +34,35 @@
     "minBlockVolume": 0,
     "maxBlockVolume": 100
   },
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 4.6
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 4.6
+      }
+    }
+  },
   "displayName": "Thermocycler Module GEN2",
   "quirks": [],
   "slotTransforms": {
     "ot3_standard": {
-      "7": {
+      "B1": {
         "labwareOffset": [
-          [1, 0, 0, -19.88],
-          [0, 1, 0, -0.3],
-          [0, 0, 1, -98.3],
+          [1, 0, 0, -20.005],
+          [0, 1, 0, -0.1],
+          [0, 0, 1, -98],
+          [0, 0, 0, 1]
+        ],
+        "cornerOffsetFromSlot": [
+          [1, 0, 0, -20.005],
+          [0, 1, 0, -0.1],
+          [0, 0, 1, -98],
           [0, 0, 0, 1]
         ]
       }

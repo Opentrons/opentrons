@@ -55,23 +55,23 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        padding={SPACING.spacing6}
+        padding={SPACING.spacing32}
         minHeight="32rem"
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignSelf={ALIGN_STRETCH}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            <StyledText as="h1" marginBottom={SPACING.spacing16}>
               {t('position_pipette_over_tip')}
             </StyledText>
             <Trans
               t={t}
               i18nKey="tip_pick_up_instructions"
               components={{
-                block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+                block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
               }}
             />
           </Flex>
@@ -95,7 +95,7 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
         <Flex
           width="100%"
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         >
           <NeedHelpLink />
           <PrimaryButton onClick={pickUpTip}>{t('pick_up_tip')}</PrimaryButton>

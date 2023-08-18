@@ -12,38 +12,40 @@ import {
   SIZE_1,
   PrimaryButton,
 } from '@opentrons/components'
-
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { DETACH } from './constants'
 
 export interface CheckPipetteButtonProps {
   robotName: string
   children?: React.ReactNode
-  actualPipette?: PipetteModelSpecs
+  direction?: 'detach' | 'attach'
   onDone?: () => void
 }
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): JSX.Element | null {
-  const { onDone, children, actualPipette } = props
+  const { onDone, children, direction } = props
   const { t } = useTranslation('change_pipette')
-  const { isFetching: isPending, refetch: refetchPipettes } = usePipettesQuery(
+  const [isPending, setIsPending] = React.useState(false)
+  const { refetch: refetchPipettes } = usePipettesQuery(
     { refresh: true },
     {
       enabled: false,
-      onSuccess: () => {
-        onDone?.()
+      onSettled: () => {
+        setIsPending(false)
       },
-      onSettled: () => {},
     }
   )
   const handleClick = (): void => {
+    setIsPending(true)
     refetchPipettes()
-      .then(() => {})
+      .then(() => {
+        onDone?.()
+      })
       .catch(() => {})
   }
   const icon = (
-    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
+    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing8} />
   )
 
   let body
@@ -63,10 +65,10 @@ export function CheckPipettesButton(
           name="ot-spinner"
           height={SIZE_1}
           spin
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
         />
         <StyledText>
-          {actualPipette != null
+          {direction === DETACH
             ? t('confirming_detachment')
             : t('confirming_attachment')}
         </StyledText>
@@ -74,7 +76,7 @@ export function CheckPipettesButton(
     )
   } else if (children == null && !isPending) {
     body =
-      actualPipette != null ? t('confirm_detachment') : t('confirm_attachment')
+      direction === DETACH ? t('confirm_detachment') : t('confirm_attachment')
   }
 
   return (

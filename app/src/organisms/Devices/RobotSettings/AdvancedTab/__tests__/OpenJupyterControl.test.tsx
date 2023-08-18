@@ -3,14 +3,15 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import * as Analytics from '../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_JUPYTER_OPEN,
+} from '../../../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
 jest.mock('../../../../../redux/analytics')
 
-const useTrackEvent = Analytics.useTrackEvent as jest.Mock<
-  typeof Analytics.useTrackEvent
->
+const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
 
 const mockIpAddress = '1.1.1.1'
 const mockLink = `http://${mockIpAddress}:48888`
@@ -27,7 +28,7 @@ const render = () => {
 
 describe('RobotSettings OpenJupyterControl', () => {
   beforeEach(() => {
-    useTrackEvent.mockReturnValue(trackEvent)
+    mockUseTrackEvent.mockReturnValue(trackEvent)
   })
 
   afterEach(() => {
@@ -60,7 +61,7 @@ describe('RobotSettings OpenJupyterControl', () => {
     const button = getByRole('link', { name: 'Launch Jupyter Notebook' })
     fireEvent.click(button)
     expect(trackEvent).toHaveBeenCalledWith({
-      name: 'jupyterOpen',
+      name: ANALYTICS_JUPYTER_OPEN,
       properties: {},
     })
   })

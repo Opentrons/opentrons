@@ -6,7 +6,13 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
-from . import commands
+from opentrons_shared_data.errors import (
+    ErrorCodes,
+    EnumeratedError,
+)
+
+from .errors import ProtocolCommandFailedError
+from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
     LabwareOffset,
@@ -49,6 +55,17 @@ class ProtocolEngine:
     A ProtocolEngine instance holds the state of a protocol as it executes,
     and manages calls to a command executor that actually implements the logic
     of the commands themselves.
+
+    Lifetime:
+        Instances are single-use. Each instance is associated with a single protocol,
+        or a a single chain of robot control such as Labware Position Check.
+
+    Concurrency:
+        Instances live in `asyncio` event loops. Each instance must be constructed inside an
+        event loop, and then must be interacted with exclusively through that
+        event loop's thread--even for regular non-`async` methods, like `.pause()`.
+        (This is because there are background async tasks that monitor state changes using
+        primitives that aren't thread-safe. See ChangeNotifier.)
     """
 
     def __init__(
@@ -148,6 +165,10 @@ class ProtocolEngine:
             RunStoppedError: the run has been stopped, so no new commands
                 may be added.
         """
+        request = slot_standardization.standardize_command(
+            request, self.state_view.config.robot_type
+        )
+
         command_id = self._model_utils.generate_id()
         request_hash = commands.hash_command_params(
             create=request,
@@ -166,9 +187,12 @@ class ProtocolEngine:
         return self._state_store.commands.get(command_id)
 
     async def wait_for_command(self, command_id: str) -> None:
-        """Wait for a command to be completed."""
+        """Wait for a command to be completed.
+
+        Will also return if the engine was stopped before it reached the command.
+        """
         await self._state_store.wait_for(
-            self._state_store.commands.get_is_complete,
+            self._state_store.commands.get_command_is_final,
             command_id=command_id,
         )
 
@@ -185,7 +209,9 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The completed command, whether it succeeded or failed.
+            The command. If the command completed, it will be succeeded or failed.
+            If the engine was stopped before it reached the command,
+            the command will be queued.
         """
         command = self.add_command(request)
         await self.wait_for_command(command.id)
@@ -211,7 +237,7 @@ class ProtocolEngine:
             CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
-            condition=self._state_store.commands.get_all_complete
+            condition=self._state_store.commands.get_all_commands_final
         )
 
     async def finish(
@@ -237,6 +263,15 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
+            if (
+                isinstance(error, ProtocolCommandFailedError)
+                and error.original_error is not None
+                and self._code_in_exception_stack(
+                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
+                )
+            ):
+                drop_tips_and_home = False
+
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
@@ -276,6 +311,10 @@ class ProtocolEngine:
 
         To retrieve offsets later, see `.state_view.labware`.
         """
+        request = slot_standardization.standardize_labware_offset(
+            request, self.state_view.config.robot_type
+        )
+
         labware_offset_id = self._model_utils.generate_id()
         created_at = self._model_utils.get_timestamp()
         self._action_dispatcher.dispatch(
@@ -319,6 +358,8 @@ class ProtocolEngine:
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
+        # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
+        # tip rack?
         self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
 
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
@@ -355,3 +396,17 @@ class ProtocolEngine:
 
         for a in actions:
             self._action_dispatcher.dispatch(a)
+
+    # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
+    @staticmethod
+    def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
+        if (
+            isinstance(error, ProtocolCommandFailedError)
+            and error.original_error is not None
+        ):
+            return any(
+                code.value.code == wrapped_error.errorCode
+                for wrapped_error in error.original_error.wrappedErrors
+            )
+        else:
+            return any(code == wrapped_error.code for wrapped_error in error.wrapping)

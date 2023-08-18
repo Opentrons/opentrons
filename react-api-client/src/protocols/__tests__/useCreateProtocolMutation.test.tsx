@@ -34,6 +34,7 @@ const PROTOCOL_RESPONSE = {
   data: {
     id: '1',
     createdAt: 'now',
+    robotType: 'OT-3 Standard',
     protocolType: 'json',
     metadata: {},
     analysisSummaries: [],

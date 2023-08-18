@@ -17,7 +17,7 @@
     "increment": 0.0,
     "distance": 0.0
   },
-  "plungerMotorConfigurations": { "idle": 0.3, "run": 0.3 },
+  "plungerMotorConfigurations": { "idle": 0.05, "run": 0.3 },
   "plungerPositionsConfigurations": {
     "top": 19.5,
     "bottom": 3.0,
@@ -29,5 +29,10 @@
     "partialTipSupported": false,
     "availableConfigurations": null
   },
-  "channels": 1
+  "channels": 1,
+  "shaftDiameter": 5.0,
+  "shaftULperMM": 19.635,
+  "backCompatNames": [],
+  "backlashDistance": 0.0,
+  "quirks": ["dropTipShake"]
 }

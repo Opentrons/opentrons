@@ -168,9 +168,9 @@ describe('SaveZPoint', () => {
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
       calBlock: mockTipLengthCalBlock,
     })[0]
-    getByRole('heading', { name: 'Check z-axis on block' })
+    getByRole('heading', { name: 'Check z-axis on slot 5' })
     getByText(
-      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the block in slot 6.'
+      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the deck in slot 5.'
     )
   })
 
@@ -178,9 +178,9 @@ describe('SaveZPoint', () => {
     const { getByText, getByRole } = render({
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
     })[0]
-    getByRole('heading', { name: 'Check z-axis on trash bin' })
+    getByRole('heading', { name: 'Check z-axis on slot 5' })
     getByText(
-      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the flat surface of the trash bin.'
+      'Jog the pipette until the tip is barely touching (less than 0.1 mm) the deck in slot 5.'
     )
   })
 })

@@ -4,15 +4,21 @@ import random
 from serial import Serial  # type: ignore[import]
 from time import sleep
 from typing import List, Tuple
-from typing_extensions import Final
+from typing_extensions import Final, Literal
+
+from opentrons.types import Point
 
 FIXTURE_REBOOT_TIME = 2
 FIXTURE_NUM_CHANNELS: Final[int] = 8
 FIXTURE_BAUD_RATE: Final[int] = 115200
+FIXTURE_VERSION_REQUIRED = "1.0.0"
 
 FIXTURE_CMD_TERMINATOR = "\r\n"
 FIXTURE_CMD_GET_VERSION = "VERSION"
 FIXTURE_CMD_GET_ALL_PRESSURE = "GETPRESSURE:15"
+
+LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
+LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - 14.4)
 
 
 class PressureFixtureBase(ABC):
@@ -44,6 +50,28 @@ class PressureFixtureBase(ABC):
         """Read all pressure channels on fixture in Pascals."""
         ...
 
+    def position_in_slot(self, side: Literal["left", "right"] = "left") -> Point:
+        """Position in slot."""
+        if side == "left":
+            return LOCATION_A1_LEFT
+        else:
+            return LOCATION_A1_RIGHT
+
+    @property
+    def depth(self) -> float:
+        """Depth."""
+        return 14.0
+
+    @property
+    def tip_volume(self) -> int:
+        """Tip Volume."""
+        return 50
+
+    @property
+    def aspirate_volume(self) -> float:
+        """Aspirate Volume."""
+        return 20.0
+
 
 class SimPressureFixture(PressureFixtureBase):
     """Simulating OT3 Pressure Fixture Driver."""
@@ -62,7 +90,7 @@ class SimPressureFixture(PressureFixtureBase):
 
     def firmware_version(self) -> str:
         """Firmware version."""
-        return "0.0.0"
+        return FIXTURE_VERSION_REQUIRED
 
     def read_all_pressure_channel(self) -> List[float]:
         """Read Pressure for all channels."""
@@ -94,7 +122,10 @@ class PressureFixture(PressureFixtureBase):
         self._port.flushInput()
         # NOTE: device might take a few seconds to boot up
         sleep(FIXTURE_REBOOT_TIME)
-        assert self.firmware_version(), "unable to communicate with pressure fixture"
+        fw_version = self.firmware_version()
+        assert (
+            fw_version == FIXTURE_VERSION_REQUIRED
+        ), f"unexpected pressure-fixture version: {fw_version}"
 
     def disconnect(self) -> None:
         """Disconnect."""

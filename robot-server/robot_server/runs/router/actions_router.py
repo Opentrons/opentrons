@@ -12,11 +12,17 @@ from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResp
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 from ..engine_store import EngineStore
-from ..run_store import RunStore, RunNotFoundError
+from ..run_store import RunStore
+from ..run_models import RunNotFoundError
 from ..run_controller import RunController, RunActionNotAllowedError
-from ..action_models import RunAction, RunActionCreate
+from ..action_models import RunAction, RunActionCreate, RunActionType
 from ..dependencies import get_engine_store, get_run_store
 from .base_router import RunNotFound, RunStopped
+from robot_server.maintenance_runs import (
+    MaintenanceEngineStore,
+    get_maintenance_engine_store,
+)
+
 
 log = logging.getLogger(__name__)
 actions_router = APIRouter()
@@ -78,8 +84,15 @@ async def create_run_action(
     run_controller: RunController = Depends(get_run_controller),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    maintenance_engine_store: MaintenanceEngineStore = Depends(
+        get_maintenance_engine_store
+    ),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
+
+    When a play action is issued to a protocol run while a maintenance run is active,
+    the protocol run is given priority and the maintenance run is deleted before
+    executing the protocol run play action..
 
     Arguments:
         runId: Run ID pulled from the URL.
@@ -87,21 +100,26 @@ async def create_run_action(
         run_controller: Run controller bound to the given run ID.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
+        maintenance_engine_store: The maintenance run's EngineStore
     """
+    action_type = request_body.data.actionType
+    if (
+        action_type == RunActionType.PLAY
+        and maintenance_engine_store.current_run_id is not None
+    ):
+        await maintenance_engine_store.clear()
     try:
         action = run_controller.create_action(
             action_id=action_id,
-            action_type=request_body.data.actionType,
+            action_type=action_type,
             created_at=created_at,
         )
 
     except RunActionNotAllowedError as e:
-        raise RunActionNotAllowed(detail=str(e)).as_error(
-            status.HTTP_409_CONFLICT
-        ) from e
+        raise RunActionNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e
 
     except RunNotFoundError as e:
-        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),

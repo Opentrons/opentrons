@@ -201,7 +201,7 @@ export function makeEvent(
         source === CustomLabware.OVERWRITE_LABWARE
       ) {
         return Promise.resolve({
-          name: 'addCustomLabware',
+          name: Constants.ANALYTICS_ADD_CUSTOM_LABWARE,
           properties: {
             success: true,
             overwrite: source === CustomLabware.OVERWRITE_LABWARE,
@@ -254,7 +254,7 @@ export function makeEvent(
       }
 
       return Promise.resolve({
-        name: 'addCustomLabware',
+        name: Constants.ANALYTICS_ADD_CUSTOM_LABWARE,
         properties: { success: false, overwrite: false, error },
       })
     }

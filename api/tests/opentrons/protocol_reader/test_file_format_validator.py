@@ -27,7 +27,7 @@ from opentrons.protocol_reader.file_format_validator import (
         (4, "protocol/fixtures/4/simpleV4.json"),
         (5, "protocol/fixtures/5/simpleV5.json"),
         (6, "protocol/fixtures/6/simpleV6.json"),
-        # todo(mm, 2022-12-22): Add simpleV7 when we support that in production.
+        (7, "protocol/fixtures/7/simpleV7.json"),
     ],
 )
 async def test_valid_json_main_file(
@@ -73,9 +73,8 @@ async def test_valid_python_main_file() -> None:
 
 
 @pytest.mark.parametrize(
-    # todo(mm, 2022-12-22): Add v7+ when we support that in production.
     "identified_schema_version",
-    range(3, 7),
+    range(3, 8),
 )
 async def test_invalid_json_main(identified_schema_version: int) -> None:
     """It should raise when non-conforming JSON is provided as a main file."""

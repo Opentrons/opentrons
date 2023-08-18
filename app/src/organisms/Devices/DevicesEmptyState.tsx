@@ -16,6 +16,7 @@ import {
   SPACING,
   PrimaryButton,
   POSITION_ABSOLUTE,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { startDiscovery } from '../../redux/discovery'
@@ -41,13 +42,13 @@ export function DevicesEmptyState(): JSX.Element {
         <StyledText
           as="h1"
           fontWeight={FONT_WEIGHT_REGULAR}
-          paddingBottom={SPACING.spacing4}
+          paddingBottom={SPACING.spacing16}
           id="DevicesEmptyState_noRobotsFound"
           marginTop="20vh"
         >
           {t('no_robots_found')}
         </StyledText>
-        <Box paddingBottom={SPACING.spacing4}>
+        <Box paddingBottom={SPACING.spacing16}>
           <PrimaryButton
             onClick={handleRefresh}
             id="DevicesEmptyState_refreshButton"
@@ -61,7 +62,7 @@ export function DevicesEmptyState(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         position={POSITION_ABSOLUTE}
-        bottom={SPACING.spacingXXL}
+        bottom={SPACING.spacing40}
         left="0"
         right="0"
         marginLeft={SPACING.spacingAuto}
@@ -72,7 +73,7 @@ export function DevicesEmptyState(): JSX.Element {
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-          display="flex"
+          display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
           id="DevicesEmptyState_troubleshootingConnectionProblems"
         >
@@ -80,7 +81,7 @@ export function DevicesEmptyState(): JSX.Element {
           <Icon
             name="open-in-new"
             size="0.5rem"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           />
         </Link>
       </Flex>

@@ -18,8 +18,3 @@
   max-height: calc(100vh - 3rem);
   overflow-y: hidden;
 }
-
-.robot_workspace {
-  width: 100%;
-  height: 100%;
-}

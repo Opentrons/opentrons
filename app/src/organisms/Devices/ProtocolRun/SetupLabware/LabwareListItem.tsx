@@ -18,6 +18,7 @@ import {
   BORDERS,
   WELL_LABEL_OPTIONS,
   SIZE_AUTO,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -41,7 +42,7 @@ import { SecureLabwareModal } from './SecureLabwareModal'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
@@ -50,10 +51,10 @@ const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
   border-style: ${BORDERS.styleSolid};
-  border-width: ${SPACING.spacingXXS};
+  border-width: 1px;
   border-color: ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
 `
 
 interface LabwareListItemProps extends LabwareSetupItem {
@@ -82,7 +83,8 @@ export function LabwareListItem(
   ] = React.useState<ModuleType | null>(null)
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-
+  const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
   let slotInfo: JSX.Element | null =
     initialLocation === 'offDeck'
       ? null
@@ -92,7 +94,6 @@ export function LabwareListItem(
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
   let isHeaterShakerInProtocol: boolean = false
-  let isLatchClosed: boolean = false
   let latchCommand:
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand
@@ -135,10 +136,10 @@ export function LabwareListItem(
                 <Icon
                   name="information"
                   size="0.75rem"
-                  marginTop={SPACING.spacingXS}
+                  marginTop={SPACING.spacing4}
                 />
                 <StyledText
-                  marginLeft={SPACING.spacing2}
+                  marginLeft={SPACING.spacing4}
                   as="p"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 >
@@ -152,7 +153,11 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText as="p" color={COLORS.darkGreyEnabled}>
+          <StyledText
+            as="p"
+            color={COLORS.darkGreyEnabled}
+            marginRight={SPACING.spacing16}
+          >
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -165,10 +170,20 @@ export function LabwareListItem(
           matchingHeaterShaker != null &&
           matchingHeaterShaker.moduleType === HEATERSHAKER_MODULE_TYPE
         ) {
-          isLatchClosed =
-            matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
-            matchingHeaterShaker.data.labwareLatchStatus === 'closing'
-
+          if (
+            (!isLatchClosed &&
+              (matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'closing')) ||
+            (isLatchClosed &&
+              (matchingHeaterShaker.data.labwareLatchStatus === 'idle_open' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'opening'))
+          ) {
+            setIsLatchClosed(
+              matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'closing'
+            )
+            setIsLatchLoading(false)
+          }
           latchCommand = {
             commandType: isLatchClosed
               ? 'heaterShaker/openLabwareLatch'
@@ -182,6 +197,7 @@ export function LabwareListItem(
     }
   }
   const toggleLatch = (): void => {
+    setIsLatchLoading(true)
     createLiveCommand({
       command: latchCommand,
     }).catch((e: Error) => {
@@ -190,6 +206,18 @@ export function LabwareListItem(
       )
     })
   }
+  const commandType = isLatchClosed
+    ? 'heaterShaker/openLabwareLatch'
+    : 'heaterShaker/closeLabwareLatch'
+  let hsLatchText: string = t('secure')
+  if (commandType === 'heaterShaker/closeLabwareLatch' && isLatchLoading) {
+    hsLatchText = t('closing')
+  } else if (
+    commandType === 'heaterShaker/openLabwareLatch' &&
+    isLatchLoading
+  ) {
+    hsLatchText = t('opening')
+  }
   return (
     <LabwareRow>
       <Flex>
@@ -197,8 +225,8 @@ export function LabwareListItem(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
-          marginLeft={SPACING.spacing4}
-          marginRight={SPACING.spacing5}
+          marginLeft={SPACING.spacing16}
+          marginRight={SPACING.spacing24}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {labwareDisplayName}
@@ -211,7 +239,7 @@ export function LabwareListItem(
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           <StyledText as="p">{slotInfo}</StyledText>
@@ -219,27 +247,29 @@ export function LabwareListItem(
         </Flex>
         {isHeaterShakerInProtocol ? (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h6" minWidth="4.62rem">
+            <StyledText as="h6" minWidth="6.2rem">
               {t('labware_latch')}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginTop={SPACING.spacingS}
+              marginTop="3px"
             >
               <ToggleButton
                 label={`heater_shaker_${
                   moduleLocation?.slotName ?? ''
                 }_latch_toggle`}
                 size={SIZE_AUTO}
-                disabled={!isCorrectHeaterShakerAttached}
+                disabled={!isCorrectHeaterShakerAttached || isLatchLoading}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}
-                display="flex"
+                display={DISPLAY_FLEX}
                 alignItems={ALIGN_CENTER}
               />
-              <StyledText as="p">{t('secure')}</StyledText>
+              <StyledText as="p" width="4rem">
+                {hsLatchText}
+              </StyledText>
             </Flex>
           </Flex>
         ) : null}

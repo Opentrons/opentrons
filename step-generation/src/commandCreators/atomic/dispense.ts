@@ -33,6 +33,9 @@ export const dispense: CommandCreator<DispenseParams> = (
   const actionName = 'dispense'
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const isFlexPipette =
+    (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
+    false
   const slotName = getLabwareSlot(
     labware,
     prevRobotState.labware,
@@ -77,6 +80,8 @@ export const dispense: CommandCreator<DispenseParams> = (
         labware,
       })
     )
+  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+    errors.push(errorCreators.labwareOffDeck())
   }
 
   if (
@@ -108,41 +113,41 @@ export const dispense: CommandCreator<DispenseParams> = (
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
   }
+  if (!isFlexPipette) {
+    if (
+      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
+    ) {
+      errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+    }
 
-  if (
-    pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
-  ) {
-    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
-  }
+    if (
+      getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
+    ) {
+      errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
+    }
 
-  if (
-    getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
-  ) {
-    errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
+    if (
+      getIsHeaterShakerEastWestMultiChannelPipette(
+        prevRobotState.modules,
+        slotName,
+        pipetteSpec
+      )
+    ) {
+      errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
+    }
+    if (
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        prevRobotState.modules,
+        slotName,
+        pipetteSpec,
+        invariantContext.labwareEntities[labware]
+      )
+    ) {
+      errors.push(
+        errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
+      )
+    }
   }
-
-  if (
-    getIsHeaterShakerEastWestMultiChannelPipette(
-      prevRobotState.modules,
-      slotName,
-      pipetteSpec
-    )
-  ) {
-    errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
-  }
-  if (
-    getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
-      prevRobotState.modules,
-      slotName,
-      pipetteSpec,
-      invariantContext.labwareEntities[labware]
-    )
-  ) {
-    errors.push(
-      errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
-    )
-  }
-
   if (errors.length > 0) {
     return {
       errors,

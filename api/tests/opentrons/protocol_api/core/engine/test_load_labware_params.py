@@ -70,14 +70,55 @@ def test_resolve_load_labware_params(
     assert result == (expected_namespace, expected_version)
 
 
+@pytest.mark.parametrize(
+    "load_name",
+    [
+        "opentrons_24_aluminumblock_generic_2ml_screwcap",
+        "opentrons_96_aluminumblock_generic_pcr_strip_200ul",
+        "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "corning_384_wellplate_112ul_flat",
+        "nest_96_wellplate_100ul_pcr_full_skirt",
+        "nest_96_wellplate_200ul_flat",
+        "nest_96_wellplate_2ml_deep",
+        "opentrons_96_wellplate_200ul_pcr_full_skirt",
+        "biorad_96_wellplate_200ul_pcr",
+    ],
+)
+@pytest.mark.parametrize("namespace", [OPENTRONS_NAMESPACE, None])
+@pytest.mark.parametrize(
+    ("version", "expected_version"),
+    [
+        (None, 2),
+        (0, 0),
+        (1, 1),
+        (2, 2),
+        (123456, 123456),
+    ],
+)
+def test_version_two_and_above_default_versioning(
+    load_name: str,
+    namespace: Optional[str],
+    version: Optional[int],
+    expected_version: int,
+) -> None:
+    """It should default to version 2 for these labware."""
+    result = subject.resolve(
+        load_name=load_name,
+        namespace=namespace,
+        version=version,
+        custom_load_labware_params=[],
+    )
+    assert result == (OPENTRONS_NAMESPACE, expected_version)
+
+
 def test_resolve_load_labware_params_raises() -> None:
     """It should raise if multiple custom labware params are provided."""
     with pytest.raises(subject.AmbiguousLoadLabwareParamsError):
         subject.resolve(
-            "hello",
-            "world",
-            None,
-            [
+            load_name="hello",
+            namespace="world",
+            version=None,
+            custom_load_labware_params=[
                 LabwareLoadParams("hello", "world", 123),
                 LabwareLoadParams("hello", "world", 456),
             ],

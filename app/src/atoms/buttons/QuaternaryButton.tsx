@@ -14,8 +14,8 @@ export const QuaternaryButton = styled(NewSecondaryBtn)`
   box-shadow: none;
   color: ${COLORS.blueEnabled};
   overflow: no-wrap;
-  padding-left: ${SPACING.spacing4};
-  padding-right: ${SPACING.spacing4};
+  padding-left: ${SPACING.spacing16};
+  padding-right: ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}

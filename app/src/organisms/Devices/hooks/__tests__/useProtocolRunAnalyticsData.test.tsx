@@ -65,10 +65,12 @@ const STORED_PROTOCOL_ANALYSIS = {
     protocolName: 'stored protocol',
     source: 'stored protocol source',
   },
+  robotType: 'OT-2 Standard',
   pipettes: PIPETTES,
   modules: MODULES,
 }
 const ROBOT_PROTOCOL_ANALYSIS = {
+  robotType: 'OT-2 Standard',
   pipettes: PIPETTES,
   modules: MODULES,
 }
@@ -140,6 +142,7 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolSource: 'robot protocol source',
         protocolText: 'hashedString',
         protocolType: '',
+        robotType: 'OT-2 Standard',
       },
       runTime: '1:00:00',
     })
@@ -164,6 +167,7 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolSource: 'stored protocol source',
         protocolText: 'hashedString',
         protocolType: 'json',
+        robotType: 'OT-2 Standard',
       },
       runTime: '1:00:00',
     })

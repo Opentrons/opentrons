@@ -2,10 +2,7 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
-
 from pydantic import BaseModel, Field
-
-from opentrons.protocol_engine.types import MotorAxis
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -68,10 +65,7 @@ class OpenLabwareLatchImpl(
             # Move pipette away if it is close to the heater-shaker
             # TODO(jbl 2022-07-28) replace home movement with a retract movement
             await self._movement.home(
-                [
-                    MotorAxis.RIGHT_Z,
-                    MotorAxis.LEFT_Z,
-                ]
+                axes=self._state_view.motion.get_robot_mount_axes()
             )
 
         # Allow propagation of ModuleNotAttachedError.

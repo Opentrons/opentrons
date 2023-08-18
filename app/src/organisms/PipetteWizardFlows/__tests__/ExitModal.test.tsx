@@ -81,7 +81,7 @@ describe('ExitModal', () => {
     getByText(
       'Are you sure you want to exit before completing Pipette Calibration?'
     )
-    getByLabelText('SmallButton_default').click()
+    getByLabelText('SmallButton_primary').click()
     expect(props.goBack).toHaveBeenCalled()
     getByLabelText('SmallButton_alert').click()
     expect(props.proceed).toHaveBeenCalled()

@@ -25,8 +25,11 @@ from opentrons.hardware_control import (
     util,
 )
 from opentrons.protocol_api import labware
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -109,7 +112,7 @@ class CheckCalibrationUserFlow:
             first=ComparisonStatePerCalibration(),
             second=ComparisonStatePerCalibration(),
         )
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
         self._filtered_hw_pips = self._filter_hw_pips()
         (
             self._deck_calibration,
@@ -530,7 +533,7 @@ class CheckCalibrationUserFlow:
             CheckAttachedPipette(
                 model=hw_pip.model,
                 name=hw_pip.name,
-                tipLength=hw_pip.config.tip_length,
+                tipLength=hw_pip.active_tip_settings.default_tip_length,
                 tipRackLoadName=info_pip.tip_rack.load_name,
                 tipRackDisplay=info_pip.tip_rack._core.get_definition()["metadata"][
                     "displayName"
@@ -555,7 +558,7 @@ class CheckCalibrationUserFlow:
         return CheckAttachedPipette(
             model=self.hw_pipette.model,
             name=self.hw_pipette.name,
-            tipLength=self.hw_pipette.config.tip_length,
+            tipLength=self.hw_pipette.active_tip_settings.default_tip_length,
             tipRackLoadName=self.active_pipette.tip_rack.load_name,
             tipRackDisplay=display_name,
             tipRackUri=self.active_pipette.tip_rack.uri,
@@ -837,8 +840,8 @@ class CheckCalibrationUserFlow:
                 self.active_tiprack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = self.hw_pipette.config.tip_overlap.get(
-                self.active_tiprack.uri, self.hw_pipette.config.tip_overlap["default"]
+            tip_overlap = self.hw_pipette.tip_overlap.get(
+                self.active_tiprack.uri, self.hw_pipette.tip_overlap["default"]
             )
             tip_length = self.active_tiprack.tip_length
             return tip_length - tip_overlap

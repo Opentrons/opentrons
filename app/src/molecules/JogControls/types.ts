@@ -1,6 +1,7 @@
 import {
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
+  NULL_STEP_SIZE_MM,
   SMALL_STEP_SIZE_MM,
   MEDIUM_STEP_SIZE_MM,
   LARGE_STEP_SIZE_MM,
@@ -9,6 +10,7 @@ import {
 export type Axis = 'x' | 'y' | 'z'
 export type Sign = -1 | 1
 export type StepSize =
+  | typeof NULL_STEP_SIZE_MM
   | typeof SMALL_STEP_SIZE_MM
   | typeof MEDIUM_STEP_SIZE_MM
   | typeof LARGE_STEP_SIZE_MM

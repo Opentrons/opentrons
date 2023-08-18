@@ -4,55 +4,51 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.1.0
+# Internal Release 0.14.0
 
-This is 0.1.0, the first internal release for the Opentrons Flex robot software, involving both robot control and the on-device display.
+## New Stuff In This Release
 
-This is still pretty early in the process, so some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
+- Return tip heights and some other pipette behaviors are now properly executed based on the kind of tip being used
+- Release Flex robot software builds are now cryptographically signed. If you run a release build, you can only install other properly signed release builds. Note that if the robot was previously on a non-release build this won't latch; remove the update server config file at ``/var/lib/otupdate/config.json`` to go back to signed builds only. 
+- Error handling has been overhauled; all errors now display with an error code for easier reporting. Many of those error codes are the 4000 catchall still but this will improve over time.
+- Further updates to Flex motion control parameters from hardware testing for both gantry and plunger speeds and acceleration
+- Pipette overpressure detection is now integrated.
+- All instrument flows should now show errors if they occur instead of skipping a step
+- Fixes to several incorrect status displays in ODD (i.e. protocols skipping the full-color outcome splash)
+- Robot can now handle json protocol v7
+- Support for PVT (v1.1) grippers
+- Update progress should get displayed after restart for firmware updates
+- Removed `use_pick_up_location_lpc_offset` and `use_drop_location_lpc_offset` from `protocol_context.move_labware` arguments. So they should be removed from any protocols that used them. This change also requires resetting the protocol run database on the robot.
+- Added 'contextual' gripper offsets to deck, labware and module definitions. So, any labware movement offsets that were previously being specified in the protocol should now be removed or adjusted or they will get added twice.
 
-## Hardware Revision Compatibility
-
-- This release will work best on a DVT robot frame with a programmed rear-panel board. If that doesn't apply, edit `/data/feature_flags.json` and turn `rearPanelIntegration` to `false` or the robot server won't start.
-- This release is compatible with EVT pipettes and gripper only if they have received the tool ID rework.
-- This release is compatible with DVT pipettes and gripper.
-- This release is _not_ compatible with DVT module caddies.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
-### ODD
-- Attach, detach, and calibration flows for pipettes or gripper
-- Deleting protocols stored on the robot via the ODD
-- Changing the text size on the ODD through the settings
-
 ### Robot Control
-- USB connectivity
-- Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot or restart the robot server
-- Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
+- Pipette pressure sensing for liquid-level sensing purposes
 - Labware pick up failure with gripper
-- Cancelling a protocol might hang - fix is to restart
+- E-stop integrated handling especially with modules
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
-- Liquid handling protocols with 1 and 8 channel pipettes
+- Protocol behavior
 - Labware movement between slots/modules, both manual and with gripper, from python protocols
 - Labware drop/gripper crash errors, but they're very insensitive
 - Pipette and gripper automated offset calibration
 - Network connectivity and discoverability
-- Firmware update for all devices attached when the robot turns on
+- Firmware update for all devices 
+- Cancelling a protocol run. We're even more sure we fixed this so definitely tell us if it's not.
+- USB connectivity
+- Stall detection firing basically ever unless you clearly ran into something
 
 ### ODD
-- Protocol execution
+- Protocol execution including end-of-protocol screen
+- Protocol run monitoring
+- Attach and calibrate
 - Network connection management, including viewing IP addresses and connecting to wifi networks
 - Automatic updates of robot software when new internal releases are created
 - Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
 - After a while, the ODD should go into idle; if you touch it, it will come back online
 
-## Smaller Known Issues
-### Robot Control
-- Pipette and gripper automated offset calibration still uses linear search and might have issues; double check that it worked right
 
-## Smaller fun features
-- Pipette firmware senses tips now and puts it on the canbus 
-- The Z-stage will now update its position from encoders after picking up tip instead of homing
-- Some nice images and animations are in place while the robot is starting
-- You can change the brightness of the ODD through the settings
+

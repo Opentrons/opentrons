@@ -74,6 +74,7 @@ def generate_device_info(
                     None,
                     PCBARevision(revision, None),
                     subidentifier=0,
+                    ok=True,
                 )
             }
         )
@@ -90,6 +91,7 @@ def generate_device_info(
                     None,
                     PCBARevision(revision, None),
                     subidentifier=0,
+                    ok=True,
                 )
             }
         )
@@ -147,9 +149,14 @@ def test_revision_defaulting_for_core(
 ) -> None:
     """We should pass through non-default revs and default ones that are not present."""
     _, rev = _update_type_for_device(
-        {},
         DeviceInfoCache(
-            node, 2, "abcdef12", None, PCBARevision(main=reported_rev), subidentifier=0
+            node,
+            2,
+            "abcdef12",
+            None,
+            PCBARevision(main=reported_rev),
+            subidentifier=0,
+            ok=True,
         ),
     )
     if reported_rev:
@@ -168,27 +175,17 @@ def test_revision_defaulting_for_core(
     ],
 )
 @pytest.mark.parametrize(
-    "pipette_type,default_rev,subidentifier",
-    [
-        (cast(Optional[PipetteType], pipette_type), default_rev, 0)
-        for pipette_type, default_rev in _DEFAULT_PCBA_REVS_PIPETTE.items()
-    ]
-    + [
-        (None, default_rev, pipette_type.value)
-        for pipette_type, default_rev in _DEFAULT_PCBA_REVS_PIPETTE.items()
-    ],
+    "subidentifier",
+    [pipette_type.value for pipette_type, _ in _DEFAULT_PCBA_REVS_PIPETTE.items()],
 )
-@pytest.mark.parametrize("reported_rev", ["a1", "b2", None])
+@pytest.mark.parametrize("reported_rev", ["a1", "b2", "c1"])
 def test_revision_defaulting_for_pipette(
     node: NodeId,
-    pipette_type: Optional[PipetteType],
-    default_rev: str,
     subidentifier: int,
     reported_rev: Optional[str],
 ) -> None:
-    """We should pass through non-default revs and default ones that are not present."""
+    """We should pass through revisions."""
     _, rev = _update_type_for_device(
-        {node: pipette_type} if pipette_type else {},
         DeviceInfoCache(
             node,
             2,
@@ -196,12 +193,10 @@ def test_revision_defaulting_for_pipette(
             None,
             PCBARevision(main=reported_rev),
             subidentifier=subidentifier,
+            ok=True,
         ),
     )
-    if reported_rev:
-        assert rev == reported_rev
-    else:
-        assert rev == default_rev
+    assert rev == reported_rev
 
 
 def test_firmware_file_selected_for_revision() -> None:
@@ -348,9 +343,7 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=known_firmware_updates),
     ):
-        firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}
-        )
+        firmware_updates = check_firmware_updates(device_info_cache)
         assert firmware_updates
         assert len(firmware_updates) == len(device_info_cache)
         for node_id in firmware_updates:
@@ -389,7 +382,7 @@ def test_check_firmware_updates_available_nodes_specified(
         mock.Mock(return_value=known_firmware_updates),
     ):
         firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}, targets={NodeId.gripper}
+            device_info_cache, targets={NodeId.gripper}
         )
         # only the gripper needs an update
         assert len(firmware_updates) == 1
@@ -404,9 +397,7 @@ def test_check_firmware_updates_available_forced(mock_manifest: Dict[str, Any]) 
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=known_firmware_updates),
     ):
-        firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}, force=True
-        )
+        firmware_updates = check_firmware_updates(device_info_cache, force=True)
         assert firmware_updates
         assert len(firmware_updates) == len(device_info_cache)
         for node_id in firmware_updates:
@@ -421,7 +412,7 @@ def test_load_firmware_manifest_is_empty(mock_manifest: Dict[str, Any]) -> None:
         mock.Mock(return_value={}),
     ):
         firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}
+            device_info_cache,
         )
         assert firmware_updates == {}
 
@@ -430,7 +421,13 @@ def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
     """Don't do updates if the FirmwareUpdateType is unknown."""
     device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
         NodeId.head: DeviceInfoCache(
-            NodeId.head, 2, "12345678", None, PCBARevision(None), subidentifier=0
+            NodeId.head,
+            2,
+            "12345678",
+            None,
+            PCBARevision(None),
+            subidentifier=0,
+            ok=False,
         )
     }
     known_firmware_updates = generate_update_info(mock_manifest)
@@ -439,5 +436,5 @@ def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value={}),
     ):
-        firmware_updates = check_firmware_updates(device_info, attached_pipettes={})
+        firmware_updates = check_firmware_updates(device_info)
         assert firmware_updates == {}

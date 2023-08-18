@@ -17,12 +17,12 @@ const id = 'Tooltip_123'
 const tooltipRef = jest.fn()
 const tooltipStyle = {
   position: POSITION_ABSOLUTE,
-  left: SPACING.spacing2,
+  left: SPACING.spacing4,
 } as const
 const arrowRef = jest.fn()
 const arrowStyle = {
   position: POSITION_ABSOLUTE,
-  left: SPACING.spacing3,
+  left: SPACING.spacing8,
 } as const
 
 const MockTooltipProps = {

@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Set, Union, cast, Tuple
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
@@ -16,6 +17,7 @@ from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ..._liquid import Liquid
+from ..._types import OffDeckType
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -41,8 +43,8 @@ class LegacyProtocolCore(
         sync_hardware: SyncHardwareAPI,
         api_version: APIVersion,
         labware_offset_provider: AbstractLabwareOffsetProvider,
+        deck_layout: Deck,
         equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
-        deck_layout: Optional[Deck] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
@@ -70,15 +72,15 @@ class LegacyProtocolCore(
         self._sync_hardware = sync_hardware
         self._api_version = api_version
         self._labware_offset_provider = labware_offset_provider
+        self._deck_layout = deck_layout
         self._equipment_broker = equipment_broker or EquipmentBroker()
-        self._deck_layout = Deck() if deck_layout is None else deck_layout
 
         self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
-            mount: None for mount in Mount
+            mount: None for mount in Mount.ot2_mounts()  # Legacy core works only on OT2
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
-        self._default_max_speeds = AxisMaxSpeeds()
+        self._default_max_speeds = AxisMaxSpeeds(robot_type=self.robot_type)
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
@@ -89,6 +91,10 @@ class LegacyProtocolCore(
     def api_version(self) -> APIVersion:
         """Get the API version the protocol is adhering to."""
         return self._api_version
+
+    @property
+    def robot_type(self) -> RobotType:
+        return "OT-2 Standard"
 
     @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
@@ -141,12 +147,26 @@ class LegacyProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
+        location: Union[
+            DeckSlotName,
+            LegacyLabwareCore,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LegacyLabwareCore:
         """Load a labware using its identifying parameters."""
+        if isinstance(location, OffDeckType):
+            raise APIVersionError(
+                "Loading a labware off deck is only supported with apiLevel 2.15 and newer."
+            )
+        elif isinstance(location, LegacyLabwareCore):
+            raise APIVersionError(
+                "Loading a labware onto another labware or adapter is only supported with api version 2.15 and above"
+            )
+
         deck_slot = (
             location if isinstance(location, DeckSlotName) else location.get_deck_slot()
         )
@@ -213,14 +233,27 @@ class LegacyProtocolCore(
 
         return labware_core
 
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LegacyLabwareCore:
+        """Load an adapter using its identifying parameters"""
+        raise APIVersionError("Loading adapter is not supported in this API version.")
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LegacyLabwareCore,
-        new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
+        new_location: Union[
+            DeckSlotName,
+            LegacyLabwareCore,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
+        ],
         use_gripper: bool,
-        use_pick_up_location_lpc_offset: bool,
-        use_drop_location_lpc_offset: bool,
         pick_up_offset: Optional[Tuple[float, float, float]],
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
@@ -236,7 +269,7 @@ class LegacyProtocolCore(
         """Load a module."""
         resolved_type = ModuleType.from_model(model)
         resolved_location = self._deck_layout.resolve_module_location(
-            resolved_type, deck_slot
+            resolved_type, (None if deck_slot is None else deck_slot.id)
         )
 
         selected_hardware = None
@@ -411,6 +444,11 @@ class LegacyProtocolCore(
         labware = module_core.geometry.labware
         return cast(LegacyLabwareCore, labware._core) if labware is not None else None
 
+    def get_labware_on_labware(
+        self, labware_core: LegacyLabwareCore
+    ) -> Optional[LegacyLabwareCore]:
+        assert False, "get_labware_on_labware only supported on engine core"
+
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
@@ -437,6 +475,8 @@ class LegacyProtocolCore(
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
-    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
+    ) -> Union[
+        str, LegacyLabwareCore, legacy_module_core.LegacyModuleCore, OffDeckType
+    ]:
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"

@@ -14,7 +14,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { fetchWifiList, getCanDisconnect } from '../../../redux/networking'
+import { useCanDisconnect } from '../../../resources/networking/hooks'
 import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
@@ -28,7 +28,7 @@ jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
 jest.mock('../hooks')
 jest.mock('../../../redux/buildroot')
-jest.mock('../../../redux/networking')
+jest.mock('../../../resources/networking/hooks')
 jest.mock(
   '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 )
@@ -58,11 +58,8 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
   typeof DisconnectModal
 >
-const mockGetCanDisconnect = getCanDisconnect as jest.MockedFunction<
-  typeof getCanDisconnect
->
-const mockFetchWifiList = fetchWifiList as jest.MockedFunction<
-  typeof fetchWifiList
+const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
+  typeof useCanDisconnect
 >
 
 const render = (
@@ -98,8 +95,8 @@ describe('RobotOverviewOverflowMenu', () => {
       <div>choose protocol slideout</div>
     )
     when(mockDisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, mockConnectableRobot.name)
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
       .mockReturnValue(true)
   })
   afterEach(() => {
@@ -193,7 +190,7 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
-  it('clicking home gantry should home the gantry', () => {
+  it('clicking home gantry should home the robot arm', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button')
@@ -206,8 +203,8 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, mockConnectableRobot.name)
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
       .mockReturnValue(false)
 
     const { getByRole, queryByText } = render(props)
@@ -281,24 +278,5 @@ describe('RobotOverviewOverflowMenu', () => {
     const btn = getByRole('button')
     fireEvent.click(btn)
     expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()
-  })
-
-  it('dispatches fetchWifiList on mount and on an interval', () => {
-    render({ robot: mockUnreachableRobot })
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      1,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(20000)
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      2,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      3,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(3)
   })
 })

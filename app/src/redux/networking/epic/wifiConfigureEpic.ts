@@ -53,9 +53,7 @@ const handleWifiConfigureSuccessEpic: Epic = action$ => {
     ofType<Action, PostWifiConfigureSuccessAction>(
       Constants.POST_WIFI_CONFIGURE_SUCCESS
     ),
-    switchMap(action =>
-      of(Actions.fetchWifiList(action.payload.robotName), startDiscovery())
-    )
+    switchMap(() => of(startDiscovery()))
   )
 }
 

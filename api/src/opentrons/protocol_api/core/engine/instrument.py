@@ -325,6 +325,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         location: Optional[Location],
         well_core: WellCore,
         home_after: Optional[bool],
+        alternate_drop_location: Optional[bool] = False,
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -333,6 +334,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 Used to calculate the relative well offset for the drop command.
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
+            alternate_drop_location: Whether to randomize the exact location to drop tip
+                within the specified well.
         """
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
@@ -359,6 +362,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
             home_after=home_after,
+            alternateDropLocation=alternate_drop_location,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -449,6 +453,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_max_volume(self) -> float:
         return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
+
+    def get_working_volume(self) -> float:
+        return self._engine_client.state.pipettes.get_working_volume(self._pipette_id)
 
     def get_current_volume(self) -> float:
         try:

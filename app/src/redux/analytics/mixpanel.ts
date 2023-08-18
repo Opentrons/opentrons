@@ -20,12 +20,15 @@ const MIXPANEL_OPTS = {
   track_pageview: false,
 }
 
-export function initializeMixpanel(config: AnalyticsConfig): void {
+export function initializeMixpanel(
+  config: AnalyticsConfig,
+  isOnDevice: boolean | null
+): void {
   if (MIXPANEL_ID) {
     log.debug('Initializing Mixpanel', { config })
 
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
-    setMixpanelTracking(config)
+    setMixpanelTracking(config, isOnDevice)
     trackEvent({ name: 'appOpen', properties: {} }, config)
   } else {
     log.warn('MIXPANEL_ID not found; this is a bug if build is production')
@@ -46,17 +49,27 @@ export function trackEvent(
   }
 }
 
-export function setMixpanelTracking(config: AnalyticsConfig): void {
+export function setMixpanelTracking(
+  config: AnalyticsConfig,
+  isOnDevice: boolean | null
+): void {
   if (MIXPANEL_ID) {
     if (config.optedIn) {
       log.debug('User has opted into analytics; tracking with Mixpanel')
       mixpanel.identify(config.appId)
       mixpanel.opt_in_tracking()
-      mixpanel.register({ appVersion: CURRENT_VERSION, appId: config.appId })
+      mixpanel.register({
+        appVersion: CURRENT_VERSION,
+        appId: config.appId,
+        appMode: isOnDevice ? 'ODD' : 'Desktop',
+      })
     } else {
       log.debug('User has opted out of analytics; stopping tracking')
-      mixpanel.opt_out_tracking()
-      mixpanel.reset()
+      const config = mixpanel?.get_config?.()
+      if (config != null) {
+        mixpanel.opt_out_tracking?.()
+        mixpanel.reset?.()
+      }
     }
   }
 }

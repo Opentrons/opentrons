@@ -1,31 +1,15 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
-import { useRunStatuses } from '../../Devices/hooks'
-import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../useModuleIdFromRun')
-jest.mock('../../Devices/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
->
-const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
-  typeof useCreateCommandMutation
->
-const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
-  typeof useModuleIdFromRun
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
 >
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
@@ -34,55 +18,16 @@ const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
   })[0]
 }
 
-const mockMovingHeaterShaker = {
-  id: 'heatershaker_id',
-  moduleModel: 'heaterShakerModuleV1',
-  moduleType: 'heaterShakerModuleType',
-  serialNumber: 'jkl123',
-  hardwareRevision: 'heatershaker_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    labwareLatchStatus: 'idle_closed',
-    speedStatus: 'speeding up',
-    temperatureStatus: 'idle',
-    currentSpeed: null,
-    currentTemperature: null,
-    targetSpeed: null,
-    targetTemp: null,
-    errorDetails: null,
-    status: 'idle',
-  },
-  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
-} as any
-
 describe('HeaterShakerSlideout', () => {
   let props: React.ComponentProps<typeof HeaterShakerSlideout>
   let mockCreateLiveCommand = jest.fn()
-  let mockCreateCommand = jest.fn()
 
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseRunStatuses.mockReturnValue({
-      isRunRunning: false,
-      isRunStill: false,
-      isRunTerminal: true,
-      isRunIdle: false,
-    })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
-    } as any)
-
-    mockUseModuleIdFromRun.mockReturnValue({
-      moduleIdFromRun: 'heatershaker_id',
-    })
   })
 
   afterEach(() => {
@@ -94,7 +39,6 @@ describe('HeaterShakerSlideout', () => {
       module: mockHeaterShaker,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -110,7 +54,6 @@ describe('HeaterShakerSlideout', () => {
       module: mockHeaterShaker,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      isLoadedInRun: false,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -136,7 +79,6 @@ describe('HeaterShakerSlideout', () => {
       module: mockHeaterShaker,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      isLoadedInRun: false,
     }
     const { getByLabelText, getByTestId } = render(props)
     const button = getByLabelText('exit')
@@ -146,52 +88,5 @@ describe('HeaterShakerSlideout', () => {
 
     expect(props.onCloseClick).toHaveBeenCalled()
     expect(input).not.toHaveValue()
-  })
-
-  it('renders the button and it is not clickable until there is something in form field for set temp when there is a runId', () => {
-    mockUseRunStatuses.mockReturnValue({
-      isRunRunning: false,
-      isRunStill: false,
-      isRunTerminal: false,
-      isRunIdle: true,
-    })
-    props = {
-      module: mockHeaterShaker,
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-      isLoadedInRun: true,
-      currentRunId: 'test123',
-    }
-    const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
-    const input = getByTestId('heaterShakerModuleV1_setTemp')
-    fireEvent.change(input, { target: { value: '40' } })
-    expect(button).toBeEnabled()
-    fireEvent.click(button)
-    expect(props.onCloseClick).toHaveBeenCalled()
-
-    expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.currentRunId,
-      command: {
-        commandType: 'heaterShaker/setTargetTemperature',
-        params: {
-          moduleId: 'heatershaker_id',
-          celsius: 40,
-        },
-      },
-    })
-    expect(button).not.toBeEnabled()
-  })
-
-  it('input value is disabled when heater shaker is shaking', () => {
-    props = {
-      module: mockMovingHeaterShaker,
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-      isLoadedInRun: false,
-    }
-    const { getByTestId } = render(props)
-    const input = getByTestId('heaterShakerModuleV1_setTemp')
-    expect(input).toBeDisabled()
   })
 })

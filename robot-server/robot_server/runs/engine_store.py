@@ -5,12 +5,19 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
+from opentrons.protocol_runner import (
+    AnyRunner,
+    JsonRunner,
+    PythonAndLegacyRunner,
+    RunResult,
+    create_protocol_runner,
+)
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     Config as ProtocolEngineConfig,
-    StateSummary,
+    DeckType,
     LabwareOffsetCreate,
+    ProtocolEngine,
+    StateSummary,
     create_protocol_engine,
 )
 
@@ -27,10 +34,10 @@ class EngineConflictError(RuntimeError):
 
 
 class RunnerEnginePair(NamedTuple):
-    """A stored ProtocolRunner/ProtocolEngine pair."""
+    """A stored Runner/ProtocolEngine pair."""
 
     run_id: str
-    runner: ProtocolRunner
+    runner: AnyRunner
     engine: ProtocolEngine
 
 
@@ -41,6 +48,7 @@ class EngineStore:
         self,
         hardware_api: HardwareControlAPI,
         robot_type: RobotType,
+        deck_type: DeckType,
     ) -> None:
         """Initialize an engine storage interface.
 
@@ -48,9 +56,11 @@ class EngineStore:
             hardware_api: Hardware control API instance used for ProtocolEngine
                 construction.
             robot_type: Passed along to `opentrons.protocol_engine.Config`.
+            deck_type: Passed along to `opentrons.protocol_engine.Config`.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
+        self._deck_type = deck_type
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
 
@@ -61,7 +71,7 @@ class EngineStore:
         return self._runner_engine_pair.engine
 
     @property
-    def runner(self) -> ProtocolRunner:
+    def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
         assert self._runner_engine_pair is not None, "Runner not yet created."
         return self._runner_engine_pair.runner
@@ -98,6 +108,7 @@ class EngineStore:
                 hardware_api=self._hardware_api,
                 config=ProtocolEngineConfig(
                     robot_type=self._robot_type,
+                    deck_type=self._deck_type,
                     block_on_door_open=False,
                 ),
             )
@@ -129,19 +140,29 @@ class EngineStore:
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
+                deck_type=self._deck_type,
                 block_on_door_open=feature_flags.enable_door_safety_switch(),
             ),
         )
-        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
+        runner = create_protocol_runner(
+            protocol_engine=engine,
+            hardware_api=self._hardware_api,
+            protocol_config=protocol.source.config if protocol else None,
+        )
 
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")
 
-        if protocol is not None:
+        if isinstance(runner, (PythonAndLegacyRunner, JsonRunner)):
             # FIXME(mm, 2022-12-21): This `await` introduces a concurrency hazard. If
             # two requests simultaneously call this method, they will both "succeed"
             # (with undefined results) instead of one raising EngineConflictError.
+            assert (
+                protocol is not None
+            ), "A Python or JSON protocol should have a protocol source file."
             await runner.load(protocol.source)
+        else:
+            runner.prepare()
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
@@ -154,7 +175,7 @@ class EngineStore:
 
         return engine.state_view.get_summary()
 
-    async def clear(self) -> ProtocolRunResult:
+    async def clear(self) -> RunResult:
         """Remove the persisted ProtocolEngine.
 
         Raises:
@@ -173,4 +194,4 @@ class EngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return ProtocolRunResult(state_summary=run_data, commands=commands)
+        return RunResult(state_summary=run_data, commands=commands)

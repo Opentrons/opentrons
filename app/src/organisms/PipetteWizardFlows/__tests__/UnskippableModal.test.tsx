@@ -19,7 +19,7 @@ describe('UnskippableModal', () => {
     const { getByText, getByRole } = render(props)
     getByText('This is a critical step that cannot be skipped')
     getByText('You must detach the mounting plate before using other pipettes.')
-    getByRole('button', { name: 'return' }).click()
+    getByRole('button', { name: 'Return' }).click()
     expect(props.goBack).toHaveBeenCalled()
   })
   it('renders the is on device button with correct text when it is on device display', () => {

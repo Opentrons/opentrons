@@ -8,12 +8,13 @@ import {
   LabwareRender,
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
-import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
-import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
-import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
+import { getIsOnDevice } from '../../../../../redux/config'
 import { useLabwareRenderInfoForRunById } from '../../../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
+import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
+import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
+import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
@@ -27,12 +28,13 @@ jest.mock('@opentrons/components', () => {
   }
 })
 jest.mock('@opentrons/api-client')
+jest.mock('../../../../../redux/config')
+jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+jest.mock('../../../../Devices/hooks')
 jest.mock('../../utils/getSlotLabwareName')
 jest.mock('../../utils/getSlotLabwareDefinition')
-jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../utils')
 jest.mock('../LiquidDetailCard')
-jest.mock('../../../../Devices/hooks')
 
 const mockLiquidDetailCard = LiquidDetailCard as jest.MockedFunction<
   typeof LiquidDetailCard
@@ -60,6 +62,9 @@ const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jes
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
+>
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
 >
 const render = (
   props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
@@ -119,7 +124,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     mockUseMostRecentCompletedAnalysis.mockReturnValue(
       {} as CompletedProtocolAnalysis
     )
-
+    mockGetIsOnDevice.mockReturnValue(false)
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props
       .calledWith(
@@ -148,6 +153,15 @@ describe('LiquidsLabwareDetailsModal', () => {
     getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
   it('should render labware render with well fill', () => {
+    mockGetWellFillFromLabwareId.mockReturnValue({
+      C1: '#ff4888',
+      C2: '#ff4888',
+    })
+    const [{ getByText }] = render(props)
+    getByText('mock labware render with well fill')
+  })
+  it('should render labware render with well fill on odd', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
     mockGetWellFillFromLabwareId.mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',

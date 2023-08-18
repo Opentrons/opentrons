@@ -43,16 +43,16 @@ export function InterstitialTitleBar(
       css={TITLE_BAR}
       data-testid="titlebar"
     >
-      <Flex padding={SPACING.spacingXS} data-testid={`titlebar_${title}`}>
+      <Flex padding={SPACING.spacing4} data-testid={`titlebar_${title}`}>
         <Icon
           name="ot-logo"
           width={TYPOGRAPHY.lineHeight18}
           height={TYPOGRAPHY.lineHeight18}
-          paddingTop={SPACING.spacing1}
+          paddingTop={SPACING.spacing2}
           aria-label="ot-logo"
         />
         <Flex
-          paddingLeft={SPACING.spacingXS}
+          paddingLeft={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH3}
         >
@@ -65,8 +65,8 @@ export function InterstitialTitleBar(
           data-testid={`titlebar_${exit.title}`}
         >
           <StyledText
-            paddingRight={SPACING.spacingSS}
-            paddingTop={SPACING.spacingXS}
+            paddingRight={SPACING.spacing8}
+            paddingTop={SPACING.spacing4}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH3}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -76,7 +76,7 @@ export function InterstitialTitleBar(
           <Btn
             size="1.5rem"
             onClick={exit.onClick}
-            paddingTop={SPACING.spacingS}
+            paddingTop="3px"
             aria-label="close_btn"
           >
             <Icon name="close" aria-label="close" color={COLORS.white} />

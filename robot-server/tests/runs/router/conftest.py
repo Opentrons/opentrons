@@ -7,6 +7,8 @@ from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_store import RunStore
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.maintenance_runs import MaintenanceEngineStore
+
 from opentrons.protocol_engine import ProtocolEngine
 
 
@@ -44,3 +46,9 @@ def mock_run_data_manager(decoy: Decoy) -> RunDataManager:
 def mock_run_auto_deleter(decoy: Decoy) -> RunAutoDeleter:
     """Get a mock RunAutoDeleter interface."""
     return decoy.mock(cls=RunAutoDeleter)
+
+
+@pytest.fixture()
+def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
+    """Get a mock MaintenanceEngineStore interface."""
+    return decoy.mock(cls=MaintenanceEngineStore)

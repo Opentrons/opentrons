@@ -20,21 +20,23 @@ import {
 } from '@opentrons/api-client'
 import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import { StyledText } from '../../../atoms/text'
+import { EmptySection } from './EmptySection'
+
 import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
-  border-spacing: 0 ${BORDERS.size_two};
-  margin: ${SPACING.spacing4} 0;
+  border-spacing: 0 ${BORDERS.borderRadiusSize2};
+  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3} ${SPACING.spacing5};
-  color: ${COLORS.darkBlack_seventy};
+  padding: 0 ${SPACING.spacing24} 0 ${SPACING.spacing24};
+  color: ${COLORS.darkBlack70};
 `
 
 const TableRow = styled('tr')`
@@ -42,19 +44,18 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  padding: ${SPACING.spacing4} ${SPACING.spacing5};
-  background-color: ${COLORS.light_one};
-  font-size: ${TYPOGRAPHY.fontSize22};
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
+  background-color: ${COLORS.light1};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.size_three};
-    border-bottom-left-radius: ${BORDERS.size_three};
+    border-top-left-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
     width: 80%;
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.size_three};
-    border-bottom-right-radius: ${BORDERS.size_three};
+    border-top-right-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-right-radius: ${BORDERS.borderRadiusSize3};
   }
 `
 
@@ -73,7 +74,9 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
   )
   const { t, i18n } = useTranslation('protocol_details')
 
-  return (
+  return liquidsInOrder.length === 0 ? (
+    <EmptySection section="liquids" />
+  ) : (
     <Table>
       <thead>
         <tr>
@@ -94,15 +97,14 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   alignItems={TYPOGRAPHY.textAlignCenter}
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
                   <Flex
-                    borderRadius={BORDERS.size_two}
-                    padding={SPACING.spacing4}
+                    borderRadius={BORDERS.borderRadiusSize2}
+                    padding={SPACING.spacing16}
                     backgroundColor={COLORS.white}
                     height="3.75rem"
                     width="3.75rem"
-                    marginRight={SPACING.spacing4}
+                    marginRight={SPACING.spacing16}
                   >
                     <Icon
                       name="circle"
@@ -111,14 +113,11 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText lineHeight="1.75rem">
-                      {liquid.displayName}
+                    <StyledText as="p">
+                      {i18n.format(liquid.displayName, 'titleCase')}
                     </StyledText>
-                    <StyledText
-                      lineHeight="1.75rem"
-                      color={COLORS.darkBlack_seventy}
-                    >
-                      {liquid.description}
+                    <StyledText as="p" color={COLORS.darkBlack70}>
+                      {i18n.format(liquid.description, 'titleCase')}
                     </StyledText>
                   </Flex>
                 </Flex>
@@ -126,10 +125,10 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
 
               <TableDatum>
                 <Flex
-                  backgroundColor={COLORS.darkBlack_twenty}
+                  backgroundColor={COLORS.darkBlack20}
                   borderRadius={BORDERS.radiusSoftCorners}
                   height="2.75rem"
-                  padding={`${SPACING.spacing3} 0.75rem`}
+                  padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
                   width="max-content"
                   alignItems={TYPOGRAPHY.textAlignCenter}
                   marginRight={SPACING.spacingAuto}

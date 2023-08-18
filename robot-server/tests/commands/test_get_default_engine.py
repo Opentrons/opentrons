@@ -13,12 +13,6 @@ from robot_server.commands.get_default_engine import get_default_engine
 
 
 @pytest.fixture()
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out HardwareControlAPI."""
-    return decoy.mock(cls=HardwareControlAPI)
-
-
-@pytest.fixture()
 def protocol_engine(decoy: Decoy) -> ProtocolEngine:
     """Get a mocked out ProtocolEngine."""
     return decoy.mock(cls=ProtocolEngine)

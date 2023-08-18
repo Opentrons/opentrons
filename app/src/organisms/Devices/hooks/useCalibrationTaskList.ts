@@ -6,8 +6,9 @@ import {
   useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
 
-import { useAttachedPipettes, useDeckCalibrationData } from '.'
+import { useAttachedPipettes } from '.'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
+import { DECK_CAL_STATUS_OK } from '../../../redux/calibration/constants'
 import { formatTimestamp } from '../utils'
 
 import type {
@@ -24,7 +25,6 @@ import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
 const CALIBRATION_DATA_POLL_MS = 5000
 
 export function useCalibrationTaskList(
-  robotName: string,
   pipOffsetCalLauncher: DashboardCalOffsetInvoker = () => {},
   tipLengthCalLauncher: DashboardCalTipLengthInvoker = () => {},
   deckCalLauncher: DashboardCalDeckInvoker = () => {}
@@ -38,27 +38,41 @@ export function useCalibrationTaskList(
     activeIndex: null,
     taskListStatus: 'incomplete',
     taskList: [],
+    isLoading: false,
   }
-  // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
-  const {
-    isDeckCalibrated,
-    deckCalibrationData,
-    markedBad,
-  } = useDeckCalibrationData(robotName)
   const attachedPipettes = useAttachedPipettes()
+
+  const {
+    data: calStatusData,
+    isLoading: calStatusIsLoading,
+  } = useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
+  const {
+    data: pipOffsetData,
+    isLoading: pipOffsetIsLoading,
+  } = useAllPipetteOffsetCalibrationsQuery({
+    refetchInterval: CALIBRATION_DATA_POLL_MS,
+  })
+  const {
+    data: tipLengthData,
+    isLoading: tipLengthIsLoading,
+  } = useAllTipLengthCalibrationsQuery({
+    refetchInterval: CALIBRATION_DATA_POLL_MS,
+  })
+
+  taskList.isLoading =
+    calStatusIsLoading || pipOffsetIsLoading || tipLengthIsLoading
+  // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
+  const deckCalibrations = calStatusData?.deckCalibration ?? null
+
+  const isDeckCalibrated =
+    deckCalibrations?.status != null &&
+    deckCalibrations?.status === DECK_CAL_STATUS_OK
+
+  const deckCalibrationData = deckCalibrations?.data
+
   // get calibration data for mounted pipette subtasks
-
-  useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
-
-  const offsetCalibrations =
-    useAllPipetteOffsetCalibrationsQuery({
-      refetchInterval: CALIBRATION_DATA_POLL_MS,
-    })?.data?.data ?? []
-
-  const tipLengthCalibrations =
-    useAllTipLengthCalibrationsQuery({
-      refetchInterval: CALIBRATION_DATA_POLL_MS,
-    })?.data?.data ?? []
+  const offsetCalibrations = pipOffsetData?.data ?? []
+  const tipLengthCalibrations = tipLengthData?.data ?? []
 
   // first create the shape of the deck calibration task, then update values based on calibration status
   const deckTask: TaskProps = {
@@ -86,7 +100,7 @@ export function useCalibrationTaskList(
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
     deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
-    if (markedBad === true) {
+    if (deckCalibrationData?.status?.markedBad === true) {
       deckTask.markedBad = true
     }
   }

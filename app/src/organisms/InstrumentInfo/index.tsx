@@ -1,0 +1,213 @@
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  BORDERS,
+  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
+  JUSTIFY_CENTER,
+} from '@opentrons/components'
+import {
+  SINGLE_MOUNT_PIPETTES,
+  NINETY_SIX_CHANNEL,
+} from '@opentrons/shared-data'
+import { PipetteWizardFlows } from '../PipetteWizardFlows'
+import { GripperWizardFlows } from '../GripperWizardFlows'
+import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
+import { FLOWS } from '../PipetteWizardFlows/constants'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
+import { formatTimestamp } from '../Devices/utils'
+import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+
+import type { InstrumentData } from '@opentrons/api-client'
+import type { PipetteMount } from '@opentrons/shared-data'
+import type { StyleProps } from '@opentrons/components'
+interface InstrumentInfoProps {
+  // NOTE: instrument will only be null while
+  // in the middle of detach wizard which occludes
+  // the main empty contents of this page
+  instrument: InstrumentData | null
+}
+export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
+  const { t, i18n } = useTranslation('instruments_dashboard')
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
+  const { instrument } = props
+  const history = useHistory()
+  const [wizardProps, setWizardProps] = React.useState<
+    | React.ComponentProps<typeof GripperWizardFlows>
+    | React.ComponentProps<typeof PipetteWizardFlows>
+    | null
+  >(null)
+
+  const sharedGripperWizardProps: Pick<
+    React.ComponentProps<typeof GripperWizardFlows>,
+    'attachedGripper' | 'closeFlow'
+  > = {
+    attachedGripper: instrument,
+    closeFlow: () => {
+      setWizardProps(null)
+    },
+  }
+  const is96Channel =
+    instrument != null &&
+    instrument.ok &&
+    instrument.mount !== 'extension' &&
+    // @ts-expect-error the mount acts as a type narrower here
+    instrument.data?.channels === 96
+
+  const handleDetach: React.MouseEventHandler = () => {
+    setODDMaintenanceFlowInProgress()
+    if (instrument != null && instrument.ok) {
+      setWizardProps(
+        instrument.mount === 'extension'
+          ? {
+              ...sharedGripperWizardProps,
+              flowType: GRIPPER_FLOW_TYPES.DETACH,
+              onComplete: () => {
+                history.goBack()
+              },
+            }
+          : {
+              closeFlow: () => {
+                setWizardProps(null)
+              },
+              onComplete: () => {
+                history.goBack()
+              },
+              mount: instrument.mount as PipetteMount,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
+              flowType: FLOWS.DETACH,
+            }
+      )
+    }
+  }
+  const handleRecalibrate: React.MouseEventHandler = () => {
+    setODDMaintenanceFlowInProgress()
+    if (instrument != null && instrument.ok) {
+      setWizardProps(
+        instrument.mount === 'extension'
+          ? {
+              ...sharedGripperWizardProps,
+              flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
+            }
+          : {
+              closeFlow: () => {
+                setWizardProps(null)
+              },
+              mount: instrument.mount as PipetteMount,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
+              flowType: FLOWS.CALIBRATE,
+            }
+      )
+    }
+  }
+
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      height="100%"
+    >
+      {instrument != null && instrument.ok ? (
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            marginTop={SPACING.spacing24}
+          >
+            <InfoItem
+              label={t('last_calibrated')}
+              value={
+                instrument.data.calibratedOffset?.last_modified != null
+                  ? formatTimestamp(
+                      instrument.data.calibratedOffset?.last_modified
+                    )
+                  : i18n.format(t('no_cal_data'), 'capitalize')
+              }
+            />
+            {instrument.firmwareVersion != null && (
+              <InfoItem
+                label={t('firmware_version')}
+                value={instrument.firmwareVersion}
+              />
+            )}
+            <InfoItem
+              label={t('serial_number')}
+              value={instrument.serialNumber}
+            />
+          </Flex>
+          <Flex gridGap={SPACING.spacing8}>
+            <MediumButton
+              buttonType="secondary"
+              flex="1"
+              onClick={handleDetach}
+              buttonText={t('detach')}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+            <MediumButton
+              flex="1"
+              onClick={handleRecalibrate}
+              buttonText={
+                instrument.data.calibratedOffset?.last_modified == null
+                  ? t('calibrate')
+                  : t('recalibrate')
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+          </Flex>
+        </>
+      ) : null}
+      {wizardProps != null && 'mount' in wizardProps ? (
+        <PipetteWizardFlows {...wizardProps} />
+      ) : null}
+      {wizardProps != null && !('mount' in wizardProps) ? (
+        <GripperWizardFlows {...wizardProps} />
+      ) : null}
+    </Flex>
+  )
+}
+
+interface InfoItemProps extends StyleProps {
+  label: string
+  value: string
+}
+function InfoItem(props: InfoItemProps): JSX.Element {
+  return (
+    <Flex
+      borderRadius={BORDERS.borderRadiusSize3}
+      backgroundColor={COLORS.lightGreyPressed}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      lineHeight={TYPOGRAPHY.lineHeight36}
+      {...props}
+    >
+      <StyledText
+        as="h4"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        fontSize={TYPOGRAPHY.fontSize28}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
+      >
+        {props.label}
+      </StyledText>
+      <StyledText
+        as="h4"
+        color={COLORS.darkBlack70}
+        fontSize={TYPOGRAPHY.fontSize28}
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+      >
+        {props.value}
+      </StyledText>
+    </Flex>
+  )
+}

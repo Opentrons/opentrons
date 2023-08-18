@@ -1,11 +1,56 @@
-from typing import Tuple, List, Optional
+from typing import Dict, Tuple, List, Optional
 
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
 
 
+# Default versions of Opentrons standard labware definitions in Python Protocol API
+# v2.14 and above. Labware not explicitly listed here default to 1.
+#
+# TODO(jbl 2023-08-01) this needs to be done more holistically, both to find the version and make sure that
+#   it corresponds to the API level is was released with
+_APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
+    # v1 of many labware definitions have wrong `zDimension`s. (Jira RSS-202.)
+    # For "opentrons_96_aluminumblock_generic_pcr_strip_200ul" and
+    # "opentrons_24_aluminumblock_generic_2ml_screwcap", they're wrong enough to
+    # easily cause collisions. (Jira RSS-197.)
+    "opentrons_24_aluminumblock_generic_2ml_screwcap": 2,
+    "opentrons_96_aluminumblock_generic_pcr_strip_200ul": 2,
+    # The following labware definitions have had a version bump due to using new properties
+    # introduced in an inplace schema v2 update
+    "armadillo_96_wellplate_200ul_pcr_full_skirt": 2,
+    "corning_384_wellplate_112ul_flat": 2,
+    "nest_96_wellplate_100ul_pcr_full_skirt": 2,
+    "nest_96_wellplate_200ul_flat": 2,
+    "nest_96_wellplate_2ml_deep": 2,
+    "opentrons_96_wellplate_200ul_pcr_full_skirt": 2,
+    "biorad_96_wellplate_200ul_pcr": 2,
+}
+
+
+_MAP_OT3_TO_FLEX_LOAD_NAMES: Dict[str, str] = {
+    "opentrons_ot3_96_tiprack_50ul": "opentrons_flex_96_tiprack_50ul",
+    "opentrons_ot3_96_tiprack_200ul": "opentrons_flex_96_tiprack_200ul",
+    "opentrons_ot3_96_tiprack_1000ul": "opentrons_flex_96_tiprack_1000ul",
+}
+
+
 class AmbiguousLoadLabwareParamsError(RuntimeError):
     """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""
+
+
+def resolve_loadname(load_name: str) -> str:
+    """Temporarily check for old Flex tiprack loadnames so that an error is not raised.
+
+    REMOVE FOR LAUNCH.
+    Args:
+        load_name: Load name of the labware.
+
+    Returns:
+        Either the updated loadname or the original loadname if no match.
+
+    """
+    return _MAP_OT3_TO_FLEX_LOAD_NAMES.get(load_name, load_name)
 
 
 def resolve(
@@ -40,18 +85,35 @@ def resolve(
         params for params in custom_load_labware_params if matches_params(params)
     ]
 
-    # If there is no custom labware for the load name provided earlier, default anything not chosen to
-    # the opentrons defaults. If the provided namespace was OPENTRONS_NAMESPACE, there will be no custom labware
-    # associated with that namespace, meaning `custom_labware_params` will be empty and version will always
-    # default to 1 here
     if not filtered_custom_params:
+        # No custom labware matches the input, but some standard labware might.
+        # Use the Opentrons defaults for anything not explicitly provided.
+        #
+        # If the provided namespace was OPENTRONS_NAMESPACE, there would have been no
+        # custom labware matching that namespace, so we will always take this path in
+        # that case.
         resolved_namespace = namespace if namespace is not None else OPENTRONS_NAMESPACE
-        resolved_version = version if version is not None else 1
+        resolved_version = (
+            version
+            if version is not None
+            else _get_default_version_for_standard_labware(load_name=load_name)
+        )
+
     elif len(filtered_custom_params) > 1:
+        # Multiple custom labware match the input.
         raise AmbiguousLoadLabwareParamsError(
             f"Multiple custom labware associated with load name {load_name}."
         )
+
     else:
+        # Exactly one custom labware matches the input. Return it.
         resolved_namespace = filtered_custom_params[0].namespace
         resolved_version = filtered_custom_params[0].version
+
     return resolved_namespace, resolved_version
+
+
+def _get_default_version_for_standard_labware(load_name: str) -> int:
+    # We know the protocol is running at least apiLevel 2.14 by this point because
+    # apiLevel 2.13 and below has its own separate code path for resolving labware.
+    return _APILEVEL_2_14_OT_DEFAULT_VERSIONS.get(load_name, 1)

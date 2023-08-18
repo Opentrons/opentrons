@@ -178,28 +178,6 @@ describe('shell selectors', () => {
       } as any
       expect(Selectors.getProtocolsOnDeviceSortKey(state)).toEqual(null)
     })
-
-    describe('pinnedProtocolIds', () => {
-      it('should return id list if pinnedProtocolIds is selected', () => {
-        const state: State = {
-          config: {
-            protocols: {
-              pinnedProtocolIds: ['2b790468-5d72-45ba-b5da-2fd2e6d93a0e'],
-            },
-          },
-        } as any
-        expect(Selectors.getPinnedProtocolIds(state)).toEqual([
-          '2b790468-5d72-45ba-b5da-2fd2e6d93a0e',
-        ])
-      })
-
-      it('should return empty array if saved value in config is empty array', () => {
-        const state: State = {
-          config: { protocols: { pinnedProtocolIds: [] } },
-        } as any
-        expect(Selectors.getPinnedProtocolIds(state)).toEqual([])
-      })
-    })
   })
 
   describe('pinnedProtocolIds', () => {
@@ -221,6 +199,51 @@ describe('shell selectors', () => {
         config: { protocols: { pinnedProtocolIds: [] } },
       } as any
       expect(Selectors.getPinnedProtocolIds(state)).toEqual([])
+    })
+  })
+
+  describe('getOnDeviceDisplaySettings', () => {
+    it('should return the initial settings OnDeviceDisplaySettings, when starting the unbox flow', () => {
+      const state: State = {
+        config: {
+          onDeviceDisplaySettings: {
+            sleepMs: 25200000,
+            brightness: 4,
+            textSize: 1,
+            unfinishedUnboxingFlowRoute: '/welcome',
+          },
+        },
+      } as any
+      expect(Selectors.getOnDeviceDisplaySettings(state)).toEqual({
+        sleepMs: 25200000,
+        brightness: 4,
+        textSize: 1,
+        unfinishedUnboxingFlowRoute: '/welcome',
+      })
+    })
+  })
+
+  describe('applyHistoricOffsets', () => {
+    it('should return false if applyHistoricOffsets is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            applyHistoricOffsets: false,
+          },
+        },
+      } as any
+      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(false)
+    })
+
+    it('should return true if applyHistoricOffsets is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            applyHistoricOffsets: true,
+          },
+        },
+      } as any
+      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(true)
     })
   })
 })

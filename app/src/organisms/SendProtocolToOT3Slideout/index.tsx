@@ -6,17 +6,13 @@ import { useSelector } from 'react-redux'
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { PrimaryButton } from '@opentrons/components'
-import {
-  ERROR_TOAST,
-  INFO_TOAST,
-  SUCCESS_TOAST,
-  useToast,
-} from '../../atoms/Toast'
+import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../../organisms/ProtocolsLanding/utils'
+import { useToaster } from '../../organisms/ToasterOven'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 
 import type { AxiosError } from 'axios'
@@ -24,6 +20,7 @@ import type { IconProps, StyleProps } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
 
 interface SendProtocolToOT3SlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -45,7 +42,7 @@ export function SendProtocolToOT3Slideout(
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
 
-  const { eatToast, makeToast } = useToast()
+  const { eatToast, makeToast } = useToaster()
 
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation(
     {},
@@ -55,6 +52,7 @@ export function SendProtocolToOT3Slideout(
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
+  const customLabwareFiles = useSelector(getValidCustomLabwareFiles)
 
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
@@ -86,7 +84,10 @@ export function SendProtocolToOT3Slideout(
       disableTimeout: true,
     })
 
-    createProtocolAsync({ files: srcFileObjects, protocolKey })
+    createProtocolAsync({
+      files: [...srcFileObjects, ...customLabwareFiles],
+      protocolKey,
+    })
       .then(() => {
         eatToast(toastId)
         makeToast(selectedRobot?.name ?? '', SUCCESS_TOAST, {

@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
-import { Box, SPACING } from '@opentrons/components'
+import { Box, SPACING, getFootprintDiagram } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import { getFootprintDiagram } from './measurementGuide'
 import type { LabwareDefinition } from '../../pages/Labware/types'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
@@ -34,7 +33,7 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
   })?.map((src, index) => <img width="250px" src={src} key={index} />)
 
   return (
-    <Box marginBottom={SPACING.spacing4}>
+    <Box marginBottom={SPACING.spacing16}>
       <ExpandingTitle label={t('footprint')} diagram={diagram} />
       {dimensions.map(d => (
         <LabeledValue

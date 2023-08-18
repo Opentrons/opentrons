@@ -15,13 +15,13 @@ import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 
 interface SetupModulesProps {
-  expandLabwareSetupStep: () => void
+  expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
 }
 
 export const SetupModules = ({
-  expandLabwareSetupStep,
+  expandLabwarePositionCheckStep,
   robotName,
   runId,
 }: SetupModulesProps): JSX.Element => {
@@ -35,7 +35,7 @@ export const SetupModules = ({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <>
-      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing6}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing32}>
         {toggleGroup}
         {selectedValue === t('list_view') ? (
           <SetupModulesList robotName={robotName} runId={runId} />
@@ -46,12 +46,12 @@ export const SetupModules = ({
       <Flex justifyContent={JUSTIFY_CENTER}>
         <PrimaryButton
           disabled={missingModuleIds.length > 0 || runHasStarted}
-          onClick={expandLabwareSetupStep}
-          id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+          onClick={expandLabwarePositionCheckStep}
+          id="ModuleSetup_proceedToLabwarePositionCheck"
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >
-          {t('proceed_to_labware_setup_prep')}
+          {t('proceed_to_labware_position_check')}
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 || runHasStarted ? (

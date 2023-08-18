@@ -31,6 +31,7 @@ from opentrons.protocols.labware import (  # noqa: F401
 
 from . import validation
 from ._liquid import Liquid
+from ._types import OffDeckType
 from .core import well_grid
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.labware import AbstractLabware
@@ -215,8 +216,8 @@ class Well:
         """
         Load a liquid into a well.
 
-        :param liquid: The type of liquid to load into the well.
-        :param volume: The volume of liquid to load, in µL.
+        :param Liquid liquid: The liquid to load into the well.
+        :param float volume: The volume of liquid to load, in µL.
         """
         self._core.load_liquid(
             liquid=liquid,
@@ -313,6 +314,9 @@ class Labware:
 
     @property
     def separate_calibration(self) -> bool:
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError("Labware.separate_calibration has been removed")
+
         _log.warning(
             "Labware.separate_calibrations is a deprecated internal property."
             " It no longer has meaning, but will always return `False`"
@@ -338,16 +342,27 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> Union[str, ModuleTypes, None]:
-        """The parent of this labware.
+    def parent(self) -> Union[str, Labware, ModuleTypes, OffDeckType]:
+        """The parent of this labware---where this labware is loaded.
 
-        If the labware is on the deck, a `str` deck slot name will be returned.
-        If on a module, the parent :py:class:`ModuleContext` will be returned.
-        If off deck, `None` will be returned.
+        Returns:
+            If the labware is directly on the robot's deck, the `str` name of the deck slot,
+            like ``"D1"`` (Flex) or ``"1"`` (OT-2). See :ref:`deck-slots`.
+
+            If the labware is on a module, a :py:class:`ModuleContext`.
+
+            If the labware is on a labware or adapter, a :py:class:`Labware`.
+
+            If the labware is off-deck, :py:obj:`OFF_DECK`.
 
         .. versionchanged:: 2.14
             Return type for module parent changed to :py:class:`ModuleContext`.
             Prior to this version, an internal geometry interface is returned.
+        .. versionchanged:: 2.15
+            Will return a :py:class:`Labware` if the labware was loaded onto a labware/adapter.
+            Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
+            Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
+            this would return where it was before its removal.
         """
         if isinstance(self._core, LegacyLabwareCore):
             # Type ignoring to preserve backwards compatibility
@@ -357,7 +372,7 @@ class Labware:
 
         labware_location = self._protocol_core.get_labware_location(self._core)
 
-        if isinstance(labware_location, AbstractModuleCore):
+        if isinstance(labware_location, (AbstractLabware, AbstractModuleCore)):
             return self._core_map.get(labware_location)
 
         return labware_location
@@ -430,10 +445,83 @@ class Labware:
         else:
             return p["magneticModuleEngageHeight"]
 
+    @property  # type: ignore[misc]
+    @requires_version(2, 15)
+    def child(self) -> Optional[Labware]:
+        """The labware (if any) present on this labware."""
+        labware_core = self._protocol_core.get_labware_on_labware(self._core)
+        return self._core_map.get(labware_core)
+
+    @requires_version(2, 15)
+    def load_labware(
+        self,
+        name: str,
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load a compatible labware onto the labware using its load parameters.
+
+        The parameters of this function behave like those of
+        :py:obj:`ProtocolContext.load_labware` (which loads labware directly
+        onto the deck). Note that the parameter ``name`` here corresponds to
+        ``load_name`` on the ``ProtocolContext`` function.
+
+        :returns: The initialized and loaded labware object.
+        """
+        labware_core = self._protocol_core.load_labware(
+            load_name=name,
+            label=label,
+            namespace=namespace,
+            version=version,
+            location=self._core,
+        )
+
+        labware = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
+
+        self._core_map.add(labware_core, labware)
+
+        return labware
+
+    @requires_version(2, 15)
+    def load_labware_from_definition(
+        self, definition: LabwareDefinition, label: Optional[str] = None
+    ) -> Labware:
+        """Load a labware onto the module using an inline definition.
+
+        :param definition: The labware definition.
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons App.
+        :returns: The initialized and loaded labware object.
+        """
+        load_params = self._protocol_core.add_labware_definition(definition)
+
+        return self.load_labware(
+            name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+            label=label,
+        )
+
     def set_calibration(self, delta: Point) -> None:
         """
-        Called by save calibration in order to update the offset on the object.
+        An internal, deprecated method used for updating the offset on the object.
+
+        .. deprecated:: 2.14
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.set_calibration() is not supported when apiLevel is 2.14 or higher."
+                " Use a lower apiLevel"
+                " or use the Opentrons App's Labware Position Check."
+            )
         self._core.set_calibration(delta)
 
     @requires_version(2, 12)
@@ -699,6 +787,11 @@ class Labware:
         return self._is_tiprack
 
     @property  # type: ignore[misc]
+    @requires_version(2, 15)
+    def is_adapter(self) -> bool:
+        return self._core.is_adapter()
+
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def tip_length(self) -> float:
         return self._core.get_tip_length()
@@ -874,7 +967,12 @@ class Labware:
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tiprack."""
+        """Reset all tips in a tip rack.
+
+        .. versionchanged:: 2.14
+            This method will raise an exception if you call it on a labware that isn't
+            a tip rack. Formerly, it would do nothing.
+        """
         self._core.reset_tips()
 
 
@@ -891,7 +989,6 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
 def select_tiprack_from_list(
     tip_racks: List[Labware], num_channels: int, starting_point: Optional[Well] = None
 ) -> Tuple[Labware, Well]:
-
     try:
         first, rest = split_tipracks(tip_racks)
     except IndexError:

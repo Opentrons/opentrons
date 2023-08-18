@@ -50,14 +50,22 @@ async def run(args: argparse.Namespace) -> None:
     erase = not args.no_erase
     with open(args.dict) as fp:
         update_dict = json.load(fp)
-    update_details: Dict[FirmwareTarget, str] = {
-        (
-            NodeId(int(target))
-            if (int(target) in iter(NodeId))  # type: ignore[operator]
-            else USBTarget(int(target))
-        ): filepath
-        for target, filepath in update_dict.items()
-    }
+    update_details: Dict[FirmwareTarget, str] = dict()
+    for name, filepath in update_dict.items():
+        try:
+            name = name.replace("-", "_")
+            target: FirmwareTarget = (
+                NodeId[name] if name in NodeId.__members__ else USBTarget[name]
+            )
+            update_details[target] = filepath
+        except KeyError:
+            logger.warning(f"Invalid target {name}")
+            continue
+
+    if not update_details:
+        logger.error("No update targets in details file.")
+        return
+
     usb_messenger: Optional[BinaryMessenger] = None
     try:
         usb_driver: SerialUsbDriver = await (build_rear_panel_driver())

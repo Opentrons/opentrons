@@ -9,7 +9,7 @@ from opentrons.protocol_api import ProtocolContext
 
 from .record import GravimetricRecorder, GravimetricRecording
 from .environment import read_environment_data, EnvironmentData, get_average_reading
-
+from hardware_testing.drivers import asair_sensor
 
 RELATIVE_DENSITY_WATER: Final = 1.0
 
@@ -77,13 +77,15 @@ class MeasurementData(EnvironmentData):
         )
 
 
-def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
+def create_measurement_tag(
+    t: str, volume: Optional[float], channel: int, trial: int
+) -> str:
     """Create measurement tag."""
     if volume is None:
         vol_in_tag = "blank"
     else:
         vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-ul-{trial + 1}"
+    return f"{t}-{vol_in_tag}-ul-channel_{channel + 1}-trial-{trial + 1}"
 
 
 class UnstableMeasurementError(Exception):
@@ -103,11 +105,15 @@ def _build_measurement_data(
     segment = GravimetricRecording(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
+    if simulating and len(segment) == 1:
+        segment.append(segment[0])
     if stable and not simulating:
-        # isolate "stable" scale measurements
-        segment = GravimetricRecording([sample for sample in segment if sample.stable])
-        if segment.duration < MIN_DURATION_STABLE_SEGMENT:
-            raise UnstableMeasurementError(f"duration is {segment.duration} seconds")
+        # try to isolate only "stable" scale readings if sample length >= 2
+        stable_only = GravimetricRecording(
+            [sample for sample in segment if sample.stable]
+        )
+        if len(stable_only) >= 2:
+            segment = stable_only
 
     recording_grams_as_list = segment.grams_as_list
     return MeasurementData(
@@ -133,10 +139,12 @@ def record_measurement_data(
     recorder: GravimetricRecorder,
     mount: str,
     stable: bool,
+    env_sensor: asair_sensor.AsairSensorBase,
     shorten: bool = False,
+    delay_seconds: int = DELAY_FOR_MEASUREMENT,
 ) -> MeasurementData:
     """Record measurement data."""
-    env_data = read_environment_data(mount, ctx.is_simulating())
+    env_data = read_environment_data(mount, ctx.is_simulating(), env_sensor)
     # NOTE: we need to delay some amount, to give the scale time to accumulate samples
     with recorder.samples_of_tag(tag):
         if ctx.is_simulating():
@@ -145,10 +153,8 @@ def record_measurement_data(
         elif shorten:
             ctx.delay(1)
         else:
-            print(
-                f"delaying {DELAY_FOR_MEASUREMENT} seconds for measurement, please wait..."
-            )
-            ctx.delay(DELAY_FOR_MEASUREMENT)
+            print(f"delaying {delay_seconds} seconds for measurement, please wait...")
+            ctx.delay(delay_seconds)
     return _build_measurement_data(
         recorder, tag, env_data, stable=stable, simulating=ctx.is_simulating()
     )

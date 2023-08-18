@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 
 from opentrons.protocol_engine import ProtocolEngineError
+from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
 from robot_server.service.task_runner import TaskRunner
 
@@ -14,7 +15,7 @@ from .action_models import RunAction, RunActionType
 log = logging.getLogger(__name__)
 
 
-class RunActionNotAllowedError(ValueError):
+class RunActionNotAllowedError(RoboticsInteractionError):
     """Error raised when a given run action is not allowed."""
 
 
@@ -79,7 +80,7 @@ class RunController:
                 self._task_runner.run(self._engine_store.runner.stop)
 
         except ProtocolEngineError as e:
-            raise RunActionNotAllowedError(str(e)) from e
+            raise RunActionNotAllowedError(message=e.message, wrapping=[e]) from e
 
         self._run_store.insert_action(run_id=self._run_id, action=action)
 

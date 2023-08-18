@@ -45,7 +45,15 @@ import {
   mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_FINISH,
+  ANALYTICS_PROTOCOL_RUN_PAUSE,
+  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_RESUME,
+} from '../../../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
@@ -382,7 +390,7 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runStart',
+      name: ANALYTICS_PROTOCOL_RUN_START,
       properties: {},
     })
   })
@@ -400,7 +408,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runFinish',
+      name: ANALYTICS_PROTOCOL_RUN_FINISH,
       properties: {},
     })
   })
@@ -462,7 +470,9 @@ describe('ProtocolRunHeader', () => {
     getByText('Protocol start')
     getByText('Protocol end')
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runPause' })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_PAUSE,
+    })
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -497,7 +507,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Paused')
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runResume',
+      name: ANALYTICS_PROTOCOL_RUN_RESUME,
       properties: {},
     })
   })
@@ -559,7 +569,9 @@ describe('ProtocolRunHeader', () => {
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+    })
   })
 
   it('renders a Run Again button and end time when run has failed and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -582,7 +594,9 @@ describe('ProtocolRunHeader', () => {
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+    })
   })
 
   it('renders a Run Again button and end time when run has succeeded and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -608,10 +622,12 @@ describe('ProtocolRunHeader', () => {
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
     expect(mockTrackEvent).toBeCalledWith({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'RunRecordDetail' },
     })
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+    })
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {

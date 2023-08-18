@@ -1,3 +1,5 @@
+import type { Agent } from 'http'
+
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
@@ -189,13 +191,32 @@ describe('discovery client state selectors', () => {
     ])
   })
 
-  it('should be able to get a list addresses to poll', () => {
+  it('should to get a list addresses to poll', () => {
     expect(Selectors.getAddresses(STATE)).toEqual([
-      { ip: '127.0.0.2', port: 31950 },
-      { ip: '127.0.0.3', port: 31950 },
       { ip: '127.0.0.4', port: 31950 },
       { ip: '127.0.0.5', port: 31950 },
       { ip: '127.0.0.6', port: 31950 },
+      { ip: '127.0.0.2', port: 31950 },
+      { ip: '127.0.0.3', port: 31950 },
+    ])
+  })
+
+  it('should prefer manual address entries', () => {
+    expect(
+      Selectors.getAddresses({
+        ...STATE,
+        manualAddresses: [
+          { ip: '127.0.0.4', port: 31950, agent: {} as Agent },
+          { ip: '127.0.0.5', port: 31950 },
+          { ip: '127.0.0.6', port: 31950 },
+        ],
+      })
+    ).toEqual([
+      { agent: {}, ip: '127.0.0.4', port: 31950 },
+      { ip: '127.0.0.5', port: 31950 },
+      { ip: '127.0.0.6', port: 31950 },
+      { ip: '127.0.0.2', port: 31950 },
+      { ip: '127.0.0.3', port: 31950 },
     ])
   })
 
@@ -293,13 +314,27 @@ describe('discovery client state selectors', () => {
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const result = sort([regular, linkLocalV6, linkLocalV4, localhost, home])
+      const usb: Partial<HostState> = {
+        ip: 'opentrons-usb',
+        healthStatus: HEALTH_STATUS_OK,
+        serverHealthStatus: HEALTH_STATUS_OK,
+      }
+
+      const result = sort([
+        usb,
+        regular,
+        linkLocalV6,
+        linkLocalV4,
+        localhost,
+        home,
+      ])
       expect(result).toEqual([
         home,
         localhost,
         linkLocalV4,
         linkLocalV6,
         regular,
+        usb,
       ])
     })
 

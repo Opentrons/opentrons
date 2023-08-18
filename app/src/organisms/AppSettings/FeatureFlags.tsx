@@ -28,8 +28,8 @@ export function FeatureFlags(): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       minHeight="calc(100vh - 8.5rem)"
-      paddingX={SPACING.spacing4}
-      paddingY={SPACING.spacing5}
+      paddingX={SPACING.spacing16}
+      paddingY={SPACING.spacing24}
     >
       {Config.DEV_INTERNAL_FLAGS.map((flag, index) => (
         <React.Fragment key={flag}>
@@ -52,7 +52,7 @@ export function FeatureFlags(): JSX.Element {
             />
           </Flex>
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (
-            <Divider marginY={SPACING.spacing5} />
+            <Divider marginY={SPACING.spacing24} />
           )}
         </React.Fragment>
       ))}

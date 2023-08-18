@@ -21,6 +21,8 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.2.1"
+requests = "==2.26.0"
+types-requests = "==2.25.6"
 
 [requires]
 python_version = "3.7"

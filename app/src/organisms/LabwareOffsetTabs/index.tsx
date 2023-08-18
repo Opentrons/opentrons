@@ -12,9 +12,11 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
+import type { StyleProps } from '@opentrons/components'
+
 type TabOptions = 'table' | 'jupyter' | 'cli'
 
-export interface LabwareOffsetTabsProps {
+export interface LabwareOffsetTabsProps extends StyleProps {
   TableComponent: JSX.Element
   JupyterComponent: JSX.Element
   CommandLineComponent: JSX.Element
@@ -24,6 +26,7 @@ export function LabwareOffsetTabs({
   TableComponent,
   JupyterComponent,
   CommandLineComponent,
+  ...styleProps
 }: LabwareOffsetTabsProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const [currentTab, setCurrentTab] = React.useState<TabOptions>('table')
@@ -34,7 +37,12 @@ export function LabwareOffsetTabs({
     cli: CommandLineComponent,
   }
   return (
-    <Flex width="100%" height="100%" flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      width="100%"
+      height="100%"
+      flexDirection={DIRECTION_COLUMN}
+      {...styleProps}
+    >
       <Flex>
         <RoundTab
           isCurrent={currentTab === 'table'}
@@ -64,7 +72,7 @@ export function LabwareOffsetTabs({
         } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
           BORDERS.radiusSoftCorners
         }`}
-        padding={`0 ${SPACING.spacing4}`}
+        paddingX={SPACING.spacing16}
       >
         {activeTabComponent[currentTab]}
       </Box>

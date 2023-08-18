@@ -8,7 +8,7 @@ import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData } from '../../hooks'
+import { useDeckCalibrationData, useIsOT3 } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
@@ -50,6 +50,7 @@ const mockAboutPipettesSlideout = AboutPipetteSlideout as jest.MockedFunction<
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -65,6 +66,7 @@ describe('PipetteCard', () => {
   beforeEach(() => {
     startWizard = jest.fn()
     dispatchApiRequest = jest.fn()
+    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
     when(mockAboutPipettesSlideout).mockReturnValue(
       <div>mock about slideout</div>
     )
@@ -97,7 +99,7 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
-      pipetteOffsetCalibration: null,
+      isPipetteCalibrated: false,
     })
     getByText('left Mount')
     getByText('Left Pipette')
@@ -109,7 +111,7 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: true,
-      pipetteOffsetCalibration: null,
+      isPipetteCalibrated: false,
     })
     getByText('Both Mounts')
     const overflowButton = getByRole('button', {
@@ -126,7 +128,7 @@ describe('PipetteCard', () => {
       robotName: mockRobotName,
       pipetteId: 'id',
       is96ChannelAttached: false,
-      pipetteOffsetCalibration: null,
+      isPipetteCalibrated: false,
     })
     getByText('right Mount')
     getByText('Right Pipette')
@@ -137,7 +139,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       is96ChannelAttached: false,
-      pipetteOffsetCalibration: null,
+      isPipetteCalibrated: false,
     })
     getByText('right Mount')
     getByText('Empty')
@@ -148,10 +150,32 @@ describe('PipetteCard', () => {
       mount: LEFT,
       robotName: mockRobotName,
       is96ChannelAttached: false,
-      pipetteOffsetCalibration: null,
+      isPipetteCalibrated: false,
     })
     getByText('left Mount')
     getByText('Empty')
+  })
+  it('does not render banner to calibrate for ot2 pipette if not calibrated', () => {
+    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
+    const { queryByText } = render({
+      pipetteInfo: mockLeftSpecs,
+      mount: LEFT,
+      robotName: mockRobotName,
+      is96ChannelAttached: false,
+      isPipetteCalibrated: false,
+    })
+    expect(queryByText('Calibrate now')).toBeNull()
+  })
+  it('renders banner to calibrate for ot3 pipette if not calibrated', () => {
+    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(true)
+    const { getByText } = render({
+      pipetteInfo: { ...mockLeftSpecs, name: 'p300_single_flex' },
+      mount: LEFT,
+      robotName: mockRobotName,
+      is96ChannelAttached: false,
+      isPipetteCalibrated: false,
+    })
+    getByText('Calibrate now')
   })
   it('renders kebab icon, opens and closes overflow menu on click', () => {
     const { getByRole, getByText, queryByText } = render({
@@ -159,7 +183,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       is96ChannelAttached: false,
-      pipetteOffsetCalibration: null,
+      isPipetteCalibrated: false,
     })
 
     const overflowButton = getByRole('button', {

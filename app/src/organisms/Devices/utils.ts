@@ -18,6 +18,13 @@ export function formatTimestamp(timestamp: string): string {
     : timestamp
 }
 
+export function onDeviceDisplayFormatTimestamp(timestamp: string): string {
+  // eslint-disable-next-line eqeqeq
+  return (parseISO(timestamp) as Date | string) != 'Invalid Date'
+    ? format(parseISO(timestamp), 'HH:mm:ss')
+    : timestamp
+}
+
 export function downloadFile(data: object, fileName: string): void {
   // Create a blob with the data we want to download as a file
   const blob = new Blob([JSON.stringify(data)], { type: 'text/json' })

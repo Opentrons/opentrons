@@ -25,19 +25,20 @@ from opentrons.protocol_engine.errors.exceptions import (
 
 from opentrons.protocols.api_support.types import APIVersion
 
+from ... import validation
 from ..module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
 from .exceptions import InvalidMagnetEngageHeightError
 
 
 class ModuleCore(AbstractModuleCore):
     """Module core logic implementation for Python protocols.
-
     Args:
         module_id: ProtocolEngine ID of the loaded modules.
     """
@@ -67,7 +68,7 @@ class ModuleCore(AbstractModuleCore):
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
         return module_model_from_string(
-            self._engine_client.state.modules.get_model(self.module_id)
+            self._engine_client.state.modules.get_connected_model(self.module_id)
         )
 
     def get_serial_number(self) -> str:
@@ -78,11 +79,67 @@ class ModuleCore(AbstractModuleCore):
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
+    def get_deck_slot_id(self) -> str:
+        slot_name = self.get_deck_slot()
+        return validation.ensure_deck_slot_string(
+            slot_name, robot_type=self._engine_client.state.config.robot_type
+        )
+
     def get_display_name(self) -> str:
         """Get the module's display name."""
         return self._engine_client.state.modules.get_definition(
             self.module_id
         ).displayName
+
+
+class NonConnectedModuleCore(AbstractModuleCore):
+    """Not connected module core logic implementation for Python protocols.
+
+    Args:
+        module_id: ProtocolEngine ID of the loaded modules.
+    """
+
+    def __init__(
+        self,
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+    ) -> None:
+        self._module_id = module_id
+        self._engine_client = engine_client
+        self._api_version = api_version
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Get the api version protocol module target."""
+        return self._api_version
+
+    @property
+    def module_id(self) -> str:
+        """The module's unique ProtocolEngine ID."""
+        return self._module_id
+
+    def get_model(self) -> ModuleModel:
+        """Get the module's model identifier."""
+        return module_model_from_string(
+            self._engine_client.state.modules.get_connected_model(self.module_id)
+        )
+
+    def get_deck_slot(self) -> DeckSlotName:
+        """Get the module's deck slot."""
+        return self._engine_client.state.modules.get_location(self.module_id).slotName
+
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+        return self._engine_client.state.modules.get_definition(
+            self.module_id
+        ).displayName
+
+    def get_deck_slot_id(self) -> str:
+        slot_name = self.get_deck_slot()
+        return validation.ensure_deck_slot_string(
+            slot_name, robot_type=self._engine_client.state.config.robot_type
+        )
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
@@ -98,7 +155,6 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
-
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may behave unpredictably.
         """
@@ -134,9 +190,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
         height_from_home: Optional[float] = None,
     ) -> None:
         """Raise the module's magnets.
-
         Only one of `height_from_base` or `height_from_home` may be specified.
-
         Args:
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
@@ -160,7 +214,6 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
         self, offset: float = 0, preserve_half_mm: bool = False
     ) -> None:
         """Raise the module's magnets up to its loaded labware.
-
         Args:
             offset: Offset from the labware's default engage height.
             preserve_half_mm: For labware whose definitions
@@ -225,7 +278,10 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
     ) -> None:
         """Set the target temperature for the well block, in °C."""
         self._engine_client.thermocycler_set_target_block_temperature(
-            module_id=self.module_id, celsius=celsius, block_max_volume=block_max_volume
+            module_id=self.module_id,
+            celsius=celsius,
+            block_max_volume=block_max_volume,
+            hold_time_seconds=hold_time_seconds,
         )
 
     def wait_for_block_temperature(self) -> None:
@@ -407,3 +463,7 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
         return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
+
+
+class MagneticBlockCore(NonConnectedModuleCore, AbstractMagneticBlockCore):
+    """Magnetic Block control interface via a ProtocolEngine."""

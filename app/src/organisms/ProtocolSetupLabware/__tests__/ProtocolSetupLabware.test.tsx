@@ -96,14 +96,11 @@ describe('ProtocolSetupLabware', () => {
     getByText('Labware')
     getByText('Labware Name')
     getByText('Location')
-    getByRole('button', { name: 'continue' })
-    getByRole('button', { name: 'Deck Map' })
+    getByRole('button', { name: 'Map View' })
   })
 
-  it('correctly navigates with the nav buttons', () => {
-    const [{ getByRole, getAllByRole }] = render()
-    getByRole('button', { name: 'continue' }).click()
-    expect(mockSetSetupScreen).toHaveBeenCalledWith('lpc')
+  it('correctly navigates with the nav button', () => {
+    const [{ getAllByRole }] = render()
     getAllByRole('button')[0].click()
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
@@ -111,8 +108,7 @@ describe('ProtocolSetupLabware', () => {
   it('should launch and close the deck map', () => {
     const [{ getByRole, getByText, getByTestId }] = render()
 
-    getByRole('button', { name: 'Deck Map' }).click()
-    getByText('Map View')
+    getByRole('button', { name: 'Map View' }).click()
     getByTestId('ModalHeader_icon_close_Map View').click()
     getByText('Labware')
   })
@@ -127,6 +123,7 @@ describe('ProtocolSetupLabware', () => {
           moduleId: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
         },
       },
+      waitUntilComplete: true,
     })
   })
 
@@ -144,6 +141,7 @@ describe('ProtocolSetupLabware', () => {
           moduleId: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
         },
       },
+      waitUntilComplete: true,
     })
   })
 

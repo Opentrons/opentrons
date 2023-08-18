@@ -18,11 +18,15 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../../../redux/discovery'
-import { useTrackEvent } from '../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_RENAME_ROBOT,
+} from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
+import { useIsOT3 } from '../../../hooks'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
@@ -36,11 +40,11 @@ interface FormikErrors {
   newRobotName?: string
 }
 
-/* max length is 35 and min length is 1
+/* max length is 17 and min length is 1
    allow users to use alphabets(a-z & A-Z) and numbers
    https://github.com/Opentrons/opentrons/issues/10214
 */
-const REGEX_RENAME_ROBOT_PATTERN = /^([a-zA-Z0-9]{0,35})$/
+const REGEX_RENAME_ROBOT_PATTERN = /^([a-zA-Z0-9]{0,17})$/
 const regexPattern = new RegExp(REGEX_RENAME_ROBOT_PATTERN)
 
 export function RenameRobotSlideout({
@@ -52,6 +56,7 @@ export function RenameRobotSlideout({
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
+  const isOt3 = useIsOT3(robotName)
   const trackEvent = useTrackEvent()
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
@@ -85,14 +90,14 @@ export function RenameRobotSlideout({
       const errors: FormikErrors = {}
       const newName = values.newRobotName
       if (!regexPattern.test(newName)) {
-        errors.newRobotName = t('rename_robot_input_limitation_detail')
+        errors.newRobotName = t('name_rule_error_name_length')
       }
       if (
         [...connectableRobots, ...reachableRobots].some(
           robot => newName === robot.name
         )
       ) {
-        errors.newRobotName = t('robot_name_already_exists')
+        errors.newRobotName = t('name_rule_error_exist')
       }
       return errors
     },
@@ -116,7 +121,7 @@ export function RenameRobotSlideout({
 
   const handleSubmitRobotRename = (): void => {
     trackEvent({
-      name: 'renameRobot',
+      name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName,
         newRobotName: formik.values.newRobotName,
@@ -141,16 +146,18 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Banner type="informing" marginBottom={SPACING.spacing4}>
-          {t('rename_robot_prefer_usb_connection')}
-        </Banner>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        {isOt3 ? null : (
+          <Banner type="informing" marginBottom={SPACING.spacing16}>
+            {t('rename_robot_prefer_usb_connection')}
+          </Banner>
+        )}
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>
         <StyledText
           as="label"
           css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('robot_name')}
         </StyledText>
@@ -167,7 +174,11 @@ export function RenameRobotSlideout({
           {t('characters_max')}
         </StyledText>
         {formik.errors.newRobotName && (
-          <StyledText as="label" color={COLORS.errorEnabled}>
+          <StyledText
+            as="label"
+            color={COLORS.errorEnabled}
+            marginTop={SPACING.spacing4}
+          >
             {formik.errors.newRobotName}
           </StyledText>
         )}

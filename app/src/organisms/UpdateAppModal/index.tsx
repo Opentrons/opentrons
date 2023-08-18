@@ -68,20 +68,20 @@ const NOTIFICATIONS_DISABLED_DESCRIPTION = (
 
 const FINISH_UPDATE_INSTRUCTIONS = (
   <>
-    <Text marginBottom={SPACING.spacing4}>
+    <Text marginBottom={SPACING.spacing16}>
       Restart your app to complete the update. Please note the following:
     </Text>
-    <Box as="ol" paddingLeft={SPACING.spacing4}>
+    <Box as="ol" paddingLeft={SPACING.spacing16}>
       <li>
-        <Text marginBottom={SPACING.spacing3}>
-          After updating the Opentrons App, <strong>update your OT-2</strong> to
-          ensure the app and robot software is in sync.
+        <Text marginBottom={SPACING.spacing8}>
+          After updating the Opentrons App, <strong>update your robot</strong>{' '}
+          to ensure the app and robot software is in sync.
         </Text>
       </li>
       <li>
         <Text>
           You should update the Opentrons App on <strong>all computers</strong>{' '}
-          that you use with your OT-2.
+          that you use with your robot.
         </Text>
       </li>
     </Box>
@@ -97,7 +97,7 @@ const SPINNER = (
   >
     <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
       <Icon spin name="ot-spinner" width={SIZE_4} />
-      <Text marginTop={SPACING.spacing6}>{DOWNLOAD_IN_PROGRESS}</Text>
+      <Text marginTop={SPACING.spacing32}>{DOWNLOAD_IN_PROGRESS}</Text>
     </Flex>
   </BaseModal>
 )
@@ -165,7 +165,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           fontSize={FONT_SIZE_HEADER}
           fontWeight={FONT_WEIGHT_REGULAR}
         >
-          <Icon name="alert" width="1em" marginRight={SPACING.spacing3} />
+          <Icon name="alert" width="1em" marginRight={SPACING.spacing8} />
           {updatesIgnored
             ? YOUVE_TURNED_OFF_NOTIFICATIONS
             : `${APP_VERSION} ${version} ${
@@ -181,7 +181,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
                 as={InternalLink}
                 to="/more/app"
                 onClick={handleCloseClick}
-                marginRight={SPACING.spacing4}
+                marginRight={SPACING.spacing16}
               >
                 {VIEW_APP_SOFTWARE_SETTINGS}
               </SecondaryBtn>
@@ -200,7 +200,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
                 </Btn>
               ) : null}
               <SecondaryBtn
-                marginRight={SPACING.spacing4}
+                marginRight={SPACING.spacing16}
                 onClick={handleCloseClick}
               >
                 {NOT_NOW}

@@ -4,7 +4,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import { getSendAllProtocolsToOT3 } from '../../../redux/config'
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import {
@@ -66,18 +69,18 @@ describe('ProtocolOverflowMenu', () => {
     const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
     getByText('Show in folder')
-    getByText('Run now')
+    getByText('Start setup')
     getByText('Delete')
   })
 
-  it('should call run protocol when clicking run now button', () => {
+  it('should call run protocol when clicking Start setup button', () => {
     const [{ getByTestId, getByText }] = render()
     const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const runButton = getByText('Run now')
+    const runButton = getByText('Start setup')
     fireEvent.click(runButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'ProtocolsLanding' },
     })
     expect(mockHandleRunProtocol).toHaveBeenCalledWith(storedProtocolData)
@@ -101,7 +104,7 @@ describe('ProtocolOverflowMenu', () => {
     const [{ getByTestId, getByText }] = render()
     const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const sendToOT3Button = getByText('Send to OT-3')
+    const sendToOT3Button = getByText('Send to Opentrons Flex')
     fireEvent.click(sendToOT3Button)
     expect(mockHandleSendProtocolToOT3).toHaveBeenCalledWith(storedProtocolData)
   })

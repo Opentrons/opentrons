@@ -11,13 +11,15 @@ interface SecondaryButtonProps extends StyleProps {
 export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
 })<SecondaryButtonProps>`
+  appearance: none;
+  cursor: pointer;
   color: ${props =>
     props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
   border: ${BORDERS.lineBorder};
   border-color: ${props =>
     props.isDangerous ? COLORS.errorEnabled : 'initial'};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
@@ -44,6 +46,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   &.disabled {
     box-shadow: none;
     opacity: 50%;
+    cursor: default;
   }
 
   ${styleProps}

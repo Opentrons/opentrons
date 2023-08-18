@@ -60,7 +60,7 @@ describe('U2EDriverOutdatedAlert', () => {
     expect(link.prop('children')).toContain('view adapter info')
     expect(dismissAlert).toHaveBeenCalledWith(false)
     expect(trackEvent).toHaveBeenCalledWith({
-      name: 'u2eDriverAlertDismissed',
+      name: Analytics.ANALYTICS_U2E_DRIVE_ALERT_DISMISSED,
       properties: { rememberDismiss: false },
     })
   })
@@ -74,7 +74,7 @@ describe('U2EDriverOutdatedAlert', () => {
     expect(link.prop('children')).toContain('get update')
     expect(dismissAlert).toHaveBeenCalledWith(false)
     expect(trackEvent).toHaveBeenCalledWith({
-      name: 'u2eDriverLinkClicked',
+      name: Analytics.ANALYTICS_U2E_DRIVE_LINK_CLICKED,
       properties: { source: 'modal' },
     })
   })
@@ -93,7 +93,7 @@ describe('U2EDriverOutdatedAlert', () => {
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
     expect(trackEvent).toHaveBeenCalledWith({
-      name: 'u2eDriverAlertDismissed',
+      name: Analytics.ANALYTICS_U2E_DRIVE_ALERT_DISMISSED,
       properties: { rememberDismiss: true },
     })
   })

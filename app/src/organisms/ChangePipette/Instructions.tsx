@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
-import { shouldLevel } from '@opentrons/shared-data'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -18,7 +17,6 @@ import { StyledText } from '../../atoms/text'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'
-import { LevelPipette } from './LevelPipette'
 
 import type {
   PipetteNameSpecs,
@@ -38,8 +36,9 @@ interface Props {
   setWantedName: (name: string | null) => void
   back: () => void
   confirm: () => void
-  stepPage: number
-  setStepPage: React.Dispatch<React.SetStateAction<number>>
+  currentStepCount: number
+  nextStep: () => void
+  prevStep: () => void
   attachedWrong: boolean
 }
 
@@ -63,12 +62,18 @@ export function Instructions(props: Props): JSX.Element {
     direction,
     back,
     mount,
-    stepPage,
-    setStepPage,
+    currentStepCount,
+    nextStep,
+    prevStep,
     confirm,
-    attachedWrong,
   } = props
   const { t } = useTranslation('change_pipette')
+
+  React.useEffect(() => {
+    if (direction === 'detach' && currentStepCount === 0) {
+      nextStep()
+    }
+  })
 
   const channels = actualPipette
     ? actualPipette.channels
@@ -81,54 +86,57 @@ export function Instructions(props: Props): JSX.Element {
 
   //  hide continue button if no pipette is selected
   const continueButton = noPipetteSelected ? null : (
-    <PrimaryButton onClick={() => setStepPage(1)}>
-      {t('continue')}
-    </PrimaryButton>
+    <PrimaryButton onClick={() => nextStep()}>{t('continue')}</PrimaryButton>
   )
 
   return (
     <>
       {!actualPipette && !wantedPipette && (
         <Flex
-          paddingX={SPACING.spacing6}
-          paddingTop={SPACING.spacing6}
+          paddingX={SPACING.spacing32}
+          paddingTop={SPACING.spacing32}
           marginBottom="12.8rem"
         >
           {direction === 'attach' &&
-          stepPage === 0 &&
+          currentStepCount === 0 &&
           wantedPipette === null ? (
-            <PipetteSelection onPipetteChange={setWantedName} />
+            <PipetteSelection
+              onPipetteChange={pipetteName => {
+                setWantedName(pipetteName)
+                nextStep()
+              }}
+            />
           ) : null}
         </Flex>
       )}
-      {stepPage < 2 ? (
+      {currentStepCount < 3 && (
         <>
           {(actualPipette || wantedPipette) && (
             <Flex
-              paddingX={SPACING.spacing6}
-              paddingTop={SPACING.spacing6}
+              paddingX={SPACING.spacing32}
+              paddingTop={SPACING.spacing32}
               height="14.5rem"
             >
               <InstructionStep
-                diagram={stepPage === 0 ? 'screws' : 'tab'}
+                diagram={currentStepCount === 1 ? 'screws' : 'tab'}
                 {...{ direction, mount, channels, displayCategory }}
               >
                 <Flex flexDirection={DIRECTION_COLUMN}>
                   <Trans
                     t={t}
-                    i18nKey={stepPage === 0 ? stepOne : stepTwo}
+                    i18nKey={currentStepCount === 1 ? stepOne : stepTwo}
                     components={{
                       h1: (
                         <StyledText
                           css={TYPOGRAPHY.h1Default}
-                          marginBottom={SPACING.spacing4}
+                          marginBottom={SPACING.spacing16}
                         />
                       ),
                       block: <StyledText as="p" />,
                     }}
                   />
 
-                  {direction === 'attach' && stepPage === 0 ? (
+                  {direction === 'attach' && currentStepCount === 1 ? (
                     channels === 8 ? (
                       <Flex flexDirection={DIRECTION_ROW}>
                         <Trans
@@ -143,13 +151,16 @@ export function Instructions(props: Props): JSX.Element {
                               />
                             ),
                             block: (
-                              <StyledText as="p" marginTop={SPACING.spacing4} />
+                              <StyledText
+                                as="p"
+                                marginTop={SPACING.spacing16}
+                              />
                             ),
                           }}
                         />
                       </Flex>
                     ) : (
-                      <StyledText marginTop={SPACING.spacing4} as="p">
+                      <StyledText marginTop={SPACING.spacing16} as="p">
                         {t('tighten_screws_single')}
                       </StyledText>
                     )
@@ -160,41 +171,40 @@ export function Instructions(props: Props): JSX.Element {
           )}
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing6}
-            marginX={SPACING.spacing6}
+            marginBottom={SPACING.spacing32}
+            marginX={SPACING.spacing32}
             alignSelf={ALIGN_FLEX_END}
             marginTop="5.9rem"
           >
             <Btn
-              onClick={stepPage === 0 ? back : () => setStepPage(stepPage - 1)}
+              onClick={() => {
+                if (currentStepCount === 0) {
+                  back()
+                } else if (currentStepCount === 1) {
+                  prevStep()
+                  if (wantedPipette != null) setWantedName(null)
+                  if (direction === 'detach') back()
+                } else {
+                  prevStep()
+                }
+              }}
             >
               <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
             </Btn>
-            {stepPage === 0 ? (
+            {currentStepCount < 2 ? (
               continueButton
             ) : (
               <CheckPipettesButton
                 robotName={robotName}
-                actualPipette={actualPipette ?? undefined}
-                onDone={
-                  wantedPipette != null &&
-                  actualPipette != null &&
-                  shouldLevel(wantedPipette) &&
-                  !attachedWrong
-                    ? () => setStepPage(2)
-                    : confirm
-                }
+                direction={direction}
+                onDone={() => {
+                  confirm()
+                  nextStep()
+                }}
               />
             )}
           </Flex>
         </>
-      ) : (
-        <LevelPipette
-          mount={mount}
-          pipetteModelName={actualPipette ? actualPipette.name : ''}
-          confirm={confirm}
-          back={() => setStepPage(1)}
-        />
       )}
     </>
   )

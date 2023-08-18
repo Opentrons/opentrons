@@ -4,16 +4,18 @@ from time import monotonic as time_monotonic
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.actions import ActionDispatcher, PauseAction, PauseSource
 from opentrons.protocol_engine.execution.run_control import RunControlHandler
-from opentrons.protocol_engine.state import Config
+from opentrons.protocol_engine.state import Config, StateStore
+from opentrons.protocol_engine.types import DeckType
 
 
 def _make_config(ignore_pause: bool) -> Config:
     return Config(
         ignore_pause=ignore_pause,
-        robot_type="OT-2 Standard",  # Arbitrary.
+        # Robot and deck type are arbitrary.
+        robot_type="OT-2 Standard",
+        deck_type=DeckType.OT2_STANDARD,
     )
 
 

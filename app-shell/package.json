@@ -32,6 +32,7 @@
     "@opentrons/app": "link:../app",
     "@opentrons/discovery-client": "link:../discovery-client",
     "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
     "electron-notarize": "^1.2.1",
     "electron-publisher-s3": "^20.17.2"
   },
@@ -59,6 +60,7 @@
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
     "semver": "5.5.0",
+    "serialport": "10.5.0",
     "tempy": "1.0.1",
     "uuid": "3.2.1",
     "winston": "3.1.0",

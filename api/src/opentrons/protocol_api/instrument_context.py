@@ -45,6 +45,8 @@ _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
 _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
+_DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
+"""The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -203,6 +205,7 @@ class InstrumentContext(publisher.CommandPublisher):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
         c_vol = self._core.get_available_volume() if not volume else volume
@@ -313,6 +316,7 @@ class InstrumentContext(publisher.CommandPublisher):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
         c_vol = self._core.get_current_volume() if not volume else volume
@@ -835,7 +839,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.
+        the fixed trash in slot 12.  From API version 2.15 on, the API will default to
+        alternating between two different drop tip locations within the trash container
+        in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
         the `location` argument. The `location` argument can be specified in
@@ -898,8 +904,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
+        alternate_drop_location: bool = False
         if location is None:
             well = self.trash_container.wells()[0]
+            if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
+                alternate_drop_location = True
 
         elif isinstance(location, labware.Well):
             well = location
@@ -932,7 +941,10 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.drop_tip(instrument=self, location=well),
         ):
             self._core.drop_tip(
-                location=location, well_core=well._core, home_after=home_after
+                location=location,
+                well_core=well._core,
+                home_after=home_after,
+                alternate_drop_location=alternate_drop_location,
             )
 
         self._last_tip_picked_up_from = None
@@ -1179,7 +1191,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
-            max_volume = self.hw_pipette["working_volume"]
+            max_volume = self._core.get_working_volume()
 
         touch_tip = None
         if kwargs.get("touch_tip"):

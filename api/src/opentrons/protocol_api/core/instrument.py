@@ -116,6 +116,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         location: Optional[types.Location],
         well_core: WellCoreType,
         home_after: Optional[bool],
+        alternate_drop_location: Optional[bool] = False,
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -124,6 +125,8 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
                 If unspecified, the default drop location of the well will be used.
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
+            alternate_drop_location: Whether to randomize the exact location to drop tip
+                within the specified well.
         """
         ...
 
@@ -168,6 +171,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_max_volume(self) -> float:
+        ...
+
+    @abstractmethod
+    def get_working_volume(self) -> float:
         ...
 
     @abstractmethod

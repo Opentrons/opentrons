@@ -3,9 +3,7 @@ import { fireEvent } from '@testing-library/react'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { CheckPipettesButton } from '../CheckPipettesButton'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 
@@ -17,14 +15,6 @@ const render = (props: React.ComponentProps<typeof CheckPipettesButton>) => {
     i18nInstance: i18n,
   })[0]
 }
-
-const MOCK_ACTUAL_PIPETTE = {
-  ...mockPipetteInfo.pipetteSpecs,
-  model: 'model',
-  tipLength: {
-    value: 20,
-  },
-} as PipetteModelSpecs
 
 describe('CheckPipettesButton', () => {
   let props: React.ComponentProps<typeof CheckPipettesButton>
@@ -48,6 +38,7 @@ describe('CheckPipettesButton', () => {
     props = {
       robotName: 'otie',
       onDone: jest.fn(),
+      direction: 'attach',
     }
     const { getByLabelText, getByText } = render(props)
     const btn = getByLabelText('Confirm')
@@ -65,7 +56,7 @@ describe('CheckPipettesButton', () => {
     props = {
       robotName: 'otie',
       onDone: jest.fn(),
-      actualPipette: MOCK_ACTUAL_PIPETTE,
+      direction: 'detach',
     }
     const { getByLabelText, getByText } = render(props)
     const btn = getByLabelText('Confirm')
@@ -78,14 +69,14 @@ describe('CheckPipettesButton', () => {
     const refetch = jest.fn(() => Promise.resolve())
     mockUsePipettesQuery.mockReturnValue({
       refetch,
-      isFetching: true,
     } as any)
     props = {
       robotName: 'otie',
       onDone: jest.fn(),
-      actualPipette: MOCK_ACTUAL_PIPETTE,
     }
     const { getByLabelText } = render(props)
+    const btn = getByLabelText('Confirm')
+    fireEvent.click(btn)
     expect(getByLabelText('Confirm')).toBeDisabled()
   })
 
@@ -97,12 +88,12 @@ describe('CheckPipettesButton', () => {
     } as any)
     props = {
       ...props,
-      actualPipette: MOCK_ACTUAL_PIPETTE,
     }
     const { getByLabelText, getByText } = render(props)
     const btn = getByLabelText('Confirm')
     getByText('btn text')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
+    expect(getByLabelText('Confirm')).toBeDisabled()
   })
 })

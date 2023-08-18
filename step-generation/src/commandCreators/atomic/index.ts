@@ -12,6 +12,7 @@ import { replaceTip } from './replaceTip'
 import { setTemperature } from './setTemperature'
 import { touchTip } from './touchTip'
 import { moveToWell } from './moveToWell'
+import { moveLabware } from './moveLabware'
 export {
   aspirate,
   waitForTemperature,
@@ -27,4 +28,5 @@ export {
   setTemperature,
   touchTip,
   moveToWell,
+  moveLabware,
 }

@@ -6,6 +6,7 @@ import {
   Box,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
@@ -13,6 +14,7 @@ import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+
 import { ModuleInfo } from '../../ModuleInfo'
 import {
   useModuleRenderInfoForProtocolById,
@@ -41,7 +43,7 @@ export const SetupModulesMap = ({
     <Flex
       flex="1"
       maxHeight="180vh"
-      marginTop={SPACING.spacing4}
+      marginTop={SPACING.spacing16}
       flexDirection={DIRECTION_COLUMN}
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
@@ -49,6 +51,8 @@ export const SetupModulesMap = ({
           deckDef={deckDef}
           viewBox={getStandardDeckViewBox(robotType)}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+          deckFill="#e6e6e6"
+          trashSlotName="A3"
           id="ModuleSetup_deckMap"
         >
           {() => (
@@ -70,8 +74,7 @@ export const SetupModulesMap = ({
                         <ModuleInfo
                           moduleModel={model}
                           isAttached={attachedModuleMatch != null}
-                          usbPort={attachedModuleMatch?.usbPort.port ?? null}
-                          hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                          physicalPort={attachedModuleMatch?.usbPort ?? null}
                           runId={runId}
                         />
                       </Module>
@@ -79,6 +82,7 @@ export const SetupModulesMap = ({
                   )
                 }
               )}
+              <SlotLabels robotType={robotType} />
             </>
           )}
         </RobotWorkSpace>

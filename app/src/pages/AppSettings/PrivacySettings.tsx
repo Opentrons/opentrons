@@ -29,18 +29,18 @@ export function PrivacySettings(): JSX.Element {
     <Flex
       height="calc(100vh - 8.5rem)"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      paddingX={SPACING.spacing4}
-      paddingY={SPACING.spacing5}
-      gridGap={SPACING.spacing4}
+      paddingX={SPACING.spacing16}
+      paddingY={SPACING.spacing24}
+      gridGap={SPACING.spacing16}
     >
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t('share_analytics')}
         </StyledText>
-        <StyledText css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
+        <StyledText css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing8}>
           {t('analytics_description')}
         </StyledText>
       </Box>

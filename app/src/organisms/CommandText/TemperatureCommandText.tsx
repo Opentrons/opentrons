@@ -5,7 +5,7 @@ import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
   HeaterShakerSetTargetTemperatureCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 
 type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand
@@ -35,5 +35,9 @@ export const TemperatureCommandText = ({
 
   return t(T_KEYS_BY_COMMAND_TYPE[command.commandType], {
     temp: command.params.celsius,
+    hold_time_seconds:
+      'holdTimeSeconds' in command.params
+        ? command.params.holdTimeSeconds ?? '0'
+        : '0',
   })
 }

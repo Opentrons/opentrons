@@ -10,6 +10,7 @@ from typing import (
     Optional,
     Tuple,
     Union,
+    cast,
 )
 
 from opentrons.calibration_storage import (
@@ -19,13 +20,23 @@ from opentrons.calibration_storage import (
     load_tip_length_calibration,
 )
 from opentrons.hardware_control import robot_calibration as robot_cal
-from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
+from opentrons.hardware_control import (
+    HardwareControlAPI,
+    OT2HardwareControlAPI,
+    API,
+    CriticalPoint,
+    Pipette,
+)
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
@@ -53,6 +64,7 @@ from .state_machine import DeckCalibrationStateMachine
 from .dev_types import SavedPoints, ExpectedPoints
 from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -81,11 +93,13 @@ def tuplefy_cal_point_dicts(
 
 class DeckCalibrationUserFlow:
     def __init__(self, hardware: HardwareControlAPI):
-        self._hardware = hardware
+        if not isinstance(hardware, API):
+            raise HardwareNotSupportedError("This command is supported by OT-2 only.")
+        self._hardware = cast(OT2HardwareControlAPI, hardware)
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
 
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
@@ -112,7 +126,7 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
         self.hardware.set_robot_calibration(
-            robot_cal.build_temporary_identity_calibration()
+            self.hardware.build_temporary_identity_calibration()
         )
         self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._supported_commands = SupportedCommands(namespace="calibration")
@@ -123,7 +137,7 @@ class DeckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> HardwareControlAPI:
+    def hardware(self) -> OT2HardwareControlAPI:
         return self._hardware
 
     @property
@@ -165,7 +179,7 @@ class DeckCalibrationUserFlow:
         return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tipLength=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,
@@ -222,7 +236,9 @@ class DeckCalibrationUserFlow:
             return labware.load(lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
     def _get_default_tipracks(self):
-        return uf.get_default_tipracks(self.hw_pipette.config.default_tipracks)
+        return uf.get_default_tipracks(
+            cast(List[LabwareUri], self.hw_pipette.config.default_tipracks)
+        )
 
     def _build_expected_points_dict(self) -> ExpectedPoints:
         pos_1 = self._deck.get_calibration_position(POINT_ONE_ID).position
@@ -343,7 +359,7 @@ class DeckCalibrationUserFlow:
                 self._tip_rack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = self._hw_pipette.config.tip_overlap.get(self._tip_rack.uri, 0)
+            tip_overlap = self._hw_pipette.tip_overlap.get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
 

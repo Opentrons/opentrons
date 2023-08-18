@@ -18,10 +18,11 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
-import { getWifiList, postWifiDisconnect } from '../../../../redux/networking'
+import { postWifiDisconnect } from '../../../../redux/networking'
+import { useWifiList } from '../../../../resources/networking/hooks'
 import {
   dismissRequest,
   getRequestById,
@@ -44,7 +45,7 @@ export const DisconnectModal = ({
 }: DisconnectModalProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared'])
 
-  const wifiList = useSelector((state: State) => getWifiList(state, robotName))
+  const wifiList = useWifiList(robotName)
 
   const activeNetwork = wifiList?.find(nw => nw.active)
   const ssid = activeNetwork?.ssid ?? null
@@ -103,7 +104,7 @@ export const DisconnectModal = ({
   }
 
   return (
-    <Modal
+    <LegacyModal
       type="warning"
       title={
         isDisconnected
@@ -114,7 +115,7 @@ export const DisconnectModal = ({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {isError ? (
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {requestState != null &&
             'error' in requestState &&
             'message' in requestState?.error
@@ -122,11 +123,11 @@ export const DisconnectModal = ({
               : t('shared:unknown_error')}
           </StyledText>
         ) : null}
-        <StyledText as="p" marginBottom={SPACING.spacing5}>
+        <StyledText as="p" marginBottom={SPACING.spacing24}>
           {disconnectModalBody}
         </StyledText>
         {isError ? (
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {t('shared:general_error_message')}
           </StyledText>
         ) : null}
@@ -139,7 +140,7 @@ export const DisconnectModal = ({
                 role="button"
                 onClick={handleCancel}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginRight={SPACING.spacing5}
+                marginRight={SPACING.spacing24}
                 css={TYPOGRAPHY.linkPSemiBold}
               >
                 {t('shared:cancel')}
@@ -165,6 +166,6 @@ export const DisconnectModal = ({
           )}
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

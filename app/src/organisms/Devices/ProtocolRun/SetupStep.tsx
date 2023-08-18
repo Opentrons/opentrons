@@ -78,7 +78,7 @@ export function SetupStep({
               <StyledText
                 color={COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
-                marginBottom={SPACING.spacing1}
+                marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${label}`}
               >
                 {label}
@@ -86,7 +86,7 @@ export function SetupStep({
               <StyledText
                 color={COLORS.darkBlackEnabled}
                 css={TYPOGRAPHY.h3SemiBold}
-                marginBottom={SPACING.spacing2}
+                marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
@@ -109,7 +109,7 @@ export function SetupStep({
                         ? COLORS.successEnabled
                         : COLORS.warningEnabled
                     }
-                    marginRight={SPACING.spacing3}
+                    marginRight={SPACING.spacing8}
                     name={
                       calibrationStatusComplete ? 'ot-check' : 'alert-circle'
                     }
@@ -118,7 +118,7 @@ export function SetupStep({
                   <StyledText
                     color={COLORS.black}
                     css={TYPOGRAPHY.pSemiBold}
-                    marginRight={SPACING.spacing4}
+                    marginRight={SPACING.spacing16}
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                     id="RunSetupCard_calibrationText"
                   >
@@ -133,7 +133,7 @@ export function SetupStep({
                 size="1.5rem"
                 css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}
-                margin={SPACING.spacing2}
+                margin={SPACING.spacing4}
               />
             </Flex>
           </Flex>

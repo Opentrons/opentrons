@@ -22,7 +22,7 @@ describe('BaseModal', () => {
       height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: `${SPACING.spacing4}, ${SPACING.spacing5}`,
+      padding: `${SPACING.spacing16}, ${SPACING.spacing24}`,
     })
   })
 

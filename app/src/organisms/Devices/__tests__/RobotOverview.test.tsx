@@ -7,15 +7,20 @@ import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
+import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
-import { useFeatureFlag } from '../../../redux/config'
-import { getRobotModelByName } from '../../../redux/discovery'
+import { getConfig, useFeatureFlag } from '../../../redux/config'
+import {
+  getRobotAddressesByName,
+  getRobotModelByName,
+} from '../../../redux/discovery'
 import {
   HEALTH_STATUS_OK,
+  OPENTRONS_USB,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery/constants'
 import {
@@ -40,8 +45,11 @@ import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
+import type { Config } from '../../../redux/config/types'
+import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { State } from '../../../redux/types'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../../redux/config')
@@ -53,7 +61,7 @@ jest.mock('../../UpdateRobotBanner')
 jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
-const OT3_PNG_FILE_NAME = 'OT3.png'
+const FLEX_PNG_FILE_NAME = 'FLEX.png'
 
 const MOCK_STATE: State = {
   discovery: {
@@ -113,6 +121,15 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
 >
+const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
+  typeof getRobotAddressesByName
+>
+
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+
+const mockUseAuthorization = useAuthorization as jest.MockedFunction<
+  typeof useAuthorization
+>
 
 const mockToggleLights = jest.fn()
 
@@ -161,6 +178,24 @@ describe('RobotOverview', () => {
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .mockReturnValue('OT-2')
+    when(mockGetRobotAddressesByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .mockReturnValue([])
+    when(mockGetConfig)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue({
+        support: { userId: 'opentrons-robot-user' },
+      } as Config)
+    when(mockUseAuthorization)
+      .calledWith({
+        subject: 'Opentrons',
+        agent: 'com.opentrons.app',
+        agentId: 'opentrons-robot-user',
+      })
+      .mockReturnValue({
+        authorizationToken: { token: 'my.authorization.jwt' },
+        registrationToken: { token: 'my.registration.jwt' },
+      })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -176,10 +211,10 @@ describe('RobotOverview', () => {
   it('renders an OT-3 image', () => {
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue('OT-3')
+      .mockReturnValue('Opentrons Flex')
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
-    expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
+    expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
   })
 
   it('renders a RobotStatusHeader component', () => {
@@ -337,5 +372,17 @@ describe('RobotOverview', () => {
     const [{ getByText }] = render(props)
 
     getByText('mock RobotOverviewOverflowMenu')
+  })
+
+  it('requests a usb registration token if connected by usb', () => {
+    when(mockGetRobotAddressesByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .mockReturnValue([{ ip: OPENTRONS_USB } as DiscoveryClientRobotAddress])
+    render(props)
+    expect(mockUseAuthorization).toBeCalledWith({
+      subject: 'Opentrons',
+      agent: 'com.opentrons.app.usb',
+      agentId: 'opentrons-robot-user',
+    })
   })
 })

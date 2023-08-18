@@ -26,6 +26,18 @@ class BinaryMessageId(int, Enum):
     estop_button_detection_change = 0x0C
     door_switch_state_request = 0x0D
     door_switch_state_info = 0x0E
+    aux_present_detection_change = 0x0F
+    aux_present_request = 0x10
+    aux_id_request = 0x11
+    aux_id_response = 0x12
+    estop_button_present_request = 0x13
+    estop_state_request = 0x14
+    sync_state_request = 0x15
+    sync_state_resposne = 0x16
+
+    write_eeprom_request = 0x100
+    read_eeprom_request = 0x101
+    read_eeprom_response = 0x102
 
     # Light messages prefixed by 0x400
     # 0x40x = light strip

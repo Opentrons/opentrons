@@ -9,6 +9,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import Mount, DeckSlotName
+from opentrons.protocol_api import OFF_DECK
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
@@ -21,6 +22,7 @@ from opentrons.protocol_api import (
     ModuleContext,
     TemperatureModuleContext,
     MagneticModuleContext,
+    MagneticBlockContext,
     Labware,
     Deck,
     validation as mock_validation,
@@ -34,6 +36,7 @@ from opentrons.protocol_api.core.common import (
     ProtocolCore,
     TemperatureModuleCore,
     MagneticModuleCore,
+    MagneticBlockCore,
 )
 
 
@@ -207,6 +210,7 @@ def test_load_labware(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should create a labware using its execution core."""
@@ -215,7 +219,9 @@ def test_load_labware(
     decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
         "lowercase_labware"
     )
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_5)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_5
+    )
 
     decoy.when(
         mock_core.load_labware(
@@ -245,9 +251,66 @@ def test_load_labware(
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
+def test_load_labware_off_deck(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
+) -> None:
+    """It should load labware off-deck."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=OFF_DECK,
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        label="some_display_name",
+        namespace="some_namespace",
+        version=1337,
+        location=OFF_DECK,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_labware_off_deck_raises(
+    subject: ProtocolContext,
+) -> None:
+    """It should raise and api error."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="UPPERCASE_LABWARE",
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+            location=OFF_DECK,
+        )
+
+
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_core: ProtocolCore,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should be able to load a labware from a definition dictionary."""
@@ -257,7 +320,9 @@ def test_load_labware_from_definition(
     labware_load_params = LabwareLoadParams("you", "are", 1337)
 
     decoy.when(mock_validation.ensure_lowercase_name("are")).then_return("are")
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_1
+    )
     decoy.when(mock_core.add_labware_definition(labware_definition_dict)).then_return(
         labware_load_params
     )
@@ -283,6 +348,107 @@ def test_load_labware_from_definition(
 
     assert isinstance(result, Labware)
     assert result.name == "Full Name"
+
+
+def test_load_adapter(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create an adapter using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
+        "lowercase_adapter"
+    )
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_5
+    )
+
+    decoy.when(
+        mock_core.load_adapter(
+            load_name="lowercase_adapter",
+            location=DeckSlotName.SLOT_5,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_adapter(
+        load_name="UPPERCASE_ADAPTER",
+        location=42,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+def test_load_labware_on_adapter(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create a labware using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+    mock_adapter_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
+        "lowercase_adapter"
+    )
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_5
+    )
+    decoy.when(
+        mock_core.load_adapter(
+            load_name="lowercase_adapter",
+            location=DeckSlotName.SLOT_5,
+            namespace="some_namespace",
+            version=None,
+        )
+    ).then_return(mock_adapter_core)
+
+    decoy.when(mock_adapter_core.get_well_columns()).then_return([])
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=mock_adapter_core,
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        location=42,
+        label="some_display_name",
+        namespace="some_namespace",
+        version=1337,
+        adapter="UPPERCASE_ADAPTER",
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
 def test_loaded_labware(
@@ -314,13 +480,16 @@ def test_move_labware_to_slot(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new slot location."""
     drop_offset = {"x": 4, "y": 5, "z": 6}
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_1
+    )
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     movable_labware = Labware(
@@ -335,7 +504,6 @@ def test_move_labware_to_slot(
     subject.move_labware(
         labware=movable_labware,
         new_location=42,
-        use_pick_up_location_lpc_offset=True,
         drop_offset=drop_offset,
     )
 
@@ -344,8 +512,6 @@ def test_move_labware_to_slot(
             labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
             use_gripper=False,
-            use_pick_up_location_lpc_offset=True,
-            use_drop_location_lpc_offset=False,
             pick_up_offset=None,
             drop_offset=(1, 2, 3),
         )
@@ -385,18 +551,70 @@ def test_move_labware_to_module(
             labware_core=mock_labware_core,
             new_location=mock_module_core,
             use_gripper=False,
-            use_pick_up_location_lpc_offset=False,
-            use_drop_location_lpc_offset=False,
             pick_up_offset=None,
             drop_offset=None,
         )
     )
 
 
+def test_move_labware_off_deck(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
+) -> None:
+    """It should move labware off-deck."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+
+    subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
+    decoy.verify(
+        mock_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=OFF_DECK,
+            use_gripper=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_move_labware_off_deck_raises(
+    subject: ProtocolContext,
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+) -> None:
+    """It should raise an APIVersionError if using move_labware in an unsupported version."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+
+    with pytest.raises(APIVersionError):
+        subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
+
+
 def test_load_module(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
@@ -405,7 +623,9 @@ def test_load_module(
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_3)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_3
+    )
 
     decoy.when(
         mock_core.load_module(
@@ -470,6 +690,17 @@ def test_load_module_with_configuration(subject: ProtocolContext) -> None:
         )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_module_with_mag_block_raises(subject: ProtocolContext) -> None:
+    """It should raise an APIVersionError if loading a magnetic block."""
+    with pytest.raises(APIVersionError):
+        subject.load_module(
+            module_name="magneticBlockV1",
+            location=42,
+            configuration="semi",
+        )
+
+
 def test_loaded_modules(
     decoy: Decoy,
     mock_core_map: LoadedCoreMap,
@@ -479,18 +710,25 @@ def test_loaded_modules(
     """It should return a list of all loaded modules."""
     module_core_4 = decoy.mock(cls=TemperatureModuleCore)
     module_core_6 = decoy.mock(cls=MagneticModuleCore)
+    module_core_7 = decoy.mock(cls=MagneticBlockCore)
+
     module_4 = decoy.mock(cls=TemperatureModuleContext)
     module_6 = decoy.mock(cls=MagneticModuleContext)
+    module_7 = decoy.mock(cls=MagneticBlockContext)
 
-    decoy.when(mock_core.get_module_cores()).then_return([module_core_4, module_core_6])
+    decoy.when(mock_core.get_module_cores()).then_return(
+        [module_core_4, module_core_6, module_core_7]
+    )
     decoy.when(module_core_4.get_deck_slot()).then_return(DeckSlotName.SLOT_4)
     decoy.when(module_core_6.get_deck_slot()).then_return(DeckSlotName.SLOT_6)
+    decoy.when(module_core_7.get_deck_slot()).then_return(DeckSlotName.SLOT_7)
     decoy.when(mock_core_map.get(module_core_4)).then_return(module_4)
     decoy.when(mock_core_map.get(module_core_6)).then_return(module_6)
+    decoy.when(mock_core_map.get(module_core_7)).then_return(module_7)
 
     result = subject.loaded_modules
 
-    assert result == {4: module_4, 6: module_6}
+    assert result == {4: module_4, 6: module_6, 7: module_7}
 
 
 def test_home(

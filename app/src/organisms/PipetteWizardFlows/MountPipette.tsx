@@ -1,14 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import { Flex, JUSTIFY_CENTER } from '@opentrons/components'
+import {
+  SINGLE_MOUNT_PIPETTES,
+  WEIGHT_OF_96_CHANNEL,
+} from '@opentrons/shared-data'
+import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import screwPattern from '../../assets/images/change-pip/screw-pattern.png'
-import attach96Pipette from '../../assets/images/change-pip/attach-96-pipette.png'
 import { Skeleton } from '../../atoms/Skeleton'
 import { CheckPipetteButton } from './CheckPipetteButton'
-import { BODY_STYLE } from './constants'
+import { BODY_STYLE, SECTIONS } from './constants'
+import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
@@ -25,9 +28,13 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
     isFetching,
     setFetching,
     isOnDevice,
+    mount,
+    flowType,
   } = props
-  const { t } = useTranslation('pipette_wizard_flows')
+  const { t, i18n } = useTranslation('pipette_wizard_flows')
+  const pipetteWizardStep = { mount, flowType, section: SECTIONS.MOUNT_PIPETTE }
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
+
   const bodyTextSkeleton = (
     <Skeleton
       width="18rem"
@@ -47,7 +54,22 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
     )
   } else {
     bodyText = (
-      <StyledText css={BODY_STYLE}> {t('hold_pipette_carefully')}</StyledText>
+      <>
+        {!isSingleMountPipette ? (
+          <Banner
+            type="warning"
+            size={isOnDevice ? '1.5rem' : SIZE_1}
+            marginY={SPACING.spacing4}
+          >
+            {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+          </Banner>
+        ) : null}
+        <StyledText css={BODY_STYLE}>
+          {isSingleMountPipette
+            ? t('align_the_connector')
+            : t('hold_pipette_carefully')}
+        </StyledText>
+      </>
     )
   }
 
@@ -61,10 +83,13 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          t(
-            isSingleMountPipette
-              ? 'connect_and_screw_in_pipette'
-              : 'connect_96_channel'
+          i18n.format(
+            t(
+              isSingleMountPipette
+                ? 'connect_and_secure_pipette'
+                : 'connect_96_channel'
+            ),
+            'capitalize'
           )
         )
       }
@@ -77,17 +102,12 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
           />
         ) : (
           <Flex justifyContent={JUSTIFY_CENTER}>
-            <img
-              //  TODO(jr, 11/18/22): attach real image
-              src={isSingleMountPipette ? screwPattern : attach96Pipette}
-              width="171px"
-              height="248px"
-              alt={
-                isSingleMountPipette
-                  ? 'Screw pattern'
-                  : 'Attach 96 channel pipette'
-              }
-            />
+            {isSingleMountPipette
+              ? getPipetteAnimations({ pipetteWizardStep })
+              : getPipetteAnimations96({
+                  section: pipetteWizardStep.section,
+                  flowType: flowType,
+                })}
           </Flex>
         )
       }

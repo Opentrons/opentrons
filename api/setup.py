@@ -23,11 +23,12 @@ if os.name == "posix":
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
     project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
+    git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("api", project, **normalize_opts)
+    return normalize_version("api", project, git_dir=git_dir, **normalize_opts)
 
 
 VERSION = get_version()

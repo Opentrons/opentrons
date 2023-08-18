@@ -11,10 +11,14 @@ import {
 } from '@opentrons/components'
 
 import { Tooltip } from '../../../atoms/Tooltip'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
+  ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP,
+} from '../../../redux/analytics'
 import { useIsOT3, useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
-import { SetupPipetteCalibration } from './SetupPipetteCalibration'
+import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
 
 import type { ProtocolCalibrationStatus } from '../../../redux/calibration/types'
@@ -38,8 +42,8 @@ export function SetupRobotCalibration({
   const { t } = useTranslation('protocol_setup')
   const nextStepButtonKey =
     nextStep === 'module_setup_step'
-      ? 'proceed_to_module_setup_step'
-      : 'proceed_to_labware_setup_step'
+      ? ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP
+      : ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP
   const [targetProps, tooltipProps] = useHoverTooltip()
   const trackEvent = useTrackEvent()
 
@@ -58,13 +62,13 @@ export function SetupRobotCalibration({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         width="100%"
-        gridGap={SPACING.spacing4}
-        marginY={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
+        marginY={SPACING.spacing16}
       >
         {!isOT3 ? (
           <SetupDeckCalibration robotName={robotName} runId={runId} />
         ) : null}
-        <SetupPipetteCalibration robotName={robotName} runId={runId} />
+        <SetupInstrumentCalibration robotName={robotName} runId={runId} />
         {!isOT3 ? (
           <SetupTipLengthCalibration robotName={robotName} runId={runId} />
         ) : null}

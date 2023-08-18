@@ -6,6 +6,8 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
+from opentrons_shared_data.labware.labware_definition import LabwareRole
+
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.types import DeckSlotName, Point
@@ -98,6 +100,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         """Whether the labware is a tip rack."""
         return self._definition.parameters.isTiprack
 
+    def is_adapter(self) -> bool:
+        """Whether the labware is an adapter."""
+        return LabwareRole.adapter in self._definition.allowedRoles
+
     def is_fixed_trash(self) -> bool:
         """Whether the labware is a fixed trash."""
         return self._engine_client.state.labware.is_fixed_trash(
@@ -108,7 +114,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._engine_client.state.labware.get_tip_length(self._labware_id)
 
     def reset_tips(self) -> None:
-        self._engine_client.reset_tips(labware_id=self.labware_id)
+        if self.is_tip_rack():
+            self._engine_client.reset_tips(labware_id=self.labware_id)
+        else:
+            raise TypeError(f"{self.get_display_name()} is not a tip rack.")
 
     def get_next_tip(
         self, num_tips: int, starting_tip: Optional[WellCore]

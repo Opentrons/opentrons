@@ -15,16 +15,17 @@ from opentrons_shared_data.gripper.constants import (
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import DeckSlotName, Point
 
-from opentrons.hardware_control.types import OT3Mount, OT3Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
-    OFF_DECK_LOCATION,
+    OnLabwareLocation,
     LabwareOffset,
     LabwareOffsetLocation,
     LabwareOffsetVector,
     LabwareLocation,
-    ExperimentalOffsetData,
+    NonStackedLocation,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -88,13 +89,11 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
     return decoy.mock(cls=HeaterShakerMovementFlagger)
 
 
-def default_experimental_movement_data() -> ExperimentalOffsetData:
+def default_experimental_movement_data() -> LabwareMovementOffsetData:
     """Experimental movement data with default values."""
-    return ExperimentalOffsetData(
-        usePickUpLocationLpcOffset=False,
-        useDropLocationLpcOffset=False,
-        pickUpOffset=None,
-        dropOffset=None,
+    return LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
     )
 
 
@@ -135,6 +134,14 @@ def subject(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ModuleLocation(moduleId="module-id"),
         ),
+        (
+            OnLabwareLocation(labwareId="a-labware-id"),
+            OnLabwareLocation(labwareId="another-labware-id"),
+        ),
+        (
+            ModuleLocation(moduleId="a-module-id"),
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        ),
     ],
 )
 @pytest.mark.ot3_only
@@ -144,16 +151,37 @@ async def test_move_labware_with_gripper(
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
     ot3_hardware_api: OT3API,
     subject: LabwareMovementHandler,
-    from_location: Union[DeckSlotLocation, ModuleLocation],
-    to_location: Union[DeckSlotLocation, ModuleLocation],
+    from_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
+    to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
+    # TODO (spp, 2023-07-26): this test does NOT stub out movement waypoints in order to
+    #  keep this as the semi-smoke test that it previously was. We should add a proper
+    #  smoke test for gripper labware movement with actual labware and make this a unit test.
+
+    user_offset_data = LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=123, y=234, z=345),
+        dropOffset=LabwareOffsetVector(x=111, y=222, z=333),
+    )
+    final_offset_data = LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
 
     decoy.when(
         await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
     ).then_return(Point(x=777, y=888, z=999))
+
+    decoy.when(
+        state_store.geometry.get_final_labware_movement_offset_vectors(
+            from_location=from_location,
+            to_location=to_location,
+            additional_offset_vector=user_offset_data,
+        )
+    ).then_return(final_offset_data)
 
     decoy.when(
         state_store.geometry.get_labware_center(
@@ -167,9 +195,12 @@ async def test_move_labware_with_gripper(
         )
     ).then_return(Point(201, 202, 219.5))
 
+    mock_tc_context_manager = decoy.mock()
     decoy.when(
-        state_store.labware.get_labware_offset_vector("my-teleporting-labware")
-    ).then_return(LabwareOffsetVector(x=0.1, y=0.2, z=0.3))
+        thermocycler_plate_lifter.lift_plate_for_labware_movement(
+            labware_location=from_location
+        )
+    ).then_return(mock_tc_context_manager)
 
     decoy.when(state_store.labware.get_labware_offset("new-offset-id")).then_return(
         LabwareOffset(
@@ -182,62 +213,51 @@ async def test_move_labware_with_gripper(
             vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
         )
     )
-    experimental_offset_data = ExperimentalOffsetData(
-        usePickUpLocationLpcOffset=True,
-        useDropLocationLpcOffset=False,
-        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
-        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
-    )
 
     expected_waypoints = [
-        Point(777, 888, 999),  # gripper retract at current location
-        Point(100.1, 100.2, 999),  # move to above slot 1
-        Point(100.1, 100.2, 116.8),  # move to labware on slot 1
-        Point(100.1, 100.2, 999),  # gripper retract at current location
+        Point(100, 100, 999),  # move to above slot 1
+        Point(100, 100, 116.5),  # move to labware on slot 1
+        Point(100, 100, 999),  # gripper retract at current location
         Point(202.0, 204.0, 999),  # move to above slot 3
         Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
-        Point(201.5, 202.6, 999),  # retract in place
+        Point(202.0, 204.0, 999),  # retract in place
     ]
 
     await subject.move_labware_with_gripper(
         labware_id="my-teleporting-labware",
         current_location=from_location,
         new_location=to_location,
-        new_offset_id="new-offset-id",
-        experimental_offset_data=experimental_offset_data,
+        user_offset_data=user_offset_data,
     )
 
     gripper = OT3Mount.GRIPPER
     decoy.verify(
-        await ot3_hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]),
-        await thermocycler_plate_lifter.lift_plate_for_labware_movement(from_location),
+        await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
+        await mock_tc_context_manager.__aenter__(),
+        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[0]
         ),
+        await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[1]
         ),
-        await ot3_hardware_api.home_gripper_jaw(),
+        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[2]
         ),
-        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
         await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
-        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[3]
         ),
+        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[4]
         ),
+        await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
-        await ot3_hardware_api.ungrip(),
-        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
-        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
         await ot3_hardware_api.grip(force_newtons=IDLE_STATE_GRIP_FORCE),
     )
 
@@ -263,8 +283,7 @@ async def test_labware_movement_raises_on_ot2(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            new_offset_id=None,
-            experimental_offset_data=default_experimental_movement_data(),
+            user_offset_data=default_experimental_movement_data(),
         )
 
 
@@ -281,8 +300,7 @@ async def test_labware_movement_skips_for_virtual_gripper(
         labware_id="labware-id",
         current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        experimental_offset_data=default_experimental_movement_data(),
-        new_offset_id=None,
+        user_offset_data=default_experimental_movement_data(),
     )
     decoy.verify(
         await ot3_hardware_api.move_to(
@@ -308,22 +326,8 @@ async def test_labware_movement_raises_without_gripper(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            experimental_offset_data=default_experimental_movement_data(),
-            new_offset_id=None,
+            user_offset_data=default_experimental_movement_data(),
         )
-
-
-def test_ensure_valid_gripper_location(subject: LabwareMovementHandler) -> None:
-    """It should validate on-deck gripper locations."""
-    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
-    module_location = ModuleLocation(moduleId="dummy-module")
-    off_deck_location = OFF_DECK_LOCATION
-
-    assert subject.ensure_valid_gripper_location(slot_location) == slot_location
-    assert subject.ensure_valid_gripper_location(module_location) == module_location
-
-    with pytest.raises(LabwareMovementNotAllowedError):
-        subject.ensure_valid_gripper_location(off_deck_location)
 
 
 @pytest.mark.parametrize(
@@ -344,13 +348,13 @@ async def test_ensure_movement_obstructed_by_thermocycler_raises(
     subject: LabwareMovementHandler,
     state_store: StateStore,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
-    from_loc: LabwareLocation,
+    from_loc: NonStackedLocation,
     to_loc: LabwareLocation,
 ) -> None:
     """It should raise error when labware movement is obstructed by thermocycler."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
-        from_loc
-    )
+    decoy.when(
+        state_store.labware.get_parent_location(labware_id="labware-id")
+    ).then_return(from_loc)
     decoy.when(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_parent=ModuleLocation(moduleId="a-thermocycler-id")
@@ -369,9 +373,9 @@ async def test_ensure_movement_not_obstructed_by_modules(
     state_store: StateStore,
 ) -> None:
     """It should not raise error when labware movement is not obstructed by thermocycler."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
-        ModuleLocation(moduleId="a-rando-module-id")
-    )
+    decoy.when(
+        state_store.labware.get_parent_location(labware_id="labware-id")
+    ).then_return(ModuleLocation(moduleId="a-rando-module-id"))
     await subject.ensure_movement_not_obstructed_by_module(
         labware_id="labware-id",
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
@@ -396,13 +400,13 @@ async def test_ensure_movement_obstructed_by_heater_shaker_raises(
     subject: LabwareMovementHandler,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     state_store: StateStore,
-    from_loc: LabwareLocation,
+    from_loc: NonStackedLocation,
     to_loc: LabwareLocation,
 ) -> None:
     """It should raise error when labware movement is obstructed by thermocycler."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
-        from_loc
-    )
+    decoy.when(
+        state_store.labware.get_parent_location(labware_id="labware-id")
+    ).then_return(from_loc)
     decoy.when(
         await heater_shaker_movement_flagger.raise_if_labware_latched_on_heater_shaker(
             labware_parent=ModuleLocation(moduleId="a-heater-shaker-id")
@@ -421,9 +425,9 @@ async def test_ensure_movement_not_obstructed_does_not_raise_for_slot_locations(
     state_store: StateStore,
 ) -> None:
     """It should not raise error when moving from slot to slot."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
+    decoy.when(
+        state_store.labware.get_parent_location(labware_id="labware-id")
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_1))
     await subject.ensure_movement_not_obstructed_by_module(
         labware_id="labware-id",
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),

@@ -1,8 +1,12 @@
 // sets up the main window ui
 import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
+import { sendReadyStatus } from '@opentrons/app/src/redux/shell'
 import { getConfig } from './config'
 import { createLogger } from './log'
+import systemd from './systemd'
+
+import type { Dispatch } from './types'
 
 const config = getConfig('ui')
 const log = createLogger('ui')
@@ -20,6 +24,7 @@ const WINDOW_OPTS = {
   width: config.width,
   minWidth: config.minWidth,
   height: config.height,
+  frame: false, // hide menubar
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {
@@ -36,7 +41,7 @@ const WINDOW_OPTS = {
   ),
 }
 
-export function createUi(): BrowserWindow {
+export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
@@ -44,6 +49,8 @@ export function createUi(): BrowserWindow {
     () => {
       log.debug('Main window ready to show')
       mainWindow.show()
+      process.env.NODE_ENV !== 'development' &&
+        waitForRobotServerAndShowMainWIndow(dispatch)
     }
   )
 
@@ -60,4 +67,21 @@ export function createUi(): BrowserWindow {
   })
 
   return mainWindow
+}
+
+export function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
+  setTimeout(function () {
+    systemd
+      .getisRobotServerReady()
+      .then((isReady: boolean) => {
+        dispatch(sendReadyStatus(isReady))
+        if (!isReady) {
+          waitForRobotServerAndShowMainWIndow(dispatch)
+        }
+      })
+      .catch(e => {
+        log.debug('Could not get status of robot server service', { e })
+        waitForRobotServerAndShowMainWIndow(dispatch)
+      })
+  }, 1500)
 }

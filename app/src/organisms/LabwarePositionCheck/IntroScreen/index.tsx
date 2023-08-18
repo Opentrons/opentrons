@@ -1,39 +1,47 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  PrimaryButton,
-  ALIGN_CENTER,
-} from '@opentrons/components'
-import { NeedHelpLink } from '../../CalibrationPanels'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { CreateRunCommand, RegisterPositionAction } from '../types'
+import { useChainRunCommands } from '../../../resources/runs/hooks'
+import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
-import { chainRunCommands } from '../utils/chainRunCommands'
+import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { GenericWizardTile } from '../../../molecules/GenericWizardTile'
+import { getIsOnDevice } from '../../../redux/config'
+import { useSelector } from 'react-redux'
 
 export const INTERVAL_MS = 3000
+const SUPPORT_PAGE_URL = 'https://support.opentrons.com/s/ot2-calibration'
 
 export const IntroScreen = (props: {
   proceed: () => void
   protocolData: CompletedProtocolAnalysis
   registerPosition: React.Dispatch<RegisterPositionAction>
-  createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   handleJog: Jog
+  setFatalError: (errorMessage: string) => void
   isRobotMoving: boolean
 }): JSX.Element | null => {
-  const { proceed, protocolData, createRunCommand, isRobotMoving } = props
+  const {
+    proceed,
+    protocolData,
+    chainRunCommands,
+    isRobotMoving,
+    setFatalError,
+  } = props
+  const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['labware_position_check', 'shared'])
-
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
-    chainRunCommands(prepCommands, createRunCommand, proceed)
+    chainRunCommands(prepCommands, false)
+      .then(() => proceed())
+      .catch((e: Error) => {
+        setFatalError(
+          `IntroScreen failed to issue prep commands with message: ${e.message}`
+        )
+      })
   }
 
   if (isRobotMoving) {
@@ -42,53 +50,28 @@ export const IntroScreen = (props: {
     )
   }
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
-      minHeight="25rem"
-    >
-      <Flex gridGap={SPACING.spacingXXL}>
-        <Flex
-          flex="1"
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
-        >
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
-            {t('shared:before_you_begin')}
-          </StyledText>
-          <Trans
-            t={t}
-            i18nKey="labware_position_check_description"
-            components={{ block: <StyledText as="p" /> }}
-          />
-        </Flex>
-        <Flex
-          flex="1"
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
-        >
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('shared:you_will_need')}
-          </StyledText>
-          <StyledText as="p">
-            {t('all_modules_and_labware_from_protocol')}
-          </StyledText>
-        </Flex>
-      </Flex>
-      <Flex
-        width="100%"
-        marginTop={SPACING.spacing6}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-      >
-        <NeedHelpLink />
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-          <PrimaryButton onClick={handleClickStartLPC}>
-            {t('shared:get_started')}
-          </PrimaryButton>
-        </Flex>
-      </Flex>
-    </Flex>
+    <GenericWizardTile
+      header={t('shared:before_you_begin')}
+      getHelp={isOnDevice ? undefined : SUPPORT_PAGE_URL}
+      bodyText={
+        <Trans
+          t={t}
+          i18nKey="labware_position_check_description"
+          components={{ block: <StyledText as="p" /> }}
+        />
+      }
+      rightHandBody={
+        <WizardRequiredEquipmentList
+          equipmentList={[
+            {
+              loadName: t('all_modules_and_labware_from_protocol'),
+              displayName: t('all_modules_and_labware_from_protocol'),
+            },
+          ]}
+        />
+      }
+      proceedButtonText={t('shared:get_started')}
+      proceed={handleClickStartLPC}
+    />
   )
 }

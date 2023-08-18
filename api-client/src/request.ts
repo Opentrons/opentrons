@@ -17,6 +17,7 @@ export const GET = 'GET'
 export const POST = 'POST'
 export const PATCH = 'PATCH'
 export const DELETE = 'DELETE'
+export const PUT = 'PUT'
 
 export function request<ResData, ReqData = null>(
   method: Method,
@@ -25,9 +26,12 @@ export function request<ResData, ReqData = null>(
   config: HostConfig,
   params?: AxiosRequestConfig['params']
 ): ResponsePromise<ResData> {
-  const { hostname, port } = config
-  const headers = { ...DEFAULT_HEADERS }
+  const { hostname, port, requestor = axios.request, token } = config
+
+  const tokenHeader = token != null ? { authenticationBearer: token } : {}
+  const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
+
   const baseURL = `http://${hostname}:${port ?? DEFAULT_PORT}`
 
-  return axios.request({ headers, method, baseURL, url, data, params })
+  return requestor<ResData>({ headers, method, baseURL, url, data, params })
 }

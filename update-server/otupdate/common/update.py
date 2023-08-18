@@ -246,6 +246,10 @@ async def commit(request: web.Request, session: UpdateSession) -> web.Response:
         except (OSError, CalledProcessError):
             LOG.exception("Failed to update machine-id")
         actions.commit_update()
+
+        # Clean up stale update files from the download dir
+        actions.clean_up(session.download_path)
+
         session.set_stage(Stages.READY_FOR_RESTART)
 
     return web.json_response(data=session.state, status=200)

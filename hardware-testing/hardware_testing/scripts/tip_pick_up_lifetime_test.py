@@ -11,7 +11,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
+from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 
 from opentrons.hardware_control.types import CriticalPoint
 
@@ -134,11 +134,11 @@ async def jog(api, position, cp):
 
         print(
             "Coordinates: ",
-            round(position[OT3Axis.X], 2),
+            round(position[Axis.X], 2),
             ",",
-            round(position[OT3Axis.Y], 2),
+            round(position[Axis.Y], 2),
             ",",
-            round(position[OT3Axis.by_mount(mount)], 2),
+            round(position[Axis.by_mount(mount)], 2),
             " Motor Step: ",
             step_size[step_length_index],
             end="",
@@ -156,7 +156,7 @@ async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
         # tip_rack_position = await helpers_ot3.jog_mount_ot3(api, mount)
         cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
         tip_rack_position = await jog(api, cur_pos, CriticalPoint.NOZZLE)
-        calibrated_slot_loc[key] = (tip_rack_position[OT3Axis.X], tip_rack_position[OT3Axis.Y], tip_rack_position[AXIS])
+        calibrated_slot_loc[key] = (tip_rack_position[Axis.X], tip_rack_position[Axis.Y], tip_rack_position[AXIS])
         await api.home([AXIS])
 
     json_object = json.dumps(calibrated_slot_loc, indent=0)
@@ -180,9 +180,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         test_robot = input("Enter robot ID:\n\t>> ")
 
     if(mount == OT3Mount.LEFT):
-        AXIS = OT3Axis.Z_L
+        AXIS = Axis.Z_L
     else:
-        AXIS = OT3Axis.Z_R
+        AXIS = Axis.Z_R
 
 
 
@@ -363,13 +363,16 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         total_pick_ups += 1
 
                         ### check tip presence after tip pick up
+                        
+
                         if check_tip_presence:
                             tip_presence_pick_up = await api.get_tip_status(mount)
-                            pick_up_keys = list(tip_presence_pick_up.keys())
-                            if(tip_presence_pick_up[pick_up_keys[0]]):
+                            #pick_up_keys = list(tip_presence_pick_up.keys())
+                            if tip_presence_pick_up == 1:#(tip_presence_pick_up[pick_up_keys[0]]):
                                 print("\t>> Tip detected!\n")
                                 tip_presence_pick_up_flag = True
                             else:
+                                print("GET Tip presenc{}".format(tip_presence_eject))
                                 total_failures += 1
                                 tip_presence_pick_up_flag = False
                                 print(f"\t>> Tip not detected! Total failures: {total_failures}\n")
@@ -391,8 +394,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         await api.drop_tip(mount)
                         if check_tip_presence:
                             tip_presence_eject = await api.get_tip_status(mount)
-                            drop_tip_keys = list(tip_presence_eject.keys())
-                            if(tip_presence_eject[drop_tip_keys[0]]):
+                            #drop_tip_keys = list(tip_presence_eject.keys())
+                            if tip_presence_eject == 1:#(tip_presence_eject[drop_tip_keys[0]]):
+                                print("GET Tip presenc{}".format(tip_presence_eject))
                                 print("\t>> Tip detected after ejecting tip!\n")
                                 print("\t>> Canceling script...\n")
                                 total_failures += 1

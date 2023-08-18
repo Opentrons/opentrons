@@ -11,6 +11,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareRole,
     Parameters as LabwareDefinitionParameters,
     Metadata as LabwareDefinitionMetadata,
 )
@@ -86,7 +87,15 @@ def test_get_definition(subject: LabwareCore) -> None:
     """It should get the labware's definition as a dictionary."""
     assert subject.get_definition() == cast(
         LabwareDefDict,
-        {"namespace": "hello", "parameters": {"loadName": "world"}, "ordering": []},
+        {
+            "namespace": "hello",
+            "parameters": {"loadName": "world"},
+            "ordering": [],
+            "allowedRoles": [],
+            "stackingOffsetWithLabware": {},
+            "stackingOffsetWithModule": {},
+            "gripperOffsets": {},
+        },
     )
     assert subject.get_parameters() == cast(LabwareParamsDict, {"loadName": "world"})
 
@@ -167,6 +176,30 @@ def test_is_tip_rack(subject: LabwareCore) -> None:
 
 
 @pytest.mark.parametrize(
+    argnames=["labware_definition", "expected_result"],
+    argvalues=[
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                ordering=[], allowedRoles=[LabwareRole.adapter]
+            ),
+            True,
+        ),
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                ordering=[], allowedRoles=[LabwareRole.labware]
+            ),
+            False,
+        ),
+    ],
+)
+def test_is_adapter(expected_result: bool, subject: LabwareCore) -> None:
+    """It should know whether it's an adapter."""
+    result = subject.is_adapter()
+
+    assert result is expected_result
+
+
+@pytest.mark.parametrize(
     "labware_definition",
     [
         LabwareDefinition.construct(  # type: ignore[call-arg]
@@ -223,12 +256,41 @@ def test_get_next_tip(
     assert result == "A2"
 
 
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(isTiprack=True),  # type: ignore[call-arg]
+        )
+    ],
+)
 def test_reset_tips(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
     """It should reset the tip state of a labware."""
     subject.reset_tips()
     decoy.verify(mock_engine_client.reset_tips(labware_id="cool-labware"), times=1)
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(isTiprack=False),  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.construct(  # type: ignore[call-arg]
+                displayName="Cool Display Name"
+            ),
+        )
+    ],
+)
+def test_reset_tips_raises_if_not_tip_rack(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should raise an exception if the labware isn't a tip rack."""
+    with pytest.raises(TypeError, match="Cool Display Name is not a tip rack"):
+        subject.reset_tips()
 
 
 def test_get_tip_length(

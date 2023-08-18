@@ -5,12 +5,12 @@ import {
   Box,
   POSITION_RELATIVE,
   COLORS,
-  OVERFLOW_SCROLL,
+  OVERFLOW_AUTO,
 } from '@opentrons/components'
 
-import { ToasterOven } from '../atoms/Toast'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
+import { ToasterOven } from '../organisms/ToasterOven'
 import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
@@ -102,7 +102,7 @@ export const DesktopApp = (): JSX.Element => {
                     width="100%"
                     height="100%"
                     backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
+                    overflow={OVERFLOW_AUTO}
                   >
                     <ModalPortalRoot />
                     <Component />

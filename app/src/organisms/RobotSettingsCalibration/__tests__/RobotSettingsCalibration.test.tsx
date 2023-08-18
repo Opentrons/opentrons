@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
-
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
 import { useFeatureFlag } from '../../../redux/config'
@@ -13,13 +13,17 @@ import {
   mockPipetteOffsetCalibration3,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
+import {
+  mockAttachedPipette,
+  mockAttachedPipetteInformation,
+} from '../../../redux/pipettes/__fixtures__'
 import {
   useIsOT3,
   usePipetteOffsetCalibrations,
   useRobot,
   useAttachedPipettes,
   useRunStatuses,
+  useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
 
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
@@ -32,6 +36,7 @@ import { RobotSettingsCalibration } from '..'
 
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
+jest.mock('@opentrons/react-api-client/src/instruments/useInstrumentsQuery')
 jest.mock('../../../organisms/CalibrationStatusCard')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/sessions/selectors')
@@ -50,6 +55,9 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
 } as any
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
+>
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
@@ -85,6 +93,9 @@ const mockRobotSettingsPipetteOffsetCalibration = RobotSettingsPipetteOffsetCali
 const mockRobotSettingsTipLengthCalibration = RobotSettingsTipLengthCalibration as jest.MockedFunction<
   typeof RobotSettingsTipLengthCalibration
 >
+const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
+  typeof useAttachedPipettesFromInstrumentsQuery
+>
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const RUN_STATUSES = {
@@ -110,6 +121,20 @@ const render = () => {
 
 describe('RobotSettingsCalibration', () => {
   beforeEach(() => {
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: null,
+      right: null,
+    })
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            ok: true,
+            instrumentType: 'gripper',
+          } as any,
+        ],
+      },
+    } as any)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
@@ -213,5 +238,27 @@ describe('RobotSettingsCalibration', () => {
   it('does not render a Gripper Calibration component for an OT-2', () => {
     const [{ queryByText }] = render()
     expect(queryByText('Mock RobotSettingsGripperCalibration')).toBeNull()
+  })
+
+  it('does not render the OT-2 components when there is an OT-3 attached with pipettes', () => {
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: mockAttachedPipetteInformation,
+      right: null,
+    })
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock RobotSettingsDeckCalibration')).toBeNull()
+    expect(queryByText('Mock RobotSettingsTipLengthCalibration')).toBeNull()
+    expect(queryByText('Mock CalibrationHealthCheck')).toBeNull()
+  })
+
+  it('renders the correct calibration data for an OT-3 pipette', () => {
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: mockAttachedPipetteInformation,
+      right: null,
+    })
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock RobotSettingsPipetteOffsetCalibration')
   })
 })

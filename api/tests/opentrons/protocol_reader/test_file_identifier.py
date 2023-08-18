@@ -88,6 +88,22 @@ class _ValidPythonProtocolSpec:
                     "apiLevel": "2.11",
                 }
                 requirements = {
+                    "robotType": "Flex",
+                }
+                """
+            ),
+            expected_api_level=APIVersion(2, 11),
+            expected_robot_type="OT-3 Standard",
+            expected_metadata={"apiLevel": "2.11"},
+        ),
+        _ValidPythonProtocolSpec(
+            file_name="foo.py",
+            contents=textwrap.dedent(
+                """
+                metadata = {
+                    "apiLevel": "2.11",
+                }
+                requirements = {
                     "robotType": "OT-3",
                 }
                 """
@@ -141,7 +157,19 @@ class _ValidJsonProtocolSpec:
     "spec",
     [
         # Basic JSON protocols of various versions:
-        # todo(mm, 2022-12-22): Add a v7 protocol when we support that in production.
+        _ValidJsonProtocolSpec(
+            file_name="foo.json",
+            contents=load_shared_data("protocol/fixtures/7/simpleV7.json"),
+            expected_schema_version=7,
+            expected_robot_type="OT-2 Standard",
+            expected_metadata={
+                "protocolName": "Simple test protocol",
+                "author": "engineering <engineering@opentrons.com>",
+                "description": "A short test protocol",
+                "created": 1223131231,
+                "tags": ["unitTest"],
+            },
+        ),
         _ValidJsonProtocolSpec(
             file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/6/simpleV6.json"),
@@ -381,7 +409,18 @@ class _InvalidInputSpec:
                 requirements = {"robotType": "ot2"}
                 """
             ),
-            expected_message="robotType must be 'OT-2' or 'OT-3', not 'ot2'.",
+            expected_message="robotType must be 'OT-2' or 'Flex', not 'ot2'.",
+        ),
+        _InvalidInputSpec(
+            file_name="protocol.py",
+            contents=textwrap.dedent(
+                """
+                metadata = {"apiLevel": "2.11"}
+                # robotType provided, but not a valid string.
+                requirements = {"robotType": "flex"}
+                """
+            ),
+            expected_message="robotType must be 'OT-2' or 'Flex', not 'flex'.",
         ),
         # Unrecognized file extension:
         _InvalidInputSpec(

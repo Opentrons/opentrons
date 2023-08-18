@@ -23,15 +23,15 @@
       }
     },
     "flowRate": {
+      "description": "Object with a default value and optional dict keyed by api level. If API level is unavailable, default is used.",
       "type": "object",
-      "required": ["value", "min", "max"],
+      "required": ["default", "valuesByApiLevel"],
       "properties": {
-        "value": {
+        "default": {
           "$ref": "#/definitions/positiveNumber",
-          "$comment": "This key is deprecated in favor of valuesByApiLevel"
+          "$comment": "The default value of the flowrate"
         },
-        "min": { "$ref": "#/definitions/positiveNumber" },
-        "max": { "$ref": "#/definitions/positiveNumber" }
+        "valuesByApiLevel": { "type": "object", "required": [] }
       }
     }
   },
@@ -41,7 +41,8 @@
     "maxVolume",
     "minVolume",
     "defaultTipracks",
-    "supportedTips"
+    "supportedTips",
+    "defaultTipOverlapDictionary"
   ],
   "additionalProperties": false,
   "properties": {
@@ -75,10 +76,10 @@
               "defaultBlowOutFlowRate": {
                 "$ref": "#/definitions/flowRate"
               },
-              "defaultTipLength": {
+              "defaultFlowAcceleration": {
                 "$ref": "#/definitions/positiveNumber"
               },
-              "defaultTipOverlap": {
+              "defaultTipLength": {
                 "$ref": "#/definitions/positiveNumber"
               },
               "defaultReturnTipHeight": {
@@ -96,6 +97,16 @@
           }
         }
       }
+    },
+    "defaultTipOverlapDictionary": {
+      "type": "object",
+      "description": "Map of tip overlap values with defaults",
+      "required": ["default"],
+      "$comment": "Other keys in here should be labware URIs",
+      "properties": {
+        "default": { "type": "number" }
+      },
+      "additionalProperties": { "type": "number" }
     },
     "maxVolume": { "$ref": "#/definitions/positiveNumber" },
     "minVolume": { "$ref": "#/definitions/positiveNumber" },

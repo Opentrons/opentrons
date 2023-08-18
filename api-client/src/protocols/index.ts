@@ -3,6 +3,7 @@ export { getProtocolAnalyses } from './getProtocolAnalyses'
 export { deleteProtocol } from './deleteProtocol'
 export { createProtocol } from './createProtocol'
 export { getProtocols } from './getProtocols'
+export { getProtocolIds } from './getProtocolIds'
 
 export * from './types'
 export * from './utils'

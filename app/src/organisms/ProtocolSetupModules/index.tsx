@@ -2,33 +2,39 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Btn,
-  Flex,
-  Icon,
-  Module,
-  RobotWorkSpace,
   ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LocationIcon,
+  Module,
+  RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
+  NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
-import { Banner } from '../../atoms/Banner'
-import { BackButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
+import { Chip } from '../../atoms/Chip'
+import { InlineNotification } from '../../atoms/InlineNotification'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
@@ -39,6 +45,7 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from './utils'
+import { SetupInstructionsModal } from './SetupInstructionsModal'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
@@ -63,120 +70,67 @@ function RowModule({
   setShowMultipleModulesModal,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
+    module.moduleDef.moduleType
+  )
+  const isModuleReady =
+    isNonConnectingModule || module.attachedModuleMatch != null
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={
-        module.attachedModuleMatch != null
-          ? `${COLORS.successEnabled}${COLORS.opacity20HexCode}`
-          : COLORS.warningBackgroundMed
-      }
-      borderRadius="1rem"
+      backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
+      borderRadius={BORDERS.borderRadiusSize3}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing4}
-      paddingLeft={SPACING.spacing5}
+      gridGap={SPACING.spacing24}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       onClick={() =>
         isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
       }
     >
-      <Flex width="50%">
-        <StyledText>{getModuleDisplayName(module.moduleDef.model)}</StyledText>
-      </Flex>
-      <Flex width="20%">
-        <StyledText>
-          {/* TODO(bh, 2023-02-07): adjust slot location when hi-fi designs finalized */}
-          {t('slot_location', {
-            slotName:
-              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-                ? TC_MODULE_LOCATION_OT3
-                : module.slotName,
-          })}
+      <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {getModuleDisplayName(module.moduleDef.model)}
         </StyledText>
       </Flex>
-      <Flex
-        width="30%"
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <StyledText>
-          {module.attachedModuleMatch != null
-            ? t('module_connected')
-            : t('module_disconnected')}
-        </StyledText>
-        {isDuplicateModuleModel ? (
-          <Icon name="information" size="1.5rem" />
-        ) : null}
+      <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
+        <LocationIcon
+          slotName={
+            getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
+              ? TC_MODULE_LOCATION_OT3
+              : module.slotName
+          }
+        />
       </Flex>
+      {isNonConnectingModule ? (
+        <Flex
+          flex="3 0 0"
+          alignItems={ALIGN_CENTER}
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+        >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('n_a')}
+          </StyledText>
+        </Flex>
+      ) : (
+        <Flex
+          flex="3 0 0"
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <Chip
+            text={
+              isModuleReady ? t('module_connected') : t('module_disconnected')
+            }
+            type={isModuleReady ? 'success' : 'warning'}
+            background={false}
+            iconName="connection-status"
+          />
+          {isDuplicateModuleModel ? (
+            <Icon name="information" size="2rem" />
+          ) : null}
+        </Flex>
+      )}
     </Flex>
-  )
-}
-
-function SetupInstructionsButton(
-  props: React.HTMLProps<HTMLButtonElement>
-): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  return (
-    <Btn
-      alignItems="center"
-      backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
-      borderRadius={BORDERS.size_five}
-      display="flex"
-      gridGap="0.5rem"
-      padding="1rem 2rem"
-      whiteSpace="nowrap"
-      onClick={props.onClick}
-    >
-      <Icon name="information" size="1.5rem" />
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('setup_instructions')}
-      </StyledText>
-    </Btn>
-  )
-}
-
-export function ContinueButton(
-  props: React.HTMLProps<HTMLButtonElement>
-): JSX.Element {
-  const { t } = useTranslation('shared')
-  return (
-    <Btn
-      backgroundColor={COLORS.blueEnabled}
-      borderRadius={BORDERS.size_five}
-      color={COLORS.white}
-      padding="1rem 2rem"
-      onClick={props.onClick}
-    >
-      <StyledText
-        as="h1"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        textTransform={TYPOGRAPHY.textTransformCapitalize}
-      >
-        {t('continue')}
-      </StyledText>
-    </Btn>
-  )
-}
-
-export function DeckMapButton(
-  props: React.HTMLProps<HTMLButtonElement>
-): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  return (
-    <Btn
-      position="fixed"
-      bottom="1.5rem"
-      right="1.5rem"
-      backgroundColor={COLORS.blueEnabled}
-      borderRadius={BORDERS.size_five}
-      color={COLORS.white}
-      padding="1rem 2rem"
-      onClick={props.onClick}
-    >
-      <StyledText as="h1" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('deck_map')}
-      </StyledText>
-    </Btn>
   )
 }
 
@@ -192,7 +146,7 @@ export function ProtocolSetupModules({
   runId,
   setSetupScreen,
 }: ProtocolSetupModulesProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -240,15 +194,12 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showSetupInstructionsModal ? (
-          <Modal
-            title={t('setup_instructions')}
-            onClose={() => setShowSetupInstructionsModal(false)}
-          >
-            TODO: setup instructions modal
-          </Modal>
+          <SetupInstructionsModal
+            setShowSetupInstructionsModal={setShowSetupInstructionsModal}
+          />
         ) : null}
         {showDeckMapModal ? (
-          <Modal
+          <LegacyModal
             title={t('map_view')}
             onClose={() => setShowDeckMapModal(false)}
             fullPage
@@ -256,89 +207,108 @@ export function ProtocolSetupModules({
             <RobotWorkSpace
               deckDef={deckDef}
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+              deckFill={COLORS.light1}
+              trashSlotName="A3"
               id="ModuleSetup_deckMap"
             >
-              {() =>
-                attachedProtocolModuleMatches.map(module => (
-                  <Module
-                    key={module.moduleId}
-                    x={module.x}
-                    y={module.y}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      module.x
-                    )}
-                    def={module.moduleDef}
-                  >
-                    <ModuleInfo
-                      moduleModel={module.moduleDef.model}
-                      isAttached={module.attachedModuleMatch != null}
-                      usbPort={module.attachedModuleMatch?.usbPort.port ?? null}
-                      hubPort={module.attachedModuleMatch?.usbPort.hub ?? null}
-                      runId={runId}
-                    />
-                  </Module>
-                ))
-              }
+              {() => (
+                <>
+                  {attachedProtocolModuleMatches.map(module => (
+                    <Module
+                      key={module.moduleId}
+                      x={module.x}
+                      y={module.y}
+                      orientation={inferModuleOrientationFromXCoordinate(
+                        module.x
+                      )}
+                      def={module.moduleDef}
+                    >
+                      <ModuleInfo
+                        moduleModel={module.moduleDef.model}
+                        isAttached={module.attachedModuleMatch != null}
+                        physicalPort={
+                          module.attachedModuleMatch?.usbPort ?? null
+                        }
+                        runId={runId}
+                      />
+                    </Module>
+                  ))}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
+                </>
+              )}
             </RobotWorkSpace>
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('modules')}
-        </BackButton>
-        <Flex gridGap="2.5rem">
-          <SetupInstructionsButton
-            onClick={() => setShowSetupInstructionsModal(true)}
-          />
-          <ContinueButton onClick={() => setSetupScreen('labware')} />
-        </Flex>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <ODDBackButton
+          label={t('modules')}
+          onClick={() => setSetupScreen('prepare to run')}
+        />
+        <SmallButton
+          alignSelf={ALIGN_FLEX_END}
+          buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
+          buttonType="tertiaryLowLight"
+          iconName="information"
+          iconPlacement="startIcon"
+          onClick={() => setShowSetupInstructionsModal(true)}
+        />
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing6}
+        gridGap={SPACING.spacing24}
+        marginTop={SPACING.spacing32}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
-          <Banner
-            type="warning"
-            onCloseClick={() => setClearModuleMismatchBanner(true)}
-          >
-            {`${t('module_mismatch_error')}. ${t('module_mismatch_body')}`}
-          </Banner>
+          <InlineNotification
+            type="alert"
+            onCloseClick={e => {
+              e.stopPropagation()
+              setClearModuleMismatchBanner(true)
+            }}
+            heading={t('extra_module_attached')}
+            message={t('module_mismatch_body')}
+          />
         ) : null}
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex paddingLeft={SPACING.spacing5} width="50%">
-            <StyledText>{'Module Name'}</StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          <Flex
+            color={COLORS.darkBlack70}
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            gridGap={SPACING.spacing24}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+            paddingX={SPACING.spacing24}
+          >
+            <StyledText flex="4 0 0">{'Module Name'}</StyledText>
+            <StyledText flex="2 0 0">{'Location'}</StyledText>
+            <StyledText flex="3 0 0"> {'Status'}</StyledText>
           </Flex>
-          <Flex width="20%">
-            <StyledText>{'Location'}</StyledText>
-          </Flex>
-          <Flex width="30%">
-            <StyledText>{'Status'}</StyledText>
-          </Flex>
-        </Flex>
-        {attachedProtocolModuleMatches.map(module => {
-          // check for duplicate module model in list of modules for protocol
-          const isDuplicateModuleModel = protocolModulesInfo
-            // filter out current module
-            .filter(otherModule => otherModule.moduleId !== module.moduleId)
-            // check for existence of another module of same model
-            .some(
-              otherModule =>
-                otherModule.moduleDef.model === module.moduleDef.model
+          {attachedProtocolModuleMatches.map(module => {
+            // check for duplicate module model in list of modules for protocol
+            const isDuplicateModuleModel = protocolModulesInfo
+              // filter out current module
+              .filter(otherModule => otherModule.moduleId !== module.moduleId)
+              // check for existence of another module of same model
+              .some(
+                otherModule =>
+                  otherModule.moduleDef.model === module.moduleDef.model
+              )
+            return (
+              <RowModule
+                key={module.moduleId}
+                module={module}
+                isDuplicateModuleModel={isDuplicateModuleModel}
+                setShowMultipleModulesModal={setShowMultipleModulesModal}
+              />
             )
-          return (
-            <RowModule
-              key={module.moduleId}
-              module={module}
-              isDuplicateModuleModel={isDuplicateModuleModel}
-              setShowMultipleModulesModal={setShowMultipleModulesModal}
-            />
-          )
-        })}
+          })}
+        </Flex>
       </Flex>
-      <DeckMapButton onClick={() => setShowDeckMapModal(true)} />
+      <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
     </>
   )
 }

@@ -19,6 +19,7 @@ const SPECS: ActionSpec[] = [
     expected: {
       type: 'systemInfo:USB_DEVICE_ADDED',
       payload: { usbDevice: Fixtures.mockUsbDevice },
+      meta: { shell: true },
     },
   },
   {
@@ -28,6 +29,7 @@ const SPECS: ActionSpec[] = [
     expected: {
       type: 'systemInfo:USB_DEVICE_REMOVED',
       payload: { usbDevice: Fixtures.mockUsbDevice },
+      meta: { shell: true },
     },
   },
   {
@@ -47,6 +49,7 @@ const SPECS: ActionSpec[] = [
         ],
         networkInterfaces: [Fixtures.mockNetworkInterface],
       },
+      meta: { shell: true },
     },
   },
   {

@@ -52,7 +52,10 @@ async def test_legacy_custom_labware(custom_labware_protocol_files: List[Path]) 
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=protocol_source.config,
+    )
     result = await subject.run(protocol_source)
 
     expected_labware = LoadedLabware.construct(

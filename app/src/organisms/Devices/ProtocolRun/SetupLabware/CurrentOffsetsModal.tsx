@@ -19,11 +19,14 @@ import {
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
+import {
+  LegacyModalHeader,
+  LegacyModalShell,
+} from '../../../../molecules/LegacyModal'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { getLatestCurrentOffsets } from './utils'
+import { getLatestCurrentOffsets } from '../SetupLabwarePositionCheck/utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
@@ -36,21 +39,21 @@ const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing1};
-  margin: ${SPACING.spacing4} 0;
+  border-spacing: 0 ${SPACING.spacing2};
+  margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
   background-color: ${COLORS.fundamentalsBackground};
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
 `
 
 const OffsetTableDatum = styled('td')`
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
   white-space: break-spaces;
   text-overflow: wrap;
 `
@@ -130,16 +133,19 @@ export function CurrentOffsetsModal(
     />
   )
   return (
-    <ModalShell
+    <LegacyModalShell
       maxWidth="40rem"
       header={
-        <ModalHeader title={t('applied_offset_data')} onClose={onCloseClick} />
+        <LegacyModalHeader
+          title={t('applied_offset_data')}
+          onClose={onCloseClick}
+        />
       }
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        padding={SPACING.spacing6}
+        padding={SPACING.spacing32}
       >
         {isLabwareOffsetCodeSnippetsOn ? (
           <LabwareOffsetTabs
@@ -151,6 +157,6 @@ export function CurrentOffsetsModal(
           TableComponent
         )}
       </Flex>
-    </ModalShell>
+    </LegacyModalShell>
   )
 }

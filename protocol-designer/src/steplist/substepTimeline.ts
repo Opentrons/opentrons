@@ -4,7 +4,7 @@ import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
-import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 import { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,
@@ -147,6 +147,7 @@ export const substepTimelineMultiChannel = (
         const wellsForTips =
           channels &&
           labwareDef &&
+          // @ts-expect-error 96 channels not yet supported
           getWellsForTips(channels, labwareDef, wellName).wellsForTips
         const wellInfo = {
           labwareId,

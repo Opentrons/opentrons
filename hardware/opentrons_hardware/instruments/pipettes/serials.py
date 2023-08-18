@@ -2,10 +2,27 @@
 import re
 from typing import Dict, Tuple
 import struct
+from opentrons_shared_data.errors.exceptions import (
+    InvalidInstrumentData,
+    PythonException,
+)
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
-SERIAL_RE = re.compile("^(?P<name>P.{3,3})V(?P<model>[0-9]{2,2})(?P<code>.{,12})$")
+# Separate string into 3 named groups:
+#   - name P any
+#   - model
+#   - code
+
+RAW_SERIAL_STRING = (
+    "^"  # start of string
+    r"(?P<name>P[\w\d]{3})"  # "name" group starts with P and contains exactly 3 alphanumeric characters
+    "V"  # The character V
+    r"(?P<model>\d{2})"  # "model" group contains exactly 2 digits
+    r"(?P<code>[\w\d]{0,12})"  # "code" group contains 0 to 12 inclusive alphanumeric characters
+    "$"  # end of string
+)
+SERIAL_RE = re.compile(RAW_SERIAL_STRING)
 
 NAME_LOOKUP: Dict[str, PipetteName] = {
     "P1KS": PipetteName.p1000_single,
@@ -34,14 +51,16 @@ def info_from_serial_string(serialval: str) -> Tuple[PipetteName, int, bytes]:
     """
     matches = SERIAL_RE.match(serialval.strip())
     if not matches:
-        raise ValueError(
-            f"The serial number {serialval.strip()} is not valid. {SERIAL_FORMAT_MSG}"
+        raise InvalidInstrumentData(
+            message=f"The serial number {serialval.strip()} is not valid. {SERIAL_FORMAT_MSG}",
+            detail={"serial": serialval},
         )
     try:
         name = NAME_LOOKUP[matches.group("name")]
     except KeyError:
-        raise ValueError(
-            f"The pipette name part of the serial number ({matches.group('name')}) is unknown. {SERIAL_FORMAT_MSG}"
+        raise InvalidInstrumentData(
+            message=f"The pipette name part of the serial number ({matches.group('name')}) is unknown. {SERIAL_FORMAT_MSG}",
+            detail={"name": matches.group("name")},
         )
     model = int(matches.group("model"))
 
@@ -64,9 +83,16 @@ def serial_val_from_parts(name: PipetteName, model: int, serialval: bytes) -> by
 
     you will not get what you put in.
     """
-    return struct.pack(
-        ">HH16s",
-        name.value,
-        model,
-        ensure_serial_length(serialval),
-    )
+    try:
+        return struct.pack(
+            ">HH16s",
+            name.value,
+            model,
+            ensure_serial_length(serialval),
+        )
+    except struct.error as e:
+        raise InvalidInstrumentData(
+            message="Invalid pipette serial",
+            detail={"name": name, "model": model, "serial": str(serialval)},
+            wrapping=[PythonException(e)],
+        )

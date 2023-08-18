@@ -20,11 +20,11 @@ import {
   useHoverTooltip,
   TOOLTIP_TOP_START,
 } from '@opentrons/components'
+import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
-import { getUniqueWellProperties } from './helpers/labwareInference'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'
 import { Dimensions } from './Dimensions'
@@ -48,7 +48,7 @@ const CLOSE_ICON_STYLE = css`
 `
 
 const COPY_ICON_STYLE = css`
-  transform: translateY(${SPACING.spacing2});
+  transform: translateY(${SPACING.spacing4});
   &:hover {
     color: ${COLORS.blueEnabled};
   }
@@ -97,9 +97,9 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const slideoutHeader = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
-      paddingX={SPACING.spacing4}
-      marginBottom={SPACING.spacing4}
+      gridGap={SPACING.spacing4}
+      paddingX={SPACING.spacing16}
+      marginBottom={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -113,7 +113,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           role="button"
           data-testid="labwareDetails_slideout_close_button"
         >
-          <Icon name="close" height={SPACING.spacing5} css={CLOSE_ICON_STYLE} />
+          <Icon
+            name="close"
+            height={SPACING.spacing24}
+            css={CLOSE_ICON_STYLE}
+          />
         </Link>
       </Flex>
       {!isCustomDefinition && (
@@ -126,7 +130,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           >
             {t('opentrons_def')}
           </StyledText>
@@ -136,7 +140,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          paddingRight={SPACING.spacing1}
+          paddingRight={SPACING.spacing2}
           alignItems={ALIGN_CENTER}
         >
           <StyledText
@@ -160,8 +164,8 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       <Gallery definition={definition} />
       <Box
         backgroundColor={COLORS.fundamentalsBackground}
-        padding={SPACING.spacing4}
-        marginBottom={SPACING.spacing5}
+        padding={SPACING.spacing16}
+        marginBottom={SPACING.spacing24}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">
@@ -181,7 +185,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         </Link>
       </Box>
       <Box border={BORDERS.lineBorder}>
-        <Box padding={SPACING.spacing4}>
+        <Box padding={SPACING.spacing16}>
           <WellCount
             wellLabel={getWellLabel(definition)}
             count={Object.keys(wells).length}

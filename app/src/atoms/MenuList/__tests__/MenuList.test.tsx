@@ -12,12 +12,22 @@ describe('MenuList', () => {
   let props: React.ComponentProps<typeof MenuList>
   beforeEach(() => {
     props = {
-      buttons: [mockBtn],
+      children: mockBtn,
     }
   })
 
-  it('renders a child', () => {
+  it('renders a child not on device', () => {
     const { getByText } = render(props)
     getByText('mockBtn')
+  })
+  it('renders isOnDevice child, clicking background overlay calls onClick', () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+      onClick: jest.fn(),
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('BackgroundOverlay_ModalShell').click()
+    expect(props.onClick).toHaveBeenCalled()
   })
 })

@@ -60,20 +60,24 @@ class QueueWorker:
 
             try:
                 await worker_task
-            except (RunStoppedError, asyncio.CancelledError):
+            except asyncio.CancelledError:  # From self.cancel().
                 pass
             except Exception as e:
                 log.error("Unhandled exception in QueueWorker job", exc_info=e)
                 raise e
 
     async def _run_commands(self) -> None:
-        while not self._state_store.commands.get_stop_requested():
-            command_id = await self._state_store.wait_for(
-                condition=self._state_store.commands.get_next_queued
-            )
-
-            await self._command_executor.execute(command_id=command_id)
-
-            # Yield to the event loop in case we're executing a long run of commands
-            # that never yields internally. For example, a long run of comment commands.
-            await asyncio.sleep(0)
+        while True:
+            try:
+                command_id = await self._state_store.wait_for(
+                    condition=self._state_store.commands.get_next_to_execute
+                )
+            except RunStoppedError:
+                # There are no more commands that we should execute, either because the run has
+                # completed on its own, or because a client requested it to stop.
+                break
+            else:
+                await self._command_executor.execute(command_id=command_id)
+                # Yield to the event loop in case we're executing a long sequence of commands
+                # that never yields internally. For example, a long sequence of comment commands.
+                await asyncio.sleep(0)

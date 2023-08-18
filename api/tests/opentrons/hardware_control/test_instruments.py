@@ -260,7 +260,7 @@ async def test_cache_instruments_sim(sim_and_instr):
     current_calls = [mock.call({"B": 0.05}), mock.call({"C": 0.05})]
     sim._backend._smoothie_driver.update_steps_per_mm.assert_has_calls(
         steps_mm_calls, any_order=True
-    )
+    )  # <-- this line
     sim._backend._smoothie_driver.update_pipette_config.assert_has_calls(
         pip_config_calls, any_order=True
     )
@@ -650,7 +650,7 @@ async def test_blowout_flow_rate(sim_and_instr):
         await hw_api.blow_out(mount)
         assert_move_called(
             mock_move,
-            get_plunger_speed(hw_api)(pip, pip.blow_out_flow_rate, "dispense"),
+            get_plunger_speed(hw_api)(pip, pip.blow_out_flow_rate, "blowout"),
         )
 
     hw_api.set_flow_rate(mount, blow_out=2)
@@ -660,7 +660,7 @@ async def test_blowout_flow_rate(sim_and_instr):
         await hw_api.blow_out(types.Mount.LEFT)
         assert_move_called(
             mock_move,
-            get_plunger_speed(hw_api)(pip, 2, "dispense"),
+            get_plunger_speed(hw_api)(pip, 2, "blowout"),
         )
 
     hw_api.set_pipette_speed(mount, blow_out=15)

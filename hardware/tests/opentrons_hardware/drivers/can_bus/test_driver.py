@@ -4,8 +4,8 @@ from typing import AsyncGenerator
 import pytest
 from can import Bus, Message
 
+from opentrons_shared_data.errors.exceptions import CANBusBusError
 from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
-from opentrons_hardware.drivers.can_bus.errors import ErrorFrameCanError
 
 
 @pytest.fixture
@@ -100,5 +100,5 @@ async def test_raise_error_frame_error(subject: CanDriver, can_bus: Bus) -> None
         data=bytearray([1, 2, 3, 4]),
     )
     can_bus.send(m)
-    with pytest.raises(ErrorFrameCanError):
+    with pytest.raises(CANBusBusError):
         await subject.read()

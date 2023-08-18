@@ -1,7 +1,7 @@
 // well dimensions and spacing for details page
 import * as React from 'react'
 import round from 'lodash/round'
-
+import { getMeasurementDiagram } from '@opentrons/components'
 import {
   MEASUREMENTS,
   WELL_X_DIM,
@@ -12,7 +12,6 @@ import {
   MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
-import { getMeasurementDiagram } from '../measurement-guide'
 
 import type { LabwareWellGroupProperties, LabwareParameters } from '../../types'
 

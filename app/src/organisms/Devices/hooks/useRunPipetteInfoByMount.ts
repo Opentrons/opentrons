@@ -4,16 +4,16 @@ import {
   getLabwareDefURI,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '../../../redux/pipettes'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
-  useTipLengthCalibrations,
   useStoredProtocolAnalysis,
 } from '.'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   Mount,
   AttachedPipette,
@@ -37,7 +37,6 @@ export interface PipetteInfo {
 }
 
 export function useRunPipetteInfoByMount(
-  robotName: string,
   runId: string
 ): {
   [mount in Mount]: PipetteInfo | null
@@ -49,7 +48,8 @@ export function useRunPipetteInfoByMount(
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations =
     useAttachedPipetteCalibrations() ?? EMPTY_MOUNTS
-  const tipLengthCalibrations = useTipLengthCalibrations(robotName) ?? []
+  const tipLengthCalibrations =
+    useAllTipLengthCalibrationsQuery()?.data?.data ?? []
 
   if (protocolData == null) {
     return EMPTY_MOUNTS

@@ -456,9 +456,9 @@
       "opentrons/geb_96_tiprack_1000ul/1"
     ]
   },
-  "p50_single_gen3": {
+  "p50_single_flex": {
     "displayName": "Flex 1-Channel 50 μL",
-    "displayCategory": "GEN3",
+    "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,
@@ -492,13 +492,15 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_300ul/1",
-      "opentrons/opentrons_96_filtertiprack_200ul/1"
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
-  "p1000_single_gen3": {
+  "p1000_single_flex": {
     "displayName": "Flex 1-Channel 1000 μL",
-    "displayCategory": "GEN3",
+    "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
@@ -527,7 +529,7 @@
       }
     },
     "channels": 1,
-    "minVolume": 100,
+    "minVolume": 5,
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
@@ -535,14 +537,17 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_1000ul/1",
-      "opentrons/opentrons_96_filtertiprack_1000ul/1",
-      "opentrons/geb_96_tiprack_1000ul/1"
+      "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
-  "p1000_multi_gen3": {
+  "p1000_multi_flex": {
     "displayName": "Flex 8-Channel 1000 μL",
-    "displayCategory": "GEN3",
+    "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 159.04,
       "min": 3,
@@ -569,7 +574,7 @@
       }
     },
     "channels": 8,
-    "minVolume": 1,
+    "minVolume": 5,
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
@@ -577,14 +582,17 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_1000ul/1",
-      "opentrons/opentrons_96_filtertiprack_1000ul/1",
-      "opentrons/geb_96_tiprack_1000ul/1"
+      "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
-  "p50_multi_gen3": {
+  "p50_multi_flex": {
     "displayName": "Flex 8-Channel 50 μL",
-    "displayCategory": "GEN3",
+    "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,
@@ -618,8 +626,10 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_300ul/1",
-      "opentrons/opentrons_96_filtertiprack_200ul/1"
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
   "p1000_96": {
@@ -649,17 +659,21 @@
         "2.0": 7.85
       }
     },
-    "channels": 8,
-    "minVolume": 1,
-    "maxVolume": 50,
+    "channels": 96,
+    "minVolume": 5,
+    "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
       "homePosition": 230.15,
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_300ul/1",
-      "opentrons/opentrons_96_filtertiprack_200ul/1"
+      "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   }
 }

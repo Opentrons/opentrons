@@ -4,7 +4,10 @@ import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+} from '../../../redux/analytics'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -112,7 +115,7 @@ describe('CalibrationHealthCheck', () => {
     expect(button).not.toBeDisabled()
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'calibrationHealthCheckButtonClicked',
+      name: ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
       properties: {},
     })
   })

@@ -20,7 +20,7 @@ const Children = (
     <StyledText
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
-      paddingTop={SPACING.spacing2}
+      paddingTop={SPACING.spacing4}
     >
       {'this is where the slideout body goes'}
     </StyledText>

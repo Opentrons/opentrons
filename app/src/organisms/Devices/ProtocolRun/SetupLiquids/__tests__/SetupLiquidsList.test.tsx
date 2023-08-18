@@ -11,7 +11,11 @@ import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
-import { useTrackEvent } from '../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
+  ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
+} from '../../../../../redux/analytics'
 import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
@@ -119,7 +123,7 @@ describe('SetupLiquidsList', () => {
     const row = getByText('mock liquid 1')
     fireEvent.click(row)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'expandLiquidSetupRow',
+      name: ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
       properties: {},
     })
     getByText('Location')
@@ -137,7 +141,7 @@ describe('SetupLiquidsList', () => {
     const subRow = getByText('mock labware name')
     fireEvent.click(subRow)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'openLiquidLabwareDetailModal',
+      name: ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
       properties: {},
     })
     getByText('Mock liquids labwaqre details modal')

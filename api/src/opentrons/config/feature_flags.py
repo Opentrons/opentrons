@@ -35,3 +35,21 @@ def rear_panel_integration() -> bool:
     """Whether to enable usb connected rear_panel for the OT-3."""
 
     return advs.get_setting_with_env_overload("rearPanelIntegration")
+
+
+def stall_detection_enabled() -> bool:
+    return not advs.get_setting_with_env_overload("disableStallDetection")
+
+
+def overpressure_detection_enabled() -> bool:
+    return not advs.get_setting_with_env_overload("disableOverpressureDetection")
+
+
+def status_bar_enabled() -> bool:
+    """Whether the status bar is enabled."""
+    return not advs.get_setting_with_env_overload("disableStatusBar")
+
+
+def tip_presence_detection_enabled() -> bool:
+    """Whether tip presence is enabled on the Flex"""
+    return not advs.get_setting_with_env_overload("disableTipPresenceDetection")

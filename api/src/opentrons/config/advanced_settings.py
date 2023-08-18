@@ -181,9 +181,22 @@ settings = [
         title="Enable robots with the new usb connected rear-panel board.",
         description="This is an Opentrons-internal setting to test new rear-panel.",
     ),
+    SettingDefinition(
+        _id="disableStallDetection",
+        title="Disable stall detection on the Flex.",
+        description="This is an Opentrons-internal setting for hardware-testing.",
+    ),
+    SettingDefinition(
+        _id="disableStatusBar",
+        title="Disable the LED status bar on the Flex.",
+        description="This setting disables the LED status bar on the Flex.",
+    ),
 ]
 
-if ARCHITECTURE == SystemArchitecture.BUILDROOT:
+if (
+    ARCHITECTURE == SystemArchitecture.BUILDROOT
+    or ARCHITECTURE == SystemArchitecture.YOCTO
+):
     settings.append(DisableLogIntegrationSettingDefinition())
 
 
@@ -547,6 +560,46 @@ def _migrate23to24(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate24to25(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 25 of the feature flags file.
+
+    - Adds the disableStallDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableStallDetection"] = None
+    return newmap
+
+
+def _migrate25to26(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 26 of the feature flags file.
+
+    - Adds the disableStatusBar config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableStatusBar"] = None
+    return newmap
+
+
+def _migrate26to27(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 27 of the feature flags file.
+
+    - Adds the disableOverpressureDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableOverpressureDetection"] = None
+    return newmap
+
+
+def _migrate27to28(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 28 of the feature flags file.
+
+    - Adds the disableTipPresenceDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableTipPresenceDetection"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -572,6 +625,10 @@ _MIGRATIONS = [
     _migrate21to22,
     _migrate22to23,
     _migrate23to24,
+    _migrate24to25,
+    _migrate25to26,
+    _migrate26to27,
+    _migrate27to28,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'
+import cx from 'classnames'
 
 import {
   Card,
@@ -10,19 +11,20 @@ import {
   OutlineButton,
   DeprecatedPrimaryButton,
 } from '@opentrons/components'
-import cx from 'classnames'
 import { i18n } from '../localization'
 import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
+
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-import { ModuleType } from '@opentrons/shared-data'
-import { FileMetadataFields } from '../file-data'
-import { ModulesForEditModulesCard } from '../step-forms'
+
+import type { ModuleType } from '@opentrons/shared-data'
+import type { FileMetadataFields } from '../file-data'
+import type { ModulesForEditModulesCard } from '../step-forms'
 
 export interface Props {
   formValues: FileMetadataFields

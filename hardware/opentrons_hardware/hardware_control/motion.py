@@ -35,6 +35,7 @@ class MoveType(int, Enum):
             MoveStopCondition.encoder_position: cls.linear,
             MoveStopCondition.gripper_force: cls.grip,
             MoveStopCondition.stall: cls.linear,
+            MoveStopCondition.limit_switch_backoff: cls.linear,
         }
         return mapping[condition]
 
@@ -55,10 +56,11 @@ class MoveGroupSingleAxisStep:
 class MoveGroupTipActionStep:
     """A single tip handling action that requires movement in a move group."""
 
-    velocity_mm_sec: np.float64
     duration_sec: np.float64
+    velocity_mm_sec: np.float64
     action: PipetteTipActionType
     stop_condition: MoveStopCondition
+    acceleration_mm_sec_sq: np.float64
 
 
 @dataclass(frozen=True)
@@ -95,6 +97,8 @@ MAX_SPEEDS = {
     NodeId.pipette_right: 2,
 }
 
+BACKOFF_MAX_MM = 5
+
 
 def create_step(
     distance: Dict[NodeId, np.float64],
@@ -115,12 +119,11 @@ def create_step(
         A Move
     """
     ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
-    # Gripper G cannont process this type of move and this will
+    # Gripper G cannot process this type of move and this will
     # result in numerous move set timeouts if the gripper is attached
     # possible TODO if requested is to also add a move group step that
-    # adds a MoveGroupeSingleGripperStep
+    # adds a MoveGroupSingleGripperStep
     ordered_nodes = list([n for n in present_nodes if n != NodeId.gripper_g])
-
     step: MoveGroupStep = {}
     for axis_node in ordered_nodes:
         step[axis_node] = MoveGroupSingleAxisStep(
@@ -132,6 +135,22 @@ def create_step(
             move_type=MoveType.get_move_type(stop_condition),
         )
     return step
+
+
+def create_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
+    """Create a sequence to back away from the limit switch and re-home."""
+    backoff: MoveGroupStep = {}
+
+    for axis, v in velocity.items():
+        backoff[axis] = MoveGroupSingleAxisStep(
+            distance_mm=np.float64(BACKOFF_MAX_MM),
+            acceleration_mm_sec_sq=np.float64(0),
+            velocity_mm_sec=abs(v),
+            duration_sec=np.float64(BACKOFF_MAX_MM) / abs(v),
+            stop_condition=MoveStopCondition.limit_switch_backoff,
+            move_type=MoveType.linear,
+        )
+    return backoff
 
 
 def create_home_step(
@@ -151,25 +170,41 @@ def create_home_step(
     return step
 
 
+def create_tip_action_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
+    """Create a sequence to back away from the limit switch and re-home."""
+    backoff: MoveGroupStep = {}
+    for axis, v in velocity.items():
+        backoff[axis] = MoveGroupTipActionStep(
+            velocity_mm_sec=abs(v),
+            duration_sec=abs(np.float64(BACKOFF_MAX_MM) / abs(v)),
+            stop_condition=MoveStopCondition.limit_switch_backoff,
+            action=PipetteTipActionType.home,
+            acceleration_mm_sec_sq=np.float64(0),
+        )
+    return backoff
+
+
 def create_tip_action_step(
     velocity: Dict[NodeId, np.float64],
-    distance: Dict[NodeId, np.float64],
+    acceleration: Dict[NodeId, np.float64],
+    duration: np.float64,
     present_nodes: Iterable[NodeId],
     action: PipetteTipActionType,
 ) -> MoveGroupStep:
     """Creates a step for tip handling actions that require motor movement."""
-    step: MoveGroupStep = {}
     stop_condition = (
         MoveStopCondition.limit_switch
         if action == PipetteTipActionType.home
         else MoveStopCondition.none
     )
+    step: MoveGroupStep = {}
     for axis_node in present_nodes:
         step[axis_node] = MoveGroupTipActionStep(
-            velocity_mm_sec=velocity[axis_node],
-            duration_sec=abs(distance[axis_node] / velocity[axis_node]),
-            stop_condition=stop_condition,
+            duration_sec=duration,
+            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
             action=action,
+            stop_condition=stop_condition,
+            acceleration_mm_sec_sq=acceleration.get(axis_node, np.float64(0)),
         )
     return step
 

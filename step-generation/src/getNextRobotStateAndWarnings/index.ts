@@ -32,6 +32,7 @@ import {
   forHeaterShakerSetTargetTemperature,
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
+import { forMoveLabware } from './forMoveLabware'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -87,9 +88,15 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    case 'moveLabware':
+      forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
+      break
+
     case 'touchTip':
-    case 'delay':
+    case 'waitForDuration':
+    case 'waitForResume':
     case 'moveToWell':
+    case 'delay':
       // these commands don't have any effects on the state
       break
 

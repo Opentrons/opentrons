@@ -34,7 +34,9 @@ import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
+import { appShellRequestor } from '../../../redux/shell/remote'
 
 import type {
   DesktopRouteParams,
@@ -50,7 +52,7 @@ const baseRoundTabStyling = css`
   border-top: ${BORDERS.transparentLineBorder};
   border-left: ${BORDERS.transparentLineBorder};
   border-right: ${BORDERS.transparentLineBorder};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 `
 
@@ -140,17 +142,18 @@ export function ProtocolRunDetails(): JSX.Element | null {
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
       robotName={robot.name}
     >
       <Box
         minWidth={SIZE_6}
         height="100%"
         overflow={OVERFLOW_SCROLL}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           width="100%"
         >
           <PageContents
@@ -233,9 +236,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`${String(SPACING.spacingXXS)} ${String(
-          BORDERS.styleSolid
-        )} ${String(COLORS.medGreyEnabled)}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
           protocolRunDetailsTab === 'setup'

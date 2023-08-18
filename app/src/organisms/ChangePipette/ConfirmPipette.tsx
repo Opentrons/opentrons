@@ -43,6 +43,7 @@ export interface ConfirmPipetteProps {
   setConfirmPipetteLevel: React.Dispatch<React.SetStateAction<boolean>>
   tryAgain: () => void
   exit: () => void
+  nextStep: () => void
   toCalibrationDashboard: () => void
   isDisabled: boolean
 }
@@ -51,7 +52,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const {
     success,
     mount,
-    tryAgain,
+    nextStep,
     wrongWantedPipette,
     actualPipette,
     setConfirmPipetteLevel,
@@ -107,14 +108,16 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const isWrongWantedPipette = wrongWantedPipette != null
 
   return !confirmPipetteLevel &&
-    wrongWantedPipette &&
+    (wrongWantedPipette != null || (props.wantedPipette != null && success)) &&
     actualPipette != null &&
     actualPipette.channels === 8 ? (
     <LevelPipette
       mount={mount}
       pipetteModelName={actualPipette.name}
-      back={tryAgain}
-      confirm={() => setConfirmPipetteLevel(true)}
+      confirm={() => {
+        nextStep()
+        setConfirmPipetteLevel(true)
+      }}
     />
   ) : (
     <SimpleWizardBody
@@ -160,7 +163,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
     return (
       <>
         <SecondaryButton
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
           onClick={() => setWrongWantedPipette(actualPipette)}
           disabled={isDisabled}
         >
@@ -175,7 +178,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
     return (
       <>
         <SecondaryButton
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
           onClick={exit}
           disabled={isDisabled}
         >
@@ -190,7 +193,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
   return (
     <>
       <SecondaryButton
-        marginRight={SPACING.spacing3}
+        marginRight={SPACING.spacing8}
         onClick={exit}
         disabled={isDisabled}
       >
@@ -222,7 +225,7 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
       {!actualPipetteOffset &&
       (wrongWantedPipette || (success && actualPipette)) ? (
         <SecondaryButton
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
           onClick={toCalibrationDashboard}
         >
           {t('calibrate_pipette_offset')}

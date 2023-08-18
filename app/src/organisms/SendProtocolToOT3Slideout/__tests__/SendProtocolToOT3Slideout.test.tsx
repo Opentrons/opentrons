@@ -14,7 +14,7 @@ import {
 
 import { mockSuccessQueryResults } from '../../../__fixtures__'
 import { i18n } from '../../../i18n'
-import { useToast } from '../../../atoms/Toast'
+import { useToaster } from '../../../organisms/ToasterOven'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -30,14 +30,20 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '../../../redux/networking'
 import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { SendProtocolToOT3Slideout } from '..'
 
+import type { State } from '../../../redux/types'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
+
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../atoms/Toast')
+jest.mock('../../../organisms/ToasterOven')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/networking')
+jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/protocol-storage/selectors')
 
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
@@ -56,7 +62,7 @@ const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
 const mockStartDiscovery = startDiscovery as jest.MockedFunction<
   typeof startDiscovery
 >
-const mockUseToast = useToast as jest.MockedFunction<typeof useToast>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
   typeof useAllRunsQuery
 >
@@ -65,6 +71,12 @@ const mockUseCreateProtocolMutation = useCreateProtocolMutation as jest.MockedFu
 >
 const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
   typeof getIsProtocolAnalysisInProgress
+>
+const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
+  typeof getNetworkInterfaces
+>
+const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
+  typeof getValidCustomLabwareFiles
 >
 
 const render = (
@@ -99,9 +111,11 @@ const mockUnreachableOT3 = {
   robotModel: ROBOT_MODEL_OT3,
 }
 
+const mockMakeSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 const mockMutateAsync = jest.fn()
+const mockCustomLabwareFile: File = { path: 'fake_custom_labware_path' } as any
 
 describe('SendProtocolToOT3Slideout', () => {
   beforeEach(() => {
@@ -116,12 +130,13 @@ describe('SendProtocolToOT3Slideout', () => {
     mockGetScanning.mockReturnValue(false)
     mockStartDiscovery.mockReturnValue({ type: 'mockStartDiscovery' } as any)
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
-    when(mockUseToast).calledWith().mockReturnValue({
+    when(mockUseToaster).calledWith().mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
     when(mockUseAllRunsQuery)
-      .calledWith(expect.any(Object), expect.any(Object))
+      .calledWith(expect.any(Object), expect.any(Object), expect.any(Object))
       .mockReturnValue(
         mockSuccessQueryResults({
           data: [],
@@ -132,6 +147,12 @@ describe('SendProtocolToOT3Slideout', () => {
       .calledWith(expect.any(Object), expect.any(Object))
       .mockReturnValue({ mutateAsync: mockMutateAsync } as any)
     when(mockMutateAsync).mockImplementation(() => Promise.resolve())
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, expect.any(String))
+      .mockReturnValue({ wifi: null, ethernet: null })
+    when(mockGetValidCustomLabwareFiles)
+      .calledWith({} as State)
+      .mockReturnValue([mockCustomLabwareFile])
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -144,7 +165,7 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    getByText('Send protocol to an OT-3')
+    getByText('Send protocol to Opentrons Flex')
     getByRole('button', { name: 'Send' })
   })
 
@@ -161,7 +182,9 @@ describe('SendProtocolToOT3Slideout', () => {
   })
   it('does not render a robot option for a busy OT-3', () => {
     when(mockUseAllRunsQuery)
-      .calledWith(expect.any(Object), { hostname: mockConnectableOT3.ip })
+      .calledWith(expect.any(Object), expect.any(Object), {
+        hostname: mockConnectableOT3.ip,
+      })
       .mockReturnValue(
         mockSuccessQueryResults({
           data: [],
@@ -232,6 +255,9 @@ describe('SendProtocolToOT3Slideout', () => {
     mockRobot.click()
     expect(sendButton).not.toBeDisabled()
     sendButton.click()
-    expect(mockMutateAsync).toBeCalled()
+    expect(mockMutateAsync).toBeCalledWith({
+      files: [expect.any(Object), mockCustomLabwareFile],
+      protocolKey: 'protocolKeyStub',
+    })
   })
 })

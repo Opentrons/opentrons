@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Mapping, Optional, Union
 
+from opentrons_shared_data.errors.exceptions import EnumeratedError
+
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
@@ -31,6 +33,7 @@ from ..errors import (
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
     PauseNotAllowedError,
+    UnexpectedProtocolError,
     ProtocolCommandFailedError,
 )
 from ..types import EngineStatus
@@ -250,13 +253,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.running_command_id = None
 
         elif isinstance(action, FailCommandAction):
-            error_occurrence = ErrorOccurrence.construct(
+            error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id,
                 createdAt=action.failed_at,
-                errorType=type(action.error).__name__,
-                detail=str(action.error),
+                error=action.error,
             )
-
             prev_entry = self._state.commands_by_id[action.command_id]
             self._state.commands_by_id[action.command_id] = CommandEntry(
                 index=prev_entry.index,
@@ -317,7 +318,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
-                self._state.queued_command_ids.clear()
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
@@ -334,14 +334,32 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 if action.error_details:
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
-                    error = action.error_details.error
+                    if (
+                        isinstance(
+                            action.error_details.error, ProtocolCommandFailedError
+                        )
+                        and action.error_details.error.original_error is not None
+                    ):
+                        self._state.errors_by_id[
+                            error_id
+                        ] = action.error_details.error.original_error
+                    else:
+                        if isinstance(
+                            action.error_details.error,
+                            EnumeratedError,
+                        ):
+                            error = action.error_details.error
+                        else:
+                            error = UnexpectedProtocolError(
+                                message=str(action.error_details.error),
+                                wrapping=[action.error_details.error],
+                            )
 
-                    self._state.errors_by_id[error_id] = ErrorOccurrence.construct(
-                        id=error_id,
-                        createdAt=created_at,
-                        errorType=type(error).__name__,
-                        detail=str(error),
-                    )
+                        self._state.errors_by_id[
+                            error_id
+                        ] = ErrorOccurrence.from_failed(
+                            id=error_id, createdAt=created_at, error=error
+                        )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
@@ -449,7 +467,7 @@ class CommandView(HasState[CommandState]):
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
         for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
-            if self.get_is_complete(cid):
+            if self.get_command_is_final(cid):
                 entry = self._state.commands_by_id[cid]
                 return CurrentCommand(
                     command_id=entry.command.id,
@@ -460,15 +478,15 @@ class CommandView(HasState[CommandState]):
 
         return None
 
-    def get_next_queued(self) -> Optional[str]:
+    def get_next_to_execute(self) -> Optional[str]:
         """Return the next command in line to be executed.
 
         Returns:
             The ID of the earliest queued command, if any.
 
         Raises:
-            RunStoppedError: The engine is currently stopped, so
-                there are not queued commands.
+            RunStoppedError: The engine is currently stopped or stopping,
+                so it will never run any more commands.
         """
         if self._state.run_result:
             raise RunStoppedError("Engine was stopped")
@@ -510,45 +528,53 @@ class CommandView(HasState[CommandState]):
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
-    def get_is_complete(self, command_id: str) -> bool:
-        """Get whether a given command is completed.
+    def get_command_is_final(self, command_id: str) -> bool:
+        """Get whether a given command has reached its final `status`.
 
-        A command is "completed" if one of the following is true:
+        This happens when one of the following is true:
 
-        - Its status is CommandStatus.SUCCEEDED
-        - Its status is CommandStatus.FAILED
+        - Its status is `CommandStatus.SUCCEEDED`.
+        - Its status is `CommandStatus.FAILED`.
+        - Its status is `CommandStatus.QUEUED` but the run has been requested to stop,
+          so the run will never reach it.
 
         Arguments:
             command_id: Command to check.
         """
         status = self.get(command_id).status
 
-        return status == CommandStatus.SUCCEEDED or status == CommandStatus.FAILED
+        return (
+            status == CommandStatus.SUCCEEDED
+            or status == CommandStatus.FAILED
+            or (status == CommandStatus.QUEUED and self._state.run_result is not None)
+        )
 
-    def get_all_complete(self) -> bool:
-        """Get whether all added commands have completed.
+    def get_all_commands_final(self) -> bool:
+        """Get whether all commands added so far have reached their final `status`.
+
+        See `get_command_is_final()`.
 
         Raises:
-            CommandExecutionFailedError: if any added command failed.
+            CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
+            `setup`.
         """
         no_command_running = self._state.running_command_id is None
-        no_command_queued = len(self._state.queued_command_ids) == 0
+        no_command_to_execute = (
+            self._state.run_result is not None
+            or len(self._state.queued_command_ids) == 0
+        )
 
-        if no_command_running and no_command_queued:
+        if no_command_running and no_command_to_execute:
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
-                    raise ProtocolCommandFailedError(command.error.detail)
+                    # TODO(tz, 7-11-23): avoid raising an error and return the status instead
+                    raise ProtocolCommandFailedError(
+                        original_error=command.error, message=command.error.detail
+                    )
             return True
         else:
             return False
-
-    def get_stop_requested(self) -> bool:
-        """Get whether an engine stop has been requested.
-
-        A command may still be executing while the engine is stopping.
-        """
-        return self._state.run_result is not None
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
@@ -574,7 +600,7 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
-        if self.get_stop_requested():
+        if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
         elif isinstance(action, PlayAction):

@@ -41,7 +41,7 @@ jest.mock('../RobotOverflowMenu')
 jest.mock('../RobotStatusHeader')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
-const OT3_PNG_FILE_NAME = 'OT3.png'
+const FLEX_PNG_FILE_NAME = 'FLEX.png'
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
@@ -158,11 +158,11 @@ describe('RobotCard', () => {
     props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, 'buzz')
-      .mockReturnValue('OT-3')
+      .mockReturnValue('Opentrons Flex')
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
 
-    expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
+    expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
   })
 
   it('renders a UpdateRobotBanner component', () => {
@@ -178,19 +178,5 @@ describe('RobotCard', () => {
   it('renders a RobotStatusHeader component', () => {
     const [{ getByText }] = render(props)
     getByText('Mock RobotStatusHeader')
-  })
-
-  it('renders the type of pipettes attached to left and right mounts', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('instruments')
-    getByText(mockLeftProtoPipette.modelSpecs.displayName)
-    getByText(mockRightProtoPipette.modelSpecs.displayName)
-  })
-
-  it('renders a modules section', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('Modules')
   })
 })

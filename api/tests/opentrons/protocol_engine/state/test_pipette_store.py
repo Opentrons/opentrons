@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import commands as cmd
@@ -39,6 +40,7 @@ from .command_fixtures import (
     create_dispense_in_place_command,
     create_pick_up_tip_command,
     create_drop_tip_command,
+    create_drop_tip_in_place_command,
     create_touch_tip_command,
     create_move_to_well_command,
     create_blow_out_command,
@@ -118,6 +120,34 @@ def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
     subject.handle_action(UpdateCommandAction(command=drop_tip_command))
     assert subject.state.attached_tip_by_id["abc"] is None
     assert subject.state.aspirated_volume_by_id["abc"] is None
+
+
+def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
+    """It should clear tip and volume details after a drop tip in place."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="xyz",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="xyz", tip_volume=42, tip_length=101, tip_diameter=8.0
+    )
+
+    drop_tip_in_place_command = create_drop_tip_in_place_command(
+        pipette_id="xyz",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+    assert subject.state.attached_tip_by_id["xyz"] == TipGeometry(
+        volume=42, length=101, diameter=8.0
+    )
+    assert subject.state.aspirated_volume_by_id["xyz"] == 0
+
+    subject.handle_action(UpdateCommandAction(command=drop_tip_in_place_command))
+    assert subject.state.attached_tip_by_id["xyz"] is None
+    assert subject.state.aspirated_volume_by_id["xyz"] is None
 
 
 def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
@@ -560,7 +590,10 @@ def test_set_movement_speed(subject: PipetteStore) -> None:
     assert subject.state.movement_speed_by_id[pipette_id] == 123.456
 
 
-def test_add_pipette_config(subject: PipetteStore) -> None:
+def test_add_pipette_config(
+    subject: PipetteStore,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """It should issue an action to add a pipette config."""
     subject.handle_action(
         AddPipetteConfigAction(
@@ -577,7 +610,7 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
                     default_dispense={"b": 2},
                     default_blow_out={"c": 3},
                 ),
-                return_tip_scale=4,
+                tip_configuration_lookup_table={4: supported_tip_fixture},
                 nominal_tip_overlap={"default": 5},
                 home_position=8.9,
                 nozzle_offset_z=10.11,
@@ -591,7 +624,8 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
         display_name="pipette name",
         min_volume=1.23,
         max_volume=4.56,
-        return_tip_scale=4,
+        channels=7,
+        tip_configuration_lookup_table={4: supported_tip_fixture},
         nominal_tip_overlap={"default": 5},
         home_position=8.9,
         nozzle_offset_z=10.11,

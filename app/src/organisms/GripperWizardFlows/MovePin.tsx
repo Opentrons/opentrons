@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import { LEFT } from '@opentrons/shared-data'
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
@@ -10,37 +12,35 @@ import {
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
 } from './constants'
-import { useCreateRunCommandMutation } from '../../resources/runs/hooks'
 import movePinStorageToFront from '../../assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
 import movePinFrontToRear from '../../assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
 import movePinRearToStorage from '../../assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
 import calibratingFrontJaw from '../../assets/videos/gripper-wizards/CALIBRATING_FRONT_JAW.webm'
 import calibratingRearJaw from '../../assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
-import type { GripperWizardStepProps, MovePinStep } from './types'
 import type { Coordinates } from '@opentrons/shared-data'
+import type { CreateMaintenaceCommand } from '../../resources/runs/hooks'
+import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void
   frontJawOffset: Coordinates | null
-  createRunCommand: ReturnType<
-    typeof useCreateRunCommandMutation
-  >['createRunCommand']
+  createRunCommand: CreateMaintenaceCommand
 }
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const {
     proceed,
-    attachedGripper,
     isRobotMoving,
     goBack,
     movement,
     setFrontJawOffset,
     frontJawOffset,
     createRunCommand,
+    errorMessage,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
-  if (attachedGripper == null) return null
 
   const handleOnClick = (): void => {
     if (movement === REMOVE_PIN_FROM_REAR_JAW) {
@@ -56,10 +56,12 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         },
         waitUntilComplete: true,
       })
-        .then(() => {
+        .then(({ data }) => {
+          if (data.status === 'failed') {
+            setErrorMessage(data.error?.detail ?? null)
+          }
           createRunCommand({
             command: {
-              // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
               commandType: 'calibration/calibrateGripper' as const,
               params:
                 jaw === 'rear' && frontJawOffset != null
@@ -69,27 +71,32 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
             waitUntilComplete: true,
           })
             .then(({ data }) => {
+              if (data.status === 'failed') {
+                setErrorMessage(data.error?.detail ?? null)
+              }
               if (jaw === 'front' && data?.result?.jawOffset != null) {
                 setFrontJawOffset(data.result.jawOffset)
               }
               createRunCommand({
                 command: {
-                  // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
                   commandType: 'calibration/moveToMaintenancePosition' as const,
                   params: {
-                    mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+                    mount: LEFT,
                   },
                 },
                 waitUntilComplete: true,
               })
-                .then(() => {
+                .then(({ data }) => {
+                  if (data.status === 'failed') {
+                    setErrorMessage(data.error?.detail ?? null)
+                  }
                   proceed()
                 })
-                .catch()
+                .catch(error => setErrorMessage(error.message))
             })
-            .catch()
+            .catch(error => setErrorMessage(error.message))
         })
-        .catch()
+        .catch(error => setErrorMessage(error.message))
     }
   }
   const infoByMovement: {
@@ -154,7 +161,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
-      buttonText: t('shared:continue'),
+      buttonText: t('continue'),
       prepImage: (
         <video
           css={css`
@@ -203,11 +210,34 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   if (isRobotMoving)
     return (
       <InProgressModal
-        description={inProgressText}
-        alternativeSpinner={inProgressImage}
+        description={
+          errorMessage == null
+            ? inProgressText
+            : t('shared:stand_back_robot_is_in_motion')
+        }
+        alternativeSpinner={errorMessage == null ? inProgressImage : undefined}
       />
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={
+        <Trans
+          t={t}
+          i18nKey={'return_pin_error'}
+          values={{ error: errorMessage }}
+          components={{
+            block: <StyledText as="p" />,
+            bold: (
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            ),
+          }}
+        />
+      }
+    />
+  ) : (
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}

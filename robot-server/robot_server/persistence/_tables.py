@@ -10,7 +10,7 @@ migration_table = sqlalchemy.Table(
     "migration",
     _metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
+    sqlalchemy.Column("created_at", UTCDateTime, nullable=False),
     sqlalchemy.Column(
         "version",
         sqlalchemy.Integer,

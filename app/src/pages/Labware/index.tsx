@@ -23,13 +23,17 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { ERROR_TOAST, SUCCESS_TOAST, useToast } from '../../atoms/Toast'
+import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
+} from '../../redux/analytics'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from '../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
 import { LabwareDetails } from '../../organisms/LabwareDetails'
+import { useToaster } from '../../organisms/ToasterOven'
 import {
   LabwareDefAndDate,
   useAllLabware,
@@ -77,7 +81,7 @@ export function Labware(): JSX.Element {
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const trackEvent = useTrackEvent()
   const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
-  const { makeToast } = useToast()
+  const { makeToast } = useToaster()
 
   const labware = useAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
@@ -112,12 +116,12 @@ export function Labware(): JSX.Element {
 
   return (
     <>
-      <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
+      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
-          paddingBottom={SPACING.spacing5}
+          paddingBottom={SPACING.spacing24}
         >
           <StyledText
             as="h1"
@@ -133,9 +137,9 @@ export function Labware(): JSX.Element {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_FLEX_END}
-          paddingBottom={SPACING.spacing5}
+          paddingBottom={SPACING.spacing24}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('category')}
             </StyledText>
@@ -158,15 +162,15 @@ export function Labware(): JSX.Element {
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               borderRadius={BORDERS.radiusSoftCorners}
-              marginLeft={SPACING.spacing3}
+              marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
             >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
-                paddingLeft={SPACING.spacing3}
-                paddingRight={SPACING.spacing2}
-                paddingY={SPACING.spacing2}
+                paddingLeft={SPACING.spacing8}
+                paddingRight={SPACING.spacing4}
+                paddingY={SPACING.spacing4}
                 data-testid="sortBy-label"
               >
                 {sortBy === 'alphabetical'
@@ -174,7 +178,7 @@ export function Labware(): JSX.Element {
                   : t('shared:reverse')}
               </StyledText>
               <Icon
-                paddingRight={SPACING.spacing3}
+                paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />
@@ -189,7 +193,7 @@ export function Labware(): JSX.Element {
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
               top="8.5rem"
-              right={SPACING.spacing1}
+              right={SPACING.spacing2}
               flexDirection={DIRECTION_COLUMN}
               ref={sortOverflowWrapperRef}
             >
@@ -212,7 +216,7 @@ export function Labware(): JSX.Element {
             </Flex>
           )}
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           {labware.map((labware, index) => (
             <LabwareCard
               key={`${String(labware.definition.metadata.displayName)}${index}`}
@@ -225,9 +229,9 @@ export function Labware(): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
-          marginTop={SPACING.spacing6}
+          marginTop={SPACING.spacing32}
         >
           <StyledText
             as="p"
@@ -241,7 +245,7 @@ export function Labware(): JSX.Element {
             external
             onClick={() =>
               trackEvent({
-                name: 'openLabwareCreatorFromBottomOfLabwareLibraryList',
+                name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
                 properties: {},
               })
             }
@@ -252,7 +256,7 @@ export function Labware(): JSX.Element {
             <Icon
               name="open-in-new"
               size="0.5rem"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
             />
           </Link>
         </Flex>

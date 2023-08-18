@@ -9,9 +9,9 @@ import {
   SPACING,
   Flex,
   Icon,
+  RESPONSIVENESS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { getIsOnDevice } from '../../redux/config'
 
@@ -24,39 +24,51 @@ interface Props {
 
 const DESCRIPTION_STYLE = css`
   ${TYPOGRAPHY.h1Default}
-  margin-top: ${SPACING.spacing5};
-  margin-bottom: ${SPACING.spacing3};
+  margin-top: ${SPACING.spacing24};
+  margin-bottom: ${SPACING.spacing8};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
-    font-weight: 700;
-    font-size: 2rem;
-    margin-top: ${SPACING.spacing6};
-    margin-bottom: ${SPACING.spacing2};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightBold};
+    font-size: ${TYPOGRAPHY.fontSize32};
+    margin-top: ${SPACING.spacing32};
+    margin-bottom: ${SPACING.spacing4};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
     text-align: ${TYPOGRAPHY.textAlignCenter};
-    line-height: 2.625rem;
+    line-height: ${TYPOGRAPHY.lineHeight42};
   }
 `
+const MODAL_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_CENTER};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 31.5625rem;
+  }
+`
+const SPINNER_STYLE = css`
+  color: ${COLORS.darkGreyEnabled};
+  opacity: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    color: ${COLORS.darkBlackEnabled};
+    opacity: 70%;
+  }
+`
+
 export function InProgressModal(props: Props): JSX.Element {
   const { alternativeSpinner, children, description } = props
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_CENTER}
-      height="24.625rem"
-      padding={SPACING.spacing6}
-    >
+    <Flex css={MODAL_STYLE}>
       {alternativeSpinner ?? (
         <Icon
           name="ot-spinner"
           aria-label="spinner"
           size={isOnDevice ? '6.25rem' : '5.125rem'}
-          color={isOnDevice ? COLORS.darkBlackEnabled : COLORS.darkGreyEnabled}
-          opacity={isOnDevice ? '70%' : '100%'}
+          css={SPINNER_STYLE}
           spin
         />
       )}

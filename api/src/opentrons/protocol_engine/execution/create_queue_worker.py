@@ -13,6 +13,7 @@ from .tip_handler import create_tip_handler
 from .run_control import RunControlHandler
 from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
+from .status_bar import StatusBarHandler
 
 
 def create_queue_worker(
@@ -69,6 +70,8 @@ def create_queue_worker(
         hardware_api=hardware_api,
     )
 
+    status_bar_handler = StatusBarHandler(hardware_api=hardware_api)
+
     command_executor = CommandExecutor(
         hardware_api=hardware_api,
         state_store=state_store,
@@ -81,6 +84,7 @@ def create_queue_worker(
         tip_handler=tip_handler,
         run_control=run_control_handler,
         rail_lights=rail_lights_handler,
+        status_bar=status_bar_handler,
     )
 
     return QueueWorker(

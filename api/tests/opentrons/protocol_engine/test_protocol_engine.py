@@ -1,18 +1,22 @@
 """Tests for the ProtocolEngine class."""
+import inspect
 from datetime import datetime
 from typing import Any
 
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import ProtocolEngine, commands
+
+from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
 from opentrons.protocol_engine.types import (
+    DeckType,
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareOffsetVector,
@@ -28,8 +32,9 @@ from opentrons.protocol_engine.execution import (
     DoorWatcher,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state import Config, StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
+from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -82,7 +87,7 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mock HardwareControlAPI."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
@@ -101,6 +106,15 @@ def door_watcher(decoy: Decoy) -> DoorWatcher:
 def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     """Get a mock ModuleDataProvider."""
     return decoy.mock(cls=ModuleDataProvider)
+
+
+@pytest.fixture(autouse=True)
+def _mock_slot_standardization_module(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out opentrons.protocol_engine.slot_standardization functions."""
+    for name, func in inspect.getmembers(slot_standardization, inspect.isfunction):
+        monkeypatch.setattr(slot_standardization, name, decoy.mock(func=func))
 
 
 @pytest.fixture(autouse=True)
@@ -154,26 +168,36 @@ def test_add_command(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add a command to the state from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    params = commands.HomeParams()
-    request = commands.HomeCreate(params=params)
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(params=commands.HomeParams())
     queued = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
-        params=params,
+        params=commands.HomeParams(),
     )
+
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
     decoy.when(state_store.commands.get_latest_command_hash()).then_return("abc")
     decoy.when(
-        commands.hash_command_params(create=request, last_hash="abc")
+        commands.hash_command_params(create=standardized_request, last_hash="abc")
     ).then_return("123")
 
     def _stub_queued(*_a: object, **_k: object) -> None:
@@ -184,7 +208,7 @@ def test_add_command(
             QueueCommandAction(
                 command_id="command-id",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash="123",
             )
         )
@@ -192,7 +216,7 @@ def test_add_command(
         QueueCommandAction(
             command_id="command-id-validated",
             created_at=created_at,
-            request=request,
+            request=standardized_request,
             request_hash="456",
         )
     )
@@ -202,13 +226,13 @@ def test_add_command(
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash="456",
             )
         ),
     ).then_do(_stub_queued)
 
-    result = subject.add_command(request)
+    result = subject.add_command(original_request)
 
     assert result == queued
 
@@ -218,27 +242,37 @@ async def test_add_and_execute_command(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add and execute a command from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    params = commands.HomeParams()
-    request = commands.HomeCreate(params=params)
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(params=commands.HomeParams())
     queued = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
-        params=params,
+        params=commands.HomeParams(),
     )
     completed = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=created_at,
-        params=params,
+        params=commands.HomeParams(),
     )
+
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
@@ -255,7 +289,7 @@ async def test_add_and_execute_command(
             QueueCommandAction(
                 command_id="command-id",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash=None,
             )
         )
@@ -263,7 +297,7 @@ async def test_add_and_execute_command(
         QueueCommandAction(
             command_id="command-id-validated",
             created_at=created_at,
-            request=request,
+            request=standardized_request,
             request_hash=None,
         )
     )
@@ -273,7 +307,7 @@ async def test_add_and_execute_command(
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash=None,
             )
         )
@@ -281,12 +315,12 @@ async def test_add_and_execute_command(
 
     decoy.when(
         await state_store.wait_for(
-            condition=state_store.commands.get_is_complete,
+            condition=state_store.commands.get_command_is_final,
             command_id="command-id",
         ),
     ).then_do(_stub_completed)
 
-    result = await subject.add_and_execute_command(request)
+    result = await subject.add_and_execute_command(original_request)
 
     assert result == completed
 
@@ -296,7 +330,6 @@ def test_play(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
 ) -> None:
@@ -325,7 +358,6 @@ def test_play_blocked_by_door(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
 ) -> None:
@@ -380,7 +412,6 @@ async def test_finish(
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
     drop_tips_and_home: bool,
@@ -411,9 +442,6 @@ async def test_finish(
 async def test_finish_with_defaults(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
-    plugin_starter: PluginStarter,
-    queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
 ) -> None:
@@ -430,7 +458,6 @@ async def test_finish_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     model_utils: ModelUtils,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
@@ -462,10 +489,50 @@ async def test_finish_with_error(
     )
 
 
+async def test_finish_with_estop_error_will_not_drop_tip_and_home(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
+) -> None:
+    """It should be able to tell the engine it's finished because of an error and will not drop tip and home."""
+    error = ProtocolCommandFailedError(
+        original_error=ErrorOccurrence.construct(  # type: ignore[call-arg]
+            wrappedErrors=[
+                ErrorOccurrence.construct(errorCode="3008")  # type: ignore[call-arg]
+            ]
+        )
+    )
+    expected_error_details = FinishErrorDetails(
+        error_id="error-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        error=error,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("error-id")
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2021, month=1, day=1), datetime(year=2022, month=2, day=2)
+    )
+
+    await subject.finish(error=error)
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishAction(error_details=expected_error_details, set_run_status=True)
+        ),
+        await queue_worker.join(),
+        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=False),
+        action_dispatcher.dispatch(
+            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
+        ),
+    )
+
+
 async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     hardware_stopper: HardwareStopper,
     door_watcher: DoorWatcher,
     action_dispatcher: ActionDispatcher,
@@ -502,7 +569,9 @@ async def test_wait_until_complete(
     await subject.wait_until_complete()
 
     decoy.verify(
-        await state_store.wait_for(condition=state_store.commands.get_all_complete)
+        await state_store.wait_for(
+            condition=state_store.commands.get_all_commands_final
+        )
     )
 
 
@@ -510,7 +579,6 @@ async def test_stop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     hardware_stopper: HardwareStopper,
     state_store: StateStore,
     subject: ProtocolEngine,
@@ -557,6 +625,11 @@ def test_add_labware_offset(
         location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
+    standardized_request = LabwareOffsetCreate(
+        definitionUri="standardized-definition-uri",
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
+        vector=LabwareOffsetVector(x=2, y=3, z=4),
+    )
 
     id = "labware-offset-id"
     created_at = datetime(year=2021, month=11, day=15)
@@ -564,11 +637,18 @@ def test_add_labware_offset(
     expected_result = LabwareOffset(
         id=id,
         createdAt=created_at,
-        definitionUri=request.definitionUri,
-        location=request.location,
-        vector=request.vector,
+        definitionUri=standardized_request.definitionUri,
+        location=standardized_request.location,
+        vector=standardized_request.vector,
     )
 
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+    decoy.when(
+        slot_standardization.standardize_labware_offset(request, robot_type)
+    ).then_return(standardized_request)
     decoy.when(model_utils.generate_id()).then_return(id)
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
     decoy.when(
@@ -590,7 +670,7 @@ def test_add_labware_offset(
             AddLabwareOffsetAction(
                 labware_offset_id=id,
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
             )
         )
     )
@@ -624,7 +704,6 @@ def test_add_labware_definition(
 def test_add_liquid(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
-    state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
     """It should dispatch an AddLiquidAction action."""

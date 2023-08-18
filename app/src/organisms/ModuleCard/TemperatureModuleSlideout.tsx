@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   TYPOGRAPHY,
@@ -21,68 +18,41 @@ import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
-import { useRunStatuses } from '../Devices/hooks'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
-import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-
+import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { TemperatureModule } from '../../redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  isLoadedInRun: boolean
-  currentRunId?: string
 }
 
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const {
-    module,
-    onCloseClick,
-    isLoadedInRun,
-    isExpanded,
-    currentRunId,
-  } = props
+  const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
-
-  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
     null
   )
-  const { isRunIdle, isRunTerminal } = useRunStatuses()
-
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId: isRunIdle ? moduleIdFromRun : module.id,
+          moduleId: module.id,
           celsius: temperatureValue,
         },
       }
-      if (isRunIdle && currentRunId != null && isLoadedInRun) {
-        createCommand({
-          runId: currentRunId,
-          command: saveTempCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${saveTempCommand.commandType} and run id ${currentRunId}: ${e.message}`
-          )
-        })
-      } else if (isRunTerminal || currentRunId == null) {
-        createLiveCommand({
-          command: saveTempCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
-          )
-        })
-      }
+      createLiveCommand({
+        command: saveTempCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
+        )
+      })
     }
     setTemperatureValue(null)
     onCloseClick()
@@ -110,7 +80,7 @@ export const TemperatureModuleSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`TemperatureSlideout_body_text_${module.serialNumber}`}
       >
         {t('tempdeck_slideout_body', {
@@ -118,7 +88,7 @@ export const TemperatureModuleSlideout = (
         })}
       </StyledText>
       <Flex
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
@@ -126,7 +96,7 @@ export const TemperatureModuleSlideout = (
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t('set_temperature')}
         </StyledText>

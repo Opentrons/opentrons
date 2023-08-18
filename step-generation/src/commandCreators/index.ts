@@ -22,4 +22,5 @@ export {
   replaceTip,
   setTemperature,
   touchTip,
+  moveLabware,
 } from './atomic'

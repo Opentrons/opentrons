@@ -30,6 +30,10 @@ class MoveManager(Generic[AxisKey]):
         """Update system constraints when instruments are changed."""
         self._constraints = constraints
 
+    def get_constraints(self) -> SystemConstraints[AxisKey]:
+        """Retrieve current system constraints."""
+        return self._constraints
+
     def _clear_blend_log(self) -> None:
         """Empty the blend log."""
         self._blend_log = []
@@ -82,7 +86,7 @@ class MoveManager(Generic[AxisKey]):
                         self._blend_log.append(blend_log)
                     break
             if move_utils.all_blended(self._constraints, self._blend_log[i]):
-                log.info(
+                log.debug(
                     f"built {len(self._blend_log[i])} moves with "
                     f"{sum(list(m.nonzero_blocks for m in self._blend_log[i]))} "
                     f"non-zero blocks after {i+1} iteration(s)"

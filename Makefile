@@ -17,8 +17,10 @@ SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 SERVER_UTILS_DIR := server-utils
+SYSTEM_SERVER_DIR := system-server
 HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
+NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
 PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
 
@@ -94,6 +96,7 @@ clean: clean-js clean-py
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+	$(MAKE) -C $(NODE_USB_BRIDGE_CLIENT_DIR) clean
 	$(MAKE) -C $(COMPONENTS_DIR) clean
 
 PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_DIRS))
@@ -128,31 +131,31 @@ push-update-server:
 push: export host=$(usb_host)
 push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	# TODO (amit, 2021-09-28): re-enable when opentrons-hardware is worth deploying.
-	# $(MAKE) -C $(HARDWARE_DIR) push-no-restart
-	# sleep 1
-	$(MAKE) -C $(API_DIR) push-no-restart
-	sleep 1
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart
 	sleep 1
-	$(MAKE) -C $(UPDATE_SERVER_DIR) push
+	$(MAKE) -C $(API_DIR) push-no-restart
+	sleep 1
+	$(MAKE) -C $(SERVER_UTILS_DIR) push
 	sleep 1
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push
 	sleep 1
+	$(MAKE) -C $(SYSTEM_SERVER_DIR) push
+	sleep 1
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
 	sleep 1
-	$(MAKE) -C $(SERVER_UTILS_DIR) push
+	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 
 
 .PHONY: push-ot3
 push-ot3:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	$(MAKE) -C $(API_DIR) push-no-restart-ot3
-	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart-ot3
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
-	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
+	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
+	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-ot3
+	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
+	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
 	$(MAKE) -C $(USB_BRIDGE_DIR) push-ot3
 

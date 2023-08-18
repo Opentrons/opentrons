@@ -32,7 +32,8 @@ export function useSetLightsMutation(
   hostOverride?: HostConfig | null
 ): UseSetLightsMutationResult {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<Lights, AxiosError, SetLightsData>(
     [host, 'robot', 'lights'],
     setLightsData =>

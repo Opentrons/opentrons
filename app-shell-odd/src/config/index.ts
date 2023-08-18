@@ -4,10 +4,10 @@ import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
-import fs from 'fs-extra'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
+import systemd from '../systemd'
 import { createLogger } from '../log'
 import { DEFAULTS_V12, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
@@ -22,9 +22,7 @@ import type { Config, Overrides } from './types'
 
 export * from './types'
 
-// Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
-const BRIGHTNESS_FILE =
-  '/sys/class/backlight/backlight/device/backlight/backlight/brightness'
+const ODD_DIR = '/data/ODD'
 
 // make sure all arguments are included in production
 const argv = process.argv0.endsWith('defaultApp')
@@ -46,7 +44,11 @@ let _log: Logger | undefined
 const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = (new Store({ defaults: DEFAULTS_V12 }) as unknown) as Store<Config>
+    _store = (new Store({
+      defaults: DEFAULTS_V12,
+      // dont overwrite config dir if in dev mode because it causes issues
+      ...(process.env.NODE_ENV === 'production' && { cwd: ODD_DIR }),
+    }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }
   return _store
@@ -78,16 +80,24 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
           getFullConfig()
         )
 
-        // Note (kj:03/02/2023)  this is to change brightness
+        if (path === 'devtools') {
+          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err =>
+            log().debug('Something wrong when setting remote dev tools', {
+              err,
+            })
+          )
+        }
+
+        // Note (kj:08/03/2023) change touchscreen brightness
         if (path === 'onDeviceDisplaySettings.brightness') {
-          fs.writeFile(BRIGHTNESS_FILE, String(nextValue), 'ascii')
-            .then(() => fs.readFile(BRIGHTNESS_FILE))
-            .then(data => {
-              log().debug('Change display brightness', { nextValue })
-            })
-            .catch(err => {
-              log().debug('Something wrong during overwriting', { err })
-            })
+          systemd.updateBrightness(String(nextValue)).catch(err =>
+            log().debug(
+              'Something wrong when updating the touchscreen brightness',
+              {
+                err,
+              }
+            )
+          )
         }
 
         log().debug('Updating config', { path, nextValue })

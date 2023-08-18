@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Mapping
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
@@ -158,6 +158,18 @@ class MotionController(Protocol):
         """
         ...
 
+    async def move_axes(
+        self,
+        position: Mapping[Axis, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
+        """
+        ...
+
     async def move_rel(
         self,
         mount: Mount,
@@ -195,4 +207,8 @@ class MotionController(Protocol):
 
         Works regardless of critical point or home status.
         """
+        ...
+
+    async def retract_axis(self, axis: Axis) -> None:
+        """Retract the specified axis to its home position."""
         ...

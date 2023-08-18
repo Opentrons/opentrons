@@ -1,7 +1,7 @@
 """Protocol analysis module."""
 import logging
 
-from opentrons.protocol_runner import ProtocolRunner
+from opentrons import protocol_runner
 
 from .protocol_store import ProtocolResource
 from .analysis_store import AnalysisStore
@@ -15,11 +15,9 @@ class ProtocolAnalyzer:
 
     def __init__(
         self,
-        protocol_runner: ProtocolRunner,
         analysis_store: AnalysisStore,
     ) -> None:
         """Initialize the analyzer and its dependencies."""
-        self._protocol_runner = protocol_runner
         self._analysis_store = analysis_store
 
     async def analyze(
@@ -28,7 +26,11 @@ class ProtocolAnalyzer:
         analysis_id: str,
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
-        result = await self._protocol_runner.run(protocol_resource.source)
+        runner = await protocol_runner.create_simulating_runner(
+            robot_type=protocol_resource.source.robot_type,
+            protocol_config=protocol_resource.source.config,
+        )
+        result = await runner.run(protocol_resource.source)
 
         log.info(f'Completed analysis "{analysis_id}".')
 

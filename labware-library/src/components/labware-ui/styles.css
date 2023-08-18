@@ -32,11 +32,6 @@
   @apply --aspect-1-1;
 }
 
-.robot_workspace {
-  width: 100%;
-  height: 100%;
-}
-
 .load_name {
   display: flex;
 }

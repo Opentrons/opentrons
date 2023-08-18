@@ -36,14 +36,17 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
-import { protocolHasLiquids } from '@opentrons/shared-data'
+import { getGripperDisplayName } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { Modal } from '../../molecules/Modal'
-import { useTrackEvent } from '../../redux/analytics'
+import { LegacyModal } from '../../molecules/LegacyModal'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../redux/analytics'
 import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
@@ -55,6 +58,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
@@ -118,7 +122,7 @@ function MetadataDetails({
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText as="h6" marginTop={SPACING.spacing3}>
+              <StyledText as="h6" marginTop={SPACING.spacing8}>
                 {startCase(item.label)}
               </StyledText>
               <StyledText as="p">{item.value}</StyledText>
@@ -137,7 +141,7 @@ interface ReadMoreContentProps {
 
 const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   const { metadata, protocolType } = props
-  const { t } = useTranslation('protocol_details')
+  const { t, i18n } = useTranslation('protocol_details')
   const [isReadMore, setIsReadMore] = React.useState(true)
 
   const description = isEmpty(metadata.description)
@@ -159,11 +163,12 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
         <Link
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
-          marginTop={SPACING.spacing3}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          marginTop={SPACING.spacing8}
           onClick={() => setIsReadMore(!isReadMore)}
         >
-          {isReadMore ? t('read_more') : t('read_less')}
+          {isReadMore
+            ? i18n.format(t('read_more'), 'capitalize')
+            : i18n.format(t('read_less'), 'capitalize')}
         </Link>
       )}
     </Flex>
@@ -178,7 +183,7 @@ export function ProtocolDetails(
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids'
   >('robot_config')
@@ -208,6 +213,11 @@ export function ProtocolDetails(
     mostRecentAnalysis != null
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
+
+  const requiredExtensionInstrumentName =
+    mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis)
+      ? getGripperDisplayName('gripperV1')
+      : null
 
   const requiredModuleDetails =
     mostRecentAnalysis != null
@@ -279,6 +289,7 @@ export function ProtocolDetails(
       <RobotConfigurationDetails
         leftMountPipetteName={leftMountPipetteName}
         rightMountPipetteName={rightMountPipetteName}
+        extensionInstrumentName={requiredExtensionInstrumentName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
         robotType={robotType}
@@ -321,7 +332,7 @@ export function ProtocolDetails(
 
   const handleRunProtocolButtonClick = (): void => {
     trackEvent({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'ProtocolsDetail' },
     })
     setShowChooseRobotToRunProtocolSlideout(true)
@@ -331,17 +342,17 @@ export function ProtocolDetails(
     <>
       <Portal level="top">
         {showDeckViewModal ? (
-          <Modal
+          <LegacyModal
             title={t('deck_view')}
             onClose={() => setShowDeckViewModal(false)}
           >
             {deckThumbnail}
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
         width="100%"
       >
         <ChooseRobotToRunProtocolSlideout
@@ -361,14 +372,12 @@ export function ProtocolDetails(
           position={POSITION_RELATIVE}
           flexDirection={DIRECTION_ROW}
           width="100%"
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
         >
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing4}
-            padding={`${String(SPACING.spacing4)} 0 ${String(
-              SPACING.spacing4
-            )} ${String(SPACING.spacing4)}`}
+            gridGap={SPACING.spacing16}
+            padding={`${SPACING.spacing16} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
             width="100%"
           >
             {analysisStatus !== 'loading' &&
@@ -381,8 +390,9 @@ export function ProtocolDetails(
             ) : null}
             <StyledText
               css={TYPOGRAPHY.h2SemiBold}
-              marginBottom={SPACING.spacing4}
+              marginBottom={SPACING.spacing16}
               data-testid={`ProtocolDetails_${protocolDisplayName}`}
+              overflowWrap="anywhere"
             >
               {protocolDisplayName}
             </StyledText>
@@ -437,11 +447,11 @@ export function ProtocolDetails(
                   data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                 >
-                  {t('run_protocol')}
+                  {t('start_setup')}
                 </PrimaryButton>
               </Flex>
             </Flex>
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <Flex css={GRID_STYLE}>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -452,7 +462,7 @@ export function ProtocolDetails(
                 </StyledText>
                 <StyledText
                   as="p"
-                  marginRight={SPACING.spacingM}
+                  marginRight={SPACING.spacing20}
                   overflowWrap="anywhere"
                 >
                   {analysisStatus === 'loading' ? t('shared:loading') : author}
@@ -479,8 +489,8 @@ export function ProtocolDetails(
           </Flex>
           <Box
             position={POSITION_RELATIVE}
-            top={SPACING.spacing1}
-            right={SPACING.spacing1}
+            top={SPACING.spacing2}
+            right={SPACING.spacing2}
           >
             <ProtocolOverflowMenu
               handleRunProtocol={() =>
@@ -510,7 +520,7 @@ export function ProtocolDetails(
             <Flex
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              padding={SPACING.spacing4}
+              padding={SPACING.spacing16}
             >
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('deck_view')}
@@ -520,15 +530,15 @@ export function ProtocolDetails(
                 disabled={analysisStatus !== 'complete'}
                 display={DISPLAY_FLEX}
                 justifyContent={JUSTIFY_CENTER}
-                height={SPACING.spacing5}
-                width={SPACING.spacing5}
+                height={SPACING.spacing24}
+                width={SPACING.spacing24}
                 css={ZOOM_ICON_STYLE}
                 onClick={() => setShowDeckViewModal(true)}
               >
                 <Icon name="union" size={SIZE_1} />
               </Btn>
             </Flex>
-            <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
+            <Box padding={SPACING.spacing16} backgroundColor={COLORS.white}>
               {deckViewByAnalysisStatus[analysisStatus]}
             </Box>
           </Flex>
@@ -537,7 +547,7 @@ export function ProtocolDetails(
             width="100%"
             height="100%"
             flexDirection={DIRECTION_COLUMN}
-            marginLeft={SPACING.spacing4}
+            marginLeft={SPACING.spacing16}
           >
             <Flex>
               <RoundTab
@@ -545,8 +555,8 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'robot_config'}
                 onClick={() => setCurrentTab('robot_config')}
               >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('robot_configuration')}
+                <StyledText>
+                  {i18n.format(t('robot_configuration'), 'capitalize')}
                 </StyledText>
               </RoundTab>
               <RoundTab
@@ -554,24 +564,21 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'labware'}
                 onClick={() => setCurrentTab('labware')}
               >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('labware')}
+                <StyledText>
+                  {i18n.format(t('labware'), 'capitalize')}
                 </StyledText>
               </RoundTab>
-              {mostRecentAnalysis != null &&
-                protocolHasLiquids(mostRecentAnalysis) && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_liquids"
-                    isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
-                  >
-                    <StyledText
-                      textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    >
-                      {t('liquids')}
-                    </StyledText>
-                  </RoundTab>
-                )}
+              {mostRecentAnalysis != null && (
+                <RoundTab
+                  data-testid="ProtocolDetails_liquids"
+                  isCurrent={currentTab === 'liquids'}
+                  onClick={() => setCurrentTab('liquids')}
+                >
+                  <StyledText>
+                    {i18n.format(t('liquids'), 'capitalize')}
+                  </StyledText>
+                </RoundTab>
+              )}
             </Flex>
             <Box
               backgroundColor={COLORS.white}
@@ -584,9 +591,7 @@ export function ProtocolDetails(
               } ${String(BORDERS.radiusSoftCorners)} ${String(
                 BORDERS.radiusSoftCorners
               )} ${String(BORDERS.radiusSoftCorners)}`}
-              padding={`${String(SPACING.spacing4)} ${String(
-                SPACING.spacing4
-              )} 0 ${String(SPACING.spacing4)}`}
+              padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
             >
               {contentsByTabName[currentTab]}
             </Box>

@@ -27,10 +27,10 @@ def test_load_calibration_cals() -> None:
     )
 
     # altered values are preserved
-    mostly_right["calibration"]["edge_sense"]["overrun_tolerance_mm"] += 0.2
+    mostly_right["calibration"]["edge_sense"]["overrun_tolerance_mm"] -= 0.2
     mostly_right["calibration"]["z_offset"]["pass_settings"][
         "max_overrun_distance_mm"
-    ] += 5
+    ] -= 0.5
     built_with_overrides = defaults_ot3._build_default_calibration(
         mostly_right["calibration"], defaults_ot3.DEFAULT_CALIBRATION_SETTINGS
     )
@@ -115,29 +115,31 @@ def test_load_offset_vals() -> None:
 def test_load_transform_vals() -> None:
     # not list
     assert (
-        defaults_ot3._build_default_transform(None, defaults_ot3.DEFAULT_DECK_TRANSFORM)
-        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+        defaults_ot3._build_default_transform(
+            None, defaults_ot3.DEFAULT_MACHINE_TRANSFORM
+        )
+        == defaults_ot3.DEFAULT_MACHINE_TRANSFORM
     )
     # list of not lists
     assert (
         defaults_ot3._build_default_transform(
-            [1, 2, 3], defaults_ot3.DEFAULT_DECK_TRANSFORM
+            [1, 2, 3], defaults_ot3.DEFAULT_MACHINE_TRANSFORM
         )
-        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+        == defaults_ot3.DEFAULT_MACHINE_TRANSFORM
     )
     # list of wrong number of lists
     assert (
         defaults_ot3._build_default_transform(
-            [[1, 2, 3], [3, 2, 1]], defaults_ot3.DEFAULT_DECK_TRANSFORM
+            [[1, 2, 3], [3, 2, 1]], defaults_ot3.DEFAULT_MACHINE_TRANSFORM
         )
-        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+        == defaults_ot3.DEFAULT_MACHINE_TRANSFORM
     )
     # list of right number of lists of wrong number of elements
     assert (
         defaults_ot3._build_default_transform(
-            [[1, 2, 3], [1, 2, 3], [1, 2, 3, 4]], defaults_ot3.DEFAULT_DECK_TRANSFORM
+            [[1, 2, 3], [1, 2, 3], [1, 2, 3, 4]], defaults_ot3.DEFAULT_MACHINE_TRANSFORM
         )
-        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+        == defaults_ot3.DEFAULT_MACHINE_TRANSFORM
     )
     # list of right number of lists of right number of elements of wrong type
     assert (
@@ -151,13 +153,13 @@ def test_load_transform_vals() -> None:
                 [1, "hi", 3],
                 [1, 2, {}],
             ],
-            defaults_ot3.DEFAULT_DECK_TRANSFORM,
+            defaults_ot3.DEFAULT_MACHINE_TRANSFORM,
         )
-        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+        == defaults_ot3.DEFAULT_MACHINE_TRANSFORM
     )
     # right shape, different data is preserved
     assert defaults_ot3._build_default_transform(
-        [[1, 2, 3], [1, 2, 3], [1, 2, 3]], defaults_ot3.DEFAULT_DECK_TRANSFORM
+        [[1, 2, 3], [1, 2, 3], [1, 2, 3]], defaults_ot3.DEFAULT_MACHINE_TRANSFORM
     ) == [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
 
 

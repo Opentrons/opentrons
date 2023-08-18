@@ -12,7 +12,7 @@ from opentrons.motion_planning import Waypoint
 
 from ..state import StateView
 from ..types import MotorAxis, CurrentWell
-from ..errors import MustHomeError
+from ..errors import MustHomeError, InvalidAxisForRobotType
 
 
 _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -22,7 +22,20 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_Z: HardwareAxis.A,
     MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
+    MotorAxis.EXTENSION_Z: HardwareAxis.Z_G,
+    MotorAxis.EXTENSION_JAW: HardwareAxis.G,
 }
+
+# The height of the bottom of the pipette nozzle at home position without any tips.
+# We rely on this being the same for every OT-3 pipette.
+#
+# We found this number by peeking at the height that OT3Simulator returns for these pipettes:
+#   * Single- and 8-Channel P50 GEN3
+#   * Single-, 8-, and 96-channel P1000 GEN3
+#
+# That OT3Simulator return value is what Protocol Engine uses for simulation when Protocol Engine
+# is configured to not virtualize pipettes, so this number should match it.
+VIRTUAL_MAX_OT3_HEIGHT = 248.0
 
 
 class GantryMover(TypingProtocol):
@@ -59,6 +72,9 @@ class GantryMover(TypingProtocol):
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Home the gantry."""
         ...
+
+    async def retract_axis(self, axis: MotorAxis) -> None:
+        """Retract the specified axis to its home position."""
 
 
 class HardwareGantryMover(GantryMover):
@@ -174,7 +190,26 @@ class HardwareGantryMover(GantryMover):
             await self._hardware_api.home_plunger(Mount.RIGHT)
         else:
             hardware_axes = [_MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
+            if self._state_view.config.robot_type == "OT-2 Standard" and any(
+                axis not in HardwareAxis.ot2_axes() for axis in hardware_axes
+            ):
+                raise InvalidAxisForRobotType(
+                    f"{axes} includes axes that are not valid for OT-2 Standard robot type"
+                )
+            # Hardware API will raise error if invalid axes are passed for the type of robot
             await self._hardware_api.home(axes=hardware_axes)
+
+    async def retract_axis(self, axis: MotorAxis) -> None:
+        """Retract specified axis."""
+        hardware_axis = _MOTOR_AXIS_TO_HARDWARE_AXIS[axis]
+        if (
+            self._state_view.config.robot_type == "OT-2 Standard"
+            and hardware_axis not in HardwareAxis.ot2_axes()
+        ):
+            raise InvalidAxisForRobotType(
+                f"{axis} is not valid for OT-2 Standard robot type"
+            )
+        await self._hardware_api.retract_axis(axis=hardware_axis)
 
 
 class VirtualGantryMover(GantryMover):
@@ -211,9 +246,12 @@ class VirtualGantryMover(GantryMover):
         Args:
             pipette_id: Pipette ID to get instrument height and tip length for.
         """
-        instrument_height = self._state_view.pipettes.get_instrument_max_height_ot2(
-            pipette_id
-        )
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            instrument_height = self._state_view.pipettes.get_instrument_max_height_ot2(
+                pipette_id
+            )
+        else:
+            instrument_height = VIRTUAL_MAX_OT3_HEIGHT
         tip_length = self._state_view.tips.get_tip_length(pipette_id)
         return instrument_height - tip_length
 
@@ -244,11 +282,15 @@ class VirtualGantryMover(GantryMover):
         """Home the gantry. No-op in virtual implementation."""
         pass
 
+    async def retract_axis(self, axis: MotorAxis) -> None:
+        """Retract the specified axis. No-op in virtual implementation."""
+        pass
+
 
 def create_gantry_mover(
     state_view: StateView, hardware_api: HardwareControlAPI
 ) -> GantryMover:
-    """Create a tip handler."""
+    """Create a gantry mover."""
     return (
         HardwareGantryMover(hardware_api=hardware_api, state_view=state_view)
         if state_view.config.use_virtual_pipettes is False

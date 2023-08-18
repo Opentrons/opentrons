@@ -13,6 +13,13 @@ import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
 export const getConfig = (state: State): Config | null => state.config
 
+export const getApplyHistoricOffsets: (
+  state: State
+) => boolean = createSelector(
+  getConfig,
+  config => config?.protocols.applyHistoricOffsets ?? true
+)
+
 export const getDevtoolsEnabled = (state: State): boolean => {
   return state.config?.devtools ?? false
 }
@@ -65,9 +72,9 @@ export const getUpdateChannelOptions = (state: State): SelectOption[] => {
     : UPDATE_CHANNEL_OPTS
 }
 
-export const getIsOnDevice: (state: State) => boolean | null = createSelector(
+export const getIsOnDevice: (state: State) => boolean = createSelector(
   getConfig,
-  config => config?.isOnDevice ?? null
+  config => config?.isOnDevice ?? false
 )
 
 export const getSendAllProtocolsToOT3: (
@@ -107,5 +114,8 @@ export const getOnDeviceDisplaySettings: (
       sleepMs: config?.onDeviceDisplaySettings?.sleepMs ?? SLEEP_NEVER_MS,
       brightness: config?.onDeviceDisplaySettings?.brightness ?? 4,
       textSize: config?.onDeviceDisplaySettings?.textSize ?? 1,
+      unfinishedUnboxingFlowRoute:
+        config?.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ??
+        '/welcome',
     }
 )

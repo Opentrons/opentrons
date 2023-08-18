@@ -21,7 +21,16 @@ if os.name == "posix":
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 DATA_ROOT = ".."
-DATA_SUBDIRS = ["deck", "labware", "module", "pipette", "protocol", "gripper", "robot"]
+DATA_SUBDIRS = [
+    "deck",
+    "labware",
+    "module",
+    "pipette",
+    "protocol",
+    "gripper",
+    "robot",
+    "errors",
+]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
 
@@ -95,11 +104,12 @@ class BuildWithData(build_py.build_py):
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
     project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
+    git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("shared-data", project, **normalize_opts)
+    return normalize_version("shared-data", project, git_dir=git_dir, **normalize_opts)
 
 
 VERSION = get_version()

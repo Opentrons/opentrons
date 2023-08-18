@@ -31,7 +31,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="27rem"
     >
       <Flex
@@ -44,10 +44,10 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
           name="ot-alert"
           size="2.5rem"
           color={COLORS.warningEnabled}
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         />
         {heading != null ? (
-          <StyledText as="h1" marginBottom={SPACING.spacing3}>
+          <StyledText as="h1" marginBottom={SPACING.spacing8}>
             {heading}
           </StyledText>
         ) : null}
@@ -56,11 +56,11 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
       <Flex
         flex="0"
         width="100%"
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <NeedHelpLink />
-        <Flex gridGap={SPACING.spacing3}>
+        <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton onClick={back}>{t('go_back')}</SecondaryButton>
           <AlertPrimaryButton
             onClick={exit}

@@ -12,7 +12,7 @@ import {
 import { FormModulesByType } from '../../../step-forms'
 import { ModuleDiagram } from '../../modules'
 import styles from './FilePipettesModal.css'
-import type { ModuleType } from '@opentrons/shared-data'
+import { MAGNETIC_BLOCK_TYPE, ModuleType } from '@opentrons/shared-data'
 
 export interface ModuleFieldsProps {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
@@ -32,6 +32,9 @@ export interface ModuleFieldsProps {
         heaterShakerModuleType?: {
           model: string
         }
+        magneticBlockType?: {
+          model: string
+        }
       }
   touched:
     | null
@@ -47,6 +50,9 @@ export interface ModuleFieldsProps {
           model: boolean
         }
         heaterShakerModuleType?: {
+          model: boolean
+        }
+        magneticBlockType?: {
           model: boolean
         }
       }
@@ -68,8 +74,11 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     touched,
   } = props
 
+  // TODO(BC, 2023-05-11): REMOVE THIS MAG BLOCK FILTER BEFORE LAUNCH TO INCLUDE IT AMONG MODULE OPTIONS
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
-  const modules: ModuleType[] = Object.keys(values)
+  const modules: ModuleType[] = Object.keys(values).filter(
+    k => k !== MAGNETIC_BLOCK_TYPE
+  )
   const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
     const targetToClear = `modulesByType.${type}.model`
 

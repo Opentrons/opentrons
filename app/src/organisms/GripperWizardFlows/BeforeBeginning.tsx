@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
+import { COLORS } from '@opentrons/components'
+import { LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import {
@@ -11,10 +14,13 @@ import {
   GRIPPER_LOADNAME,
   CAL_PIN_LOADNAME,
 } from './constants'
-import type { Run, CreateRunData } from '@opentrons/api-client'
-import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
-import { CreateCommand, LEFT } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -42,7 +48,12 @@ const INFO_BY_FLOW_TYPE: {
   },
 }
 interface BeforeBeginningProps extends GripperWizardStepProps {
-  createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    CreateMaintenanceRunData,
+    unknown
+  >
   isCreateLoading: boolean
 }
 
@@ -51,50 +62,45 @@ export const BeforeBeginning = (
 ): JSX.Element | null => {
   const {
     proceed,
-    createRun,
+    createMaintenanceRun,
     flowType,
     isCreateLoading,
     isRobotMoving,
     chainRunCommands,
+    errorMessage,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createRun({})
+    createMaintenanceRun({})
   }, [])
 
-  let commandsOnProceed: CreateCommand[] = [
+  const commandsOnProceed: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+        mount: LEFT,
       },
     },
   ]
-  if (
-    flowType === GRIPPER_FLOW_TYPES.ATTACH ||
-    flowType === GRIPPER_FLOW_TYPES.RECALIBRATE
-  ) {
-    commandsOnProceed = [
-      { commandType: 'home' as const, params: {} },
-      ...commandsOnProceed,
-    ]
-  }
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, true)
+    chainRunCommands(commandsOnProceed, false)
       .then(() => {
         proceed()
       })
-      .catch(() => {})
+      .catch(error => {
+        setErrorMessage(error.message)
+      })
   }
 
   const equipmentInfoByLoadName: {
     [loadName: string]: { displayName: string; subtitle?: string }
   } = {
     calibration_pin: { displayName: t('calibration_pin') },
-    t10_torx_screwdriver: {
-      displayName: t('t10_torx_screwdriver'),
+    hex_screwdriver: {
+      displayName: t('hex_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
     [GRIPPER_LOADNAME]: { displayName: t('gripper') },
@@ -112,7 +118,14 @@ export const BeforeBeginning = (
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
       //  TODO(BC, 11/8/22): wire up this URL and unhide the link!

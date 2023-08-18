@@ -9,7 +9,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 
 def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
-    pos_min = types.Point(x=0, y=25, z=pos_max.z - 200)  # stay above deck to be safe
+    pos_min = types.Point(x=0, y=45, z=pos_max.z - 200)  # stay above deck to be safe
     bowtie_points = [
         pos_max,  # back-right-up
         pos_min._replace(z=pos_max.z),  # front-left-up
@@ -32,7 +32,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
         for p in bowtie_points:
             await api.move_to(mount, p)
     await api.move_to(mount, bowtie_points[0])
-    await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
+    await api.disengage_axes([types.Axis.X, types.Axis.Y])
 
 
 if __name__ == "__main__":

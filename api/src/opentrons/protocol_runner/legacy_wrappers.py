@@ -96,6 +96,8 @@ class LegacyFileReader:
         )
 
 
+# TODO (spp, 2023-04-05): Remove 'legacy' wording since this is the context we are using
+#  for all python protocols.
 class LegacyContextCreator:
     """Interface to construct Protocol API v2 contexts."""
 
@@ -139,6 +141,7 @@ class LegacyContextCreator:
         return create_protocol_context(
             api_version=protocol.api_level,
             hardware_api=self._hardware_api,
+            deck_type=self._protocol_engine.state_view.config.deck_type.value,
             protocol_engine=self._protocol_engine,
             protocol_engine_loop=asyncio.get_running_loop(),
             broker=broker,

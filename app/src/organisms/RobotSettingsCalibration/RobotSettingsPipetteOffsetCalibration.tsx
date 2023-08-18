@@ -10,9 +10,9 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import {
+  useAttachedPipettesFromInstrumentsQuery,
   useIsOT3,
   usePipetteOffsetCalibrations,
-  useRobot,
 } from '../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
@@ -31,17 +31,30 @@ export function RobotSettingsPipetteOffsetCalibration({
 }: RobotSettingsPipetteOffsetCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
-  const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
 
-  // wait for robot request to resolve instead of using name directly from params
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
+  const attachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery()
+  const ot3AttachedLeftPipetteOffsetCal =
+    attachedPipettesFromInstrumentsQuery.left?.data?.calibratedOffset ?? null
+  const ot3AttachedRightPipetteOffsetCal =
+    attachedPipettesFromInstrumentsQuery.right?.data?.calibratedOffset ?? null
+
+  let showPipetteOffsetCalItems = false
+  if (!isOT3 && pipetteOffsetCalibrations != null) {
+    showPipetteOffsetCalItems = true
+  } else if (
+    isOT3 &&
+    (ot3AttachedLeftPipetteOffsetCal != null ||
+      ot3AttachedRightPipetteOffsetCal != null)
+  )
+    showPipetteOffsetCalItems = true
 
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      paddingY={SPACING.spacing5}
-      gridGap={SPACING.spacing3}
+      paddingY={SPACING.spacing24}
+      gridGap={SPACING.spacing8}
     >
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {isOT3
@@ -51,7 +64,7 @@ export function RobotSettingsPipetteOffsetCalibration({
       {isOT3 ? (
         <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
       ) : null}
-      {pipetteOffsetCalibrations != null ? (
+      {showPipetteOffsetCalItems ? (
         <PipetteOffsetCalibrationItems
           robotName={robotName}
           formattedPipetteOffsetCalibrations={

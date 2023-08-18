@@ -8,9 +8,10 @@ The Python models for Protocol Engine commands do not match the shared JSON sche
 
 If this change is accidental, undo the changes to our Python models.
 
-Or, if this change is intentional, update the shared JSON schema by running:
+Or, if this change is intentional, update the shared JSON schema by running this from the monorepo root:
 
     make -C api command-schema COMMAND_SCHEMA_VERSION=<version number>
+    make format
 
 ...and include the updated JSON schema file in your pull request.
 """

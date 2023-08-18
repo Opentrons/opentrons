@@ -2,6 +2,12 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { SpinnerModalPage, AlertModal } from '@opentrons/components'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  useCalibrationStatusQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
@@ -10,11 +16,10 @@ import { CalibrateDeck } from '../../organisms/CalibrateDeck'
 import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../organisms/CheckCalibration'
 import {
-  usePipetteOffsetCalibrations,
   useRobot,
-  useAttachedPipettes,
   useRunStatuses,
   useIsOT3,
+  useAttachedPipettesFromInstrumentsQuery,
 } from '../../organisms/Devices/hooks'
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
 import { CONNECTABLE } from '../../redux/discovery'
@@ -28,6 +33,7 @@ import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibrati
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
 
+import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { RequestState } from '../../redux/robot-api/types'
 import type {
@@ -35,11 +41,6 @@ import type {
   DeckCalibrationSession,
 } from '../../redux/sessions/types'
 import type { State, Dispatch } from '../../redux/types'
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useAllTipLengthCalibrationsQuery,
-  useCalibrationStatusQuery,
-} from '@opentrons/react-api-client'
 
 const CALS_FETCH_MS = 5000
 
@@ -118,11 +119,21 @@ export function RobotSettingsCalibration({
     }
   )
 
-  // wait for robot request to resolve instead of using name directly from params
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
-  const attachedPipettes = useAttachedPipettes()
+  // Note: following fetch need to reflect the latest state of calibrations
+  // when a user does calibration or rename a robot.
+  useCalibrationStatusQuery({ refetchInterval: CALS_FETCH_MS })
+  useAllTipLengthCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
+      .data?.data ?? []
+  const attachedInstruments =
+    useInstrumentsQuery({ refetchInterval: CALS_FETCH_MS }).data?.data ?? []
+  const attachedGripper =
+    (attachedInstruments ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+    ) ?? null
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const { isRunRunning: isRunning } = useRunStatuses()
-
   const pipettePresent =
     !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
 
@@ -180,34 +191,49 @@ export function RobotSettingsCalibration({
 
   const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 
-  if (attachedPipettes != null) {
+  if (!isOT3 && attachedPipettes != null) {
     formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.left?.modelSpecs?.displayName,
-      serialNumber: attachedPipettes.left?.id,
+      modelName: attachedPipettes.left?.displayName,
+      serialNumber: attachedPipettes.left?.serialNumber,
       mount: 'left' as Mount,
       tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
+        p => p.pipette === attachedPipettes.left?.serialNumber
       )?.tiprackUri,
       lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
+        p => p.pipette === attachedPipettes.left?.serialNumber
       )?.lastModified,
       markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.id
+        p => p.pipette === attachedPipettes.left?.serialNumber
       )?.status.markedBad,
     })
     formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.right?.modelSpecs?.displayName,
-      serialNumber: attachedPipettes.right?.id,
+      modelName: attachedPipettes.right?.displayName,
+      serialNumber: attachedPipettes.right?.serialNumber,
       mount: 'right' as Mount,
       tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
+        p => p.pipette === attachedPipettes.right?.serialNumber
       )?.tiprackUri,
       lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
+        p => p.pipette === attachedPipettes.right?.serialNumber
       )?.lastModified,
       markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.id
+        p => p.pipette === attachedPipettes.right?.serialNumber
       )?.status.markedBad,
+    })
+  } else {
+    formattedPipetteOffsetCalibrations.push({
+      modelName: attachedPipettes.left?.displayName,
+      serialNumber: attachedPipettes.left?.serialNumber,
+      mount: 'left' as Mount,
+      lastCalibrated:
+        attachedPipettes.left?.data.calibratedOffset?.last_modified,
+    })
+    formattedPipetteOffsetCalibrations.push({
+      modelName: attachedPipettes.right?.displayName,
+      serialNumber: attachedPipettes.right?.serialNumber,
+      mount: 'right' as Mount,
+      lastCalibrated:
+        attachedPipettes.right?.data.calibratedOffset?.last_modified,
     })
   }
 
@@ -216,12 +242,6 @@ export function RobotSettingsCalibration({
       createRequestId.current = null
     }
   }, [createStatus])
-
-  // Note: following fetch need to reflect the latest state of calibrations
-  // when a user does calibration or rename a robot.
-  useCalibrationStatusQuery({ refetchInterval: CALS_FETCH_MS })
-  useAllPipetteOffsetCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
-  useAllTipLengthCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
 
   return (
     <>
@@ -296,7 +316,9 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
           <Line />
-          <RobotSettingsGripperCalibration />
+          {attachedGripper != null && (
+            <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          )}
         </>
       ) : (
         <>

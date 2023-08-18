@@ -30,10 +30,19 @@
       "$ref": "#/definitions/DropTipCreate"
     },
     {
+      "$ref": "#/definitions/DropTipInPlaceCreate"
+    },
+    {
       "$ref": "#/definitions/HomeCreate"
     },
     {
+      "$ref": "#/definitions/RetractAxisCreate"
+    },
+    {
       "$ref": "#/definitions/LoadLabwareCreate"
+    },
+    {
+      "$ref": "#/definitions/LoadAdapterCreate"
     },
     {
       "$ref": "#/definitions/LoadLiquidCreate"
@@ -73,6 +82,9 @@
     },
     {
       "$ref": "#/definitions/TouchTipCreate"
+    },
+    {
+      "$ref": "#/definitions/SetStatusBarCreate"
     },
     {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
@@ -714,6 +726,12 @@
           "title": "Homeafter",
           "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
           "type": "boolean"
+        },
+        "alternateDropLocation": {
+          "title": "Alternatedroplocation",
+          "description": "Whether to alternate location where tip is dropped within the labware. If True, this command will ignore the wellLocation provided and alternate between dropping tips at two predetermined locations inside the specified labware well. If False, the tip will be dropped at the top center of the well.",
+          "default": false,
+          "type": "boolean"
         }
       },
       "required": ["pipetteId", "labwareId", "wellName"]
@@ -748,10 +766,67 @@
       },
       "required": ["params"]
     },
+    "DropTipInPlaceParams": {
+      "title": "DropTipInPlaceParams",
+      "description": "Payload required to drop a tip in place.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "homeAfter": {
+          "title": "Homeafter",
+          "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
+          "type": "boolean"
+        }
+      },
+      "required": ["pipetteId"]
+    },
+    "DropTipInPlaceCreate": {
+      "title": "DropTipInPlaceCreate",
+      "description": "Drop tip in place command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "dropTipInPlace",
+          "enum": ["dropTipInPlace"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/DropTipInPlaceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
     "MotorAxis": {
       "title": "MotorAxis",
       "description": "Motor axis on which to issue a home command.",
-      "enum": ["x", "y", "leftZ", "rightZ", "leftPlunger", "rightPlunger"],
+      "enum": [
+        "x",
+        "y",
+        "leftZ",
+        "rightZ",
+        "leftPlunger",
+        "rightPlunger",
+        "extensionZ",
+        "extensionJaw"
+      ],
       "type": "string"
     },
     "HomeParams": {
@@ -798,11 +873,81 @@
       },
       "required": ["params"]
     },
+    "RetractAxisParams": {
+      "title": "RetractAxisParams",
+      "description": "Payload required for a Retract Axis command.",
+      "type": "object",
+      "properties": {
+        "axis": {
+          "description": "Axis to retract to its home position as quickly as safely possible. The difference between retracting an axis and homing an axis using the home command is that a home will always probe the limit switch and will work as the first motion command a robot will need to execute; On the other hand, retraction will rely on this previously determined  home position to move to it as fast as safely possible. So on the Flex, it will move (fast) the axis to the previously recorded home position and on the OT2, it will move (fast) the axis a safe distance from the previously recorded home position, and then slowly approach the limit switch.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MotorAxis"
+            }
+          ]
+        }
+      },
+      "required": ["axis"]
+    },
+    "RetractAxisCreate": {
+      "title": "RetractAxisCreate",
+      "description": "Data to create a Retract Axis command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "retractAxis",
+          "enum": ["retractAxis"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/RetractAxisParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
     "DeckSlotName": {
       "title": "DeckSlotName",
       "description": "Deck slot identifiers.",
-      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-      "type": "string"
+      "enum": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2",
+        "B3",
+        "C1",
+        "C2",
+        "C3",
+        "D1",
+        "D2",
+        "D3"
+      ]
     },
     "DeckSlotLocation": {
       "title": "DeckSlotLocation",
@@ -810,7 +955,12 @@
       "type": "object",
       "properties": {
         "slotName": {
-          "$ref": "#/definitions/DeckSlotName"
+          "description": "A slot on the robot's deck.\n\nThe plain numbers like `\"5\"` are for the OT-2, and the coordinates like `\"C2\"` are for the Flex.\n\nWhen you provide one of these values, you can use either style. It will automatically be converted to match the robot.\n\nWhen one of these values is returned, it will always match the robot.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DeckSlotName"
+            }
+          ]
         }
       },
       "required": ["slotName"]
@@ -828,6 +978,19 @@
       },
       "required": ["moduleId"]
     },
+    "OnLabwareLocation": {
+      "title": "OnLabwareLocation",
+      "description": "The location of something placed atop another labware.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The ID of a loaded Labware from a prior `loadLabware` command.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId"]
+    },
     "LoadLabwareParams": {
       "title": "LoadLabwareParams",
       "description": "Payload required to load a labware into a slot.",
@@ -842,6 +1005,9 @@
             },
             {
               "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "$ref": "#/definitions/OnLabwareLocation"
             },
             {
               "enum": ["offDeck"],
@@ -890,6 +1056,80 @@
         },
         "params": {
           "$ref": "#/definitions/LoadLabwareParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "LoadAdapterParams": {
+      "title": "LoadAdapterParams",
+      "description": "Payload required to load an adapter into a slot.",
+      "type": "object",
+      "properties": {
+        "location": {
+          "title": "Location",
+          "description": "Location the adapter should be loaded into.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DeckSlotLocation"
+            },
+            {
+              "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "enum": ["offDeck"],
+              "type": "string"
+            }
+          ]
+        },
+        "loadName": {
+          "title": "Loadname",
+          "description": "Name used to reference a labware definition.",
+          "type": "string"
+        },
+        "namespace": {
+          "title": "Namespace",
+          "description": "The namespace the labware definition belongs to.",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "description": "The labware definition version.",
+          "type": "integer"
+        },
+        "adapterId": {
+          "title": "Adapterid",
+          "description": "An optional ID to assign to this adapter. If None, an ID will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["location", "loadName", "namespace", "version"]
+    },
+    "LoadAdapterCreate": {
+      "title": "LoadAdapterCreate",
+      "description": "Load adapter command creation request.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "loadAdapter",
+          "enum": ["loadAdapter"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/LoadAdapterParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -973,7 +1213,8 @@
         "magneticModuleV2",
         "thermocyclerModuleV1",
         "thermocyclerModuleV2",
-        "heaterShakerModuleV1"
+        "heaterShakerModuleV1",
+        "magneticBlockV1"
       ],
       "type": "string"
     },
@@ -983,7 +1224,7 @@
       "type": "object",
       "properties": {
         "model": {
-          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.",
+          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.\n\n For example, if you request a `temperatureModuleV1` here, Protocol Engine might load a `temperatureModuleV1` or a `temperatureModuleV2`.\n\n The model that it finds connected will be available through `result.model`.",
           "allOf": [
             {
               "$ref": "#/definitions/ModuleModel"
@@ -1047,23 +1288,24 @@
         "p20_multi_gen2",
         "p50_single",
         "p50_multi",
-        "p50_single_gen3",
-        "p50_multi_gen3",
+        "p50_single_flex",
+        "p50_multi_flex",
         "p300_single",
         "p300_multi",
         "p300_single_gen2",
         "p300_multi_gen2",
         "p1000_single",
         "p1000_single_gen2",
-        "p1000_single_gen3",
-        "p1000_multi_gen3"
+        "p1000_single_flex",
+        "p1000_multi_flex",
+        "p1000_96"
       ],
       "type": "string"
     },
     "MountType": {
       "title": "MountType",
       "description": "An enumeration.",
-      "enum": ["left", "right"],
+      "enum": ["left", "right", "extension"],
       "type": "string"
     },
     "LoadPipetteParams": {
@@ -1177,6 +1419,9 @@
               "$ref": "#/definitions/ModuleLocation"
             },
             {
+              "$ref": "#/definitions/OnLabwareLocation"
+            },
+            {
               "enum": ["offDeck"],
               "type": "string"
             }
@@ -1189,18 +1434,6 @@
               "$ref": "#/definitions/LabwareMovementStrategy"
             }
           ]
-        },
-        "usePickUpLocationLpcOffset": {
-          "title": "Usepickuplocationlpcoffset",
-          "description": "Whether to use LPC offset of the labware associated with its pick up location. Experimental param, subject to change.",
-          "default": false,
-          "type": "boolean"
-        },
-        "useDropLocationLpcOffset": {
-          "title": "Usedroplocationlpcoffset",
-          "description": "Whether to use LPC offset of the labware associated with its drop off location. Experimental param, subject to change.",
-          "default": false,
-          "type": "boolean"
         },
         "pickUpOffset": {
           "title": "Pickupoffset",
@@ -1797,6 +2030,57 @@
       },
       "required": ["params"]
     },
+    "StatusBarAnimation": {
+      "title": "StatusBarAnimation",
+      "description": "Status Bar animation options.",
+      "enum": ["idle", "confirm", "updating", "disco", "off"]
+    },
+    "SetStatusBarParams": {
+      "title": "SetStatusBarParams",
+      "description": "Payload required to set the status bar to run an animation.",
+      "type": "object",
+      "properties": {
+        "animation": {
+          "description": "The animation that should be executed on the status bar.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/StatusBarAnimation"
+            }
+          ]
+        }
+      },
+      "required": ["animation"]
+    },
+    "SetStatusBarCreate": {
+      "title": "SetStatusBarCreate",
+      "description": "setStatusBar command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "setStatusBar",
+          "enum": ["setStatusBar"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/SetStatusBarParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
     "opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureParams": {
       "title": "WaitForTemperatureParams",
       "description": "Input parameters to wait for a Heater-Shaker's target temperature.",
@@ -2361,6 +2645,11 @@
         "blockMaxVolumeUl": {
           "title": "Blockmaxvolumeul",
           "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
+          "type": "number"
+        },
+        "holdTimeSeconds": {
+          "title": "Holdtimeseconds",
+          "description": "Amount of time, in seconds, to hold the temperature for. If specified, a waitForBlockTemperature command will block until the given hold time has elapsed.",
           "type": "number"
         }
       },
@@ -2958,6 +3247,11 @@
       },
       "required": ["params"]
     },
+    "MaintenancePosition": {
+      "title": "MaintenancePosition",
+      "description": "Maintenance position options.",
+      "enum": ["attachPlate", "attachInstrument"]
+    },
     "MoveToMaintenancePositionParams": {
       "title": "MoveToMaintenancePositionParams",
       "description": "Calibration set up position command parameters.",
@@ -2968,6 +3262,15 @@
           "allOf": [
             {
               "$ref": "#/definitions/MountType"
+            }
+          ]
+        },
+        "maintenancePosition": {
+          "description": "The position the gantry mount needs to move to.",
+          "default": "attachInstrument",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MaintenancePosition"
             }
           ]
         }

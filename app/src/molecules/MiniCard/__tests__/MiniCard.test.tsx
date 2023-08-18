@@ -34,7 +34,7 @@ describe('MiniCard', () => {
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
-    expect(miniCard).toHaveStyle(`padding: ${String(SPACING.spacing3)}`)
+    expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
   })
@@ -52,7 +52,7 @@ describe('MiniCard', () => {
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
-    expect(miniCard).toHaveStyle(`padding: ${String(SPACING.spacing3)}`)
+    expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
     expect(miniCard).toHaveStyleRule(
@@ -85,7 +85,7 @@ describe('MiniCard', () => {
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
-    expect(miniCard).toHaveStyle(`padding: ${String(SPACING.spacing3)}`)
+    expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
     expect(miniCard).toHaveStyleRule(

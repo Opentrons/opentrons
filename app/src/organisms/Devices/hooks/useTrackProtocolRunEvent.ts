@@ -6,7 +6,7 @@ interface ProtocolRunAnalyticsEvent {
   properties?: { [key: string]: unknown }
 }
 
-type TrackProtocolRunEvent = (
+export type TrackProtocolRunEvent = (
   protocolRunEvent: ProtocolRunAnalyticsEvent
 ) => void
 

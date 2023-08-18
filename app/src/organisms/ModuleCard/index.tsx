@@ -40,13 +40,13 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
-import { SUCCESS_TOAST, useToast } from '../../atoms/Toast'
+import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -98,7 +98,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
-  const currentRunId = useCurrentRunId()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
   const runStatus = useCurrentRunStatus({
     onSettled: data => {
@@ -120,7 +119,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     robotName &&
       dispatchApiRequest(updateModule(robotName, module.serialNumber))
   }
-  const { makeToast } = useToast()
+  const { makeToast } = useToaster()
   React.useEffect(() => {
     if (
       module.hasAvailableUpdate === false &&
@@ -213,7 +212,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
-      borderRadius={SPACING.spacing2}
+      borderRadius={SPACING.spacing4}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
@@ -226,11 +225,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       {showSlideout && (
         <ModuleSlideout
           module={module}
-          runId={currentRunId != null ? currentRunId : undefined}
           isSecondary={hasSecondary}
           showSlideout={showSlideout}
           onCloseClick={() => setShowSlideout(false)}
-          isLoadedInRun={isLoadedInRun}
         />
       )}
       {showAboutModule && (
@@ -246,15 +243,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module as HeaterShakerModule}
           isExpanded={showTestShake}
           onCloseClick={() => setShowTestShake(false)}
-          isLoadedInRun={isLoadedInRun}
-          currentRunId={currentRunId != null ? currentRunId : undefined}
         />
       )}
-      <Box
-        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
-        width="100%"
-      >
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+      <Box padding={`${SPACING.spacing16} ${SPACING.spacing8}`} width="100%">
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
               width="60px"
@@ -266,7 +258,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
-            paddingLeft={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
           >
             <ErrorInfo attachedModule={module} />
             {latestRequest != null && latestRequest.status === FAILURE && (
@@ -278,7 +270,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             )}
             {module.hasAvailableUpdate && showBanner && !isPending ? (
               <Flex
-                paddingBottom={SPACING.spacing2}
+                paddingBottom={SPACING.spacing4}
                 width="100%"
                 flexDirection={DIRECTION_COLUMN}
                 data-testid={`ModuleCard_firmware_update_banner_${module.serialNumber}`}
@@ -305,8 +297,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <Flex
                 width="100%"
                 flexDirection={DIRECTION_COLUMN}
-                paddingRight={SPACING.spacingM}
-                paddingBottom={SPACING.spacing3}
+                paddingRight={SPACING.spacing20}
+                paddingBottom={SPACING.spacing8}
                 data-testid={`ModuleCard_too_hot_banner_${module.serialNumber}`}
               >
                 <Banner type="warning" icon={hotToTouch}>
@@ -328,12 +320,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 data-testid={`ModuleCard_update_pending_${module.serialNumber}`}
               >
                 <Icon
-                  width={SPACING.spacingSM}
+                  width="10px"
                   name="ot-spinner"
                   spin
                   aria-label="ot-spinner"
                 />
-                <StyledText marginLeft={SPACING.spacing3}>
+                <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
                 </StyledText>
               </Flex>
@@ -344,26 +336,28 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   color={COLORS.darkGreyEnabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
-                  paddingBottom={SPACING.spacing2}
+                  paddingBottom={SPACING.spacing4}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
                   slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
-                  {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
-                    port: module.usbPort.hub ?? module.usbPort.port,
-                  })}
+                  {module?.usbPort !== null
+                    ? t('usb_port', {
+                        port: module?.usbPort?.port,
+                      })
+                    : t('usb_port_not_connected')}
                 </StyledText>
                 <Flex
-                  paddingBottom={SPACING.spacing2}
+                  paddingBottom={SPACING.spacing4}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
                   fontSize={TYPOGRAPHY.fontSizeP}
                 >
                   <ModuleIcon
                     moduleType={module.moduleType}
                     size="1rem"
-                    marginRight={SPACING.spacing1}
+                    marginRight={SPACING.spacing2}
                     color={COLORS.darkGreyEnabled}
                   />
                   <StyledText>
@@ -384,7 +378,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
       <Box
         alignSelf={ALIGN_START}
-        padding={SPACING.spacing2}
+        padding={SPACING.spacing4}
         data-testid={`ModuleCard_overflow_btn_${module.serialNumber}`}
         opacity={isPending ? '50%' : '100%'}
       >
@@ -412,10 +406,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               module={module}
               robotName={robotName}
               runId={runId}
+              isLoadedInRun={isLoadedInRun}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
-              isLoadedInRun={isLoadedInRun}
             />
           </Box>
           {menuOverlay}
@@ -427,62 +421,45 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
 interface ModuleSlideoutProps {
   module: AttachedModule
-  runId?: string
   isSecondary: boolean
   showSlideout: boolean
-  isLoadedInRun: boolean
   onCloseClick: () => unknown
 }
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
-  const {
-    module,
-    runId,
-    isSecondary,
-    showSlideout,
-    onCloseClick,
-    isLoadedInRun,
-  } = props
+  const { module, isSecondary, showSlideout, onCloseClick } = props
 
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSecondaryTemp={isSecondary}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === MAGNETIC_MODULE_TYPE) {
     return (
       <MagneticModuleSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   } else {
     return (
       <HeaterShakerSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   }

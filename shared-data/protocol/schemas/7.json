@@ -1,0 +1,290 @@
+{
+  "$id": "opentronsProtocolSchemaV7",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "pipetteName": {
+      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json file",
+      "type": "string",
+      "enum": [
+        "p10_single",
+        "p10_multi",
+        "p20_single_gen2",
+        "p20_multi_gen2",
+        "p50_single",
+        "p50_multi",
+        "p300_single",
+        "p300_multi",
+        "p300_single_gen2",
+        "p300_multi_gen2",
+        "p1000_single",
+        "p1000_single_gen2",
+        "p50_single_flex",
+        "p50_multi_flex",
+        "p1000_single_flex",
+        "p1000_multi_flex",
+        "p1000_96"
+      ]
+    },
+
+    "moduleOnlyParams": {
+      "required": ["moduleId"],
+      "additionalProperties": false,
+      "properties": {
+        "moduleId": {
+          "type": "string",
+          "description": "Unique identifier of module to target. Must be a key from the top level 'modules' object"
+        }
+      }
+    },
+
+    "offset": {
+      "description": "x, y, and z component of offset vector in mm",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    },
+
+    "pipetteAccessParams": {
+      "required": ["pipetteId", "labwareId", "wellName"],
+      "properties": {
+        "pipetteId": {
+          "type": "string"
+        },
+        "labwareId": {
+          "type": "string"
+        },
+        "wellName": {
+          "type": "string"
+        }
+      }
+    },
+
+    "volumeParams": {
+      "required": ["volume"],
+      "volume": {
+        "type": "number"
+      }
+    },
+
+    "flowRate": {
+      "required": ["flowRate"],
+      "properties": {
+        "flowRate": {
+          "description": "flow rate in ul/sec",
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+
+    "wellLocation": {
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "reference location with respect to a well from which to apply an offset if given (e.g. 'bottom' || 'top')"
+        },
+        "offset": {
+          "$ref": "#/definitions/offset",
+          "description": "X, Y, Z offset from the specified origin with respect to well"
+        }
+      }
+    },
+
+    "labwareLocation": {
+      "oneOf": [
+        {
+          "required": ["slotName"],
+          "properties": {
+            "slotName": {
+              "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "required": ["moduleId"],
+          "properties": {
+            "moduleId": {
+              "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "const": "offDeck",
+          "description": "String literal 'offDeck'. Used to load a labware without placing it on the deck"
+        }
+      ]
+    }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$otSharedSchema",
+    "schemaVersion",
+    "metadata",
+    "robot",
+    "labwareDefinitions",
+    "commands"
+  ],
+  "properties": {
+    "$otSharedSchema": {
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
+      "enum": ["#/protocol/schemas/7"]
+    },
+
+    "schemaVersion": {
+      "description": "Schema version of a protocol is a single integer",
+      "enum": [7]
+    },
+
+    "metadata": {
+      "description": "Optional metadata about the protocol",
+      "type": "object",
+
+      "properties": {
+        "protocolName": {
+          "description": "A short, human-readable name for the protocol",
+          "type": "string"
+        },
+        "author": {
+          "description": "The author or organization who created the protocol",
+          "type": "string"
+        },
+        "description": {
+          "description": "A text description of the protocol.",
+          "type": ["string", "null"]
+        },
+
+        "created": {
+          "description": "UNIX timestamp when this file was created",
+          "type": "number"
+        },
+        "lastModified": {
+          "description": "UNIX timestamp when this file was last modified",
+          "type": ["number", "null"]
+        },
+
+        "category": {
+          "description": "Category of protocol (eg, \"Basic Pipetting\")",
+          "type": ["string", "null"]
+        },
+        "subcategory": {
+          "description": "Subcategory of protocol (eg, \"Cell Plating\")",
+          "type": ["string", "null"]
+        },
+        "tags": {
+          "description": "Tags to be used in searching for this protocol",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "designerApplication": {
+      "description": "Optional data & metadata not required to execute the protocol, used by the application that created this protocol",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the application that created the protocol. Should be namespaced under the organization or individual who owns the organization, eg \"opentrons/protocol-designer\"",
+          "type": "string"
+        },
+        "version": {
+          "description": "Version of the application that created the protocol",
+          "type": "string"
+        },
+        "data": {
+          "description": "Any data used by the application that created this protocol",
+          "type": "object"
+        }
+      }
+    },
+
+    "robot": {
+      "required": ["model", "deckId"],
+      "properties": {
+        "model": {
+          "description": "Model of the robot this protocol is written for",
+          "type": "string",
+          "enum": ["OT-2 Standard", "OT-3 Standard"]
+        },
+        "deckId": {
+          "description": "Identifier of physical deck this protocol is written for. This should match a top-level key in shared-data/deck/definitions/3.json",
+          "type": "string"
+        }
+      }
+    },
+
+    "labwareDefinitions": {
+      "description": "All labware definitions used by labware in this protocol, keyed by a unique identifier (definitionId)",
+      "patternProperties": {
+        ".+": {
+          "$ref": "opentronsLabwareSchemaV2"
+        }
+      }
+    },
+
+    "liquids": {
+      "description": "All instances of liquid used in this protocol, keyed by a unique identifier (liquidId)",
+      "patternProperties": {
+        ".+": {
+          "description": "Fields describing a single liquid",
+          "type": "object",
+          "required": ["displayName", "description"],
+          "properties": {
+            "displayName": {
+              "description": "An human-readable name for this liquid.",
+              "type": "string"
+            },
+            "description": {
+              "description": "A description of this liquid.",
+              "type": "string"
+            },
+            "displayColor": {
+              "description": "Hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+
+    "commands": {
+      "description": "An array of command objects representing steps to be executed on the robot.",
+      "type": "array",
+      "items": { "$ref": "opentronsCommandSchemaV7" }
+    },
+
+    "commandAnnotations": {
+      "type": "array",
+      "items": {
+        "description": "An optional object of annotations associated with commands.",
+        "type": "object",
+        "required": ["commandIds", "annotationType"],
+        "properties": {
+          "commandIds": {
+            "description": "An array of command ids that correspond to the targeted grouping of this annotation",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "annotationType": {
+            "description": "The type of annotation (e.g. 'transfer', 'initialSetup')",
+            "type": "string"
+          },
+          "params": {
+            "description": "The parameters used to create this grouping of atomic commands",
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

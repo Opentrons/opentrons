@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     errors as pe_errors,
 )
-from opentrons.protocol_runner import ProtocolRunResult
+from opentrons.protocol_runner import RunResult, JsonRunner, PythonAndLegacyRunner
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
@@ -94,7 +94,9 @@ async def test_create_play_action_to_resume(
     subject: RunController,
 ) -> None:
     """It should resume a run."""
-    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
+    mock_json_runner = decoy.mock(cls=JsonRunner)
+    decoy.when(mock_engine_store.runner).then_return(mock_json_runner)
+    decoy.when(mock_json_runner.was_started()).then_return(True)
 
     result = subject.create_action(
         action_id="some-action-id",
@@ -109,8 +111,8 @@ async def test_create_play_action_to_resume(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_engine_store.runner.play(), times=1)
-    decoy.verify(await mock_engine_store.runner.run(), times=0)
+    decoy.verify(mock_json_runner.play(), times=1)
+    decoy.verify(await mock_json_runner.run(), times=0)
 
 
 async def test_create_play_action_to_start(
@@ -124,7 +126,9 @@ async def test_create_play_action_to_start(
     subject: RunController,
 ) -> None:
     """It should start a run."""
-    decoy.when(mock_engine_store.runner.was_started()).then_return(False)
+    mock_python_runner = decoy.mock(cls=PythonAndLegacyRunner)
+    decoy.when(mock_engine_store.runner).then_return(mock_python_runner)
+    decoy.when(mock_python_runner.was_started()).then_return(False)
 
     result = subject.create_action(
         action_id="some-action-id",
@@ -143,8 +147,8 @@ async def test_create_play_action_to_start(
     background_task_captor = matchers.Captor()
     decoy.verify(mock_task_runner.run(background_task_captor))
 
-    decoy.when(await mock_engine_store.runner.run()).then_return(
-        ProtocolRunResult(
+    decoy.when(await mock_python_runner.run()).then_return(
+        RunResult(
             commands=protocol_commands,
             state_summary=engine_state_summary,
         )

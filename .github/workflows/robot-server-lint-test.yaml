@@ -17,7 +17,7 @@ on:
       - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
-      - '.github/workflows/robot-server-test-lint.yaml'
+      - '.github/workflows/robot-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
       - 'edge'
@@ -37,7 +37,7 @@ on:
       - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
-      - '.github/workflows/robot-server-test-lint.yaml'
+      - '.github/workflows/robot-server-lint-test.yaml'
       - '.github/actions/python/**'
   workflow_dispatch:
 
@@ -76,7 +76,11 @@ jobs:
         run: make -C robot-server setup-ot2
       - name: Lint
         run: make -C robot-server lint
-      - name: Test
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: make -C robot-server test-cov test_opts="-m 'not ot3_only'"
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
         run: make -C robot-server test-cov
       - name: Ensure assets build
         run: make -C robot-server sdist wheel

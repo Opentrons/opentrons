@@ -1,54 +1,62 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
-import { Portal } from '../../App/portal'
-// import { useTrackEvent } from '../../redux/analytics'
-import { IntroScreen } from './IntroScreen'
-import { ExitConfirmation } from './ExitConfirmation'
-import { CheckItem } from './CheckItem'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { PickUpTip } from './PickUpTip'
-import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
+import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import {
-  useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
+  useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
-
-import type { LabwareOffset } from '@opentrons/api-client'
 import {
   CompletedProtocolAnalysis,
   Coordinates,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type {
-  CreateRunCommand,
-  RegisterPositionAction,
-  WorkingOffset,
-} from './types'
-import { LabwareOffsetCreateData } from '@opentrons/api-client'
+import { Portal } from '../../App/portal'
+// import { useTrackEvent } from '../../redux/analytics'
+import { IntroScreen } from './IntroScreen'
+import { ExitConfirmation } from './ExitConfirmation'
+import { CheckItem } from './CheckItem'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { getIsOnDevice } from '../../redux/config'
+import { PickUpTip } from './PickUpTip'
+import { ReturnTip } from './ReturnTip'
+import { ResultsSummary } from './ResultsSummary'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import { FatalErrorModal } from './FatalErrorModal'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import { chainRunCommands } from './utils/chainRunCommands'
-import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LabwareOffset } from '@opentrons/api-client'
+import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
+  maintenanceRunId: string
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
   caughtError?: Error
 }
 
-export const LabwarePositionCheckInner = (
+export const LabwarePositionCheckComponent = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
-  const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
+  const {
+    mostRecentAnalysis,
+    onCloseClick,
+    existingOffsets,
+    runId,
+    maintenanceRunId,
+  } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
+  const [fatalError, setFatalError] = React.useState<string | null>(null)
   const [
     { workingOffsets, tipPickUpOffset },
     registerPosition,
@@ -120,27 +128,19 @@ export const LabwarePositionCheckInner = (
     },
     { workingOffsets: [], tipPickUpOffset: null }
   )
+  const [isExiting, setIsExiting] = React.useState(false)
   const {
-    createCommand,
-    isLoading: isCommandMutationLoading,
-  } = useCreateCommandMutation()
-  const { createCommand: createSilentCommand } = useCreateCommandMutation()
-  const createRunCommand: CreateRunCommand = (variables, ...options) => {
-    return createCommand({ ...variables, runId }, ...options)
-  }
-  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
-  React.useEffect(() => {
-    if (isCommandMutationLoading) {
-      const timer = setTimeout(() => setIsRobotMoving(true), 700)
-      return () => clearTimeout(timer)
-    } else {
-      setIsRobotMoving(false)
-    }
-  }, [isCommandMutationLoading])
+    createMaintenanceCommand: createSilentCommand,
+  } = useCreateMaintenanceCommandMutation(maintenanceRunId)
+  const {
+    chainRunCommands,
+    isCommandMutationLoading: isCommandChainLoading,
+  } = useChainMaintenanceCommands(maintenanceRunId)
 
+  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
       protocolData?.pipettes ?? []
     ).map(pip => ({
@@ -149,7 +149,7 @@ export const LabwarePositionCheckInner = (
         pipetteId: pip.id,
         labwareId: FIXED_TRASH_ID,
         wellName: 'A1',
-        wellLocation: { origin: 'default' as const },
+        wellLocation: { origin: 'top' as const },
       },
     }))
     chainRunCommands(
@@ -157,9 +157,10 @@ export const LabwarePositionCheckInner = (
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
       ],
-      createRunCommand,
-      props.onCloseClick
+      true
     )
+      .then(() => props.onCloseClick())
+      .catch(() => props.onCloseClick())
   }
   const {
     confirm: confirmExitLPC,
@@ -168,13 +169,11 @@ export const LabwarePositionCheckInner = (
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
   const proceed = (): void => {
-    if (!isCommandMutationLoading) {
-      setCurrentStepIndex(
-        currentStepIndex !== LPCSteps.length - 1
-          ? currentStepIndex + 1
-          : currentStepIndex
-      )
-    }
+    setCurrentStepIndex(
+      currentStepIndex !== LPCSteps.length - 1
+        ? currentStepIndex + 1
+        : currentStepIndex
+    )
   }
   if (protocolData == null) return null
   const LPCSteps = getLabwarePositionCheckSteps(protocolData)
@@ -191,7 +190,6 @@ export const LabwarePositionCheckInner = (
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
       createSilentCommand({
-        runId,
         command: {
           commandType: 'moveRelative',
           params: { pipetteId: pipetteId, distance: step * dir, axis },
@@ -200,40 +198,50 @@ export const LabwarePositionCheckInner = (
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess != null && onSuccess(data?.data?.result?.position ?? null)
+          onSuccess?.(data?.data?.result?.position ?? null)
         })
         .catch((e: Error) => {
-          console.error(`error issuing jog command: ${e.message}`)
+          setFatalError(`error issuing jog command: ${e.message}`)
         })
     } else {
-      console.error(`could not find pipette to jog with id: ${pipetteId}`)
+      setFatalError(`could not find pipette to jog with id: ${pipetteId ?? ''}`)
     }
   }
   const movementStepProps = {
     proceed,
     protocolData,
-    createRunCommand,
+    chainRunCommands,
+    setFatalError,
     registerPosition,
     handleJog,
-    isRobotMoving,
+    isRobotMoving: isCommandChainLoading,
     workingOffsets,
     existingOffsets,
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
-    Promise.all(
-      offsets.map(data => createLabwareOffset({ runId: runId, data }))
-    )
+    Promise.all(offsets.map(data => createLabwareOffset({ runId, data })))
       .then(() => {
         onCloseClick()
       })
       .catch((e: Error) => {
-        console.error(`error applying labware offsets: ${e.message}`)
+        setFatalError(`error applying labware offsets: ${e.message}`)
       })
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (showConfirmation) {
+  if (isExiting) {
+    modalContent = (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
+  } else if (fatalError != null) {
+    modalContent = (
+      <FatalErrorModal
+        errorMessage={fatalError}
+        onClose={handleCleanUpAndClose}
+      />
+    )
+  } else if (showConfirmation) {
     modalContent = (
       <ExitConfirmation
         onGoBack={cancelExitLPC}
@@ -266,30 +274,36 @@ export const LabwarePositionCheckInner = (
       />
     )
   }
+  const wizardHeader = (
+    <WizardHeader
+      title={t('labware_position_check_title')}
+      currentStep={currentStepIndex}
+      totalSteps={totalStepCount}
+      onExit={
+        showConfirmation || isExiting
+          ? undefined
+          : () => {
+              if (fatalError != null) {
+                handleCleanUpAndClose()
+              } else {
+                confirmExitLPC()
+              }
+            }
+      }
+    />
+  )
   return (
     <Portal level="top">
-      <ModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={t('labware_position_check_title')}
-            currentStep={currentStepIndex}
-            totalSteps={totalStepCount}
-            onExit={showConfirmation ? null : confirmExitLPC}
-          />
-        }
-      >
-        {modalContent}
-      </ModalShell>
+      {isOnDevice ? (
+        <LegacyModalShell fullPage>
+          {wizardHeader}
+          {modalContent}
+        </LegacyModalShell>
+      ) : (
+        <LegacyModalShell width="47rem" header={wizardHeader}>
+          {modalContent}
+        </LegacyModalShell>
+      )}
     </Portal>
   )
 }
-
-// NOTE: we are memoizing on the run id here, because this flow cannot be launched
-// until the robot analysis loads (which requires a stable run), other components that
-// rendered nearby will cause the run to be periodically polled for updates
-// and we don't need those polls causing unnecessary rerenders to the LPC flow
-export const LabwarePositionCheckComponent = React.memo(
-  LabwarePositionCheckInner,
-  ({ runId: prevRunId }, { runId: nextRunId }) => prevRunId === nextRunId
-)

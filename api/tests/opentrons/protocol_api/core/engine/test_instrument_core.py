@@ -277,6 +277,7 @@ def test_drop_tip_no_location(
                 offset=WellOffset(x=0, y=0, z=0),
             ),
             home_after=True,
+            alternateDropLocation=False,
         ),
         times=1,
     )
@@ -312,6 +313,7 @@ def test_drop_tip_with_location(
                 origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             home_after=True,
+            alternateDropLocation=False,
         ),
         times=1,
     )
@@ -700,6 +702,20 @@ def test_get_max_volume(
         )
     ).then_return(4.56)
     assert subject.get_max_volume() == 4.56
+
+
+def test_get_working_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's working volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_working_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(7.89)
+    assert subject.get_working_volume() == 7.89
 
 
 def test_get_channels(

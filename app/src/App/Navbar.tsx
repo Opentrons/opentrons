@@ -3,20 +3,20 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
-  Flex,
-  COLORS,
-  Icon,
-  Link,
-  DIRECTION_COLUMN,
-  FLEX_NONE,
-  SPACING,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  COLORS,
+  DIRECTION_COLUMN,
+  FLEX_NONE,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
+  Link,
   SIZE_2,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import logoSvg from '../assets/images/logo_nav.svg'
@@ -76,7 +76,7 @@ const IconLink = styled(Link)`
 const NavbarIcon = styled(Icon)`
   width: ${SIZE_2};
   height: ${SIZE_2};
-  padding: 0.375rem;
+  padding: ${SPACING.spacing6};
   border-radius: 50%;
   color: ${COLORS.medGreyEnabled};
   background-color: ${COLORS.transparent};
@@ -104,7 +104,7 @@ const NavbarIcon = styled(Icon)`
 
 const LogoImg = styled('img')`
   align-self: ${ALIGN_CENTER};
-  margin: ${SPACING.spacing5} 0;
+  margin: ${SPACING.spacing24} 0;
 `
 
 export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
@@ -135,7 +135,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
           <NavbarLink key={name} to={navLinkTo as string}>
             <StyledText
               as="h3"
-              margin={`${SPACING.spacing3} 0 ${SPACING.spacing3} 0.75rem`}
+              margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} ${SPACING.spacing12}`}
             >
               {name}
             </StyledText>
@@ -143,7 +143,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         ))}
       </Flex>
       <Flex
-        marginBottom={SPACING.spacing3}
+        marginBottom={SPACING.spacing8}
         alignSelf={ALIGN_STRETCH}
         justifyContent={JUSTIFY_SPACE_EVENLY}
       >

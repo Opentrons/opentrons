@@ -3,9 +3,11 @@
 #  dataclass fields interpretation.
 #  from __future__ import annotations
 from dataclasses import dataclass, field, asdict
-from . import message_definitions
-from typing import Iterator
+from typing import Iterator, List
 
+from opentrons_shared_data.errors.exceptions import InternalMessageFormatError
+
+from . import message_definitions
 from .fields import (
     FirmwareShortSHADataField,
     VersionFlagsField,
@@ -27,6 +29,7 @@ from .fields import (
     MoveStopConditionField,
     GearMotorIdField,
     OptionalRevisionField,
+    MotorUsageTypeField,
 )
 from .. import utils
 
@@ -183,8 +186,8 @@ class AddToMoveGroupRequestPayload(MoveGroupRequestPayload):
 class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
     """Add a linear move request to a message group."""
 
-    acceleration: utils.Int32Field
-    velocity: utils.Int32Field
+    acceleration_um: utils.Int32Field
+    velocity_mm: utils.Int32Field
     request_stop_condition: MoveStopConditionField
 
 
@@ -192,7 +195,7 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 class HomeRequestPayload(AddToMoveGroupRequestPayload):
     """Request to home."""
 
-    velocity: utils.Int32Field
+    velocity_mm: utils.Int32Field
 
 
 @dataclass(eq=False)
@@ -313,14 +316,16 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
         data_length = len(self.data.value)
         address = self.address.value
         if address % 8 != 0:
-            raise ValueError(
-                f"Data address needs to be doubleword aligned."
-                f" {address} mod 8 equals {address % 8} and should be 0"
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data address needs to be doubleword aligned."
+                f" {address} mod 8 equals {address % 8} and should be 0",
+                detail={"address": address},
             )
         if data_length > FirmwareUpdateDataField.NUM_BYTES:
-            raise ValueError(
-                f"Data cannot be more than"
-                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}."
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data cannot be more than"
+                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}.",
+                detail={"size": data_length},
             )
 
     @classmethod
@@ -545,6 +550,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
     request_stop_condition: MoveStopConditionField
+    acceleration: utils.Int32Field
 
 
 @dataclass(eq=False)
@@ -568,3 +574,40 @@ class SerialNumberPayload(EmptyPayload):
     """A payload with a serial number."""
 
     serial: SerialField
+
+
+@dataclass(eq=False)
+class _GetMotorUsageResponsePayloadBase(EmptyPayload):
+    num_elements: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
+    """A payload with motor lifetime usage."""
+
+    @classmethod
+    def build(cls, data: bytes) -> "GetMotorUsageResponsePayload":
+        """Build a response payload from incoming bytes.
+
+        This override is required to handle responses with multiple values.
+        """
+        consumed = _GetMotorUsageResponsePayloadBase.get_size()
+        superdict = asdict(_GetMotorUsageResponsePayloadBase.build(data))
+        num_elements = superdict["num_elements"]
+        message_index = superdict.pop("message_index")
+
+        usage_values: List[MotorUsageTypeField] = []
+
+        for i in range(num_elements.value):
+            usage_values.append(
+                MotorUsageTypeField.build(
+                    data[consumed : consumed + MotorUsageTypeField.NUM_BYTES]
+                )
+            )
+            consumed = consumed + MotorUsageTypeField.NUM_BYTES
+
+        inst = cls(**superdict, usage_elements=usage_values)
+        inst.message_index = message_index
+        return inst
+
+    usage_elements: List[MotorUsageTypeField]

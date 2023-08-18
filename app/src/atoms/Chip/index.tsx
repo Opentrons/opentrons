@@ -13,11 +13,11 @@ import {
 
 import { StyledText } from '../text'
 
-import type { IconName } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 
-export type ChipType = 'basic' | 'success' | 'warning' | 'neutral'
+export type ChipType = 'basic' | 'error' | 'neutral' | 'success' | 'warning'
 
-interface ChipProps {
+interface ChipProps extends StyleProps {
   /** Display background color? */
   background?: boolean
   /** Chip icon */
@@ -39,37 +39,43 @@ const CHIP_PROPS_BY_TYPE: Record<
   }
 > = {
   basic: {
-    backgroundColor: COLORS.darkBlack_twenty,
-    borderRadius: BORDERS.size_one,
-    textColor: COLORS.darkBlack_ninety,
+    backgroundColor: COLORS.darkBlack20,
+    borderRadius: BORDERS.borderRadiusSize1,
+    textColor: COLORS.darkBlack90,
+  },
+  error: {
+    backgroundColor: COLORS.red3,
+    borderRadius: BORDERS.borderRadiusSize5,
+    iconColor: COLORS.red1,
+    textColor: COLORS.red1,
   },
   neutral: {
-    backgroundColor: COLORS.darkBlack_twenty,
-    borderRadius: BORDERS.size_six,
-    iconColor: COLORS.darkBlack_ninety,
-    textColor: COLORS.darkBlack_seventy,
+    backgroundColor: COLORS.darkBlack20,
+    borderRadius: BORDERS.borderRadiusSize5,
+    iconColor: COLORS.darkBlack90,
+    textColor: COLORS.darkBlack70,
   },
   success: {
-    backgroundColor: COLORS.green_three,
-    borderRadius: BORDERS.size_six,
-    iconColor: COLORS.green_one,
+    backgroundColor: COLORS.green3,
+    borderRadius: BORDERS.borderRadiusSize5,
+    iconColor: COLORS.green1,
     iconName: 'ot-check',
-    textColor: COLORS.green_one,
+    textColor: COLORS.green1,
   },
   warning: {
-    backgroundColor: COLORS.yellow_three,
-    borderRadius: BORDERS.size_six,
-    iconColor: COLORS.yellow_two,
-    textColor: COLORS.yellow_one,
+    backgroundColor: COLORS.yellow3,
+    borderRadius: BORDERS.borderRadiusSize5,
+    iconColor: COLORS.yellow1,
+    textColor: COLORS.yellow1,
   },
 }
 
-// ToDo (kj:02/09/2023) replace hard-coded values when the DS is out
 export function Chip({
   background,
   iconName,
   type,
   text,
+  ...styleProps
 }: ChipProps): JSX.Element {
   const backgroundColor =
     background === false && type !== 'basic'
@@ -82,9 +88,12 @@ export function Chip({
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-      gridGap={SPACING.spacing3}
+      padding={`${SPACING.spacing8} ${
+        background === false ? 0 : SPACING.spacing16
+      }`}
+      gridGap={SPACING.spacing8}
       data-testid={`Chip_${type}`}
+      {...styleProps}
     >
       {type !== 'basic' && (
         <Icon
@@ -96,8 +105,8 @@ export function Chip({
         />
       )}
       <StyledText
-        fontSize="1.25rem"
-        lineHeight="1.6875rem"
+        fontSize={TYPOGRAPHY.fontSize22}
+        lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         color={CHIP_PROPS_BY_TYPE[type].textColor}
       >

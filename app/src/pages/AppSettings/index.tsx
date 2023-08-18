@@ -45,25 +45,23 @@ export function AppSettings(): JSX.Element {
   )
 
   return (
-    <Flex paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
+    <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
       <Box
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        border={`${String(SPACING.spacingXXS)} ${String(
-          BORDERS.styleSolid
-        )} ${String(COLORS.medGreyEnabled)}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >
-        <Box padding={SPACING.spacing4} paddingBottom="0">
-          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
+        <Box padding={SPACING.spacing16} paddingBottom="0">
+          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing24}>
             {t('app_settings')}
           </Text>
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacingM}
+            gridGap={SPACING.spacing20}
           >
             <NavTab to="/app-settings/general" tabName={t('general')} />
             <NavTab to="/app-settings/privacy" tabName={t('privacy')} />

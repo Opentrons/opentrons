@@ -1,3 +1,5 @@
+:og:description: How to define positions within an Opentrons robot and alter its speed and trajectory.
+
 .. _robot-position:
 
 ########################

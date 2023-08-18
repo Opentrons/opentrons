@@ -7,11 +7,11 @@
       "minimum": 0
     },
     "channels": {
-      "enum": [1, 8]
+      "enum": [1, 8, 96]
     },
     "displayCategory": {
       "type": "string",
-      "enum": ["GEN1", "GEN2", "GEN3"]
+      "enum": ["GEN1", "GEN2", "FLEX"]
     },
     "valuesByApiLevel": {
       "type": "object",

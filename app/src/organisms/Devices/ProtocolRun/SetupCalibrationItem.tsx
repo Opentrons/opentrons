@@ -59,7 +59,7 @@ export function SetupCalibrationItem({
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="2.5rem" // 40px
-      padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
     >
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -71,11 +71,11 @@ export function SetupCalibrationItem({
                   ? COLORS.successEnabled
                   : COLORS.warningEnabled
               }
-              marginRight={SPACING.spacing4}
+              marginRight={SPACING.spacing16}
               name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
             />
           ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {label != null && (
               <StyledText
                 color={COLORS.darkGreyEnabled}

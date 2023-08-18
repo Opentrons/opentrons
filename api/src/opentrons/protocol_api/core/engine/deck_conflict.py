@@ -9,9 +9,11 @@ from opentrons.protocol_engine import (
     StateView,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
+from opentrons.types import DeckSlotName
 
 
 @overload
@@ -66,13 +68,6 @@ def check(
         opentrons.motion_planning.deck_conflict.DeckConflictError:
             If the newly-added item conflicts with one of the existing items.
     """
-    if engine_state.config.robot_type == "OT-3 Standard":
-        # No-op if this is an OT-3 deck, for now.
-        #
-        # todo(mm, 2023-02-24): Support deck conflict checking for the OT-3.
-        # This will likely require adding support for it in the underlying
-        # wrapped_deck_conflict.check() function.
-        return
 
     if new_labware_id is not None:
         new_location_and_item = _map_labware(engine_state, new_labware_id)
@@ -95,7 +90,7 @@ def check(
     )
     mapped_existing_modules = (m for m in all_existing_modules if m is not None)
 
-    existing_items: Dict[int, wrapped_deck_conflict.DeckItem] = {}
+    existing_items: Dict[DeckSlotName, wrapped_deck_conflict.DeckItem] = {}
     for existing_location, existing_item in itertools.chain(
         mapped_existing_labware, mapped_existing_modules
     ):
@@ -106,20 +101,21 @@ def check(
         existing_items=existing_items,
         new_item=new_item,
         new_location=new_location,
+        robot_type=engine_state.config.robot_type,
     )
 
 
 def _map_labware(
     engine_state: StateView,
     labware_id: str,
-) -> Optional[Tuple[int, wrapped_deck_conflict.DeckItem]]:
+) -> Optional[Tuple[DeckSlotName, wrapped_deck_conflict.DeckItem]]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
 
     if isinstance(location_from_engine, DeckSlotLocation):
         # This labware is loaded directly into a deck slot.
         # Map it to a wrapped_deck_conflict.Labware.
         return (
-            _deck_slot_to_int(location_from_engine),
+            location_from_engine.slotName,
             wrapped_deck_conflict.Labware(
                 name_for_errors=engine_state.labware.get_load_name(
                     labware_id=labware_id
@@ -139,6 +135,10 @@ def _map_labware(
         # let _map_module() pick it up.
         return None
 
+    elif isinstance(location_from_engine, OnLabwareLocation):
+        # TODO(jbl 2023-06-08) check if we need to do any logic here or if this is correct
+        return None
+
     elif location_from_engine == OFF_DECK_LOCATION:
         # This labware is off-deck. Exclude it from conflict checking.
         # todo(mm, 2023-02-23): Move this logic into wrapped_deck_conflict.
@@ -148,12 +148,10 @@ def _map_labware(
 def _map_module(
     engine_state: StateView,
     module_id: str,
-) -> Optional[Tuple[int, wrapped_deck_conflict.DeckItem]]:
-    module_model = engine_state.modules.get_model(module_id=module_id)
+) -> Optional[Tuple[DeckSlotName, wrapped_deck_conflict.DeckItem]]:
+    module_model = engine_state.modules.get_connected_model(module_id=module_id)
     module_type = module_model.as_type()
-    mapped_location = _deck_slot_to_int(
-        engine_state.modules.get_location(module_id=module_id)
-    )
+    mapped_location = engine_state.modules.get_location(module_id=module_id).slotName
 
     # Use the module model (e.g. "temperatureModuleV1") as the name for error messages
     # because it's convenient for us. Unfortunately, this won't necessarily match

@@ -23,18 +23,23 @@ import {
 } from '../hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { SetupLabware } from './SetupLabware'
+import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupModules } from './SetupModules'
 import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
+import { EmptySetupStep } from './EmptySetupStep'
+
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
+const LPC_KEY = 'labware_position_check_step' as const
 const LABWARE_SETUP_KEY = 'labware_setup_step' as const
 const LIQUID_SETUP_KEY = 'liquid_setup_step' as const
 
 export type StepKey =
   | typeof ROBOT_CALIBRATION_STEP_KEY
   | typeof MODULE_SETUP_KEY
+  | typeof LPC_KEY
   | typeof LABWARE_SETUP_KEY
   | typeof LIQUID_SETUP_KEY
 
@@ -49,7 +54,7 @@ export function ProtocolRunSetup({
   robotName,
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -64,31 +69,18 @@ export function ProtocolRunSetup({
   )
   const [stepsKeysInOrder, setStepKeysInOrder] = React.useState<StepKey[]>([
     ROBOT_CALIBRATION_STEP_KEY,
+    LPC_KEY,
     LABWARE_SETUP_KEY,
   ])
 
   React.useEffect(() => {
     let nextStepKeysInOrder = stepsKeysInOrder
-    const showModuleSetup = protocolData != null && modules.length > 0
-    const showLiquidSetup =
-      protocolData != null && protocolData.liquids?.length > 0
 
-    if (showModuleSetup && showLiquidSetup) {
+    if (protocolData != null) {
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
         MODULE_SETUP_KEY,
-        LABWARE_SETUP_KEY,
-        LIQUID_SETUP_KEY,
-      ]
-    } else if (showModuleSetup) {
-      nextStepKeysInOrder = [
-        ROBOT_CALIBRATION_STEP_KEY,
-        MODULE_SETUP_KEY,
-        LABWARE_SETUP_KEY,
-      ]
-    } else if (showLiquidSetup) {
-      nextStepKeysInOrder = [
-        ROBOT_CALIBRATION_STEP_KEY,
+        LPC_KEY,
         LABWARE_SETUP_KEY,
         LIQUID_SETUP_KEY,
       ]
@@ -97,6 +89,8 @@ export function ProtocolRunSetup({
   }, [Boolean(protocolData), protocolData?.commands])
 
   if (robot == null) return null
+  const hasLiquids = protocolData != null && protocolData.liquids?.length > 0
+  const hasModules = protocolData != null && modules.length > 0
 
   const StepDetailMap: Record<
     StepKey,
@@ -126,14 +120,25 @@ export function ProtocolRunSetup({
     [MODULE_SETUP_KEY]: {
       stepInternals: (
         <SetupModules
-          expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+          expandLabwarePositionCheckStep={() => setExpandedStepKey(LPC_KEY)}
           robotName={robotName}
           runId={runId}
         />
       ),
-      description: t(`${MODULE_SETUP_KEY}_description`, {
-        count: modules.length,
-      }),
+      description: !hasModules
+        ? i18n.format(t('no_modules_specified'), 'capitalize')
+        : t(`${MODULE_SETUP_KEY}_description`, {
+            count: modules.length,
+          }),
+    },
+    [LPC_KEY]: {
+      stepInternals: (
+        <SetupLabwarePositionCheck
+          {...{ runId, robotName }}
+          expandLabwareStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+        />
+      ),
+      description: t('labware_position_check_step_description'),
     },
     [LABWARE_SETUP_KEY]: {
       stepInternals: (
@@ -160,15 +165,17 @@ export function ProtocolRunSetup({
           runId={runId}
         />
       ),
-      description: t(`${LIQUID_SETUP_KEY}_description`),
+      description: hasLiquids
+        ? t(`${LIQUID_SETUP_KEY}_description`)
+        : i18n.format(t('liquids_not_in_the_protocol'), 'capitalize'),
     },
   }
 
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      margin={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
+      margin={SPACING.spacing16}
     >
       {protocolData != null ? (
         <>
@@ -182,26 +189,35 @@ export function ProtocolRunSetup({
           ) : (
             stepsKeysInOrder.map((stepKey, index) => (
               <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
-                <SetupStep
-                  expanded={stepKey === expandedStepKey}
-                  label={t('step', { index: index + 1 })}
-                  title={t(`${stepKey}_title`)}
-                  description={StepDetailMap[stepKey].description}
-                  toggleExpanded={() =>
-                    stepKey === expandedStepKey
-                      ? setExpandedStepKey(null)
-                      : setExpandedStepKey(stepKey)
-                  }
-                  calibrationStatusComplete={
-                    stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
-                      ? calibrationStatus.complete
-                      : null
-                  }
-                >
-                  {StepDetailMap[stepKey].stepInternals}
-                </SetupStep>
+                {(stepKey === 'liquid_setup_step' && !hasLiquids) ||
+                (stepKey === 'module_setup_step' && !hasModules) ? (
+                  <EmptySetupStep
+                    title={t(`${stepKey}_title`)}
+                    description={StepDetailMap[stepKey].description}
+                    label={t('step', { index: index + 1 })}
+                  />
+                ) : (
+                  <SetupStep
+                    expanded={stepKey === expandedStepKey}
+                    label={t('step', { index: index + 1 })}
+                    title={t(`${stepKey}_title`)}
+                    description={StepDetailMap[stepKey].description}
+                    toggleExpanded={() =>
+                      stepKey === expandedStepKey
+                        ? setExpandedStepKey(null)
+                        : setExpandedStepKey(stepKey)
+                    }
+                    calibrationStatusComplete={
+                      stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
+                        ? calibrationStatus.complete
+                        : null
+                    }
+                  >
+                    {StepDetailMap[stepKey].stepInternals}
+                  </SetupStep>
+                )}
                 {index !== stepsKeysInOrder.length - 1 ? (
-                  <Line marginTop={SPACING.spacing5} />
+                  <Line marginTop={SPACING.spacing24} />
                 ) : null}
               </Flex>
             ))

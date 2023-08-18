@@ -16,21 +16,22 @@ import {
   ModuleModel,
   getModuleDisplayName,
   getModuleDef2,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
 import { useRunHasStarted } from './hooks'
+import type { PhysicalPort } from '../../redux/modules/api-types'
 
 export interface ModuleInfoProps {
   moduleModel: ModuleModel
   isAttached: boolean
-  usbPort: number | null
-  hubPort: number | null
+  physicalPort: PhysicalPort | null
   runId?: string
 }
 
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
-  const { moduleModel, usbPort, hubPort, isAttached, runId = null } = props
+  const { moduleModel, physicalPort, isAttached, runId = null } = props
   const moduleDef = getModuleDef2(moduleModel)
   const {
     xDimension,
@@ -41,14 +42,14 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
 
   const runHasStarted = useRunHasStarted(runId)
-
   let connectionStatus = t('no_usb_port_yet')
-  if (usbPort === null && hubPort === null && isAttached) {
+  if (moduleModel === MAGNETIC_BLOCK_V1) {
+    connectionStatus = t('no_usb_required')
+  }
+  if (physicalPort === null && isAttached) {
     connectionStatus = t('usb_connected_no_port_info')
-  } else if (hubPort === null && usbPort !== null && isAttached) {
-    connectionStatus = t('usb_port_connected', { port: usbPort })
-  } else if (hubPort !== null && isAttached) {
-    connectionStatus = t('hub_port_connected', { port: hubPort })
+  } else if (physicalPort != null && isAttached) {
+    connectionStatus = t('usb_port_connected', { port: physicalPort.port })
   }
 
   return (
@@ -57,22 +58,23 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
-      flexProps={{ padding: SPACING.spacing4 }}
+      flexProps={{ padding: SPACING.spacing16 }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing1}
+        gridGap={SPACING.spacing2}
         justifyContent={JUSTIFY_CENTER}
       >
-        {!runHasStarted ? (
+        {!runHasStarted && moduleModel !== MAGNETIC_BLOCK_V1 ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
               color={isAttached ? COLORS.successEnabled : COLORS.warningEnabled}
               key="icon"
               size="10px"
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
             />
+
             <StyledText
               color={COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}

@@ -16,6 +16,7 @@ LabwareDisplayCategory = Union[
     Literal["trash"],
     Literal["wellPlate"],
     Literal["aluminumBlock"],
+    Literal["adapter"],
     Literal["other"],
 ]
 
@@ -27,6 +28,13 @@ LabwareFormat = Union[
     Literal["trash"],
 ]
 
+LabwareRoles = Union[
+    Literal["labware"],
+    Literal["fixture"],
+    Literal["adapter"],
+    Literal["maintenance"],
+]
+
 Circular = Literal["circular"]
 Rectangular = Literal["rectangular"]
 WellShape = Union[Circular, Rectangular]
@@ -36,6 +44,11 @@ class NamedOffset(TypedDict):
     x: float
     y: float
     z: float
+
+
+class GripperOffsets(TypedDict):
+    pickUpOffset: NamedOffset
+    dropOffset: NamedOffset
 
 
 class LabwareParameters(TypedDict, total=False):
@@ -104,7 +117,7 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class LabwareDefinition(TypedDict):
+class _RequiredLabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
     namespace: str
@@ -116,3 +129,10 @@ class LabwareDefinition(TypedDict):
     dimensions: LabwareDimensions
     wells: Dict[str, WellDefinition]
     groups: List[WellGroup]
+
+
+class LabwareDefinition(_RequiredLabwareDefinition, total=False):
+    stackingOffsetWithLabware: Dict[str, NamedOffset]
+    stackingOffsetWithModule: Dict[str, NamedOffset]
+    allowedRoles: List[LabwareRoles]
+    gripperOffsets: Dict[str, GripperOffsets]

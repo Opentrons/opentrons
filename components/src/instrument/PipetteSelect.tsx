@@ -1,19 +1,18 @@
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-import { Flex } from '../primitives'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
   GEN1,
   GEN2,
+  FLEX,
 } from '@opentrons/shared-data'
+import { Flex } from '../primitives'
 import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
-
-import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
-
+import type { SelectOption } from '../forms'
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
   pipetteName?: string | null
@@ -68,14 +67,15 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
   }
+  const flexOptions = specsByCategory[FLEX].map(specToOption).filter(allowlist)
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
+    ...(flexOptions.length > 0 ? [{ options: flexOptions }] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
     ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
   ]
-
   const defaultValue = enableNoneOption ? OPTION_NONE : null
   const value =
     allPipetteNameSpecs
@@ -117,17 +117,17 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
 }
 
 const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
-  const { channels, displayName, displayCategory } = props
-  const volumeClassMaybeMatch = displayName && displayName.match(/P\d+/)
-  const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''
-
+  const { channels, name, displayCategory } = props
+  const volumeClassMaybeMatch = name && name.match(/p(\d+)/i)
+  const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[1] : ''
   let displayChannels = ''
   if (channels === 1) {
     displayChannels = 'Single-Channel'
   } else if (channels === 8) {
     displayChannels = '8-Channel'
+  } else if (channels === 96) {
+    displayChannels = '96-Channel'
   }
-
   return (
     <Flex
       data-test={dataIdFormat(
@@ -150,8 +150,15 @@ const dataIdFormat = (
   channels: number,
   displayCategory: string
 ): string => {
+  let dataIdFormatChannels
+  if (channels === 1) {
+    dataIdFormatChannels = 'SingleChannel'
+  } else if (channels === 8) {
+    dataIdFormatChannels = 'MultiChannel'
+  } else {
+    dataIdFormatChannels = '96-Channel'
+  }
   const dataIdFormatVolumeClass = volumeClass.toLowerCase()
-  const dataIdFormatChannels = channels === 1 ? 'SingleChannel' : 'MultiChannel'
   const dataIdFormatDisplayCategory =
     displayCategory.charAt(0) + displayCategory.slice(1).toLowerCase()
 

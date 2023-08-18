@@ -1,10 +1,9 @@
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import { isEqual } from 'lodash'
 import { SECTIONS } from '../constants'
 import { getLabwareDefinitionsFromCommands } from './labware'
 import {
   getLabwareDefURI,
   getIsTiprack,
-  getSlotHasMatingSurfaceUnitVector,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
@@ -21,7 +20,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { LabwareOffsetLocation } from '@opentrons/api-client'
+import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -31,29 +30,21 @@ interface LPCArgs {
   commands: RunTimeCommand[]
 }
 
-const OT2_STANDARD_DECK_DEF = standardDeckDef as any
-
-const PICK_UP_TIP_LOCATION: LabwareOffsetLocation = { slotName: '2' }
-
 export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
   if (checkTipRacksSectionSteps.length < 1) return []
-
+  const allButLastTiprackCheckSteps = checkTipRacksSectionSteps.slice(
+    0,
+    checkTipRacksSectionSteps.length - 1
+  )
   const lastTiprackCheckStep =
     checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
-  // TODO(BC, 2022-11-30): once robot model is available from analysis output, this should only
-  // be a conflict with heater shaker positioning on OT2's so something like `isOT2Protocol &&`
-  // should be prepended to this boolean
-  const cannotAccessDefaultPickUpTipLocation = args.modules.some(m =>
-    ['1', '3'].includes(m.location.slotName)
-  )
+
   const pickUpTipSectionStep: PickUpTipStep = {
     section: SECTIONS.PICK_UP_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: cannotAccessDefaultPickUpTipLocation
-      ? lastTiprackCheckStep.location
-      : PICK_UP_TIP_LOCATION,
+    location: lastTiprackCheckStep.location,
   }
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
@@ -61,14 +52,12 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     section: SECTIONS.RETURN_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: cannotAccessDefaultPickUpTipLocation
-      ? lastTiprackCheckStep.location
-      : PICK_UP_TIP_LOCATION,
+    location: lastTiprackCheckStep.location,
   }
 
   return [
     { section: SECTIONS.BEFORE_BEGINNING },
-    ...checkTipRacksSectionSteps,
+    ...allButLastTiprackCheckSteps,
     pickUpTipSectionStep,
     ...checkLabwareSectionSteps,
     returnTipSectionStep,
@@ -122,9 +111,23 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     ...onlySecondaryPipettePickUpTipCommands,
     ...uniqPrimaryPipettePickUpTipCommands,
   ].reduce<CheckTipRacksStep[]>((acc, { params }) => {
-    const labwareLocations = labwareLocationCombos.filter(
-      combo => combo.labwareId === params.labwareId
-    )
+    const labwareLocations = labwareLocationCombos.reduce<
+      LabwareLocationCombo[]
+    >((acc, labwareLocationCombo) => {
+      // remove labware that isn't accessed by a pickup tip command
+      if (labwareLocationCombo.labwareId !== params.labwareId) {
+        return acc
+      }
+      // remove duplicate definitionUri in same location
+      const comboAlreadyExists = acc.some(
+        accLocationCombo =>
+          labwareLocationCombo.definitionUri ===
+            accLocationCombo.definitionUri &&
+          isEqual(labwareLocationCombo.location, accLocationCombo.location)
+      )
+      return comboAlreadyExists ? acc : [...acc, labwareLocationCombo]
+    }, [])
+
     return [
       ...acc,
       ...labwareLocations.map(({ location }) => ({
@@ -163,13 +166,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       ...acc,
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
         (innerAcc, { location, labwareId, moduleId }) => {
-          if (
-            !getSlotHasMatingSurfaceUnitVector(
-              OT2_STANDARD_DECK_DEF,
-              location.slotName
-            ) ||
-            labwareId !== currentLabware.id
-          ) {
+          if (labwareId !== currentLabware.id) {
             return innerAcc
           }
 

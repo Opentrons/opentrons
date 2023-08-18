@@ -2,7 +2,7 @@
   "$otSharedSchema": "gripper/schemas/1",
   "model": "gripperV1",
   "schemaVersion": 1,
-  "displayName": "Gripper V1",
+  "displayName": "Flex Gripper",
   "gripForceProfile": {
     "polynomial": [
       [0, -0.282],

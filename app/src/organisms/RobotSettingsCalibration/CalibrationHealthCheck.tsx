@@ -18,7 +18,10 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+} from '../../redux/analytics'
 import * as Calibration from '../../redux/calibration'
 import * as Config from '../../redux/config'
 import * as Pipettes from '../../redux/pipettes'
@@ -126,18 +129,18 @@ export function CalibrationHealthCheck({
   const handleHealthCheckClick = (): void => {
     handleHealthCheck(null)
     doTrackEvent({
-      name: 'calibrationHealthCheckButtonClicked',
+      name: ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
       properties: {},
     })
   }
 
   return (
     <Flex
-      paddingY={SPACING.spacing5}
+      paddingY={SPACING.spacing24}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('calibration_health_check_title')}
         </StyledText>

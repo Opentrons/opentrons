@@ -5,7 +5,7 @@
 ################################################################################
 
 define OTUPDATESERVER_CALL_PBU
-	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server robot-stack $(1))
+	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
 
 PYTHON_OPENTRONS_UPDATE_SERVER_VERSION = $(call OTUPDATESERVER_CALL_PBU,get_version)
@@ -36,6 +36,7 @@ define PYTHON_OPENTRONS_UPDATE_SERVER_INSTALL_INIT_SYSTEMD
   ln -sf ../opentrons-update-server.service \
     $(TARGET_DIR)/etc/systemd/system/opentrons.target.wants/opentrons-update-server.service
 endef
+export OPENTRONS_GIT_DIR=$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 
 # Calling inner-python-package directly instead of using python-package macro
 # because our directory layout doesn’t conform to buildroot’s expectation of

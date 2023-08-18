@@ -6,13 +6,16 @@ import { FilePage, Props } from '../FilePage'
 import { EditModules } from '../EditModules'
 import { EditModulesCard } from '../modules'
 import { ModulesForEditModulesCard } from '../../step-forms'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
 
 jest.mock('../EditModules')
 jest.mock('../../step-forms/utils')
 jest.mock('../../step-forms/selectors')
 jest.mock('../../feature-flags')
+jest.mock('../../file-data/selectors')
 
 const editModulesMock: jest.MockedFunction<any> = EditModules
+const editGetAdditionalEquipment: jest.MockedFunction<any> = getAdditionalEquipment
 
 describe('File Page', () => {
   let props: Props
@@ -32,6 +35,7 @@ describe('File Page', () => {
       getState: () => ({ mock: 'this is a mocked out getState' }),
     }
     editModulesMock.mockImplementation(() => <div>mock edit modules</div>)
+    editGetAdditionalEquipment.mockReturnValue({})
   })
 
   const render = (props: Props) =>

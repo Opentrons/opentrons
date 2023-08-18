@@ -7,6 +7,7 @@ import {
   LabwareDefinition2,
   ModuleType,
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../labware-defs'
 import { LabwareOnDeck } from '../step-forms'
@@ -46,6 +47,7 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'usascientific_96_wellplate_2.4ml_deep',
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
@@ -56,6 +58,12 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
     'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
     'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  ],
+  [MAGNETIC_BLOCK_TYPE]: [
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
 }
 export const getLabwareIsCompatible = (

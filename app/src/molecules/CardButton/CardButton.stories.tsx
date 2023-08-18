@@ -21,7 +21,7 @@ export default {
 
 const Template: Story<React.ComponentProps<typeof CardButton>> = args => (
   <MemoryRouter>
-    <Flex marginTop={SPACING.spacing4}>
+    <Flex marginTop={SPACING.spacing16} width="15.375rem" height="17rem">
       <CardButton {...args} />
     </Flex>
   </MemoryRouter>
@@ -29,10 +29,9 @@ const Template: Story<React.ComponentProps<typeof CardButton>> = args => (
 
 export const Primary = Template.bind({})
 Primary.args = {
-  cardWidth: '19rem',
-  cardHeight: '21.875rem',
-  title: 'Wi-Fi',
+  title: 'Header',
   iconName: 'wifi',
-  description: 'Find a network in your lab or enter your own.',
-  distPath: '/app-molecules-cardbutton--primary',
+  description: 'Subtext.',
+  destinationPath: '/app-molecules-cardbutton--primary',
+  disabled: false,
 }

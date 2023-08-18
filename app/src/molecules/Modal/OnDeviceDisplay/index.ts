@@ -1,1 +1,0 @@
-export { TooManyPinsModal } from './TooManyPinsModal'

@@ -60,7 +60,6 @@ describe('LevelPipette', () => {
     props = {
       mount: LEFT,
       pipetteModelName: MOCK_WANTED_PIPETTE.name,
-      back: jest.fn(),
       confirm: jest.fn(),
     }
   })
@@ -75,7 +74,7 @@ describe('LevelPipette', () => {
     )
     getByText(
       nestedTextMatcher(
-        'Place the calibration block in slot 1/3 with the tall/short surface on the left/right side.'
+        'Place the calibration block in slot 3 with the tall surface on the left side.'
       )
     )
     getByText(
@@ -91,12 +90,9 @@ describe('LevelPipette', () => {
     getByText(nestedTextMatcher('Gently and slowly push the pipette back up.'))
   })
 
-  it('the CTAs should be clickable', () => {
+  it('the CTA should be clickable', () => {
     const { getByRole } = render(props)
-    const goBack = getByRole('button', { name: 'Go back' })
     const cont = getByRole('button', { name: 'Confirm level' })
-    fireEvent.click(goBack)
-    expect(props.back).toHaveBeenCalled()
     fireEvent.click(cont)
     expect(props.confirm).toHaveBeenCalled()
   })

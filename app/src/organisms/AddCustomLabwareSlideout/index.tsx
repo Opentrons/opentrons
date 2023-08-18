@@ -15,7 +15,10 @@ import {
 } from '../../redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_ADD_CUSTOM_LABWARE,
+} from '../../redux/analytics'
 import { UploadInput } from '../../molecules/UploadInput'
 import type { Dispatch } from '../../redux/types'
 
@@ -40,7 +43,7 @@ export function AddCustomLabwareSlideout(
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         <UploadInput
           onUpload={(file: File) => {
@@ -49,7 +52,7 @@ export function AddCustomLabwareSlideout(
           onClick={() => {
             dispatch(addCustomLabware())
             trackEvent({
-              name: 'addCustomLabware',
+              name: ANALYTICS_ADD_CUSTOM_LABWARE,
               properties: {},
             })
           }}

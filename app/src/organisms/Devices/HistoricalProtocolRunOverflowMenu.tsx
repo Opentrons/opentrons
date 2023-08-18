@@ -18,10 +18,7 @@ import {
   SIZE_1,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import {
-  useDeleteRunMutation,
-  useAllCommandsQuery,
-} from '@opentrons/react-api-client'
+import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { Divider } from '../../atoms/structure'
 import { Tooltip } from '../../atoms/Tooltip'
@@ -29,7 +26,11 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+} from '../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
 
@@ -55,6 +56,10 @@ export function HistoricalProtocolRunOverflowMenu(
   const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
+  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
+    props.robotName,
+    runId
+  )
 
   return (
     <Flex
@@ -69,7 +74,12 @@ export function HistoricalProtocolRunOverflowMenu(
             ref={protocolRunOverflowWrapperRef}
             data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
           >
-            <MenuDropdown {...props} closeOverflowMenu={handleOverflowClick} />
+            <MenuDropdown
+              {...props}
+              downloadRunLog={downloadRunLog}
+              isRunLogLoading={isRunLogLoading}
+              closeOverflowMenu={handleOverflowClick}
+            />
           </Box>
           {menuOverlay}
         </>
@@ -80,25 +90,21 @@ export function HistoricalProtocolRunOverflowMenu(
 
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
+  downloadRunLog: () => void
+  isRunLogLoading: boolean
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
 
-  const { runId, robotName, robotIsBusy, closeOverflowMenu } = props
-
-  const commands = useAllCommandsQuery(
+  const {
     runId,
-    { cursor: 0, pageLength: 0 },
-    { staleTime: Infinity }
-  )
-  const runTotalCommandCount = commands?.data?.meta?.totalLength ?? 0
-
-  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
     robotName,
-    runId,
-    runTotalCommandCount
-  )
+    robotIsBusy,
+    closeOverflowMenu,
+    downloadRunLog,
+    isRunLogLoading,
+  } = props
 
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
@@ -129,10 +135,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
     reset()
     trackEvent({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'HistoricalProtocolRun' },
     })
-    trackProtocolRunEvent({ name: 'runAgain' })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -177,7 +183,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         disabled={isRunLogLoading}
         onClick={onDownloadClick}
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {t('download_run_log')}
           {isRunLogLoading ? (
             <Icon

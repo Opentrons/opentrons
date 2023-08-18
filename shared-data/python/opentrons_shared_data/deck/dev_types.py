@@ -98,7 +98,18 @@ class LocationsV3(TypedDict):
     fixtures: List[Fixture]
 
 
-class DeckDefinitionV3(TypedDict):
+class NamedOffset(TypedDict):
+    x: float
+    y: float
+    z: float
+
+
+class GripperOffsets(TypedDict):
+    pickUpOffset: NamedOffset
+    dropOffset: NamedOffset
+
+
+class _RequiredDeckDefinitionV3(TypedDict):
     otId: str
     schemaVersion: Literal[3]
     cornerOffsetFromOrigin: List[float]
@@ -107,6 +118,10 @@ class DeckDefinitionV3(TypedDict):
     robot: Robot
     locations: LocationsV3
     layers: List[INode]
+
+
+class DeckDefinitionV3(_RequiredDeckDefinitionV3, total=False):
+    gripperOffsets: Dict[str, GripperOffsets]
 
 
 DeckDefinition = DeckDefinitionV3

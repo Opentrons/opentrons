@@ -15,6 +15,7 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from '../utils'
+import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { ProtocolSetupModules } from '..'
 
 jest.mock('@opentrons/shared-data/js/helpers')
@@ -24,6 +25,7 @@ jest.mock(
 )
 jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../utils')
+jest.mock('../SetupInstructionsModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -42,6 +44,9 @@ const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jes
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
+>
+const mockSetupInstructionsModal = SetupInstructionsModal as jest.MockedFunction<
+  typeof SetupInstructionsModal
 >
 
 const RUN_ID = "otie's run"
@@ -79,6 +84,9 @@ describe('ProtocolSetupModules', () => {
     when(mockGetDeckDefFromRobotType)
       .calledWith('OT-3 Standard')
       .mockReturnValue(ot3StandardDeckDef as any)
+    mockSetupInstructionsModal.mockReturnValue(
+      <div>mock SetupInstructionsModal</div>
+    )
   })
 
   afterEach(() => {
@@ -88,26 +96,23 @@ describe('ProtocolSetupModules', () => {
 
   it('should render text and buttons', () => {
     const [{ getByRole, getByText }] = render()
-    getByText('Modules')
     getByText('Module Name')
     getByText('Location')
     getByText('Status')
-    getByRole('button', { name: 'Setup Instructions' })
-    getByRole('button', { name: 'continue' })
-    getByRole('button', { name: 'Deck Map' })
+    getByText('Setup Instructions')
+    getByRole('button', { name: 'Map View' })
   })
 
   it('should launch deck map on button click', () => {
-    const [{ getByRole, getByText }] = render()
+    const [{ getByRole }] = render()
 
-    getByRole('button', { name: 'Deck Map' }).click()
-    getByText('Map View')
+    getByRole('button', { name: 'Map View' }).click()
   })
 
   it('should launch setup instructions modal on button click', () => {
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
-    getByRole('button', { name: 'Setup Instructions' }).click()
-    getByText('TODO: setup instructions modal')
+    getByText('Setup Instructions').click()
+    getByText('mock SetupInstructionsModal')
   })
 })

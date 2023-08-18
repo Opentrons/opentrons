@@ -92,6 +92,8 @@ MessageDefinition = Union[
     defs.SetGripperErrorTolerance,
     defs.PushTipPresenceNotification,
     defs.TipStatusQueryRequest,
+    defs.GetMotorUsageRequest,
+    defs.GetMotorUsageResponse,
 ]
 
 

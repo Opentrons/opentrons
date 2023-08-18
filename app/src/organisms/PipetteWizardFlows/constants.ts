@@ -1,6 +1,5 @@
 import { css } from 'styled-components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
-import { TYPOGRAPHY } from '@opentrons/components'
+import { TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
 
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
@@ -11,6 +10,7 @@ export const SECTIONS = {
   DETACH_PIPETTE: 'DETACH_PIPETTE',
   MOUNTING_PLATE: 'MOUNTING_PLATE',
   CARRIAGE: 'CARRIAGE',
+  FIRMWARE_UPDATE: 'FIRMWARE_UPDATE',
 } as const
 
 export const FLOWS = {
@@ -33,11 +33,12 @@ export const CALIBRATION_PROBE = {
 export const HEX_SCREWDRIVER = {
   loadName: 'hex_screwdriver',
   displayName: HEX_SCREWDRIVER_DISPLAY_NAME,
+  //  TODO(jr, 4/3/23): add this subtitle to i18n
   subtitle:
-    'Provided with robot. Using another size can strip the instruments’s screws.',
+    'Provided with the robot. Using another size can strip the instruments’s screws.',
 }
 export const PIPETTE = {
-  loadName: 'gen3_pipette',
+  loadName: 'flex_pipette',
   displayName: PIPETTE_DISPLAY_NAME,
 }
 export const NINETY_SIX_CHANNEL_PIPETTE = {
@@ -52,7 +53,7 @@ export const NINETY_SIX_CHANNEL_MOUNTING_PLATE = {
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.275rem;
     line-height: 1.75rem;
   }

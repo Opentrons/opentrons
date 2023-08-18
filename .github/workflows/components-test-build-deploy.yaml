@@ -110,12 +110,18 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)

@@ -50,6 +50,10 @@ Use `hardware_testing.liquid.height` to automatically tracking volumes and liqui
 
 Use `hardware_testing.liquid.liquid_class` to define liquid class parameters given a specific liquid-pipette-tip combination.
 
+#### [gravimetric](./hardware_testing/gravimetric/README.md)
+
+Scripts and methods for running gravimetric and photometric tests
+
 #### [measure](./hardware_testing/measure/README.md)
 
 Classes and methods for measuring aspects of a test. Currently just implements a `weight` measurement, but should also include `distance` (eg: dial-indicator), `temperature` (eg: thermocouple), and more.

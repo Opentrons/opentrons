@@ -22,17 +22,17 @@
       "shape": "rectangular",
       "xDimension": 20,
       "yDimension": 20,
-      "x": 97.88,
-      "y": 42.74,
-      "z": 21.61
+      "x": 92.88,
+      "y": 40.25,
+      "z": 22.75
     },
     "B1": {
       "depth": 0,
       "totalLiquidVolume": 0,
       "shape": "circular",
       "diameter": 1,
-      "x": 110.88,
-      "y": 55.74,
+      "x": 105.88,
+      "y": 53.25,
       "z": 27.5
     }
   },

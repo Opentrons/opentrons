@@ -1,5 +1,6 @@
 import type {
   DiscoveryClientRobot,
+  DiscoveryClientRobotAddress,
   HealthResponse,
   HealthStatus,
 } from '@opentrons/discovery-client'
@@ -13,7 +14,7 @@ import {
   ROBOT_MODEL_OT3,
 } from './constants'
 
-export type { DiscoveryClientRobot, HealthStatus }
+export type { DiscoveryClientRobot, DiscoveryClientRobotAddress, HealthStatus }
 
 export type RobotsMap = Record<string, DiscoveryClientRobot>
 

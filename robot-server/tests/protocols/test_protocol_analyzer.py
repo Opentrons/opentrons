@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
     types as pe_types,
 )
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
+import opentrons.protocol_runner as protocol_runner
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -22,10 +22,13 @@ from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 
 
-@pytest.fixture
-def protocol_runner(decoy: Decoy) -> ProtocolRunner:
-    """Get a mocked out ProtocolRunner."""
-    return decoy.mock(cls=ProtocolRunner)
+@pytest.fixture(autouse=True)
+def patch_mock_create_simulating_runner(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace protocol_runner.check() with a mock."""
+    mock = decoy.mock(func=protocol_runner.create_simulating_runner)
+    monkeypatch.setattr(protocol_runner, "create_simulating_runner", mock)
 
 
 @pytest.fixture
@@ -36,19 +39,16 @@ def analysis_store(decoy: Decoy) -> AnalysisStore:
 
 @pytest.fixture
 def subject(
-    protocol_runner: ProtocolRunner,
     analysis_store: AnalysisStore,
 ) -> ProtocolAnalyzer:
     """Get a ProtocolAnalyzer test subject."""
     return ProtocolAnalyzer(
-        protocol_runner=protocol_runner,
         analysis_store=analysis_store,
     )
 
 
 async def test_analyze(
     decoy: Decoy,
-    protocol_runner: ProtocolRunner,
     analysis_store: AnalysisStore,
     subject: ProtocolAnalyzer,
 ) -> None:
@@ -97,8 +97,17 @@ async def test_analyze(
         mount=MountType.LEFT,
     )
 
-    decoy.when(await protocol_runner.run(protocol_resource.source)).then_return(
-        ProtocolRunResult(
+    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+
+    decoy.when(
+        await protocol_runner.create_simulating_runner(
+            robot_type="OT-3 Standard",
+            protocol_config=JsonProtocolConfig(schema_version=123),
+        )
+    ).then_return(json_runner)
+
+    decoy.when(await json_runner.run(protocol_resource.source)).then_return(
+        protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
                 status=EngineStatus.SUCCEEDED,

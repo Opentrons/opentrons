@@ -87,6 +87,9 @@ class LegacyModuleCore(AbstractModuleCore):
         """Get the module's deck slot."""
         return DeckSlotName.from_primitive(self._geometry.parent)  # type: ignore[arg-type]
 
+    def get_deck_slot_id(self) -> str:
+        return self.get_deck_slot().id
+
     def get_display_name(self) -> str:
         """Get the module's display name."""
         return self._geometry.display_name
@@ -538,7 +541,7 @@ class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
             pipette_location=protocol_core.get_last_location()
         ):
             hardware = protocol_core.get_hardware()
-            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            hardware.home(axes=[axis for axis in Axis.ot2_mount_axes()])
             protocol_core.set_last_location(None)
 
     def _prepare_for_latch_open(self) -> None:
@@ -551,7 +554,7 @@ class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
             pipette_location=protocol_core.get_last_location()
         ):
             hardware = protocol_core.get_hardware()
-            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            hardware.home(axes=[axis for axis in Axis.ot2_mount_axes()])
             protocol_core.set_last_location(None)
 
 

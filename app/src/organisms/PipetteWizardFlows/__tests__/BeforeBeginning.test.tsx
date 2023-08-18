@@ -8,17 +8,13 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedGen3Pipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../../CalibrationPanels'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { FLOWS } from '../constants'
 import { getIsGantryEmpty } from '../utils'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
@@ -41,10 +37,7 @@ const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedGen3Pipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('BeforeBeginning', () => {
   let props: React.ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
@@ -56,15 +49,16 @@ describe('BeforeBeginning', () => {
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
-      createRun: jest.fn(),
+      createMaintenanceRun: jest.fn(),
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
       isOnDevice: false,
+      requiredPipette: undefined,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -78,10 +72,10 @@ describe('BeforeBeginning', () => {
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
       getByText(
-        'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText('You will need:')
       // getByText('mock need help link')
@@ -95,9 +89,10 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -151,19 +146,70 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByAltText('1- or 8-Channel Pipette')
       getByText('You will need:')
       getByAltText('Calibration Probe')
       getByAltText('2.5 mm Hex Screwdriver')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
+    it('renders the attach flow when swapping pipettes is needed', async () => {
+      props = {
+        ...props,
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
+        flowType: FLOWS.DETACH,
+        requiredPipette: {
+          mount: LEFT,
+          id: 'abc',
+          pipetteName: 'p1000_single_flex',
+        },
+      }
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+      getByText(
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
+      )
+      getByAltText('Flex 1-Channel 1000 μL')
+      getByText('You will need:')
+      getByAltText('Calibration Probe')
+      getByAltText('2.5 mm Hex Screwdriver')
+      getByText(
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
+      )
+      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_flex',
+            },
+          },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -180,17 +226,17 @@ describe('BeforeBeginning', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
       }
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       fireEvent.click(proceedBtn)
@@ -201,9 +247,10 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -231,7 +278,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -241,7 +288,7 @@ describe('BeforeBeginning', () => {
       getByAltText('96-Channel Pipette')
       getByAltText('96-Channel Mounting Plate')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', {
         name: 'Move gantry to front',
@@ -249,13 +296,10 @@ describe('BeforeBeginning', () => {
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT },
-          },
-          {
-            commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: RIGHT },
+            params: { maintenancePosition: 'attachPlate', mount: RIGHT },
           },
         ],
         false
@@ -269,7 +313,7 @@ describe('BeforeBeginning', () => {
       props = {
         ...props,
         mount: RIGHT,
-        attachedPipettes: { left: null, right: mockPipette },
+        attachedPipettes: { left: null, right: mockAttachedPipetteInformation },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -279,7 +323,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -289,7 +333,7 @@ describe('BeforeBeginning', () => {
       getByAltText('96-Channel Pipette')
       getByAltText('96-Channel Mounting Plate')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', {
         name: 'Move gantry to front',
@@ -302,9 +346,10 @@ describe('BeforeBeginning', () => {
             params: {
               mount: RIGHT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: RIGHT },
@@ -320,7 +365,7 @@ describe('BeforeBeginning', () => {
       mockGetIsGantryEmpty.mockReturnValue(false)
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -330,7 +375,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -340,7 +385,7 @@ describe('BeforeBeginning', () => {
       getByAltText('96-Channel Pipette')
       getByAltText('96-Channel Mounting Plate')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', {
         name: 'Move gantry to front',
@@ -353,9 +398,67 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
+          { commandType: 'home' as const, params: {} },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
+    it('renders the detach and attach 96 channel flow when there is a required 96-channel', async () => {
+      mockGetIsGantryEmpty.mockReturnValue(false)
+      props = {
+        ...props,
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
+        flowType: FLOWS.ATTACH,
+        selectedPipette: NINETY_SIX_CHANNEL,
+        requiredPipette: {
+          id: '123',
+          pipetteName: 'p1000_96',
+          mount: 'left',
+        },
+      }
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+      getByText(
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
+      )
+      getByText(
+        'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
+      )
+      getByAltText('2.5 mm Hex Screwdriver')
+      getByAltText('Calibration Probe')
+      getByAltText('Flex 96-Channel 1000 μL')
+      getByAltText('96-Channel Mounting Plate')
+      getByText(
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
+      )
+      const proceedBtn = getByRole('button', {
+        name: 'Move gantry to front',
+      })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_flex',
+            },
+          },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -372,7 +475,7 @@ describe('BeforeBeginning', () => {
     it('renders the banner for 96 channel with correct info for on device display', () => {
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
         selectedPipette: NINETY_SIX_CHANNEL,
         isOnDevice: true,
@@ -384,13 +487,13 @@ describe('BeforeBeginning', () => {
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
     })
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -400,7 +503,7 @@ describe('BeforeBeginning', () => {
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
@@ -412,9 +515,10 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },

@@ -4,6 +4,7 @@ include ../scripts/push.mk
 include ../scripts/python.mk
 
 SHX := npx shx
+REDOC := npx @redocly/cli
 
 # Path of source package
 SRC_PATH = robot_server
@@ -23,6 +24,9 @@ wheel_file = dist/$(call python_get_wheelname,robot-server,$(project_rs_default)
 # use python here so we can use the same version normalization that will be
 # used to create the sdist.
 sdist_file = dist/$(call python_get_sdistname,robot-server,$(project_ot3_default),robot_server)
+
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,robot-server,$(project_ot3_default),robot_server)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -152,7 +156,7 @@ push: wheel
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server",,,$(version_file))
 
 .PHONY: install-key
 install-key:
@@ -192,8 +196,10 @@ change-left:
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
 
-.PHONY: docs
-docs: settings_schema.json
 
-settings_schema.json: robot_server/settings.py
-	$(python) -m scripts.settings_schema $@
+.PHONY: docs
+docs:
+	$(SHX) mkdir -p docs/build/
+	$(python) ./scripts/spec_generator.py docs/build/openapi.json
+	$(SHX) mkdir -p docs/dist/http
+	$(REDOC) build-docs docs/build/openapi.json -o docs/dist/http/api_reference.html

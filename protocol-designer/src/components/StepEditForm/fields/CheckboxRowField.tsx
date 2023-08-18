@@ -35,12 +35,13 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: tooltipPlacement,
   })
-
   return (
     <>
-      <Tooltip lineHeight="1.5" {...tooltipProps}>
-        {tooltipContent}
-      </Tooltip>
+      {tooltipContent && (
+        <Tooltip lineHeight="1.5" {...tooltipProps}>
+          {tooltipContent}
+        </Tooltip>
+      )}
       <div className={styles.checkbox_row}>
         <DeprecatedCheckboxField
           className={cx(styles.checkbox_field, className)}
@@ -52,7 +53,7 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             updateValue(!value)
           }
-          value={Boolean(value)}
+          value={disabled ? false : Boolean(value)}
         />
         {value && !disabled && !isIndeterminate ? children : null}
       </div>

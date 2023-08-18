@@ -7,14 +7,13 @@
   "step_description": {
     "mix": "Mix contents of wells/tubes.",
     "pause": "Enable pause within protocol.",
+    "moveLabware": "Move labware to and from deck slot and module locations.",
     "moveLiquid": "Move liquid to and from wells/tubes.",
     "magnet": "Engage or disengage the Magnetic module.",
     "temperature": "Set temperature command for Temperature module.",
     "thermocycler": "Change Thermocycler state or program a profile.",
     "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module"
   },
-
-  "disabled_module_step": "Add a relevant module to use this step",
 
   "step_fields": {
     "defaults": {
@@ -69,6 +68,11 @@
         "blowout_checkbox": "Redundant with disposal volume"
       }
     },
+    "moveLabware": {
+      "disabled": {
+        "gripper_not_used": "Attach Gripper to move labware"
+      }
+    },
     "batch_edit": {
       "disabled": {
         "pipette-different": "Cannot edit unless selected steps share the same pipette.",
@@ -90,6 +94,9 @@
       "disabled": {
         "latchOpen": "Labware Latch cannot be open while the module is shaking"
       }
+    },
+    "touchTip": {
+      "disabled": "Touch tip is not supported with this labware"
     }
   },
   "edit_module_card": {

@@ -2,6 +2,8 @@
 from datetime import datetime
 from typing import List, Optional
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from opentrons.protocol_engine import (
     EngineStatus,
     LabwareOffsetCreate,
@@ -148,7 +150,35 @@ class RunDataManager:
 
         return _build_run(run_resource, state_summary, current)
 
-    def get_all(self) -> List[Run]:
+    def get_run_loaded_labware_definitions(
+        self, run_id: str
+    ) -> List[LabwareDefinition]:
+        """Get a run's load labware definitions.
+
+        This method will get the labware definitions loaded by loadLabware commands for the current run
+        depending on if `run_id` refers to the current run.
+
+        Args:
+            run_id: The identifier of the run to return.
+
+        Returns:
+            The run's loaded labware definitions.
+
+        Raises:
+            RunNotCurrentError: The given run identifier is not the current run.
+        """
+        # The database doesn't store runs' loaded labware definitions in a way that we
+        # can query quickly. Avoid it by only supporting this on in-memory runs.
+        if run_id != self._engine_store.current_run_id:
+            raise RunNotCurrentError(
+                f"Cannot get load labware definitions of {run_id} because it is not the current run."
+            )
+
+        return (
+            self._engine_store.engine.state_view.labware.get_loaded_labware_definitions()
+        )
+
+    def get_all(self, length: Optional[int]) -> List[Run]:
         """Get current and stored run resources.
 
         Returns:
@@ -160,7 +190,7 @@ class RunDataManager:
                 state_summary=self._get_state_summary(run_resource.run_id),
                 current=run_resource.run_id == self._engine_store.current_run_id,
             )
-            for run_resource in self._run_store.get_all()
+            for run_resource in self._run_store.get_all(length)
         ]
 
     async def delete(self, run_id: str) -> None:

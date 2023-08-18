@@ -15,6 +15,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   LabwareDefinition2,
   ModuleType,
@@ -73,13 +74,23 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
     'opentrons_96_aluminumblock_nest_wellplate_100ul',
   ],
-  [MAGNETIC_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [MAGNETIC_MODULE_TYPE]: [
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  ],
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   [HEATERSHAKER_MODULE_TYPE]: [
     'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
     'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
     'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
     'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  ],
+  [MAGNETIC_BLOCK_TYPE]: [
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
 }
 
@@ -178,7 +189,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       !getLabwareCompatible(labwareDef),
     [filterRecommended, filterHeight, getLabwareCompatible, moduleType]
   )
-
   const getTitleText = (): string => {
     if (isNextToHeaterShaker) {
       return `Slot ${slot}, Labware to the side of ${i18n.t(
@@ -283,11 +293,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               )}{' '}
               <KnowledgeBaseLink
                 className={styles.link}
-                to={
-                  isNextToHeaterShaker
-                    ? 'heaterShakerLabware'
-                    : 'recommendedLabware'
-                }
+                to={'recommendedLabware'}
               >
                 here
               </KnowledgeBaseLink>

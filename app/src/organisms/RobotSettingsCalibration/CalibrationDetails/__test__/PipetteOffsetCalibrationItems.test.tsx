@@ -4,10 +4,14 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
+import {
+  mockAttachedPipette,
+  mockAttachedPipetteInformation,
+} from '../../../../redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
   useIsOT3,
+  useAttachedPipettesFromInstrumentsQuery,
 } from '../../../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
@@ -42,6 +46,14 @@ const mockPipetteOffsetCalibrations = [
     markedBad: false,
   },
 ]
+const mockPipetteOffsetCalibrationsForOt3 = [
+  {
+    modelName: 'mockPipetteModelLeft',
+    serialNumber: '1234567',
+    mount: 'left' as Mount,
+    lastCalibrated: '2022-11-10T18:15:02',
+  },
+]
 
 jest.mock('../../../../redux/custom-labware/selectors')
 jest.mock('../../../../redux/sessions/selectors')
@@ -62,11 +74,18 @@ const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
   typeof OverflowMenu
 >
+const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
+  typeof useAttachedPipettesFromInstrumentsQuery
+>
 
 describe('PipetteOffsetCalibrationItems', () => {
   let props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
 
   beforeEach(() => {
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: null,
+      right: null,
+    })
     mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
@@ -99,7 +118,24 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Last Calibrated')
   })
 
-  it('should render overFlow menu', () => {
+  it('should include the correct information for OT-3 when 1 pipette is attached', () => {
+    props = {
+      ...props,
+      formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrationsForOt3,
+    }
+    mockUseIsOT3.mockReturnValue(true)
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: mockAttachedPipetteInformation,
+      right: null,
+    })
+    const [{ getByText }] = render(props)
+    getByText('mockPipetteModelLeft')
+    getByText('1234567')
+    getByText('left')
+    getByText('11/10/2022 18:15:02')
+  })
+
+  it('should render overflow menu', () => {
     const [{ queryAllByText }] = render(props)
     expect(queryAllByText('mock overflow menu')).toHaveLength(2)
   })

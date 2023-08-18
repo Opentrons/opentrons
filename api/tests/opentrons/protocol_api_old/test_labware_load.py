@@ -6,6 +6,10 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 labware_name = "corning_96_wellplate_360ul_flat"
 
 
+# labware._core.get_geometry() is an implementation detail and is not present in ProtocolContexts
+# backed by Protocol Engine.
+# TODO(mm, 2022-04-28): Make sure this logic is tested elsewhere, then delete this test.
+@pytest.mark.apiv2_non_pe_only
 def test_load_to_slot(
     ctx: papi.ProtocolContext, deck_definition: DeckDefinitionV3
 ) -> None:

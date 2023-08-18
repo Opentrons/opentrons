@@ -56,11 +56,11 @@ async def test_messaging(
 
     target = Target.from_single_node(NodeId.head)
 
-    mock_messenger.send.side_effect = responder
+    mock_messenger.send_exclusive.side_effect = responder
 
     await subject.run(target, 1, 1)
 
-    assert mock_messenger.send.mock_calls == [
+    assert mock_messenger.send_exclusive.mock_calls == [
         call(
             node_id=target.system_node,
             message=message_definitions.FirmwareUpdateInitiate(),
@@ -116,12 +116,12 @@ async def test_retry(
 
     target = Target.from_single_node(NodeId.head)
 
-    mock_messenger.send.side_effect = responder
+    mock_messenger.send_exclusive.side_effect = responder
 
     await subject.run(target, retry_count=retry_count + 1, ready_wait_time_sec=0.1)
 
     assert (
-        mock_messenger.send.mock_calls
+        mock_messenger.send_exclusive.mock_calls
         == [
             call(
                 node_id=target.system_node,
@@ -154,7 +154,7 @@ async def test_bootloader_not_ready(
         await subject.run(target, retry_count=retry_count, ready_wait_time_sec=0.1)
 
     assert (
-        mock_messenger.send.mock_calls
+        mock_messenger.send_exclusive.mock_calls
         == [
             call(
                 node_id=target.system_node,

@@ -51,7 +51,7 @@ class CSVFormatter:
     @classmethod
     def build(cls, metadata: CSVMetaData, header: List[str]) -> "CSVFormatter":
         """Build a csv formatter object."""
-        date = datetime.now().date()
+        date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         csv_name = f"{metadata.sensor}_test_{date}.csv"
         with open(csv_name, "w") as cv:
             writer = csv.DictWriter(cv, fieldnames=header)

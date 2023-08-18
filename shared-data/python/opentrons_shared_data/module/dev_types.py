@@ -17,24 +17,28 @@ MagneticModuleType = Literal["magneticModuleType"]
 TemperatureModuleType = Literal["temperatureModuleType"]
 ThermocyclerModuleType = Literal["thermocyclerModuleType"]
 HeaterShakerModuleType = Literal["heaterShakerModuleType"]
+MagneticBlockType = Literal["magneticBlockType"]
 
 ModuleType = Union[
     MagneticModuleType,
     TemperatureModuleType,
     ThermocyclerModuleType,
     HeaterShakerModuleType,
+    MagneticBlockType,
 ]
 
 MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
 TemperatureModuleModel = Literal["temperatureModuleV1", "temperatureModuleV2"]
 ThermocyclerModuleModel = Literal["thermocyclerModuleV1", "thermocyclerModuleV2"]
 HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
+MagneticBlockModel = Literal["magneticBlockV1"]
 
 ModuleModel = Union[
     MagneticModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
 ]
 
 ModuleSlotTransform = TypedDict(
@@ -73,6 +77,18 @@ CornerOffsetFromSlot = TypedDict(
     "CornerOffsetFromSlot", {"x": float, "y": float, "z": float}
 )
 
+
+class NamedOffset(TypedDict):
+    x: float
+    y: float
+    z: float
+
+
+class GripperOffsets(TypedDict):
+    pickUpOffset: NamedOffset
+    dropOffset: NamedOffset
+
+
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
 ModuleDefinitionV3 = TypedDict(
     "ModuleDefinitionV3",
@@ -90,7 +106,9 @@ ModuleDefinitionV3 = TypedDict(
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
         "twoDimensionalRendering": Dict[str, Any],
+        "gripperOffsets": Dict[str, GripperOffsets],
     },
+    total=False,
 )
 
 # V2 is not used anymore. This type is preserved for historical purposes

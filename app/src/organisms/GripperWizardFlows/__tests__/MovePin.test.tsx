@@ -18,6 +18,7 @@ describe('MovePin', () => {
     props?: Partial<React.ComponentProps<typeof MovePin>>
   ) => ReturnType<typeof renderWithProviders>
   let mockCreateRunCommand: jest.Mock
+  let mockSetErrorMessage: jest.Mock
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
@@ -32,7 +33,7 @@ describe('MovePin', () => {
     render = (props = {}) => {
       return renderWithProviders(
         <MovePin
-          runId={mockRunId}
+          maintenanceRunId={mockRunId}
           section={SECTIONS.MOVE_PIN}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}
@@ -44,6 +45,8 @@ describe('MovePin', () => {
           setFrontJawOffset={mockSetFrontJawOffset}
           frontJawOffset={{ x: 0, y: 0, z: 0 }}
           createRunCommand={mockCreateRunCommand}
+          errorMessage={null}
+          setErrorMessage={mockSetErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -96,7 +99,7 @@ describe('MovePin', () => {
 
   it('renders correct loader for move pin to front jaw', () => {
     const { getByText } = render({ isRobotMoving: true })[0]
-    getByText('Stand Back, Gripper is Calibrating')
+    getByText('Stand Back, Flex Gripper is Calibrating')
   })
 
   it('renders correct text for move pin from front jaw to rear with correct callbacks', async () => {
@@ -107,7 +110,7 @@ describe('MovePin', () => {
     getByText(
       'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
     )
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       command: { commandType: 'home', params: { axes: [] } },
@@ -138,7 +141,7 @@ describe('MovePin', () => {
       isRobotMoving: true,
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
-    getByText('Stand Back, Gripper is Calibrating')
+    getByText('Stand Back, Flex Gripper is Calibrating')
   })
 
   it('renders correct text for remove pin from rear jaw', () => {
