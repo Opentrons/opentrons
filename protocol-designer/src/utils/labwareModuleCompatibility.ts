@@ -122,24 +122,23 @@ export const getAdapterLabwareIsAMatch = (
   allLabware: LabwareOnDeck[],
   draggedLabwareLoadname: string
 ): boolean => {
-  const labwareDefUri = Object.values(allLabware).find(
-    lab => lab.id === labwareId
-  )?.labwareDefURI
+  const loadName = Object.values(allLabware).find(lab => lab.id === labwareId)
+    ?.def.parameters.loadName
 
   const deepWellPair =
-    labwareDefUri === 'opentrons/opentrons_96_deep_well_adapter/1' &&
+    loadName === DEEP_WELL_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'nest_96_wellplate_2ml_deep'
   const flatBottomPair =
-    labwareDefUri === 'opentrons/opentrons_96_flat_bottom_adapter/1' &&
+    loadName === FLAT_BOTTOM_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'nest_96_wellplate_200ul_flat'
   const pcrPair =
-    labwareDefUri === 'opentrons/opentrons_96_pcr_adapter/1' &&
+    loadName === PCR_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt'
   const universalPair =
-    labwareDefUri === 'opentrons/opentrons_universal_flat_adapter/1' &&
+    loadName === UNIVERSAL_FLAT_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'corning_384_wellplate_112ul_flat'
   const aluminumBlock96Pairs =
-    labwareDefUri === 'opentrons/opentrons_96_well_aluminum_block/1' &&
+    loadName === ALUMINUM_BLOCK_96_LOADNAME &&
     (draggedLabwareLoadname === 'biorad_96_wellplate_200ul_pcr' ||
       draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt')
 

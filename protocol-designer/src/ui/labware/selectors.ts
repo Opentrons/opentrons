@@ -52,8 +52,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
-        const isAdapter =
-          labwareEntity.def.metadata.displayCategory === 'adapter'
+        const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
         const isAdapterOrAluminumBlock =
           isAdapter ||
           labwareEntity.def.metadata.displayCategory === 'aluminumBlock'

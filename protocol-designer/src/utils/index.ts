@@ -3,6 +3,8 @@ import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
+import type { LabwareEntities } from '@opentrons/step-generation'
+
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
     ? // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -105,7 +107,13 @@ export const makeTimerText = (
         'application.units.minutes'
       )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
 
-export const getIsAdapter = (id: string): boolean =>
-  id.includes('opentrons_96_aluminumblock_biorad_wellplate_200ul') ||
-  id.includes('adapter') ||
-  id.includes('opentrons_96_aluminumblock_nest_wellplate_100ul')
+export const getIsAdapter = (
+  labwareId: string,
+  labwareEntities: LabwareEntities
+): boolean => {
+  if (labwareEntities[labwareId]) return false
+
+  return (
+    labwareEntities[labwareId].def.allowedRoles?.includes('adapter') ?? false
+  )
+}

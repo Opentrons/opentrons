@@ -28,8 +28,8 @@ import {
 import {
   ProfileFormError,
   getProfileFormErrors,
-  getMoveLabwareProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
+import { getMoveLabwareFormErrors } from '../../steplist/formLevel/MoveLabwareFormErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
@@ -529,7 +529,7 @@ const _dynamicMoveLabwareFieldFormErrors = (
   hydratedForm: FormData,
   invariantContext: InvariantContext
 ): ProfileFormError[] => {
-  return getMoveLabwareProfileFormErrors(hydratedForm, invariantContext)
+  return getMoveLabwareFormErrors(hydratedForm, invariantContext)
 }
 // TODO type with hydrated form type
 export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {

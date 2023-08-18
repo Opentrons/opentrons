@@ -24,8 +24,8 @@ interface MoveLabwareHeaderProps {
 //  TODO(jr, 7/31/23): add text to i18n
 export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   const { sourceLabwareNickname, destinationSlot, useGripper } = props
-  const moduleEntites = useSelector(getModuleEntities)
-  const labwareEntites = useSelector(getLabwareEntities)
+  const moduleEntities = useSelector(getModuleEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
 
   const [sourceTargetProps, sourceTooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
@@ -42,14 +42,14 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     destSlot = 'off deck'
   } else if (
     destinationSlot != null &&
-    moduleEntites[destinationSlot] != null
+    moduleEntities[destinationSlot] != null
   ) {
-    destSlot = `${getModuleDisplayName(moduleEntites[destinationSlot].model)}`
+    destSlot = `${getModuleDisplayName(moduleEntities[destinationSlot].model)}`
   } else if (
     destinationSlot != null &&
-    labwareEntites[destinationSlot] != null
+    labwareEntities[destinationSlot] != null
   ) {
-    destSlot = getLabwareDisplayName(labwareEntites[destinationSlot].def)
+    destSlot = getLabwareDisplayName(labwareEntities[destinationSlot].def)
   } else {
     destSlot = destinationSlot
   }

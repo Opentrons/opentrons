@@ -93,7 +93,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   getRobotStateAtActiveItem,
   getModuleEntities,
   getRobotType,
-  (robotState, moduleEntities, robotType) => {
+  getLabwareEntities,
+  (robotState, moduleEntities, robotType, labwareEntities) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
@@ -123,7 +124,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         )
         const modSlot =
           modIdWithAdapter != null ? modules[modIdWithAdapter].slot : null
-        const isAdapter = getIsAdapter(labwareId)
+        const isAdapter = getIsAdapter(labwareId, labwareEntities)
 
         return labwareOnAdapter == null && isAdapter
           ? [

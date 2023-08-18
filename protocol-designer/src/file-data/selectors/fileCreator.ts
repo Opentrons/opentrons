@@ -215,8 +215,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labwareId: string
       ): LoadLabwareCreateCommand[] => {
         const { def } = labwareEntities[labwareId]
-        const isAdapter = def.metadata.displayCategory === 'adapter'
-        if (!isAdapter) return [...acc]
+        const isAdapter = def.allowedRoles?.includes('adapter')
+        if (!isAdapter) return acc
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const namespace = def.namespace
         const loadName = def.parameters.loadName
@@ -252,8 +252,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labwareId: string
       ): LoadLabwareCreateCommand[] => {
         const { def } = labwareEntities[labwareId]
-        const isAdapter = def.metadata.displayCategory === 'adapter'
-        if (labwareId === FIXED_TRASH_ID || isAdapter) return [...acc]
+        const isAdapter = def.allowedRoles?.includes('adapter')
+        if (labwareId === FIXED_TRASH_ID || isAdapter) return acc
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const isOnAdapter =
           loadAdapterCommands.find(

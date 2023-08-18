@@ -29,12 +29,6 @@ interface LabwareLocationUpdate {
   [id: string]: string
 }
 
-//  might need better way to filter this???
-const getIsAdapter = (id: string): boolean =>
-  id.includes('opentrons_96_aluminumblock_biorad_wellplate_200ul') ||
-  id.includes('adapter') ||
-  id.includes('opentrons_96_aluminumblock_nest_wellplate_100ul')
-
 export const migrateFile = (
   appData: ProtocolFileV6<DesignerApplicationData>
 ): ProtocolFile => {
@@ -47,6 +41,25 @@ export const migrateFile = (
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
 
   const allLatestDefs = getOnlyLatestDefs()
+
+  const getIsAdapter = (labwareId: string): boolean => {
+    const labwareEntity = labware[labwareId]
+    if (labwareEntity == null) return false
+    const loadName =
+      labwareDefinitions[labwareEntity.definitionId].parameters.loadName
+
+    return (
+      loadName === 'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep' ||
+      loadName ===
+        'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat' ||
+      loadName ===
+        'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt' ||
+      loadName ===
+        'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat' ||
+      loadName === 'opentrons_96_aluminumblock_biorad_wellplate_200ul' ||
+      loadName === 'opentrons_96_aluminumblock_nest_wellplate_100ul'
+    )
+  }
 
   const loadPipetteCommands: LoadPipetteCreateCommand[] = commands
     .filter(
@@ -141,15 +154,10 @@ export const migrateFile = (
       acc[defId] = labwareDefinitions[defId]
     } else {
       const { adapterUri, labwareUri } = getAdapterAndLabwareSplitInfo(defId)
-      const defUris = Object.keys(allLatestDefs)
-      const adapterDefUri = defUris.find(defUri => defUri === adapterUri) ?? ''
-      const labwareDefUri = defUris.find(defUri => defUri === labwareUri) ?? ''
-
-      const adapterLabwareDef = allLatestDefs[adapterDefUri]
-      const labwareDef = allLatestDefs[labwareDefUri]
-
-      acc[adapterDefUri] = adapterLabwareDef
-      acc[labwareDefUri] = labwareDef
+      const adapterLabwareDef = allLatestDefs[adapterUri]
+      const labwareDef = allLatestDefs[labwareUri]
+      acc[adapterUri] = adapterLabwareDef
+      acc[labwareUri] = labwareDef
     }
     return acc
   }, {})
@@ -217,7 +225,7 @@ export const migrateFile = (
         },
         {}
       )
-      Object.assign(acc, adapterAndLabwareLocationUpdate)
+      acc = { ...acc, ...adapterAndLabwareLocationUpdate }
     }
     return acc
   }, {})
