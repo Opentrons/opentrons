@@ -30,22 +30,22 @@ import {
   ALIGN_FLEX_END,
   LocationIcon,
 } from '@opentrons/components'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
 } from '../../redux/config'
+import { SmallButton } from '../../atoms/buttons'
+import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
-import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type {
   LabwareOffset,
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { SmallButton } from '../../atoms/buttons'
+import type { ResultsSummaryStep, WorkingOffset } from './types'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -113,11 +113,13 @@ export const ResultsSummary = (
     <TerseOffsetTable
       offsets={offsetsToApply}
       labwareDefinitions={labwareDefinitions}
+      protocolData={protocolData}
     />
   ) : (
     <OffsetTable
       offsets={offsetsToApply}
       labwareDefinitions={labwareDefinitions}
+      protocolData={protocolData}
     />
   )
   const JupyterSnippet = (
@@ -222,10 +224,11 @@ const Header = styled.h1`
 interface OffsetTableProps {
   offsets: LabwareOffsetCreateData[]
   labwareDefinitions: LabwareDefinition2[]
+  protocolData: CompletedProtocolAnalysis
 }
 
 const OffsetTable = (props: OffsetTableProps): JSX.Element => {
-  const { offsets, labwareDefinitions } = props
+  const { offsets, labwareDefinitions, protocolData } = props
   const { t } = useTranslation('labware_position_check')
   return (
     <Table>
@@ -244,6 +247,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           )
           const labwareDisplayName =
             labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
+
           return (
             <TableRow key={index}>
               <TableDatum>
@@ -251,7 +255,11 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, t)}
+                  {getDisplayLocation(
+                    location,
+                    getLabwareDefinitionsFromCommands(protocolData.commands),
+                    t
+                  )}
                 </StyledText>
               </TableDatum>
               <TableDatum>

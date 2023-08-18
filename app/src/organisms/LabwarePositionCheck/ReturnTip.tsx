@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
 import {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -11,10 +8,16 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
+import { StyledText } from '../../atoms/text'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { useChainRunCommands } from '../../resources/runs/hooks'
+import {
+  getLabwareDef,
+  getLabwareDefinitionsFromCommands,
+} from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { PrepareSpace } from './PrepareSpace'
 
 import type { VectorOffset } from '@opentrons/api-client'
 import type { ReturnTipStep } from './types'
@@ -44,7 +47,11 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
 
-  const displayLocation = getDisplayLocation(location, t)
+  const displayLocation = getDisplayLocation(
+    location,
+    getLabwareDefinitionsFromCommands(protocolData.commands),
+    t
+  )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [

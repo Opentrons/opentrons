@@ -102,7 +102,7 @@ describe('ApplyHistoricOffsets', () => {
     // second candidate table row
     getByText('Slot 2')
     // third candidate on module table row
-    getByText('Slot 3 - Heater-Shaker Module GEN1')
+    getByText('Heater-Shaker Module GEN1 in slot 3')
     getByTestId('ModalHeader_icon_close_Stored Labware Offset data').click()
 
     expect(queryByText('Stored Labware Offset data')).toBeNull()
@@ -141,4 +141,5 @@ describe('ApplyHistoricOffsets', () => {
     expect(getByText('Jupyter Notebook')).toBeTruthy()
     expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
+  it.todo('add test coverage for adapters')
 })

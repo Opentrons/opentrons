@@ -160,4 +160,5 @@ describe('CurrentOffsetsTable', () => {
     expect(getByText('Jupyter Notebook')).toBeTruthy()
     expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
+  it.todo('add test coverage for labware offset on adapters')
 })
