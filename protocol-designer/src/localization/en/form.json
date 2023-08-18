@@ -35,7 +35,10 @@
       "aspirate": "source",
       "dispense": "destination",
       "mixLabware": "labware",
-      "movedLabware": "labware"
+      "movedLabware": "labware",
+      "errors": {
+        "labwareSlotIncompatible": "The selected labware and new location are incompatible"
+      }
     },
     "mixVolumeLabel": "mix volume",
     "mixRepetitions": "repetitions",

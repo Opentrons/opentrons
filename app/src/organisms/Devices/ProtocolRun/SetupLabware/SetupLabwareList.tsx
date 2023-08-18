@@ -51,6 +51,7 @@ export function SetupLabwareList(
       </HeaderRow>
       {onDeckItems.map((labwareItem, index) => (
         <LabwareListItem
+          commands={commands}
           key={index}
           attachedModuleInfo={attachedModuleInfo}
           extraAttentionModules={extraAttentionModules}
@@ -58,7 +59,11 @@ export function SetupLabwareList(
           isOt3={isOt3}
         />
       ))}
-      <OffDeckLabwareList labwareItems={offDeckItems} isOt3={isOt3} />
+      <OffDeckLabwareList
+        commands={commands}
+        labwareItems={offDeckItems}
+        isOt3={isOt3}
+      />
     </Flex>
   )
 }

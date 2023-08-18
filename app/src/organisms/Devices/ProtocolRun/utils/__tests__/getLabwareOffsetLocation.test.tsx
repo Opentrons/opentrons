@@ -35,14 +35,14 @@ describe('getLabwareOffsetLocation', () => {
     resetAllWhenMocks()
     jest.restoreAllMocks()
   })
-  it('should return just the slot name if the labware is not on top of a module', () => {
+  it('should return just the slot name if the labware is not on top of a module or adapter', () => {
     const MOCK_SLOT = '2'
     when(mockGetLabwareLocation)
       .calledWith(MOCK_LABWARE_ID, MOCK_COMMANDS)
       .mockReturnValue({ slotName: MOCK_SLOT })
 
     expect(
-      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES)
+      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES, [])
     ).toEqual({ slotName: MOCK_SLOT })
   })
   it('should return null if the location is off deck', () => {
@@ -51,7 +51,7 @@ describe('getLabwareOffsetLocation', () => {
       .mockReturnValue('offDeck')
 
     expect(
-      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES)
+      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES, [])
     ).toEqual(null)
   })
   it('should return the slot name and module model if the labware is on top of a module', () => {
@@ -67,7 +67,9 @@ describe('getLabwareOffsetLocation', () => {
       .mockReturnValue({ location: { slotName: MOCK_SLOT } } as any)
 
     expect(
-      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES)
+      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES, [])
     ).toEqual({ slotName: MOCK_SLOT, moduleModel: TCModelInProtocol })
   })
+
+  it.todo('TODO(jr, 8/7/23): add test cases for labware on adapter')
 })
