@@ -42,13 +42,13 @@ This is a good position to use for a :ref:`blow out operation <new-blow-out>` or
 Bottom
 ^^^^^^
 
-As an example, lets look at the :py:meth:`.Well.bottom` method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
+Let's look at the :py:meth:`.Well.bottom` method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
 
 .. code-block:: python
 
    plate['A1'].bottom()  # the bottom center of the well
 
-This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z``` numbers move it down.
+This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z`` numbers move it down.
 
 .. code-block:: python
 
@@ -65,7 +65,7 @@ This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activi
 Center
 ^^^^^^
 
-As an example, lets look at the :py:meth:`.Well.center` method. It returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
+Let's look at the :py:meth:`.Well.center` method. It returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
 
 .. code-block:: python
 
@@ -110,7 +110,7 @@ Using Labware Position Check
 
 All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
 
-You should only adjust labware offsets in your Python code if you plan to run your protocol in the Opentrons App. However, if you're running a protocol in Jupyter Notebook, see :ref:`using_lpc`.
+You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See :ref:`using_lpc` in the Advanced Control article for information.
 
 Position Relative to the Deck
 =============================

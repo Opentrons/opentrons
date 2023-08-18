@@ -66,9 +66,7 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
 Setting Labware Offsets
 -----------------------
 
-All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
-
-You shouldn't adjust labware offsets in your Python code if you plan to run your protocol in the app or on the touchscreen. However, if you are running your code in Jupyter Notebook or with ``opentrons_execute``, you need to set your own offsets because you can't perform run setup and Labware Position Check there. For these applications, do the following to calculate and apply labware offsets:
+All positions relative to labware are adjusted automatically based on labware offset data. When you're running your code in Jupyter Notebook or with ``opentrons_execute``, you need to set your own offsets because you can't perform run setup and Labware Position Check in the Opentrons App or on the Flex touchscreen. For these applications, do the following to calculate and apply labware offsets:
 	
 	1. Create a "dummy" protocol that loads your labware and has each used pipette pick up a tip from a tip rack.
 	2. Import the dummy protocol to the Opentrons App.
