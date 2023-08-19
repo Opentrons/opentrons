@@ -1166,6 +1166,7 @@ async def _test_liquid_probe(
     assert CALIBRATED_LABWARE_LOCATIONS.plate is not None
     target_z = CALIBRATED_LABWARE_LOCATIONS.plate.z
     for trial in range(trials):
+        await api.home()
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
         await _move_to_above_plate_liquid(api, mount, height_mm=hover_mm)
         start_pos = await api.gantry_position(mount)
