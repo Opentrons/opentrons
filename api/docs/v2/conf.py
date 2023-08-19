@@ -71,8 +71,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'OT-2 API V2'
-copyright = '2010, Opentrons'
+project = 'Python Protocol API v2'
+copyright = '2010–23, Opentrons'
 author = 'Opentrons Labworks'
 
 # The version info for the project you're documenting, acts as replacement for

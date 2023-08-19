@@ -22,6 +22,10 @@ div.document [id] {
     scroll-margin-top: 150px;
 }
 
+div.documentwrapper {
+    width: auto;
+}
+
 @media only screen and (min-device-width: 768px) and (min-width: 768px) and (max-width: 1023px) {
     div.document {
         padding-top: 100px;
@@ -50,6 +54,11 @@ div.body h1 + p {
     padding-top: 24px;
 }
 
+div.sphinxsidebar {
+    width: 280px;
+    margin-left: -1000px;
+}
+
 div.sphinxsidebar h2,
 div.sphinxsidebar h3,
 div.sphinxsidebar h4,
@@ -60,6 +69,10 @@ div.body h3,
 div.body h4,
 div.body h5 {
     font-family: "Open Sans", "sans-serif";
+}
+
+p.blurb {
+    display: none;
 }
 
 /* Suppressing the display of the toctrees rendered in the doc body means we
