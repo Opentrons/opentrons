@@ -50,8 +50,23 @@ div.body h1 + p {
     padding-top: 24px;
 }
 
+div.document {
+    position: relative;
+}
+
+div.documentwrapper {
+    float: none;
+}
+
+pre, div[class*="highlight-"] {
+    clear: none;
+}
+
 div.sphinxsidebar {
-    max-height: calc(100% - 150px);
+    position: sticky;
+    top: 150px;
+    align-self: flex-start;
+    max-height: calc(100vh - 150px);
     overflow-y: auto;
 }
 
