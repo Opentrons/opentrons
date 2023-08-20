@@ -34,8 +34,6 @@ The examples in this section will use the following set up:
 
 This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 1 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 2 and 3, and uses a P300 Single pipette and a P300 Multi pipette.
 
-You can follow along and simulate the protocol using our protocol simulator, which can be installed by following the instructions at :ref:`writing`.
-
 There are three complex liquid handling commands:
 
 +------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
