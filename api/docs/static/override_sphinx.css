@@ -58,7 +58,7 @@ div.documentwrapper {
     float: none;
 }
 
-pre, div[class*="highlight-"] {
+pre, div[class*="highlight-"], blockquote, blockquote::after, div.admonition::after {
     clear: none;
 }
 
@@ -224,6 +224,7 @@ table.docutils.field-list {
 /* Adjustments to Note and Warning admonitions */
 div.admonition {
     padding-top: 20px;
+    clear: none;
 }
 
 div.admonition p.admonition-title {

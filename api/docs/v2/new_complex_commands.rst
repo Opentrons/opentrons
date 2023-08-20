@@ -57,7 +57,6 @@ Transfer
 --------
 
 .. image:: ../img/complex_commands/transfer.png
-   :scale: 75 %
    :name: Transfer
    :align: center
 
@@ -68,7 +67,6 @@ Distribute
 ----------
 
 .. image:: ../img/complex_commands/robot_distribute.png
-   :scale: 50 %
    :name: Distribute
    :align: center
 
@@ -78,7 +76,6 @@ Consolidate
 -----------
 
 .. image:: ../img/complex_commands/robot_consolidate.png
-   :scale: 50 %
    :name: Consolidate
    :align: center
 
@@ -942,7 +939,7 @@ will have the steps...
 See this image for example,
 
 .. image:: ../img/complex_commands/distribute_illustration_tip.png
-   :scale: 50 %
+   :width: 50%
    :align: center
 
 .. versionadded:: 2.0
