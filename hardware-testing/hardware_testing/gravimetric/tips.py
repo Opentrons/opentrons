@@ -35,24 +35,26 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentCon
 
 MULTI_CHANNEL_TEST_ORDER = [0, 1, 2, 3, 7, 6, 5, 4]  # zero indexed
 CHANNEL_TO_TIP_ROW_LOOKUP = {  # zero indexed
-    0: "H",
-    1: "G",
-    2: "E",
-    3: "B",
-    4: "G",
-    5: "D",
-    6: "B",
-    7: "A",
-}
-CHANNEL_TO_SLOT_ROW_LOOKUP = {  # zero indexed
-    0: "B",
-    1: "B",
-    2: "B",
-    3: "B",
-    4: "C",
-    5: "C",
+    0: "G",
+    1: "F",
+    2: "D",
+    3: "A",
+    4: "H",
+    5: "E",
     6: "C",
-    7: "C",
+    7: "B",
+}
+REAR_CHANNELS = [0, 1, 2, 3]
+FRONT_CHANNELS = [4, 5, 6, 7]
+REAR_CHANNELS_TIP_SLOTS = {
+    50: [2, 7],
+    200: [10],
+    1000: [3],
+}
+FRONT_CHANNELS_TIP_SLOTS = {
+    50: [8, 6],
+    200: [5],
+    1000: [9],
 }
 
 
@@ -64,32 +66,52 @@ def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
     }
 
 
+def _unused_tips_for_racks(racks: List[Labware]) -> List[Well]:
+    wells: List[Well] = []
+    rows = "ABCDEFGH"
+    for rack in racks:
+        for col in range(1, 13):
+            for row in rows:
+                wellname = f"{row}{col}"
+                next_well = rack.next_tip(1, rack[wellname])
+                if next_well is not None and wellname == next_well.well_name:
+                    wells.append(rack[wellname])
+    return wells
+
+
+def get_unused_tips(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
+    """Use the labware's tip tracker to get a list of all unused tips for a given tip volume."""
+    racks = [
+        r for r in _get_racks(ctx).values() if r.wells()[0].max_volume == tip_volume
+    ]
+    return _unused_tips_for_racks(racks)
+
+
 def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
     """Get tips for single channel."""
-    racks = _get_racks(ctx)
-    return [
-        tip
-        for rack in racks.values()
-        for tip in rack.wells()
-        if tip.max_volume == tip_volume
-    ]
+    return get_unused_tips(ctx, tip_volume)
 
 
 def get_tips_for_individual_channel_on_multi(
-    ctx: ProtocolContext, channel: int
+    ctx: ProtocolContext, channel: int, tip_volume: int, pipette_volume: int
 ) -> List[Well]:
     """Get tips for a multi's channel."""
-    racks = _get_racks(ctx)
-    slot_row = CHANNEL_TO_SLOT_ROW_LOOKUP[channel]
+    print(f"getting {tip_volume} tips for channel {channel}")
+    if pipette_volume == 1000:
+        if channel in FRONT_CHANNELS:
+            slots = FRONT_CHANNELS_TIP_SLOTS[tip_volume]
+        else:
+            slots = REAR_CHANNELS_TIP_SLOTS[tip_volume]
+        print(f"Slots for this channel/tip {slots}")
+        all_racks = _get_racks(ctx)
+        specific_racks: List[Labware] = []
+        for slot in slots:
+            specific_racks.append(all_racks[slot])
+        unused_tips = _unused_tips_for_racks(specific_racks)
+    else:
+        unused_tips = get_unused_tips(ctx, tip_volume)
     tip_row = CHANNEL_TO_TIP_ROW_LOOKUP[channel]
-    # FIXME: need custom deck to support 3x racks horizontally
-    slots = [5, 6] if slot_row == "B" else [8, 9]
-    tips = [
-        tip
-        for slot in slots
-        for tip in racks[slot].wells()
-        if tip.well_name[0] == tip_row
-    ]
+    tips = [tip for tip in unused_tips if tip.well_name[0] == tip_row]
     return tips
 
 
@@ -119,7 +141,9 @@ def get_tips(
             return {0: get_tips_for_all_channels_on_multi(ctx)}
         else:
             return {
-                channel: get_tips_for_individual_channel_on_multi(ctx, channel)
+                channel: get_tips_for_individual_channel_on_multi(
+                    ctx, channel, tip_volume, int(pipette.max_volume)
+                )
                 for channel in range(pipette.channels)
             }
     elif pipette.channels == 96:

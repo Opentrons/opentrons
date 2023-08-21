@@ -268,11 +268,13 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
 class GravimetricRecorder:
     """Gravimetric Recorder."""
 
-    def __init__(self, cfg: GravimetricRecorderConfig, simulate: bool = False) -> None:
+    def __init__(
+        self, cfg: GravimetricRecorderConfig, scale: Scale, simulate: bool = False
+    ) -> None:
         """Gravimetric Recorder."""
         self._cfg = cfg
         self._file_name: Optional[str] = None
-        self._scale: Scale = Scale.build(simulate=simulate)
+        self._scale: Scale = scale
         self._recording = GravimetricRecording()
         self._is_recording = Event()
         self._reading_samples = Event()
