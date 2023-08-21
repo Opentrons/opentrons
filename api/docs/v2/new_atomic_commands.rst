@@ -516,7 +516,7 @@ You can also check whether the rail lights are on or off in the protocol using :
 .. versionadded:: 2.5
 
 
-.. TODO clarify that this is specifit to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
+.. TODO clarify that this is specific to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
 
 Monitor Robot Door
 ==================
