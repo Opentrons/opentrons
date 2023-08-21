@@ -819,6 +819,7 @@ class OT3API(
             GantryLoad.HIGH_THROUGHPUT
         ][OT3AxisKind.Q]
 
+        # if position is not known, move toward limit switch at a constant velocity
         if not any(self._backend.gear_motor_position):
             await self._backend.home_gear_motors(
                 distance=self._backend.axis_bounds[Axis.Q][1],
@@ -1832,7 +1833,6 @@ class OT3API(
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 pipette_axis
             ]
-
             clamp_move_target = pipette_spec.pick_up_distance
             clamp_moves = self._build_moves(
                 {Axis.Q: gear_origin_float}, {Axis.Q: clamp_move_target}
