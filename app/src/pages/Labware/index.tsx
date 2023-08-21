@@ -46,8 +46,8 @@ import type { LabwareFilter, LabwareSort } from './types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 const labwareDisplayCategoryFilters: LabwareFilter[] = [
-  'adapter',
   'all',
+  'adapter',
   'aluminumBlock',
   'customLabware',
   'reservoir',
