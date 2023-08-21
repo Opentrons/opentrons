@@ -91,7 +91,11 @@ export interface TemperatureModuleDeactivateRunTimeCommand
 export interface TemperatureModuleAwaitTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'temperatureModule/waitForTemperature'
-  params: TemperatureParams
+  params: {
+    // same params as TemperatureParams except celsius is optional
+    moduleId: string
+    celsius?: number
+  }
 }
 export interface TemperatureModuleAwaitTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
