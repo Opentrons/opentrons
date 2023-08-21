@@ -22,7 +22,35 @@ Flex requires you to specify an ``apiLevel`` of 2.15 or higher. If your OT-2 pro
 
 You also need to specify ``'robotType': 'Flex'``. If you omit ``robotType`` in the ``requirements`` dictionary, the API will assume the protocol is designed for the OT-2.
 
-.. TK code tabs here
+.. tabs::
+    
+    .. tab:: Original OT-2 code
+    
+        .. code-block:: python
+            :substitutions:
+            
+            from opentrons import protocol_api
+            
+            metadata = {
+                "protocolName": "My Protocol",
+                "description": "This protocol uses the OT-2",
+                "apiLevel": "|apiLevel|" 
+            }
+
+    .. tab:: Updated Flex code
+    
+        .. code-block:: python
+            :substitutions:
+            
+            from opentrons import protocol_api
+            
+            metadata = {
+                "protocolName": "My Protocol",
+                "description": "This protocol uses the Flex",
+            }
+
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
 
 Pipettes and Tip-rack Load Names
 ================================
@@ -34,15 +62,34 @@ Flex uses different types of pipettes and tip racks than OT-2, which have their 
 
 This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and 300 µL tips to Flex code that uses a Flex 1-Channel 1000 µL pipette and 1000 µL tips.
 
-.. TK code tabs here
+.. tabs::
+    
+    .. tab:: Original OT-2 code
+    
+        .. code-block:: python
 
+            def run(protocol: protocol_api.ProtocolContext):
+                tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+                left_pipette = protocol.load_instrument(
+                    "p300_single_gen2", "left", tip_racks=[tips]
+                )
+                
+    .. tab:: Updated Flex code
+    
+        .. code-block:: python
+
+            def run(protocol: protocol_api.ProtocolContext):
+                tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
+                left_pipette = protocol.load_instrument(
+                    "flex_1channel_1000", "left", tip_racks[tips]
+                )
 
 Deck Slot Labels
 ================
 
 It's good practice to update numeric labels for :ref:`deck-slots` (which match the labels on an OT-2) to coordinate ones (which match the labels on Flex). This is an optional step, since the two formats are interchangeable.
 
-.. TK code?
+For example, the code in the previous section changed the location of the tip rack from ``1`` to ``"D1"``.
 
 
 Module Load Names
@@ -57,4 +104,47 @@ The Heater-Shaker Module only has one generation, ``heaterShakerModuleV1``, whic
 
 The Magnetic Module is not compatible with Flex. For protocols that load ``magnetic module``, ``magdeck``, or ``magnetic module gen2``, you will need to make further modifications to use the :ref:`magnetic-block` and Flex Gripper instead. This will require reworking some of your protocol steps, and you should verify that your new protocol design achieves similar results.
 
-.. TK some code from the science team?
+This simplified example, taken from a DNA extraction protocol, shows how using the Flex Gripper and the Magnetic Block can save time. Instead of pipetting an entire plate's worth of liquid from the Heater-Shaker to the Magnetic Module and then engaging the module, the gripper moves the plate to the Magnetic Block in one step.
+
+.. tabs::
+    
+    .. tab:: Original OT-2 code
+    
+        .. code-block:: python
+
+            hs_mod.set_and_wait_for_shake_speed(2000)
+            protocol.delay(minutes=5)
+            hs_mod.deactivate_shaker()
+        
+            for i in sample_plate.wells():
+                # mix, transfer, and blow-out all samples
+                pipette.pick_up_tip()
+                pipette.aspirate(100,hs_plate[i])
+                pipette.dispense(100,hs_plate[i])
+                pipette.aspirate(100,hs_plate[i])
+                pipette.air_gap(10)
+                pipette.dispense(pipette.current_volume,mag_plate[i])
+                pipette.aspirate(50,hs_plate[i])
+                pipette.air_gap(10)
+                pipette.dispense(pipette.current_volume,mag_plate[i])
+                pipette.blow_out(mag_plate[i].bottom(0.5))
+                pipette.drop_tip()
+        
+            mag_mod.engage()
+        
+            # perform elution steps
+
+    .. tab:: Updated Flex code
+    
+        .. code-block:: python
+
+            hs_mod.set_and_wait_for_shake_speed(2000)
+            protocol.delay(minutes=5)
+            hs_mod.deactivate_shaker()
+        
+            # move entire plate
+            # no pipetting from Heater-Shaker needed
+            hs_mod.open_labware_latch()
+            protocol.move_labware(sample_plate, mag_block, use_gripper=True)
+        
+            # perform elution steps
