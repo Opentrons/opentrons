@@ -108,7 +108,8 @@ export function InstrumentsAndModules({
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
-  const attachPipetteRequired = attachedLeftPipette == null
+  const attachPipetteRequired =
+    attachedLeftPipette == null && attachedRightPipette == null
   const updatePipetteFWRequired =
     badLeftPipette != null || badRightPipette != null
 
