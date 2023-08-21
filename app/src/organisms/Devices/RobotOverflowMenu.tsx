@@ -62,7 +62,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
 
-  const isRobotBusy = useIsRobotBusy()
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()

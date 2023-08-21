@@ -18,7 +18,7 @@ export function useIsRobotBusy(
   const robotHasCurrentRun =
     useAllRunsQuery({}, queryOptions)?.data?.links?.current != null
   const allSessionsQueryResponse = useAllSessionsQuery(queryOptions)
-  const { data: estopStatus, error: estopError } = useEstopQuery()
+  const { data: estopStatus, error: estopError } = useEstopQuery(queryOptions)
 
   return (
     robotHasCurrentRun ||
