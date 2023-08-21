@@ -57,7 +57,7 @@ export function getAreInstrumentsReady(
   })
   const isExtensionMountReady = getProtocolUsesGripper(analysis)
     ? getAttachedGripper(attachedInstruments)?.data.calibratedOffset
-        .last_modified != null
+        ?.last_modified != null
     : true
 
   return allSpeccedPipettesReady && isExtensionMountReady
