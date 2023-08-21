@@ -86,7 +86,7 @@ For example, the following dummy protocol will use a Flex 50 µL pipette to enab
 .. code-block:: python
     :substitutions:
 
-    requirements = {'robotType': 'Flex','apiLevel': '|apiLevel|'}
+    requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
     def run(protocol):
         tips = protocol.load_labware('opentrons_flex_96_tiprack_50ul', 'D1')
