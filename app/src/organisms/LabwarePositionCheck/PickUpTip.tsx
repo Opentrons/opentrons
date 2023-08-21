@@ -30,6 +30,8 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
+import { useSelector } from 'react-redux'
+import { getIsOnDevice } from '../../redux/config'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -59,7 +61,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     setFatalError,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
-
+  const isOnDevice = useSelector(getIsOnDevice)
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
@@ -328,9 +330,14 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           header={t('pick_up_tip_from_rack_in_location', {
             location: displayLocation,
           })}
-          body={
-            <StyledText as="p">{t('ensure_nozzle_is_above_tip')}</StyledText>
-          }
+          body={(
+            <StyledText as="p">
+              {t('ensure_nozzle_is_above_tip')}
+              {isOnDevice
+                ? t('if_not_aligned_tap_to_jog')
+                : t('if_not_aligned_click_to_jog')}
+            </StyledText>
+          )}
           labwareDef={labwareDef}
           pipetteName={pipetteName}
           handleConfirmPosition={handleConfirmPosition}

@@ -30,7 +30,8 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
-import { useFeatureFlag } from '../../redux/config'
+import { getIsOnDevice, useFeatureFlag } from '../../redux/config'
+import { useSelector } from 'react-redux'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -64,6 +65,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   } = props
   const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { t } = useTranslation(['labware_position_check', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
@@ -111,7 +113,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   React.useEffect(() => {
     if (initialPosition == null && modulePrepCommands.length > 0) {
       chainRunCommands(modulePrepCommands, false)
-        .then(() => {})
+        .then(() => { })
         .catch((e: Error) => {
           setFatalError(
             `CheckItem module prep commands failed with message: ${e?.message}`
@@ -336,6 +338,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               {isTiprack
                 ? t('ensure_nozzle_is_above_tip')
                 : t('ensure_tip_is_above_well')}
+              {isOnDevice
+                ? t('if_not_aligned_tap_to_jog')
+                : t('if_not_aligned_click_to_jog')}
             </StyledText>
           }
           labwareDef={labwareDef}
