@@ -329,7 +329,6 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
 class PipetteConfigurations(
     PipetteGeometryDefinition,
     PipettePhysicalPropertiesDefinition,
-    PipetteLiquidPropertiesDefinition,
 ):
     """The full pipette configurations of a given model and version."""
 
@@ -339,3 +338,14 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
+    liquid_properties: Dict[
+        pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition
+    ] = Field(
+        ..., description="A dictionary of liquid properties keyed by liquid classes."
+    )
+
+    @validator("liquid_properties", pre=True)
+    def convert_liquid_properties_key(
+        cls, v: Dict[str, PipetteLiquidPropertiesDefinition]
+    ) -> Dict[pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition]:
+        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
