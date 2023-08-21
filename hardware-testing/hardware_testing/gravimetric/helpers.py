@@ -147,14 +147,13 @@ def _sense_liquid_height(
     well: Well,
     cfg: config.VolumetricConfig,
 ) -> float:
+    if ctx.is_simulating():
+        return well.depth - 1
     hwapi = get_sync_hw_api(ctx)
     pipette.move_to(well.top())
-    print(f"well top {well.top().point}")
     lps = config._get_liquid_probe_settings(cfg, well)
-    print(f"lps settings {lps}")
     height = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
     depth = well.depth - height
-    print(f"well top {well.top().point} height {height} depth {depth}")
     return depth
 
 
