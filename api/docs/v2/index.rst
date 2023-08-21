@@ -19,6 +19,7 @@ Welcome
     robot_position
     new_advanced_running
     new_examples
+    adapting_ot2_flex
     new_protocol_api
 
 The OT-2 Python Protocol API is a Python framework designed to make it easy to write automated biology lab protocols that use the OT-2 robot and optional hardware modules. We've designed the API to be accessible to anyone with basic Python and wet-lab skills. 
