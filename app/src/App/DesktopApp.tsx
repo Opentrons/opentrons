@@ -144,7 +144,7 @@ function RobotControlTakeover(): JSX.Element | null {
   const isOT3 = useIsOT3(robotName)
 
   // E-stop is not supported on OT2
-  if (isOT3) return null
+  if (!isOT3) return null
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
