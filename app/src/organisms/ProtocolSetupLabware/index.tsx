@@ -339,9 +339,7 @@ export function ProtocolSetupLabware({
           >
             <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
               <LabwareThumbnail
-                viewBox={` 0 0 ${String(
-                  selectedLabware.dimensions.xDimension
-                )} ${String(selectedLabware.dimensions.yDimension)}`}
+                viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
               >
                 <LabwareRender definition={selectedLabware} />
               </LabwareThumbnail>
