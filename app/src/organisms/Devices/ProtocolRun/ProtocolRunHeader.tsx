@@ -83,6 +83,7 @@ import {
   useIsRobotViewable,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
+  useIsOT3,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
@@ -149,6 +150,8 @@ export function ProtocolRunHeader({
     showEmergencyStopRunBanner,
     setShowEmergencyStopRunBanner,
   ] = React.useState<boolean>(false)
+  const isOT3 = useIsOT3(robotName)
+
   React.useEffect(() => {
     if (estopStatus?.data.status !== DISENGAGED && estopError == null) {
       setShowEmergencyStopRunBanner(true)
