@@ -54,7 +54,7 @@ GRAVIMETRIC_CFG = {
     1000: {
         1: gravimetric_ot3_p1000_single,
         8: gravimetric_ot3_p1000_multi,
-        96: gravimetric_ot3_p1000_96_1000ul_tip,
+        96: gravimetric_ot3_p1000_96,
     },
 }
 
