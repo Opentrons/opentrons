@@ -169,6 +169,8 @@ dev-app-update.yml:
 
 .PHONY: dev
 dev: export NODE_ENV := development
+dev: export DEBUG := $(DEBUG)
+dev: export NODE_DEBUG := $(NODE_DEBUG)
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
 	webpack
