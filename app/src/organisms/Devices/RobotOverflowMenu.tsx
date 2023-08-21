@@ -14,8 +14,6 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useEstopQuery } from '@opentrons/react-api-client'
-
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -38,7 +36,6 @@ interface RobotOverflowMenuProps extends StyleProps {
 }
 
 export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
-  console.log(useEstopQuery())
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
   const {
