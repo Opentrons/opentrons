@@ -1720,7 +1720,7 @@ class OT3API(
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
-    ) -> None:
+    ) -> Dict[Axis, float]:
         for press in pipette_spec.presses:
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
@@ -1730,6 +1730,7 @@ class OT3API(
                     mount, press.relative_down, self._current_position
                 )
                 await self._move(target_down, speed=press.speed, expect_stalls=True)
+                press_dist = await self.encoder_current_position_ot3(mount)
             # we expect a stall has happened during pick up, so we want to
             # update the motor estimation
             await self._update_position_estimation([Axis.by_mount(mount)])
@@ -1737,6 +1738,7 @@ class OT3API(
                 mount, press.relative_up, self._current_position
             )
             await self._move(target_up)
+        return press_dist
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
@@ -1815,7 +1817,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-    ) -> None:
+    ) -> Dict[Axis, float]:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
@@ -1826,7 +1828,7 @@ class OT3API(
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
-            await self._force_pick_up_tip(realmount, spec)
+            press_dist = await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -1837,16 +1839,17 @@ class OT3API(
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
 
-        if (
-            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
-            and ff.tip_presence_detection_enabled()
-        ):
-            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+        # if (
+        #     self.gantry_load != GantryLoad.HIGH_THROUGHPUT
+        #     and ff.tip_presence_detection_enabled()
+        # ):
+        #     await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
+        return press_dist
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
