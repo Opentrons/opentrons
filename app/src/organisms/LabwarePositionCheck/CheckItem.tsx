@@ -70,7 +70,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     setFatalError,
   } = props
   const goldenLPC = useFeatureFlag('lpcWithProbe')
-  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
@@ -138,7 +138,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
   const isTiprack = getIsTiprack(labwareDef)
-  const displayLocation = getDisplayLocation(location, labwareDefs, t)
+  const displayLocation = getDisplayLocation(location, labwareDefs, t, i18n)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   let placeItemInstruction: JSX.Element = (
@@ -178,7 +178,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           location: getDisplayLocation(
             omit(location, ['definitionUri']), // only want the adapter's location here
             labwareDefs,
-            t
+            t,
+            i18n
           ),
         }}
         components={{

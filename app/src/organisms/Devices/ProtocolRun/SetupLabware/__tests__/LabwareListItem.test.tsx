@@ -3,6 +3,7 @@ import { fireEvent } from '@testing-library/react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { StaticRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
+import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
 import { i18n } from '../../../../../i18n'
 import {
   mockHeaterShaker,
@@ -13,7 +14,13 @@ import {
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type {
+  LoadLabwareRunTimeCommand,
+  ModuleModel,
+  ModuleType,
+  LabwareDefinition2,
+  LoadModuleRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../../redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '../../../hooks'
 
@@ -27,6 +34,8 @@ const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFu
   typeof useCreateLiveCommandMutation
 >
 
+const mockAdapterDef = fixture_adapter as LabwareDefinition2
+const mockAdapterId = 'mockAdapterId'
 const mockNestedLabwareDisplayName = 'nested labware display name'
 const mockLocationInfo = {
   labwareOffset: { x: 1, y: 1, z: 1 },
@@ -191,6 +200,92 @@ describe('LabwareListItem', () => {
     })
     getByText('Mock Labware Definition')
     getByText('Slot 7, Temperature Module GEN1')
+    getByText('nickName')
+  })
+
+  it('renders the correct info for a labware on an adapter on top of a temperature module', () => {
+    const mockAdapterLoadCommand: LoadLabwareRunTimeCommand = {
+      commandType: 'loadLabware',
+      params: {
+        location: { moduleId: mockModuleId },
+      },
+      result: {
+        labwareId: mockAdapterId,
+        definition: mockAdapterDef,
+      },
+      offsets: {
+        x: 0,
+        y: 1,
+        z: 1.2,
+      },
+    } as any
+    const mockModuleLoadCommand: LoadModuleRunTimeCommand = {
+      commandType: 'loadModule',
+      params: {
+        moduleId: mockModuleId,
+        location: { slotName: 7 },
+        model: 'temperatureModuleV2',
+      },
+    } as any
+
+    const { getByText } = render({
+      commands: [mockAdapterLoadCommand, mockModuleLoadCommand],
+      nickName: mockNickName,
+      definition: mockLabwareDef,
+      initialLocation: { labwareId: mockAdapterId },
+      moduleModel: 'temperatureModuleV1' as ModuleModel,
+      moduleLocation: mockModuleSlot,
+      extraAttentionModules: [],
+      attachedModuleInfo: {
+        [mockModuleId]: ({
+          moduleId: 'temperatureModuleId',
+          attachedModuleMatch: (mockTemperatureModule as any) as AttachedModule,
+          moduleDef: {
+            moduleId: 'someTemperatureModule',
+            model: 'temperatureModuleV2' as ModuleModel,
+            type: 'temperatureModuleType' as ModuleType,
+            ...mockLocationInfo,
+          } as any,
+          ...mockAttachedModuleInfo,
+        } as any) as ModuleRenderInfoForProtocol,
+      },
+      isOt3: false,
+    })
+    getByText('Mock Labware Definition')
+    getByText('Slot 7, Opentrons 96 PCR Adapter on Temperature Module GEN2')
+    getByText('nickName')
+  })
+
+  it('renders the correct info for a labware on an adapter on the deck', () => {
+    const mockAdapterLoadCommand: LoadLabwareRunTimeCommand = {
+      commandType: 'loadLabware',
+      params: {
+        location: { slotName: 'A2' },
+      },
+      result: {
+        labwareId: mockAdapterId,
+        definition: mockAdapterDef,
+      },
+      offsets: {
+        x: 0,
+        y: 1,
+        z: 1.2,
+      },
+    } as any
+
+    const { getByText } = render({
+      commands: [mockAdapterLoadCommand],
+      nickName: mockNickName,
+      definition: mockLabwareDef,
+      initialLocation: { labwareId: mockAdapterId },
+      moduleModel: null,
+      moduleLocation: null,
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isOt3: false,
+    })
+    getByText('Mock Labware Definition')
+    getByText('Slot A2, Opentrons 96 PCR Adapter')
     getByText('nickName')
   })
 
