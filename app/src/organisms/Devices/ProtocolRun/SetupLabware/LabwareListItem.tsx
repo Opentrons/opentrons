@@ -331,9 +331,7 @@ function StandaloneLabware(props: {
   const { definition } = props
   return (
     <LabwareThumbnail
-      viewBox={` 0 0 ${String(definition.dimensions.xDimension)} ${String(
-        definition.dimensions.yDimension
-      )}`}
+      viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
     >
       <LabwareRender
         definition={definition}
