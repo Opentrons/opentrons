@@ -292,6 +292,7 @@ export function ProtocolRunHeader({
         ) : null}
         {estopStatus?.data.status !== DISENGAGED &&
         estopError == null &&
+        isOT3 &&
         showEmergencyStopRunBanner ? (
           <EmergencyStopRunBanner
             setShowEmergencyStopRunBanner={setShowEmergencyStopRunBanner}
