@@ -37,6 +37,12 @@ const EXIT_BUTTON_STYLE = css`
     margin-right: 1.75rem;
     font-size: ${TYPOGRAPHY.fontSize22};
     font-weight: ${TYPOGRAPHY.fontWeightBold};
+    &:hover {
+      opacity: 100%;
+    }
+    &:active {
+      opacity: 70%;
+    }
   }
 `
 const BOX_STYLE = css`
