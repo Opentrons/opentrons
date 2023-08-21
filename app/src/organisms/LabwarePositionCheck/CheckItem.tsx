@@ -429,6 +429,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               {isTiprack
                 ? t('ensure_nozzle_is_above_tip')
                 : t('ensure_tip_is_above_well')}
+              &nbsp;
               {isOnDevice
                 ? t('if_not_aligned_tap_to_jog')
                 : t('if_not_aligned_click_to_jog')}

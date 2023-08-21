@@ -92,7 +92,7 @@ describe('PickUpTip', () => {
     })
     getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
     getByText(
-      "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position.If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
+      "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
     )
     getByRole('link', { name: 'Need help?' })
   })
@@ -111,7 +111,7 @@ describe('PickUpTip', () => {
     })
     getByRole('heading', { name: 'Pick up tip from tip rack in slot D1' })
     getByText(
-      "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position.If it isn't, tap <bold>Move pipette</bold> and then jog the pipette until it is properly aligned."
+      "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap <bold>Move pipette</bold> and then jog the pipette until it is properly aligned."
     )
   })
   it('executes correct chained commands when confirm placement CTA is clicked', async () => {
