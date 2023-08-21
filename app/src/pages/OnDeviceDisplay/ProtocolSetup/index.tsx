@@ -115,6 +115,26 @@ export function ProtocolSetupStep({
     }
   }
 
+  let backgroundColor: string
+  if (!disabled) {
+    switch (status) {
+      case 'general':
+        backgroundColor = COLORS.darkBlack40
+        break
+      case 'ready':
+        backgroundColor = COLORS.green3Pressed
+        break
+      default:
+        backgroundColor = COLORS.yellow3Pressed
+    }
+  } else backgroundColor = ''
+
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${backgroundColor};
+    }
+  `
+
   return (
     <Btn
       onClick={() =>
@@ -130,6 +150,7 @@ export function ProtocolSetupStep({
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
+        css={PUSHED_STATE_STYLE}
       >
         {status !== 'general' && !disabled ? (
           <Icon
