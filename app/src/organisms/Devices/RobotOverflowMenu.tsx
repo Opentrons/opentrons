@@ -14,6 +14,8 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import { useEstopQuery } from '@opentrons/react-api-client'
+
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -25,6 +27,7 @@ import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { useIsRobotBusy } from './hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -35,6 +38,7 @@ interface RobotOverflowMenuProps extends StyleProps {
 }
 
 export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
+  console.log(useEstopQuery())
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
   const {
@@ -61,6 +65,8 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
 
+  const isRobotBusy = useIsRobotBusy()
+
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -78,14 +84,16 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   if (robot.status === CONNECTABLE && runId == null) {
     menuItems = (
       <>
-        <MenuItem
-          {...targetProps}
-          onClick={handleClickRun}
-          disabled={isRobotOnWrongVersionOfSoftware}
-          data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
-        >
-          {t('run_a_protocol')}
-        </MenuItem>
+        {!isRobotBusy ? (
+          <MenuItem
+            {...targetProps}
+            onClick={handleClickRun}
+            disabled={isRobotOnWrongVersionOfSoftware}
+            data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+          >
+            {t('run_a_protocol')}
+          </MenuItem>
+        ) : null}
         {isRobotOnWrongVersionOfSoftware && (
           <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
             {t('shared:a_software_update_is_available')}

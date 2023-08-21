@@ -142,7 +142,7 @@ export function ProtocolRunHeader({
     runRecord?.data?.errors != null
       ? getHighestPriorityError(runRecord?.data?.errors)
       : undefined
-  const { data: estopStatus } = useEstopQuery({
+  const { data: estopStatus, error: estopError } = useEstopQuery({
     refetchInterval: ESTOP_POLL_MS,
   })
   const [
@@ -150,7 +150,7 @@ export function ProtocolRunHeader({
     setShowEmergencyStopRunBanner,
   ] = React.useState<boolean>(false)
   React.useEffect(() => {
-    if (estopStatus?.data.status !== DISENGAGED) {
+    if (estopStatus?.data.status !== DISENGAGED && estopError == null) {
       setShowEmergencyStopRunBanner(true)
     }
   }, [estopStatus?.data.status])
@@ -288,6 +288,7 @@ export function ProtocolRunHeader({
           />
         ) : null}
         {estopStatus?.data.status !== DISENGAGED &&
+        estopError == null &&
         showEmergencyStopRunBanner ? (
           <EmergencyStopRunBanner
             setShowEmergencyStopRunBanner={setShowEmergencyStopRunBanner}

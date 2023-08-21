@@ -2,6 +2,7 @@ import { UseQueryResult } from 'react-query'
 import {
   useAllSessionsQuery,
   useAllRunsQuery,
+  useEstopQuery,
 } from '@opentrons/react-api-client'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
