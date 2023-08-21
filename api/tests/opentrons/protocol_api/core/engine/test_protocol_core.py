@@ -1468,7 +1468,7 @@ def test_get_labware_location_deck_slot(
     )
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-2 Standard")
     decoy.when(
-        validation.ensure_deck_slot_string(DeckSlotName.SLOT_1, "OT-2 Standard")
+        validation.internal_slot_to_public_string(DeckSlotName.SLOT_1, "OT-2 Standard")
     ).then_return("777")
 
     assert subject.get_labware_location(mock_labware_core) == "777"
