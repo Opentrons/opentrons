@@ -117,6 +117,7 @@ describe('RobotOverflowMenu', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+
     mockUseIsRobotBusy.mockReturnValue(true)
     const { getByText, getByLabelText, queryByText } = render(props)
     const btn = getByLabelText('RobotOverflowMenu_button')
