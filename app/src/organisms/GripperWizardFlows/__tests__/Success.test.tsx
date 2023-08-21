@@ -64,7 +64,7 @@ describe('Success', () => {
       successfulAction: SUCCESSFULLY_ATTACHED,
     })[0]
     getByText('Gripper successfully attached')
-    getByRole('button', { name: 'Calibrate gripper' })
+    getByRole('button', { name: 'Calibrate Gripper' })
   })
 
   it('renders correct text for detached', () => {
