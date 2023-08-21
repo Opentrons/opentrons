@@ -2194,7 +2194,6 @@ class OT3API(
 
         pos = await self.gantry_position(mount, refresh=True)
         probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
-        print(f"start pos {probe_start_pos}")
         await self.move_to(mount, probe_start_pos)
 
         if probe_settings.aspirate_while_sensing:
