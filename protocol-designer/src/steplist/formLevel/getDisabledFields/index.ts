@@ -18,6 +18,7 @@ function _getDisabledFields(rawForm: FormData): Set<string> {
     case 'pause':
     case 'magnet':
     case 'thermocycler':
+    case 'moveLabware':
       return new Set()
 
     // nothing to disabled

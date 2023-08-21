@@ -153,7 +153,7 @@ export const LabwarePositionCheckComponent = (
         pipetteId: pip.id,
         labwareId: FIXED_TRASH_ID,
         wellName: 'A1',
-        wellLocation: { origin: 'top' as const },
+        wellLocation: { origin: 'default' as const },
       },
     }))
     chainRunCommands(

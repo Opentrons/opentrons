@@ -70,10 +70,10 @@ describe('PickUpTip', () => {
   })
   it('renders correct copy when preparing space', () => {
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare tip rack in slot D1' })
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
-      matchTextWithSpans('Place a full Mock TipRack Definition into slot D1')
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
     )
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
@@ -90,7 +90,7 @@ describe('PickUpTip', () => {
         },
       ],
     })
-    getByRole('heading', { name: 'Pick up tip from tip rack in slot D1' })
+    getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
     getByText(
       "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position.If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
     )

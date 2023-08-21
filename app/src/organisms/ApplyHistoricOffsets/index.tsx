@@ -22,6 +22,7 @@ import {
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { StyledText } from '../../atoms/text'
+import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -154,13 +155,23 @@ export function ApplyHistoricOffsets(
                 isLabwareOffsetCodeSnippetsOn ? (
                   <LabwareOffsetTabs
                     TableComponent={
-                      <LabwareOffsetTable offsetCandidates={offsetCandidates} />
+                      <LabwareOffsetTable
+                        offsetCandidates={offsetCandidates}
+                        labwareDefinitions={getLabwareDefinitionsFromCommands(
+                          commands
+                        )}
+                      />
                     }
                     JupyterComponent={JupyterSnippet}
                     CommandLineComponent={CommandLineSnippet}
                   />
                 ) : (
-                  <LabwareOffsetTable offsetCandidates={offsetCandidates} />
+                  <LabwareOffsetTable
+                    offsetCandidates={offsetCandidates}
+                    labwareDefinitions={getLabwareDefinitionsFromCommands(
+                      commands
+                    )}
+                  />
                 )
               ) : null}
             </Flex>

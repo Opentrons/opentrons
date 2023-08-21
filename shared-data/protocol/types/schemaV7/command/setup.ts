@@ -65,6 +65,7 @@ export type SetupRunTimeCommand =
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
+
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
@@ -73,6 +74,12 @@ export type SetupCreateCommand =
   | MoveLabwareCreateCommand
 
 export type LabwareLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
+  | { labwareId: string }
+
+export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }

@@ -20,7 +20,10 @@ import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
-import { getLabwareDef } from './utils/labware'
+import {
+  getLabwareDef,
+  getLabwareDefinitionsFromCommands,
+} from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { Jog } from '../../molecules/JogControls/types'
@@ -45,7 +48,7 @@ interface PickUpTipProps extends PickUpTipStep {
   isRobotMoving: boolean
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
-  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const {
     labwareId,
     pipetteId,
@@ -72,7 +75,12 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
-  const displayLocation = getDisplayLocation(location, t)
+  const displayLocation = getDisplayLocation(
+    location,
+    getLabwareDefinitionsFromCommands(protocolData.commands),
+    t,
+    i18n
+  )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   const instructions = [
     t('clear_all_slots'),

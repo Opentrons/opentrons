@@ -1,7 +1,7 @@
 import reduce from 'lodash/reduce'
 import { AIR } from '@opentrons/step-generation'
-import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { WellFill } from '@opentrons/components'
+import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { ContentsByWell, WellContents } from '../../labware-ingred/types'
 
 const ingredIdsToColor = (

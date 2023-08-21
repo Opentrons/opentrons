@@ -20,10 +20,12 @@
     "run": 0.8
   },
   "plungerPositionsConfigurations": {
-    "top": 0.5,
-    "bottom": 68.5,
-    "blowout": 73.5,
-    "drop": 80
+    "default": {
+      "top": 0.5,
+      "bottom": 68.5,
+      "blowout": 73.5,
+      "drop": 80
+    }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],

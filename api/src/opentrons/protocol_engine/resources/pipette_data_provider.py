@@ -44,26 +44,32 @@ def get_virtual_pipette_static_config(
         pipette_model.pipette_version,
     )
 
-    tip_configuration = config.supported_tips[
-        pip_types.PipetteTipType(config.max_volume)
+    # TODO the liquid classes should be made configurable
+    # in a follow-up PR.
+    liquid_class = pip_types.LiquidClasses.default
+    tip_configuration = config.liquid_properties[liquid_class].supported_tips[
+        pip_types.PipetteTipType(config.liquid_properties[liquid_class].max_volume)
     ]
     return LoadedStaticPipetteData(
         model=str(pipette_model),
         display_name=config.display_name,
-        min_volume=config.min_volume,
-        max_volume=config.max_volume,
+        min_volume=config.liquid_properties[liquid_class].min_volume,
+        max_volume=config.liquid_properties[liquid_class].max_volume,
         channels=config.channels,
         home_position=config.mount_configurations.homePosition,
         nozzle_offset_z=config.nozzle_offset[2],
         tip_configuration_lookup_table={
-            k.value: v for k, v in config.supported_tips.items()
+            k.value: v
+            for k, v in config.liquid_properties[liquid_class].supported_tips.items()
         },
         flow_rates=FlowRates(
             default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
             default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
             default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
         ),
-        nominal_tip_overlap=config.tip_overlap_dictionary,
+        nominal_tip_overlap=config.liquid_properties[
+            liquid_class
+        ].tip_overlap_dictionary,
     )
 
 
