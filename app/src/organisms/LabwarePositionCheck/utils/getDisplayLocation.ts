@@ -1,4 +1,3 @@
-import capitalize from 'lodash/capitalize'
 import {
   getModuleDisplayName,
   getModuleType,
@@ -6,18 +5,19 @@ import {
   getLabwareDefURI,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { i18n, TFunction } from 'i18next'
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
-import type { TFunction } from 'i18next'
 
 export function getDisplayLocation(
   location: LabwareOffsetLocation,
   labwareDefinitions: LabwareDefinition2[],
   t: TFunction,
-  //  TODO: (jr, 8/18/23): perhaps find a new route here and refactor this,
-  //  only some instances of slot need to be capitalized depending on the parent component
-  capitalizeSlot?: boolean
+  i18n: i18n
 ): string {
-  const slotDisplayLocation = t('slot_name', { slotName: location.slotName })
+  const slotDisplayLocation = i18n.format(
+    t('slot_name', { slotName: location.slotName }),
+    'titleCase'
+  )
 
   if ('definitionUri' in location && location.definitionUri != null) {
     const adapterDisplayName = labwareDefinitions.find(
@@ -57,8 +57,6 @@ export function getDisplayLocation(
       })
     }
   } else {
-    return capitalizeSlot
-      ? capitalize(slotDisplayLocation)
-      : slotDisplayLocation
+    return slotDisplayLocation
   }
 }

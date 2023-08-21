@@ -40,7 +40,7 @@ export function LabwareOffsetTable(
   props: LabwareOffsetTableProps
 ): JSX.Element | null {
   const { offsetCandidates, labwareDefinitions } = props
-  const { t } = useTranslation('labware_position_check')
+  const { t, i18n } = useTranslation('labware_position_check')
   return (
     <OffsetTable>
       <thead>
@@ -55,7 +55,7 @@ export function LabwareOffsetTable(
         {offsetCandidates.map(offset => (
           <OffsetTableRow key={offset.id}>
             <OffsetTableDatum>
-              {getDisplayLocation(offset.location, labwareDefinitions, t, true)}
+              {getDisplayLocation(offset.location, labwareDefinitions, t, i18n)}
             </OffsetTableDatum>
             <OffsetTableDatum>
               {formatTimestamp(offset.runCreatedAt)}

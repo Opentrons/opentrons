@@ -66,7 +66,7 @@ export function CurrentOffsetsTable(
   props: CurrentOffsetsTableProps
 ): JSX.Element {
   const { currentOffsets, commands, labware, modules } = props
-  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
@@ -95,7 +95,7 @@ export function CurrentOffsetsTable(
                   offset.location,
                   getLabwareDefinitionsFromCommands(commands),
                   t,
-                  true // capitalize Slot
+                  i18n
                 )}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>

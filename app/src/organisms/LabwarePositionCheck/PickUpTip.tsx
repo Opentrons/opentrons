@@ -46,7 +46,7 @@ interface PickUpTipProps extends PickUpTipStep {
   isRobotMoving: boolean
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
-  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const {
     labwareId,
     pipetteId,
@@ -76,7 +76,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const displayLocation = getDisplayLocation(
     location,
     getLabwareDefinitionsFromCommands(protocolData.commands),
-    t
+    t,
+    i18n
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   const instructions = [
