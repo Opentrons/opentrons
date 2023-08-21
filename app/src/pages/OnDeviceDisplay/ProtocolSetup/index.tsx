@@ -219,33 +219,6 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   )
 }
 
-const PLAY_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.blueEnabled};
-  }
-
-  &:active {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
 interface PlayButtonProps {
   ready: boolean
   onPlay?: () => void
@@ -271,7 +244,33 @@ function PlayButton({
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
-      css={PLAY_BUTTON_STYLE}
+      css={css`
+        -webkit-tap-highlight-color: transparent;
+        &:focus {
+          background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+          color: ${COLORS.white};
+        }
+
+        &:hover {
+          background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+          color: ${COLORS.white};
+        }
+
+        &:focus-visible {
+          box-shadow: ${ODD_FOCUS_VISIBLE};
+          background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+        }
+
+        &:active {
+          background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+          color: ${COLORS.white};
+        }
+
+        &:disabled {
+          background-color: ${COLORS.darkBlack20};
+          color: ${COLORS.darkBlack60};
+        }
+      `}
     >
       <Icon
         color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
