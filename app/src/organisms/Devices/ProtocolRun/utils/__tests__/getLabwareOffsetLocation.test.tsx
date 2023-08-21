@@ -9,8 +9,8 @@ import type {
   LoadedLabware,
   LoadedModule,
   ProtocolAnalysisFile,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('../getLabwareLocation')
 jest.mock('../getModuleInitialLoadInfo')
