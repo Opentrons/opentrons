@@ -152,7 +152,7 @@ def _change_to_camel_case(c: str) -> str:
     return f"{config_name[0]}" + "".join(s.capitalize() for s in config_name[1::])
 
 
-def update_pipette_configuration(
+def update_pipette_configuration(  # noqa: C901
     base_configurations: PipetteConfigurations,
     v1_configuration_changes: Dict[str, Any],
     liquid_class: Optional[LiquidClasses] = None,

@@ -504,7 +504,9 @@ async def test_blow_out_position(
         # make sure target distance is not more than max blowout position
         assert (
             position_result[pipette_axis]
-            < instr_data["config"].plunger_positions_configurations[liquid_class].blow_out
+            < instr_data["config"]
+            .plunger_positions_configurations[liquid_class]
+            .blow_out
         )
         # make sure calculated position is roughly what we expect
         assert position_result[pipette_axis] == pytest.approx(

@@ -93,14 +93,6 @@
     "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5
   },
   "maxVolume": 50,
-<<<<<<< HEAD
-<<<<<<< HEAD
   "minVolume": 5,
-=======
-  "minVolume": 0.5,
->>>>>>> nest values by liquid class and support this change in the definitions
-=======
-  "minVolume": 5,
->>>>>>> change pipette max volumes
   "defaultTipracks": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
 }
