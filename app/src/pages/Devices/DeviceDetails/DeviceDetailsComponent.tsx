@@ -14,6 +14,7 @@ import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAnd
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
+import { useIsOT3 } from '../../../organisms/Devices/hooks'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -24,6 +25,7 @@ export function DeviceDetailsComponent({
 }: DeviceDetailsComponentProps): JSX.Element {
   const { data: estopStatus, error: estopError } = useEstopQuery()
   const { isEmergencyStopModalDismissed } = useEstopContext()
+  const isOT3 = useIsOT3(robotName)
 
   return (
     <Box
@@ -35,6 +37,7 @@ export function DeviceDetailsComponent({
     >
       {estopStatus?.data.status !== DISENGAGED &&
       estopError == null &&
+      isOT3 &&
       isEmergencyStopModalDismissed ? (
         <Flex marginBottom={SPACING.spacing16}>
           <EstopBanner status={estopStatus?.data.status} />
