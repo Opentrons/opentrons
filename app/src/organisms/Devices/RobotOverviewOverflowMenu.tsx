@@ -14,6 +14,8 @@ import {
   useMountEffect,
 } from '@opentrons/components'
 
+import { useEstopQuery } from '@opentrons/react-api-client'
+
 import { Portal } from '../../App/portal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -30,6 +32,7 @@ import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useIsRobotBusy } from './hooks'
+import { DISENGAGED } from '../EmergencyStop'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
@@ -102,6 +105,9 @@ export const RobotOverviewOverflowMenu = (
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
 
+  const { data: estopStatus } = useEstopQuery()
+  const isDisengaged = estopStatus?.data.status === DISENGAGED
+
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
       <Portal level="top">
@@ -153,7 +159,11 @@ export const RobotOverviewOverflowMenu = (
               <MenuItem
                 {...targetProps}
                 onClick={handleClickRun}
-                disabled={isRobotOnWrongVersionOfSoftware || isRobotBusy}
+                disabled={
+                  isRobotOnWrongVersionOfSoftware ||
+                  isRobotBusy ||
+                  !isDisengaged
+                }
                 data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
               >
                 {t('run_a_protocol')}
@@ -166,7 +176,7 @@ export const RobotOverviewOverflowMenu = (
             </>
           ) : null}
           <MenuItem
-            disabled={isRobotUnavailable}
+            disabled={isRobotUnavailable || !isDisengaged}
             onClick={handleClickHomeGantry}
             data-testid={`RobotOverviewOverflowMenu_homeGantry_${String(
               robot.name
@@ -176,7 +186,7 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
           {robot.status === CONNECTABLE ? (
             <MenuItem
-              disabled={isRobotBusy || !canDisconnect}
+              disabled={isRobotBusy || !canDisconnect || !isDisengaged}
               onClick={handleClickDisconnect}
             >
               {t('disconnect_from_network')}

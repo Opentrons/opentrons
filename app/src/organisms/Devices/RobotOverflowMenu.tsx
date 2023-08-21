@@ -25,6 +25,7 @@ import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { useEstopContext } from '../EmergencyStop'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -61,6 +62,8 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
 
+  const { estoppedRobotName } = useEstopContext()
+
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -81,7 +84,9 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         <MenuItem
           {...targetProps}
           onClick={handleClickRun}
-          disabled={isRobotOnWrongVersionOfSoftware}
+          disabled={
+            isRobotOnWrongVersionOfSoftware || robot.name === estoppedRobotName
+          }
           data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
         >
           {t('run_a_protocol')}

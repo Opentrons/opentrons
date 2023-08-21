@@ -5,11 +5,15 @@ export interface EmergencyStopContextType {
   setIsEmergencyStopModalDismissed: (
     isEmergencyStopModalDismissed: boolean
   ) => void
+  estoppedRobotName: string | null
+  setEstoppedRobotName: (estoppedRobotName: string | null) => void
 }
 
 export const EmergencyStopContext = React.createContext<EmergencyStopContextType>(
   {
     isEmergencyStopModalDismissed: false,
     setIsEmergencyStopModalDismissed: () => {},
+    estoppedRobotName: null,
+    setEstoppedRobotName: () => {},
   }
 )

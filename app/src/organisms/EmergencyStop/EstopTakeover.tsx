@@ -27,6 +27,7 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const {
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
+    setEstoppedRobotName,
   } = useEstopContext()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const closeModal = (): void => {
@@ -62,6 +63,14 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
         return null
     }
   }
+
+  React.useEffect(() => {
+    if (estopStatus?.data.status === DISENGAGED) {
+      setEstoppedRobotName(null)
+    } else if (robotName != null) {
+      setEstoppedRobotName(robotName)
+    }
+  })
 
   return (
     <>

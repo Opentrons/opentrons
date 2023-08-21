@@ -37,6 +37,9 @@ export const DesktopApp = (): JSX.Element => {
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
   ] = React.useState<boolean>(false)
+  const [estoppedRobotName, setEstoppedRobotName] = React.useState<
+    string | null
+  >(null)
 
   const desktopRoutes: RouteProps[] = [
     {
@@ -104,6 +107,8 @@ export const DesktopApp = (): JSX.Element => {
           value={{
             isEmergencyStopModalDismissed,
             setIsEmergencyStopModalDismissed,
+            estoppedRobotName,
+            setEstoppedRobotName,
           }}
         >
           <Box width="100%">

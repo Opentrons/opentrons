@@ -7,10 +7,14 @@ export function useEstopContext(): EmergencyStopContextType {
   const {
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
+    estoppedRobotName,
+    setEstoppedRobotName,
   } = React.useContext(EmergencyStopContext)
 
   return {
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
+    estoppedRobotName,
+    setEstoppedRobotName,
   }
 }
