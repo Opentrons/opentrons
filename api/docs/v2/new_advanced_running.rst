@@ -34,7 +34,7 @@ Rather than writing a  ``run`` function and embedding commands within it, start 
 .. code-block:: python
 
     import opentrons.execute
-    protocol = opentrons.execute.get_protocol_api('2.13')
+    protocol = opentrons.execute.get_protocol_api("2.13")
     protocol.home()
 
 The first command you execute should always be :py:meth:`~opentrons.protocol_api.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
@@ -58,7 +58,7 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
 
 .. code-block:: python
 
-    protocol = opentrons.execute.get_protocol_api('2.13')
+    protocol = opentrons.execute.get_protocol_api("2.13")
     run(protocol)  # your protocol will now run
 
 .. _using_lpc:
@@ -81,39 +81,38 @@ Creating the dummy protocol requires you to:
     4. Load your smallest capacity pipette and specify its ``tipracks``.
     5. Call ``pick_up_tip()``. Labware Position Check can't run if you don't pick up a tip.
     
-For example, the following dummy protocol will use a Flex 50 µL pipette to enable Labware Position Check for a Flex tip rack, NEST reservoir, and NEST flat well plate.
+For example, the following dummy protocol will use a P300 Single-Channel GEN2 pipette to enable Labware Position Check for an OT-2 tip rack, NEST reservoir, and NEST flat well plate.
 
 .. code-block:: python
-    :substitutions:
 
-    requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
-
-    def run(protocol):
-        tips = protocol.load_labware('opentrons_flex_96_tiprack_50ul', 'D1')
-        reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
-        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
-        pipette = protocol.load_instrument('flex_1channel_50', 'left', tip_racks=[tips])
-        pipette.pick_up_tip()
-        pipette.return_tip()
+    metadata = {"apiLevel": "2.13"} 
+  
+     def run(protocol): 
+         tiprack = protocol.load_labware("opentrons_96_tiprack_300ul", 1) 
+         reservoir = protocol.load_labware("nest_12_reservoir_15ml", 2) 
+         plate = protocol.load_labware("nest_96_wellplate_200ul_flat", 3) 
+         p300 = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tiprack]) 
+         p300.pick_up_tip() 
+         p300.return_tip()
 
 After importing this protocol to the Opentrons App, run Labware Position Check to get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware.
 
 .. code-block:: python
 	
-    labware_1 = protocol.load_labware('opentrons_flex_96_tiprack_200ul', location='D1')
+    labware_1 = protocol.load_labware("opentrons_96_tiprack_300ul", location="1")
     labware_1.set_offset(x=0.00, y=0.00, z=0.00)
 
-    labware_2 = protocol.load_labware('nest_12_reservoir_15ml', location='D2')
+    labware_2 = protocol.load_labware("nest_12_reservoir_15ml", location="2")
     labware_2.set_offset(x=0.10, y=0.20, z=0.30)
 
-    labware_3 = protocol.load_labware('nest_96_wellplate_200ul_flat', location='D3')
+    labware_3 = protocol.load_labware("nest_96_wellplate_200ul_flat", location="3")
     labware_3.set_offset(x=0.10, y=0.20, z=0.30)
     
 This automatically generated code uses generic names for the loaded labware. If you want to match the labware names already in your protocol, change the labware names to match your original code:
 
 .. code-block:: python
 
-    reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
+    reservoir = protocol.load_labware("nest_12_reservoir_15ml", "2")
     reservoir.set_offset(x=0.10, y=0.20, z=0.30)
     
 .. versionadded:: 2.12
