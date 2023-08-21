@@ -1,11 +1,11 @@
 import { when, resetAllWhenMocks } from 'jest-when'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
 import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
 import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
 import { getLabwareLocation } from '../getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
-import {
-  getLabwareDefURI,
+import type {
   LoadedLabware,
   LoadedModule,
   ProtocolAnalysisFile,
