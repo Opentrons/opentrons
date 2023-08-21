@@ -1075,13 +1075,6 @@ def test_ensure_location_not_occupied_raises(
     )
 
 
-@pytest.mark.parametrize(
-    argnames=["location", "expected_center_point"],
-    argvalues=[
-        (DeckSlotLocation(slotName=DeckSlotName.SLOT_1), Point(101.0, 102.0, 203)),
-        (ModuleLocation(moduleId="module-id"), Point(111.0, 122.0, 233)),
-    ],
-)
 def test_get_labware_grip_point(
     decoy: Decoy,
     labware_view: LabwareView,
@@ -1096,20 +1089,6 @@ def test_get_labware_grip_point(
         labware_view.get_grip_height_from_labware_bottom("labware-id")
     ).then_return(100)
 
-    if isinstance(location, ModuleLocation):
-        decoy.when(labware_view.get_deck_definition()).then_return(
-            ot2_standard_deck_def
-        )
-        decoy.when(
-            module_view.get_module_offset(
-                module_id="module-id", deck_type=DeckType.OT2_STANDARD
-            )
-        ).then_return(LabwareOffsetVector(x=10, y=20, z=30))
-
-        decoy.when(module_view.get_location("module-id")).then_return(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-        )
-
     decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_1)).then_return(
         Point(x=101, y=102, z=103)
     )
@@ -1120,30 +1099,43 @@ def test_get_labware_grip_point(
     assert labware_center == expected_center_point
 
 
+@pytest.mark.parametrize(
+    argnames=["location", "expected_center_point"],
+    argvalues=[
+        (OnLabwareLocation(labwareId="labware-id"), Point(5, 10, 115.0)),
+        (ModuleLocation(moduleId="module-id"), Point(111.0, 122.0, 233)),
+    ],
+)
 def test_get_labware_grip_point_on_labware(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     ot2_standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
+    location: Union[ModuleLocation, OnLabwareLocation],
+    expected_center_point: Point,
 ) -> None:
     """It should get the grip point of a labware on another labware."""
-    decoy.when(labware_view.get(labware_id="labware-id")).then_return(
-        LoadedLabware(
-            id="labware-id",
-            loadName="above-name",
-            definitionUri="1234",
-            location=OnLabwareLocation(labwareId="below-id"),
+    if isinstance(location, ModuleLocation):
+        decoy.when(module_view.get_location("module-id")).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_4))
+    else:
+
+        decoy.when(labware_view.get(labware_id="labware-id")).then_return(
+            LoadedLabware(
+                id="labware-id",
+                loadName="above-name",
+                definitionUri="1234",
+                location=OnLabwareLocation(labwareId="below-id"),
+            )
         )
-    )
-    decoy.when(labware_view.get(labware_id="below-id")).then_return(
-        LoadedLabware(
-            id="below-id",
-            loadName="below-name",
-            definitionUri="1234",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        decoy.when(labware_view.get(labware_id="below-id")).then_return(
+            LoadedLabware(
+                id="below-id",
+                loadName="below-name",
+                definitionUri="1234",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            )
         )
-    )
 
     decoy.when(labware_view.get_dimensions("below-id")).then_return(
         Dimensions(x=1000, y=1001, z=11)
@@ -1163,7 +1155,7 @@ def test_get_labware_grip_point_on_labware(
         labware_id="labware-id", location=OnLabwareLocation(labwareId="below-id")
     )
 
-    assert grip_point == Point(5, 10, 115.0)
+    assert grip_point == expected_center_point
 
 
 @pytest.mark.parametrize(
