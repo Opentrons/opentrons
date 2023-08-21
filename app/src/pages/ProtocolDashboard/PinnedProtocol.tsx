@@ -85,7 +85,7 @@ export function PinnedProtocol(props: {
     }
   }, [longpress.isLongPressed, longPress])
 
-  const PUSHED_STATE_STYLING = css`
+  const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${longpress.isLongPressed ? '' : COLORS.darkBlack40};
     }
@@ -96,7 +96,7 @@ export function PinnedProtocol(props: {
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
-      css={PUSHED_STATE_STYLING}
+      css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing24}
       height={cardStyleBySize[cardSize].height}

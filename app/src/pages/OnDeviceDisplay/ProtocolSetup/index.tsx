@@ -127,7 +127,7 @@ export function ProtocolSetupStep({
     }
   } else backgroundColor = ''
 
-  const PUSHED_STATE_STYLING = css`
+  const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${backgroundColor};
     }
@@ -148,7 +148,7 @@ export function ProtocolSetupStep({
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
-        css={PUSHED_STATE_STYLING}
+        css={PUSHED_STATE_STYLE}
       >
         {status !== 'general' && !disabled ? (
           <Icon

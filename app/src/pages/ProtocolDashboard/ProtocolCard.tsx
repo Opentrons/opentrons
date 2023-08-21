@@ -126,7 +126,7 @@ export function ProtocolCard(props: {
     }
   }
 
-  const PUSHED_STATE_STYLING = css`
+  const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${longpress.isLongPressed
         ? ''
@@ -146,7 +146,7 @@ export function ProtocolCard(props: {
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}
       ref={longpress.ref}
-      css={PUSHED_STATE_STYLING}
+      css={PUSHED_STATE_STYLE}
     >
       <Flex
         width="30.75rem"

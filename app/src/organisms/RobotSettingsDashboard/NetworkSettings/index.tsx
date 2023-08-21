@@ -98,7 +98,7 @@ function NetworkSettingButton({
   networkName,
   onClick,
 }: NetworkSettingButtonProps): JSX.Element {
-  const PUSHED_STATE_STYLING = css`
+  const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${chipType === 'success'
         ? COLORS.green3Pressed
@@ -113,7 +113,7 @@ function NetworkSettingButton({
       paddingY={SPACING.spacing20}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadiusSize3}
-      css={PUSHED_STATE_STYLING}
+      css={PUSHED_STATE_STYLE}
       onClick={onClick}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
