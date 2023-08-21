@@ -70,6 +70,10 @@ div.sphinxsidebar {
     overflow-y: auto;
 }
 
+div.sphinxsidebarwrapper {
+    padding-top: 6px;
+}
+
 p.blurb {
     display: none;
 }
