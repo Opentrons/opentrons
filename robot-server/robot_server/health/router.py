@@ -15,6 +15,10 @@ LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
 
 health_router = APIRouter()
 
+@health_router.get(path='/version', status_code=status.HTTP_200_OK)
+async def get_version():
+    return {"version": "firerock-stable-6.3.1"}
+
 
 @health_router.get(
     path="/health",
