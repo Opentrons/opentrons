@@ -220,6 +220,7 @@ ul ul {
         order: 2;
         top: 0;
         padding-top: 0;
+        max-height: none;
     }
     div.documentwrapper{
         order: 1;
