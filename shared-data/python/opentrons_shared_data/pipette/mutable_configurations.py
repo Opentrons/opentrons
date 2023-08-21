@@ -50,7 +50,6 @@ def _migrate_to_v2_configurations(
     value of that configuration."""
     quirks_list = []
     dict_of_base_model = base_configurations.dict(by_alias=True)
-
     for c, v in v1_mutable_configs.items():
         if isinstance(v, str):
             # ignore the saved model
@@ -74,6 +73,9 @@ def _migrate_to_v2_configurations(
                     dict_of_base_model["liquid_properties"][LIQUID_CLASS][top_name][k][
                         nested_name
                     ] = v
+            elif new_names.get("liquid_class") and isinstance(v, MutableConfig):
+                _class = LiquidClasses[new_names["liquid_class"]]
+                dict_of_base_model[top_name][_class][nested_name] = v.value
             elif isinstance(v, MutableConfig):
                 # isinstances are needed for type checking.
                 dict_of_base_model[top_name][nested_name] = v.value
@@ -91,6 +93,10 @@ def _migrate_to_v2_configurations(
     }
     dict_of_base_model["liquid_properties"] = {
         k.name: v for k, v in dict_of_base_model["liquid_properties"].items()
+    }
+    dict_of_base_model["plungerPositionsConfigurations"] = {
+        k.name: v
+        for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
     }
     return PipetteConfigurations.parse_obj(dict_of_base_model)
 
@@ -158,6 +164,9 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
         default_value = configs["liquid_properties"][LIQUID_CLASS][
             lookup_dict["top_level_name"]
         ][tip_list[-1]][nested_name]
+    elif lookup_dict.get("liquid_class"):
+        _class = LiquidClasses[lookup_dict["liquid_class"]]
+        default_value = configs[lookup_dict["top_level_name"]][_class][nested_name]
     else:
         default_value = configs[lookup_dict["top_level_name"]][nested_name]
     return MutableConfig(

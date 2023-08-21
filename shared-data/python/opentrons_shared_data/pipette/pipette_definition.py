@@ -214,9 +214,9 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     plunger_motor_configurations: MotorConfigurations = Field(
         ..., alias="plungerMotorConfigurations"
     )
-    plunger_positions_configurations: PlungerPositions = Field(
-        ..., alias="plungerPositionsConfigurations"
-    )
+    plunger_positions_configurations: Dict[
+        pip_types.LiquidClasses, PlungerPositions
+    ] = Field(..., alias="plungerPositionsConfigurations")
     available_sensors: AvailableSensorDefinition = Field(..., alias="availableSensors")
     partial_tip_configurations: PartialTipDefinition = Field(
         ..., alias="partialTipConfigurations"
@@ -258,6 +258,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     @validator("quirks", pre=True)
     def convert_quirks(cls, v: List[str]) -> List[pip_types.Quirks]:
         return [pip_types.Quirks(q) for q in v]
+
+    @validator("plunger_positions_configurations", pre=True)
+    def convert_plunger_positions(
+        cls, v: Dict[str, PlungerPositions]
+    ) -> Dict[pip_types.LiquidClasses, PlungerPositions]:
+        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
 
     class Config:
         json_encoders = {
