@@ -68,14 +68,16 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           savedStepForms,
           labwareId
         )
-        const module = moduleOnDeck
-          ? i18n.t(
-              `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
-            )
-          : null
-        const nickName = module
-          ? `${nicknamesById[labwareId]} in ${module}`
-          : nicknamesById[labwareId]
+        const module =
+          moduleOnDeck != null
+            ? i18n.t(
+                `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
+              )
+            : null
+        const nickName =
+          module != null
+            ? `${nicknamesById[labwareId]} in ${module}`
+            : nicknamesById[labwareId]
 
         if (!moveLabwarePresavedStep) {
           return getIsTiprack(labwareEntity.def) || isAdapter
