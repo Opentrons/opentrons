@@ -172,7 +172,7 @@ export function RobotSettingButton({
           <InlineNotification
             type="alert"
             heading={i18n.format(t('update_available'), 'capitalize')}
-            // hug={true}
+            hug={true}
           />
         ) : null}
         {enabledDevTools == null &&
