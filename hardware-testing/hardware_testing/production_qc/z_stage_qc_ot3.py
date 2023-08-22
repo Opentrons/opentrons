@@ -60,7 +60,7 @@ thread_sensor = False
 force_output = []
 
 
-def _connect_to_mark10_fixture(simulate: bool) -> Mark10:
+def _connect_to_mark10_fixture(simulate: bool) -> Union[Mark10, SimMark10]:
     """Connect to the force Gauge."""
     if not simulate:
         fixture = Mark10.create(port="/dev/ttyUSB0")
@@ -118,6 +118,8 @@ def _record_force(mark10: Mark10) -> None:
     """Record force in a separate thread."""
     global thread_sensor
     global force_output
+    if mark10.is_simulator():
+        force_output.append(0)  # to make it pass analysis
     try:
         while thread_sensor:
             force = mark10.read_force()
@@ -243,6 +245,8 @@ async def _force_gauge(
             await api.move_to(mount=mount, abs_position=pre_test_pos)
 
             ui.print_header(f"Cycle {i+1}: Testing Current = {test_current}")
+            if mark10.is_simulator():
+                mark10.set_simulation_force(test["F_MAX"])
             TH = Thread(target=_record_force, args=(mark10,))
             thread_sensor = True
             force_output = []
@@ -319,7 +323,8 @@ async def _main(arguments: argparse.Namespace) -> None:
     await api.set_gantry_load(api.gantry_load)
 
     report = _build_csv_report()
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report)
+    dut = helpers_ot3.DeviceUnderTest.OTHER
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
     for k, v in TEST_PARAMETERS.items():
         report("TEST_PARAMETERS", k, [v])
@@ -358,6 +363,8 @@ async def _main(arguments: argparse.Namespace) -> None:
             ui.print_title("Test Done - PASSED")
         else:
             ui.print_title("Test Done - FAILED")
+        report.save_to_disk()
+        report.print_results()
 
 
 if __name__ == "__main__":
