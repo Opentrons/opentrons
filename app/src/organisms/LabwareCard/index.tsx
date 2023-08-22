@@ -21,7 +21,6 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
-
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 export interface LabwareCardProps {
@@ -36,7 +35,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = definition.namespace !== 'opentrons'
-
   return (
     <Box
       role="link"
@@ -56,9 +54,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
-          viewBox={`0 0 ${String(definition.dimensions.xDimension)} ${String(
-            definition.dimensions.yDimension
-          )}`}
+          viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
         >
           {() => <LabwareRender definition={definition} />}
         </RobotWorkSpace>

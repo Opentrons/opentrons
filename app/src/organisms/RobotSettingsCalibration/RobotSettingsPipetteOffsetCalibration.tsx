@@ -73,7 +73,9 @@ export function RobotSettingsPipetteOffsetCalibration({
           updateRobotStatus={updateRobotStatus}
         />
       ) : (
-        <StyledText as="label">{t('not_calibrated')}</StyledText>
+        <StyledText as="label" marginTop={SPACING.spacing8}>
+          {t('no_pipette_attached')}
+        </StyledText>
       )}
     </Flex>
   )

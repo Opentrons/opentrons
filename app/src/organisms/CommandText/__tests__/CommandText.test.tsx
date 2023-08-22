@@ -10,7 +10,7 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import { RunTimeCommand } from '@opentrons/shared-data'
+import { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
 
 describe('CommandText', () => {
   it('renders correct text for aspirate', () => {
@@ -157,11 +157,25 @@ describe('CommandText', () => {
       getByText('Load Magnetic Module GEN2 in Slot 1')
     }
   })
+  it('renders correct text for loadLabware that is category adapter in slot', () => {
+    const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
+      c => c.commandType === 'loadLabware'
+    )
+    const loadLabwareCommand = loadLabwareCommands[0]
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        command={loadLabwareCommand}
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Load Opentrons 96 Flat Bottom Adapter in Slot 2')
+  })
   it('renders correct text for loadLabware in slot', () => {
     const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
       c => c.commandType === 'loadLabware'
     )
-    const loadTipRackCommand = loadLabwareCommands[1]
+    const loadTipRackCommand = loadLabwareCommands[2]
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
@@ -175,7 +189,7 @@ describe('CommandText', () => {
     const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
       c => c.commandType === 'loadLabware'
     )
-    const loadOnModuleCommand = loadLabwareCommands[2]
+    const loadOnModuleCommand = loadLabwareCommands[3]
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
@@ -187,14 +201,52 @@ describe('CommandText', () => {
       'Load NEST 96 Well Plate 100 µL PCR Full Skirt in Magnetic Module GEN2 in Slot 1'
     )
   })
+  it('renders correct text for loadLabware in adapter', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'loadLabware',
+          params: {
+            version: 1,
+            namespace: 'opentrons',
+            loadName: 'labwareMock',
+            location: {
+              labwareId:
+                '29444782-bdc8-4ad8-92fe-5e28872e85e5:opentrons/opentrons_96_flat_bottom_adapter/1',
+            },
+          },
+          id: 'def456',
+          result: {
+            labwareId: 'mockId',
+            definition: {
+              metadata: { displayName: 'mock displayName' },
+            } as LabwareDefinition2,
+            offset: { x: 0, y: 0, z: 0 },
+          },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Load mock displayName in Opentrons 96 Flat Bottom Adapter in Slot 2'
+    )
+  })
   it('renders correct text for loadLabware off deck', () => {
     const loadLabwareCommands = mockRobotSideAnalysis.commands.filter(
       c => c.commandType === 'loadLabware'
     )
     const loadOffDeckCommand = {
-      ...loadLabwareCommands[3],
+      ...loadLabwareCommands[4],
       params: {
-        ...loadLabwareCommands[3].params,
+        ...loadLabwareCommands[4].params,
         location: 'offDeck',
       },
     } as LoadLabwareRunTimeCommand
@@ -214,7 +266,7 @@ describe('CommandText', () => {
     const liquidId = 'zxcvbn'
     const labwareId = 'uytrew'
     const loadLiquidCommand = {
-      ...loadLabwareCommands[0],
+      ...loadLabwareCommands[1],
       commandType: 'loadLiquid',
       params: { liquidId, labwareId },
     } as LoadLiquidRunTimeCommand

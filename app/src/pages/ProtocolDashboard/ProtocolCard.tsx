@@ -74,7 +74,7 @@ export function ProtocolCard(props: {
   ): void => {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
-    } else if (longpress.isLongPressed !== true) {
+    } else if (!longpress.isLongPressed) {
       history.push(`/protocols/${protocolId}`)
     }
   }
@@ -125,6 +125,17 @@ export function ProtocolCard(props: {
       )
     }
   }
+
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${longpress.isLongPressed
+        ? ''
+        : isFailedAnalysis
+        ? COLORS.red3Pressed
+        : COLORS.darkBlack40};
+    }
+  `
+
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
@@ -135,6 +146,7 @@ export function ProtocolCard(props: {
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}
       ref={longpress.ref}
+      css={PUSHED_STATE_STYLE}
     >
       <Flex
         width="30.75rem"
