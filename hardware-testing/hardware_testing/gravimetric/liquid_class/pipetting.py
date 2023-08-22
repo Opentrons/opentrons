@@ -205,20 +205,31 @@ def _pipette_with_liquid_settings(
     if aspirate:
         submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
         retract_speed = config.TIP_SPEED_WHILE_RETRACTING_ASPIRATE
+        _z_disc = liquid_class.aspirate.z_retract_discontinuity
     else:
         submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_DISPENSE
         retract_speed = config.TIP_SPEED_WHILE_RETRACTING_DISPENSE
+        _z_disc = liquid_class.dispense.z_retract_discontinuity
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
+    def _aspirate_on_mix() -> None:
+        _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
+        _num_mixes = 5
+        for i in range(_num_mixes):
+            pipette.aspirate(aspirate)
+            if i < _num_mixes - 1:
+                pipette.dispense(aspirate)
+            else:
+                _dispense_with_added_blow_out()
+        _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
+        hw_api.prepare_for_aspirate(hw_mount, rate=0.25)  # slowly so as not to pull up droplets
+        assert pipette.current_volume == 0
+
     def _aspirate_on_submerge() -> None:
-        # TODO: re-implement mixing once we have a real use for it
-        #       and once the rest of the script settles down
-        if mix:
-            raise NotImplementedError("mixing is not currently implemented")
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
@@ -273,6 +284,10 @@ def _pipette_with_liquid_settings(
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate else _dispense_on_approach()
 
+    # PHASE 1B: MIXING
+    if mix and aspirate:
+        _aspirate_on_mix()
+
     # PHASE 2: SUBMERGE
     callbacks.on_submerging()
     _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
@@ -280,10 +295,6 @@ def _pipette_with_liquid_settings(
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    if aspirate:
-        _z_disc = liquid_class.aspirate.z_retract_discontinuity
-    else:
-        _z_disc = liquid_class.dispense.z_retract_discontinuity
     _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
