@@ -64,6 +64,7 @@ export function TouchScreenSleep({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
+        marginTop="7.75rem"
       >
         {settingsButtons.map(radio => (
           <RadioButton
