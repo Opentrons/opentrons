@@ -147,6 +147,9 @@ def loaded_static_pipette_data(
         home_position=10.11,
         nozzle_offset_z=12.13,
         default_push_out_volume=5,
+        plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
+            top=1, bottom=2, blowout=3, drop=4
+        ),
     )
 
 

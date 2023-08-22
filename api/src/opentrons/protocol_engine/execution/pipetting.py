@@ -98,8 +98,8 @@ class HardwarePipettingHandler(PipettingHandler):
         )
 
         if push_out and (
-            push_out < 0
-        ):  # or push_out > (bottom position + blow_out) conversion to ul
+            push_out < 0 or push_out > hw_pipette.config["plunger_positions"].bottom
+        ):
             raise ValueError("push out value cannot have a negative value.")
         with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
             await self._hardware_api.dispense(
