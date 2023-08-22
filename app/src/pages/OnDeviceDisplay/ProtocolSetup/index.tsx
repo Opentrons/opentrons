@@ -251,6 +251,33 @@ function PlayButton({
   onPlay,
   ready,
 }: PlayButtonProps): JSX.Element {
+  const playButtonStyle = css`
+    -webkit-tap-highlight-color: transparent;
+    &:focus {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:hover {
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+      color: ${COLORS.white};
+    }
+
+    &:focus-visible {
+      box-shadow: ${ODD_FOCUS_VISIBLE};
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+    }
+
+    &:active {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack60};
+    }
+  `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
@@ -265,33 +292,7 @@ function PlayButton({
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
-      css={css`
-        -webkit-tap-highlight-color: transparent;
-        &:focus {
-          background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
-          color: ${COLORS.white};
-        }
-
-        &:hover {
-          background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
-          color: ${COLORS.white};
-        }
-
-        &:focus-visible {
-          box-shadow: ${ODD_FOCUS_VISIBLE};
-          background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
-        }
-
-        &:active {
-          background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
-          color: ${COLORS.white};
-        }
-
-        &:disabled {
-          background-color: ${COLORS.darkBlack20};
-          color: ${COLORS.darkBlack60};
-        }
-      `}
+      css={playButtonStyle}
     >
       <Icon
         color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
@@ -390,11 +391,11 @@ function PrepareToRun({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  // True if any sever request is still pending.
+  // True if any server request is still pending.
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules == null)
+    (protocolHasModules && attachedModules.length === 0)
 
   const speccedInstrumentCount =
     mostRecentAnalysis !== null
@@ -415,6 +416,7 @@ function PrepareToRun({
     if (
       isHeaterShakerInProtocol &&
       !isHeaterShakerShaking &&
+      isReadyToRun &&
       (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
     ) {
       confirmAttachment()
