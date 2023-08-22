@@ -107,7 +107,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showHSWizard, setShowHSWizard] = React.useState<boolean>(false)
   const [showFWBanner, setshowFWBanner] = React.useState<boolean>(true)
-  const [showCalBanner, setshowCalBanner] = React.useState<boolean>(true)
   const [showCalModal, setshowCalModal] = React.useState<boolean>(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -120,7 +119,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset === undefined
+  const requireModuleCalibration = module.moduleOffset == null
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -295,12 +294,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             {attachPipetteRequired != null &&
             updatePipetteFWRequired != null &&
             requireModuleCalibration &&
-            showCalBanner &&
             !isPending ? (
               <UpdateBanner
                 updateType="calibration"
                 serialNumber={module.serialNumber}
-                setShowBanner={setshowCalBanner}
+                setShowBanner={() => null}
                 handleUpdateClick={() => setshowCalModal(true)}
                 attachPipetteRequired={attachPipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}

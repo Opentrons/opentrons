@@ -39,9 +39,9 @@ export const UpdateBanner = ({
   if (updateType === 'calibration') {
     bannerType = 'error'
     closeButtonRendered = false
-    if (attachPipetteRequired === true)
+    if (attachPipetteRequired)
       bannerMessage = t('module_calibration_required_no_pipette_attached')
-    else if (updatePipetteFWRequired === true)
+    else if (updatePipetteFWRequired)
       bannerMessage = t('module_calibration_required_update_pipette_FW')
     else bannerMessage = t('module_calibration_required')
     hyperlinkText =
