@@ -74,16 +74,17 @@ export function DeviceReset({
     )
   const dispatch = useDispatch<Dispatch>()
 
+  console.log({resetOptions, options})
+
+  const totalOptionsSelected = Object.values(resetOptions).filter(
+    selected => selected === true
+  ).length
+
+  const isEveryOptionSelected =
+    totalOptionsSelected > 0 && totalOptionsSelected === availableOptions.length
+
   const handleClick = (): void => {
     if (resetOptions != null) {
-      const totalOptionsSelected = Object.values(resetOptions).filter(
-        selected => selected === true
-      ).length
-
-      const isEveryOptionSelected =
-        totalOptionsSelected > 0 &&
-        totalOptionsSelected === availableOptions.length
-
       if (isEveryOptionSelected) {
         dispatchRequest(
           resetConfig(robotName, {
@@ -194,6 +195,40 @@ export function DeviceReset({
               </React.Fragment>
             )
           })}
+
+          <OptionButton
+            id={'clearAllStoredData'}
+            type="checkbox"
+            value={'clearAllStoredData'}
+            onChange={() => {
+              console.log('in onchange, about to call setResetOptions')
+              setResetOptions(
+                isEveryOptionSelected
+                  ? {}
+                  : availableOptions.reduce((acc, val) => {
+                      return {
+                        ...acc,
+                        [val.id]: true,
+                      }
+                    }, {})
+              )
+            }}
+          />
+          <OptionLabel isSelected={isEveryOptionSelected}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                {t('clear_all_stored_data')}
+              </StyledText>
+              <StyledText
+                as="p"
+                color={
+                  isEveryOptionSelected ? COLORS.white : COLORS.darkBlack70
+                }
+              >
+                {t('clear_all_stored_data_description')}
+              </StyledText>
+            </Flex>
+          </OptionLabel>
         </Flex>
         <MediumButton
           data-testid="DeviceReset_clear_data_button"
