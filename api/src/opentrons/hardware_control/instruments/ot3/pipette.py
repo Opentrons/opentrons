@@ -147,6 +147,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def liquid_class(self) -> PipetteLiquidPropertiesDefinition:
         return self._liquid_class
 
+    def configure_liquid_class(self, liquid_class: pip_types.LiquidClasses) -> None:
+        self._liquid_class = self._config.liquid_properties[liquid_class]
+        self._update_active_settings_from_liquid_class()
+
     @property
     def channels(self) -> pip_types.PipetteChannelType:
         return self._max_channels
@@ -192,6 +196,35 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def active_tip_settings(self) -> SupportedTipsDefinition:
         return self._active_tip_settings
+
+    def _update_active_settings_from_liquid_class(self) -> None:
+        self._active_tip_settings = self._liquid_class.supported_tips[
+            pip_types.PipetteTipType(self._liquid_class.max_volume)
+        ]
+        self._fallback_tip_length = self._active_tip_settings.default_tip_length
+
+        self._aspirate_flow_rates_lookup = (
+            self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
+        )
+        self._dispense_flow_rates_lookup = (
+            self._active_tip_settings.default_dispense_flowrate.values_by_api_level
+        )
+        self._blowout_flow_rates_lookup = (
+            self._active_tip_settings.default_blowout_flowrate.values_by_api_level
+        )
+
+        self._aspirate_flow_rate = (
+            self._active_tip_settings.default_aspirate_flowrate.default
+        )
+        self._dispense_flow_rate = (
+            self._active_tip_settings.default_dispense_flowrate.default
+        )
+        self._blow_out_flow_rate = (
+            self._active_tip_settings.default_blowout_flowrate.default
+        )
+        self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
+
+        self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
     def act_as(self, name: PipetteName) -> None:
         """Reconfigure to act as ``name``. ``name`` must be either the
