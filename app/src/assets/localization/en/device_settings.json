@@ -71,7 +71,7 @@
   "deck_calibration_modal_title": "Are you sure you want to calibrate?",
   "deck_calibration_recommended": "Deck calibration recommended",
   "deck_calibration_title": "Deck Calibration",
-  "dev_tools_description": "Enable additional logging and allow access to feature flags.",
+  "dev_tools_description": "Access additional logging and feature flags.",
   "device_reset_description": "Reset labware calibration, boot scripts, and/or robot calibration to factory settings.",
   "device_reset_slideout_description": "Select individual settings to only clear specific data types.",
   "device_reset": "Device Reset",
