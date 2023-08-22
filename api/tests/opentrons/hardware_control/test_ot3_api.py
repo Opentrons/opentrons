@@ -83,6 +83,9 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.module_control import AttachedModulesControl
 
 
+# TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
+
+
 @pytest.fixture
 def fake_settings() -> CapacitivePassSettings:
     return CapacitivePassSettings(

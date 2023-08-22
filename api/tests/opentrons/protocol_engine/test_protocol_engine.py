@@ -594,6 +594,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         action_dispatcher.dispatch(FinishAction()),
         # await queue_worker.join() should be called, and should raise, here.
         # We can't verify that step in the sequence here because of a Decoy limitation.
+        await hardware_stopper.do_halt(),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         await plugin_starter.stop(),

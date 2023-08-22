@@ -507,7 +507,6 @@ class API(
         see :py:meth:`pause` for more detail), then home and reset the
         robot. After this call, no further recovery is necessary.
         """
-        await self.halt()  # calls smoothie_driver.hard_halt()
         await self._backend.halt()  # calls smoothie_driver.kill()
         self._log.info("Recovering from halt")
         await self.reset()

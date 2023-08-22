@@ -754,7 +754,6 @@ class OT3API(
 
     async def stop(self, home_after: bool = True) -> None:
         """Stop motion as soon as possible, reset, and optionally home."""
-        await self.halt()
         self._log.info("Resetting OT3API")
         await self.reset()
 
