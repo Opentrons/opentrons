@@ -114,11 +114,11 @@
       "touchTip": { "label": "touch tip" },
       "moduleActionLabware": { "label": "module" },
       "moduleLabwarePrefix": {
-        "magneticModuleType": "MAG",
-        "temperatureModuleType": "TEMP",
-        "thermocyclerModuleType": "THERMO",
-        "heaterShakerModuleType": "HS",
-        "magneticBlockType": "MAG"
+        "magneticModuleType": "Magnetic Module",
+        "temperatureModuleType": "Temperature Module",
+        "thermocyclerModuleType": "Thermocycler",
+        "heaterShakerModuleType": "Heater-Shaker",
+        "magneticBlockType": "Magnetic Block"
       },
       "magnetAction": {
         "label": "Magnet action",
