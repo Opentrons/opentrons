@@ -1,7 +1,8 @@
 import * as React from 'react'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { MoveLabwareOnDeck as MoveLabwareOnDeckComponent } from './MoveLabwareOnDeck'
-import { FLEX_ROBOT_TYPE, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -21,6 +22,7 @@ export const MoveLabwareOnDeck: Story = {
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
       loadedModules={[]}
+      loadedLabware={[]}
       robotType={args.robotType}
     />
   ),

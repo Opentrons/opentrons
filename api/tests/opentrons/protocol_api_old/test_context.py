@@ -376,10 +376,10 @@ def test_use_filter_tips(ctx, get_labware_def):
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
     pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
 
-    assert pipette.available_volume == pipette.config.max_volume
+    assert pipette.available_volume == pipette.liquid_class.max_volume
 
     instr.pick_up_tip()
-    assert pipette.available_volume < pipette.config.max_volume
+    assert pipette.available_volume < pipette.liquid_class.max_volume
 
 
 @pytest.mark.parametrize("pipette_model", ["p10_single", "p20_single_gen2"])

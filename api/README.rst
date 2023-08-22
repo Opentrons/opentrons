@@ -16,13 +16,13 @@ Opentrons
 Introduction
 ------------
 
-This is the Opentrons library, the Python module that runs the Opentrons OT-2. It contains the code that interprets and executes protocols; code that controls the hardware both during and outside of protocols; and all the other small tasks and capabilities that the robot fulfills.
+This is the Opentrons library, the Python module that runs Opentrons robots. It contains the code that interprets and executes protocols; code that controls the hardware both during and outside of protocols; and all the other small tasks and capabilities that the robot fulfills.
 
 This document is about the structure and purpose of the source code. For information on how to use the Opentrons library or the robot in general, please refer to our  `Full API Documentation`_ for detailed instructions.
 
 The Opentrons library has two purposes:
 
-1. **Control an Opentrons OT-2 robot.**  The API server uses the Opentrons library when controlling a robot. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
+1. **Control an Opentrons robot.**  The API server uses the Opentrons library when controlling a robot. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
 
 2. **Simulate protocols on users’ computers.** When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
 
@@ -85,4 +85,4 @@ The module has a lot of configuration, some of which is only relevant when runni
 Dealing With Robot Versions
 ---------------------------
 
-The OT2 does not use the ``hardware`` subdirectory or the ``opentrons_hardware`` package. This can be a problem to work around. Please keep imports of ``opentrons_hardware`` to limited places inside the hardware_control submodule and tests of that submodule, and ensure that anything outside these safe areas conditionally imports ``opentrons_hardware`` or imports it inside a non-file scope in a place used only outside an OT2. In tests, any test that uses the OT3 hardware controller will be skipped in the ``test-ot2`` Makefile recipe.
+The OT-2 does not use the ``hardware`` subdirectory or the ``opentrons_hardware`` package. This can be a problem to work around. Please keep imports of ``opentrons_hardware`` to limited places inside the hardware_control submodule and tests of that submodule, and ensure that anything outside these safe areas conditionally imports ``opentrons_hardware`` or imports it inside a non-file scope in a place used only outside an OT2. In tests, any test that uses the OT3 hardware controller will be skipped in the ``test-ot2`` Makefile recipe.

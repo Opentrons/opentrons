@@ -5,6 +5,38 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+
+## Opentrons Robot Software Changes in 7.0.0
+
+Welcome to the v7.0.0 release of the Opentrons robot software! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
+
+### New Features
+
+- Flex touchscreen
+  - Robot dashboard: Quickly access recently run protocols.
+  - Manage protocols: Organize, view details, set up, and run protocols directly from the touchscreen.
+  - Manage instruments: View information about connected pipettes and the gripper. Attach, detach, or recalibrate instruments.
+  - Robot settings: Customize the behavior of your Flex, including the LED and touchscreen displays.
+- Flex features 
+  - Analyze and run protocols that use the Flex robot, Flex pipettes, and Flex tip racks.
+  - Move labware around the deck automatically with the Flex Gripper.
+  - Use the Flex Gripper to move labware onto or off of the Magnetic Block.
+- Python API features
+  - Manually move labware around, off of, or onto the deck without ending your protocol.
+  - Load adapters separately from labware (to allow moving labware onto or off of the adapter).
+  - Use coordinate or numeric deck slot names interchangeably.
+
+### Improved Features
+
+- The API relaxes placement restrictions for the Heater-Shaker Module on Flex.
+- Pipettes drop tips in multiple locations above the trash bin to prevent tips from stacking up.
+
+### Known Issues
+
+- Tip tracking starting at a well other than A1 will not pick up tips from the intended locations.
+
+---
+
 ## OT-2 Software Changes in 6.3.1
 
 Welcome to the v6.3.1 release of the OT-2 software! This hotfix release addresses a few problems.

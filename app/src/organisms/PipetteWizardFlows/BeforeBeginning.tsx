@@ -172,7 +172,7 @@ export const BeforeBeginning = (
       },
     ]
     if (pipetteId == null) moveToFrontCommands = moveToFrontCommands.slice(1)
-    chainRunCommands(moveToFrontCommands, false)
+    chainRunCommands?.(moveToFrontCommands, false)
       .then(() => {
         proceed()
       })
@@ -203,7 +203,7 @@ export const BeforeBeginning = (
   ]
 
   const handleOnClickAttach = (): void => {
-    chainRunCommands(
+    chainRunCommands?.(
       selectedPipette === SINGLE_MOUNT_PIPETTES
         ? SingleMountAttachCommand
         : NinetySixChannelAttachCommand,

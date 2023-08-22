@@ -39,7 +39,7 @@ The 2 protocols are to provide basic coverage of a python and json protocol. Eac
 
 Contains an invalid SQLite database file, to simulate a database that's been corrupted.
 
-### v6.2.0Large
+### v6.2.0_large
 
 1. Use the app installer to install the app version you are testing
 1. Reinstall the robot version to ensure matching version
@@ -76,3 +76,7 @@ Contains an invalid SQLite database file, to simulate a database that's been cor
    1. Complex JSON v5 protocol analysis
 1. Power off robot and power on
 1. Retrieve robot DB
+
+### ot3_v0.14.0_python_validation
+
+This has a single Python protocol and a single run of that protocol. The protocol file is valid on the Flex's internal release v0.14.0, but invalid for the first public release, because of additional validation of the `metadata` and `requirements` dicts that was added late during Flex development. See https://opentrons.atlassian.net/browse/RSS-306.

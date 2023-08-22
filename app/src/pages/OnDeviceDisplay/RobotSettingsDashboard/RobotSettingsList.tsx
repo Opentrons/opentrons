@@ -20,6 +20,7 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
+import { StyledText } from '../../../atoms/text'
 import { getLocalRobot, getRobotApiVersion } from '../../../redux/discovery'
 import { getRobotUpdateAvailable } from '../../../redux/robot-update'
 import {
@@ -34,11 +35,12 @@ import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from '../hooks'
+import { getRobotSettings } from '../../../redux/robot-settings'
 import { RobotSettingButton } from './RobotSettingButton'
 
 import type { Dispatch, State } from '../../../redux/types'
+import type { RobotSettings } from '../../../redux/robot-settings/types'
 import type { SetSettingOption } from './'
-import { StyledText } from '../../../atoms/text'
 
 interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
@@ -63,6 +65,10 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const settings = useSelector<State, RobotSettings>((state: State) =>
+    getRobotSettings(state, robotName)
+  )
+  const homeGantrySettings = settings?.find(s => s.id === 'disableHomeOnBoot')
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -121,7 +127,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('apply_historic_offsets')}
           settingInfo={t('historic_offsets_description')}
           iconName="reticle"
-          enabledHistoricOffests
+          enabledHistoricOffsets
           historicOffsetsOn={historicOffsetsOn}
         />
         <RobotSettingButton
@@ -129,6 +135,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           currentOption="DeviceReset"
           setCurrentOption={setCurrentOption}
           iconName="reset"
+        />
+        <RobotSettingButton
+          settingName={t('home_gantry_on_restart')}
+          settingInfo={t('home_gantry_subtext')}
+          iconName="gantry-homing"
+          enabledHomeGantry
+          homeGantrySettings={homeGantrySettings}
+          robotName={robotName}
         />
         <RobotSettingButton
           settingName={t('app_settings:update_channel')}

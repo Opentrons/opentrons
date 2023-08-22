@@ -3,7 +3,10 @@ import {
   useCreateCommandMutation,
   useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
-import { chainRunCommandsRecursive } from './utils'
+import {
+  chainRunCommandsRecursive,
+  chainMaintenanceCommandsRecursive,
+} from './utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export type CreateCommandMutate = ReturnType<
@@ -14,7 +17,7 @@ export type CreateRunCommand = (
   options?: Parameters<CreateCommandMutate>[1]
 ) => ReturnType<CreateCommandMutate>
 
-export type CreateMaintenaceCommand = ReturnType<
+export type CreateMaintenanceCommand = ReturnType<
   typeof useCreateMaintenanceCommandMutation
 >['createMaintenanceCommand']
 
@@ -60,25 +63,24 @@ export function useChainRunCommands(
   }
 }
 
-export function useChainMaintenanceCommands(
-  maintenanceRunId: string
-): {
+export function useChainMaintenanceCommands(): {
   chainRunCommands: (
+    maintenanceRunId: string,
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
-  ) => ReturnType<typeof chainRunCommandsRecursive>
+  ) => ReturnType<typeof chainMaintenanceCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
   const [isLoading, setIsLoading] = React.useState(false)
-  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation(
-    maintenanceRunId
-  )
+  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
   return {
     chainRunCommands: (
+      maintenanceRunId,
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ) =>
-      chainRunCommandsRecursive(
+      chainMaintenanceCommandsRecursive(
+        maintenanceRunId,
         commands,
         createMaintenanceCommand,
         continuePastCommandFailure,

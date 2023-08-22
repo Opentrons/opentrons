@@ -42,7 +42,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
-  (labwareEntities, nicknamesById, initialDeckSetup) => {
+  stepFormSelectors.getPresavedStepForm,
+  (labwareEntities, nicknamesById, initialDeckSetup, presavedStepForm) => {
+    const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
     const options = reduce(
       labwareEntities,
       (
@@ -50,6 +52,10 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
+        const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
+        const isAdapterOrAluminumBlock =
+          isAdapter ||
+          labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
         const moduleOnDeck = getModuleUnderLabware(initialDeckSetup, labwareId)
         const prefix = moduleOnDeck
           ? i18n.t(
@@ -59,15 +65,30 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         const nickName = prefix
           ? `${prefix} ${nicknamesById[labwareId]}`
           : nicknamesById[labwareId]
-        return getIsTiprack(labwareEntity.def)
-          ? acc
-          : [
-              ...acc,
-              {
-                name: nickName,
-                value: labwareId,
-              },
-            ]
+
+        if (!moveLabwarePresavedStep) {
+          return getIsTiprack(labwareEntity.def) || isAdapter
+            ? acc
+            : [
+                ...acc,
+                {
+                  name: nickName,
+                  value: labwareId,
+                },
+              ]
+        } else {
+          //  TODO(jr, 7/17/23): filter out moving trash for now in MoveLabware step type
+          //  remove this when we support other slots for trash
+          return nickName === 'Trash' || isAdapterOrAluminumBlock
+            ? acc
+            : [
+                ...acc,
+                {
+                  name: nickName,
+                  value: labwareId,
+                },
+              ]
+        }
       },
       []
     )

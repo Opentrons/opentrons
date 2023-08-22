@@ -1,7 +1,18 @@
 """A set that preserves the order in which elements are added."""
 
+from __future__ import annotations
 
-from typing import Dict, Generic, Hashable, Iterable, Iterator, TypeVar, Union, overload
+from typing import (
+    Dict,
+    Generic,
+    Hashable,
+    Iterable,
+    Iterator,
+    Set,
+    TypeVar,
+    Union,
+    overload,
+)
 from typing_extensions import Literal
 
 
@@ -110,3 +121,12 @@ class OrderedSet(Generic[_SetElementT]):
             return list(self) == list(other)
         else:
             return False
+
+    def __sub__(
+        self, other: Union[OrderedSet[_SetElementT], Set[_SetElementT]]
+    ) -> OrderedSet[_SetElementT]:
+        """Return this set, without any elements that appear in `other`.
+
+        The elements that aren't removed retain their original relative order.
+        """
+        return OrderedSet(e for e in self if e not in other)
