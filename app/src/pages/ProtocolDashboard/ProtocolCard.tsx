@@ -175,7 +175,7 @@ export function ProtocolCard(props: {
           {protocolName}
         </StyledText>
       </Flex>
-      <Flex width="9.25rem" justifyContent={JUSTIFY_CENTER}>
+      <Flex width="9.25rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
@@ -184,7 +184,7 @@ export function ProtocolCard(props: {
             : t('no_history')}
         </StyledText>
       </Flex>
-      <Flex width="11.9125rem">
+      <Flex width="12.5rem" whiteSpace="nowrap">
         <StyledText as="p" color={COLORS.darkBlack70}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
