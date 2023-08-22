@@ -479,7 +479,7 @@ def test_load_adapter(
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
 ) -> None:
-    """It should issue a LoadAdapter command."""
+    """It should issue a LoadLabware command for an adapter."""
     decoy.when(
         mock_engine_client.state.labware.find_custom_labware_load_params()
     ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
@@ -494,15 +494,15 @@ def test_load_adapter(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        mock_engine_client.load_adapter(
+        mock_engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_adapter",
             namespace="some_namespace",
             version=9001,
         )
     ).then_return(
-        commands.LoadAdapterResult(
-            adapterId="abc123",
+        commands.LoadLabwareResult(
+            labwareId="abc123",
             definition=LabwareDefinition.construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
@@ -1456,7 +1456,7 @@ def test_get_labware_location_deck_slot(
     )
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-2 Standard")
     decoy.when(
-        validation.ensure_deck_slot_string(DeckSlotName.SLOT_1, "OT-2 Standard")
+        validation.internal_slot_to_public_string(DeckSlotName.SLOT_1, "OT-2 Standard")
     ).then_return("777")
 
     assert subject.get_labware_location(mock_labware_core) == "777"

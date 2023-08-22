@@ -18,14 +18,14 @@ import {
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../../organisms/RobotSettingsDashboard'
-import { getBuildrootUpdateAvailable } from '../../../../redux/buildroot'
+import { getRobotUpdateAvailable } from '../../../../redux/robot-update'
 import { useNetworkConnection } from '../../hooks'
 import { useLEDLights } from '../../../../organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '..'
 
 jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/buildroot')
+jest.mock('../../../../redux/robot-update')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/robot-settings')
 jest.mock('../../hooks/useNetworkConnection')
@@ -69,11 +69,11 @@ const mockTouchscreenBrightness = TouchscreenBrightness as jest.MockedFunction<
 const mockUpdateChannel = UpdateChannel as jest.MockedFunction<
   typeof UpdateChannel
 >
-const mockuseLEDLights = useLEDLights as jest.MockedFunction<
+const mockUseLEDLights = useLEDLights as jest.MockedFunction<
   typeof useLEDLights
 >
-const mockGetBuildrootUpdateAvailable = getBuildrootUpdateAvailable as jest.MockedFunction<
-  typeof getBuildrootUpdateAvailable
+const mockGetBuildrootUpdateAvailable = getRobotUpdateAvailable as jest.MockedFunction<
+  typeof getRobotUpdateAvailable
 >
 const mockUseNetworkConnection = useNetworkConnection as jest.MockedFunction<
   typeof useNetworkConnection
@@ -99,12 +99,20 @@ describe('RobotSettingsDashboard', () => {
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
-    mockGetRobotSettings.mockReturnValue([])
+    mockGetRobotSettings.mockReturnValue([
+      {
+        id: 'disableHomeOnBoot',
+        title: 'Disable home on boot',
+        description: 'Prevent robot from homing motors on boot',
+        restart_required: false,
+        value: true,
+      },
+    ])
     mockTouchscreenBrightness.mockReturnValue(
       <div>Mock Touchscreen Brightness</div>
     )
     mockUpdateChannel.mockReturnValue(<div>Mock Update Channel</div>)
-    mockuseLEDLights.mockReturnValue({
+    mockUseLEDLights.mockReturnValue({
       lightsEnabled: false,
       toggleLights: mockToggleLights,
     })
@@ -158,12 +166,12 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render text with lights on', () => {
-    mockuseLEDLights.mockReturnValue({
+    mockUseLEDLights.mockReturnValue({
       lightsEnabled: true,
       toggleLights: mockToggleLights,
     })
-    const [{ getByText }] = render()
-    getByText('On')
+    const [{ getByTestId }] = render()
+    expect(getByTestId('RobotSettingButton_LED_Lights')).toHaveTextContent('On')
   })
 
   it('should render component when tapping network settings', () => {
@@ -199,6 +207,31 @@ describe('RobotSettingsDashboard', () => {
     const button = getByText('Update Channel')
     fireEvent.click(button)
     getByText('Mock Update Channel')
+  })
+
+  it('should call a mock function when tapping home gantry on restart', () => {
+    const [{ getByText, getByTestId }] = render()
+    getByText('Home gantry on restart')
+    getByText('By default, this setting is turned on.')
+    expect(getByTestId('RobotSettingButton_Home_Gantry')).toHaveTextContent(
+      'On'
+    )
+  })
+
+  it('should render text with home gantry  off', () => {
+    mockGetRobotSettings.mockReturnValue([
+      {
+        id: 'disableHomeOnBoot',
+        title: 'Disable home on boot',
+        description: 'Prevent robot from homing motors on boot',
+        restart_required: false,
+        value: false,
+      },
+    ])
+    const [{ getByTestId }] = render()
+    expect(getByTestId('RobotSettingButton_LED_Lights')).toHaveTextContent(
+      'Off'
+    )
   })
 
   it('should call a mock function when tapping enable historic offset', () => {

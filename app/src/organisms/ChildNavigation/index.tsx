@@ -1,17 +1,19 @@
 import * as React from 'react'
+import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  Btn,
   COLORS,
   Flex,
   Icon,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_FIXED,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  POSITION_FIXED,
 } from '@opentrons/components'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
@@ -48,9 +50,9 @@ export function ChildNavigation({
       backgroundColor={COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
-        <Btn onClick={onClickBack}>
+        <IconButton onClick={onClickBack}>
           <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
-        </Btn>
+        </IconButton>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
         </StyledText>
@@ -72,3 +74,20 @@ export function ChildNavigation({
     </Flex>
   )
 }
+
+const IconButton = styled('button')`
+  border-radius: ${SPACING.spacing4};
+  max-height: 100%;
+  background-color: ${COLORS.white};
+
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:disabled {
+    background-color: transparent;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+  }
+`

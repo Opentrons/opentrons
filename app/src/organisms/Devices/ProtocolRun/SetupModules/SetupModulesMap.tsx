@@ -59,11 +59,11 @@ export const SetupModulesMap = ({
             <>
               {map(
                 moduleRenderInfoForProtocolById,
-                ({ x, y, moduleDef, attachedModuleMatch }) => {
+                ({ x, y, moduleDef, attachedModuleMatch, moduleId }) => {
                   const { model } = moduleDef
                   return (
                     <React.Fragment
-                      key={`ModuleSetup_Module_${String(model)}_${x}${y}`}
+                      key={`ModuleSetup_Module_${moduleId}_${x}${y}`}
                     >
                       <Module
                         x={x}

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { mountWithStore, WrapperWithStore } from '@opentrons/components'
 import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
-import * as Buildroot from '../../../../../redux/buildroot'
+import * as RobotUpdate from '../../../../../redux/robot-update'
 import { VersionInfoModal } from '../VersionInfoModal'
 import { ViewUpdateModal } from '../ViewUpdateModal'
 import { InstallModal } from '../InstallModal'
@@ -19,16 +19,16 @@ jest.mock('../ViewUpdateModal', () => ({
   ViewUpdateModal: () => <></>,
 }))
 
-jest.mock('../../../../../redux/buildroot/selectors')
+jest.mock('../../../../../redux/robot-update/selectors')
 
-const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
-  typeof Buildroot.getBuildrootUpdateAvailable
+const getRobotUpdateAvailable = RobotUpdate.getRobotUpdateAvailable as jest.MockedFunction<
+  typeof RobotUpdate.getRobotUpdateAvailable
 >
-const getBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<
-  typeof Buildroot.getBuildrootSession
+const getRobotUpdateSession = RobotUpdate.getRobotUpdateSession as jest.MockedFunction<
+  typeof RobotUpdate.getRobotUpdateSession
 >
-const getRobotSystemType = Buildroot.getRobotSystemType as jest.MockedFunction<
-  typeof Buildroot.getRobotSystemType
+const getRobotSystemType = RobotUpdate.getRobotSystemType as jest.MockedFunction<
+  typeof RobotUpdate.getRobotSystemType
 >
 
 const MOCK_STATE: State = { mockState: true } as any
@@ -45,8 +45,8 @@ describe('UpdateBuildroot wizard', () => {
   }
 
   beforeEach(() => {
-    getBuildrootUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
-    getRobotSystemType.mockReturnValue(Buildroot.BUILDROOT)
+    getRobotUpdateAvailable.mockReturnValue(RobotUpdate.UPGRADE)
+    getRobotSystemType.mockReturnValue(RobotUpdate.OT2_BUILDROOT)
   })
 
   afterEach(() => {
@@ -57,7 +57,7 @@ describe('UpdateBuildroot wizard', () => {
     const { store } = render()
 
     expect(store.dispatch).toHaveBeenCalledWith(
-      Buildroot.setBuildrootUpdateSeen(mockRobot.name)
+      RobotUpdate.setRobotUpdateSeen(mockRobot.name)
     )
   })
 
@@ -66,12 +66,9 @@ describe('UpdateBuildroot wizard', () => {
     const versionInfo = wrapper.find(VersionInfoModal)
 
     expect(versionInfo.prop('robot')).toBe(mockRobot)
-    expect(versionInfo.prop('robotUpdateType')).toBe(Buildroot.UPGRADE)
+    expect(versionInfo.prop('robotUpdateType')).toBe(RobotUpdate.UPGRADE)
 
-    expect(getBuildrootUpdateAvailable).toHaveBeenCalledWith(
-      MOCK_STATE,
-      mockRobot
-    )
+    expect(getRobotUpdateAvailable).toHaveBeenCalledWith(MOCK_STATE, mockRobot)
     expect(closeModal).not.toHaveBeenCalled()
 
     versionInfo.invoke('close')?.()
@@ -87,8 +84,8 @@ describe('UpdateBuildroot wizard', () => {
 
     const viewUpdate = wrapper.find(ViewUpdateModal)
     expect(viewUpdate.prop('robotName')).toBe(mockRobot.name)
-    expect(viewUpdate.prop('robotUpdateType')).toBe(Buildroot.UPGRADE)
-    expect(viewUpdate.prop('robotSystemType')).toBe(Buildroot.BUILDROOT)
+    expect(viewUpdate.prop('robotUpdateType')).toBe(RobotUpdate.UPGRADE)
+    expect(viewUpdate.prop('robotSystemType')).toBe(RobotUpdate.OT2_BUILDROOT)
     expect(getRobotSystemType).toHaveBeenCalledWith(mockRobot)
 
     viewUpdate.invoke('close')?.()
@@ -100,14 +97,14 @@ describe('UpdateBuildroot wizard', () => {
     wrapper.find(VersionInfoModal).invoke('installUpdate')?.()
 
     expect(store.dispatch).toHaveBeenCalledWith(
-      Buildroot.startBuildrootUpdate(mockRobot.name)
+      RobotUpdate.startRobotUpdate(mockRobot.name)
     )
   })
 
   it('should display an InstallModal if a session is in progress', () => {
     const mockSession = {
       robotName: mockRobot.name,
-      userFileInfo: null,
+      fileInfo: null,
       token: null,
       pathPrefix: null,
       step: null,
@@ -116,13 +113,13 @@ describe('UpdateBuildroot wizard', () => {
       error: null,
     }
 
-    getBuildrootSession.mockReturnValue(mockSession)
+    getRobotUpdateSession.mockReturnValue(mockSession)
 
     const { wrapper } = render()
     const installModal = wrapper.find(InstallModal)
 
     expect(installModal.prop('robot')).toBe(mockRobot)
-    expect(installModal.prop('robotSystemType')).toBe(Buildroot.BUILDROOT)
+    expect(installModal.prop('robotSystemType')).toBe(RobotUpdate.OT2_BUILDROOT)
     expect(installModal.prop('session')).toBe(mockSession)
 
     expect(closeModal).not.toHaveBeenCalled()
@@ -133,44 +130,44 @@ describe('UpdateBuildroot wizard', () => {
   it('should clear a finished session un unmount', () => {
     const mockSession = {
       robotName: mockRobot.name,
-      userFileInfo: null,
+      fileInfo: null,
       token: null,
       pathPrefix: null,
-      step: Buildroot.FINISHED,
+      step: RobotUpdate.FINISHED,
       stage: null,
       progress: null,
       error: null,
     }
 
-    getBuildrootSession.mockReturnValue(mockSession)
+    getRobotUpdateSession.mockReturnValue(mockSession)
 
     const { wrapper, store } = render()
 
     wrapper.unmount()
     expect(store.dispatch).toHaveBeenCalledWith(
-      Buildroot.clearBuildrootSession()
+      RobotUpdate.clearRobotUpdateSession()
     )
   })
 
   it('should not clear an unfinished session un unmount', () => {
     const mockSession = {
       robotName: mockRobot.name,
-      userFileInfo: null,
+      fileInfo: null,
       token: null,
       pathPrefix: null,
-      step: Buildroot.RESTART,
+      step: RobotUpdate.RESTART,
       stage: null,
       progress: null,
       error: null,
     }
 
-    getBuildrootSession.mockReturnValue(mockSession)
+    getRobotUpdateSession.mockReturnValue(mockSession)
 
     const { wrapper, store } = render()
 
     wrapper.unmount()
     expect(store.dispatch).not.toHaveBeenCalledWith(
-      Buildroot.clearBuildrootSession()
+      RobotUpdate.clearRobotUpdateSession()
     )
   })
 })

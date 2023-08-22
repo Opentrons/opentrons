@@ -7,6 +7,7 @@ control the OT2.
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
 
 from .protocol_context import ProtocolContext
@@ -32,6 +33,7 @@ from .create_protocol_context import (
 __all__ = [
     "MAX_SUPPORTED_VERSION",
     "MIN_SUPPORTED_VERSION",
+    "MIN_SUPPORTED_VERSION_FOR_FLEX",
     "ProtocolContext",
     "Deck",
     "ModuleContext",

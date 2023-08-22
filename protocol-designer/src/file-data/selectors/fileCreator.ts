@@ -10,7 +10,7 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
-  OT3_STANDARD_DECKID,
+  FLEX_STANDARD_DECKID,
   PipetteName,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
@@ -202,6 +202,44 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
       {}
     )
+    // initiate "adapter" commands first so we can map through them to get the
+    //  labware that goes on top of it's location
+    const loadAdapterCommands = reduce<
+      RobotState['labware'],
+      LoadLabwareCreateCommand[]
+    >(
+      initialRobotState.labware,
+      (
+        acc,
+        labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
+        labwareId: string
+      ): LoadLabwareCreateCommand[] => {
+        const { def } = labwareEntities[labwareId]
+        const isAdapter = def.allowedRoles?.includes('adapter')
+        if (!isAdapter) return acc
+        const isOnTopOfModule = labware.slot in initialRobotState.modules
+        const namespace = def.namespace
+        const loadName = def.parameters.loadName
+        const version = def.version
+        const loadAdapterCommands = {
+          key: uuid(),
+          commandType: 'loadLabware' as const,
+          params: {
+            displayName: def.metadata.displayName,
+            labwareId,
+            loadName,
+            namespace: namespace,
+            version: version,
+            location: isOnTopOfModule
+              ? { moduleId: labware.slot }
+              : { slotName: labware.slot },
+          },
+        }
+
+        return [...acc, loadAdapterCommands]
+      },
+      []
+    )
 
     const loadLabwareCommands = reduce<
       RobotState['labware'],
@@ -213,13 +251,18 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
       ): LoadLabwareCreateCommand[] => {
-        if (labwareId === FIXED_TRASH_ID) return [...acc]
-        const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
-        const { labwareDefURI, def } = labwareEntities[labwareId]
+        const { def } = labwareEntities[labwareId]
+        const isAdapter = def.allowedRoles?.includes('adapter')
+        if (labwareId === FIXED_TRASH_ID || isAdapter) return acc
+        const isOnTopOfModule = labware.slot in initialRobotState.modules
+        const isOnAdapter =
+          loadAdapterCommands.find(
+            command => command.params.labwareId === labware.slot
+          ) != null
         const namespace = def.namespace
-        const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
+        const loadName = def.parameters.loadName
         const version = def.version
-        const loadLabwareCommand = {
+        const loadLabwareCommands = {
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
@@ -228,12 +271,15 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             loadName,
             namespace: namespace,
             version: version,
-            location: isLabwareOnTopOfModule
+            location: isOnTopOfModule
               ? { moduleId: labware.slot }
+              : isOnAdapter
+              ? { labwareId: labware.slot }
               : { slotName: labware.slot },
           },
         }
-        return [...acc, loadLabwareCommand]
+
+        return [...acc, loadLabwareCommands]
       },
       []
     )
@@ -272,6 +318,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const loadCommands: CreateCommand[] = [
       ...loadPipetteCommands,
       ...loadModuleCommands,
+      ...loadAdapterCommands,
       ...loadLabwareCommands,
       ...loadLiquidCommands,
     ]
@@ -298,7 +345,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       designerApplication,
       robot:
         robotType === FLEX_ROBOT_TYPE
-          ? { model: FLEX_ROBOT_TYPE, deckId: OT3_STANDARD_DECKID }
+          ? { model: FLEX_ROBOT_TYPE, deckId: FLEX_STANDARD_DECKID }
           : { model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID },
       liquids,
       labwareDefinitions,

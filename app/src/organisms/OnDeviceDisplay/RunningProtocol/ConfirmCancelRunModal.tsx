@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -18,6 +19,7 @@ import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
 import { CancelingRunModal } from './CancelingRunModal'
 
@@ -42,6 +44,7 @@ export function ConfirmCancelRunModal({
     dismissCurrentRun,
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
+  const runStatus = useRunStatus(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const history = useHistory()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -56,22 +59,25 @@ export function ConfirmCancelRunModal({
   const handleCancelRun = (): void => {
     setIsCanceling(true)
     stopRun(runId, {
-      onSuccess: () => {
-        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
-        dismissCurrentRun(runId)
-        if (!isActiveRun) {
-          if (protocolId != null) {
-            history.push(`/protocols/${protocolId}`)
-          } else {
-            history.push(`/protocols`)
-          }
-        }
-      },
       onError: () => {
         setIsCanceling(false)
       },
     })
   }
+
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_STOPPED) {
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
+      dismissCurrentRun(runId)
+      if (!isActiveRun) {
+        if (protocolId != null) {
+          history.push(`/protocols/${protocolId}`)
+        } else {
+          history.push(`/protocols`)
+        }
+      }
+    }
+  }, [runStatus])
 
   return isCanceling || isDismissing ? (
     <CancelingRunModal />

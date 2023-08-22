@@ -316,9 +316,7 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
           <Line />
-          {attachedGripper != null && (
-            <RobotSettingsGripperCalibration gripper={attachedGripper} />
-          )}
+          <RobotSettingsGripperCalibration gripper={attachedGripper} />
         </>
       ) : (
         <>

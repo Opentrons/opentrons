@@ -2,6 +2,7 @@
 
 from typing_extensions import Literal
 from .error_responses import ErrorDetails
+from opentrons_shared_data.errors.codes import ErrorCodes
 
 
 class InstrumentNotFound(ErrorDetails):
@@ -38,3 +39,27 @@ class HardwareFailedToInitialize(ErrorDetails):
 
     id: Literal["HardwareFailedToInitialize"] = "HardwareFailedToInitialize"
     title: str = "Hardware Failed to Initialize"
+
+
+class EstopNotAttached(ErrorDetails):
+    """An error if there is no Estop present."""
+
+    id: Literal["EstopNotAttached"] = "EstopNotAttached"
+    title: str = "There is no Estop attached"
+    errorCode: str = ErrorCodes.E_STOP_NOT_PRESENT.value.code
+
+
+class EstopEngaged(ErrorDetails):
+    """An error if there is an Estop engaged."""
+
+    id: Literal["EstopEngaged"] = "EstopEngaged"
+    title: str = "An Estop is physically engaged"
+    errorCode: str = ErrorCodes.E_STOP_ACTIVATED.value.code
+
+
+class EstopNotAcknowledged(ErrorDetails):
+    """An error if a client needs to acknowledge an estop engage event."""
+
+    id: Literal["EstopNotAcknowledged"] = "EstopNotAcknowledged"
+    title: str = "Estop event must be acknowledged"
+    errorCode: str = ErrorCodes.E_STOP_ACTIVATED.value.code

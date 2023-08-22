@@ -31,7 +31,7 @@ import {
   RE_ROBOT_MODEL_OT3,
   ROBOT_MODEL_OT3,
 } from '../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
@@ -147,7 +147,7 @@ export function ChooseRobotSlideout(
     useSelector((state: State) => {
       const value =
         selectedRobot != null
-          ? getBuildrootUpdateDisplayInfo(state, selectedRobot.name)
+          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
           : { autoUpdateAction: '' }
       return value
     })?.autoUpdateAction

@@ -86,7 +86,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files = [] } = event.target ?? {}
-    files?.[0] && props.onUpload(files?.[0])
+    files?.[0] != null && props.onUpload(files?.[0])
     if ('value' in event.currentTarget) event.currentTarget.value = ''
   }
 

@@ -24,7 +24,7 @@ import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { UpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
@@ -96,7 +96,7 @@ export const RobotOverviewOverflowMenu = (
   }
 
   const { autoUpdateAction } = useSelector((state: State) => {
-    return getBuildrootUpdateDisplayInfo(state, robot.name)
+    return getRobotUpdateDisplayInfo(state, robot.name)
   })
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'

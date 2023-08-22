@@ -14,11 +14,13 @@ from typing import (
 
 from typing_extensions import TypeGuard
 
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -57,6 +59,14 @@ class InvalidPipetteMountError(ValueError):
 
 class PipetteMountTypeError(TypeError):
     """An error raised when an invalid mount type is used for loading pipettes."""
+
+
+class LabwareDefinitionIsNotAdapterError(ValueError):
+    """An error raised when an adapter is attempted to be loaded as a labware."""
+
+
+class LabwareDefinitionIsNotLabwareError(ValueError):
+    """An error raised when a labware is not loaded using `load_labware`."""
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
@@ -115,10 +125,12 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from e
 
 
-def ensure_deck_slot(
-    deck_slot: Union[int, str], api_version: APIVersion
+def ensure_and_convert_deck_slot(
+    deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
 ) -> DeckSlotName:
     """Ensure that a primitive value matches a named deck slot.
+
+    Also, convert the deck slot to match the given `robot_type`.
 
     Params:
         deck_slot: The primitive value to validate. Valid values are like `5`, `"5"`, or `"C2"`.
@@ -129,6 +141,10 @@ def ensure_deck_slot(
         TypeError: If you provide something that's not an `int` or `str`.
         ValueError: If the value does not match a known deck slot.
         APIVersionError: If you provide a value like `"C2"`, but `api_version` is too old.
+
+    Returns:
+        A `DeckSlotName` appropriate for the given `robot_type`. For example, given `"5"`,
+        this will return `DeckSlotName.SLOT_C2` on a Flex.
     """
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
@@ -147,10 +163,18 @@ def ensure_deck_slot(
             f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
         )
 
-    return parsed_slot
+    return parsed_slot.to_equivalent_for_robot_type(robot_type)
 
 
-def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+def internal_slot_to_public_string(
+    slot_name: DeckSlotName, robot_type: RobotType
+) -> str:
+    """Convert an internal `DeckSlotName` to a user-facing Python Protocol API string.
+
+    This normalizes the string to the robot type's native format, like "5" for OT-2s or "C2" for
+    Flexes. This probably won't change anything because the internal `DeckSlotName` should already
+    match the robot's native format, but it's nice to have an explicit interface barrier.
+    """
     return slot_name.to_equivalent_for_robot_type(robot_type).id
 
 
@@ -160,6 +184,22 @@ def ensure_lowercase_name(name: str) -> str:
         raise TypeError(f"Value must be a string, but got {name}")
 
     return name.lower()
+
+
+def ensure_definition_is_adapter(definition: LabwareDefinition) -> None:
+    """Ensure that one of the definition's allowed roles is `adapter`."""
+    if LabwareRole.adapter not in definition.allowedRoles:
+        raise LabwareDefinitionIsNotAdapterError(
+            f"Labware {definition.parameters.loadName} is not an adapter."
+        )
+
+
+def ensure_definition_is_labware(definition: LabwareDefinition) -> None:
+    """Ensure that one of the definition's allowed roles is `labware` or that that field is empty."""
+    if definition.allowedRoles and LabwareRole.labware not in definition.allowedRoles:
+        raise LabwareDefinitionIsNotLabwareError(
+            f"Labware {definition.parameters.loadName} is not defined as a normal labware."
+        )
 
 
 _MODULE_ALIASES: Dict[str, ModuleModel] = {

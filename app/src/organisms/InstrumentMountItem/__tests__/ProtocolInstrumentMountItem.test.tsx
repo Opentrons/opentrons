@@ -86,11 +86,13 @@ describe('ProtocolInstrumentMountItem', () => {
   })
 
   it('renders the correct information when there is no pipette attached', () => {
-    const { getByText } = render(props)
+    const { getByText, getByLabelText } = render(props)
     getByText('Left Mount')
     getByText('No data')
     getByText('Flex 8-Channel 1000 μL')
     getByText('Attach')
+    getByLabelText('SmallButton_primary').click()
+    getByText('pipette wizard flow')
   })
   it('renders the correct information when there is no pipette attached for 96 channel', () => {
     props = {

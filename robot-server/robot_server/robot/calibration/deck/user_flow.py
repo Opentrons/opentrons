@@ -209,7 +209,7 @@ class DeckCalibrationUserFlow:
 
         right_pip = pips[Mount.RIGHT]
         left_pip = pips[Mount.LEFT]
-        if right_pip.config.max_volume == left_pip.config.max_volume:
+        if right_pip.liquid_class.max_volume == left_pip.liquid_class.max_volume:
             if right_pip.config.channels == left_pip.config.channels:
                 return right_pip, Mount.RIGHT
             else:
@@ -220,7 +220,7 @@ class DeckCalibrationUserFlow:
         else:
             return sorted(
                 [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
-                key=lambda p_m: p_m[0].config.max_volume,
+                key=lambda p_m: p_m[0].liquid_class.max_volume,
             )[0]
 
     def _get_tip_rack_lw(
@@ -231,13 +231,13 @@ class DeckCalibrationUserFlow:
                 tiprack_definition, self._deck.position_for(TIP_RACK_SLOT)
             )
         else:
-            pip_vol = self._hw_pipette.config.max_volume
+            pip_vol = self._hw_pipette.liquid_class.max_volume
             lw_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
             return labware.load(lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
     def _get_default_tipracks(self):
         return uf.get_default_tipracks(
-            cast(List[LabwareUri], self.hw_pipette.config.default_tipracks)
+            cast(List[LabwareUri], self.hw_pipette.liquid_class.default_tipracks)
         )
 
     def _build_expected_points_dict(self) -> ExpectedPoints:
