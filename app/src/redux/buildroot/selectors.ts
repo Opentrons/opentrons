@@ -128,8 +128,7 @@ export function getBuildrootUpdateAvailable(
   state: State,
   robot: ViewableRobot
 ): BuildrootUpdateType | null {
-  // const currentVersion = getRobotApiVersion(robot)
-  const currentVersion = '0.0.0'
+  const currentVersion = getRobotApiVersion(robot)
   const updateVersion = getBuildrootUpdateVersion(state)
 
   return getBuildrootUpdateType(currentVersion, updateVersion)

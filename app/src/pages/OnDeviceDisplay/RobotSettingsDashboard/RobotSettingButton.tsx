@@ -89,7 +89,6 @@ export function RobotSettingButton({
       onClick={handleClick}
       display={DISPLAY_FLEX}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing24}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
     >
@@ -97,6 +96,8 @@ export function RobotSettingButton({
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
+        width="100%"
+        whiteSpace="nowrap"
       >
         <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
         <Flex
@@ -104,7 +105,6 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
-          // width="46.25rem"
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {settingName}
@@ -127,7 +127,7 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing10} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
@@ -141,7 +141,7 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing10} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
@@ -155,7 +155,7 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing10} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
@@ -163,11 +163,7 @@ export function RobotSettingButton({
           </StyledText>
         </Flex>
       ) : null}
-      <Flex
-        gridGap={SPACING.spacing24}
-        alignItems={ALIGN_CENTER}
-        // marginLeft={isUpdateAvailable ? '-18rem' : undefined}
-      >
+      <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
         {isUpdateAvailable ?? false ? (
           <InlineNotification
             type="alert"
