@@ -110,7 +110,7 @@ describe('RobotOverflowMenu', () => {
     expect(run).toBeDisabled()
   })
 
-  it('should only render robotsettings when e-stop is pressed or disconnected', () => {
+  it('should only render robot settings when e-stop is pressed or disconnected', () => {
     mockUseCurrentRunId.mockReturnValue(null)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'upgrade',
