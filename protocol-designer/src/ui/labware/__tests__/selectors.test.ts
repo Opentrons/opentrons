@@ -150,6 +150,7 @@ describe('labware selectors', () => {
           labwareEntities,
           names,
           initialDeckSetup,
+          {},
           {}
         )
       ).toEqual([
@@ -179,7 +180,8 @@ describe('labware selectors', () => {
           labwareEntities,
           names,
           initialDeckSetup,
-          presavedStepForm
+          presavedStepForm,
+          {}
         )
       ).toEqual([
         { name: 'Opentrons Tip Rack 10 µL', value: 'tiprack10Id' },
@@ -259,6 +261,7 @@ describe('labware selectors', () => {
           labwareEntities,
           nicknames,
           initialDeckSetup,
+          {},
           {}
         )
       ).toEqual([
@@ -318,7 +321,7 @@ describe('labware selectors', () => {
           savedStep
         )
       ).toEqual([
-        { name: 'Well Plate', value: 'wellPlateId' },
+        { name: 'Well Plate in Magnetic Module', value: 'wellPlateId' },
         { name: 'Trash', value: 'fixedTrash' },
       ])
     })

@@ -65,7 +65,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
         const moduleOnDeck = getModuleUnderLabware(
           initialDeckSetup,
-          savedStepForms,
+          savedStepForms ?? {},
           labwareId
         )
         const module =
