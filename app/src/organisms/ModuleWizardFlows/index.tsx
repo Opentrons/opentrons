@@ -28,8 +28,8 @@ import { FirmwareUpdate } from './FirmwareUpdate'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
-  slotName: string
   closeFlow: () => void
+  slotName?: string
   onComplete?: () => void
 }
 
