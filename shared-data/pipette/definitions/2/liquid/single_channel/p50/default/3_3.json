@@ -85,7 +85,8 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 1.5
+      "defaultBlowoutVolume": 1.5,
+      "defaultPushOutVolume": 0
     }
   },
   "defaultTipOverlapDictionary": {
