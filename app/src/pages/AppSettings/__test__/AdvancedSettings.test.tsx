@@ -138,7 +138,7 @@ describe('AdvancedSettings', () => {
     getByText('Additional Custom Labware Source Folder')
     getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
-    getByText('Enable Developer Tools')
+    getByText('Developer Tools')
     getByText('OT-2 Advanced Settings')
     getByText('Tip Length Calibration Method')
     getByText('USB-to-Ethernet Adapter Information')
