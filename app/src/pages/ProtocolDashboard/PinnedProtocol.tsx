@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { format, formatDistance } from 'date-fns'
+import { formatDistance } from 'date-fns'
 import styled, { css } from 'styled-components'
 
 import {
@@ -19,6 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -69,7 +70,7 @@ export function PinnedProtocol(props: {
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
-  const { t } = useTranslation(['protocol_info', 'shared'])
+  const { t } = useTranslation('protocol_info')
 
   const handleProtocolClick = (
     longpress: UseLongPressResult,
@@ -131,9 +132,7 @@ export function PinnedProtocol(props: {
             : t('no_history')}
         </StyledText>
         <StyledText as="p">
-          {t('shared:utc', {
-            timestamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
-          })}
+          {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
       </Flex>
       {longpress.isLongPressed && (

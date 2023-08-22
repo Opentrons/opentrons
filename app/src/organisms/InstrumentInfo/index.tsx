@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { format } from 'date-fns'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -23,6 +22,7 @@ import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -34,7 +34,7 @@ interface InstrumentInfoProps {
   instrument: InstrumentData | null
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
-  const { t, i18n } = useTranslation(['instruments_dashboard', 'shared'])
+  const { t, i18n } = useTranslation('instruments_dashboard')
   const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
@@ -128,14 +128,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               label={t('last_calibrated')}
               value={
                 instrument.data.calibratedOffset?.last_modified != null
-                  ? t('shared:utc', {
-                      timestamp: format(
-                        new Date(
-                          instrument.data.calibratedOffset?.last_modified
-                        ),
-                        'M/d/yy HH:mm'
-                      ),
-                    })
+                  ? formatTimeWithUtcLabel(
+                      instrument.data.calibratedOffset?.last_modified
+                    )
                   : i18n.format(t('no_cal_data'), 'capitalize')
               }
             />

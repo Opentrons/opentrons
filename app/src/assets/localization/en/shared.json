@@ -75,6 +75,5 @@
   "update": "Update",
   "view_latest_release_notes": "View latest release notes on",
   "yes": "yes",
-  "you_will_need": "You will need:",
-  "utc": "{{timestamp}} UTC"
+  "you_will_need": "You will need:"
 }

@@ -52,15 +52,16 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
+import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
-import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
-  const { t } = useTranslation(['run_details', 'shared'])
+  const { t } = useTranslation('run_details')
   const history = useHistory()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const runStatus = runRecord?.data.status ?? null
@@ -207,9 +208,7 @@ export function RunSummary(): JSX.Element {
             <ProtocolName>{protocolName}</ProtocolName>
             <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
               <SummaryDatum>
-                {t('shared:utc', {
-                  timestamp: `${t('run')}: ${createdAtTimestamp}`,
-                })}
+                {`${t('run')}: ${formatTimeWithUtcLabel(createdAtTimestamp)}`}
               </SummaryDatum>
               <SummaryDatum>
                 {`${t('duration')}: `}
@@ -224,14 +223,10 @@ export function RunSummary(): JSX.Element {
                 />
               </SummaryDatum>
               <SummaryDatum>
-                {t('shared:utc', {
-                  timestamp: `${t('start')}: ${startedAtTimestamp}`,
-                })}
+                {`${t('start')}: ${formatTimeWithUtcLabel(startedAtTimestamp)}`}
               </SummaryDatum>
               <SummaryDatum>
-                {t('shared:utc', {
-                  timestamp: `${t('end')}: ${completedAtTimestamp}`,
-                })}
+                {`${t('end')}: ${formatTimeWithUtcLabel(completedAtTimestamp)}`}
               </SummaryDatum>
             </Flex>
           </Flex>

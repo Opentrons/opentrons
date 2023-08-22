@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { format, formatDistance } from 'date-fns'
+import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
@@ -27,6 +27,7 @@ import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -185,9 +186,7 @@ export function ProtocolCard(props: {
       </Flex>
       <Flex width="11.9125rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
-          {t('shared:utc', {
-            timestamp: format(new Date(protocol.createdAt), 'M/d/yy HH:mm'),
-          })}
+          {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
