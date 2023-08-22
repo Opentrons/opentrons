@@ -32,6 +32,7 @@ class LoadedStaticPipetteData:
     ]
     nominal_tip_overlap: Dict[str, float]
     default_push_out_volume: Optional[float]
+    plunger_positions_for_liquid_class: pipette_definition.PlungerPositions
 
 
 def get_virtual_pipette_static_config(
@@ -50,6 +51,9 @@ def get_virtual_pipette_static_config(
     liquid_class = pip_types.LiquidClasses.default
     tip_configuration = config.liquid_properties[liquid_class].supported_tips[
         pip_types.PipetteTipType(config.liquid_properties[liquid_class].max_volume)
+    ]
+    plunger_positions_for_liquid_class = config.plunger_positions_configurations[
+        liquid_class
     ]
     return LoadedStaticPipetteData(
         model=str(pipette_model),
@@ -72,6 +76,7 @@ def get_virtual_pipette_static_config(
             liquid_class
         ].tip_overlap_dictionary,
         default_push_out_volume=tip_configuration.default_push_out_volume,
+        plunger_positions_for_liquid_class=plunger_positions_for_liquid_class,
     )
 
 
@@ -97,4 +102,5 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         home_position=0,
         nozzle_offset_z=0,
         default_push_out_volume=pipette_dict["default_push_out_volume"],
+        plunger_positions_for_liquid_class=pipette_dict["plunger_positions"],
     )

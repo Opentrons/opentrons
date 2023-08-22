@@ -19,6 +19,7 @@ from opentrons_shared_data.pipette.types import PipetteTipType
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     SupportedTipsDefinition,
+    PlungerPositions,
 )
 from opentrons_shared_data.gripper import (
     GripperModel,
@@ -95,6 +96,7 @@ class PipetteDict(InstrumentDict):
     default_blow_out_volume: float
     default_push_out_volume: Optional[float]
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
+    plunger_positions: PlungerPositions
 
 
 class PipetteStateDict(TypedDict):
