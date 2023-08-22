@@ -14,6 +14,7 @@ from opentrons.util.linal import solve_attitude, SolvePoints
 from .types import OT3Mount, Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
+from opentrons.hardware_control.types import CriticalPoint
 import json
 
 from opentrons_shared_data.deck import (
@@ -548,6 +549,7 @@ async def _calibrate_mount(
     slot: int = SLOT_CENTER,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
     raise_verify_error: bool = True,
+    front_channel: bool = False,
 ) -> Point:
     """
     Run automatic calibration for the tool attached to the specified mount.
@@ -574,6 +576,13 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = Point(*get_calibration_square_position_in_slot(slot))
+    if front_channel:
+        assert mount != OT3Mount.GRIPPER, f"no front-channel to calibrate on gripper"
+        pip = hcapi.hardware_instruments[mount.to_mount()]
+        assert pip
+        assert pip.channels != 1, f"no front-channel to calibrate on 1ch pipette"
+        # need to move closer to REAR of machine, so that FRONT channel calibrates
+        nominal_center += Point(x=0, y=9 * 7, z=0)
     async with hcapi.restore_system_constrants():
         await hcapi.set_system_constraints_for_calibration()
         try:
@@ -759,6 +768,7 @@ async def find_pipette_offset(
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
     raise_verify_error: bool = True,
     reset_instrument_offset: bool = True,
+    front_channel: bool = False,
 ) -> Point:
     """
     Run automatic calibration for pipette and only return the calibration point.
@@ -774,7 +784,9 @@ async def find_pipette_offset(
         if reset_instrument_offset:
             await hcapi.reset_instrument_offset(mount)
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
+        offset = await _calibrate_mount(
+            hcapi, mount, slot, method, raise_verify_error, front_channel=front_channel
+        )
         return offset
     finally:
         await hcapi.remove_tip(mount)
@@ -786,6 +798,7 @@ async def calibrate_pipette(
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
     raise_verify_error: bool = True,
+    front_channel: bool = False,
 ) -> Point:
     """
     Run automatic calibration for pipette and save the offset.
@@ -795,7 +808,9 @@ async def calibrate_pipette(
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered).
     """
-    offset = await find_pipette_offset(hcapi, mount, slot, method, raise_verify_error)
+    offset = await find_pipette_offset(
+        hcapi, mount, slot, method, raise_verify_error, front_channel=front_channel
+    )
     await hcapi.save_instrument_offset(mount, offset)
     return offset
 

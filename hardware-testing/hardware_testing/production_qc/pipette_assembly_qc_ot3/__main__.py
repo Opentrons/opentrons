@@ -16,7 +16,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     PushTipPresenceNotification,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.constants import SensorType
+from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId
 
 from opentrons.config.types import LiquidProbeSettings
 from opentrons.hardware_control.types import (
@@ -159,15 +159,15 @@ HUMIDITY_THRESH = [10, 90]
 # THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = {
     1: [3.0, 7.0],
-    8: [3.0, 7.0],  # TODO: update for PVT multi build
+    8: [5.0, 12.0],
 }
 CAP_THRESH_PROBE = {
     1: [4.0, 8.0],
-    8: [5.0, 20.0],  # TODO: update for PVT multi build
+    8: [8.0, 20.0],
 }
 CAP_THRESH_SQUARE = {
     1: [8.0, 15.0],
-    8: [0.0, 1000.0],  # TODO: update for PVT multi build
+    8: [12.0, 30.0],
 }
 
 # THRESHOLDS: air-pressure sensor
@@ -603,7 +603,11 @@ async def _test_for_leak_by_eye(
 
 
 async def _read_pipette_sensor_repeatedly_and_average(
-    api: OT3API, mount: OT3Mount, sensor_type: SensorType, num_readings: int
+    api: OT3API,
+    mount: OT3Mount,
+    sensor_type: SensorType,
+    num_readings: int,
+    sensor_id: SensorId,
 ) -> float:
     # FIXME: this while loop is required b/c the command does not always
     #        return a value, not sure what's the source of this issue
@@ -611,14 +615,18 @@ async def _read_pipette_sensor_repeatedly_and_average(
     while len(readings) < num_readings:
         try:
             if sensor_type == SensorType.capacitive:
-                r = await helpers_ot3.get_capacitance_ot3(api, mount)
+                r = await helpers_ot3.get_capacitance_ot3(api, mount, sensor_id)
             elif sensor_type == SensorType.pressure:
-                r = await helpers_ot3.get_pressure_ot3(api, mount)
+                r = await helpers_ot3.get_pressure_ot3(api, mount, sensor_id)
             elif sensor_type == SensorType.temperature:
-                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                res = await helpers_ot3.get_temperature_humidity_ot3(
+                    api, mount, sensor_id
+                )
                 r = res[0]
             elif sensor_type == SensorType.humidity:
-                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                res = await helpers_ot3.get_temperature_humidity_ot3(
+                    api, mount, sensor_id
+                )
                 r = res[1]
             else:
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
@@ -664,7 +672,7 @@ async def _test_diagnostics_environment(
 
     # CELSIUS
     celsius = await _read_pipette_sensor_repeatedly_and_average(
-        api, mount, SensorType.temperature, 10
+        api, mount, SensorType.temperature, 10, SensorId.S0
     )
     print(f"celsius: {celsius} C")
     if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
@@ -674,7 +682,7 @@ async def _test_diagnostics_environment(
 
     # HUMIDITY
     humidity = await _read_pipette_sensor_repeatedly_and_average(
-        api, mount, SensorType.humidity, 10
+        api, mount, SensorType.humidity, 10, SensorId.S0
     )
     print(f"humidity: {humidity} C")
     if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
@@ -727,215 +735,266 @@ async def _test_diagnostics_capacitive(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     print("testing capacitance")
-    capacitive_open_air_pass = True
-    capacitive_probe_attached_pass = True
-    capacitive_square_pass = True
-    capacitive_probing_pass = True
+    results: List[bool] = []
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
+    sensor_ids = [SensorId.S0]
+    if pip.channels == 8:
+        sensor_ids.append(SensorId.S1)
 
-    async def _read_cap() -> float:
+    async def _read_cap(_sensor_id: SensorId) -> float:
         return await _read_pipette_sensor_repeatedly_and_average(
-            api, mount, SensorType.capacitive, 10
+            api, mount, SensorType.capacitive, 10, _sensor_id
         )
 
-    capacitance_open_air = await _read_cap()
-    print(f"open-air capacitance: {capacitance_open_air}")
-    if (
-        capacitance_open_air < CAP_THRESH_OPEN_AIR[pip.channels][0]
-        or capacitance_open_air > CAP_THRESH_OPEN_AIR[pip.channels][1]
-    ):
-        capacitive_open_air_pass = False
-        print(f"FAIL: open-air capacitance ({capacitance_open_air}) is not correct")
-    write_cb(
-        [
-            "capacitive-open-air",
-            capacitance_open_air,
-            _bool_to_pass_fail(capacitive_open_air_pass),
-        ]
-    )
-
-    if not api.is_simulator:
-        _get_operator_answer_to_question('ATTACH the probe, enter "y" when attached')
-    capacitance_with_probe = await _read_cap()
-    print(f"probe capacitance: {capacitance_with_probe}")
-    if (
-        capacitance_with_probe < CAP_THRESH_PROBE[pip.channels][0]
-        or capacitance_with_probe > CAP_THRESH_PROBE[pip.channels][1]
-    ):
-        capacitive_probe_attached_pass = False
-        print(f"FAIL: probe capacitance ({capacitance_with_probe}) is not correct")
-    write_cb(
-        [
-            "capacitive-probe",
-            capacitance_with_probe,
-            _bool_to_pass_fail(capacitive_probe_attached_pass),
-        ]
-    )
-
-    offsets: List[Point] = []
-    for trial in range(2):
-        print("probing deck slot #5")
-        if trial > 0 and not api.is_simulator:
-            input("`REINSTALL` the probe, press ENTER when ready: ")
-        await api.home()
-        if api.is_simulator:
-            pass
-        try:
-            await calibrate_pipette(api, mount, slot=5)  # type: ignore[arg-type]
-        except (
-            EdgeNotFoundError,
-            EarlyCapacitiveSenseTrigger,
-            CalibrationStructureNotFoundError,
-        ) as e:
-            print(f"ERROR: {e}")
-            write_cb([f"probe-slot-{trial}", None, None, None])
-        else:
-            pip = api.hardware_pipettes[mount.to_mount()]
-            assert pip
-            o = pip.pipette_offset.offset
-            print(f"found offset: {o}")
-            write_cb(
-                [f"probe-slot-{trial}", round(o.x, 2), round(o.y, 2), round(o.z, 2)]
+    for sensor_id in sensor_ids:
+        capacitance = await _read_cap(sensor_id)
+        print(f"open-air {sensor_id.name} capacitance: {capacitance}")
+        if (
+            capacitance < CAP_THRESH_OPEN_AIR[pip.channels][0]
+            or capacitance > CAP_THRESH_OPEN_AIR[pip.channels][1]
+        ):
+            results.append(False)
+            print(
+                f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct"
             )
-            offsets.append(o)
-        await api.retract(mount)
-    if (
-        not api.is_simulator
-        and len(offsets) > 1
-        and (
-            abs(offsets[0].x - offsets[1].x) <= PROBING_DECK_PRECISION_MM
-            and abs(offsets[0].y - offsets[1].y) <= PROBING_DECK_PRECISION_MM
-            and abs(offsets[0].z - offsets[1].z) <= PROBING_DECK_PRECISION_MM
+        else:
+            results.append(True)
+        write_cb(
+            [
+                f"capacitive-open-air-{sensor_id.name}",
+                capacitance,
+                _bool_to_pass_fail(results[-1]),
+            ]
         )
-    ):
-        probe_slot_pass = True
 
-    else:
-        probe_slot_pass = False
-    probe_slot_result = _bool_to_pass_fail(probe_slot_pass)
-    print(f"probe-slot-result: {probe_slot_result}")
-    write_cb(["capacitive-probe-slot-result", probe_slot_result])
+    for sensor_id in sensor_ids:
+        if not api.is_simulator:
+            if pip.channels == 1:
+                _get_operator_answer_to_question(
+                    'ATTACH the probe, enter "y" when attached'
+                )
+            elif sensor_id == SensorId.S0:
+                _get_operator_answer_to_question(
+                    'ATTACH the REAR probe, enter "y" when attached'
+                )
+            else:
+                _get_operator_answer_to_question(
+                    'ATTACH the FRONT probe, enter "y" when attached'
+                )
+        capacitance = await _read_cap(sensor_id)
+        print(f"probe {sensor_id.name} capacitance: {capacitance}")
+        if (
+            capacitance < CAP_THRESH_PROBE[pip.channels][0]
+            or capacitance > CAP_THRESH_PROBE[pip.channels][1]
+        ):
+            results.append(False)
+            print(f"FAIL: probe capacitance ({capacitance}) is not correct")
+        else:
+            results.append(True)
+        write_cb(
+            [
+                f"capacitive-probe-{sensor_id.name}",
+                capacitance,
+                _bool_to_pass_fail(results[-1]),
+            ]
+        )
 
-    probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    probe_pos += Point(13, 13, 0)
-    await api.add_tip(mount, api.config.calibration.probe_length)
-    print(f"Moving to: {probe_pos}")
-    # start probe 5mm above deck
-    _probe_start_mm = probe_pos.z + 5
-    current_pos = await api.gantry_position(mount)
-    if current_pos.z < _probe_start_mm:
-        await api.move_to(mount, current_pos._replace(z=_probe_start_mm))
-        current_pos = await api.gantry_position(mount)
-    await api.move_to(mount, probe_pos._replace(z=current_pos.z))
-    await api.move_to(mount, probe_pos)
-    capacitance_with_square = await _read_cap()
-    print(f"square capacitance: {capacitance_with_square}")
-    if (
-        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels][0]
-        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels][1]
-    ):
-        capacitive_square_pass = False
-        print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
-    write_cb(
-        [
-            "capacitive-square",
-            capacitance_with_square,
-            _bool_to_pass_fail(capacitive_square_pass),
-        ]
-    )
-    await api.home_z(mount)
-    await api.remove_tip(mount)
+        offsets: List[Point] = []
+        for trial in range(2):
+            print("probing deck slot #5")
+            if trial > 0 and not api.is_simulator:
+                input("`REINSTALL` the probe, press ENTER when ready: ")
+            await api.home()
+            if api.is_simulator:
+                pass
+            try:
+                front_channel = True if sensor_id == SensorId.S1 else False
+                await calibrate_pipette(api, mount, slot=5, front_channel=front_channel)  # type: ignore[arg-type]
+            except (
+                EdgeNotFoundError,
+                EarlyCapacitiveSenseTrigger,
+                CalibrationStructureNotFoundError,
+            ) as e:
+                print(f"ERROR: {e}")
+                write_cb([f"probe-slot-{sensor_id.name}-{trial}", None, None, None])
+            else:
+                pip = api.hardware_pipettes[mount.to_mount()]
+                assert pip
+                o = pip.pipette_offset.offset
+                print(f"found offset: {o}")
+                write_cb(
+                    [
+                        f"probe-slot-{sensor_id.name}-{trial}",
+                        round(o.x, 2),
+                        round(o.y, 2),
+                        round(o.z, 2),
+                    ]
+                )
+                offsets.append(o)
+            await api.retract(mount)
+        if (
+            not api.is_simulator
+            and len(offsets) > 1
+            and (
+                abs(offsets[0].x - offsets[1].x) <= PROBING_DECK_PRECISION_MM
+                and abs(offsets[0].y - offsets[1].y) <= PROBING_DECK_PRECISION_MM
+                and abs(offsets[0].z - offsets[1].z) <= PROBING_DECK_PRECISION_MM
+            )
+        ):
+            results.append(True)
+        else:
+            results.append(False)
+        probe_slot_result = _bool_to_pass_fail(results[-1])
+        print(f"probe-slot-{sensor_id.name}-result: {probe_slot_result}")
+        write_cb([f"capacitive-probe-{sensor_id.name}-slot-result", probe_slot_result])
 
-    if not api.is_simulator:
-        _get_operator_answer_to_question('REMOVE the probe, enter "y" when removed')
-    return (
-        capacitive_open_air_pass
-        and capacitive_probe_attached_pass
-        and capacitive_probing_pass
-        and capacitive_square_pass
-        and probe_slot_pass
-    )
+        if len(offsets) > 1:
+            probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+            probe_pos += Point(13, 13, 0)
+            if sensor_id == SensorId.S1:
+                probe_pos += Point(x=0, y=9 * 7, z=0)
+            await api.add_tip(mount, api.config.calibration.probe_length)
+            print(f"Moving to: {probe_pos}")
+            # start probe 5mm above deck
+            _probe_start_mm = probe_pos.z + 5
+            current_pos = await api.gantry_position(mount)
+            if current_pos.z < _probe_start_mm:
+                await api.move_to(mount, current_pos._replace(z=_probe_start_mm))
+                current_pos = await api.gantry_position(mount)
+            await api.move_to(mount, probe_pos._replace(z=current_pos.z))
+            await api.move_to(mount, probe_pos)
+            capacitance = await _read_cap(sensor_id)
+            print(f"square capacitance {sensor_id.name}: {capacitance}")
+            if (
+                capacitance < CAP_THRESH_SQUARE[pip.channels][0]
+                or capacitance > CAP_THRESH_SQUARE[pip.channels][1]
+            ):
+                results.append(False)
+                print(f"FAIL: square capacitance ({capacitance}) is not correct")
+            else:
+                results.append(True)
+        else:
+            results.append(False)
+        write_cb(
+            [
+                f"capacitive-square-{sensor_id.name}",
+                capacitance,
+                _bool_to_pass_fail(results[-1]),
+            ]
+        )
+        await api.home_z(mount)
+        if not api.is_simulator:
+            _get_operator_answer_to_question('REMOVE the probe, enter "y" when removed')
+        await api.remove_tip(mount)
+
+    return all(results)
 
 
 async def _test_diagnostics_pressure(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
+    print("testing pressure")
+    results: List[bool] = []
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    sensor_ids = [SensorId.S0]
+    if pip.channels == 8:
+        sensor_ids.append(SensorId.S1)
     await api.add_tip(mount, 0.1)
     await api.prepare_for_aspirate(mount)
     await api.remove_tip(mount)
 
-    async def _read_pressure() -> float:
+    async def _read_pressure(_sensor_id: SensorId) -> float:
         return await _read_pipette_sensor_repeatedly_and_average(
-            api, mount, SensorType.pressure, 10
+            api, mount, SensorType.pressure, 10, _sensor_id
         )
 
-    print("testing pressure")
-    pressure_open_air_pass = True
-    pressure_open_air = await _read_pressure()
-    print(f"pressure-open-air: {pressure_open_air}")
-    if (
-        pressure_open_air < PRESSURE_THRESH_OPEN_AIR[0]
-        or pressure_open_air > PRESSURE_THRESH_OPEN_AIR[1]
-    ):
-        pressure_open_air_pass = False
-        print(f"FAIL: open-air pressure ({pressure_open_air}) is not correct")
-    write_cb(
-        [
-            "pressure-open-air",
-            pressure_open_air,
-            _bool_to_pass_fail(pressure_open_air_pass),
-        ]
-    )
+    for sensor_id in sensor_ids:
+        pressure = await _read_pressure(sensor_id)
+        print(f"pressure-open-air-{sensor_id.name}: {pressure}")
+        if (
+            pressure < PRESSURE_THRESH_OPEN_AIR[0]
+            or pressure > PRESSURE_THRESH_OPEN_AIR[1]
+        ):
+            results.append(False)
+            print(
+                f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
+            )
+        else:
+            results.append(True)
+        write_cb(
+            [
+                f"pressure-open-air-{sensor_id.name}",
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ]
+        )
 
+    # PICK-UP TIP(S)
     _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print("moving plunger to bottom")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
     await _pick_up_tip_for_tip_volume(api, mount, tip_volume=50)
     await api.retract(mount)
+
+    # SEALED PRESSURE
     if not api.is_simulator:
-        _get_operator_answer_to_question('COVER tip with finger, enter "y" when ready')
-    pressure_sealed = await _read_pressure()
-    pressure_sealed_pass = True
-    print(f"pressure-sealed: {pressure_sealed}")
-    if (
-        pressure_sealed < PRESSURE_THRESH_SEALED[0]
-        or pressure_sealed > PRESSURE_THRESH_SEALED[1]
-    ):
-        pressure_sealed_pass = False
-        print(f"FAIL: sealed pressure ({pressure_sealed}) is not correct")
-    write_cb(
-        ["pressure-sealed", pressure_sealed, _bool_to_pass_fail(pressure_sealed_pass)]
-    )
+        _get_operator_answer_to_question(
+            f'COVER tip(s) with finger(s), enter "y" when ready'
+        )
+    for sensor_id in sensor_ids:
+        pressure = await _read_pressure(sensor_id)
+        print(f"pressure-sealed: {pressure}")
+        if pressure < PRESSURE_THRESH_SEALED[0] or pressure > PRESSURE_THRESH_SEALED[1]:
+            results.append(False)
+            print(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
+        else:
+            results.append(True)
+        write_cb(
+            [
+                f"pressure-sealed-{sensor_id.name}",
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ]
+        )
+
+    # COMPRESSED
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
     plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[pip_vol]
     print(f"aspirate {plunger_aspirate_ul} ul")
     await api.aspirate(mount, plunger_aspirate_ul)
-    pressure_compress = await _read_pressure()
-    print(f"pressure-compressed: {pressure_compress}")
-    pressure_compress_pass = True
-    if (
-        pressure_compress < PRESSURE_THRESH_COMPRESS[0]
-        or pressure_compress > PRESSURE_THRESH_COMPRESS[1]
-    ):
-        pressure_compress_pass = False
-        print(f"FAIL: sealed pressure ({pressure_compress}) is not correct")
-    write_cb(
-        [
-            "pressure-compressed",
-            pressure_compress,
-            _bool_to_pass_fail(pressure_compress_pass),
-        ]
-    )
+    for sensor_id in sensor_ids:
+        pressure = await _read_pressure(sensor_id)
+        print(f"pressure-compressed-{sensor_id.name}: {pressure}")
+        if (
+            pressure < PRESSURE_THRESH_COMPRESS[0]
+            or pressure > PRESSURE_THRESH_COMPRESS[1]
+        ):
+            results.append(False)
+            print(
+                f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct"
+            )
+        else:
+            results.append(True)
+        write_cb(
+            [
+                f"pressure-compressed-{sensor_id.name}",
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ]
+        )
 
     if not api.is_simulator:
         _get_operator_answer_to_question('REMOVE your finger, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
     await api.dispense(mount)
+    await api.prepare_for_aspirate(mount)
+
     await _drop_tip_in_trash(api, mount)
-    return pressure_open_air_pass and pressure_sealed_pass and pressure_compress_pass
+    return all(results)
 
 
 async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
@@ -948,13 +1007,15 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
     # CAPACITIVE SENSOR
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
     capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
     print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
-    write_cb(["diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
+    write_cb([f"diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
     # PRESSURE
     pressure_pass = await _test_diagnostics_pressure(api, mount, write_cb)
     print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
-    write_cb(["diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
+    write_cb([f"diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
     return environment_pass and pressure_pass and encoder_pass and capacitance_pass
 
 
