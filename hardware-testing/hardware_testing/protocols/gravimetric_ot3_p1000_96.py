@@ -1,6 +1,7 @@
 """Gravimetric OT3 P1000."""
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api._types import OffDeckType
+
 metadata = {"protocolName": "gravimetric-ot3-p1000-96"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
@@ -33,4 +34,4 @@ def run(ctx: ProtocolContext) -> None:
             pipette.aspirate(10, scale_labware["A1"].top())
             pipette.dispense(10, scale_labware["A1"].top())
             pipette.drop_tip(home_after=False)
-            ctx.move_labware(rack,OffDeckType.OFF_DECK)
+            ctx.move_labware(rack, OffDeckType.OFF_DECK)

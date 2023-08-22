@@ -113,7 +113,7 @@ test-gravimetric-multi:
 
 .PHONY: test-gravimetric-96
 test-gravimetric-96:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --trials-2 --no-blank
 
 .PHONY: test-gravimetric
 test-gravimetric:

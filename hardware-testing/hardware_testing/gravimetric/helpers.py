@@ -398,8 +398,16 @@ def _load_tipracks(
     loaded_labwares = ctx.loaded_labwares
     pre_loaded_tips: List[Labware] = []
     for ls in tiprack_load_settings:
-        if ls[0] in loaded_labwares.keys() and loaded_labwares[ls[0]].name == ls[1]:
-            pre_loaded_tips.append(loaded_labwares[ls[0]])
+        if ls[0] in loaded_labwares.keys():
+            if loaded_labwares[ls[0]].name == ls[1]:
+                pre_loaded_tips.append(loaded_labwares[ls[0]])
+            else:
+                # If something is in the slot that's not what we want, remove it
+                # we use this only for the 96 channel
+                ui.print_info(
+                    f"Removing {loaded_labwares[ls[0]].name} from slot {ls[0]}"
+                )
+                del ctx._core.get_deck()[ls[0]]  # type: ignore[attr-defined]
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 

@@ -498,6 +498,13 @@ def _get_liquid_height(
     resources: TestResources, cfg: config.GravimetricConfig, well: Well
 ) -> float:
     resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
+    if cfg.pipette_channels == 96:
+        if not resources.ctx.is_simulating():
+            ui.alert_user_ready(
+                f"Please replace the {cfg.tip_volume}ul tips in slot 2",
+                resources.ctx._core.get_hardware(),
+            )
+        _tip_counter[0] = 0
     if cfg.jog:
         _liquid_height = _jog_to_find_liquid_height(
             resources.ctx, resources.pipette, well
@@ -526,8 +533,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         # initialize the global tip counter, per each channel that will be tested
         _tip_counter[channel] = 0
     trial_total = len(resources.test_volumes) * cfg.trials * len(channels_to_test)
-    support_tip_resupply = bool(cfg.pipette_channels == 96 and cfg.increment)
-    if trial_total > total_tips:
+    support_tip_resupply = bool(cfg.pipette_channels == 96)
+    if (trial_total + 1) > total_tips:
         if not support_tip_resupply:
             raise ValueError(f"more trials ({trial_total}) than tips ({total_tips})")
         elif not resources.ctx.is_simulating():
