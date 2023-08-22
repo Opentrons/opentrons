@@ -134,6 +134,10 @@ export function RunSummary(): JSX.Element {
     setShowSplash(false)
   }
 
+  console.log('createdAtTimestamp', createdAtTimestamp)
+  console.log('startedAtTimestamp', startedAtTimestamp)
+  console.log('completedAtTimestamp', completedAtTimestamp)
+
   return (
     <Btn
       display={DISPLAY_FLEX}
