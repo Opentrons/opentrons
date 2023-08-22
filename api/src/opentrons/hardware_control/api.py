@@ -491,7 +491,7 @@ class API(
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     async def halt(self) -> None:
-        """Immediately stop motion.
+        """Immediately stop motion, cancel execution manager and cancel running tasks.
 
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
