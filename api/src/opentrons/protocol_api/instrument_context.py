@@ -101,7 +101,13 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def starting_tip(self) -> Union[labware.Well, None]:
-        """The starting tip from which the pipette pick up"""
+        """
+        Which well of a tip rack the pipette should start at when tracking tips.
+
+        The first call to :py:meth:`.pick_up_tip` with no argument will pick up from
+        that well. Subsequent calls will follow the ordering specified by the labware
+        definition and :py:meth:`.Labware.wells`.
+        """
         return self._starting_tip
 
     @starting_tip.setter
