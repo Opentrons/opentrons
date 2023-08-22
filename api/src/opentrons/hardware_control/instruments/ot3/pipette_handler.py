@@ -272,6 +272,7 @@ class PipetteHandlerProvider:
             result[
                 "default_push_out_volume"
             ] = instr.active_tip_settings.default_push_out_volume
+            result["plunger_positions"] = instr.plunger_positions
         return cast(PipetteDict, result)
 
     @property
