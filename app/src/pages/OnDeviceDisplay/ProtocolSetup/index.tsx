@@ -339,7 +339,8 @@ function PrepareToRun({
   const { data: attachedInstruments } = useInstrumentsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
-    protocolRecord?.data.files[0].name ?? ''
+    protocolRecord?.data.files[0].name ??
+    ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
   const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
