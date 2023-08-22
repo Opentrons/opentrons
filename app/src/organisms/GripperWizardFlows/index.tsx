@@ -79,7 +79,7 @@ export function GripperWizardFlows(
     if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
       closeFlow()
     }
-  }, [maintenanceRunData, closeFlow])
+  }, [maintenanceRunData?.data.id, closeFlow])
 
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
