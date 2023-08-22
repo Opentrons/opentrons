@@ -10,7 +10,7 @@ Opentrons OT-2 HTTP API
 Introduction
 ------------
 
-This is the Opentrons HTTP Server, the webservice that runs the Opentrons OT-2. It contains endpoints for executing protocols, controlling the hardware, and various other small tasks and capabilities that the robot fulfills.
+This is the Opentrons HTTP Server, the webservice that runs the Opentrons Flex and Opentrons OT-2. It contains endpoints for executing protocols, controlling the hardware, and various other small tasks and capabilities that the robot fulfills.
 
 This document is about the structure and purpose of the source code of the HTTP Server.
 
@@ -54,7 +54,7 @@ Developer Modes
 
 The robot server can be run on a PC in one of two development modes.
 
-These can be useful when an OT-2 and modules are not available.
+These can be useful when a physical robot and modules are not available.
 
 The **Opentrons** application will automatically discover a locally running robot server as **dev**.
 
