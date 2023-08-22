@@ -126,11 +126,7 @@ export function WifiConnectionDetails({
                     aria-label={`${activeSsid}_info_icon`}
                     color={COLORS.darkBlack100}
                   />
-                  <StyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={COLORS.darkBlack100}
-                  >
+                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                     {t('view_details')}
                   </StyledText>
                 </Flex>

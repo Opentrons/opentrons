@@ -26,7 +26,7 @@ import type { WifiNetwork } from '../../redux/networking/types'
 const NETWORK_ROW_STYLE = css`
   display: ${DISPLAY_FLEX};
   width: 100%;
-  height: '5rem';
+  height: 5rem;
   padding: ${SPACING.spacing20} ${SPACING.spacing32};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing16};
