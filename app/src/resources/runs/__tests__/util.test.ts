@@ -5,4 +5,13 @@ describe('formatTimeWithUtc', () => {
     const result = formatTimeWithUtcLabel('2023-08-20T20:25')
     expect(result).toEqual('8/20/23 20:25 UTC')
   })
+  it('return formatted time with UTC without T', () => {
+    const result = formatTimeWithUtcLabel('08/22/2023 21:35:04')
+    expect(result).toEqual('8/22/23 21:35 UTC')
+  })
+
+  it('return formatted time with UTC only hh:mm', () => {
+    const result = formatTimeWithUtcLabel('21:35:04', true)
+    expect(result).toEqual('21:35:04 UTC')
+  })
 })

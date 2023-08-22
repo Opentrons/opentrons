@@ -223,10 +223,16 @@ export function RunSummary(): JSX.Element {
                 />
               </SummaryDatum>
               <SummaryDatum>
-                {`${t('start')}: ${formatTimeWithUtcLabel(startedAtTimestamp)}`}
+                {`${t('start')}: ${formatTimeWithUtcLabel(
+                  startedAtTimestamp,
+                  true
+                )}`}
               </SummaryDatum>
               <SummaryDatum>
-                {`${t('end')}: ${formatTimeWithUtcLabel(completedAtTimestamp)}`}
+                {`${t('end')}: ${formatTimeWithUtcLabel(
+                  completedAtTimestamp,
+                  true
+                )}`}
               </SummaryDatum>
             </Flex>
           </Flex>
