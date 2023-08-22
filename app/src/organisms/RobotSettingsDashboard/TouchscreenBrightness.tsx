@@ -85,6 +85,7 @@ export function TouchscreenBrightness({
         gridGap={SPACING.spacing24}
         paddingX={SPACING.spacing60}
         paddingY={SPACING.spacing120}
+        marginTop="7.75rem"
       >
         <IconButton
           disabled={brightness === LOWEST_BRIGHTNESS}

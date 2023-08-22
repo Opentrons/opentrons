@@ -3,17 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  Flex,
-  SPACING,
+  ALIGN_CENTER,
+  BORDERS,
+  Btn,
   COLORS,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Icon,
-  Btn,
-  BORDERS,
-  ALIGN_CENTER,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -68,7 +69,7 @@ export function WifiConnectionDetails({
           securityType={connectedWifiAuthType}
         />
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop="7.75rem">
         {activeSsid != null ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -91,9 +92,14 @@ export function WifiConnectionDetails({
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}
             >
-              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing24}
+                width="100%"
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+              >
                 <Flex gridGap={SPACING.spacing8} width="34.8125rem">
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
                     <Icon
                       name="wifi"
                       size="2.5rem"
@@ -112,18 +118,15 @@ export function WifiConnectionDetails({
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacing12}
+                  gridGap={SPACING.spacing10}
                 >
                   <Icon
                     size="2.5rem"
                     name="info"
                     aria-label={`${activeSsid}_info_icon`}
+                    color={COLORS.darkBlack100}
                   />
-                  <StyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={COLORS.darkBlack70}
-                  >
+                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                     {t('view_details')}
                   </StyledText>
                 </Flex>
@@ -137,6 +140,7 @@ export function WifiConnectionDetails({
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.darkBlack70}
             paddingX={SPACING.spacing40}
+            marginBottom={SPACING.spacing8}
           >
             {t('other_networks')}
           </StyledText>

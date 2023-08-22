@@ -8,9 +8,10 @@ import {
   Icon,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_FIXED,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
@@ -42,6 +43,11 @@ export function ChildNavigation({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       paddingX={SPACING.spacing40}
       paddingY={SPACING.spacing32}
+      position={POSITION_FIXED}
+      top="0"
+      left="0"
+      width="100%"
+      backgroundColor={COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
         <IconButton onClick={onClickBack}>
