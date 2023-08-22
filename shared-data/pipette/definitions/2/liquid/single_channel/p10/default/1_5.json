@@ -38,7 +38,8 @@
         "opentrons/geb_96_tiprack_10ul/1": 6.2,
         "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1.0
       },
-      "defaultBlowoutVolume": 2.356
+      "defaultBlowoutVolume": 2.356,
+      "defaultPushOutVolume": 0
     }
   },
   "defaultTipOverlapDictionary": {
