@@ -23,9 +23,11 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
 import { toggleDevtools, toggleHistoricOffsets } from '../../../redux/config'
+import { updateSetting } from '../../../redux/robot-settings'
 
 import type { IconName } from '@opentrons/components'
 import type { Dispatch } from '../../../redux/types'
+import type { RobotSettingsField } from '../../../redux/robot-settings/types'
 import type { SettingOption, SetSettingOption } from '../RobotSettingsDashboard'
 
 const SETTING_BUTTON_STYLE = css`
@@ -34,6 +36,10 @@ const SETTING_BUTTON_STYLE = css`
   background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
+
+  &:active {
+    background-color: ${COLORS.darkBlack40};
+  }
 `
 
 interface RobotSettingButtonProps {
@@ -51,6 +57,8 @@ interface RobotSettingButtonProps {
   ledLights?: boolean
   lightsOn?: boolean
   toggleLights?: () => void
+  enabledHomeGantry?: boolean
+  homeGantrySettings?: RobotSettingsField
 }
 
 export function RobotSettingButton({
@@ -58,6 +66,7 @@ export function RobotSettingButton({
   settingInfo,
   currentOption,
   setCurrentOption,
+  robotName,
   isUpdateAvailable,
   iconName,
   enabledDevTools,
@@ -67,9 +76,17 @@ export function RobotSettingButton({
   ledLights,
   lightsOn,
   toggleLights,
+  enabledHomeGantry,
+  homeGantrySettings,
 }: RobotSettingButtonProps): JSX.Element {
   const { t, i18n } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const settingValue = homeGantrySettings?.value
+    ? homeGantrySettings.value
+    : false
+  const settingId = homeGantrySettings?.id
+    ? homeGantrySettings.id
+    : 'disableHomeOnBoot'
 
   const handleClick = (): void => {
     if (currentOption != null && setCurrentOption != null) {
@@ -80,6 +97,8 @@ export function RobotSettingButton({
       dispatch(toggleHistoricOffsets())
     } else if (Boolean(ledLights)) {
       if (toggleLights != null) toggleLights()
+    } else if (Boolean(enabledHomeGantry) && robotName != null) {
+      dispatch(updateSetting(robotName, settingId, !settingValue))
     }
   }
 
@@ -158,7 +177,11 @@ export function RobotSettingButton({
           padding={`${SPACING.spacing10} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadiusSize4}
         >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText
+            data-testid="RobotSettingButton_LED_Lights"
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
             {Boolean(lightsOn) ? t('shared:on') : t('shared:off')}
           </StyledText>
         </Flex>
@@ -171,9 +194,28 @@ export function RobotSettingButton({
             hug={true}
           />
         ) : null}
+        {enabledHomeGantry != null ? (
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing12}
+            alignItems={ALIGN_CENTER}
+            backgroundColor={COLORS.transparent}
+            padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+            borderRadius={BORDERS.borderRadiusSize4}
+          >
+            <StyledText
+              data-testid="RobotSettingButton_Home_Gantry"
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+            >
+              {Boolean(settingValue) ? t('shared:on') : t('shared:off')}
+            </StyledText>
+          </Flex>
+        ) : null}
         {enabledDevTools == null &&
         enabledHistoricOffsets == null &&
-        ledLights == null ? (
+        ledLights == null &&
+        enabledHomeGantry == null ? (
           <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         ) : null}
       </Flex>

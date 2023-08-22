@@ -34,13 +34,16 @@
   "end_of_protocol": "End of protocol",
   "end_step_time": "End",
   "end": "End",
-  "error_type": "Error: {{errorType}}",
   "error_info": "Error {{errorCode}}: {{errorType}}",
+  "error_type": "Error: {{errorType}}",
   "failed_step": "Failed step",
   "ignore_stored_data": "Ignore stored data",
   "labware_offset_data": "labware offset data",
   "labware": "labware",
   "left": "Left",
+  "load_labware_info_protocol_setup_adapter_module": "Load {{labware}} in {{adapter_name}} in {{module_name}} in Slot {{slot_name}}",
+  "load_labware_info_protocol_setup_adapter_off_deck": "Load {{labware}} in {{adapter_name}} off deck",
+  "load_labware_info_protocol_setup_adapter": "Load {{labware}} in {{adapter_name}} in Slot {{slot_name}}",
   "load_labware_info_protocol_setup_no_module": "Load {{labware}} in Slot {{slot_name}}",
   "load_labware_info_protocol_setup_off_deck": "Load {{labware}} off deck",
   "load_labware_info_protocol_setup_plural": "Load {{labware}} in {{module_name}}",
@@ -91,6 +94,7 @@
   "run_completed": "Run completed.",
   "run_cta_disabled": "Complete required steps on Protocol tab before starting the run",
   "run_failed_modal_body": "Error occurred when protocol was {{command}}",
+  "run_failed_modal_description_desktop": "Download the run log and send it to support@opentrons.com for assistance.",
   "run_failed_modal_description": "Please contact support@opentrons.com with relevant information for assistance with troubleshooting.",
   "run_failed_modal_header": "{{errorName}}: {{errorCode}} at protocol step {{count}}",
   "run_failed_modal_title": "Run failed",
@@ -133,5 +137,6 @@
   "unable_to_determine_steps": "Unable to determine steps",
   "view_analysis_error_details": "View <errorLink>error details</errorLink>",
   "view_current_step": "View current step",
-  "view_error_details": "View error details"
+  "view_error_details": "View error details",
+  "view_error": "View error"
 }

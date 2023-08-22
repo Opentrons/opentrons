@@ -19,13 +19,14 @@ import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
-import { Selector } from '../../types'
 import {
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
 } from '../../step-forms/selectors'
+import { getIsAdapter } from '../../utils'
 import type { RobotState } from '@opentrons/step-generation'
+import type { Selector } from '../../types'
 
 interface Option {
   name: string
@@ -92,7 +93,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   getRobotStateAtActiveItem,
   getModuleEntities,
   getRobotType,
-  (robotState, moduleEntities, robotType) => {
+  getLabwareEntities,
+  (robotState, moduleEntities, robotType, labwareEntities) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
@@ -108,6 +110,37 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         } else {
           return [...acc, modOnDeck.slot]
         }
+      },
+      []
+    )
+
+    const unoccupiedAdapterOptions = Object.entries(labware).reduce<Option[]>(
+      (acc, [labwareId, labwareOnDeck]) => {
+        const labwareOnAdapter = Object.values(labware).find(
+          temporalProperties => temporalProperties.slot === labwareId
+        )
+        const modIdWithAdapter = Object.keys(modules).find(
+          modId => modId === labwareOnDeck.slot
+        )
+        const modSlot =
+          modIdWithAdapter != null ? modules[modIdWithAdapter].slot : null
+        const isAdapter = getIsAdapter(labwareId, labwareEntities)
+
+        return labwareOnAdapter == null && isAdapter
+          ? [
+              ...acc,
+              {
+                name: `Adapter on top of ${
+                  modIdWithAdapter != null
+                    ? getModuleDisplayName(
+                        moduleEntities[modIdWithAdapter].model
+                      )
+                    : 'unknown module'
+                } in slot ${modSlot ?? 'unknown slot'}`,
+                value: labwareId,
+              },
+            ]
+          : acc
       },
       []
     )
@@ -154,9 +187,18 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       offDeckSlot !== 'offDeck' ? { name: 'Off Deck', value: 'offDeck' } : null
 
     if (offDeck == null) {
-      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+      return [
+        ...unoccupiedAdapterOptions,
+        ...unoccupiedModuleOptions,
+        ...unoccupiedSlotOptions,
+      ]
     } else {
-      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions, offDeck]
+      return [
+        ...unoccupiedAdapterOptions,
+        ...unoccupiedModuleOptions,
+        ...unoccupiedSlotOptions,
+        offDeck,
+      ]
     }
   }
 )

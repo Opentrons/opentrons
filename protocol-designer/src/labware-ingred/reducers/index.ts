@@ -212,11 +212,12 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
       action: LoadFileAction
     ): SavedLabwareState => {
       const file = action.payload.file
-      const loadLabwareCommands = Object.values(file.commands).filter(
+      const loadLabwareAndAdapterCommands = Object.values(file.commands).filter(
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
-      const labware = loadLabwareCommands.reduce(
+
+      const labware = loadLabwareAndAdapterCommands.reduce(
         (
           acc: Record<
             string,
@@ -228,13 +229,15 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
           >,
           command
         ) => {
-          const { labwareId, displayName, loadName } = command.params
+          const { displayName, loadName, labwareId } = command.params
           const location = command.params.location
           let slot
           if (location === 'offDeck') {
             slot = 'offDeck'
           } else if ('moduleId' in location) {
             slot = location.moduleId
+          } else if ('labwareId' in location) {
+            slot = location.labwareId
           } else {
             slot = location.slotName
           }

@@ -67,7 +67,12 @@ const Title = styled.h1`
   }
 `
 interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
-  section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'PICK_UP_TIP' | 'RETURN_TIP'
+  section:
+    | 'CHECK_LABWARE'
+    | 'CHECK_TIP_RACKS'
+    | 'PICK_UP_TIP'
+    | 'RETURN_TIP'
+    | 'CHECK_POSITIONS'
   labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void

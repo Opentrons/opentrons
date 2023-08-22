@@ -24,6 +24,7 @@ export function getRunLabwareRenderInfo(
       const location = labware.location
       if (
         (typeof location === 'object' && 'moduleId' in location) ||
+        (typeof location === 'object' && 'labwareId' in location) ||
         labware.id === 'fixedTrash'
       ) {
         return acc

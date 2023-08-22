@@ -77,7 +77,17 @@ export type BlowoutParams = FlowRateParams &
   PipetteAccessParams &
   WellLocationParam
 export type TouchTipParams = PipetteAccessParams & WellLocationParam
-export type DropTipParams = TouchTipParams
+export type DropTipParams = PipetteAccessParams & {
+  wellLocation?: {
+    origin?: 'default' | 'top' | 'center' | 'bottom'
+    offset?: {
+      // mm values all default to 0
+      x?: number
+      y?: number
+      z?: number
+    }
+  }
+}
 export type PickUpTipParams = TouchTipParams
 
 interface FlowRateParams {

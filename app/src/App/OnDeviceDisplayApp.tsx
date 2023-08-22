@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -296,11 +296,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 }
 
 function TopLevelRedirects(): JSX.Element | null {
-  const runRouteMatch = useRouteMatch({ path: '/runs/:runId' })
   const currentRunRoute = useCurrentRunRoute()
-
-  if (runRouteMatch != null && currentRunRoute == null)
-    return <Redirect to="/dashboard" />
   return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
 }
 

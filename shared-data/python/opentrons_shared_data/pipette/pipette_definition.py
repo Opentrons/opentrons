@@ -177,6 +177,11 @@ class PartialTipDefinition(BaseModel):
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
     )
+    per_tip_pickup_current: float = Field(
+        default=0.5,
+        description="A current scale for pick up tip in a partial tip configuration",
+        alias="perTipPickupCurrent",
+    )
 
 
 class PipettePhysicalPropertiesDefinition(BaseModel):
@@ -209,9 +214,9 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     plunger_motor_configurations: MotorConfigurations = Field(
         ..., alias="plungerMotorConfigurations"
     )
-    plunger_positions_configurations: PlungerPositions = Field(
-        ..., alias="plungerPositionsConfigurations"
-    )
+    plunger_positions_configurations: Dict[
+        pip_types.LiquidClasses, PlungerPositions
+    ] = Field(..., alias="plungerPositionsConfigurations")
     available_sensors: AvailableSensorDefinition = Field(..., alias="availableSensors")
     partial_tip_configurations: PartialTipDefinition = Field(
         ..., alias="partialTipConfigurations"
@@ -253,6 +258,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     @validator("quirks", pre=True)
     def convert_quirks(cls, v: List[str]) -> List[pip_types.Quirks]:
         return [pip_types.Quirks(q) for q in v]
+
+    @validator("plunger_positions_configurations", pre=True)
+    def convert_plunger_positions(
+        cls, v: Dict[str, PlungerPositions]
+    ) -> Dict[pip_types.LiquidClasses, PlungerPositions]:
+        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
 
     class Config:
         json_encoders = {
@@ -324,7 +335,6 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
 class PipetteConfigurations(
     PipetteGeometryDefinition,
     PipettePhysicalPropertiesDefinition,
-    PipetteLiquidPropertiesDefinition,
 ):
     """The full pipette configurations of a given model and version."""
 
@@ -334,3 +344,14 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
+    liquid_properties: Dict[
+        pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition
+    ] = Field(
+        ..., description="A dictionary of liquid properties keyed by liquid classes."
+    )
+
+    @validator("liquid_properties", pre=True)
+    def convert_liquid_properties_key(
+        cls, v: Dict[str, PipetteLiquidPropertiesDefinition]
+    ) -> Dict[pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition]:
+        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}

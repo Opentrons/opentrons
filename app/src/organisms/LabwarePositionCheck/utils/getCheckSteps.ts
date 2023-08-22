@@ -155,7 +155,8 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       )
     }
     const isTiprack = getIsTiprack(labwareDef)
-    if (isTiprack) return acc // skip any labware that is a tiprack
+    const adapter = (labwareDef?.allowedRoles ?? []).includes('adapter')
+    if (isTiprack || adapter) return acc // skip any labware that is a tiprack or adapter
 
     const labwareLocationCombos = getLabwareLocationCombos(
       commands,
@@ -165,7 +166,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     return [
       ...acc,
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
-        (innerAcc, { location, labwareId, moduleId }) => {
+        (innerAcc, { location, labwareId, moduleId, adapterId }) => {
           if (labwareId !== currentLabware.id) {
             return innerAcc
           }
@@ -178,6 +179,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
               pipetteId: primaryPipetteId,
               location,
               moduleId,
+              adapterId,
             },
           ]
         },

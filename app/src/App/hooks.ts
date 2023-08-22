@@ -51,7 +51,7 @@ export function useProtocolReceiptToast(): void {
   const protocolIdsRef = React.useRef(protocolIds)
   const hasRefetched = React.useRef(true)
 
-  if (protocolIdsQuery.isRefetching === true) {
+  if (protocolIdsQuery.isRefetching) {
     hasRefetched.current = false
   }
 
@@ -83,7 +83,11 @@ export function useProtocolReceiptToast(): void {
               t('protocol_added', {
                 protocol_name: name,
               }),
-              'success'
+              'success',
+              {
+                closeButton: true,
+                disableTimeout: true,
+              }
             )
           })
         })
@@ -138,7 +142,8 @@ export function useCurrentRunRoute(): string | null {
   )
   if (
     runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
+    // don't want to route to the run summary page if the run has been cancelled before starting
+    (runStatus === RUN_STATUS_STOPPED && hasBeenStarted) ||
     runStatus === RUN_STATUS_FAILED
   ) {
     return `/runs/${runId}/summary`
@@ -147,7 +152,10 @@ export function useCurrentRunRoute(): string | null {
     (!hasBeenStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
   ) {
     return `/runs/${runId}/setup`
-  } else {
+    // don't want to route to the run page if the run hasn't started
+  } else if (hasBeenStarted) {
     return `/runs/${runId}/run`
+  } else {
+    return null
   }
 }

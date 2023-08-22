@@ -26,9 +26,7 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isAttached }) =>
     isAttached ? COLORS.green3 : COLORS.light1};
-  &:hover,
-  &:active,
-  &:focus {
+  &:active {
     background-color: ${({ isAttached }) =>
       isAttached ? COLORS.green3Pressed : COLORS.light1Pressed};
   }

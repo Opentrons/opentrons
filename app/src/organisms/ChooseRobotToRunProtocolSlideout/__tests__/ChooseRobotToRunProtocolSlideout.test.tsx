@@ -21,7 +21,7 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -40,7 +40,7 @@ jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/config')
 jest.mock('../useCreateRunFromProtocol')
@@ -49,8 +49,8 @@ jest.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
   typeof useOffsetCandidatesForAnalysis
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots

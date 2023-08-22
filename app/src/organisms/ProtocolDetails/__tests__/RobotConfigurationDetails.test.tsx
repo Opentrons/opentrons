@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
+import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
@@ -89,7 +89,7 @@ describe('RobotConfigurationDetails', () => {
       requiredModuleDetails: null,
       extensionInstrumentName: null,
       isLoading: false,
-      robotType: OT3_STANDARD_MODEL,
+      robotType: FLEX_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('robot')
@@ -135,7 +135,7 @@ describe('RobotConfigurationDetails', () => {
       requiredModuleDetails: null,
       extensionInstrumentName: null,
       isLoading: false,
-      robotType: OT3_STANDARD_MODEL,
+      robotType: FLEX_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('extension mount')

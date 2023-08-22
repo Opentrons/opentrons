@@ -200,8 +200,6 @@ class PipetteHandlerProvider(Generic[MountType]):
         if instr:
             configs = [
                 "name",
-                "min_volume",
-                "max_volume",
                 "aspirate_flow_rate",
                 "dispense_flow_rate",
                 "pipette_id",
@@ -226,6 +224,8 @@ class PipetteHandlerProvider(Generic[MountType]):
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
+            result["min_volume"] = instr.liquid_class.min_volume
+            result["max_volume"] = instr.liquid_class.max_volume
             result["channels"] = instr.channels
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
@@ -451,13 +451,13 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plunger_speed(
         self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
+        mm_per_s = ul_per_s / instr.ul_per_mm(instr.liquid_class.max_volume, action)
         return round(mm_per_s, 6)
 
     def plunger_flowrate(
         self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
+        ul_per_s = mm_per_s * instr.ul_per_mm(instr.liquid_class.max_volume, action)
         return round(ul_per_s, 6)
 
     @overload

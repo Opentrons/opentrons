@@ -92,11 +92,18 @@ stages:
               commandId: '{setup_command_id}'
               key: '{setup_command_key}'
               createdAt: '{setup_command_created_at}'
-              index: 14
+              index: 15
         meta:
           cursor: 0
-          totalLength: 15
+          totalLength: 16
         data:
+          # Initial home
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            status: queued
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -338,8 +345,16 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 15
+          totalLength: 16
         data:
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadPipette

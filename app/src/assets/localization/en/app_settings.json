@@ -1,5 +1,7 @@
 {
   "__dev_internal__enableExtendedHardware": "Enable Extended Hardware",
+  "__dev_internal__enableModuleCalibration": "Enable Module Calibration",
+  "__dev_internal__lpcWithProbe": "Golden Tip LPC",
   "add_folder_button": "Add labware source folder",
   "add_ip_button": "Add",
   "add_ip_error": "Enter an IP Address or Hostname",
