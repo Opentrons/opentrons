@@ -104,7 +104,7 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
-          width="46.25rem"
+          // width="46.25rem"
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {settingName}
@@ -166,13 +166,13 @@ export function RobotSettingButton({
       <Flex
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
-        marginLeft={isUpdateAvailable ? '-18rem' : undefined}
+        // marginLeft={isUpdateAvailable ? '-18rem' : undefined}
       >
         {isUpdateAvailable ?? false ? (
           <InlineNotification
             type="alert"
             heading={i18n.format(t('update_available'), 'capitalize')}
-            hug={true}
+            // hug={true}
           />
         ) : null}
         {enabledDevTools == null &&
