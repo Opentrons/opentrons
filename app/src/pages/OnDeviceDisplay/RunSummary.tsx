@@ -6,7 +6,6 @@ import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
   BORDERS,
@@ -22,7 +21,6 @@ import {
   OVERFLOW_HIDDEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  SIZE_2,
   WRAP,
   SPACING,
   TYPOGRAPHY,
