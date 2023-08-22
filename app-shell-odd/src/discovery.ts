@@ -115,6 +115,7 @@ export function registerDiscovery(
   client = createDiscoveryClient({
     onListChange: handleRobotListChange,
     logger: log,
+    enableMDNS: false
   })
 
   client.start({
