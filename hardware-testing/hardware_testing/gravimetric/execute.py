@@ -498,6 +498,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
         mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
         resources.ctx._core.get_hardware().retract(mnt)
+        if not resources.ctx.is_simulating():
+            if not cfg.same_tip:
+                ui.get_user_ready("REPLACE first tip with NEW TIP")
+                ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         _liquid_height = _get_liquid_height(resources, cfg, well)
@@ -527,9 +531,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             )
 
         ui.print_info("dropping tip")
-        _drop_tip(
-            resources.pipette, return_tip=False, minimum_z_height=_minimum_z_height(cfg)
-        )  # always trash calibration tips
+        if not cfg.same_tip:
+            _drop_tip(
+                resources.pipette, return_tip=False, minimum_z_height=_minimum_z_height(cfg)
+            )  # always trash calibration tips
         calibration_tip_in_use = False
         trial_count = 0
         trials = build_gravimetric_trials(
@@ -574,12 +579,13 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         cfg, resources, channel, total_tips
                     )
                     next_tip_location = next_tip.top().move(channel_offset)
-                    _pick_up_tip(
-                        resources.ctx,
-                        resources.pipette,
-                        cfg,
-                        location=next_tip_location,
-                    )
+                    if not cfg.same_tip:
+                        _pick_up_tip(
+                            resources.ctx,
+                            resources.pipette,
+                            cfg,
+                            location=next_tip_location,
+                        )
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -620,7 +626,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         disp_with_evap,
                     )
                     ui.print_info("dropping tip")
-                    _drop_tip(resources.pipette, cfg.return_tip, _minimum_z_height(cfg))
+                    if not cfg.same_tip:
+                        _drop_tip(resources.pipette, cfg.return_tip, _minimum_z_height(cfg))
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
                 aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(

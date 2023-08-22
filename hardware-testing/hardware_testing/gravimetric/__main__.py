@@ -322,6 +322,7 @@ def build_gravimetric_cfg(
     isolate_channels: List[int],
     extra: bool,
     jog: bool,
+    same_tip: bool,
     run_args: RunArgs,
 ) -> GravimetricConfig:
     """Build."""
@@ -348,6 +349,7 @@ def build_gravimetric_cfg(
         kind=ConfigType.gravimetric,
         extra=extra,
         jog=jog,
+        same_tip=same_tip,
     )
 
 
@@ -362,6 +364,7 @@ def build_photometric_cfg(
     refill: bool,
     extra: bool,
     jog: bool,
+    same_tip: bool,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
@@ -388,6 +391,7 @@ def build_photometric_cfg(
         kind=ConfigType.photometric,
         extra=extra,
         jog=jog,
+        same_tip=same_tip,
     )
 
 
@@ -410,6 +414,7 @@ def _main(
             args.refill,
             args.extra,
             args.jog,
+            args.same_tip,
             run_args,
         )
         union_cfg = cfg_pm
@@ -428,6 +433,7 @@ def _main(
             args.isolate_channels if args.isolate_channels else [],
             args.extra,
             args.jog,
+            args.same_tip,
             run_args,
         )
 
@@ -485,6 +491,7 @@ if __name__ == "__main__":
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
     parser.add_argument("--extra", action="store_true")
     parser.add_argument("--jog", action="store_true")
+    parser.add_argument("--same-tip", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     try:

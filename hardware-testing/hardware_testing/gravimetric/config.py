@@ -34,6 +34,7 @@ class VolumetricConfig:
     kind: ConfigType
     extra: bool
     jog: bool
+    same_tip: bool
 
 
 @dataclass
