@@ -72,12 +72,12 @@ export interface PipetteWizardStepProps {
   mount: PipetteMount
   proceed: () => void
   goBack: () => void
-  chainRunCommands: (
+  chainRunCommands?: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  maintenanceRunId: string
+  maintenanceRunId?: string
   attachedPipettes: AttachedPipettesFromInstrumentsQuery
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
