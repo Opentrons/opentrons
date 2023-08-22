@@ -90,5 +90,5 @@ export const chainMaintenanceCommandsRecursive = (
 export const formatTimeWithUtcLabel = (time: string): string => {
   const UTC_LABEL = 'UTC'
   const TIME_FORMAT = 'M/d/yy HH:mm'
-  return `${format(new Date(time), TIME_FORMAT)} ${UTC_LABEL}`
+  return `${format(new Date(Date.parse(time)), TIME_FORMAT)} ${UTC_LABEL}`
 }

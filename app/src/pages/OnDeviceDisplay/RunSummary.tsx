@@ -134,6 +134,10 @@ export function RunSummary(): JSX.Element {
     setShowSplash(false)
   }
 
+  console.log('createdAtTimestamp', createdAtTimestamp)
+  console.log('startedAtTimestamp', startedAtTimestamp)
+  console.log('completedAtTimestamp', completedAtTimestamp)
+
   return (
     <Btn
       display={DISPLAY_FLEX}
@@ -207,9 +211,9 @@ export function RunSummary(): JSX.Element {
             </Flex>
             <ProtocolName>{protocolName}</ProtocolName>
             <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
-              <SummaryDatum>
+              {/* <SummaryDatum>
                 {`${t('run')}: ${formatTimeWithUtcLabel(createdAtTimestamp)}`}
-              </SummaryDatum>
+              </SummaryDatum> */}
               <SummaryDatum>
                 {`${t('duration')}: `}
                 <RunTimer
@@ -222,12 +226,12 @@ export function RunSummary(): JSX.Element {
                   style={DURATION_TEXT_STYLE}
                 />
               </SummaryDatum>
-              <SummaryDatum>
+              {/* <SummaryDatum>
                 {`${t('start')}: ${formatTimeWithUtcLabel(startedAtTimestamp)}`}
               </SummaryDatum>
               <SummaryDatum>
                 {`${t('end')}: ${formatTimeWithUtcLabel(completedAtTimestamp)}`}
-              </SummaryDatum>
+              </SummaryDatum> */}
             </Flex>
           </Flex>
           <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
