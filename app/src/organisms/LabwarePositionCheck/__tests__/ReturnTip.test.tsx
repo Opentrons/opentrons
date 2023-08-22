@@ -56,11 +56,11 @@ describe('ReturnTip', () => {
   })
   it('renders correct copy', () => {
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Return tip rack to slot D1' })
+    getByRole('heading', { name: 'Return tip rack to Slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
       matchTextWithSpans(
-        'Place the Mock TipRack Definition that you used before back into slot D1. The pipette will return tips to their original location in the rack.'
+        'Place the Mock TipRack Definition that you used before back into Slot D1. The pipette will return tips to their original location in the rack.'
       )
     )
     getByRole('link', { name: 'Need help?' })
@@ -94,7 +94,7 @@ describe('ReturnTip', () => {
             pipetteId: 'pipetteId1',
             labwareId: 'labwareId1',
             wellName: 'A1',
-            wellLocation: { origin: 'top', offset: undefined },
+            wellLocation: { origin: 'default', offset: undefined },
           },
         },
         {
@@ -145,7 +145,7 @@ describe('ReturnTip', () => {
             labwareId: 'labwareId1',
             wellName: 'A1',
             wellLocation: {
-              origin: 'top',
+              origin: 'default',
               offset: { x: 10, y: 11, z: 12 },
             },
           },
@@ -223,7 +223,7 @@ describe('ReturnTip', () => {
             labwareId: 'labwareId1',
             wellName: 'A1',
             wellLocation: {
-              origin: 'top',
+              origin: 'default',
               offset: { x: 10, y: 11, z: 12 },
             },
           },

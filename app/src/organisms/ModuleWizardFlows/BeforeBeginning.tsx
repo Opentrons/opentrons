@@ -30,6 +30,7 @@ export const BeforeBeginning = (
     createMaintenanceRun,
     isCreateLoading,
     attachedModule,
+    maintenanceRunId,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -57,7 +58,7 @@ export const BeforeBeginning = (
         />
       }
       proceedButtonText={t('move_gantry_to_front')}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={proceed}
     />
   )

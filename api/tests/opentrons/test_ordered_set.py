@@ -137,3 +137,11 @@ def test_head() -> None:
         subject.head()
 
     assert subject.head(default_value=42) == 42
+
+
+def test_difference() -> None:
+    """It should return the set difference, preserving order."""
+    a = OrderedSet([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9])
+    b = {1, 9}
+
+    assert (a - OrderedSet(b)) == (a - b) == OrderedSet([3, 4, 5, 2, 6, 5, 3, 5, 8, 7])

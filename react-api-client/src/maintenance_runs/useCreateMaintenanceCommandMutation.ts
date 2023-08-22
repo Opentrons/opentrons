@@ -14,6 +14,7 @@ import type {
 import type { CreateCommand } from '@opentrons/shared-data'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
+  maintenanceRunId: string
   command: CreateCommand
   waitUntilComplete?: boolean
   timeout?: number
@@ -37,9 +38,7 @@ export type UseCreateMaintenanceCommandMutationOptions = UseMutationOptions<
   CreateMaintenanceCommandMutateParams
 >
 
-export function useCreateMaintenanceCommandMutation(
-  maintenanceRunId: string
-): UseCreateMaintenanceCommandMutationResult {
+export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
@@ -47,7 +46,7 @@ export function useCreateMaintenanceCommandMutation(
     CommandData,
     unknown,
     CreateMaintenanceCommandMutateParams
-  >(({ command, waitUntilComplete, timeout }) =>
+  >(({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
     createMaintenanceCommand(host as HostConfig, maintenanceRunId, command, {
       waitUntilComplete,
       timeout,

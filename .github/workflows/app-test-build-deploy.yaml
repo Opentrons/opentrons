@@ -348,7 +348,7 @@ jobs:
       - name: 'deploy internal-release release builds to s3'
         run: |
           aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
-      - name: 'upload artifacts to GH release'
+      - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
         if: needs.determine-build-type.outputs.type == 'release'
         with:
@@ -357,7 +357,29 @@ jobs:
           omitDraftDuringUpdate: true
           omitNameDuringUpdate: true
           omitPrereleaseDuringUpdate: true
-          artifacts: ./artifacts/*/*.exe ./artifacts/*/*.dmg ./artifacts/*/*.AppImage
+          artifacts: ./artifacts/*/*.exe
+          artifactContentType: application/vnd.microsoft.portable-executable
+      - name: 'upload macos artifacts to GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: needs.determine-build-type.outputs.type == 'release'
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./artifacts/*/*.dmg
+          artifactContentType: application/octet-stream
+      - name: 'upload linux artifacts to GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: needs.determine-build-type.outputs.type == 'release'
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./artifacts/*/*.AppImage
           artifactContentType: application/octet-stream
       - name: 'detect build data for notification'
         id: names

@@ -28,7 +28,6 @@ import {
 import {
   useProtocolQuery,
   useRunQuery,
-  useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 import {
@@ -116,6 +115,26 @@ export function ProtocolSetupStep({
     }
   }
 
+  let backgroundColor: string
+  if (!disabled) {
+    switch (status) {
+      case 'general':
+        backgroundColor = COLORS.darkBlack40
+        break
+      case 'ready':
+        backgroundColor = COLORS.green3Pressed
+        break
+      default:
+        backgroundColor = COLORS.yellow3Pressed
+    }
+  } else backgroundColor = ''
+
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${backgroundColor};
+    }
+  `
+
   return (
     <Btn
       onClick={() =>
@@ -131,6 +150,7 @@ export function ProtocolSetupStep({
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
+        css={PUSHED_STATE_STYLE}
       >
         {status !== 'general' && !disabled ? (
           <Icon
@@ -317,9 +337,6 @@ function PrepareToRun({
   })
 
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const {
-    data: allPipettesCalibrationData,
-  } = useAllPipetteOffsetCalibrationsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
@@ -357,12 +374,16 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
+  const areInstrumentsReady =
+    mostRecentAnalysis != null && attachedInstruments != null
+      ? getAreInstrumentsReady(mostRecentAnalysis, attachedInstruments)
+      : false
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingPipCalForOdd: allPipettesCalibrationData == null,
+    hasMissingCalForOdd: !areInstrumentsReady,
   })
 
   const [
@@ -374,19 +395,8 @@ function PrepareToRun({
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules == null) ||
-    allPipettesCalibrationData == null
+    (protocolHasModules && attachedModules == null)
 
-  const areInstrumentsReady =
-    mostRecentAnalysis != null &&
-    attachedInstruments != null &&
-    allPipettesCalibrationData != null
-      ? getAreInstrumentsReady(
-          mostRecentAnalysis,
-          attachedInstruments,
-          allPipettesCalibrationData
-        )
-      : false
   const speccedInstrumentCount =
     mostRecentAnalysis !== null
       ? mostRecentAnalysis.pipettes.length +

@@ -49,9 +49,11 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-
     &:hover {
       opacity: 100%;
+    }
+    &:active {
+      opacity: 70%;
     }
   }
 `

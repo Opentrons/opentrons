@@ -88,7 +88,7 @@ describe('BackToTopButton', () => {
     const button = getByRole('link', { name: 'Back to top' })
     expect(button).not.toBeDisabled()
     expect(button.getAttribute('href')).toEqual(
-      '/devices/otie/protocol-runs/1/run-preview'
+      '/devices/otie/protocol-runs/1/setup'
     )
   })
 

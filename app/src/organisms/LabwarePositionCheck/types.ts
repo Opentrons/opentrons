@@ -45,6 +45,7 @@ export interface CheckLabwareStep {
   labwareId: string
   location: LabwareOffsetLocation
   moduleId?: string
+  adapterId?: string
 }
 export interface ReturnTipStep {
   section: typeof SECTIONS.RETURN_TIP

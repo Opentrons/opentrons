@@ -60,7 +60,7 @@ export function BackToTopButton({
 
   return (
     <Link
-      to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+      to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
       onClick={() => {
         trackEvent({
           name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

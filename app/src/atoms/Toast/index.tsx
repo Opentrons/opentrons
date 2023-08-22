@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import {
+  DefaultTheme,
+  FlattenSimpleInterpolation,
+  ThemedCssFunction,
+  css,
+} from 'styled-components'
 
 import {
   Flex,
@@ -44,9 +49,12 @@ export interface ToastProps extends StyleProps {
   duration?: number
   heading?: string
   displayType?: 'desktop' | 'odd'
+  exitNow?: boolean
 }
 
-const TOAST_ANIMATION_DURATION = 500
+// TODO: (jh: 08/10/23) refactor toast component and render logic.
+
+export const TOAST_ANIMATION_DURATION = 500
 
 export function Toast(props: ToastProps): JSX.Element {
   const {
@@ -57,13 +65,14 @@ export function Toast(props: ToastProps): JSX.Element {
     closeButton,
     onClose,
     disableTimeout = false,
-    duration = 8000,
+    duration = 7000,
     heading,
     displayType,
+    exitNow = false,
     ...styleProps
   } = props
   const { t } = useTranslation('shared')
-  const [isClosed, setIsClosed] = React.useState<boolean>(false)
+  const [isClosed, setIsClosed] = React.useState<boolean>(exitNow)
 
   // We want to be able to storybook both the ODD and the Desktop versions,
   // so let it (and unit tests, for that matter) be able to pass in a parameter
@@ -81,10 +90,19 @@ export function Toast(props: ToastProps): JSX.Element {
       : closeButton === true
       ? t('close')
       : ''
-  const DESKTOP_ANIMATION_IN = css`
+
+  const ANIMATION_OVERFLOW = `
+  overflow: hidden;
+  `
+  const ODD_ANIMATION_OPTIMIZATIONS = `
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: opacity, transform3d;
+  `
+  const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidein;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
 
     @keyframes slidein {
       from {
@@ -95,10 +113,10 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const DESKTOP_ANIMATION_OUT = css`
+  const DESKTOP_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideout;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
 
     @keyframes slideout {
       from {
@@ -109,40 +127,80 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const desktopAnimation = isClosed
-    ? DESKTOP_ANIMATION_OUT
-    : DESKTOP_ANIMATION_IN
 
-  const ODD_ANIMATION_IN = css`
+  const desktopAnimation = isClosed
+    ? DESKTOP_ANIMATION_SLIDE_DOWN_AND_OUT
+    : DESKTOP_ANIMATION_SLIDE_UP_AND_IN
+
+  const ODD_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideup;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
 
     @keyframes slideup {
       from {
-        transform: translateY(100%);
+        transform: translate3d(0%, 50%, 0);
+        filter: opacity(0);
       }
       to {
-        transform: translateY(0%);
+        transform: translate3d(0%, 0%, 0);
+        filter: opacity(100%);
       }
     }
   `
-  const ODD_ANIMATION_OUT = css`
+  const ODD_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidedown;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
 
     @keyframes slidedown {
       from {
-        transform: translateY(0%);
+        transform: translate3d(0%, 0%, 0);
+        filter: opacity(100%);
       }
       to {
-        transform: translateY(100%);
+        transform: translate3d(0%, 50%, 0);
+        filter: opacity(0);
+      }
+    }
+  `
+  const ODD_ANIMATION_FADE_UP_AND_OUT = css`
+    animation-duration: ${TOAST_ANIMATION_DURATION}ms;
+    animation-name: fadeUpAndOut;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
+
+    @keyframes fadeUpAndOut {
+      from {
+        transform: translate3d(0%, 0%, 0);
+        filter: opacity(100%);
+      }
+      to {
+        transform: translate3d(0%, -10%, 0);
+        filter: opacity(0%);
       }
     }
   `
 
-  const oddAnimation = isClosed ? ODD_ANIMATION_OUT : ODD_ANIMATION_IN
+  const ODD_ANIMATION_NONE = css``
+
+  let oddAnimation: FlattenSimpleInterpolation | ThemedCssFunction<DefaultTheme>
+
+  if (isClosed) {
+    if (exitNow) {
+      oddAnimation = ODD_ANIMATION_FADE_UP_AND_OUT
+    } else {
+      oddAnimation = ODD_ANIMATION_SLIDE_DOWN_AND_OUT
+    }
+  } else {
+    if (exitNow) {
+      oddAnimation = ODD_ANIMATION_NONE
+    } else {
+      oddAnimation = ODD_ANIMATION_SLIDE_UP_AND_IN
+    }
+  }
 
   const toastStyleByType: {
     [k in ToastType]: {
@@ -194,6 +252,7 @@ export function Toast(props: ToastProps): JSX.Element {
     duration: number | undefined
   ): number => {
     const combinedDuration = (message.length + heading.length) * 50
+    if (exitNow) return 0
     if (duration !== undefined) {
       return duration
     }
@@ -206,7 +265,17 @@ export function Toast(props: ToastProps): JSX.Element {
     return combinedDuration
   }
 
-  if (!disableTimeout) {
+  // Handle dismissal of toast when no timer is set.
+  const onCloseHandler = (): void => {
+    setIsClosed(true)
+    setTimeout(() => {
+      onClose?.()
+    }, TOAST_ANIMATION_DURATION - 50)
+  }
+
+  const isAutomaticAnimationExit = !disableTimeout || exitNow
+
+  if (isAutomaticAnimationExit) {
     setTimeout(() => {
       setIsClosed(true)
       setTimeout(() => {
@@ -228,7 +297,7 @@ export function Toast(props: ToastProps): JSX.Element {
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      onClick={closeText.length > 0 ? onClose : undefined}
+      onClick={isAutomaticAnimationExit ? onClose : onCloseHandler}
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle

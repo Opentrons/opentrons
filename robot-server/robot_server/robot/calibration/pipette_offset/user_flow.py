@@ -146,7 +146,7 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._default_tipracks = util.get_default_tipracks(
-            cast(List[LabwareUri], self.hw_pipette.config.default_tipracks)
+            cast(List[LabwareUri], self.hw_pipette.liquid_class.default_tipracks)
         )
         self._supported_commands = SupportedCommands(namespace="calibration")
         self._supported_commands.loadLabware = True
@@ -215,7 +215,7 @@ class PipetteOffsetCalibrationUserFlow:
         self._has_calibration_block = hasBlock
 
     def _get_tip_rack_lw(self) -> labware.Labware:
-        pip_vol = self._hw_pipette.config.max_volume
+        pip_vol = self._hw_pipette.liquid_class.max_volume
         lw_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
         return labware.load(lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
@@ -380,7 +380,7 @@ class PipetteOffsetCalibrationUserFlow:
         self._using_default_tiprack, self._tip_rack = self._get_tr_lw(
             tip_rack_def,
             existing_calibration,
-            self._hw_pipette.config.max_volume,
+            self._hw_pipette.liquid_class.max_volume,
             self._deck.position_for(TIP_RACK_SLOT),
         )
         if self._deck[TIP_RACK_SLOT]:

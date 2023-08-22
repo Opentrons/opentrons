@@ -9,10 +9,12 @@ export const CATEGORY_LABELS_BY_CATEGORY = {
   aluminumBlock: 'Aluminum Block',
   trash: 'Trash',
   other: 'Other',
+  adapter: 'Adapter',
 }
 
 export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
   all: 'All',
+  adapter: 'Adapter',
   tubeRack: 'Tube Racks',
   tipRack: 'Tip Racks',
   wellPlate: 'Well Plates',
