@@ -54,7 +54,9 @@ const mockCalibratedModule = {
   },
 }
 
-const render = (props: React.ComponentProps<typeof ModuleCalibrationItems>) => {
+const render = (
+  props: React.ComponentProps<typeof ModuleCalibrationItems>
+): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<ModuleCalibrationItems {...props} />, {
     i18nInstance: i18n,
   })

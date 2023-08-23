@@ -7,7 +7,7 @@ import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
 const render = (
   props: React.ComponentProps<typeof ModuleCalibrationOverflowMenu>
-) => {
+): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<ModuleCalibrationOverflowMenu {...props} />, {
     i18nInstance: i18n,
   })
