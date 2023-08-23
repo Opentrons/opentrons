@@ -121,7 +121,7 @@ export function LabwareListItem(
         const module = commands.find(
           (command): command is LoadModuleRunTimeCommand =>
             command.commandType === 'loadModule' &&
-            command.params.moduleId === loadedAdapterLocation.moduleId
+            command.result?.moduleId === loadedAdapterLocation.moduleId
         )
         if (module != null) {
           slotInfo = t('adapter_slot_location_module', {
