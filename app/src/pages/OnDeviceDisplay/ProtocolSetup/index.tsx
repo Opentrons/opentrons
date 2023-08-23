@@ -356,12 +356,6 @@ function PrepareToRun({
 
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
-  const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
-    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
@@ -415,7 +409,6 @@ function PrepareToRun({
   const onPlay = (): void => {
     if (
       isHeaterShakerInProtocol &&
-      !isHeaterShakerShaking &&
       isReadyToRun &&
       (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
     ) {
