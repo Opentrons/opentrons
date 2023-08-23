@@ -546,10 +546,12 @@ def test_load_adapter(
 
 
 @pytest.mark.parametrize(
-    argnames=["use_gripper", "expected_strategy"],
+    argnames=["use_gripper", "pause_for_manual_move", "expected_strategy"],
     argvalues=[
-        (True, LabwareMovementStrategy.USING_GRIPPER),
-        (False, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
+        (True, False, LabwareMovementStrategy.USING_GRIPPER),
+        (True, True, LabwareMovementStrategy.USING_GRIPPER),
+        (False, False, LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE),
+        (False, True, LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE),
     ],
 )
 @pytest.mark.parametrize(
@@ -566,6 +568,7 @@ def test_move_labware(
     mock_engine_client: EngineClient,
     expected_strategy: LabwareMovementStrategy,
     use_gripper: bool,
+    pause_for_manual_move: bool,
     pick_up_offset: Optional[Tuple[float, float, float]],
     drop_offset: Optional[Tuple[float, float, float]],
 ) -> None:
@@ -582,6 +585,7 @@ def test_move_labware(
         labware_core=labware,
         new_location=DeckSlotName.SLOT_5,
         use_gripper=use_gripper,
+        pause_for_manual_move=pause_for_manual_move,
         pick_up_offset=pick_up_offset,
         drop_offset=drop_offset,
     )
@@ -630,6 +634,7 @@ def test_move_labware_on_non_connected_module(
         labware_core=labware,
         new_location=non_connected_module_core,
         use_gripper=False,
+        pause_for_manual_move=True,
         pick_up_offset=None,
         drop_offset=None,
     )
@@ -662,6 +667,7 @@ def test_move_labware_off_deck(
         labware_core=labware,
         new_location=OFF_DECK,
         use_gripper=False,
+        pause_for_manual_move=True,
         pick_up_offset=None,
         drop_offset=None,
     )

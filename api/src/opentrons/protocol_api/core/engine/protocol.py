@@ -256,17 +256,20 @@ class ProtocolCore(
             DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
         ],
         use_gripper: bool,
+        pause_for_manual_move: bool,
         pick_up_offset: Optional[Tuple[float, float, float]],
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
         to_location = self._convert_labware_location(location=new_location)
 
-        strategy = (
-            LabwareMovementStrategy.USING_GRIPPER
-            if use_gripper
-            else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
-        )
+        if use_gripper:
+            strategy = LabwareMovementStrategy.USING_GRIPPER
+        elif pause_for_manual_move:
+            strategy = LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
+        else:
+            strategy = LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE
+
         _pick_up_offset = (
             LabwareOffsetVector(
                 x=pick_up_offset[0], y=pick_up_offset[1], z=pick_up_offset[2]
