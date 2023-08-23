@@ -15,7 +15,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
