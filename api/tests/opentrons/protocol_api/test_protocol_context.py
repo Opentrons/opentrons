@@ -517,6 +517,7 @@ def test_move_labware_to_slot(
             labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=(1, 2, 3),
         )
@@ -556,6 +557,7 @@ def test_move_labware_to_module(
             labware_core=mock_labware_core,
             new_location=mock_module_core,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,
         )
@@ -586,6 +588,7 @@ def test_move_labware_off_deck(
             labware_core=mock_labware_core,
             new_location=OFF_DECK,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,
         )
