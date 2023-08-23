@@ -17,9 +17,9 @@ import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useRunStatuses } from '../../Devices/hooks'
-// ToDo (kk:2023/08/23) Need Module Calibration Wizard component here
+// ToDo (kk:08/23/2023) Need Module Calibration Wizard component here
 
-// Note (kk:2023/08/23) This props interface may be varied
+// Note (kk:08/23/2023) This props interface may be varied
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean
   updateRobotStatus: (isRobotBusy: boolean) => void
@@ -46,11 +46,13 @@ export function ModuleCalibrationOverflowMenu({
   })
 
   const handleCalibration = (): void => {
+    // ToDo (kk:08/23/2023)
     // start module calibration wizard
     // when isRunning is false, calibration is available
   }
 
   const handleDeleteCalibration = (): void => {
+    // ToDo (kk:08/23/2023)
     // call a custom hook to delete calibration data
   }
 
