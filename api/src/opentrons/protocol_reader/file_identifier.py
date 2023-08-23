@@ -101,9 +101,7 @@ class FileIdentifier:
     """File identifier interface."""
 
     @staticmethod
-    async def identify(
-        files: Sequence[BufferedFile], python_parse_mode: parse.PythonParseMode
-    ) -> Sequence[IdentifiedFile]:
+    async def identify(files: Sequence[BufferedFile]) -> Sequence[IdentifiedFile]:
         """Identify the type and extract basic information from each file.
 
         This is intended to take ≲1 second per protocol on an OT-2, so it can extract
@@ -111,19 +109,15 @@ class FileIdentifier:
         and validating protocols can take 10-100x longer, so that's left to other units,
         for only when it's really needed.
         """
-        return [await _identify(file, python_parse_mode) for file in files]
+        return [await _identify(file) for file in files]
 
 
-async def _identify(
-    file: BufferedFile, python_parse_mode: parse.PythonParseMode
-) -> IdentifiedFile:
+async def _identify(file: BufferedFile) -> IdentifiedFile:
     lower_file_name = file.name.lower()
     if lower_file_name.endswith(".json"):
         return await _analyze_json(json_file=file)
     elif lower_file_name.endswith(".py"):
-        return _analyze_python_protocol(
-            py_file=file, python_parse_mode=python_parse_mode
-        )
+        return _analyze_python_protocol(py_file=file)
     elif lower_file_name.endswith(".csv") or lower_file_name.endswith(".txt"):
         return IdentifiedData(original_file=file)
     else:
@@ -207,14 +201,9 @@ def _analyze_json_protocol(
 
 def _analyze_python_protocol(
     py_file: BufferedFile,
-    python_parse_mode: parse.PythonParseMode,
 ) -> IdentifiedPythonMain:
     try:
-        parsed = parse.parse(
-            protocol_file=py_file.contents,
-            filename=py_file.name,
-            python_parse_mode=python_parse_mode,
-        )
+        parsed = parse.parse(protocol_file=py_file.contents, filename=py_file.name)
     except MalformedPythonProtocolError as e:
         raise FileIdentificationError(e.short_message) from e
 
