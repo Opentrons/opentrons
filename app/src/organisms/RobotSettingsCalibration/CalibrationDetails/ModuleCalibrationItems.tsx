@@ -22,8 +22,6 @@ export function ModuleCalibrationItems({
 }: ModuleCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
-  console.log('module model', attachedModules)
-
   return (
     <StyledTable>
       <thead>

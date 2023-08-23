@@ -7,7 +7,7 @@ import { mockFetchModulesSuccessActionPayloadModules } from '../../../../redux/m
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 import { ModuleCalibrationItems } from '../ModuleCalibrationItems'
 
-import { AttachedModule } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 
 jest.mock('../ModuleCalibrationOverflowMenu')
 
