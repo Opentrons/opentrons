@@ -439,10 +439,13 @@ class GeometryView:
         )
         location_slot: DeckSlotName
 
-        if isinstance(location, (ModuleLocation, OnLabwareLocation)):
+        if isinstance(location, DeckSlotLocation):
+            location_slot = location.slotName
+            offset = LabwareOffsetVector(x=0, y=0, z=0)
+        else:
             if isinstance(location, ModuleLocation):
                 location_slot = self._modules.get_location(location.moduleId).slotName
-            else:
+            else:  # OnLabwareLocation
                 location_slot = self.get_ancestor_slot_name(location.labwareId)
             labware_offset = self._get_labware_position_offset(labware_id, location)
             # Get the calibrated offset if the on labware location is on top of a module, otherwise return empty one
@@ -452,9 +455,6 @@ class GeometryView:
                 y=labware_offset.y + cal_offset.y,
                 z=labware_offset.z + cal_offset.z,
             )
-        else:
-            location_slot = location.slotName
-            offset = LabwareOffsetVector(x=0, y=0, z=0)
 
         slot_center = self._labware.get_slot_center_position(location_slot)
         return Point(
