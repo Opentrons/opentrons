@@ -104,8 +104,8 @@ export const LabwareInfoOverlay = (
   const height = definition.dimensions.yDimension
   return (
     <RobotCoordsForeignDiv
-      x={0}
-      y={0}
+      x={definition.cornerOffsetFromSlot.x}
+      y={definition.cornerOffsetFromSlot.y}
       {...{ width, height }}
       innerDivProps={{
         display: DISPLAY_FLEX,
