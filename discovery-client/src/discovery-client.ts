@@ -15,7 +15,7 @@ import type {
 export function createDiscoveryClient(
   options: DiscoveryClientOptions
 ): DiscoveryClient {
-  const { onListChange, logger } = options
+  const { onListChange, logger, enableMDNS = true } = options
   const { getState, dispatch, subscribe } = Store.createStore()
   const getAddresses = (): Address[] => Store.getAddresses(getState())
   const getRobots = (): DiscoveryClientRobot[] => Store.getRobots(getState())
@@ -45,7 +45,7 @@ export function createDiscoveryClient(
     let prevRobots = getRobots()
 
     healthPoller.start({ list: prevAddrs, interval: healthPollInterval })
-    mdnsBrowser.start()
+    enableMDNS && mdnsBrowser.start()
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!unsubscribe) {
@@ -63,7 +63,7 @@ export function createDiscoveryClient(
   }
 
   const stop = (): void => {
-    mdnsBrowser.stop()
+    enableMDNS && mdnsBrowser.stop()
     healthPoller.stop()
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (unsubscribe) {
