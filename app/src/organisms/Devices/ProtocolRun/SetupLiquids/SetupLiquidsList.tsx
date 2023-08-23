@@ -21,8 +21,14 @@ import {
   SIZE_AUTO,
   Box,
   JUSTIFY_FLEX_START,
+  LocationIcon,
+  MODULE_ICON_NAME_BY_TYPE,
 } from '@opentrons/components'
-import { MICRO_LITERS } from '@opentrons/shared-data'
+import {
+  getModuleType,
+  MICRO_LITERS,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
@@ -30,7 +36,7 @@ import {
 } from '../../../../redux/analytics'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../../../atoms/text'
-import { getSlotLabwareName } from '../utils/getSlotLabwareName'
+import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import {
   getTotalVolumePerLiquidId,
@@ -185,11 +191,12 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             </StyledText>
           </Flex>
           {labwareByLiquidId[liquidId].map((labware, index) => {
-            //  TODO: (jr, 8/16/23): show adapter and module name here
-            const { slotName, labwareName } = getSlotLabwareName(
-              labware.labwareId,
-              commands
-            )
+            const {
+              slotName,
+              labwareName,
+              adapterName,
+              moduleModel,
+            } = getLocationInfoNames(labware.labwareId, commands)
             const handleLiquidDetailsLabwareId = (): void => {
               setLiquidDetailsLabwareId(labware.labwareId)
               trackEvent({
@@ -213,23 +220,47 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   justifyContent={JUSTIFY_FLEX_START}
                   gridGap={SPACING.spacing16}
                 >
-                  <StyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    minWidth="8.125rem"
-                  >
-                    {t('slot_location', {
-                      slotName: slotName,
-                    })}
-                  </StyledText>
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-                    {labwareName}
-                  </StyledText>
+                  <Flex>
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightRegular}
+                      minWidth="8.125rem"
+                    >
+                      {t('slot_location', {
+                        slotName: slotName,
+                      })}
+                    </StyledText>
+                    {/* {moduleModel != null ? (
+                      <LocationIcon
+                        iconName={
+                          MODULE_ICON_NAME_BY_TYPE[getModuleType(moduleModel)]
+                        }
+                      />
+                    ) : null} */}
+                  </Flex>
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    >
+                      {labwareName}
+                    </StyledText>
+                    {adapterName != null ? (
+                      <StyledText
+                        as="p"
+                        fontWeight={TYPOGRAPHY.fontWeightRegular}
+                        color={COLORS.darkBlack70}
+                      >
+                        {t('on_adapter', { adapterName: adapterName })}
+                      </StyledText>
+                    ) : null}
+                  </Flex>
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     minWidth="4.25rem"
                     marginLeft={SPACING.spacingAuto}
+                    alignSelf={ALIGN_CENTER}
                   >
                     {getTotalVolumePerLiquidLabwarePair(
                       liquidId,

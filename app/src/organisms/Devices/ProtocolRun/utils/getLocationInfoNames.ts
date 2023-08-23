@@ -1,24 +1,22 @@
 import {
   getLabwareDisplayName,
-  getModuleDisplayName,
   LoadLabwareRunTimeCommand,
   RunTimeCommand,
   LoadModuleRunTimeCommand,
+  ModuleModel,
 } from '@opentrons/shared-data'
 
-export interface SlotInfo {
+export interface LocationInfoNames {
   slotName: string
   labwareName: string
   adapterName?: string
-  moduleName?: string
+  moduleModel?: ModuleModel
 }
 
-//  TODO: (jr, 8/16/23): probably need to call this a new name and should slotName and labwareName be optional?
-//  also TODO: refactor all instances of getSlotLabwareName to display the module and adapter name if applicable
-export function getSlotLabwareName(
+export function getLocationInfoNames(
   labwareId: string,
   commands?: RunTimeCommand[]
-): SlotInfo {
+): LocationInfoNames {
   const loadLabwareCommands = commands?.filter(
     (command): command is LoadLabwareRunTimeCommand =>
       command.commandType === 'loadLabware'
@@ -58,9 +56,7 @@ export function getSlotLabwareName(
           slotName:
             loadModuleCommandUnderLabware?.params.location.slotName ?? '',
           labwareName,
-          moduleName: getModuleDisplayName(
-            loadModuleCommandUnderLabware?.params.model
-          ),
+          moduleModel: loadModuleCommandUnderLabware?.params.model,
         }
       : { slotName: '', labwareName: '' }
   } else {
@@ -100,9 +96,7 @@ export function getSlotLabwareName(
             labwareName,
             adapterName:
               loadedAdapterCommand.result?.definition.metadata.displayName,
-            moduleName: getModuleDisplayName(
-              loadModuleCommandUnderAdapter.params.model
-            ),
+            moduleModel: loadModuleCommandUnderAdapter.params.model,
           }
         : { slotName: '', labwareName }
     } else {
