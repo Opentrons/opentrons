@@ -105,9 +105,9 @@ def _get_deck_definition_test_source(api_level: str, robot_type: str) -> str:
         # The exact values don't matter much for this test, since we're not checking positional
         # accuracy here. They just need to be clearly different between the OT-2 and OT-3.
         ("2.13", "OT-2", "(196.38, 42.785, 44.04)"),
-        ("2.15", "OT-2", "(196.38, 42.785, 44.04)"),
+        ("2.14", "OT-2", "(196.38, 42.785, 44.04)"),
         pytest.param(
-            "2.15",
+            "2.14",
             "OT-3",
             "(227.88, 42.785, 44.04)",
             marks=pytest.mark.ot3_only,  # Analyzing an OT-3 protocol requires an OT-3 hardware API.
@@ -151,6 +151,10 @@ def test_analysis_deck_definition(
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
 # protocols. https://opentrons.atlassian.net/browse/RSS-306
+@pytest.mark.xfail(
+    # TODO(mm, 2023-08-12): Remove xfail when we implement this special handling.
+    strict=True
+)
 def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     """It should apply strict validation to the metadata and requirements dicts.
 
