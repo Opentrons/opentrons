@@ -5,6 +5,7 @@
   "before_you_begin": "Before you begin",
   "browse": "browse",
   "cancel": "cancel",
+  "clear_data": "clear data",
   "close": "close",
   "computer_in_app_is_controlling_robot": "A computer with the Opentrons App is currently controlling this robot.",
   "confirm_placement": "Confirm placement",
