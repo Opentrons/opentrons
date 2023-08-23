@@ -503,6 +503,7 @@ def _get_liquid_height(
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
                 resources.ctx._core.get_hardware(),
+                30,
             )
         _tip_counter[0] = 0
     if cfg.jog:
@@ -690,6 +691,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                         run_trial.channel,
                         asp_with_evap,
                         disp_with_evap,
+                        liquid_tracker.get_liquid_height(well),
                     )
                     ui.print_info("dropping tip")
                     if not cfg.same_tip:

@@ -244,7 +244,7 @@ def create_csv_test_report(
                     for v in volumes
                     for c in range(pip_channels_tested)
                     for t in range(trials)
-                    for m in ["aspirate", "dispense"]
+                    for m in ["aspirate", "dispense", "liquid_height"]
                 ],
             ),
             CSVSection(
@@ -519,6 +519,7 @@ def store_trial(
     channel: int,
     aspirate: float,
     dispense: float,
+    liquid_height: float,
 ) -> None:
     """Report trial."""
     vol_in_tag = str(round(volume, 2))
@@ -531,6 +532,11 @@ def store_trial(
         "TRIALS",
         f"trial-{trial + 1}-dispense-{vol_in_tag}-ul-channel_{channel + 1}",
         [dispense],
+    )
+    report(
+        "TRIALS",
+        f"trial-{trial + 1}-liquid_height-{vol_in_tag}-ul-channel_{channel + 1}",
+        [liquid_height],
     )
 
 
