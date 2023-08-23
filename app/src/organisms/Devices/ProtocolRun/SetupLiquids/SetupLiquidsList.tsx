@@ -25,6 +25,7 @@ import {
   MODULE_ICON_NAME_BY_TYPE,
 } from '@opentrons/components'
 import {
+  getModuleDisplayName,
   getModuleType,
   MICRO_LITERS,
   ModuleModel,
@@ -225,18 +226,10 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       as="p"
                       fontWeight={TYPOGRAPHY.fontWeightRegular}
                       minWidth="8.125rem"
+                      alignSelf={ALIGN_CENTER}
                     >
-                      {t('slot_location', {
-                        slotName: slotName,
-                      })}
+                      {slotName}
                     </StyledText>
-                    {/* {moduleModel != null ? (
-                      <LocationIcon
-                        iconName={
-                          MODULE_ICON_NAME_BY_TYPE[getModuleType(moduleModel)]
-                        }
-                      />
-                    ) : null} */}
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
                     <StyledText
@@ -249,9 +242,16 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       <StyledText
                         as="p"
                         fontWeight={TYPOGRAPHY.fontWeightRegular}
-                        color={COLORS.darkBlack70}
+                        color={COLORS.darkGreyEnabled}
                       >
-                        {t('on_adapter', { adapterName: adapterName })}
+                        {moduleModel != null
+                          ? t('on_adapter_in_mod', {
+                              adapterName: adapterName,
+                              moduleName: getModuleDisplayName(moduleModel),
+                            })
+                          : t('on_adapter', {
+                              adapterName: adapterName,
+                            })}
                       </StyledText>
                     ) : null}
                   </Flex>
