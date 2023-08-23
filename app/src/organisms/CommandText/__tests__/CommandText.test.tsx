@@ -322,7 +322,7 @@ describe('CommandText', () => {
     )[0]
     getByText('Setting Temperature Module to 20°C (rounded to nearest integer)')
   })
-  it('renders correct text for temperatureModule/waitForTemperature', () => {
+  it('renders correct text for temperatureModule/waitForTemperature with target temp', () => {
     const mockTemp = 20
     const { getByText } = renderWithProviders(
       <CommandText
@@ -343,9 +343,29 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )[0]
-    getByText(
-      'Waiting for Temperature Module to reach 20°C (rounded to nearest integer)'
-    )
+    getByText('Waiting for Temperature Module to reach 20°C')
+  })
+  it('renders correct text for temperatureModule/waitForTemperature with no specified temp', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'temperatureModule/waitForTemperature',
+          params: { moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText('Waiting for Temperature Module to reach target temperature')
   })
   it('renders correct text for thermocycler/setTargetBlockTemperature', () => {
     const mockTemp = 20
