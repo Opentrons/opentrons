@@ -98,6 +98,7 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const [createdRunId, setCreatedRunId] = React.useState<string | null>(null)
 
   const goBack = (): void => {
     setCurrentStepIndex(
@@ -122,12 +123,23 @@ export const PipetteWizardFlows = (
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({}, host)
+  } = useCreateMaintenanceRunMutation(
+    {
+      onSuccess: response => {
+        setCreatedRunId(response.data.id)
+      },
+    },
+    host
+  )
 
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
-    if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
+    if (
+      maintenanceRunData?.data.id == null &&
+      prevMaintenanceRunId.current != null &&
+      createdRunId != null
+    ) {
       closeFlow()
     }
   }, [maintenanceRunData, closeFlow])
@@ -192,7 +204,10 @@ export const PipetteWizardFlows = (
 
   let chainMaintenanceRunCommands
 
-  if (maintenanceRunData?.data.id != null) {
+  if (
+    maintenanceRunData?.data.id != null &&
+    maintenanceRunData.data.id === createdRunId
+  ) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
       continuePastCommandFailure: boolean

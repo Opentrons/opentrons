@@ -62,18 +62,26 @@ export const ModuleWizardFlows = (
     isCommandMutationLoading,
   } = useChainMaintenanceCommands()
 
+  const [createdRunId, setCreatedRunId] = React.useState<string | null>(null)
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation()
-
+  } = useCreateMaintenanceRunMutation({
+    onSuccess: response => {
+      setCreatedRunId(response.data.id)
+    },
+  })
   const prevMaintenanceRunId = React.useRef<string | undefined>(
     maintenanceRunData?.data.id
   )
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
-    if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
+    if (
+      maintenanceRunData?.data.id == null &&
+      prevMaintenanceRunId != null &&
+      createdRunId != null
+    ) {
       closeFlow()
     }
   }, [maintenanceRunData, closeFlow])
@@ -131,7 +139,10 @@ export const ModuleWizardFlows = (
 
   let chainMaintenanceRunCommands
 
-  if (maintenanceRunData?.data.id != null) {
+  if (
+    maintenanceRunData?.data.id != null &&
+    maintenanceRunData.data.id === createdRunId
+  ) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
