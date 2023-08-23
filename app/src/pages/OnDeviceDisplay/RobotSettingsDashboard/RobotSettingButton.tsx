@@ -98,7 +98,10 @@ export function RobotSettingButton({
     } else if (Boolean(ledLights)) {
       if (toggleLights != null) toggleLights()
     } else if (Boolean(enabledHomeGantry) && robotName != null) {
+      console.log('called')
+      console.log('before', settingValue)
       dispatch(updateSetting(robotName, settingId, !settingValue))
+      console.log('after', settingValue)
     }
   }
 
