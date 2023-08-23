@@ -224,8 +224,9 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
-	-$(MAKE) patch-for-gravimetric
-	$(MAKE) sync-sw-ot3
+	$(MAKE) apply-patches-gravimetric
+	-$(MAKE) sync-sw-ot3
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: apply-patches-gravimetric
 patch-for-gravimetric:
