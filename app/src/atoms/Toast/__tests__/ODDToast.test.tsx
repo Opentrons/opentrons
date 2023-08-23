@@ -43,9 +43,13 @@ describe('Toast', () => {
     getByText('Super-long-protocol-file-name-that-the-u...py')
   })
   it('calls onClose when close button is pressed', () => {
+    jest.useFakeTimers()
     const { getByRole } = render(props)
     const closeButton = getByRole('button')
     fireEvent.click(closeButton)
+    act(() => {
+      jest.advanceTimersByTime(TOAST_ANIMATION_DURATION)
+    })
     expect(props.onClose).toHaveBeenCalled()
   })
   it('does not render close button if buttonText and closeButton are undefined', () => {
