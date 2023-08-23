@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { formatDistance } from 'date-fns'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-
 import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'

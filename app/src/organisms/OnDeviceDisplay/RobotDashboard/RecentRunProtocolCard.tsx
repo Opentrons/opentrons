@@ -171,7 +171,7 @@ export function ProtocolWithLastRun({
             aria-label="icon_ot-spinner"
             spin={true}
             size="2.5rem"
-            color={COLORS.darkBlackEnabled}
+            color={COLORS.darkBlack100}
           />
         )}
       </Flex>
