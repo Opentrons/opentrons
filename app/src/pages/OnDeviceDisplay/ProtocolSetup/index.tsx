@@ -395,7 +395,7 @@ function PrepareToRun({
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules.length === 0)
+    (protocolHasModules && attachedModules == null)
 
   const speccedInstrumentCount =
     mostRecentAnalysis !== null
