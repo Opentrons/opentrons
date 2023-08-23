@@ -740,7 +740,7 @@ class OT3API(
         await self._backend.halt()
 
     async def _cancel_execution_and_running_tasks(self) -> None:
-        """Cancel execution man."""
+        """Cancel execution manager and all running (hardware module) tasks."""
         await self._execution_manager.cancel()
 
     async def halt(self) -> None:
