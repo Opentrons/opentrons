@@ -47,7 +47,7 @@ def _get_heights_in_well(
             below=max(height_after - submerge, config.LABWARE_BOTTOM_CLEARANCE),
         ),
     )
-    approach = max(pipetting_heights.start.above, pipetting_heights.end.below)
+    approach = max(pipetting_heights.start.above, pipetting_heights.end.above)
     submerge = pipetting_heights.end.below
     retract = pipetting_heights.end.above
     return approach, submerge, retract
@@ -67,18 +67,19 @@ class PipettingCallbacks:
 
 
 def _check_aspirate_dispense_args(
-    aspirate: Optional[float], dispense: Optional[float]
+    mix: Optional[float], aspirate: Optional[float], dispense: Optional[float]
 ) -> None:
-    if aspirate is None and dispense is None:
-        raise ValueError("either a aspirate or dispense volume must be set")
-    if aspirate and dispense:
-        raise ValueError("both aspirate and dispense volumes cannot be set together")
+    if mix is None and aspirate is None and dispense is None:
+        raise ValueError("either mix, aspirate or dispense volume must be set")
+    if aspirate and dispense or mix and aspirate or mix and dispense:
+        raise ValueError("only a mix, aspirate or dispense volumes can be set")
 
 
 def _get_approach_submerge_retract_heights(
     well: Well,
     liquid_tracker: LiquidTracker,
     liquid_class: LiquidClassSettings,
+    mix: Optional[float],
     aspirate: Optional[float],
     dispense: Optional[float],
     blank: bool,
@@ -86,7 +87,7 @@ def _get_approach_submerge_retract_heights(
 ) -> Tuple[float, float, float]:
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
         well,
-        aspirate=aspirate,
+        aspirate=aspirate if aspirate else 0,
         dispense=dispense,
         channels=channel_count,
     )
@@ -141,7 +142,7 @@ def _retract(
     # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
     hw_api.set_gantry_load(hw_api.gantry_load)
     # retract out of the liquid (not out of the well)
-    pipette.move_to(well.top(mm_above_well_bottom).move(channel_offset), speed=speed)
+    pipette.move_to(well.bottom(mm_above_well_bottom).move(channel_offset), speed=speed)
     # reset discontinuity back to default
     if pipette.channels == 96:
         hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
@@ -164,11 +165,10 @@ def _pipette_with_liquid_settings(
     channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
+    mix: Optional[float] = None,
     aspirate: Optional[float] = None,
     dispense: Optional[float] = None,
     blank: bool = True,
-    inspect: bool = False,
-    mix: bool = False,
     added_blow_out: bool = True,
     touch_tip: bool = False,
 ) -> None:
@@ -176,7 +176,7 @@ def _pipette_with_liquid_settings(
     # FIXME: stop using hwapi, and get those functions into core software
     hw_api = ctx._core.get_hardware()
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-    _check_aspirate_dispense_args(aspirate, dispense)
+    _check_aspirate_dispense_args(mix, aspirate, dispense)
 
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
@@ -184,6 +184,13 @@ def _pipette_with_liquid_settings(
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
         hw_api.blow_out(hw_mount, liquid_class.dispense.blow_out_submerged)
+
+    def _blow_out_remaining_air() -> None:
+        # FIXME: using the HW-API to specify that we want to blow-out the full
+        #        available blow-out volume
+        # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
+        max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 14.9
+        hw_api.blow_out(hw_mount, max_blow_out_volume)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -195,6 +202,7 @@ def _pipette_with_liquid_settings(
         well,
         liquid_tracker,
         liquid_class,
+        mix,
         aspirate,
         dispense,
         blank,
@@ -202,7 +210,7 @@ def _pipette_with_liquid_settings(
     )
 
     # SET Z SPEEDS DURING SUBMERGE/RETRACT
-    if aspirate:
+    if aspirate or mix:
         submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
         retract_speed = config.TIP_SPEED_WHILE_RETRACTING_ASPIRATE
         _z_disc = liquid_class.aspirate.z_retract_discontinuity
@@ -217,16 +225,21 @@ def _pipette_with_liquid_settings(
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_mix() -> None:
+        callbacks.on_mixing()
         _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         _num_mixes = 5
         for i in range(_num_mixes):
-            pipette.aspirate(aspirate)
+            pipette.aspirate(mix)
+            ctx.delay(liquid_class.aspirate.delay)
             if i < _num_mixes - 1:
-                pipette.dispense(aspirate)
+                pipette.dispense(mix)
             else:
                 _dispense_with_added_blow_out()
-        _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
-        hw_api.prepare_for_aspirate(hw_mount, rate=0.25)  # slowly so as not to pull up droplets
+            ctx.delay(liquid_class.aspirate.delay)
+        # don't go all the way up to retract position, but instead just above liquid
+        _retract(ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc)
+        _blow_out_remaining_air()
+        hw_api.prepare_for_aspirate(hw_mount)
         assert pipette.current_volume == 0
 
     def _aspirate_on_submerge() -> None:
@@ -265,11 +278,7 @@ def _pipette_with_liquid_settings(
         if pipette.current_volume <= 0 and added_blow_out:
             # blow-out any remaining air in pipette (any reason why not?)
             callbacks.on_blowing_out()
-            # FIXME: using the HW-API to specify that we want to blow-out the full
-            #        available blow-out volume
-            # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
-            max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
-            hw_api.blow_out(hw_mount, max_blow_out_volume)
+            _blow_out_remaining_air()
             hw_api.prepare_for_aspirate(hw_mount)
         if touch_tip:
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
@@ -282,25 +291,57 @@ def _pipette_with_liquid_settings(
     pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
     pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
-    _aspirate_on_approach() if aspirate else _dispense_on_approach()
+    _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
 
-    # PHASE 1B: MIXING
-    if mix and aspirate:
+    if mix:
+        # PHASE 2A: MIXING
         _aspirate_on_mix()
+    else:
+        # PHASE 2B: ASPIRATE or DISPENSE
+        callbacks.on_submerging()
+        _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
+        _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
-    # PHASE 2: SUBMERGE
-    callbacks.on_submerging()
-    _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
-    _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
-
-    # PHASE 3: RETRACT
-    callbacks.on_retracting()
-    _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
-    _aspirate_on_retract() if aspirate else _dispense_on_retract()
+        # PHASE 3: RETRACT
+        callbacks.on_retracting()
+        _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
+        _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
     callbacks.on_exiting()
     hw_api.retract(hw_mount)
+
+
+def mix_with_liquid_class(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    tip_volume: int,
+    mix_volume: float,
+    well: Well,
+    channel_offset: Point,
+    channel_count: int,
+    liquid_tracker: LiquidTracker,
+    callbacks: PipettingCallbacks,
+    blank: bool = False,
+    touch_tip: bool = False,
+) -> None:
+    """Mix with liquid class."""
+    liquid_class = get_liquid_class(
+        int(pipette.max_volume), pipette.channels, tip_volume, int(mix_volume)
+    )
+    _pipette_with_liquid_settings(
+        ctx,
+        pipette,
+        liquid_class,
+        well,
+        channel_offset,
+        channel_count,
+        liquid_tracker,
+        callbacks,
+        mix=mix_volume,
+        blank=blank,
+        touch_tip=touch_tip,
+    )
 
 
 def aspirate_with_liquid_class(
@@ -314,8 +355,6 @@ def aspirate_with_liquid_class(
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
-    inspect: bool = False,
-    mix: bool = False,
     touch_tip: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
@@ -333,8 +372,6 @@ def aspirate_with_liquid_class(
         callbacks,
         aspirate=aspirate_volume,
         blank=blank,
-        inspect=inspect,
-        mix=mix,
         touch_tip=touch_tip,
     )
 
@@ -350,8 +387,6 @@ def dispense_with_liquid_class(
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
-    inspect: bool = False,
-    mix: bool = False,
     added_blow_out: bool = True,
     touch_tip: bool = False,
 ) -> None:
@@ -370,8 +405,6 @@ def dispense_with_liquid_class(
         callbacks,
         dispense=dispense_volume,
         blank=blank,
-        inspect=inspect,
-        mix=mix,
         added_blow_out=added_blow_out,
         touch_tip=touch_tip,
     )
