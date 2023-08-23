@@ -11,7 +11,6 @@ from typing import Dict, List, Optional, Set
 from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
-from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 from robot_server.persistence import (
     analysis_table,
@@ -444,7 +443,6 @@ async def _compute_protocol_sources(
             files=protocol_files,
             directory=Path(protocol_subdirectory),
             files_are_prevalidated=True,
-            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
         sources_by_id[protocol_id] = protocol_source
 

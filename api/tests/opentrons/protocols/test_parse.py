@@ -6,7 +6,6 @@ import pytest
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.parse import (
-    PythonParseMode,
     _get_protocol_schema_version,
     validate_json,
     parse,
@@ -168,6 +167,7 @@ parse_version_cases = [
         APIVersion(10, 23123151),
     ),
     # Explicitly-declared apiLevel with various cases of it being in metadata or requirements:
+    # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
     (
         """
         requirements = {"apiLevel": "123.456"}
@@ -197,6 +197,16 @@ parse_version_cases = [
         def run(ctx): pass
         """,
         APIVersion(123, 456),
+    ),
+    (
+        # Overriding:
+        # TODO(mm, 2022-10-21): The expected behavior here is still to be decided.
+        """
+        metadata = {"apiLevel": "123.456"}
+        requirements = {"apiLevel": "789.0"}
+        def run(ctx): pass
+        """,
+        APIVersion(789, 0),
     ),
 ]
 
@@ -336,7 +346,7 @@ def test_validate_json(
             metadata = {
                 'mk1': 'mv1',
                 'mk2': 'mv2',
-                'apiLevel': '2.123'
+                'apiLevel': '2.0'
             }
             print('wat?')
             def run(cxt): pass
@@ -349,9 +359,9 @@ def test_validate_json(
             {
                 "mk1": "mv1",
                 "mk2": "mv2",
-                "apiLevel": "2.123",
+                "apiLevel": "2.0",
             },
-            APIVersion(2, 123),
+            APIVersion(2, 0),
             "OT-3 Standard",
         ),
         (
@@ -632,102 +642,3 @@ def test_parse_extra_contents(
 def test_parse_bad_structure(bad_protocol: str, expected_message: str) -> None:
     with pytest.raises(MalformedPythonProtocolError, match=expected_message):
         parse(dedent(bad_protocol))
-
-
-# TODO(mm, 2023-08-10): When we remove python_parse_mode from parse(), remove this
-# parametrization and merge these tests with the other metadata/requirements validation tests.
-@pytest.mark.parametrize("python_parse_mode", PythonParseMode)
-@pytest.mark.parametrize(
-    ("questionable_protocol", "expected_message"),
-    [
-        (
-            # apiLevel in both metadata and requirements.
-            """
-            metadata = {"apiLevel": "2.14"}
-            requirements = {"apiLevel": "2.14"}
-            def run(ctx): pass
-            """,
-            "You may only put apiLevel in the metadata dict or the requirements dict, not both.",
-        ),
-        (
-            # apiLevel in both metadata and requirements.
-            """
-            metadata = {"apiLevel": "2.14"}
-            requirements = {"apiLevel": ""}
-            def run(ctx): pass
-            """,
-            "You may only put apiLevel in the metadata dict or the requirements dict, not both.",
-        ),
-        (
-            # Unrecognized keys in requirements.
-            """
-            requirements = {
-                "apiLevel": "2.15",
-                "robotType": "Flex",
-                "APILevel": "2.15",
-                "RobotType": "Flex",
-                "foo": "bar",
-            }
-            def run(ctx): pass
-            """,
-            "Unrecognized keys in requirements dict: 'APILevel', 'RobotType', 'foo'",
-        ),
-        (
-            # apiLevel too old to support the Flex.
-            """
-            requirements = {"apiLevel": "2.13", "robotType": "Flex"}
-            def run(ctx): pass
-            """,
-            "The Opentrons Flex only supports apiLevel 2.15 or newer.",
-        ),
-    ],
-)
-def test_errors_conditional_on_legacy_mode(
-    questionable_protocol: str,
-    python_parse_mode: PythonParseMode,
-    expected_message: str,
-) -> None:
-    if python_parse_mode == PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS:
-        # Should not raise:
-        parse(dedent(questionable_protocol), python_parse_mode=python_parse_mode)
-    else:
-        with pytest.raises(MalformedPythonProtocolError, match=expected_message):
-            parse(dedent(questionable_protocol), python_parse_mode=python_parse_mode)
-
-
-# TODO(mm, 2023-08-10): Remove these tests when we remove python_parse_mode from parse().
-# https://opentrons.atlassian.net/browse/RSS-306
-@pytest.mark.parametrize(
-    ("protocol_source", "expected_api_level"),
-    [
-        (
-            """
-            metadata = {"apiLevel": "2.15"}
-            requirements = {"apiLevel": "2.14"}
-            def run(ctx): pass
-            """,
-            APIVersion(2, 14),
-        ),
-        (
-            """
-            requirements = {"apiLevel": "2.14"}
-            metadata = {"apiLevel": "2.15"}
-            def run(ctx): pass
-            """,
-            APIVersion(2, 14),
-        ),
-    ],
-)
-def test_legacy_apilevel_override(
-    protocol_source: str, expected_api_level: APIVersion
-) -> None:
-    """An apiLevel in requirements should override an apiLevel in metadata.
-
-    This only matters with `PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS`.
-    With stricter validation, it's impossible to put apiLevel in both dicts in the first place.
-    """
-    parsed = parse(
-        dedent(protocol_source),
-        python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-    )
-    assert parsed.api_level == expected_api_level

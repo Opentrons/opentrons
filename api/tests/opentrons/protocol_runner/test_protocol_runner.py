@@ -12,7 +12,6 @@ from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.parse import PythonParseMode
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
@@ -435,7 +434,6 @@ async def test_load_legacy_python(
         legacy_file_reader.read(
             protocol_source=legacy_protocol_source,
             labware_definitions=[labware_definition],
-            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(legacy_protocol)
     decoy.when(
@@ -446,10 +444,7 @@ async def test_load_legacy_python(
         )
     ).then_return(legacy_context)
 
-    await legacy_python_runner_subject.load(
-        legacy_protocol_source,
-        python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-    )
+    await legacy_python_runner_subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
@@ -503,9 +498,7 @@ async def test_load_python_with_pe_papi_core(
     ).then_return([])
     decoy.when(
         legacy_file_reader.read(
-            protocol_source=legacy_protocol_source,
-            labware_definitions=[],
-            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+            protocol_source=legacy_protocol_source, labware_definitions=[]
         )
     ).then_return(legacy_protocol)
     decoy.when(
@@ -514,10 +507,7 @@ async def test_load_python_with_pe_papi_core(
         )
     ).then_return(legacy_context)
 
-    await legacy_python_runner_subject.load(
-        legacy_protocol_source,
-        python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-    )
+    await legacy_python_runner_subject.load(legacy_protocol_source)
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
 
@@ -563,7 +553,6 @@ async def test_load_legacy_json(
         legacy_file_reader.read(
             protocol_source=legacy_protocol_source,
             labware_definitions=[labware_definition],
-            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(legacy_protocol)
     decoy.when(
@@ -574,10 +563,7 @@ async def test_load_legacy_json(
         )
     ).then_return(legacy_context)
 
-    await legacy_python_runner_subject.load(
-        legacy_protocol_source,
-        python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-    )
+    await legacy_python_runner_subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
