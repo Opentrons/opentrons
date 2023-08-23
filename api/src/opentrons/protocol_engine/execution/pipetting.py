@@ -96,10 +96,8 @@ class HardwarePipettingHandler(PipettingHandler):
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
         )
-
-        if push_out and (
-            push_out < 0 or push_out > hw_pipette.config["plunger_positions"].bottom
-        ):
+        # TODO (tz, 8-23-23): add a check for push_out not larger that the max volume allowed when working on this https://opentrons.atlassian.net/browse/RSS-329
+        if push_out and (push_out < 0):
             raise ValueError("push out value cannot have a negative value.")
         with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
             await self._hardware_api.dispense(
@@ -206,6 +204,9 @@ class VirtualPipettingHandler(PipettingHandler):
         push_out: Optional[float],
     ) -> float:
         """Virtually dispense (no-op)."""
+        # TODO (tz, 8-23-23): add a check for push_out not larger that the max volume allowed when working on this https://opentrons.atlassian.net/browse/RSS-329
+        if push_out and (push_out < 0):
+            raise ValueError("push out value cannot have a negative value.")
         self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
         return volume
 
