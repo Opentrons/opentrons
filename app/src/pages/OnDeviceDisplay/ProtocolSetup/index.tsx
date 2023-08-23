@@ -33,7 +33,6 @@ import {
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
@@ -76,7 +75,6 @@ import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
 interface ProtocolSetupStepProps {
