@@ -171,7 +171,7 @@ def _change_plunger_acceleration(
     else:
         shaft_diameter_mm = 4.5
     nominal_ul_per_mm = pi * pow(shaft_diameter_mm * 0.5, 2)
-    p_accel = ul_per_sec_per_sec / nominal_ul_per_mm
+    p_accel = 1500
     if pipette.channels == 96:
         hw_api.config.motion_settings.acceleration.high_throughput[
             OT3AxisKind.P
