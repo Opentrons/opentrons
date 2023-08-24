@@ -61,7 +61,7 @@ TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
     ),
 }
 
-POINT_ONE_ID: Final = "10TLC"
+POINT_ONE_ID: Final = "9TRD"
 POINT_TWO_ID: Final = "3BRC"
 POINT_THREE_ID: Final = "7TLC"
 
@@ -78,7 +78,7 @@ CAL_BLOCK_SETUP_BY_MOUNT: Dict[Mount, LabwareInfo] = {
         load_name="opentrons_calibrationblock_short_side_right", slot="3", well="A1"
     ),
     Mount.RIGHT: LabwareInfo(
-        load_name="opentrons_calibrationblock_short_side_left", slot="1", well="A2"
+        load_name="opentrons_calibrationblock_short_side_left", slot="10", well="A2"
     ),
 }
 CAL_BLOCK_SETUP_CAL_CHECK: LabwareInfo = LabwareInfo(
