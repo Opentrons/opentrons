@@ -986,9 +986,9 @@ class API(
     async def dispense(
         self,
         mount: top_types.Mount,
-        push_out: Optional[float] = None,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.

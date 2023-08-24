@@ -61,7 +61,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             rate: The rate for how quickly to dispense.
             flow_rate: The flow rate in µL/s to dispense at.
             in_place: Whether this is in-place.
-            push_out: The amount to push the plunger bellow bottom position.
+            push_out: The amount to push the plunger below bottom position.
         """
         ...
 
