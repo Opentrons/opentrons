@@ -40,7 +40,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
-    create_gear_motor_home_group,
+    create_tip_motor_home_group,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
@@ -641,7 +641,7 @@ class OT3Controller:
             positions = await asyncio.gather(*coros)
         # TODO(CM): default gear motor homing routine to have some acceleration
         if Axis.Q in checked_axes:
-            await self.home_gear_motors(
+            await self.home_tip_motors(
                 distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
                 velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     Axis.to_kind(Axis.Q)
@@ -663,15 +663,13 @@ class OT3Controller:
             )
         return new_group
 
-    async def home_gear_motors(
+    async def home_tip_motors(
         self,
         distance: float,
         velocity: float,
         back_off: bool = True,
     ) -> None:
-        move_group = create_gear_motor_home_group(
-            float(distance), float(velocity), back_off
-        )
+        move_group = create_tip_motor_home_group(distance, velocity, back_off)
 
         runner = MoveGroupRunner(
             move_groups=[move_group],

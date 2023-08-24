@@ -397,7 +397,7 @@ class OT3Simulator:
     ) -> None:
         pass
 
-    async def home_gear_motors(
+    async def home_tip_motors(
         self,
         distance: float,
         velocity: float,
