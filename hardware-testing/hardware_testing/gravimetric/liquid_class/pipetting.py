@@ -300,9 +300,9 @@ def _pipette_with_liquid_settings(
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
     pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
     pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
-    _change_plunger_acceleration(
-        ctx, pipette, liquid_class.dispense.plunger_acceleration
-    )
+    #_change_plunger_acceleration(
+    #    ctx, pipette, liquid_class.dispense.plunger_acceleration
+    #)
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate else _dispense_on_approach()
 
@@ -323,7 +323,7 @@ def _pipette_with_liquid_settings(
     # EXIT
     callbacks.on_exiting()
     hw_api.retract(hw_mount)
-    _reset_plunger_acceleration(ctx, pipette)
+    #_reset_plunger_acceleration(ctx, pipette)
 
 
 def aspirate_with_liquid_class(
