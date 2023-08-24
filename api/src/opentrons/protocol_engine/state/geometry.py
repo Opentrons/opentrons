@@ -139,6 +139,15 @@ class GeometryView:
         """Gets the offset vector of a labware on the given location.
 
         NOTE: Not to be confused with LPC offset.
+        - For labware on Deck Slot: returns an offset of (0, 0, 0)
+        - For labware on a Module: returns the nominal offset for the labware's position
+          when placed on the specified module (using slot-transformed labwareOffset
+          from the module's definition with any stacking overlap).
+          Does not include module calibration offset or LPC offset.
+        - For labware on another labware: returns the nominal offset for the labware
+          as placed on the specified labware, taking into account any offsets for labware
+          on modules as well as stacking overlaps.
+          Does not include module calibration offset or LPC offset.
         """
         if isinstance(labware_location, DeckSlotLocation):
             return LabwareOffsetVector(x=0, y=0, z=0)
