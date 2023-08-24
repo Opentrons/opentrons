@@ -5,7 +5,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Opentrons Flex 96 Channel Tip Rack Adapter",
+    "displayName": "Opentrons Flex 96 Tip Rack Adapter",
     "displayCategory": "adapter",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -27,7 +27,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_flex_96_channel_tip_rack_adapter"
+    "loadName": "opentrons_flex_96_tiprack_adapter"
   },
   "namespace": "opentrons",
   "version": 1,
