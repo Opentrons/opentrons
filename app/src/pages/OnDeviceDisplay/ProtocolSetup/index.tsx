@@ -33,7 +33,6 @@ import {
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
@@ -76,7 +75,6 @@ import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
 interface ProtocolSetupStepProps {
@@ -240,33 +238,6 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   )
 }
 
-const PLAY_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.blueEnabled};
-  }
-
-  &:active {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
 interface PlayButtonProps {
   ready: boolean
   onPlay?: () => void
@@ -278,6 +249,33 @@ function PlayButton({
   onPlay,
   ready,
 }: PlayButtonProps): JSX.Element {
+  const playButtonStyle = css`
+    -webkit-tap-highlight-color: transparent;
+    &:focus {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:hover {
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+      color: ${COLORS.white};
+    }
+
+    &:focus-visible {
+      box-shadow: ${ODD_FOCUS_VISIBLE};
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+    }
+
+    &:active {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack60};
+    }
+  `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
@@ -292,7 +290,7 @@ function PlayButton({
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
-      css={PLAY_BUTTON_STYLE}
+      css={playButtonStyle}
     >
       <Icon
         color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
@@ -357,12 +355,6 @@ function PrepareToRun({
 
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
-  const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
-    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
@@ -392,7 +384,7 @@ function PrepareToRun({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  // True if any sever request is still pending.
+  // True if any server request is still pending.
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
@@ -416,7 +408,7 @@ function PrepareToRun({
   const onPlay = (): void => {
     if (
       isHeaterShakerInProtocol &&
-      !isHeaterShakerShaking &&
+      isReadyToRun &&
       (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
     ) {
       confirmAttachment()
