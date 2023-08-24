@@ -1,5 +1,10 @@
 :og:description: Building block commands are the smallest individual actions that Opentrons robots can perform.
 
+.. adding a comment to make this different from edge to open a PR
+.. github won't allow PRs if the upstream resource is the same
+.. could do an empty pull request, but that seems wrong
+.. delete these comments when done with the project
+
 .. _v2-atomic-commands:
 
 #######################
