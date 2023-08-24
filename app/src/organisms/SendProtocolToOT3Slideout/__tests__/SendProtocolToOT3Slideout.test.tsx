@@ -165,8 +165,8 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    getByText('Send protocol to Opentrons Flex')
-    getByRole('button', { name: 'Send' })
+    getByText('Choose Robot to Run fakeSrcFileName')
+    getByRole('button', { name: 'Proceed to setup' })
   })
 
   it('renders an available robot option for every connectable OT-3, and link for other robots', () => {
@@ -246,7 +246,7 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const sendButton = getByRole('button', { name: 'Send' })
+    const sendButton = getByRole('button', { name: 'Proceed to setup' })
     expect(sendButton).not.toBeDisabled()
     const otherRobot = getByText('otherRobot')
     otherRobot.click() // unselect default robot
@@ -259,5 +259,28 @@ describe('SendProtocolToOT3Slideout', () => {
       files: [expect.any(Object), mockCustomLabwareFile],
       protocolKey: 'protocolKeyStub',
     })
+  })
+  it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
+    when(mockGetBuildrootUpdateDisplayInfo)
+      .calledWith(({} as any) as State, 'opentrons-robot-name')
+      .mockReturnValue({
+        autoUpdateAction: 'upgrade',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    expect(proceedButton).toBeDisabled()
+    expect(
+      getByText(
+        'A robot software update is required to run protocols with this version of the Opentrons App.'
+      )
+    ).toBeInTheDocument()
+    const linkToRobotDetails = getByText('Go to Robot')
+    linkToRobotDetails.click()
   })
 })

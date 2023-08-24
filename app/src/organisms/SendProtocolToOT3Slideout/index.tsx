@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
-import { PrimaryButton } from '@opentrons/components'
+import { PrimaryButton, IconProps, StyleProps } from '@opentrons/components'
 import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
 import {
@@ -16,7 +16,7 @@ import { useToaster } from '../../organisms/ToasterOven'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 
 import type { AxiosError } from 'axios'
-import type { IconProps, StyleProps } from '@opentrons/components'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -38,9 +38,22 @@ export function SendProtocolToOT3Slideout(
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
-  const { t } = useTranslation('protocol_details')
+  const { t } = useTranslation(['protocol_details', 'shared'])
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
+
+  const isSelectedRobotOnWrongVersionOfSoftware = [
+    'upgrade',
+    'downgrade',
+  ].includes(
+    useSelector((state: State) => {
+      const value =
+        selectedRobot != null
+          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
+          : { autoUpdateAction: '' }
+      return value
+    })?.autoUpdateAction
+  )
 
   const { eatToast, makeToast } = useToaster()
 
@@ -128,14 +141,18 @@ export function SendProtocolToOT3Slideout(
     <ChooseRobotSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}
-      title={t('send_protocol_to_ot3')}
+      title={t('choose_robot_to_run', {
+        protocol_name: protocolDisplayName,
+      })}
       footer={
         <PrimaryButton
-          disabled={selectedRobot == null}
+          disabled={
+            selectedRobot == null || isSelectedRobotOnWrongVersionOfSoftware
+          }
           onClick={handleSendClick}
           width="100%"
         >
-          {t('send')}
+          {t('shared:proceed_to_setup')}
         </PrimaryButton>
       }
       selectedRobot={selectedRobot}
