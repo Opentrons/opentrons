@@ -61,7 +61,7 @@ TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
     ),
 }
 
-POINT_ONE_ID: Final = "1BLC"
+POINT_ONE_ID: Final = "10TLC"
 POINT_TWO_ID: Final = "3BRC"
 POINT_THREE_ID: Final = "7TLC"
 
