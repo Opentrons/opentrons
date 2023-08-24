@@ -1015,7 +1015,7 @@
     "x": 0,
     "y": 0,
     "z": 0
-    },
+  },
   "stackingOffsetWithLabware": {
     "opentrons_flex_96_channel_tip_rack_adapter": {
       "x": 0,
