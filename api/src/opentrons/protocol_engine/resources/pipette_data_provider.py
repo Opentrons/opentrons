@@ -97,5 +97,7 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
         nozzle_offset_z=0,
-        default_push_out_volume=pipette_dict["default_push_out_volume"],
+        default_push_out_volume=pipette_dict["default_push_out_volume"]
+        if "default_push_out_volume" in pipette_dict
+        else None,
     )
