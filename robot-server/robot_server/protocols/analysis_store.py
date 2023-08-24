@@ -190,6 +190,21 @@ class AnalysisStore:
         else:
             raise AnalysisNotFoundError(analysis_id=analysis_id)
 
+    async def get_as_document(self, analysis_id: str) -> str:
+        pending_analysis = self._pending_store.get(analysis_id=analysis_id)
+        completed_analysis_document = await self._completed_store.get_by_id_as_document(
+            analysis_id=analysis_id
+        )
+
+        if pending_analysis is not None:
+            # TODO: Probably want this to be a separate HTTP status code so the pending case
+            # doesn't have to pollute the completed analysis schema.
+            return pending_analysis.json()
+        elif completed_analysis_document is not None:
+            return completed_analysis_document
+        else:
+            raise AnalysisNotFoundError(analysis_id=analysis_id)
+
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
         """Get summaries of all analyses for a protocol, in order from oldest first.
 

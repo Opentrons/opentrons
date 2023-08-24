@@ -51,6 +51,7 @@ from .dependencies import (
     get_file_hasher,
 )
 
+from starlette.responses import PlainTextResponse
 
 log = logging.getLogger(__name__)
 
@@ -501,3 +502,27 @@ async def get_protocol_analysis_by_id(
         ) from error
 
     return await PydanticResponse.create(content=SimpleBody.construct(data=analysis))
+
+
+@protocols_router.get(path="/protocols/{protocolId}/analyses/{analysisId}/asDocument")
+async def get_protocol_analysis_as_document(
+    protocolId: str,
+    analysisId: str,
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
+) -> PlainTextResponse:  # TODO: We want this to have a JSON MIME type.
+    if not protocol_store.has(protocolId):
+        raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        # TODO(mm, 2022-04-28): This will erroneously return an analysis even if
+        # this analysis isn't owned by this protocol. This should be an error.
+        analysis = await analysis_store.get_as_document(analysisId)
+    except AnalysisNotFoundError as error:
+        raise AnalysisNotFound(detail=str(error)).as_error(
+            status.HTTP_404_NOT_FOUND
+        ) from error
+
+    return PlainTextResponse(content=analysis)

@@ -56,8 +56,14 @@ analysis_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "completed_analysis",
-        sqlalchemy.LargeBinary,
+        sqlalchemy.LargeBinary,  # A pickle.
         nullable=False,
+    ),
+    # TODO: Migration concerns, etc.  :)
+    sqlalchemy.Column(
+        "completed_analysis_as_document",
+        sqlalchemy.String,  # TODO: Is it better to store this as str or bytes?
+        nullable=True,
     ),
 )
 

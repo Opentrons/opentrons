@@ -1,7 +1,7 @@
 """Completed analysis storage and access."""
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from logging import getLogger
 from dataclasses import dataclass
 import sqlalchemy
@@ -40,10 +40,12 @@ class CompletedAnalysisResource:
         Avoid calling this from inside a SQL transaction, since it might be slow.
         """
 
-        def serialize_completed_analysis() -> bytes:
-            return legacy_pickle.dumps(self.completed_analysis.dict())
+        def serialize_completed_analysis() -> Tuple[bytes, str]:
+            pickle = legacy_pickle.dumps(self.completed_analysis.dict())
+            json = self.completed_analysis.json()  # TODO: exclude_none, by_alias, etc.?
+            return pickle, json
 
-        serialized_completed_analysis = await anyio.to_thread.run_sync(
+        serialized_pickle, serialized_json = await anyio.to_thread.run_sync(
             serialize_completed_analysis,
             # Cancellation may orphan the worker thread,
             # but that should be harmless in this case.
@@ -54,7 +56,8 @@ class CompletedAnalysisResource:
             "id": self.id,
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
-            "completed_analysis": serialized_completed_analysis,
+            "completed_analysis": serialized_pickle,
+            "completed_analysis_as_document": serialized_json,
         }
 
     @classmethod
@@ -143,6 +146,15 @@ class CompletedAnalysisStore:
         )
         self._memcache.insert(resource.id, resource)
         return resource
+
+    async def get_by_id_as_document(self, analysis_id: str) -> Optional[str]:
+        statement = sqlalchemy.select(
+            analysis_table.c.completed_analysis_as_document
+        ).where(analysis_table.c.id == analysis_id)
+        with self._sql_engine.begin() as transaction:
+            # TODO: Sort out what to do if analysis_id is wrong.
+            # get_by_id() would return None but we're using that return value for something else here.
+            return transaction.execute(statement).scalar_one()
 
     async def get_by_protocol(
         self, protocol_id: str
