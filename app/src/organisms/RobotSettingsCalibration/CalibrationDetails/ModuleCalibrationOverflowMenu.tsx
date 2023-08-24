@@ -17,16 +17,19 @@ import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useRunStatuses } from '../../Devices/hooks'
-// ToDo (kk:08/23/2023) Need Module Calibration Wizard component here
+import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 
-// Note (kk:08/23/2023) This props interface may be varied
+import type { AttachedModule } from '../../../redux/modules/types'
+
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean
+  attachedModule: AttachedModule
   updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function ModuleCalibrationOverflowMenu({
   isCalibrated,
+  attachedModule,
   updateRobotStatus,
 }: ModuleCalibrationOverflowMenuProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'robot_calibration'])
@@ -38,7 +41,7 @@ export function ModuleCalibrationOverflowMenu({
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
 
-  // const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const { isRunRunning: isRunning } = useRunStatuses()
 
   const OverflowMenuRef = useOnClickOutside<HTMLDivElement>({
@@ -46,9 +49,7 @@ export function ModuleCalibrationOverflowMenu({
   })
 
   const handleCalibration = (): void => {
-    // ToDo (kk:08/23/2023)
-    // start module calibration wizard
-    // when isRunning is false, calibration is available
+    setShowModuleWizard(true)
   }
 
   const handleDeleteCalibration = (): void => {
@@ -70,9 +71,15 @@ export function ModuleCalibrationOverflowMenu({
         onClick={handleOverflowClick}
         disabled={isRunning}
       />
-      {/* {showModuleWizard ? (
-        <ModuleWizardFlows />
-      ) : null} */}
+      {showModuleWizard ? (
+        <ModuleWizardFlows
+          attachedModule={attachedModule}
+          slotName="A1"
+          closeFlow={() => {
+            setShowModuleWizard(false)
+          }}
+        />
+      ) : null}
       {showOverflowMenu ? (
         <Flex
           ref={OverflowMenuRef}

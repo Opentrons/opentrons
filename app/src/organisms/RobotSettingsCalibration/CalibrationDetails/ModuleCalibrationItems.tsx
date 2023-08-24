@@ -56,6 +56,7 @@ export function ModuleCalibrationItems({
                 isCalibrated={
                   attachedModule.moduleOffset?.last_modified != null
                 }
+                attachedModule={attachedModule}
                 updateRobotStatus={updateRobotStatus}
               />
             </StyledTableCell>
