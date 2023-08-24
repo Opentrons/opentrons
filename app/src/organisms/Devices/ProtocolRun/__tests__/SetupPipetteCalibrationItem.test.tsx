@@ -86,7 +86,7 @@ describe('SetupPipetteCalibrationItem', () => {
     getByText('Not calibrated yet')
     expect(
       getByRole('link', {
-        name: 'Calibrate Now',
+        name: 'Calibrate now',
       }).getAttribute('href')
     ).toBe('/devices/otie/robot-settings/calibration/dashboard')
   })
@@ -144,7 +144,7 @@ describe('SetupPipetteCalibrationItem', () => {
     })
     getByText('Left Mount')
     getByText(mockPipetteInfo.pipetteSpecs.displayName)
-    const attach = getByRole('button', { name: 'Calibrate Now' })
+    const attach = getByRole('button', { name: 'Calibrate now' })
     fireEvent.click(attach)
     getByText('pipette wizard flows')
   })
