@@ -112,7 +112,7 @@ class SupportedTipsDefinition(BaseModel):
     default_push_out_volume: Optional[float] = Field(
         ...,
         description="The default volume for a push-out during dispense.",
-        alias="defaultPushOutVolume"
+        alias="defaultPushOutVolume",
     )
 
 
