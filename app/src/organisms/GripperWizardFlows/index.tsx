@@ -90,12 +90,14 @@ export function GripperWizardFlows(
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
-    if (maintenanceRunData?.data.id === createdMaintenanceRunId) {
+    if (
+      createdMaintenanceRunId !== null &&
+      maintenanceRunData?.data.id === createdMaintenanceRunId
+    ) {
       setMonitorMaintenanceRunForDeletion(true)
     }
     if (
-      maintenanceRunData?.data.id == null &&
-      createdMaintenanceRunId != null &&
+      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
       monitorMaintenanceRunForDeletion
     ) {
       closeFlow()
@@ -155,7 +157,6 @@ export function GripperWizardFlows(
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}
-      createdMaintenanceRunId={createdMaintenanceRunId}
     />
   )
 }
@@ -182,7 +183,6 @@ interface GripperWizardProps {
   createRunCommand: ReturnType<
     typeof useCreateMaintenanceCommandMutation
   >['createMaintenanceCommand']
-  createdMaintenanceRunId: string | null
 }
 
 export const GripperWizard = (
@@ -201,7 +201,6 @@ export const GripperWizard = (
     setErrorMessage,
     errorMessage,
     isExiting,
-    createdMaintenanceRunId,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
