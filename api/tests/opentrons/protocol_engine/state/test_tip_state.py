@@ -249,6 +249,43 @@ def test_get_next_tip_with_starting_tip(
     assert result == "C2"
 
 
+def test_get_next_tip_with_starting_tip_8_channel(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+) -> None:
+    """It should return the starting tip, and then the following tip after that."""
+    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=8,
+        starting_tip_name="A2",
+    )
+
+    assert result == "A2"
+
+    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+        params=commands.PickUpTipParams.construct(
+            pipetteId="pipette-id",
+            labwareId="cool-labware",
+            wellName="A2",
+        ),
+        result=commands.PickUpTipResult.construct(
+            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
+        ),
+    )
+
+    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip))
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=8,
+        starting_tip_name="A2",
+    )
+
+    assert result == "A3"
+
+
 def test_get_next_tip_with_starting_tip_out_of_tips(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
