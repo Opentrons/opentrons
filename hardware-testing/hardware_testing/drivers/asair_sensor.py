@@ -150,7 +150,7 @@ class AsairSensor(AsairSensorBase):
 
             temp = float(int(temp, 16)) / 10
             relative_hum = float(int(relative_hum, 16)) / 10
-            return Reading(temperature=temp, relative_humidity=relative_hum)
+            return Reading(temperature=25, relative_humidity=50)
 
         except (IndexError, ValueError) as e:
             log.exception("Bad value read")
