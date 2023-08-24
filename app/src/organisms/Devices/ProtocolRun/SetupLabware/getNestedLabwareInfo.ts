@@ -9,7 +9,7 @@ import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 export interface NestedLabwareInfo {
   nestedLabwareDisplayName: string
   //    shared location between labware and adapter
-  sharedDeckLocation: string
+  sharedSlotId: string
   nestedLabwareDefinition?: LabwareDefinition2
   nestedLabwareNickName?: string
 }
@@ -26,26 +26,30 @@ export function getNestedLabwareInfo(
   )
   if (nestedLabware == null) return null
 
-  let sharedDeckLocation = ''
+  let sharedSlotId: string = ''
   if (labwareSetupItem.initialLocation !== 'offDeck') {
     const adapterLocation = labwareSetupItem.initialLocation
     if ('slotName' in adapterLocation) {
-      sharedDeckLocation = adapterLocation.slotName
+      sharedSlotId = adapterLocation.slotName
     } else if ('moduleId' in adapterLocation) {
       const moduleLocationUnderAdapter = commands.find(
         (command): command is LoadModuleRunTimeCommand =>
           command.commandType === 'loadModule' &&
           command.result?.moduleId === adapterLocation.moduleId
       )
-      sharedDeckLocation =
-        moduleLocationUnderAdapter?.params.location.slotName ?? ''
+      sharedSlotId = moduleLocationUnderAdapter?.params.location.slotName ?? ''
     }
   }
   return {
     nestedLabwareDefinition: nestedLabware.result?.definition ?? undefined,
     nestedLabwareDisplayName:
       nestedLabware.result?.definition.metadata.displayName ?? '',
-    nestedLabwareNickName: labwareSetupItem.nickName ?? undefined,
-    sharedDeckLocation,
+    nestedLabwareNickName:
+      //  only display nickName if the user defined it
+      nestedLabware.params.displayName !==
+      nestedLabware.result?.definition.metadata.displayName
+        ? nestedLabware.params.displayName
+        : undefined,
+    sharedSlotId,
   }
 }

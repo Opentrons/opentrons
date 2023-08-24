@@ -97,7 +97,6 @@ export function LabwareListItem(
     initialLocation !== 'offDeck' && 'slotName' in initialLocation
       ? initialLocation.slotName
       : null
-  let adapterId
   let moduleDisplayName: string | null = null
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
@@ -113,7 +112,6 @@ export function LabwareListItem(
         command.result?.labwareId === initialLocation.labwareId
     )
     const loadedAdapterLocation = loadedAdapter?.params.location
-    adapterId = loadedAdapter?.result?.labwareId
 
     if (loadedAdapterLocation != null && loadedAdapterLocation !== 'offDeck') {
       if ('slotName' in loadedAdapterLocation) {
@@ -253,7 +251,9 @@ export function LabwareListItem(
   return (
     <LabwareRow>
       <Flex alignItems={ALIGN_CENTER}>
-        <StyledText as="p">{slotInfo}</StyledText>
+        <StyledText as="p" data-testid={`slot_info_${slotInfo}`}>
+          {slotInfo}
+        </StyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex>
@@ -273,7 +273,7 @@ export function LabwareListItem(
           </Flex>
         </Flex>
         {nestedLabwareInfo != null &&
-        nestedLabwareInfo?.sharedDeckLocation === slotInfo ? (
+        nestedLabwareInfo?.sharedSlotId === slotInfo ? (
           <Flex>
             {nestedLabwareInfo.nestedLabwareDefinition != null ? (
               <StandaloneLabware

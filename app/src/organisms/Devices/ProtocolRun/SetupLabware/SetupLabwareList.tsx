@@ -19,7 +19,7 @@ import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTyp
 
 const HeaderRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 5.5fr 5.5fr;
+  grid-template-columns: 1fr 5.2fr 5.3fr;
   grip-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing8};
 `

@@ -21,15 +21,8 @@ import {
   SIZE_AUTO,
   Box,
   JUSTIFY_FLEX_START,
-  LocationIcon,
-  MODULE_ICON_NAME_BY_TYPE,
 } from '@opentrons/components'
-import {
-  getModuleDisplayName,
-  getModuleType,
-  MICRO_LITERS,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
 import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
