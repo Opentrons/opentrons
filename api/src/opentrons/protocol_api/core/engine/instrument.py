@@ -156,7 +156,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to dispense at.
             in_place: whether this is a in-place command.
-            push_out: The amount to push the plunger bellow bottom position.
+            push_out: The amount to push the plunger below bottom position.
         """
         if well_core is None:
             if not in_place:

@@ -1628,9 +1628,9 @@ class OT3API(
     async def dispense(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        push_out: Optional[float] = None,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""

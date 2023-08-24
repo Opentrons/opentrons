@@ -126,7 +126,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
             in_place: Whether we should move_to location.
-            push_out: The amount to push the plunger bellow bottom position.
+            push_out: The amount to push the plunger below bottom position.
         """
         if push_out:
             raise APIVersionError("push_out is not supported in this API version.")
