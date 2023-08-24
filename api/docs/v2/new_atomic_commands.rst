@@ -7,32 +7,118 @@
 
 .. _v2-atomic-commands:
 
-#######################
+***********************
 Building Block Commands
-#######################
+***********************
 
-Building block, or basic, commands are the smallest individual actions that can be completed on an Opentrons robot.
-For example, the complex command ``transfer`` (see :ref:`v2-complex-commands`) executes a series of ``pick_up_tip()``, ``aspirate()``, ``dispense()`` and ``drop_tip()`` basic commands.
+Building block commands execute some of the most basic actions that your robot can complete. But basic doesn’t mean these commands lack capabilities. They perform important tasks in your protocols. They're also foundational to the :ref:`complex commands <v2-complex-commands>` that help you write and run longer, more intricate procedures. In this section, we'll look at building block commands that let you work with pipette tips, liquids, and robot utility features.
 
-The examples in this section would be added to the following:
+.. I wonder if this should start w/ an H2 like "Getting Started" and make the
+.. 3 following H3 headers (code samples, instruments and labware, sample file)
 
-.. code-block:: python
-    :substitutions:
+Using These Examples
+====================
 
-    from opentrons import protocol_api
+These code samples are designed for anyone using an Opentrons Flex or OT-2 liquid handling robot. For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we'll try to show code samples without horizontal scrolling and use `named arguments <https://en.wikipedia.org/wiki/Named_parameter>`_ instead of positional arguments. For example::
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    # This code uses named arguments
+    tiprack_1 = protocol.load_labware(
+        load_name="opentrons_flex_96_tiprack_1000ul", location="D2"
+    )
 
-    def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
-        plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        pipette = protocol.load_instrument('p300_single_gen2', mount='left')
-        # the example code below would go here, inside the run function
+    # This code uses positional arguments
+    tiprack_1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D2")   
 
+Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit. It shows the parameter name and its value together (e.g. ``location="D2"``), which may be helpful when you're unsure about what's going on in a protocol code sample.
 
-This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 3, and uses a P300 Single GEN2 pipette.
+Python developers with more experience should feel free to ignore the code styling used here and work with these examples as you like.
 
-.. _atomic-tip-manipulation:
+Instruments and Labware
+=======================
+
+The sample protocols all use the following pipettes:
+
+* Flex 1-Channel Pipette (5–1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
+* P300 Single-Channel GEN2 pipette for the OT-2. The API load name for this pipette is ``p300_single_gen2``. 
+
+They also use the labware listed below: 
+
+.. list-table::
+    :header-rows: 1
+
+    * - Labware type
+      - Labware name
+      - API load name
+    * - Well plate
+      - Corning 96 Well Plate 360 µL Flat
+      - ``corning_96_wellplate_360ul_flat``
+    * - Flex tip rack
+      - Opentrons Flex 96 Tip Rack 1000 µL
+      - ``opentrons_flex_96_tiprack_1000ul``
+    * - OT-2 tip rack
+      - Opentrons 96 Tip Rack 300 µL
+      - ``opentrons_96_tiprack_300ul``
+
+.. _atomic-file:
+
+Sample Protocol File 
+====================
+
+Depending on your robot model and/or API version, the foundation of a basic protocol file could look similar to the following examples. For information about variations in the code before the ``run()`` function, see the :ref:`Metadata <tutorial-metadata>` and :ref:`Requirements <tutorial-requirements>` sections of the :ref:`tutorial <tutorial>`. The examples in this section are based on and work with this starting code.
+
+.. tabs::
+
+    .. tab:: Flex 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load well plate in deck slot D2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location="D2"
+                )
+                # load tip rack in deck slot D3
+                tiprack_1 = protocol.load_labware(
+                    load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="flex_1channel_1000",
+                    mount="left",
+                    tip_racks=[tip_rack_1],
+                )
+                # Put other protocol commands here
+    
+    .. tab:: OT-2 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load well plate in deck slot 2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location=2
+                )
+                # load tip rack in deck slot 3
+                tiprack_1 = protocol.load_labware(
+                    load_name="opentrons_96_tiprack_300ul", location=3
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="p300_single_gen2",
+                    mount="left",
+                    tip_racks=[tip_rack_1]
+                )  
+                # Put other protocol commands here
 
 Manipulating Pipette Tips
 =========================
