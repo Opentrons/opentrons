@@ -19,10 +19,12 @@
   },
   "plungerMotorConfigurations": { "idle": 0.05, "run": 0.5 },
   "plungerPositionsConfigurations": {
-    "top": 19.5,
-    "bottom": 2.5,
-    "blowout": 0.5,
-    "drop": -4.0
+    "default": {
+      "top": 19.5,
+      "bottom": 2.5,
+      "blowout": 0.5,
+      "drop": -4.0
+    }
   },
   "availableSensors": { "sensors": [] },
   "partialTipConfigurations": {

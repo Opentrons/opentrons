@@ -83,6 +83,7 @@ import {
   useIsRobotViewable,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
+  useIsOT3,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
@@ -142,15 +143,17 @@ export function ProtocolRunHeader({
     runRecord?.data?.errors != null
       ? getHighestPriorityError(runRecord?.data?.errors)
       : undefined
-  const { data: estopStatus } = useEstopQuery({
+  const { data: estopStatus, error: estopError } = useEstopQuery({
     refetchInterval: ESTOP_POLL_MS,
   })
   const [
     showEmergencyStopRunBanner,
     setShowEmergencyStopRunBanner,
   ] = React.useState<boolean>(false)
+  const isOT3 = useIsOT3(robotName)
+
   React.useEffect(() => {
-    if (estopStatus?.data.status !== DISENGAGED) {
+    if (estopStatus?.data.status !== DISENGAGED && estopError == null) {
       setShowEmergencyStopRunBanner(true)
     }
   }, [estopStatus?.data.status])
@@ -288,6 +291,8 @@ export function ProtocolRunHeader({
           />
         ) : null}
         {estopStatus?.data.status !== DISENGAGED &&
+        estopError == null &&
+        isOT3 &&
         showEmergencyStopRunBanner ? (
           <EmergencyStopRunBanner
             setShowEmergencyStopRunBanner={setShowEmergencyStopRunBanner}

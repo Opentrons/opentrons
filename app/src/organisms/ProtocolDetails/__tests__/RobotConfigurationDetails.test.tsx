@@ -151,7 +151,6 @@ describe('RobotConfigurationDetails', () => {
       robotType: OT2_STANDARD_MODEL,
     }
     const { queryByText } = render(props)
-    console.log(props.robotType)
     expect(queryByText('extension mount')).not.toBeInTheDocument()
   })
 

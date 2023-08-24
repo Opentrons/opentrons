@@ -6,9 +6,9 @@ import {
   SPACING,
   BORDERS,
   Flex,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { StyledText } from '../text'
-import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -73,8 +73,8 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
     ${disabled && DISABLED_BUTTON_STYLE}
 
-    &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      cursor: default;
     }
   `
 

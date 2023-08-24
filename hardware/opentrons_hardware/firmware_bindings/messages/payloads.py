@@ -521,6 +521,13 @@ class GripperInfoResponsePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class GripperJawStatePayload(EmptyPayload):
+    """A respones carrying info about the jaw state of a gripper."""
+
+    state: utils.UInt8Field
+
+
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 

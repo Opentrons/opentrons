@@ -35,10 +35,11 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     flowType,
     section: SECTIONS.DETACH_PIPETTE,
   }
+  const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
   const is96ChannelPipette =
-    attachedPipettes[mount]?.instrumentName === 'p1000_96'
+    memoizedAttachedPipettes[mount]?.instrumentName === 'p1000_96'
   const handle96ChannelProceed = (): void => {
-    chainRunCommands(
+    chainRunCommands?.(
       [
         {
           commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -57,7 +58,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         proceed()
       })
   }
-  const channel = attachedPipettes[mount]?.data.channels
+  const channel = memoizedAttachedPipettes[mount]?.data.channels
   let bodyText: React.ReactNode = <div></div>
   if (isFetching) {
     bodyText = (
@@ -90,7 +91,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           />
         ) : (
           `${i18n.format(t('loose_detach'))}${
-            attachedPipettes[mount]?.displayName
+            memoizedAttachedPipettes[mount]?.displayName
           }`
         )
       }

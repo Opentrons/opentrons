@@ -81,6 +81,25 @@ const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction
   typeof useMissingHardwareText
 >
 
+const MOCK_DATA = {
+  data: {
+    id: 'mockProtocol1',
+    createdAt: '2022-05-03T21:36:12.494778+00:00',
+    protocolType: 'json',
+    metadata: {
+      protocolName:
+        'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
+      author: 'engineering testing division',
+      description: 'A short mock protocol',
+      created: 1606853851893,
+      tags: ['unitTest'],
+    },
+    analysisSummaries: [],
+    files: [],
+    key: '26ed5a82-502f-4074-8981-57cdda1d066d',
+  },
+}
+
 const render = (path = '/protocols/fakeProtocolId') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
@@ -108,24 +127,8 @@ describe('ODDProtocolDetails', () => {
       isLoading: false,
     })
     mockUseProtocolQuery.mockReturnValue({
-      data: {
-        data: {
-          id: 'mockProtocol1',
-          createdAt: '2022-05-03T21:36:12.494778+00:00',
-          protocolType: 'json',
-          metadata: {
-            protocolName:
-              'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
-            author: 'engineering testing division',
-            description: 'A short mock protocol',
-            created: 1606853851893,
-            tags: ['unitTest'],
-          },
-          analysisSummaries: [],
-          files: [],
-          key: '26ed5a82-502f-4074-8981-57cdda1d066d',
-        },
-      },
+      data: MOCK_DATA,
+      isLoading: false,
     } as any)
     mockUseProtocolAnalysesQuery.mockReturnValue({
       data: {
@@ -217,5 +220,13 @@ describe('ODDProtocolDetails', () => {
     const summaryButton = getByRole('button', { name: 'Summary' })
     summaryButton.click()
     getByText('A short mock protocol')
+  })
+  it('should render a loading skeleton while awaiting a response from the server', () => {
+    mockUseProtocolQuery.mockReturnValue({
+      data: MOCK_DATA,
+      isLoading: true,
+    } as any)
+    const [{ getAllByTestId }] = render()
+    expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
   })
 })

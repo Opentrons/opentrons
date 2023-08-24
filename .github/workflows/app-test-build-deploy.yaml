@@ -181,7 +181,7 @@ jobs:
             echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
             echo "both develop builds for edge"
-            echo 'variants=["release", "internal-release"]' >> GITHUB_OUTPUT
+            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', endsWith(github.ref, 'app-build-internal')) }}" = "true" ] ; then
             echo "internal-release builds for app-build-internal suffixes"
@@ -313,7 +313,7 @@ jobs:
           make -C app-shell-odd dist-ot3
 
   deploy-release-app:
-    name: 'Deploy built release-variant app artifacts to S3'
+    name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
@@ -348,15 +348,7 @@ jobs:
       - name: 'deploy internal-release release builds to s3'
         run: |
           aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
-      - name: 'create GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
-        if: needs.determine-build-type.outputs.type == 'release'
-        with:
-          allowUpdates: true
-          replacesArtifacts: true
-          omitBodyDuringUpdate: true
-          omitPrereleaseDuringUpdate: true
-      - name: 'upload windows artifact to GH release'
+      - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
         if: needs.determine-build-type.outputs.type == 'release'
         with:
@@ -365,11 +357,32 @@ jobs:
           omitDraftDuringUpdate: true
           omitNameDuringUpdate: true
           omitPrereleaseDuringUpdate: true
-          artifacts: ./artifacts/**/*.exe ./artifacts/**/*.dmg ./artifacts/**/*.AppImage
+          artifacts: ./artifacts/*/*.exe
           artifactContentType: application/vnd.microsoft.portable-executable
-      - name: 'detect internal-release build data for notification'
+      - name: 'upload macos artifacts to GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: needs.determine-build-type.outputs.type == 'release'
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./artifacts/*/*.dmg
+          artifactContentType: application/octet-stream
+      - name: 'upload linux artifacts to GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: needs.determine-build-type.outputs.type == 'release'
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./artifacts/*/*.AppImage
+          artifactContentType: application/octet-stream
+      - name: 'detect build data for notification'
         id: names
-        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         shell: bash
         run: |
           for variant in release internal-release ; do

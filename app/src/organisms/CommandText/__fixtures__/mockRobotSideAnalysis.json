@@ -359,6 +359,67 @@
       "completedAt": "2023-01-31T21:53:07.056216+00:00"
     },
     {
+      "id": "7f344b13-6093-4cfa-b018-9f078994e3d3",
+      "createdAt": "2023-01-31T21:53:07.239297+00:00",
+      "commandType": "loadLabware",
+      "key": "abf85339-9dd9-45de-9ac8-8e4597fb7bba",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "slotName": "2"
+        },
+        "loadName": "opentrons_96_flat_bottom_adapter",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "29444782-bdc8-4ad8-92fe-5e28872e85e5:opentrons/opentrons_96_flat_bottom_adapter/1",
+        "definition": {
+          "ordering": [],
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "metadata": {
+            "displayName": "Opentrons 96 Flat Bottom Adapter",
+            "displayCategory": "adapter",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "dimensions": {
+            "xDimension": 111,
+            "yDimension": 75,
+            "zDimension": 7.9
+          },
+          "wells": {},
+          "groups": [
+            {
+              "metadata": {},
+              "wells": []
+            }
+          ],
+          "parameters": {
+            "format": "96Standard",
+            "quirks": [],
+            "isTiprack": false,
+            "isMagneticModuleCompatible": false,
+            "loadName": "opentrons_96_flat_bottom_adapter"
+          },
+          "namespace": "opentrons",
+          "version": 1,
+          "schemaVersion": 2,
+          "allowedRoles": ["adapter"],
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        }
+      },
+      "startedAt": "2023-01-31T21:53:07.242393+00:00",
+      "completedAt": "2023-01-31T21:53:07.245230+00:00"
+    },
+    {
       "id": "73bc8139-4a12-4bb7-bf6d-dfabe490f61f",
       "createdAt": "2023-01-31T21:53:07.239297+00:00",
       "commandType": "loadLabware",

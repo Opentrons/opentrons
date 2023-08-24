@@ -117,11 +117,44 @@ export function parseInitialLoadedLabwareBySlot(
     .reverse()
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
-    (acc, command) =>
-      typeof command.params.location === 'object' &&
-      'slotName' in command.params.location
-        ? { ...acc, [command.params.location.slotName]: command }
-        : acc,
+    (acc, command) => {
+      if (
+        typeof command.params.location === 'object' &&
+        'slotName' in command.params.location
+      ) {
+        return { ...acc, [command.params.location.slotName]: command }
+      } else {
+        return acc
+      }
+    },
+    {}
+  )
+}
+
+interface LoadedLabwareByAdapter {
+  [labwareId: string]: LoadLabwareRunTimeCommand
+}
+export function parseInitialLoadedLabwareByAdapter(
+  commands: RunTimeCommand[]
+): LoadedLabwareByAdapter {
+  const loadLabwareCommandsReversed = commands
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reverse()
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
+    loadLabwareCommandsReversed,
+    (acc, command) => {
+      if (
+        typeof command.params.location === 'object' &&
+        'labwareId' in command.params.location
+      ) {
+        return { ...acc, [command.params.location.labwareId]: command }
+      } else {
+        return acc
+      }
+    },
     {}
   )
 }

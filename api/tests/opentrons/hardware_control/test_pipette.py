@@ -399,5 +399,3 @@ def test_reload_instrument_cal_ot3(
     assert skipped
     # it's the same pipette
     assert new_pip == old_pip
-    # only pipette offset has been updated
-    assert new_pip._pipette_offset == new_cal

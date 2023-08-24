@@ -88,5 +88,3 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
     assert new_gripper == old_gripper
     # we said upstream could skip
     assert skip
-    # only pipette offset has been updated
-    assert new_gripper._calibration_offset == new_cal

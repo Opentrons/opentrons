@@ -47,6 +47,7 @@ describe('MovePin', () => {
           createRunCommand={mockCreateRunCommand}
           errorMessage={null}
           setErrorMessage={mockSetErrorMessage}
+          isExiting={false}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -62,6 +63,7 @@ describe('MovePin', () => {
     const { getByRole } = render()[0]
     await getByRole('button', { name: 'Begin calibration' }).click()
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
         params: { axes: ['extensionZ', 'extensionJaw'] },
@@ -69,6 +71,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: { jaw: 'front' },
@@ -76,6 +79,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
         params: { mount: 'extension' },
@@ -116,6 +120,7 @@ describe('MovePin', () => {
     await getByRole('button', { name: 'Continue' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
         params: { axes: ['extensionZ', 'extensionJaw'] },
@@ -123,6 +128,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: {
@@ -133,6 +139,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
         params: { mount: 'extension' },
@@ -166,6 +173,15 @@ describe('MovePin', () => {
     const { getByText } = render({
       isRobotMoving: true,
       movement: REMOVE_PIN_FROM_REAR_JAW,
+    })[0]
+    getByText('Stand Back, Robot is in Motion')
+  })
+
+  it('renders correct loader for early exiting', () => {
+    const { getByText } = render({
+      isRobotMoving: true,
+      isExiting: true,
+      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
     getByText('Stand Back, Robot is in Motion')
   })

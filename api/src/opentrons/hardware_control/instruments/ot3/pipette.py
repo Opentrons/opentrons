@@ -15,6 +15,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     TipHandlingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
+    PipetteLiquidPropertiesDefinition,
 )
 from ..instrument_abc import AbstractInstrument
 from ..instrument_helpers import (
@@ -63,7 +64,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     ) -> None:
         self._config = config
         self._config_as_dict = config.dict()
-        self._plunger_positions = config.plunger_positions_configurations
         self._plunger_motor_current = config.plunger_motor_configurations
         self._pick_up_configurations = config.pick_up_tip_configurations
         self._drop_configurations = config.drop_tip_configurations
@@ -72,6 +72,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pipette_version = self._config.version
         self._max_channels = self._config.channels
         self._backlash_distance = config.backlash_distance
+
+        self._liquid_class_name = pip_types.LiquidClasses.default
+        self._liquid_class = self._config.liquid_properties[self._liquid_class_name]
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
         self._pipette_name = PipetteNameType(
@@ -87,7 +90,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self._liquid_class.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
@@ -103,8 +106,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self.ready_to_aspirate = False
 
         #: True if ready to aspirate
-        self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._config.max_volume)
+        self._active_tip_settings = self._liquid_class.supported_tips[
+            pip_types.PipetteTipType(self._liquid_class.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
@@ -129,7 +132,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
-        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
+        self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
         if ff.use_old_aspiration_functions():
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
@@ -139,6 +142,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def config(self) -> PipetteConfigurations:
         return self._config
+
+    @property
+    def liquid_class(self) -> PipetteLiquidPropertiesDefinition:
+        return self._liquid_class
 
     @property
     def channels(self) -> pip_types.PipetteChannelType:
@@ -162,7 +169,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def plunger_positions(self) -> PlungerPositions:
-        return self._plunger_positions
+        return self._config.plunger_positions_configurations[self._liquid_class_name]
 
     @property
     def plunger_motor_current(self) -> MotorConfigurations:
@@ -212,14 +219,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def reset_state(self) -> None:
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self.liquid_class.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
         self.ready_to_aspirate = False
         #: True if ready to aspirate
-        self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._config.max_volume)
+        self._active_tip_settings = self.liquid_class.supported_tips[
+            pip_types.PipetteTipType(self.liquid_class.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
@@ -234,7 +241,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
-        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
+        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -435,13 +442,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @working_volume.setter
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
-        self._working_volume = min(self.config.max_volume, tip_volume)
+        self._working_volume = min(self.liquid_class.max_volume, tip_volume)
         tip_size_type = pip_types.PipetteTipType.check_and_return_type(
-            int(self._working_volume), self.config.max_volume
+            int(self._working_volume), self.liquid_class.max_volume
         )
-        self._active_tip_settings = self._config.supported_tips[tip_size_type]
+        self._active_tip_settings = self.liquid_class.supported_tips[tip_size_type]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
+        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
 
     @property
     def available_volume(self) -> float:
@@ -549,7 +556,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
-                "supported_tips": self._config.supported_tips,
+                "supported_tips": self.liquid_class.supported_tips,
             }
         )
         return self._config_as_dict
@@ -565,10 +572,7 @@ def _reload_and_check_skip(
     # match closely enough.
     # Returns a pipette object and True if we may skip hw reconfig
     # TODO this can potentially be removed in a follow-up refactor.
-    if (
-        new_config == attached_instr.config
-        and pipette_offset == attached_instr._pipette_offset
-    ):
+    if new_config == attached_instr.config:
         # Same config, good enough
         return attached_instr, True
     else:

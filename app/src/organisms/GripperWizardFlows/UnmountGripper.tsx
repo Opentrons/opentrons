@@ -71,7 +71,10 @@ export const UnmountGripper = (
       .then(() => {
         setIsPending(false)
         if (!isGripperStillAttached) {
-          chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
+          chainRunCommands?.(
+            [{ commandType: 'home' as const, params: {} }],
+            true
+          )
             .then(() => {
               proceed()
             })
