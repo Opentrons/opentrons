@@ -52,7 +52,10 @@ _log = getLogger(__name__)
 #
 # This does not necessarily have any correspondence with the user-facing
 # robot software version.
-_CURRENT_ANALYZER_VERSION: Final = "initial"
+#
+# Version History
+#     * Changed to "2" for version 7.0 from "initial"
+_CURRENT_ANALYZER_VERSION: Final = "2"
 # We have a reasonable limit for a memory cache of analyses.
 _CACHE_MAX_SIZE: Final = 32
 
