@@ -199,9 +199,6 @@ def test_get_next_tip_skips_picked_up_tip(
                 nozzle_offset_z=1.23,
                 home_position=4.56,
                 default_push_out_volume=3,
-                plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
-                    top=1, bottom=2, blowout=3, drop=4
-                ),
             ),
         )
     )
@@ -260,9 +257,6 @@ def test_reset_tips(
                 nozzle_offset_z=1.23,
                 home_position=4.56,
                 default_push_out_volume=3,
-                plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
-                    top=1, bottom=2, blowout=3, drop=4
-                ),
             ),
         )
     )
@@ -302,9 +296,6 @@ def test_handle_pipette_config_action(
                 nozzle_offset_z=1.23,
                 home_position=4.56,
                 default_push_out_volume=3,
-                plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
-                    top=1, bottom=2, blowout=3, drop=4
-                ),
             ),
         )
     )
@@ -373,9 +364,6 @@ def test_drop_tip(
                 nozzle_offset_z=1.23,
                 home_position=4.56,
                 default_push_out_volume=5,
-                plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
-                    top=1, bottom=2, blowout=3, drop=4
-                ),
             ),
         )
     )

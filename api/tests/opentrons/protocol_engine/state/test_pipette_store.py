@@ -615,9 +615,6 @@ def test_add_pipette_config(
                 home_position=8.9,
                 nozzle_offset_z=10.11,
                 default_push_out_volume=5,
-                plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
-                    top=1, bottom=2, blowout=3, drop=4
-                ),
             ),
         )
     )
