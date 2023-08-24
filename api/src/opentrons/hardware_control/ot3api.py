@@ -821,7 +821,7 @@ class OT3API(
 
         # if position is not known, move toward limit switch at a constant velocity
         if not any(self._backend.gear_motor_position):
-            await self._backend.home_gear_motors(
+            await self._backend.home_tip_motors(
                 distance=self._backend.axis_bounds[Axis.Q][1],
                 velocity=homing_velocity,
             )
@@ -844,7 +844,7 @@ class OT3API(
             ]
 
         # move until the limit switch is triggered, with no acceleration
-        await self._backend.home_gear_motors(
+        await self._backend.home_tip_motors(
             distance=(current_pos_float + self._config.safe_home_distance),
             velocity=homing_velocity,
         )
