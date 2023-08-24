@@ -155,10 +155,7 @@ export const ModuleWizardFlows = (
 
   let chainMaintenanceRunCommands
 
-  if (
-    maintenanceRunData?.data.id != null &&
-    maintenanceRunData.data.id === createdMaintenanceRunId
-  ) {
+  if (maintenanceRunData?.data.id != null) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
       continuePastCommandFailure: boolean

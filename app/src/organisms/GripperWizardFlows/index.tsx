@@ -235,10 +235,7 @@ export const GripperWizard = (
 
   let chainMaintenanceRunCommands
 
-  if (
-    maintenanceRunId != null &&
-    createdMaintenanceRunId === maintenanceRunId
-  ) {
+  if (maintenanceRunId != null) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
