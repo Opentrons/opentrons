@@ -40,7 +40,9 @@ class Plot:
     def import_files(self, path):
         df = pd.DataFrame()
         for item in os.listdir(path):
+            print(item)
             dir = os.path.join(path, item)
+            print(dir)
             if os.path.isdir(dir):
                 for file in os.listdir(dir):
                     if file.lower().endswith('.csv'):
@@ -79,7 +81,9 @@ class Plot:
         return df_avg
 
     def create_plot(self):
-        print("Plotting Force-to-Force...")
+        print("Plotting Force vs Cycle...")
+        self.force_plot()
+        print("Plotting Average Force...")
         self.avg_force_plot()
         print("Plots Saved!")
 
@@ -135,6 +139,38 @@ class Plot:
 
         for key, value in self.plot_param.items():
             self.plot_param[key] = None
+
+    def force_plot(self):
+        df = self.df_data
+        df["Input Force"] = df["Input Force"].astype(str) + " N"
+        part_number = df["Part Number"].iloc[0]
+        input_forces = df["Input Force"].unique()
+        x_axis = "Cycle"
+        y_axis = "Output Force"
+        x_start = df[x_axis].iloc[0]
+        x_end = df[x_axis].iloc[-1]
+        y_start = df[y_axis].iloc[0]
+        y_end = df[y_axis].iloc[-1]
+        fig = px.line(df, x=x_axis, y=[y_axis], color="Input Force", symbol="Input Force", markers=True)
+        fig.update_traces(marker={"size":8})
+
+        avg_annotation = []
+        avg_xpos = df[x_axis].iloc[-1]/2
+        for force in input_forces:
+            avg_force = round(df[df["Input Force"] == force]["Output Force"].mean(), 2)
+            avg_text = f"Avg = {avg_force} N"
+            avg_annotation.append(self.set_annotation(avg_xpos, avg_force, avg_text, ax_pos=50, ay_pos=-50))
+
+        self.plot_param["figure"] = fig
+        self.plot_param["filename"] = "plot_force"
+        self.plot_param["title"] = f"Gripper Force ({part_number})"
+        self.plot_param["x_title"] = "Cycle"
+        self.plot_param["y_title"] = "Output Force (N)"
+        self.plot_param["x_range"] = [x_start, x_end]
+        self.plot_param["y_range"] = [0, 25]
+        self.plot_param["legend"] = "Input Force"
+        self.plot_param["annotation"] = avg_annotation
+        self.write_plot(self.plot_param)
 
     def avg_force_plot(self):
         df = self.df_sum
