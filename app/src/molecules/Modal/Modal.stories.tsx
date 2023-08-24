@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { COLORS, Flex, BORDERS, SPACING } from '@opentrons/components'
+import { customViewports } from '../../../../.storybook/preview'
 import { Modal } from './Modal'
 import type { Story, Meta } from '@storybook/react'
 
@@ -11,6 +12,12 @@ export default {
       control: { type: 'radio' },
     },
     onOutsideClick: { action: 'clicked' },
+  },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
   },
 } as Meta
 

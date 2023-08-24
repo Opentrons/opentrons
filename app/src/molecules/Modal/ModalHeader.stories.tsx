@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
+import { customViewports } from '../../../../.storybook/preview'
 import { ModalHeader } from './ModalHeader'
 import type { Story, Meta } from '@storybook/react'
 
@@ -22,6 +23,12 @@ export default {
       },
     },
     onClick: { action: 'clicked' },
+  },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
   },
 } as Meta
 

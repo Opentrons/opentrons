@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
+import { customViewports } from '../../../../.storybook/preview'
 import { MediumButton } from './'
 import type { Story, Meta } from '@storybook/react'
-import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
 
 export default {
   title: 'ODD/Atoms/Buttons/MediumButton',
@@ -26,6 +27,12 @@ export default {
         type: 'text',
       },
       defaultValue: undefined,
+    },
+  },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
     },
   },
 } as Meta

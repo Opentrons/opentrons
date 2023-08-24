@@ -1,10 +1,17 @@
 import * as React from 'react'
+import { customViewports } from '../../../../.storybook/preview'
 import { LargeButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Buttons/LargeButton',
   argTypes: { onClick: { action: 'clicked' } },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
 } as Meta
 
 const LargeButtonTemplate: Story<

@@ -6,17 +6,25 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
-import { TerseOffsetTable } from './ResultsSummary'
-import type { Story, Meta } from '@storybook/react'
-
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { LabwareDefinition2, getLabwareDefURI } from '@opentrons/shared-data'
+
+import { customViewports } from '../../../../.storybook/preview'
 import { SmallButton } from '../../atoms/buttons'
+import { TerseOffsetTable } from './ResultsSummary'
+
+import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Organisms/TerseOffsetTable',
   component: TerseOffsetTable,
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
 } as Meta
 
 // Note: 59rem(944px) is the size of ODD

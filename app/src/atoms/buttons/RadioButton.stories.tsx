@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { customViewports } from '../../../../.storybook/preview'
+
 import { RadioButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
@@ -13,6 +15,12 @@ export default {
       defaultValue: 'large',
     },
     onClick: { action: 'clicked' },
+  },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
   },
 } as Meta
 

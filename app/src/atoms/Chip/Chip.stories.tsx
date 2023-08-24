@@ -1,11 +1,18 @@
 import * as React from 'react'
 import { Flex, COLORS, SPACING } from '@opentrons/components'
+import { customViewports } from '../../../../.storybook/preview'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Chip',
   component: Chip,
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
 } as Meta
 
 interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {

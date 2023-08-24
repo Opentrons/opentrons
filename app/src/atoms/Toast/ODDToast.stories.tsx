@@ -8,6 +8,7 @@ import {
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
+import { customViewports } from '../../../../.storybook/preview'
 import { StyledText } from '../text'
 import { Toast } from '.'
 import type { Story, Meta } from '@storybook/react'
@@ -15,6 +16,12 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/Toast',
   component: Toast,
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Toast>> = args => {

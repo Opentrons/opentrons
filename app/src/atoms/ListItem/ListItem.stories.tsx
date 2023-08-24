@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { customViewports } from '../../../../.storybook/preview'
 import { StyledText } from '../text'
 import { ListItem } from '.'
 import type { Story, Meta } from '@storybook/react'
@@ -12,6 +13,12 @@ export default {
         type: 'select',
         options: ['error', 'noActive', 'success', 'warning'],
       },
+    },
+  },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
     },
   },
 } as Meta

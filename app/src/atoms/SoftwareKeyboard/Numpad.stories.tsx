@@ -5,14 +5,21 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
+import { customViewports } from '../../../../.storybook/preview'
 import { InputField } from '../InputField'
 import { Numpad } from './'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Odd/Atoms/SoftwareKeyboard/Numpad',
+  title: 'ODD/Atoms/SoftwareKeyboard/Numpad',
   component: Numpad,
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Numpad>> = args => {

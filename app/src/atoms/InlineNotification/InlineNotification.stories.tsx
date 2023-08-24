@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { customViewports } from '../../../../.storybook/preview'
 import { InlineNotification } from '.'
 import type { Story, Meta } from '@storybook/react'
 
@@ -23,6 +24,12 @@ export default {
         type: 'boolean',
       },
       defaultValue: true,
+    },
+  },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
     },
   },
 } as Meta

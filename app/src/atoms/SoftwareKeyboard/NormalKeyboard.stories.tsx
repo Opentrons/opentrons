@@ -5,6 +5,7 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
+import { customViewports } from '../../../../.storybook/preview'
 import { InputField } from '../InputField'
 import { NormalKeyboard } from './'
 import '../../styles.global.css'
@@ -12,8 +13,14 @@ import '../../styles.global.css'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Odd/Atoms/SoftwareKeyboard/NormalKeyboard',
+  title: 'ODD/Atoms/SoftwareKeyboard/NormalKeyboard',
   component: NormalKeyboard,
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof NormalKeyboard>> = args => {

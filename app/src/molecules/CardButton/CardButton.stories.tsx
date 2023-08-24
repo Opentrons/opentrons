@@ -1,14 +1,21 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { Flex, SPACING } from '@opentrons/components'
+import { customViewports } from '../../../../.storybook/preview'
 import { GlobalStyle } from '../../atoms/GlobalStyle'
 import { CardButton } from '.'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Odd/Molecules/CardButton',
+  title: 'ODD/Molecules/CardButton',
   component: CardButton,
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
   decorators: [
     Story => (
       <>

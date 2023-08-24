@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { FloatingActionButton } from './'
-import type { Story, Meta } from '@storybook/react'
 import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
+import { customViewports } from '../../../../.storybook/preview'
+import { FloatingActionButton } from './'
+
+import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Buttons/FloatingActionButton',
@@ -14,6 +16,12 @@ export default {
       defaultValue: undefined,
     },
     onClick: { action: 'clicked' },
+  },
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
   },
 } as Meta
 
