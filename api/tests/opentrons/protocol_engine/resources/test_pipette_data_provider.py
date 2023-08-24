@@ -41,9 +41,6 @@ def test_get_virtual_pipette_static_config() -> None:
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
         default_push_out_volume=0,
-        plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
-            top=19.5, bottom=-8.5, blowout=-13.0, drop=-27.0
-        ),
     )
 
 
@@ -87,9 +84,6 @@ def test_get_pipette_static_config(
         "default_blow_out_volume": 10,
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
-        "plunger_positions": pipette_definition.PlungerPositions(
-            top=1, bottom=2, blowout=3, drop=4
-        ),
     }
 
     result = subject.get_pipette_static_config(pipette_dict)
@@ -116,7 +110,4 @@ def test_get_pipette_static_config(
         nozzle_offset_z=0,
         home_position=0,
         default_push_out_volume=3,
-        plunger_positions_for_liquid_class=pipette_definition.PlungerPositions(
-            top=1, bottom=2, blowout=3, drop=4
-        ),
     )
