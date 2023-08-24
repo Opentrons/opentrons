@@ -54,8 +54,19 @@ export const ModuleWizardFlows = (
       currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+    string | null
+  >(null)
+  // we should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = React.useState<boolean>(false)
+
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: createdMaintenanceRunId != null,
   })
   const {
     chainRunCommands,
@@ -65,18 +76,33 @@ export const ModuleWizardFlows = (
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation()
+  } = useCreateMaintenanceRunMutation({
+    onSuccess: response => {
+      setCreatedMaintenanceRunId(response.data.id)
+    },
+  })
 
-  const prevMaintenanceRunId = React.useRef<string | undefined>(
-    maintenanceRunData?.data.id
-  )
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
-    if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
+    if (
+      createdMaintenanceRunId !== null &&
+      maintenanceRunData?.data.id === createdMaintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    }
+    if (
+      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
       closeFlow()
     }
-  }, [maintenanceRunData, closeFlow])
+  }, [
+    maintenanceRunData?.data.id,
+    createdMaintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    closeFlow,
+  ])
 
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
