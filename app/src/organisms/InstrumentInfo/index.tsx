@@ -21,8 +21,8 @@ import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { useMaintenanceRunTakeover } from '../TakeoverModal'
-import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -128,7 +128,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               label={t('last_calibrated')}
               value={
                 instrument.data.calibratedOffset?.last_modified != null
-                  ? formatTimestamp(
+                  ? formatTimeWithUtcLabel(
                       instrument.data.calibratedOffset?.last_modified
                     )
                   : i18n.format(t('no_cal_data'), 'capitalize')

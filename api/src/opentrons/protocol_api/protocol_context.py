@@ -597,6 +597,7 @@ class ProtocolContext(CommandPublisher):
             labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
+            pause_for_manual_move=True,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )

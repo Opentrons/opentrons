@@ -226,6 +226,9 @@ describe('LabwareListItem', () => {
         location: { slotName: 7 },
         model: 'temperatureModuleV2',
       },
+      result: {
+        moduleId: mockModuleId,
+      },
     } as any
 
     const { getByText } = render({
