@@ -285,6 +285,7 @@ def _drop_tip(
 def _get_volumes(
     ctx: ProtocolContext,
     increment: bool,
+    pipette_channels: int,
     pipette_volume: int,
     tip_volume: int,
     user_volumes: bool,
@@ -294,7 +295,9 @@ def _get_volumes(
 ) -> List[float]:
     if increment:
         print("if")
-        test_volumes = get_volume_increments(pipette_volume, tip_volume)
+        test_volumes = get_volume_increments(
+            pipette_channels, pipette_volume, tip_volume
+        )
     elif user_volumes and not ctx.is_simulating():
         print("elif")
         _inp = input(
