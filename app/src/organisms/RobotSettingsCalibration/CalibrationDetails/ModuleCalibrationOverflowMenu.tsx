@@ -49,6 +49,7 @@ export function ModuleCalibrationOverflowMenu({
   })
 
   const handleCalibration = (): void => {
+    setShowOverflowMenu(false)
     setShowModuleWizard(true)
   }
 
@@ -84,7 +85,7 @@ export function ModuleCalibrationOverflowMenu({
         <Flex
           ref={OverflowMenuRef}
           whiteSpace="nowrap"
-          zIndex={10}
+          zIndex="5"
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
