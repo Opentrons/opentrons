@@ -1101,7 +1101,7 @@ class OT3Controller:
         log_pressure: bool = True,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
-        sensor_id: SensorId = SensorId.S0,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
@@ -1116,7 +1116,7 @@ class OT3Controller:
             log_pressure,
             auto_zero_sensor,
             num_baseline_reads,
-            sensor_id,
+            sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
             self._position.update({node: point[0]})

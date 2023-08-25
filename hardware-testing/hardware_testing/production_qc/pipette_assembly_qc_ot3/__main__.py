@@ -23,6 +23,7 @@ from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
     SubSystem,
+    InstrumentProbeType
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
@@ -127,7 +128,8 @@ class LabwareLocations:
     tip_rack_200: Optional[Point]
     tip_rack_50: Optional[Point]
     reservoir: Optional[Point]
-    plate: Optional[Point]
+    plate_primary: Optional[Point]
+    plate_secondary: Optional[Point]
     fixture: Optional[Point]
 
 
@@ -139,7 +141,8 @@ IDEAL_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     tip_rack_200=None,
     tip_rack_50=None,
     reservoir=None,
-    plate=None,
+    plate_primary=None,
+    plate_secondary=None,
     fixture=None,
 )
 CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
@@ -148,7 +151,8 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     tip_rack_200=None,
     tip_rack_50=None,
     reservoir=None,
-    plate=None,
+    plate_primary=None,
+    plate_secondary=None,
     fixture=None,
 )
 
@@ -193,6 +197,17 @@ PRESSURE_THRESH_COMPRESS = {
     1: [-2600, 1600],
     8: [-4600, -2600]
 }
+
+_trash_loc_counter = 0
+TRASH_OFFSETS = [
+    Point(x=(64 * -0.75)),
+    Point(x=(64 * -0.5)),
+    Point(x=(64 * -0.25)),
+    Point(x=(64 * 0)),
+    Point(x=(64 * 0.25)),
+    Point(x=(64 * 0.5)),
+    Point(x=(64 * 0.75)),
+]
 
 
 def _bool_to_pass_fail(result: bool) -> str:
@@ -263,7 +278,8 @@ def _get_ideal_labware_locations(
         tip_rack_200=tip_rack_200_loc_ideal,
         tip_rack_50=tip_rack_50_loc_ideal,
         reservoir=reservoir_loc_ideal,
-        plate=plate_loc_ideal + Point(z=5),  # give a few extra mm to help alignment
+        plate_primary=plate_loc_ideal + Point(z=5),  # give a few extra mm to help alignment
+        plate_secondary=plate_loc_ideal + Point(z=5),  # give a few extra mm to help alignment
         trash=trash_loc_ideal,
         fixture=fixture_loc_ideal,
     )
@@ -369,27 +385,47 @@ async def _move_to_reservoir_liquid(api: OT3API, mount: OT3Mount) -> None:
     )
 
 
-async def _move_to_plate_liquid(api: OT3API, mount: OT3Mount) -> None:
-    CALIBRATED_LABWARE_LOCATIONS.plate = await _move_to_or_calibrate(
-        api,
-        mount,
-        IDEAL_LABWARE_LOCATIONS.plate,
-        CALIBRATED_LABWARE_LOCATIONS.plate,
-    )
+async def _move_to_plate_liquid(api: OT3API, mount: OT3Mount, probe: InstrumentProbeType) -> None:
+    if probe == InstrumentProbeType.PRIMARY:
+        CALIBRATED_LABWARE_LOCATIONS.plate_primary = await _move_to_or_calibrate(
+            api,
+            mount,
+            IDEAL_LABWARE_LOCATIONS.plate_primary,
+            CALIBRATED_LABWARE_LOCATIONS.plate_primary,
+        )
+    else:
+        # move towards back of machine, so 8th channel can reach well
+        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = await _move_to_or_calibrate(
+            api,
+            mount,
+            IDEAL_LABWARE_LOCATIONS.plate_secondary + Point(y=9 * 7),
+            CALIBRATED_LABWARE_LOCATIONS.plate_secondary,
+        )
 
 
 async def _move_to_above_plate_liquid(
-    api: OT3API, mount: OT3Mount, height_mm: float
+    api: OT3API, mount: OT3Mount, probe: InstrumentProbeType, height_mm: float
 ) -> None:
-    assert (
-        CALIBRATED_LABWARE_LOCATIONS.plate
-    ), "you must calibrate the liquid before hovering"
-    await _move_to_or_calibrate(
-        api,
-        mount,
-        IDEAL_LABWARE_LOCATIONS.plate,
-        CALIBRATED_LABWARE_LOCATIONS.plate + Point(z=height_mm),
-    )
+    if probe == InstrumentProbeType.PRIMARY:
+        assert (
+            CALIBRATED_LABWARE_LOCATIONS.plate_primary
+        ), "you must calibrate the liquid before hovering"
+        await _move_to_or_calibrate(
+            api,
+            mount,
+            IDEAL_LABWARE_LOCATIONS.plate_primary,
+            CALIBRATED_LABWARE_LOCATIONS.plate_primary + Point(z=height_mm),
+        )
+    else:
+        assert (
+            CALIBRATED_LABWARE_LOCATIONS.plate_secondary
+        ), "you must calibrate the liquid before hovering"
+        await _move_to_or_calibrate(
+            api,
+            mount,
+            IDEAL_LABWARE_LOCATIONS.plate_secondary,
+            CALIBRATED_LABWARE_LOCATIONS.plate_secondary + Point(z=height_mm),
+        )
 
 
 async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
@@ -403,12 +439,15 @@ async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
 
 
 async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
+    global _trash_loc_counter
     # assume the ideal is accurate enough
     ideal = IDEAL_LABWARE_LOCATIONS.trash
     assert ideal
+    random_trash_pos = ideal + TRASH_OFFSETS[_trash_loc_counter]
+    _trash_loc_counter = (_trash_loc_counter + 1) % len(TRASH_OFFSETS)
     current_pos = await api.gantry_position(mount)
-    safe_height = max(ideal.z, current_pos.z) + SAFE_HEIGHT_TRAVEL
-    await helpers_ot3.move_to_arched_ot3(api, mount, ideal, safe_height=safe_height)
+    safe_height = max(random_trash_pos.z, current_pos.z) + SAFE_HEIGHT_TRAVEL
+    await helpers_ot3.move_to_arched_ot3(api, mount, random_trash_pos, safe_height=safe_height)
     await api.drop_tip(mount, home_after=False)
 
 
@@ -483,6 +522,8 @@ async def _read_pressure_and_check_results(
     _samples_min = min(_samples_clipped)
     _samples_max = max(_samples_clipped)
     if _samples_max - _samples_min > pressure_event_config.stability_threshold:
+        print(f"ERROR: samples are too far apart, "
+              f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}")
         test_pass_stability = False
     else:
         test_pass_stability = True
@@ -497,6 +538,8 @@ async def _read_pressure_and_check_results(
         _samples_min < pressure_event_config.min
         or _samples_max > pressure_event_config.max
     ):
+        print(f"ERROR: samples are out of range, "
+              f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}")
         test_pass_accuracy = False
     else:
         test_pass_accuracy = True
@@ -759,6 +802,10 @@ async def _test_diagnostics_capacitive(
     sensor_ids = [SensorId.S0]
     if pip.channels == 8:
         sensor_ids.append(SensorId.S1)
+    sensor_to_probe = {
+        SensorId.S0: InstrumentProbeType.PRIMARY,
+        SensorId.S1: InstrumentProbeType.SECONDARY
+    }
 
     async def _read_cap(_sensor_id: SensorId) -> float:
         return await _read_pipette_sensor_repeatedly_and_average(
@@ -827,8 +874,8 @@ async def _test_diagnostics_capacitive(
             if api.is_simulator:
                 pass
             try:
-                front_channel = True if sensor_id == SensorId.S1 else False
-                await calibrate_pipette(api, mount, slot=5, front_channel=front_channel)  # type: ignore[arg-type]
+                probe = sensor_to_probe[sensor_id]
+                await calibrate_pipette(api, mount, slot=5, probe=probe)  # type: ignore[arg-type]
             except (
                 EdgeNotFoundError,
                 EarlyCapacitiveSenseTrigger,
@@ -1028,12 +1075,11 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
     # CAPACITIVE SENSOR
     print("SKIPPING CAPACITIVE TESTS")
-    capacitance_pass = False
-    # pip = api.hardware_pipettes[mount.to_mount()]
-    # assert pip
-    # capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
-    # print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
-    # write_cb([f"diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
+    print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
+    write_cb([f"diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
     # PRESSURE
     pressure_pass = await _test_diagnostics_pressure(api, mount, write_cb)
     print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
@@ -1103,6 +1149,9 @@ async def _jog_for_tip_state(
 async def _test_tip_presence_flag(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_channels = pip.channels.value
     await api.retract(mount)
     slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     current_pos = await api.gantry_position(mount)
@@ -1112,7 +1161,10 @@ async def _test_tip_presence_flag(
     if not api.is_simulator:
         input("press ENTER to continue")
 
-    offset_from_a1 = Point(x=9 * 11, y=9 * -7, z=-5)
+    if pip_channels == 1:
+        offset_from_a1 = Point(x=9 * 11, y=9 * -7, z=-5)
+    else:
+        offset_from_a1 = Point(x=9 * 11, y=0, z=-5)
     nominal_test_pos = (
         IDEAL_LABWARE_LOCATIONS.tip_rack_50 + offset_from_a1  # type: ignore[operator]
     )
@@ -1122,15 +1174,15 @@ async def _test_tip_presence_flag(
     await helpers_ot3.jog_mount_ot3(api, mount)
     nozzle_pos = await api.gantry_position(mount)
     print(f"nozzle: {nozzle_pos.z}")
-    await api.move_rel(mount, Point(z=-6))
+    if pip_channels == 1:
+        await api.move_rel(mount, Point(z=-6))
+    else:
+        await api.move_rel(mount, Point(z=-2))
     print("align EJECTOR with tip-rack HOLE:")
     await helpers_ot3.jog_mount_ot3(api, mount)
     ejector_pos = await api.gantry_position(mount)
     ejector_rel_pos = round(ejector_pos.z - nozzle_pos.z, 2)
 
-    pip = api.hardware_pipettes[mount.to_mount()]
-    assert pip
-    pip_channels = pip.channels.value
     pick_up_criteria = {
         1: (
             ejector_rel_pos + -1.3,
@@ -1232,46 +1284,49 @@ PROBE_SETTINGS: Dict[int, Dict[int, _LiqProbeCfg]] = {
 
 
 async def _test_liquid_probe(
-    api: OT3API, mount: OT3Mount, tip_volume: int, trials: int
-) -> List[float]:
+    api: OT3API, mount: OT3Mount, tip_volume: int, trials: int, probes: List[InstrumentProbeType],
+) -> Dict[InstrumentProbeType, List[float]]:
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
-    # force the operator to re-calibrate the liquid every time
-    CALIBRATED_LABWARE_LOCATIONS.plate = None
-    await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
-    await _move_to_plate_liquid(api, mount)
-    await _drop_tip_in_trash(api, mount)
-    trial_results: List[float] = []
+    trial_results: Dict[InstrumentProbeType, List[float]] = {
+        probe: []
+        for probe in probes
+    }
     hover_mm = 3
     max_submerge_mm = -3
     max_z_distance_machine_coords = hover_mm - max_submerge_mm
-    assert CALIBRATED_LABWARE_LOCATIONS.plate is not None
-    target_z = CALIBRATED_LABWARE_LOCATIONS.plate.z
+    assert CALIBRATED_LABWARE_LOCATIONS.plate_primary is not None
+    if InstrumentProbeType.SECONDARY in probes:
+        assert CALIBRATED_LABWARE_LOCATIONS.plate_secondary is not None
     for trial in range(trials):
         await api.home()
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
-        await _move_to_above_plate_liquid(api, mount, height_mm=hover_mm)
-        start_pos = await api.gantry_position(mount)
-        probe_cfg = PROBE_SETTINGS[pip_vol][tip_volume]
-        probe_settings = LiquidProbeSettings(
-            starting_mount_height=start_pos.z,
-            max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
-            min_z_distance=0,  # FIXME: remove
-            mount_speed=probe_cfg.mount_speed,
-            plunger_speed=probe_cfg.plunger_speed,
-            sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
-            expected_liquid_height=0,  # FIXME: remove
-            log_pressure=False,  # FIXME: remove
-            aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
-            auto_zero_sensor=True,  # TODO: when would we want to adjust this?
-            num_baseline_reads=10,  # TODO: when would we want to adjust this?
-            data_file="",  # FIXME: remove
-        )
-        end_z = await api.liquid_probe(mount, probe_settings)
-        error_mm = end_z - target_z
-        print(f"liquid-probe error: {error_mm}")
-        trial_results.append(end_z - target_z)  # store the mm error from target
+        for probe in probes:
+            await _move_to_above_plate_liquid(api, mount, probe, height_mm=hover_mm)
+            start_pos = await api.gantry_position(mount)
+            probe_cfg = PROBE_SETTINGS[pip_vol][tip_volume]
+            probe_settings = LiquidProbeSettings(
+                starting_mount_height=start_pos.z,
+                max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
+                min_z_distance=0,  # FIXME: remove
+                mount_speed=probe_cfg.mount_speed,
+                plunger_speed=probe_cfg.plunger_speed,
+                sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
+                expected_liquid_height=0,  # FIXME: remove
+                log_pressure=False,  # FIXME: remove
+                aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
+                auto_zero_sensor=True,  # TODO: when would we want to adjust this?
+                num_baseline_reads=10,  # TODO: when would we want to adjust this?
+                data_file="",  # FIXME: remove
+            )
+            end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
+            if probe == InstrumentProbeType.PRIMARY:
+                error_mm = end_z - CALIBRATED_LABWARE_LOCATIONS.plate_primary.z
+            else:
+                error_mm = end_z - CALIBRATED_LABWARE_LOCATIONS.plate_secondary.z
+            print(f"liquid-probe error: {error_mm}")
+            trial_results[probe].append(error_mm)  # store the mm error from target
         await _drop_tip_in_trash(api, mount)
     return trial_results
 
@@ -1440,7 +1495,8 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             tip_rack_200=None,
             tip_rack_50=None,
             reservoir=None,
-            plate=None,
+            plate_primary=None,
+            plate_secondary=None,
             fixture=None,
         )
 
@@ -1530,53 +1586,67 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                 _bool_to_pass_fail(barcode_passed),
             ]
         )
+        pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
+        current_pos = await api.gantry_position(mount)
+        hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
 
         if not test_config.skip_plunger or not test_config.skip_diagnostics:
-            print("moving over slot 3")
-            pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
-            current_pos = await api.gantry_position(mount)
-            hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
-            await api.move_to(mount, hover_over_slot_3)
-            await api.move_rel(mount, Point(z=-20))
             if not test_config.skip_diagnostics:
+                await api.move_to(mount, hover_over_slot_3)
+                await api.move_rel(mount, Point(z=-20))
                 test_passed = await _test_diagnostics(api, mount, csv_cb.write)
+                await api.retract(mount)
                 csv_cb.results("diagnostics", test_passed)
             if not test_config.skip_plunger:
+                await api.move_to(mount, hover_over_slot_3)
+                await api.move_rel(mount, Point(z=-20))
                 test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
                 csv_cb.results("plunger", test_passed)
 
         if not test_config.skip_liquid_probe:
             tip_vols = [50] if pipette_volume == 50 else [50, 200, 1000]
+            probes = [InstrumentProbeType.PRIMARY]
+            if pipette_channels > 1:
+                probes.append(InstrumentProbeType.SECONDARY)
             test_passed = True
             for tip_vol in tip_vols:
-                probe_data = await _test_liquid_probe(
-                    api, mount, tip_volume=tip_vol, trials=3
+                # force the operator to re-calibrate the liquid for each tip-type
+                CALIBRATED_LABWARE_LOCATIONS.plate_primary = None
+                CALIBRATED_LABWARE_LOCATIONS.plate_secondary = None
+                await _pick_up_tip_for_tip_volume(api, mount, tip_vol)
+                for probe in probes:
+                    await _move_to_plate_liquid(api, mount, probe=probe)
+                await _drop_tip_in_trash(api, mount)
+                probes_data = await _test_liquid_probe(
+                    api, mount, tip_volume=tip_vol, trials=3, probes=probes
                 )
-                for trial, found_height in enumerate(probe_data):
-                    csv_label = f"liquid-probe-{tip_vol}-tip-trial-{trial}"
-                    csv_cb.write([csv_label, round(found_height, 2)])
-                precision = abs(max(probe_data) - min(probe_data)) * 0.5
-                accuracy = sum(probe_data) / len(probe_data)
-                prec_tag = f"liquid-probe-{tip_vol}-tip-precision"
-                acc_tag = f"liquid-probe-{tip_vol}-tip-accuracy"
-                tip_tag = f"liquid-probe-{tip_vol}-tip"
-                precision_passed = bool(
-                    precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
-                )
-                accuracy_passed = bool(
-                    abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
-                )
-                tip_passed = precision_passed and accuracy_passed
-                print(prec_tag, precision, _bool_to_pass_fail(precision_passed))
-                print(acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed))
-                print(tip_tag, _bool_to_pass_fail(tip_passed))
-                csv_cb.write(
-                    [prec_tag, precision, _bool_to_pass_fail(precision_passed)]
-                )
-                csv_cb.write([acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed)])
-                csv_cb.write([tip_tag, _bool_to_pass_fail(tip_passed)])
-                if not tip_passed:
-                    test_passed = False
+                for probe in probes:
+                    probe_data = probes_data[probe]
+                    for trial, found_height in enumerate(probe_data):
+                        csv_label = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-trial-{trial}"
+                        csv_cb.write([csv_label, round(found_height, 2)])
+                    precision = abs(max(probe_data) - min(probe_data)) * 0.5
+                    accuracy = sum(probe_data) / len(probe_data)
+                    prec_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision"
+                    acc_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy"
+                    tip_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe"
+                    precision_passed = bool(
+                        precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
+                    )
+                    accuracy_passed = bool(
+                        abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
+                    )
+                    tip_passed = precision_passed and accuracy_passed
+                    print(prec_tag, precision, _bool_to_pass_fail(precision_passed))
+                    print(acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed))
+                    print(tip_tag, _bool_to_pass_fail(tip_passed))
+                    csv_cb.write(
+                        [prec_tag, precision, _bool_to_pass_fail(precision_passed)]
+                    )
+                    csv_cb.write([acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed)])
+                    csv_cb.write([tip_tag, _bool_to_pass_fail(tip_passed)])
+                    if not tip_passed:
+                        test_passed = False
             csv_cb.results("liquid-probe", test_passed)
 
         if not test_config.skip_liquid:

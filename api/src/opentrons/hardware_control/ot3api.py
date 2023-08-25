@@ -2201,6 +2201,7 @@ class OT3API(
         self,
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
+        probe: Optional[InstrumentProbeType] = None,
     ) -> float:
         """Search for and return liquid level height.
 
@@ -2256,6 +2257,7 @@ class OT3API(
             probe_settings.log_pressure,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
+            probe=probe,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, probe_start_pos)
