@@ -77,7 +77,6 @@ def get_virtual_pipette_static_config(
 
 def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteData:
     """Get the config for a pipette, given the state/config object from the HW API."""
-    print(f"pipette_dict {pipette_dict}")
     return LoadedStaticPipetteData(
         model=pipette_dict["model"],
         display_name=pipette_dict["display_name"],
