@@ -195,6 +195,7 @@ class RunArgs:
             vls = helpers._get_volumes(
                 _ctx,
                 args.increment,
+                args.channels,
                 args.pipette,
                 tip,
                 args.user_volumes,
@@ -215,6 +216,7 @@ class RunArgs:
                 vls = helpers._get_volumes(
                     _ctx,
                     args.increment,
+                    args.channels,
                     args.pipette,
                     tip,
                     args.user_volumes,
