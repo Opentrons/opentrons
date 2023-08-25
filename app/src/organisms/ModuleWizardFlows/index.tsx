@@ -21,6 +21,7 @@ import { AttachProbe } from './AttachProbe'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
+import { THERMOCYCLER_MODULE_MODELS } from '../../../../shared-data/js/constants'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -38,16 +39,25 @@ const RUN_REFETCH_INTERVAL = 5000
 export const ModuleWizardFlows = (
   props: ModuleWizardFlowsProps
 ): JSX.Element | null => {
-  const { attachedModule, slotName, closeFlow, onComplete } = props
+  const { attachedModule, closeFlow, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-
+  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
   const currentStep = moduleCalibrationSteps?.[currentStepIndex]
+
+  // TODO: add slot select tile if slotName not provided (ND 8/25/23)
+  const slotName =
+    props.slotName ??
+    THERMOCYCLER_MODULE_MODELS.some(
+      model => model === attachedModule.moduleModel
+    )
+      ? 'B1'
+      : 'D1'
 
   const goBack = (): void => {
     setCurrentStepIndex(
@@ -142,9 +152,9 @@ export const ModuleWizardFlows = (
         continuePastCommandFailure
       )
   }
-
+  if (currentStep == null || attachedPipette == null) return null
   const calibrateBaseProps = {
-    attachedPipettes,
+    attachedPipette,
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
@@ -155,8 +165,8 @@ export const ModuleWizardFlows = (
     isOnDevice,
     attachedModule,
     slotName,
+    isExiting,
   }
-  if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />
