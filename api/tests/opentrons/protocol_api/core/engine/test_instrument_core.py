@@ -533,7 +533,7 @@ def test_dispense_to_well(
         rate=5.6,
         flow_rate=6.0,
         in_place=False,
-        push_out=None,
+        push_out=7,
     )
 
     decoy.verify(
@@ -546,7 +546,7 @@ def test_dispense_to_well(
             ),
             volume=12.34,
             flow_rate=6.0,
-            push_out=None,
+            push_out=7,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
