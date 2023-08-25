@@ -356,7 +356,7 @@ class LegacyProtocolCore(
     @property
     def fixed_trash(self) -> LegacyLabwareCore:
         """The trash fixed to slot 12 of the robot deck."""
-        trash = self._deck_layout["12"]
+        trash = self._deck_layout["1"]
 
         if isinstance(trash, LegacyLabwareCore):
             return trash

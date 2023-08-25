@@ -266,7 +266,7 @@
     "fixtures": [
       {
         "id": "fixedTrash",
-        "slot": "12",
+        "slot": "1",
         "labware": "opentrons_1_trash_1100ml_fixed",
         "displayName": "Fixed Trash"
       }
