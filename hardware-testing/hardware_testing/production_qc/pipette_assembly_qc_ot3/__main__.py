@@ -171,10 +171,28 @@ CAP_THRESH_SQUARE = {
 }
 
 # THRESHOLDS: air-pressure sensor
-PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 20.0}
-PRESSURE_THRESH_OPEN_AIR = [-15, 15]
-PRESSURE_THRESH_SEALED = [-50, 50]
-PRESSURE_THRESH_COMPRESS = [-2600, 1600]
+PRESSURE_ASPIRATE_VOL = {
+    1: {
+        50: 10.0,
+        1000: 20.0
+    },
+    8: {
+        50: 10.0,
+        1000: 20.0
+    }
+}
+PRESSURE_THRESH_OPEN_AIR = {
+    1: [-15, 15],
+    8: [-15, 15]
+}
+PRESSURE_THRESH_SEALED = {
+    1: [-50, 50],
+    8: [0, 70]
+}
+PRESSURE_THRESH_COMPRESS = {
+    1: [-2600, 1600],
+    8: [-4600, -2600]
+}
 
 
 def _bool_to_pass_fail(result: bool) -> str:
@@ -898,6 +916,7 @@ async def _test_diagnostics_pressure(
     results: List[bool] = []
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
+    pip_channels = int(pip.channels)
     sensor_ids = [SensorId.S0]
     if pip.channels == 8:
         sensor_ids.append(SensorId.S1)
@@ -914,8 +933,8 @@ async def _test_diagnostics_pressure(
         pressure = await _read_pressure(sensor_id)
         print(f"pressure-open-air-{sensor_id.name}: {pressure}")
         if (
-            pressure < PRESSURE_THRESH_OPEN_AIR[0]
-            or pressure > PRESSURE_THRESH_OPEN_AIR[1]
+            pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][0]
+            or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][1]
         ):
             results.append(False)
             print(
@@ -946,7 +965,7 @@ async def _test_diagnostics_pressure(
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         print(f"pressure-sealed: {pressure}")
-        if pressure < PRESSURE_THRESH_SEALED[0] or pressure > PRESSURE_THRESH_SEALED[1]:
+        if pressure < PRESSURE_THRESH_SEALED[pip_channels][0] or pressure > PRESSURE_THRESH_SEALED[pip_channels][1]:
             results.append(False)
             print(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
         else:
@@ -963,15 +982,16 @@ async def _test_diagnostics_pressure(
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
-    plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[pip_vol]
+    pip_channels = int(pip.channels)
+    plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[pip_channels][pip_vol]
     print(f"aspirate {plunger_aspirate_ul} ul")
     await api.aspirate(mount, plunger_aspirate_ul)
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         print(f"pressure-compressed-{sensor_id.name}: {pressure}")
         if (
-            pressure < PRESSURE_THRESH_COMPRESS[0]
-            or pressure > PRESSURE_THRESH_COMPRESS[1]
+            pressure < PRESSURE_THRESH_COMPRESS[pip_channels][0]
+            or pressure > PRESSURE_THRESH_COMPRESS[pip_channels][1]
         ):
             results.append(False)
             print(
@@ -1007,11 +1027,13 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
     # CAPACITIVE SENSOR
-    pip = api.hardware_pipettes[mount.to_mount()]
-    assert pip
-    capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
-    print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
-    write_cb([f"diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
+    print("SKIPPING CAPACITIVE TESTS")
+    capacitance_pass = False
+    # pip = api.hardware_pipettes[mount.to_mount()]
+    # assert pip
+    # capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
+    # print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
+    # write_cb([f"diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
     # PRESSURE
     pressure_pass = await _test_diagnostics_pressure(api, mount, write_cb)
     print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
@@ -1472,12 +1494,12 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             + [str(t) for t in CAP_THRESH_SQUARE[pipette_channels]]
         )
         csv_cb.write(
-            ["pressure-microliters-aspirated", PRESSURE_ASPIRATE_VOL[pipette_volume]]
+            ["pressure-microliters-aspirated", PRESSURE_ASPIRATE_VOL[pipette_channels][pipette_volume]]
         )
-        csv_cb.write(["pressure-open-air"] + [str(t) for t in PRESSURE_THRESH_OPEN_AIR])
-        csv_cb.write(["pressure-sealed"] + [str(t) for t in PRESSURE_THRESH_SEALED])
+        csv_cb.write(["pressure-open-air"] + [str(t) for t in PRESSURE_THRESH_OPEN_AIR[pipette_channels]])
+        csv_cb.write(["pressure-sealed"] + [str(t) for t in PRESSURE_THRESH_SEALED[pipette_channels]])
         csv_cb.write(
-            ["pressure-compressed"] + [str(t) for t in PRESSURE_THRESH_COMPRESS]
+            ["pressure-compressed"] + [str(t) for t in PRESSURE_THRESH_COMPRESS[pipette_channels]]
         )
         csv_cb.write(["probe-deck", PROBING_DECK_PRECISION_MM])
         csv_cb.write(
