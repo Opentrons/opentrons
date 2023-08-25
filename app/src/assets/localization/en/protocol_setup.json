@@ -25,6 +25,8 @@
   "calibration_data_not_available": "Calibration data not available once run has started",
   "calibration_needed": "Calibration needed",
   "calibration_ready": "Calibration ready",
+  "calibration_required_attach_pipette_first": "Calibration required\nAttach pipette first",
+  "calibration_required_calibrate_pipette_first": "Calibration required\nCalibrate pipette first",
   "calibration_status": "calibration status",
   "calibration": "Calibration",
   "closing": "Closing...",

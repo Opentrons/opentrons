@@ -18,6 +18,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
@@ -46,7 +47,9 @@ import {
   getUnmatchedModulesForProtocol,
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
+import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
+import type { PipetteData, BadPipette } from '@opentrons/api-client'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -63,12 +66,14 @@ interface RowModuleProps {
   isDuplicateModuleModel: boolean
   module: AttachedProtocolModuleMatch
   setShowMultipleModulesModal: (showMultipleModulesModal: boolean) => void
+  pipettesStatus: PipettesStatus
 }
 
 function RowModule({
   isDuplicateModuleModel,
   module,
   setShowMultipleModulesModal,
+  pipettesStatus,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
@@ -76,65 +81,138 @@ function RowModule({
   )
   const isModuleReady =
     isNonConnectingModule || module.attachedModuleMatch != null
-  return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
-      borderRadius={BORDERS.borderRadiusSize3}
-      cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
-      gridGap={SPACING.spacing24}
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      onClick={() =>
-        isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
-      }
-    >
-      <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {getModuleDisplayName(module.moduleDef.model)}
-        </StyledText>
-      </Flex>
-      <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-        <LocationIcon
-          slotName={
-            getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-              ? TC_MODULE_LOCATION_OT3
-              : module.slotName
-          }
-        />
-      </Flex>
-      {isNonConnectingModule ? (
-        <Flex
-          flex="3 0 0"
-          alignItems={ALIGN_CENTER}
-          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-        >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('n_a')}
-          </StyledText>
-        </Flex>
-      ) : (
-        <Flex
-          flex="3 0 0"
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
+
+  const isModuleCalibrated =
+    module.attachedModuleMatch?.moduleOffset?.last_modified != null
+
+  const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const handleCalibrate = (): void => {
+    setShowModuleWizard(true)
+  }
+
+  function ModuleCalibrationStatus(): JSX.Element {
+    if (isModuleReady === false) {
+      return (
+        <>
           <Chip
-            text={
-              isModuleReady ? t('module_connected') : t('module_disconnected')
-            }
-            type={isModuleReady ? 'success' : 'warning'}
+            text={t('module_disconnected')}
+            type="warning"
             background={false}
             iconName="connection-status"
           />
           {isDuplicateModuleModel ? (
             <Icon name="information" size="2rem" />
           ) : null}
+        </>
+      )
+    }
+    if (isModuleCalibrated) {
+      return (
+        <>
+          <Chip
+            text={t('module_connected')}
+            type="success"
+            background={false}
+            iconName="connection-status"
+          />
+          {isDuplicateModuleModel ? (
+            <Icon name="information" size="2rem" />
+          ) : null}
+        </>
+      )
+    } else {
+      return (
+        <SmallButton
+          buttonText="rounded"
+          buttonType={t('calibrate')}
+          onClick={handleCalibrate}
+        />
+      )
+    }
+  }
+
+  function CalibrationStatus(): JSX.Element {
+    switch (pipettesStatus) {
+      case 'missing':
+        return (
+          <StyledText as="p">
+            {t('calibration_required_attach_pipette_first')}
+          </StyledText>
+        )
+      case 'notCalibrated':
+        return (
+          <StyledText as="p">
+            {t('calibration_required_calibrate_pipette_first')}
+          </StyledText>
+        )
+      case 'calibrated':
+        return <ModuleCalibrationStatus />
+    }
+  }
+
+  return (
+    <>
+      {showModuleWizard && module.attachedModuleMatch != null ? (
+        <ModuleWizardFlows
+          attachedModule={module.attachedModuleMatch}
+          closeFlow={() => setShowModuleWizard(false)}
+        />
+      ) : null}
+      <Flex
+        alignItems={ALIGN_CENTER}
+        backgroundColor={
+          isModuleReady && pipettesStatus === 'calibrated'
+            ? COLORS.green3
+            : COLORS.yellow3
+        }
+        borderRadius={BORDERS.borderRadiusSize3}
+        cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
+        gridGap={SPACING.spacing24}
+        padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+        onClick={() =>
+          isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
+        }
+      >
+        <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {getModuleDisplayName(module.moduleDef.model)}
+          </StyledText>
         </Flex>
-      )}
-    </Flex>
+        <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
+          <LocationIcon
+            slotName={
+              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
+                ? TC_MODULE_LOCATION_OT3
+                : module.slotName
+            }
+          />
+        </Flex>
+        {isNonConnectingModule ? (
+          <Flex
+            flex="3 0 0"
+            alignItems={ALIGN_CENTER}
+            padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+          >
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('n_a')}
+            </StyledText>
+          </Flex>
+        ) : (
+          <Flex
+            flex="3 0 0"
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            whiteSpace="break-spaces"
+          >
+            <CalibrationStatus />
+          </Flex>
+        )}
+      </Flex>
+    </>
   )
 }
 
+type PipettesStatus = 'missing' | 'notCalibrated' | 'calibrated'
 interface ProtocolSetupModulesProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
@@ -189,6 +267,33 @@ export function ProtocolSetupModules({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('map_view'),
     hasExitIcon: true,
+  }
+
+  // check pipette status
+  const { data: instrumentsData } = useInstrumentsQuery()
+  const requiredPipettes = mostRecentAnalysis?.pipettes ?? []
+
+  const checkPipettesStatus = (): PipettesStatus => {
+    let attachedPipetteMatch
+    let badAttachedPipetteMatch
+    requiredPipettes.map(loadedPipette => {
+      attachedPipetteMatch =
+        (instrumentsData?.data ?? []).find(
+          (i): i is PipetteData =>
+            i.instrumentType === 'pipette' &&
+            i.ok &&
+            i.mount === loadedPipette.mount &&
+            i.instrumentName === loadedPipette.pipetteName
+        ) ?? null
+      badAttachedPipetteMatch =
+        (instrumentsData?.data ?? []).find(
+          (i): i is BadPipette =>
+            i.instrumentType === 'pipette' && i.ok === false
+        ) ?? null
+    })
+    if (attachedPipetteMatch != null) return 'calibrated'
+    if (badAttachedPipetteMatch != null) return 'notCalibrated'
+    return 'missing'
   }
 
   return (
@@ -310,6 +415,7 @@ export function ProtocolSetupModules({
                 module={module}
                 isDuplicateModuleModel={isDuplicateModuleModel}
                 setShowMultipleModulesModal={setShowMultipleModulesModal}
+                pipettesStatus={checkPipettesStatus()}
               />
             )
           })}
