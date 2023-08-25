@@ -152,4 +152,31 @@ describe('Toast', () => {
     })
     expect(props.onClose).toHaveBeenCalled()
   })
+  it('renders link text with an optional callback', async () => {
+    jest.useFakeTimers()
+    props = {
+      ...props,
+      linkText: 'test link',
+      onLinkClick: jest.fn(),
+    }
+    const { getByText } = render(props)
+    const clickableLink = getByText('test link')
+    fireEvent.click(clickableLink)
+    expect(props.onLinkClick).toHaveBeenCalled()
+  })
+  it('toast will not disappear on a general click if both close button and clickable link present', async () => {
+    jest.useFakeTimers()
+    props = {
+      ...props,
+      linkText: 'test link',
+      closeButton: true,
+    }
+    const { getByText } = render(props)
+    const clickableLink = getByText('test message')
+    fireEvent.click(clickableLink)
+    act(() => {
+      jest.advanceTimersByTime(TOAST_ANIMATION_DURATION)
+    })
+    expect(props.onClose).not.toHaveBeenCalled()
+  })
 })
