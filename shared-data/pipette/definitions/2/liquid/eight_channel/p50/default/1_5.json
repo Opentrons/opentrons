@@ -37,7 +37,7 @@
         }
       },
       "defaultBlowoutVolume": 4.712,
-      "defaultPushOutVolume": 0
+      "defaultPushOutVolume": 2
     },
     "t200": {
       "defaultAspirateFlowRate": {
