@@ -34,6 +34,7 @@ class VolumetricConfig:
     kind: ConfigType
     extra: bool
     jog: bool
+    ignore_fail: bool
 
 
 @dataclass
