@@ -219,7 +219,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -294,7 +294,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -478,7 +478,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             :substitutions:
 
             from opentrons import protocol_api
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
                 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
