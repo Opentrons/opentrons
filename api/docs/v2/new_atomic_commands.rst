@@ -178,7 +178,7 @@ Set the new range in the ``for`` loop to use all the tips in each tip rack::
         pipette.pick_up_tip()
         pipette.drop_tip()
 
-For a more advanced example using a loop, take a moment to review the :ref:`off-deck location protocol <off-deck-location>` on the :ref:`_moving-labware` page. This example uses a ``for`` loop to iterate through a tip rack, but also includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
+For a more advanced "real-world" example, take a moment to review the :ref:`off-deck location protocol <off-deck-location>` on the :ref:`_moving-labware` page. This example uses a ``for`` loop to iterate through a tip rack, but also includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
 
 Dropping a Tip
 --------------
@@ -190,7 +190,7 @@ To drop a tip in the trash bin, call the :py:meth:`~.InstrumentContext.drop_tip`
 You can also specify where to drop the tip by passing in a location. For example, this code drops a tip in the trash bin and drops another tip in its original tip rack location::
 
     pipette.pick_up_tip()            # picks up tip from rack location A1
-    pipette.drop_tip                 # drops tip in trash bin 
+    pipette.drop_tip()               # drops tip in trash bin 
     pipette.pick_up_tip()            # picks up tip from rack location B1
     pipette.drop_tip(tiprack['B1'])  # drops tip in rack location B1
 
