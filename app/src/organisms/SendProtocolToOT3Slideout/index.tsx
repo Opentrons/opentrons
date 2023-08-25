@@ -47,11 +47,11 @@ export function SendProtocolToOT3Slideout(
     'downgrade',
   ].includes(
     useSelector((state: State) => {
-      const value =
+      const updateInfo =
         selectedRobot != null
           ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
           : { autoUpdateAction: '' }
-      return value
+      return updateInfo
     })?.autoUpdateAction
   )
 

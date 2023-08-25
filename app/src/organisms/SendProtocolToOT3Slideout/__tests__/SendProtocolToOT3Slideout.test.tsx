@@ -246,15 +246,15 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const sendButton = getByRole('button', { name: 'Proceed to setup' })
-    expect(sendButton).not.toBeDisabled()
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    expect(proceedButton).not.toBeDisabled()
     const otherRobot = getByText('otherRobot')
     otherRobot.click() // unselect default robot
-    expect(sendButton).not.toBeDisabled()
+    expect(proceedButton).not.toBeDisabled()
     const mockRobot = getByText('opentrons-robot-name')
     mockRobot.click()
-    expect(sendButton).not.toBeDisabled()
-    sendButton.click()
+    expect(proceedButton).not.toBeDisabled()
+    proceedButton.click()
     expect(mockMutateAsync).toBeCalledWith({
       files: [expect.any(Object), mockCustomLabwareFile],
       protocolKey: 'protocolKeyStub',
