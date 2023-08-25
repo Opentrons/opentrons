@@ -81,23 +81,28 @@ export function Troubleshooting({
             .catch((e: Error) => {
               eatToast(toastId)
               makeToast(e?.message, ERROR_TOAST, { closeButton: true })
-              setIsDownloadingRobotLogs(false)
+              // avoid no-op on unmount
+              if (mounted.current != null) setIsDownloadingRobotLogs(false)
             })
         })
         .then(() => {
           eatToast(toastId)
-          setIsDownloadingRobotLogs(false)
+          if (mounted.current != null) setIsDownloadingRobotLogs(false)
         })
         .catch((e: Error) => {
           eatToast(toastId)
           makeToast(e?.message, ERROR_TOAST, { closeButton: true })
-          setIsDownloadingRobotLogs(false)
+          if (mounted.current != null) setIsDownloadingRobotLogs(false)
         })
     }
   }
 
+  // set ref on component to check if component is mounted https://react.dev/reference/react/useRef#manipulating-the-dom-with-a-ref
+  const mounted = React.useRef(null)
+
   return (
     <Flex
+      ref={mounted}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       marginTop={SPACING.spacing24}
