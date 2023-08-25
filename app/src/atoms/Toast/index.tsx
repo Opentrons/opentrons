@@ -304,11 +304,9 @@ export function Toast(props: ToastProps): JSX.Element {
     }, calculatedDuration(message, headingText, duration))
   }
 
-  type ToastCloseType = typeof onCloseHandler | null
   // Require intentional clicking if links and close button present on toast.
-  const toastClose = (): ToastCloseType => {
-    if (closeButton != null && linkText != null) return null
-    return onCloseHandler
+  const toastClose = (): void => {
+    if (closeButton == null || linkText == null) onCloseHandler()
   }
 
   return (
@@ -324,7 +322,7 @@ export function Toast(props: ToastProps): JSX.Element {
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      onClick={toastClose()}
+      onClick={toastClose}
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
