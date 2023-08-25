@@ -5,6 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../../redux/modules/__fixtures__'
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
+import { formatLastCalibrated } from '../utils'
 import { ModuleCalibrationItems } from '../ModuleCalibrationItems'
 
 import type { AttachedModule } from '@opentrons/api-client'
@@ -96,6 +97,6 @@ describe('ModuleCalibrationItems', () => {
       attachedModules: [mockCalibratedModule] as AttachedModule[],
     }
     const [{ getByText }] = render(props)
-    getByText('6/1/2023 10:42:20')
+    getByText(formatLastCalibrated('2023-06-01T14:42:20.131798+00:00'))
   })
 })
