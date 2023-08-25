@@ -9,15 +9,15 @@
         }
       },
       "defaultDispenseFlowRate": {
-        "default": 160,
+        "default": 478,
         "valuesByApiLevel": {
-          "2.14": 160
+          "2.14": 478
         }
       },
       "defaultBlowOutFlowRate": {
-        "default": 160,
+        "default": 478,
         "valuesByApiLevel": {
-          "2.14": 160
+          "2.14": 478
         }
       },
       "defaultFlowAcceleration": 24000.0,
@@ -103,15 +103,15 @@
         }
       },
       "defaultDispenseFlowRate": {
-        "default": 160,
+        "default": 716,
         "valuesByApiLevel": {
-          "2.14": 160
+          "2.14": 716
         }
       },
       "defaultBlowOutFlowRate": {
-        "default": 160,
+        "default": 716,
         "valuesByApiLevel": {
-          "2.14": 160
+          "2.14": 716
         }
       },
       "defaultFlowAcceleration": 24000.0,
@@ -197,15 +197,15 @@
         }
       },
       "defaultDispenseFlowRate": {
-        "default": 160,
+        "default": 716,
         "valuesByApiLevel": {
-          "2.14": 160
+          "2.14": 716
         }
       },
       "defaultBlowOutFlowRate": {
-        "default": 160,
+        "default": 716,
         "valuesByApiLevel": {
-          "2.14": 160
+          "2.14": 716
         }
       },
       "defaultFlowAcceleration": 24000.0,
