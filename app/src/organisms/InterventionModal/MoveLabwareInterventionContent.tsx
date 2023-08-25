@@ -33,10 +33,13 @@ import { Divider } from '../../atoms/structure'
 
 import {
   CompletedProtocolAnalysis,
+  LabwareDefinitionsByUri,
   LabwareLocation,
   MoveLabwareRunTimeCommand,
+  OT2_ROBOT_TYPE,
   RobotType,
   getDeckDefFromRobotType,
+  getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
   getModuleType,
@@ -44,7 +47,7 @@ import {
   getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
-import { getLoadedLabware } from '../CommandText/utils/accessors'
+import { getLoadedLabware, getLoadedModule } from '../CommandText/utils/accessors'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -169,6 +172,7 @@ export function MoveLabwareInterventionContent({
                 protocolData={run}
                 location={oldLabwareLocation}
                 robotType={robotType}
+                labwareDefsByUri={labwareDefsByUri}
               />
 
               <Icon name="arrow-right" css={ICON_STYLE} />
@@ -176,6 +180,7 @@ export function MoveLabwareInterventionContent({
                 protocolData={run}
                 location={command.params.newLocation}
                 robotType={robotType}
+                labwareDefsByUri={labwareDefsByUri}
               />
             </Flex>
           </Flex>
@@ -225,17 +230,16 @@ interface LabwareDisplayLocationProps {
   protocolData: RunData
   location: LabwareLocation
   robotType: RobotType
+  labwareDefsByUri: LabwareDefinitionsByUri
 }
 function LabwareDisplayLocation(
   props: LabwareDisplayLocationProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_command_text')
-  const { protocolData, location, robotType } = props
+  const { protocolData, location, robotType, labwareDefsByUri } = props
   let displayLocation: React.ReactNode = ''
   if (location === 'offDeck') {
-    // typecheck thinks t() can return undefined
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    displayLocation = <LocationIcon slotName={t('offdeck') as string} />
+    displayLocation = <LocationIcon slotName={t('offdeck')} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
   } else if ('moduleId' in location) {
@@ -258,8 +262,39 @@ function LabwareDisplayLocation(
         ),
       })
     }
-  } else {
-    console.warn('display location could not be established: ', location)
+  } else if ('labwareId' in location) {
+    const adapter = protocolData.labware.find(lw => lw.id === location.labwareId)
+    const adapterDef = adapter != null ? labwareDefsByUri[adapter.definitionUri] : null
+    const adapterDisplayName = adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
+
+    if (adapter == null) {
+      console.warn('labware is located on an unknown adapter')
+    } else if (adapter.location === 'offDeck') {
+      displayLocation = t('off_deck')
+    } else if ('slotName' in adapter.location) {
+      displayLocation = t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot_name: adapter.location.slotName,
+      })
+    } else if ('moduleId' in adapter.location) {
+      const moduleIdUnderAdapter = adapter.location.moduleId
+      const moduleModel = protocolData.modules.find(
+        module => module.id === moduleIdUnderAdapter
+      )?.model
+      if (moduleModel == null) {
+        console.warn('labware is located on an adapter on an unknown module')
+      } else {
+        const slotName = getLoadedModule(protocolData, adapter.location.moduleId)?.location?.slotName ?? ''
+        displayLocation = t('adapter_in_module_in_slot', {
+          count: getOccludedSlotCountForModule(getModuleType(moduleModel), robotType ?? OT2_ROBOT_TYPE),
+          module: getModuleDisplayName(moduleModel),
+          adapter: adapterDisplayName,
+          slot_name: slotName,
+        })
+      }
+    } else {
+      console.warn('display location could not be established: ', location)
+    }
   }
   return <>{displayLocation}</>
 }
