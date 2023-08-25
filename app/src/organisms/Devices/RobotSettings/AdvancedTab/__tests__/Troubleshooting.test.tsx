@@ -20,8 +20,6 @@ import { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../organisms/ToasterOven')
-jest.mock('../../../../../redux/shell/robot-logs/actions')
-jest.mock('../../../../../redux/shell/robot-logs/selectors')
 jest.mock('../../../../../redux/discovery/selectors')
 jest.mock('../../../hooks')
 
