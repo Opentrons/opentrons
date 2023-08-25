@@ -2,49 +2,119 @@
 
 .. _v2-complex-commands:
 
-################
+****************
 Complex Commands
-################
+****************
 
-.. _overview:
+Complex liquid handling commands combine multiple :ref:`v2-atomic-commands` into a single method call. These commands make it easier to handle larger groups of wells and repeat actions without having to write your own control flow code. They integrate tip-handling behavior and can pick up, use, and drop multiple tips depending on how you want to handle your liquids. They can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip.
 
-Overview
-========
+There are three complex liquid handling commands: :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate`. Each is optimized for a different liquid handling scenario.
 
-The commands in this section execute long or complex series of the commands described in the :ref:`v2-atomic-commands` section. These advanced commands make it easier to handle larger groups of wells and repetitive actions.
+Pages in this section of the documentation cover:
 
-The examples in this section will use the following set up:
+    - :ref:`complex-well-mapping`: Which wells commands aspirate from and dispense to.
+    - :ref:`complex-command-order`: The order of basic commands that are part of a complex commmand.
+    - :ref:`complex_params`: Additional keyword arguments that affect complex command behavior.
+    
+Using Complex Command Examples
+==============================
 
-.. code-block:: python
-    :substitutions:
+The code samples in this section are designed for anyone using an Opentrons Flex or OT-2 liquid handling robot. 
 
-    from opentrons import protocol_api
+Instruments and Labware
+-----------------------
 
-    metadata = {'apiLevel': '|apiLevel|'}
+Most samples use the following pipettes:
 
-    def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        tiprack_multi = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        pipette = protocol.load_instrument('p300_single', mount='left', tip_racks=[tiprack])
-        pipette_multi = protocol.load_instrument('p300_multi', mount='right', tip_racks=[tiprack_multi])
+* Flex 1-Channel Pipette (5–1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
+* P300 Single-Channel GEN2 pipette for the OT-2. The API load name for this pipette is ``p300_single_gen2``.
 
-        # The code used in the rest of the examples goes here
+Samples that require multi-channel pipettes use these instead:
+
+* Flex 8-Channel Pipette (5–1000 µL). The API load name for this pipette is ``flex_8channel_1000``. 
+* P300 8-Channel GEN2 pipette for the OT-2. The API load name for this pipette is ``p300_multi_gen2``.
 
 
-This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 1 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 2 and 3, and uses a P300 Single pipette and a P300 Multi pipette.
+Examples all use the labware listed below: 
 
-There are three complex liquid handling commands:
+.. list-table::
+    :header-rows: 1
 
-+------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-|    Method                                |   One source well to a group of destination wells  |   Many source wells to a group of destination wells  | Many source wells to one destination well |
-+==========================================+====================================================+======================================================+===========================================+
-| :py:meth:`.InstrumentContext.transfer`   |                   Yes                              |                      Yes                             |                   Yes                     |
-+------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-| :py:meth:`.InstrumentContext.distribute` |                   Yes                              |                       Yes                            |                    No                     |
-+------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-| :py:meth:`.InstrumentContext.consolidate`|                   No                               |                       Yes                            |                    Yes                    |
-+------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
+    * - Labware type
+      - Labware name
+      - API load name
+    * - Well plate
+      - Corning 96 Well Plate 360 µL Flat
+      - ``corning_96_wellplate_360ul_flat``
+    * - Flex tip rack
+      - Opentrons Flex 96 Tip Rack 1000 µL
+      - ``opentrons_flex_96_tiprack_1000ul``
+    * - OT-2 tip rack
+      - Opentrons 96 Tip Rack 300 µL
+      - ``opentrons_96_tiprack_300ul``
+
+.. _atomic-file:
+
+Sample Protocol File 
+--------------------
+
+To work with the samples on this page, your basic protocol file could look similar to the following examples. For information about variations in the code before the ``run()`` function, see the :ref:`Metadata <tutorial-metadata>` and :ref:`Requirements <tutorial-requirements>` sections of the :ref:`tutorial`. The examples in this section are based on and work with this starting code.
+
+.. tabs::
+
+    .. tab:: Flex 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load well plate in deck slot D2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location="D2"
+                )
+                # load tip rack in deck slot D3
+                tiprack = protocol.load_labware(
+                    load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="flex_1channel_1000",
+                    mount="left",
+                    tip_racks=[tiprack]
+                )
+                # Put other protocol commands here
+    
+    .. tab:: OT-2 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load well plate in deck slot 2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location=2
+                )
+                # load tip rack in deck slot 3
+                tiprack = protocol.load_labware(
+                    load_name="opentrons_96_tiprack_300ul", location=3
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="p300_single_gen2",
+                    mount="left",
+                    tip_racks=[tiprack]
+                )  
+                # Put other protocol commands here
+                
+.. all content below here to be refactored into 3 pages.
 
 You can also refer to these images for further clarification.
 
