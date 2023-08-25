@@ -404,11 +404,7 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText ? (
-        <Link
-          role="button"
-          data-testid="Toast_close-text"
-          onClick={() => onCloseHandler()}
-        >
+        <Link role="button" onClick={() => onCloseHandler()}>
           <StyledText
             color={COLORS.darkBlackEnabled}
             fontSize={
@@ -433,7 +429,7 @@ export function Toast(props: ToastProps): JSX.Element {
         </Link>
       ) : null}
       {!closeText && closeButton ? (
-        <Btn data-testid="Toast_close-button" onClick={() => onCloseHandler()}>
+        <Btn onClick={() => onCloseHandler()}>
           <Icon
             width={SPACING.spacing24}
             height={SPACING.spacing24}
