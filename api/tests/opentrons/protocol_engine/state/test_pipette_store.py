@@ -614,7 +614,6 @@ def test_add_pipette_config(
                 nominal_tip_overlap={"default": 5},
                 home_position=8.9,
                 nozzle_offset_z=10.11,
-                default_push_out_volume=5,
             ),
         )
     )

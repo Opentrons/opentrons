@@ -198,7 +198,6 @@ def test_get_next_tip_skips_picked_up_tip(
                 nominal_tip_overlap={},
                 nozzle_offset_z=1.23,
                 home_position=4.56,
-                default_push_out_volume=3,
             ),
         )
     )
@@ -256,7 +255,6 @@ def test_reset_tips(
                 nominal_tip_overlap={},
                 nozzle_offset_z=1.23,
                 home_position=4.56,
-                default_push_out_volume=3,
             ),
         )
     )
@@ -295,7 +293,6 @@ def test_handle_pipette_config_action(
                 nominal_tip_overlap={},
                 nozzle_offset_z=1.23,
                 home_position=4.56,
-                default_push_out_volume=3,
             ),
         )
     )
@@ -363,7 +360,6 @@ def test_drop_tip(
                 nominal_tip_overlap={},
                 nozzle_offset_z=1.23,
                 home_position=4.56,
-                default_push_out_volume=5,
             ),
         )
     )

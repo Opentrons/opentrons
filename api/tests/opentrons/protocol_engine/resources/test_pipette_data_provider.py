@@ -40,7 +40,6 @@ def test_get_virtual_pipette_static_config() -> None:
             "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
-        default_push_out_volume=0,
     )
 
 
@@ -109,5 +108,4 @@ def test_get_pipette_static_config(
         # https://opentrons.atlassian.net/browse/RCORE-655
         nozzle_offset_z=0,
         home_position=0,
-        default_push_out_volume=3,
     )

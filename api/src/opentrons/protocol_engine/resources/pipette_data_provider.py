@@ -1,6 +1,6 @@
 """Pipette config data providers."""
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.pipette import (
@@ -31,7 +31,6 @@ class LoadedStaticPipetteData:
         float, pipette_definition.SupportedTipsDefinition
     ]
     nominal_tip_overlap: Dict[str, float]
-    default_push_out_volume: Optional[float]
 
 
 def get_virtual_pipette_static_config(
@@ -71,7 +70,6 @@ def get_virtual_pipette_static_config(
         nominal_tip_overlap=config.liquid_properties[
             liquid_class
         ].tip_overlap_dictionary,
-        default_push_out_volume=tip_configuration.default_push_out_volume,
     )
 
 
@@ -96,7 +94,4 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
         nozzle_offset_z=0,
-        default_push_out_volume=pipette_dict["default_push_out_volume"]
-        if "default_push_out_volume" in pipette_dict
-        else None,
     )
