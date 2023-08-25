@@ -1,5 +1,6 @@
 """A simple size-limited memory cache used for large resources."""
-from typing import Generic, TypeVar, Deque, Type, Dict
+import asyncio
+from typing import Awaitable, Callable, Coroutine, Generic, TypeVar, Deque, Type, Dict
 from logging import getLogger
 
 from collections import deque
@@ -17,12 +18,17 @@ class MemoryCache(Generic[K, V]):
     _cache_order: Deque[K]
     _cache_size: int
 
+    _open_compute_tasks: Dict[K, "asyncio.Task[V]"]
+    _compute_concurrency_limiter: asyncio.Semaphore
+
     def __init__(self, size_limit: int, _keyhint: Type[K], _valhint: Type[V]) -> None:
         assert size_limit > 0, f"Cache size must be above 0 but was {size_limit}"
         _, _ = _keyhint, _valhint
         self._cache = {}
         self._cache_order = deque()
         self._cache_size = size_limit
+        self._open_compute_tasks = {}
+        self._compute_concurrency_limiter = asyncio.Semaphore(1)
 
     def contains(self, key: K) -> bool:
         """Returns True if the key is cached."""
@@ -31,6 +37,29 @@ class MemoryCache(Generic[K, V]):
     def get(self, key: K) -> V:
         """Get a cache element, raising KeyError if it is not cached."""
         return self._cache[key]
+
+    async def get_or_compute(self, key: K, compute: Callable[[], Awaitable[V]]) -> V:
+        if self.contains(key):
+            return self.get(key)
+
+        elif key in self._open_compute_tasks:
+            return await self._open_compute_tasks[key]
+
+        else:
+
+            async def limited_compute() -> V:
+                async with self._compute_concurrency_limiter:
+                    return await compute()
+
+            compute_task: "asyncio.Task[V]" = asyncio.create_task(limited_compute())  # type: ignore[arg-type]
+            self._open_compute_tasks[key] = compute_task
+
+            try:
+                result = await compute_task
+                self.insert(key=key, value=result)
+                return result
+            finally:  # Clean up compute_task even if it raises.
+                del self._open_compute_tasks[key]
 
     def _pop_eldest(self, key: K) -> None:
         if len(self._cache) < self._cache_size:

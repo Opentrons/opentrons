@@ -126,23 +126,23 @@ class CompletedAnalysisStore:
 
     async def get_by_id(self, analysis_id: str) -> Optional[CompletedAnalysisResource]:
         """Return the analysis with the given ID, if it exists."""
-        try:
-            return self._memcache.get(analysis_id)
-        except KeyError:
-            pass
-        statement = sqlalchemy.select(analysis_table).where(
-            analysis_table.c.id == analysis_id
+
+        async def get_from_db_and_parse() -> Optional[CompletedAnalysisResource]:
+            statement = sqlalchemy.select(analysis_table).where(
+                analysis_table.c.id == analysis_id
+            )
+            with self._sql_engine.begin() as transaction:
+                try:
+                    raw_value_from_db = transaction.execute(statement).one()
+                except sqlalchemy.exc.NoResultFound:
+                    return None
+            return await CompletedAnalysisResource.from_sql_row(
+                raw_value_from_db, self._current_analyzer_version
+            )
+
+        return await self._memcache.get_or_compute(
+            key=analysis_id, compute=get_from_db_and_parse
         )
-        with self._sql_engine.begin() as transaction:
-            try:
-                result = transaction.execute(statement).one()
-            except sqlalchemy.exc.NoResultFound:
-                return None
-        resource = await CompletedAnalysisResource.from_sql_row(
-            result, self._current_analyzer_version
-        )
-        self._memcache.insert(resource.id, resource)
-        return resource
 
     async def get_by_protocol(
         self, protocol_id: str
@@ -152,55 +152,62 @@ class CompletedAnalysisStore:
         If protocol_id doesn't point to a valid protocol, returns an empty list;
         doesn't raise an error.
         """
-        id_statement = (
-            sqlalchemy.select(analysis_table.c.id)
-            .where(analysis_table.c.protocol_id == protocol_id)
-            .order_by(sqlite_rowid)
-        )
+        # In one atomic step (one SQL transaction, and no `await`s):
+        #
+        # 1) Figure out which of the protocol's analyses are already in self._memcache.
+        # 2) For those that are, get just their IDs.
+        # 3) For those that aren't, get their IDs and their blobs so we can parse them.
         with self._sql_engine.begin() as transaction:
-            ordered_analyses_for_protocol = [
-                row.id for row in transaction.execute(id_statement).all()
-            ]
+            get_ids_statement = (
+                sqlalchemy.select(analysis_table.c.id)
+                .where(analysis_table.c.protocol_id == protocol_id)
+                .order_by(sqlite_rowid)
+            )
+            ordered_analysis_ids = list(
+                transaction.execute(get_ids_statement).scalars()
+            )
 
-        analysis_set = set(ordered_analyses_for_protocol)
-        cached_analyses = {
-            analysis_id
-            for analysis_id in ordered_analyses_for_protocol
-            if self._memcache.contains(analysis_id)
-        }
-        uncached_analyses = analysis_set - cached_analyses
+            analysis_ids = set(ordered_analysis_ids)
+            cached_analysis_ids = {
+                analysis_id
+                for analysis_id in ordered_analysis_ids
+                if self._memcache.contains(analysis_id)
+            }
+            uncached_analysis_ids = analysis_ids - cached_analysis_ids
 
-        # Because we'll be loading whatever resources are not currently cached from sql
+            get_uncached_rows_statement = sqlalchemy.select(analysis_table).where(
+                analysis_table.c.id.in_(uncached_analysis_ids)
+            )
+            uncached_rows = transaction.execute(get_uncached_rows_statement).all()
+
+        # Because we'll be loading whatever resources are not currently cached
         # using an async method, if this method is called reentrantly then inserting those
         # newly-fetched resources into the memcache could race and eject resources we just
         # added and were about to return. To prevent this, we'll make a second memcache just
         # for this coroutine - since we don't care about size limitations we can just use a
         # dict.
-        local_memcache: Dict[str, CompletedAnalysisResource] = {}
+        parsed_analyses: Dict[str, CompletedAnalysisResource] = {}
 
-        for key in cached_analyses:
-            local_memcache[key] = self._memcache.get(key)
+        # We're assuming self._memcache.get() won't raise. For this to be correct, there must be no
+        # `await`s between where we populated cached_analysis_ids and here.
+        for cached_analysis_id in cached_analysis_ids:
+            parsed_analyses[cached_analysis_id] = self._memcache.get(cached_analysis_id)
 
-        if uncached_analyses:
-            statement = (
-                sqlalchemy.select(analysis_table)
-                .where(analysis_table.c.id.in_(uncached_analyses))
-                .order_by(sqlite_rowid)
-            )
-            with self._sql_engine.begin() as transaction:
-                results = transaction.execute(statement).all()
-            for r in results:
-                resource = await CompletedAnalysisResource.from_sql_row(
-                    r, self._current_analyzer_version
+        for row_to_parse in uncached_rows:
+            uncached_analysis_id = row_to_parse.id
+
+            async def compute() -> Optional[CompletedAnalysisResource]:
+                return await CompletedAnalysisResource.from_sql_row(
+                    row_to_parse, self._current_analyzer_version
                 )
-                local_memcache[resource.id] = resource
-                self._memcache.insert(resource.id, resource)
 
-        # note: we want to iterate through ordered_analyseS_for_protocol rather than
+            parsed_analyses[uncached_analysis_id] = await self._memcache.get_or_compute(
+                key=uncached_analysis_id, compute=compute  # TODO: None/NULL handling.
+            )
+
+        # note: we want to iterate through ordered_analyses_for_protocol rather than
         # just the local_memcache dict to preserve total ordering
-        return [
-            local_memcache[analysis_id] for analysis_id in ordered_analyses_for_protocol
-        ]
+        return [parsed_analyses[analysis_id] for analysis_id in ordered_analysis_ids]
 
     def get_ids_by_protocol(self, protocol_id: str) -> List[str]:
         """Like `get_by_protocol()`, but return only the ID of each analysis."""
