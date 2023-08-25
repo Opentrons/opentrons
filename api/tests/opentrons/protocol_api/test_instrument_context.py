@@ -745,7 +745,7 @@ def test_dispense_with_well_location(
     ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(3.0)
 
-    subject.dispense(volume=42.0, location=input_location, rate=1.23)
+    subject.dispense(volume=42.0, location=input_location, rate=1.23, push_out=7)
 
     decoy.verify(
         mock_instrument_core.dispense(
@@ -755,7 +755,7 @@ def test_dispense_with_well_location(
             volume=42.0,
             rate=1.23,
             flow_rate=3.0,
-            push_out=None,
+            push_out=7,
         ),
         times=1,
     )
@@ -816,6 +816,24 @@ def test_dispense_raises_no_location(
     ).then_raise(mock_validation.NoLocationError())
     with pytest.raises(RuntimeError):
         subject.dispense(location=None)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_dispense_push_out_on_not_allowed_version(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """Should raise a APIVersionError."""
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
+
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=None)
+    ).then_raise(mock_validation.NoLocationError())
+    with pytest.raises(APIVersionError):
+        subject.dispense(push_out=3)
 
 
 def test_touch_tip(
