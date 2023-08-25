@@ -218,18 +218,21 @@ Working With Used Tips
 
 API versions 2.2 or higher consider tips as "used" after they've been picked up, even if you return a tip to the tip rack. For example, if you pick up a tip from rack location A1 and then return it to the same location, the robot will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example::
 
-    pipette.pick_up_tip()  # picks up tip from rack location A1
-    pipette.return_tip()   # drops tip in rack location A1
-    pipette.pick_up_tip()  # picks up from rack location B1
+    pipette.pick_up_tip()                # picks up tip from rack location A1
+    pipette.return_tip()                 # drops tip in rack location A1
+    pipette.pick_up_tip(tiprack_1['A1']) # picks up tip from rack location A1
+    pipette.drop_tip()                   # drops tip in trash bin
+    pipette.pick_up_tip()                # picks up tip from rack location B1
 
 .. can this be removed?
 Also in API Version 2.2, the return tip height was corrected to utilize values determined by hardware testing. This is more in-line with return tip behavior from Python Protocol API Version 1.
 
-API versions 2.0 and 2.1 treated returned tips as unused items and they could be picked up again. For example:: 
+API versions 2.0 and 2.1 treated returned tips as unused items and they could be picked up again without an explicit argument. For example:: 
 
     pipette.pick_up_tip()  # picks up tip from rack location A1
     pipette.return_tip()   # drops tip in rack location A1
     pipette.pick_up_tip()  # picks up tip from rack location A1
+
 
 ****************
 Liquid Control
