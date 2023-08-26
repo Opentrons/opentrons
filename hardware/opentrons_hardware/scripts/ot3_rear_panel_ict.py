@@ -257,12 +257,14 @@ async def main() -> None:
             print(f'READEPPROM={response}')
 
     if args.check_door_status:
-        response = await get_door_state(driver)
-        if response is None:
+        try:
+            response = await get_door_state(driver)
+            if response is None:
+                print(f'CHECKDOORSTATUS=Fail')
+            else:
+                print(f'CHECKDOORSTATUS={response}')   # True, open, False, close
+        except:
             print(f'CHECKDOORSTATUS=Fail')
-        else:
-            print(f'CHECKDOORSTATUS={response}')   # True, open, False, close
-
     if args.check_all_pin:
         response = await get_all_pin(driver,args)
         
