@@ -116,15 +116,14 @@ Depending on your robot model and/or API version, the foundation of a basic prot
                 pipette = protocol.load_instrument(
                     instrument_name="p300_single_gen2",
                     mount="left",
-                    tip_racks=[tip_rack_1]
+                    tip_racks=[tip_rack_1],
                 )  
                 # Put other protocol commands here
 
 Manipulating Pipette Tips
 =========================
 
-Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`. 
-Respectively, they tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack. Let's look at examples for each of these functions. Each of these are designed to work with the sample protocols above.
+Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`. Respectively, these methods tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack. Let's look at examples for each of these functions. Each code snippet is designed to work with the sample protocols above.
 
 Picking Up a Tip
 ----------------
@@ -138,7 +137,7 @@ This simple statement works because the variable ``tiprack_1`` in the sample pro
     pipette.pick_up_tip()  # picks up tip from rack location A1
     pipette.drop_tip()     # drops tip in trash bin
     pipette.pick_up_tip()  # picks up tip from rack location B1
-    pipette.drop_tip()   # drops tip in trash bin 
+    pipette.drop_tip()     # drops tip in trash bin 
 
 If you omit the ``tip_rack`` argument from the ``pipette`` variable, then you must pass in the tip rack location to ``pick_up_tip`` like this::
     
@@ -166,6 +165,7 @@ If your protocol requires a lot of tips, add a second tip rack to the protocol, 
         load_name="opentrons_flex_96_tiprack_1000ul",
         location="C3"
     )
+
 Next, revise the pipette's ``load_instrument()`` method to include the new tip rack in the ``tip_rack`` argument::
 
     pipette = protocol.load_instrument(
@@ -215,7 +215,7 @@ To return a tip to its original location, call the :py:meth:`~.InstrumentContext
 Working With Used Tips
 ----------------------
 
-API versions 2.2 or higher consider tips as "used" after they've been picked up, even if the tip is returned to a tip rack. For example, if you pick up a tip from rack location A1 and then return it to the same location, the robot will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example::
+API versions 2.2 or higher consider tips as "used" after they've been picked up. For example, if you pick up a tip from rack location A1 and then return it to the same location, the robot will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example::
 
     pipette.pick_up_tip()                # picks up tip from rack location A1
     pipette.return_tip()                 # drops tip in rack location A1
