@@ -184,39 +184,54 @@ async def main() -> None:
     driver = build.build_rear_panel_messenger(driver=await build.build_rear_panel_driver())
     driver.start()
     if args.set_deck_light:
-        await driver.send(message=SetDeckLightRequest(
-            length=UInt16Field(1),
-            setting=UInt8Field(1)
-        ))
+        try:
+            await driver.send(message=SetDeckLightRequest(
+                length=UInt16Field(1),
+                setting=UInt8Field(1)
+            ))
+            print("SETDECKLIGHT=Pass")
+        except:
+            print("SETDECKLIGHT=Fail")
     if args.disable_deck_light:
-        await driver.send(message=SetDeckLightRequest(
-            length=UInt16Field(1),
-            setting=UInt8Field(0)
-        ))
+        try:
+            await driver.send(message=SetDeckLightRequest(
+                length=UInt16Field(1),
+                setting=UInt8Field(0)
+            ))
+            print("DISABLEDECKLIGHT=Pass")
+        except:
+            print("DISABLEDECKLIGHT=Fail")
+
     if args.set_status_bar:
-        await driver.send(message=ClearLightActionStagingQueue())
-        await driver.send(message=AddLightActionRequest(
-            transition_time=UInt16Field(100),
-            transition_type=LightTransitionTypeField(LightTransitionType.instant),
-            red=UInt8Field(255),
-            green=UInt8Field(255),
-            blue=UInt8Field(255),
-            white=UInt8Field(255),
-        ))
-        await driver.send(message=StartLightAction())
-
+        try:
+            await driver.send(message=ClearLightActionStagingQueue())
+            await driver.send(message=AddLightActionRequest(
+                transition_time=UInt16Field(100),
+                transition_type=LightTransitionTypeField(LightTransitionType.instant),
+                red=UInt8Field(255),
+                green=UInt8Field(255),
+                blue=UInt8Field(255),
+                white=UInt8Field(255),
+            ))
+            await driver.send(message=StartLightAction())
+            print("SETSTATUSBAR=Pass")
+        except:
+            print("SETSTATUSBAR=Fail")
     if args.disable_status_bar:
-        await driver.send(message=ClearLightActionStagingQueue())
-        await driver.send(message=AddLightActionRequest(
-            transition_time=UInt16Field(100),
-            transition_type=LightTransitionTypeField(LightTransitionType.instant),
-            red=UInt8Field(0),
-            green=UInt8Field(0),
-            blue=UInt8Field(0),
-            white=UInt8Field(0),
-        ))
-        await driver.send(message=StartLightAction())
-
+        try:
+            await driver.send(message=ClearLightActionStagingQueue())
+            await driver.send(message=AddLightActionRequest(
+                transition_time=UInt16Field(100),
+                transition_type=LightTransitionTypeField(LightTransitionType.instant),
+                red=UInt8Field(0),
+                green=UInt8Field(0),
+                blue=UInt8Field(0),
+                white=UInt8Field(0),
+            ))
+            await driver.send(message=StartLightAction())
+            print("DISABLESTATUSBAR=Pass")
+        except:
+            print("DISABLESTATUSBAR=Fail")
     if args.write_eeprom:
         response = await driver.send(message=WriteEEPromRequest(
             length=UInt16Field(12),
