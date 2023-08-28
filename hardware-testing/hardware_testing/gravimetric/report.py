@@ -196,6 +196,7 @@ def create_csv_test_report(
     report = CSVReport(
         test_name=name,
         run_id=run_id,
+        validate_meta_data=False,  # to avoid >3 columns in CSV (:shrug:)
         sections=[
             CSVSection(
                 title="SERIAL-NUMBERS",

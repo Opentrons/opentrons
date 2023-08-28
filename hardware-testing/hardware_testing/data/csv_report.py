@@ -260,21 +260,37 @@ class CSVSection:
         return True
 
 
-def _generate_meta_data_section() -> CSVSection:
-    return CSVSection(
-        title=META_DATA_TITLE,
-        lines=[
-            CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
-            CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
-            CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
-            CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, str, CSVResult]),
-            CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
-            CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
-            CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str, CSVResult]),
-            CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
-            CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
-        ],
-    )
+def _generate_meta_data_section(validate_meta_data: bool) -> CSVSection:
+    if validate_meta_data:
+        return CSVSection(
+            title=META_DATA_TITLE,
+            lines=[
+                CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
+                CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, str, CSVResult]),
+                CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
+                CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str, CSVResult]),
+                CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
+                CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
+            ],
+        )
+    else:
+        return CSVSection(
+            title=META_DATA_TITLE,
+            lines=[
+                CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
+                CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
+                CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str]),
+                CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
+                CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
+            ],
+        )
 
 
 def _generate_results_overview_section(tags: List[str]) -> CSVSection:
@@ -293,13 +309,15 @@ class CSVReport:
         sections: List[CSVSection],
         run_id: Optional[str] = None,
         start_time: Optional[float] = None,
+        validate_meta_data: bool = True,
     ) -> None:
         """CSV Report init."""
         self._test_name = test_name
         self._run_id = run_id if run_id else data_io.create_run_id()
+        self._validate_meta_data = validate_meta_data
         self._tag: Optional[str] = None
         self._file_name: Optional[str] = None
-        _section_meta = _generate_meta_data_section()
+        _section_meta = _generate_meta_data_section(validate_meta_data)
         _section_titles = [META_DATA_TITLE] + [s.title for s in sections]
         _section_results = _generate_results_overview_section(_section_titles)
         self._sections = [_section_meta, _section_results] + sections
@@ -411,10 +429,17 @@ class CSVReport:
         )
         self.save_to_disk()
 
-    def set_device_id(self, device_id: str, barcode_id: str) -> None:
+    def set_device_id(self, device_id: str, barcode_id: Optional[str] = None) -> None:
         """Store DUT serial number."""
-        result = CSVResult.from_bool(device_id == barcode_id)
-        self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id, barcode_id, result])
+        if self._validate_meta_data:
+            result = CSVResult.from_bool(device_id == barcode_id)
+            self(
+                META_DATA_TITLE,
+                META_DATA_TEST_DEVICE_ID,
+                [device_id, barcode_id, result],
+            )
+        else:
+            self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id])
 
     def set_robot_id(self, robot_id: str) -> None:
         """Store robot serial number."""
@@ -422,8 +447,11 @@ class CSVReport:
 
     def set_operator(self, operator: str) -> None:
         """Set operator."""
-        result = CSVResult.from_bool(bool(operator))
-        self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator, result])
+        if self._validate_meta_data:
+            result = CSVResult.from_bool(bool(operator))
+            self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator, result])
+        else:
+            self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator])
 
     def set_version(self, version: str) -> None:
         """Set version."""
