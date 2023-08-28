@@ -3,6 +3,9 @@
 export const equipmentImages = {
   calibration_pin: require('../../assets/images/gripper_cal_pin.png'),
   calibration_probe: require('../../assets/images/change-pip/calibration_probe.png'),
+  calibration_adapter_heater_shaker: require('../../assets/images/heater_shaker_calibration_adapter.png'),
+  calibration_adapter_temperature_module: require('../../assets/images/temperature_module_calibration_adapter.png'),
+  calibration_adapter_thermocycler: require('../../assets/images/thermocycler_calibration_adapter.png'),
   t10_torx_screwdriver: require('../../assets/images/t10_torx_screwdriver.png'),
   hex_screwdriver: require('../../assets/images/change-pip/hex_screwdriver.png'),
   flex_pipette: require('../../assets/images/change-pip/single_mount_pipettes.png'),

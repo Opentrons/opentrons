@@ -7,9 +7,12 @@ import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
-import { LEFT, MotorAxes } from '../../../../shared-data'
-import { THERMOCYCLER_MODULE_MODELS } from '../../../../shared-data/js/constants'
-import { getModuleDisplayName } from '../../../../shared-data/js/modules'
+import { MotorAxes } from '@opentrons/shared-data/js/types'
+import {
+  LEFT,
+  THERMOCYCLER_MODULE_MODELS,
+} from '@opentrons/shared-data/js/constants'
+import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { BODY_STYLE } from './constants'
 import {
@@ -25,9 +28,6 @@ import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
-
-const { t, i18n } = useTranslation('module_wizard_flows')
-
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
   isExiting: boolean
   slotName: string | undefined
@@ -58,7 +58,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isOnDevice,
     slotName,
   } = props
-  const { t } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const pipetteId = attachedPipette.serialNumber
   const mount = attachedPipette.mount
@@ -99,20 +99,28 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const attachedPipetteChannels = attachedPipette.data.channels
+  console.log(attachedPipetteChannels)
+  console.log(attachedPipette.data)
   let pipetteAttachProbeVideoSource, pipetteProbingVideoSource, i18nKey
   switch (attachedPipetteChannels) {
     case 1:
       pipetteAttachProbeVideoSource = attachProbe1
       pipetteProbingVideoSource = probing1
       i18nKey = 'install_probe'
+      console.log('TEST1')
+      break
     case 8:
       pipetteAttachProbeVideoSource = attachProbe8
       pipetteProbingVideoSource = probing8
       i18nKey = 'install_probe_8_channel'
+      console.log('TEST8')
+      break
     case 96:
       pipetteAttachProbeVideoSource = attachProbe96
       pipetteProbingVideoSource = probing96
       i18nKey = 'install_probe_96_channel'
+      console.log('TEST96')
+      break
   }
 
   const pipetteAttachProbeVid = (
@@ -223,7 +231,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     />
   ) : (
     <GenericWizardTile
-      header={t('attach_probe')}
+      header={i18n.format(t('attach_probe'), 'capitalize')}
       // TODO: make sure this is the right animation
       rightHandBody={pipetteAttachProbeVid}
       bodyText={bodyText}
