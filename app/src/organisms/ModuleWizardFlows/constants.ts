@@ -18,6 +18,8 @@ export const FLOWS = {
 export const CAL_PIN_LOADNAME = 'calibration_pin' as const
 export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
 
+export const LEFT_SLOTS: Array<string> = ['A1', 'B1', 'C1', 'D1']
+
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.Regular};
 

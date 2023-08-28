@@ -97,27 +97,22 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const attachedPipetteChannels = attachedPipette.data.channels
-  console.log(attachedPipetteChannels)
-  console.log(attachedPipette.data)
   let pipetteAttachProbeVideoSource, pipetteProbingVideoSource, i18nKey
   switch (attachedPipetteChannels) {
     case 1:
       pipetteAttachProbeVideoSource = attachProbe1
       pipetteProbingVideoSource = probing1
       i18nKey = 'install_probe'
-      console.log('TEST1')
       break
     case 8:
       pipetteAttachProbeVideoSource = attachProbe8
       pipetteProbingVideoSource = probing8
       i18nKey = 'install_probe_8_channel'
-      console.log('TEST8')
       break
     case 96:
       pipetteAttachProbeVideoSource = attachProbe96
       pipetteProbingVideoSource = probing96
       i18nKey = 'install_probe_96_channel'
-      console.log('TEST96')
       break
   }
 
@@ -174,7 +169,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   if (isRobotMoving)
     return (
       <InProgressModal
-        alternativeSpinner={isExiting ? null : pipetteProbingVid}
+        // alternativeSpinner={isExiting ? null : pipetteProbingVid}
+        alternativeSpinner={null} // TODO: update proving video sources
         description={
           isExiting
             ? t('stand_back')
