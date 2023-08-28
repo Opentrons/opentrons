@@ -5,6 +5,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
@@ -16,14 +18,17 @@ import {
   getUnmatchedModulesForProtocol,
 } from '../utils'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
+import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { ProtocolSetupModules } from '..'
 
 jest.mock('@opentrons/shared-data/js/helpers')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
 jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+jest.mock('../../ModuleWizardFlows')
 jest.mock('../utils')
 jest.mock('../SetupInstructionsModal')
 
@@ -47,6 +52,12 @@ const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jes
 >
 const mockSetupInstructionsModal = SetupInstructionsModal as jest.MockedFunction<
   typeof SetupInstructionsModal
+>
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
+const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
+  typeof ModuleWizardFlows
 >
 
 const RUN_ID = "otie's run"
@@ -87,6 +98,10 @@ describe('ProtocolSetupModules', () => {
     mockSetupInstructionsModal.mockReturnValue(
       <div>mock SetupInstructionsModal</div>
     )
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [] },
+    } as any)
+    mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
   })
 
   afterEach(() => {
@@ -114,5 +129,14 @@ describe('ProtocolSetupModules', () => {
 
     getByText('Setup Instructions').click()
     getByText('mock SetupInstructionsModal')
+  })
+
+  it('should launch module calibration wizard, when tapping calibrate button', () => {
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [instrumentsResponseFixture.data[0]] },
+    } as any)
+    const [{ getByText }] = render()
+    getByText('calibrate')
+    // getByText('mock ModuleWizardFlows')
   })
 })

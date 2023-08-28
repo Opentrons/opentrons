@@ -92,19 +92,7 @@ function RowModule({
 
   function ModuleCalibrationStatus(): JSX.Element {
     if (isModuleReady === false) {
-      return (
-        <>
-          <Chip
-            text={t('module_disconnected')}
-            type="warning"
-            background={false}
-            iconName="connection-status"
-          />
-          {isDuplicateModuleModel ? (
-            <Icon name="information" size="2rem" />
-          ) : null}
-        </>
-      )
+      return <CalibrationStatus />
     }
     if (isModuleCalibrated) {
       return (
@@ -146,7 +134,19 @@ function RowModule({
           </StyledText>
         )
       case 'calibrated':
-        return <ModuleCalibrationStatus />
+        return (
+          <>
+            <Chip
+              text={t('module_disconnected')}
+              type="warning"
+              background={false}
+              iconName="connection-status"
+            />
+            {isDuplicateModuleModel ? (
+              <Icon name="information" size="2rem" />
+            ) : null}
+          </>
+        )
     }
   }
 
@@ -204,7 +204,7 @@ function RowModule({
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             whiteSpace="break-spaces"
           >
-            <CalibrationStatus />
+            <ModuleCalibrationStatus />
           </Flex>
         )}
       </Flex>
