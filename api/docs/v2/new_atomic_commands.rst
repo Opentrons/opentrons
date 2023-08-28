@@ -402,7 +402,7 @@ Touch Tip
 
 The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps to knock off any droplets that might be hanging on to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well plate. By default, the ``touch_tip()`` method performs its action within the current well location::
 
-    pipette.touch_tip() # touch tip in current well location
+    pipette.touch_tip() 
 
 The ``touch_tip()`` method also includes optional arguments that control the location and speed of a touch procedure. For example::
 
@@ -432,22 +432,20 @@ The ``touch_tip()`` method also includes optional arguments that control the loc
 Mix
 ===
 
-To mix is to perform a series of ``aspirate`` and ``dispense`` commands in a row on a single location. Instead of having to write those commands out every time, you can call :py:meth:`.InstrumentContext.mix`.
-
-The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, location)``:
+The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help blend the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in uL) of liquid, and the location of a well that contains the liquid you want to mix.   
 
 .. code-block:: python
 
-    # mix 4 times, 100uL, in plate:A2
-    pipette.mix(4, 100, plate['A2'])
-    # mix 3 times, 50uL, in current location
+    # mix 3 times, 50uL, current location
     pipette.mix(3, 50)
-    # mix 2 times, pipette's max volume, in current location
+    # mix 4 times, 100uL, from well A2
+    pipette.mix(4, 100, plate['A2'])
+    # mix 2 times, use the pipette's max volume, current location
     pipette.mix(2)
 
 .. note::
 
-    In API Versions 2.2 and earlier, mixes consist of aspirates and then immediate dispenses. In between these actions, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette will not move between actions. 
+    In API Versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette does not move between aspiratea and dispense mixing actions. 
 
 .. versionadded:: 2.0
 
