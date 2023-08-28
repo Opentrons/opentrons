@@ -62,7 +62,9 @@ async def get_networking_status() -> NetworkingStatus:
     "/wifi/list",
     summary="Scan for visible Wi-Fi networks",
     description="Returns the list of the visible wifi networks "
-    "along with some data about their security and strength. ",
+    "along with some data about their security and strength. "
+    "Only use rescan=True based on the user needs like clicking on"
+    "the scan network button and not to just poll.",
     response_model=WifiNetworks,
 )
 async def get_wifi_networks(
