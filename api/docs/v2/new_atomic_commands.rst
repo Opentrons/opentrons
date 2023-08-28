@@ -298,52 +298,39 @@ To check whether you should pick up a tip or not, you can utilize :py:meth:`.Ins
 Liquid Control
 ==============
 
+After attaching a tip, your robot is ready to manipulate liquids. The API provides several liquid-handling methods that give you a lot of control over how to use liquids in your protocols. These methods include:
 
-This section describes the :py:class:`.InstrumentContext` 's liquid-handling commands.
+- :py:meth:`.InstrumentContext.aspirate`
+- :py:meth:`.InstrumentContext.dispense`
+- :py:meth:`.InstrumentContext.blow_out`
+- :py:meth:`.InstrumentContext.touch_tip`
+- :py:meth:`.InstrumentContext.mix`
+- :py:meth:`.InstrumentContext.air_gap`
 
-The examples in this section should be inserted in the following:
-
-.. code-block:: python
-    :substitutions:
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        pipette = protocol.load_instrument('p300_single_gen2', mount='left', tip_racks=[tiprack])
-        pipette.pick_up_tip()
-        # example code goes here
-
-
-This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and a `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 3, and uses a P300 Single GEN2 pipette.
-
+The following sections demonstrate how to use each method and include sample code. Each code snippet works with the sample code shown above. 
 
 .. _new-aspirate:
 
 Aspirate
-========
+--------
 
-To aspirate is to pull liquid up into the pipette's tip. When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, you can specify the volume to aspirate in µL, where to aspirate from, and how fast to aspirate liquid.
+To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method's arguments let you specify the aspirated volume µL, where to aspirate from (e.g. a well plate or reservoir), and how fast to aspirate liquid. For example, this snippet tells the robot to draw 50 µL from well location A1 at a specific rate in µL/s::
 
-.. code-block:: python
+    pipette.aspirate(50, plate['A1'], rate=2.0)
 
-    pipette.aspirate(50, plate['A1'], rate=2.0)  # aspirate 50uL from plate:A1
+In this example: 
 
-Now the pipette's tip is holding 50 µL.
+- The location parameter (e.g., ``plate['A1']``) tells the robot to aspirate from the default position in a well. You can also aspirate from a specific position within a well by adding an optional location argument (e.g., ``plate['A1'].bottom`` or ``plate['A1'].top``).
 
-The ``location`` parameter is either a well (like ``plate['A1']``) or a position within a well, like the return value of ``plate['A1'].bottom``.
+- The ``rate`` parameter is a multiplication factor of the pipette's default aspiration flow rate. See  :ref:`new-plunger-flow-rates` for a list of Flex and OT-2 pipette flow rates.
 
-The ``rate`` parameter is a multiplication factor of the pipette's default aspiration flow rate. The default aspiration flow rate for all pipettes is in the :ref:`defaults` section.
+You can also just specify the volume to aspirate, and not mention a location. In this example, the pipette aspirates a second time from its current location, which we previously set as ``plate['A1'])``::
 
-You can also simply specify the volume to aspirate, and not mention a location. The pipette will aspirate from its current location (which we previously set as ``plate['A1'])``.
+    pipette.aspirate(50)  # aspirate 50uL from current position
 
-.. code-block:: python
+Now our pipette holds 100 µL.
 
-    pipette.aspirate(50)                     # aspirate 50uL from current position
-
-Now our pipette's tip is holding 100 µL.
-
+.. Version 1 mention in note. Is this too old to keep? Can we remove it?
 .. note::
 
     In version 1 of this API, ``aspirate`` (and ``dispense``) would inspect the types of the ``volume`` and ``location`` arguments and do the right thing if you specified only a location or specified location and volume out of order. In this and future versions of the Python Protocol API, this is no longer true. Like any other Python function, if you are specifying arguments by position without using their names, you must always specify them in order.
@@ -363,17 +350,24 @@ Now our pipette's tip is holding 100 µL.
 Dispense
 ========
 
-To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:`.InstrumentContext.dispense` in the Protocol API is similar to :py:meth:`.InstrumentContext.aspirate`, in that you can specify volume in µL and location, or only volume.
+To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.dispense` method. This method's arguments let you specify the dispensed volume µL, where to deposit a liquid (e.g. a well plate or reservoir), and how quickly to dispense it in uL/s. For example, this snippet tells the robot to dispense 50 µL into well location B1 at a specific rate in µL/s::
 
-.. code-block:: python
+    pipette.dispense(50, plate['B1'], rate=2.0)
+    
+In this example:
 
-    pipette.dispense(50, plate['B1'], rate=2.0) # dispense 50uL to plate:B1 at twice the normal rate
-    pipette.dispense(50)              # dispense 50uL to current position at the normal rate
+- The location parameter (e.g., ``plate['A1']``) tells the robot to aspirate from the default position in a well. You can also aspirate from a specific position within a well by adding an optional location argument (e.g., ``plate['A1'].bottom`` or ``plate['A1'].top``).
 
+- The ``rate`` parameter is a multiplication factor of the pipette's default aspiration flow rate. See  :ref:`new-plunger-flow-rates` for a list of Flex and OT-2 pipette flow rates.
 
-The ``location`` parameter is either a well (like ``plate['A1']``) or a position within a well, like the return value of ``plate['A1'].bottom``.
+You can also just specify the volume to aspirate, and not mention a location. For example, if our pipette holds 100 uL and you want to dispense a second time from its current location (``plate['A1'])``), you could call the ``dispense()`` method again without location argument:: 
+    
+    pipette.dispense(50)
 
-The ``rate`` parameter is a multiplication factor of the pipette's default dispense flow rate. The default dispense flow rate for all pipettes is in the :ref:`defaults` section.
+.. same question as with aspirate. Note below is kinda old (api v1 reference). Can we remove?
+.. note::
+
+    In version 1 of this API, ``dispense`` (and ``aspirate``) would inspect the types of the ``volume`` and ``location`` arguments and do the right thing if you specified only a location or specified location and volume out of order. In this and future versions of the Python Protocol API, this is no longer true. Like any other Python function, if you are specifying arguments by position without using their names, you must always specify them in order.
 
 .. note::
 
@@ -383,9 +377,6 @@ The ``rate`` parameter is a multiplication factor of the pipette's default dispe
     the default throughout your protocol - you can change the default offset with
     :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
-.. note::
-
-    In version 1 of this API, ``dispense`` (and ``aspirate``) would inspect the types of the ``volume`` and ``location`` arguments and do the right thing if you specified only a location or specified location and volume out of order. In this and future versions of the Python Protocol API, this is no longer true. Like any other Python function, if you are specifying arguments by position without using their names, you must always specify them in order.
 
 .. versionadded:: 2.0
 
@@ -396,14 +387,10 @@ The ``rate`` parameter is a multiplication factor of the pipette's default dispe
 Blow Out
 ========
 
-To blow out is to push an extra amount of air through the pipette's tip, to make sure that any remaining droplets are expelled.
+To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.InstrumentContext.blow_out` method. A blow out is useful to clear the pipette tip of any remaining liquid. When using this method, you can specify a blow out location. If no location is specified, the pipette will blow out from its current position. For example::
 
-When calling :py:meth:`.InstrumentContext.blow_out`, you can specify a location to blow out the remaining liquid. If no location is specified, the pipette will blow out from its current position.
-
-.. code-block:: python
-
-    pipette.blow_out()            # blow out in current location
-    pipette.blow_out(plate['B3']) # blow out in current plate:B3
+    pipette.blow_out()            # blow out from the current location
+    pipette.blow_out(plate['B3']) # blow out in well plate location B3
 
 
 .. versionadded:: 2.0
@@ -413,9 +400,7 @@ When calling :py:meth:`.InstrumentContext.blow_out`, you can specify a location 
 Touch Tip
 =========
 
-To touch tip is to move the pipette's currently attached tip to four opposite edges of a well, to knock off any droplets that might be hanging from the tip.
-
-When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the option to specify a location where the tip will touch the inner walls.
+The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps to knock off any droplets that might be hanging on to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well plate.
 
 :py:meth:`.InstrumentContext.touch_tip` can take up to 4 arguments: ``touch_tip(location, radius, v_offset, speed)``.
 
