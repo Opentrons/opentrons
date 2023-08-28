@@ -31,7 +31,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
                 temperature_module = protocol.load_module(
                   module_name='temperature module gen2', location='D3')
 
-        After the ``load_module()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+        After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
         
     .. tab:: OT-2
         
@@ -51,7 +51,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
                 temperature_module = protocol.load_module(
                   module_name='temperature module', location=3)
 
-        After the ``load_module()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+        After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
 
 .. versionadded:: 2.0
