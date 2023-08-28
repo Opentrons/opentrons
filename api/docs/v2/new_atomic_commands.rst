@@ -377,7 +377,9 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 Utility Commands
 ================
 
+Utility commands are commands that perform small convenience actions in a protocol or that control a robot's behavior. 
 
+The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Delay for an Amount of Time
 ---------------------------
