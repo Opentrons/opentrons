@@ -152,7 +152,7 @@
   "model_and_serial": "Pipette Model and Serial",
   "module_calibration_confirm_modal_body": "This will immediately delete calibration data for this module on this robot.",
   "module_calibration_confirm_modal_title": "Are you sure you want to clear module calibration data?",
-  "module_calibration_description": "Module calibration uses a pipette with probe attached to determine the module’s exact position relative the deck slots.",
+  "module_calibration_description": "Module calibration uses a pipette and attached probe to determine the module's exact position relative to the deck.",
   "module_calibration": "Module Calibration",
   "module": "Module",
   "mount": "Mount",
