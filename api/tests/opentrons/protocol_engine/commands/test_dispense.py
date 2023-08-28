@@ -44,9 +44,7 @@ async def test_dispense_implementation(
 
     decoy.when(
         await pipetting.dispense_in_place(
-            pipette_id="pipette-id-abc123",
-            volume=50,
-            flow_rate=1.23,
+            pipette_id="pipette-id-abc123", volume=50, flow_rate=1.23, push_out=None
         )
     ).then_return(42)
 
