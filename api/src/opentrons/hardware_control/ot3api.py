@@ -1542,7 +1542,8 @@ class OT3API(
         Possible events where this occurs:
 
         1. After homing the plunger
-        2. Between a blow-out and an aspiration (eg: re-using tips)
+        2. After picking up a new tip
+        3. Between a blow-out and an aspiration (eg: re-using tips)
 
         Three possible physical tip states when this happens:
 
@@ -1563,43 +1564,48 @@ class OT3API(
         instrument = self._pipette_handler.get_pipette(checked_mount)
         if instrument.current_volume > 0:
             raise RuntimeError("cannot position plunger while holding liquid")
+        # target position is plunger BOTTOM
         target_pos = target_position_from_plunger(
             OT3Mount.from_mount(mount),
             instrument.plunger_positions.bottom,
             self._current_position,
         )
-        pip_ax = Axis.of_main_tool_actuator(mount)
-        current_pos = self._current_position[pip_ax]
+        pip_ax = Axis.of_main_tool_actuator(checked_mount)
+        # speed depends on if there is a tip, and which direction to move
         if instrument.has_tip:
-            if current_pos > target_pos[pip_ax]:
-                # using slower aspirate flow-rate, to avoid pulling droplets up
-                speed = self._pipette_handler.plunger_speed(
-                    instrument, instrument.aspirate_flow_rate, "aspirate"
-                )
-            else:
-                # use blow-out flow-rate, so we can push droplets out
-                speed = self._pipette_handler.plunger_speed(
-                    instrument, instrument.blow_out_flow_rate, "dispense"
-                )
+            # using slower aspirate flow-rate, to avoid pulling droplets up
+            speed_up = self._pipette_handler.plunger_speed(
+                instrument, instrument.aspirate_flow_rate, "aspirate"
+            )
+            # use blow-out flow-rate, so we can push droplets out
+            speed_down = self._pipette_handler.plunger_speed(
+                instrument, instrument.blow_out_flow_rate, "dispense"
+            )
         else:
             # save time by using max speed
             max_speeds = self.config.motion_settings.default_max_speed
-            speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+            speed_up = max_speeds[self.gantry_load][OT3AxisKind.P]
+            speed_down = speed_up
         # IMPORTANT: Here is our backlash compensation.
         #            The plunger is pre-loaded in the "aspirate" direction
+        backlash_pos = target_pos.copy()
+        backlash_pos[pip_ax] += instrument.backlash_distance
         # NOTE: plunger position (mm) decreases up towards homing switch
-        if current_pos < target_pos[pip_ax]:
-            # move down below "bottom", before moving back up to "bottom"
-            backlash_pos = target_pos.copy()
-            backlash_pos[pip_ax] += instrument.backlash_distance
+        # NOTE: if already at BOTTOM, we still need to run backlash-compensation movement,
+        #       because we do not know if we arrived at BOTTOM from above or below.
+        if self._current_position[pip_ax] < backlash_pos[pip_ax]:
             await self._move(
                 backlash_pos,
-                speed=(speed * rate),
+                speed=(speed_down * rate),
                 acquire_lock=acquire_lock,
             )
+        # NOTE: This should ALWAYS be moving UP.
+        #       There should never be a time that this function is called and
+        #       the plunger doesn't physically move UP into it's BOTTOM position.
+        #       This is to make sure we are always engaged at the beginning of aspirate.
         await self._move(
             target_pos,
-            speed=(speed * rate),
+            speed=(speed_up * rate),
             acquire_lock=acquire_lock,
         )
 
