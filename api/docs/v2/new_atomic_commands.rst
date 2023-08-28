@@ -373,12 +373,12 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 
 .. _new-utility-commands:
 
-****************
+
 Utility Commands
-****************
+================
 
 Delay for an Amount of Time
-===========================
+---------------------------
 
 Sometimes you need to wait as a step in your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to wait your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol as a whole.
 
@@ -392,7 +392,7 @@ The values passed into ``delay()`` specify the number of minutes and seconds tha
 
 
 Pause Until Resumed
-===================
+-------------------
 
 The method :py:meth:`.ProtocolContext.pause` will pause protocol execution at a specific step.
 You can resume by pressing 'resume' in your Opentrons App. You can optionally specify a message that
@@ -416,7 +416,7 @@ will be displayed in the Opentrons App when protocol execution pauses.
 .. versionadded:: 2.0
 
 Homing
-======
+------
 
 You can manually request for the robot to home during protocol execution. This is typically
 not necessary; however, if at any point you will disengage motors or move
@@ -447,7 +447,7 @@ None of these functions take any arguments:
 
 
 Comment
-=======
+-------
 
 The method :py:meth:`.ProtocolContext.comment` lets you display messages in the Opentrons App during protocol execution:
 
@@ -466,7 +466,7 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
 
 
 Control and Monitor Robot Rail Lights
-=====================================
+-------------------------------------
 
 You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
 
@@ -502,7 +502,7 @@ You can also check whether the rail lights are on or off in the protocol using :
 .. TODO clarify that this is specific to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
 
 Monitor Robot Door
-==================
+------------------
 
 The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
 
