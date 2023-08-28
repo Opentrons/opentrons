@@ -392,7 +392,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           header={t('pick_up_tip_from_rack_in_location', {
             location: displayLocation,
           })}
-          body={(
+          body={
             <StyledText as="p">
               {t('ensure_nozzle_is_above_tip')}
               &nbsp;
@@ -400,7 +400,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
                 ? t('if_not_aligned_tap_to_jog')
                 : t('if_not_aligned_click_to_jog')}
             </StyledText>
-          )}
+          }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
           handleConfirmPosition={handleConfirmPosition}

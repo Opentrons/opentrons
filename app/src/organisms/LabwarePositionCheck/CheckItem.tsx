@@ -124,7 +124,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   React.useEffect(() => {
     if (initialPosition == null && modulePrepCommands.length > 0) {
       chainRunCommands(modulePrepCommands, false)
-        .then(() => { })
+        .then(() => {})
         .catch((e: Error) => {
           setFatalError(
             `CheckItem module prep commands failed with message: ${e?.message}`
