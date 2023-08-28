@@ -377,7 +377,15 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 Utility Commands
 ================
 
-Utility commands are commands that perform small convenience actions in a protocol or that control a robot's behavior. 
+Utility commands are commands that perform small convenience actions in a protocol or that control a robot's behavior. These include:
+
+- :py:meth:`.ProtocolContext.delay`
+- :py:meth:`.ProtocolContext.pause`
+- :py:meth:`.ProtocolContext.home`
+- :py:meth:`.ProtocolContext.comment`
+- :py:meth:`.ProtocolContext.set_rail_lights`
+- :py:meth:`.ProtocolContext.rail_lights_on`
+- :py:meth:`.ProtocolContext.door_closed`
 
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
