@@ -79,7 +79,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
     step = step_size[step_length_index]
     pos = 0
     speed = 10
-    current = current_size[step_current_index]
+    current = 0.5 #current_size[step_current_index]
     await set_pipette_current(current, args)
     print('Speed = {}, current = {}'.format(speed,current))
     res = {node: (0,0,0)}
@@ -136,20 +136,20 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
             if step_length_index <= 0:
                 step_length_index = 0
             step = step_size[step_length_index]
-        elif input == ">":
-            sys.stdout.flush()
-            step_current_index = step_current_index + 1
-            if step_current_index >= 21:
-                step_current_index = 21
-            current = current_size[step_current_index]
-            await set_pipette_current(current, args)
-        elif input == "<":
-            sys.stdout.flush()
-            step_current_index = step_current_index - 1
-            if step_current_index >= 0:
-                step_current_index = 0
-            current = current_size[step_current_index]
-            await set_pipette_current(current, args)
+        # elif input == ">":
+        #     sys.stdout.flush()
+        #     step_current_index = step_current_index + 1
+        #     if step_current_index >= 21:
+        #         step_current_index = 21
+        #     current = current_size[step_current_index]
+        #     await set_pipette_current(current, args)
+        # elif input == "<":
+        #     sys.stdout.flush()
+        #     step_current_index = step_current_index - 1
+        #     if step_current_index >= 0:
+        #         step_current_index = 0
+        #     current = current_size[step_current_index]
+        #     await set_pipette_current(current, args)
 
         elif input == '\r' or input == '\n' or input == '\r\n':
             sys.stdout.flush()
@@ -159,7 +159,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
                                 'encoder position: ', res[node][1], ', '
                                 ' Motor Step: ',
                                 step_size[step_length_index],
-                                "current",current_size[step_current_index],
+                                #"current",current_size[step_current_index],
                                 end = '                                      ')
         print('\r', end='')
 

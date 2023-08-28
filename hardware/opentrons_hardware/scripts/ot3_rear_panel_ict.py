@@ -21,6 +21,9 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     EstopButtonPresentRequest,
     EstopButtonDetectionChange,
     EstopStateChange,
+    DeviceInfoRequest,
+    EngageEstop,
+    ReleaseEstop,
     Ack,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
@@ -57,21 +60,33 @@ class RearPinState:
 
 async def get_estop_change(messenger: Optional[BinaryMessenger]) -> RearPinState:
     current_state = RearPinState()
-    if messenger is None:
-        return current_state
-    response = await messenger.send_and_receive(
-        message=EstopButtonPresentRequest(),
-        response_type=EstopStateChange,
-    )
-    if response is not None:
-        current_state.etop_active = bool(
-            cast(EstopStateChange, response).engaged.value
+
+
+    #estop active pin
+    # response = await messenger.send_and_receive(
+    #     message=EStopActiveRequeset(),
+    #     response_type=EstopStateChange,
+    # )
+    # if response is not None:
+    #     current_state.etop_active = bool(cast(EstopStateChange, response).engaged.value)
+
+
+    while True:   
+        if messenger is None:
+            return current_state
+        response = await messenger.send_and_receive(
+            message=DeviceInfoRequest(),
+            response_type=EstopStateChange,
         )
-        print(f'GETESTOPSTATUS={current_state.etop_active }')
-        current_state.aux2_estop_det = bool(
-            cast(EstopStateChange, response).engaged.value
-        )
-        print(f'GETESTOPSTATUS={current_state.etop_active}')
+        if response is not None:
+            current_state.etop_active = bool(
+                cast(EstopStateChange, response).engaged.value
+            )
+            print(f'GETESTOPSTATUS={current_state.etop_active }')
+            current_state.aux2_estop_det = bool(
+                cast(EstopStateChange, response).engaged.value
+            )
+            print(f'GETESTOPSTATUS={current_state.etop_active}')
 
 
 async def get_all_pin(messenger: Optional[BinaryMessenger],args: argparse.Namespace) -> RearPinState:
@@ -153,6 +168,14 @@ async def get_all_pin(messenger: Optional[BinaryMessenger],args: argparse.Namesp
             print(f'AUX1IDDET=fail')
         elif args.getpintype =="aux2iddet":
             print(f'AUX2IDDET=fail')
+    
+    if args.getpintype == "all":
+        print(f'AUX1ESTOPDET={current_state.aux1_estop_det}')
+        print(f'AUX2ESTOPDET={current_state.aux2_estop_det}')
+        print(f'AUX1AUXDET={current_state.aux1_aux_det}')
+        print(f'AUX2AUXDET={current_state.aux2_aux_det}')
+        print(f'AUX1IDDET={current_state.aux1_id_active}')
+        print(f'AUX2IDDET={current_state.aux2_id_active}')
 
     # TODO add estop port detection request
     """
@@ -175,7 +198,10 @@ async def main() -> None:
     parser.add_argument('--read-eeprom', action='store_true')
     parser.add_argument('--check-door-status', action='store_true')
     parser.add_argument('--check-all-pin',action='store_true')
-    parser.add_argument('--get-estop-status',action='store_true')
+    parser.add_argument('--set-estop-engag',action='store_true')
+    parser.add_argument('--release-estop',action='store_true')
+
+
     parser.add_argument(
         "--getpintype", type=str, help="iddet,auxdet,estopdet", default="iddet"
     )
@@ -269,10 +295,18 @@ async def main() -> None:
         response = await get_all_pin(driver,args)
         
     
-    if args.get_estop_status:
-        response = await get_estop_change(driver)
-        if response is None:
-            print(f'GETESTOPSTATUS=Fail')
-
+    if args.set_estop_engag:
+        try:
+            await driver.send(message=EngageEstop())
+            print("SETESTOPENGAG=Pass")
+        except:
+            print("SETESTOPENGAG=fail")
+    
+    if args.release_estop:
+        try:
+            await driver.send(message=ReleaseEstop())
+            print("RELEASEESTOP=Pass")
+        except:
+            print("RELEASEESTOP=fail")
 if __name__ == '__main__':
     asyncio.run(main())
