@@ -7,6 +7,7 @@ import {
   useAllTipLengthCalibrationsQuery,
   useCalibrationStatusQuery,
   useInstrumentsQuery,
+  useModulesQuery,
 } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
@@ -26,12 +27,14 @@ import { CONNECTABLE } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
 import * as Sessions from '../../redux/sessions'
+import { useFeatureFlag } from '../../redux/config'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { CalibrationHealthCheck } from './CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
+import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
@@ -118,6 +121,13 @@ export function RobotSettingsCalibration({
       }
     }
   )
+
+  // Modules Calibration
+  const enableModuleCalibration = useFeatureFlag('enableModuleCalibration')
+  const attachedModules =
+    useModulesQuery({
+      refetchInterval: CALS_FETCH_MS,
+    })?.data?.data ?? []
 
   // Note: following fetch need to reflect the latest state of calibrations
   // when a user does calibration or rename a robot.
@@ -317,6 +327,15 @@ export function RobotSettingsCalibration({
           />
           <Line />
           <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          {enableModuleCalibration ? (
+            <>
+              <Line />
+              <RobotSettingsModuleCalibration
+                attachedModules={attachedModules}
+                updateRobotStatus={updateRobotStatus}
+              />
+            </>
+          ) : null}
         </>
       ) : (
         <>
