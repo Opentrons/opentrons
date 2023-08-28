@@ -1,7 +1,8 @@
 import * as React from 'react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { Flex, Text } from '../../primitives'
+import { LocationIcon } from '../../molecules'
+import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
@@ -35,24 +36,36 @@ export const SlotLabels = ({
           width="2.5rem"
         >
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">
-              A
-            </Text>
+            <LocationIcon
+              color={color}
+              slotName="A"
+              height="max-content"
+              width="100%"
+            />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">
-              B
-            </Text>
+            <LocationIcon
+              color={color}
+              slotName="B"
+              height="max-content"
+              width="100%"
+            />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">
-              C
-            </Text>
+            <LocationIcon
+              color={color}
+              slotName="C"
+              height="max-content"
+              width="100%"
+            />
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">
-              D
-            </Text>
+            <LocationIcon
+              color={color}
+              slotName="D"
+              height="max-content"
+              width="100%"
+            />
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
@@ -73,27 +86,21 @@ export const SlotLabels = ({
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <Text color={color} as="h3">
-              1
-            </Text>
+            <LocationIcon color={color} slotName="1" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <Text color={color} as="h3">
-              2
-            </Text>
+            <LocationIcon color={color} slotName="2" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <Text color={color} as="h3">
-              3
-            </Text>
+            <LocationIcon color={color} slotName="3" height="100%" />
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
