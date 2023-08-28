@@ -293,12 +293,11 @@ To check whether you should pick up a tip or not, you can utilize :py:meth:`.Ins
 
 **********************
 
-.. start here, branch docs-liquid-control
 
 Liquid Control
 ==============
 
-After attaching a tip, your robot is ready to manipulate liquids. The API provides several liquid-handling methods that give you a lot of control over how to use liquids in your protocols. These methods include:
+After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API provides the following methods that help you manipulate liquids in your protocols. These include:
 
 - :py:meth:`.InstrumentContext.aspirate`
 - :py:meth:`.InstrumentContext.dispense`
@@ -314,7 +313,7 @@ The following sections demonstrate how to use each method and include sample cod
 Aspirate
 --------
 
-To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method's arguments let you specify the aspirated volume µL, where to aspirate from (e.g. a well plate or reservoir), and how fast to aspirate liquid. For example, this snippet tells the robot to draw 50 µL from well location A1 at a specific rate in µL/s::
+To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method's arguments let you specify the aspirated volume in µL, the well to aspirate from, and how fast to draw liquid into the pipette. For example, this snippet tells the robot to remove 50 µL from well location A1 at a specific rate in µL/s::
 
     pipette.aspirate(50, plate['A1'], rate=2.0)
 
@@ -337,7 +336,7 @@ Now our pipette holds 100 µL.
 
 .. note::
 
-    By default, the pipette will move to 1 mm above the bottom of the target well before aspirating.
+    By default, the pipette will moves to 1 mm above the bottom of the target well before aspirating.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``aspirate``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
@@ -350,17 +349,17 @@ Now our pipette holds 100 µL.
 Dispense
 ========
 
-To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.dispense` method. This method's arguments let you specify the dispensed volume µL, where to deposit a liquid (e.g. a well plate or reservoir), and how quickly to dispense it in uL/s. For example, this snippet tells the robot to dispense 50 µL into well location B1 at a specific rate in µL/s::
+To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.dispense` method. This method's arguments let you specify the dispensed volume µL, where to deposit a liquid (e.g. a well location on a plate or reservoir), and how quickly to dispense it in uL/s. For example, this snippet tells the robot to dispense 50 µL into well location B1 at a specific rate in µL/s::
 
     pipette.dispense(50, plate['B1'], rate=2.0)
     
 In this example:
 
-- The location parameter (e.g., ``plate['A1']``) tells the robot to aspirate from the default position in a well. You can also aspirate from a specific position within a well by adding an optional location argument (e.g., ``plate['A1'].bottom`` or ``plate['A1'].top``).
+- The location parameter (e.g., ``plate['A1']``) tells the robot to aspirate from the default position in a well. You can also aspirate from a the top or bottom of a well by adding an optional location argument (e.g., ``plate['A1'].top`` or ``plate['A1'].bottom``).
 
 - The ``rate`` parameter is a multiplication factor of the pipette's default aspiration flow rate. See  :ref:`new-plunger-flow-rates` for a list of Flex and OT-2 pipette flow rates.
 
-You can also just specify the volume to aspirate, and not mention a location. For example, if our pipette holds 100 uL and you want to dispense a second time from its current location (``plate['A1'])``), you could call the ``dispense()`` method again without location argument:: 
+You can also just specify the volume to aspirate, and not mention a location. For example, if our pipette holds 100 uL and you want to dispense a second time from its current location (``plate['A1'])``), you could call the ``dispense()`` method again without a location argument:: 
     
     pipette.dispense(50)
 
@@ -371,7 +370,7 @@ You can also just specify the volume to aspirate, and not mention a location. Fo
 
 .. note::
 
-    By default, the pipette will move to 1 mm above the bottom of the target well before dispensing.
+    By default, the pipette moves to 1 mm above the bottom of the target well before dispensing.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``dispense``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
@@ -387,10 +386,10 @@ You can also just specify the volume to aspirate, and not mention a location. Fo
 Blow Out
 ========
 
-To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.InstrumentContext.blow_out` method. A blow out is useful to clear the pipette tip of any remaining liquid. When using this method, you can specify a blow out location. If no location is specified, the pipette will blow out from its current position. For example::
+To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.InstrumentContext.blow_out` method. A blow out is useful to clear the pipette of any remaining liquid. When using this method, you can use a specific well in a well plate or reservoir as a blow out location. If no location is specified, the pipette will blow out from its current well position. For example::
 
     pipette.blow_out()            # blow out from the current location
-    pipette.blow_out(plate['B3']) # blow out in well plate location B3
+    pipette.blow_out(plate['B1']) # blow out into well B1
 
 
 .. versionadded:: 2.0
@@ -400,7 +399,7 @@ To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.I
 Touch Tip
 =========
 
-The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps to knock off any droplets that might be hanging on to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well plate. By default, the ``touch_tip()`` method performs its action within the current well location::
+The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps to knock off any droplets that might be hanging on to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well plate and the touch speed. Calling the ``touch_tip()`` method without arguments causes the pipette to touch the well walls from its current location::
 
     pipette.touch_tip() 
 
@@ -421,7 +420,7 @@ The ``touch_tip()`` method also includes optional arguments that control the loc
 
 .. note:
 
-    We recommend changing your API version to 2.4 to take advantage of new ``touch_tip()``
+    We recommend changing your API version to 2.4 (or higher) to take advantage of new ``touch_tip()``
     features such as:
         - A lower minimum speed (1 mm/s)
         - Improved handling
@@ -432,7 +431,7 @@ The ``touch_tip()`` method also includes optional arguments that control the loc
 Mix
 ===
 
-The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help blend the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in uL) of liquid, and the location of a well that contains the liquid you want to mix.   
+The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in uL) of liquid, and the location of a well that contains the liquid you want to mix.   
 
 .. code-block:: python
 
@@ -445,7 +444,7 @@ The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and d
 
 .. note::
 
-    In API Versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette does not move between aspiratea and dispense mixing actions. 
+    In API Versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette does not move between aspirate and dispense mixing actions. 
 
 .. versionadded:: 2.0
 
@@ -460,8 +459,7 @@ The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to aspirate s
     pipette.air_gap() # draws 500 uL of air
 
 The ``air_gap()`` method also accepts the ``volume`` and ``height`` arguments. These let you control the amount of air (in uL) drawn in and the height (in mm) above the well for aspirating air. By default, the pipette will move 5 mm above a well before creating the air gap. For example, this code aspirates 200 uL of liquid from well A1. The aspiration action is followed by an air gap of 75 uL taken from 20 mm above the well::
-
-    pipette.pick_up_tip()
+    
     pipette.aspirate(200, plate['A1'])
     pipette.air_gap(75, 20)
 
