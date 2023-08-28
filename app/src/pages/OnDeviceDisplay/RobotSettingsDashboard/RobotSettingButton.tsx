@@ -28,6 +28,10 @@ const SETTING_BUTTON_STYLE = css`
   background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
+
+  &:active {
+    background-color: ${COLORS.darkBlack40};
+  }
 `
 
 interface RobotSettingButtonProps {
@@ -43,7 +47,7 @@ export function RobotSettingButton({
   iconName,
   onClick,
   settingInfo,
-  rightElement
+  rightElement,
 }: RobotSettingButtonProps): JSX.Element {
   return (
     <Btn
@@ -51,7 +55,6 @@ export function RobotSettingButton({
       onClick={onClick}
       display={DISPLAY_FLEX}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing24}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
     >
@@ -59,6 +62,8 @@ export function RobotSettingButton({
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
+        width="100%"
+        whiteSpace="nowrap"
       >
         <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
         <Flex
@@ -66,7 +71,6 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
-          width="46.25rem"
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {settingName}
@@ -83,13 +87,13 @@ export function RobotSettingButton({
           ) : null}
         </Flex>
       </Flex>
-      {rightElement != null
-        ? rightElement : (
-          <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
-            <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
-          </Flex>
-        )
-      }
+      {rightElement != null ? (
+        rightElement
+      ) : (
+        <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
+        </Flex>
+      )}
     </Btn>
   )
 }

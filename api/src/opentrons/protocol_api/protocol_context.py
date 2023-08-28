@@ -365,7 +365,9 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_labware(
             load_name=load_name,
@@ -471,7 +473,9 @@ class ProtocolContext(CommandPublisher):
         if isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_adapter(
             load_name=load_name,
@@ -575,7 +579,9 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(new_location, OffDeckType):
             location = new_location
         else:
-            location = validation.ensure_deck_slot(new_location, self._api_version)
+            location = validation.ensure_and_convert_deck_slot(
+                new_location, self._api_version, self._core.robot_type
+            )
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
@@ -591,6 +597,7 @@ class ProtocolContext(CommandPublisher):
             labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
+            pause_for_manual_move=True,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
@@ -672,7 +679,9 @@ class ProtocolContext(CommandPublisher):
         deck_slot = (
             None
             if location is None
-            else validation.ensure_deck_slot(location, self._api_version)
+            else validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
         )
 
         module_core = self._core.load_module(

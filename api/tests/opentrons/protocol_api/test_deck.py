@@ -9,9 +9,15 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api.core.common import ProtocolCore, LabwareCore
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocol_api.core.common import ProtocolCore, LabwareCore, ModuleCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api import Deck, Labware, validation as mock_validation
+from opentrons.protocol_api import (
+    Deck,
+    Labware,
+    OFF_DECK,
+    validation as mock_validation,
+)
 from opentrons.protocol_api.deck import CalibrationPosition
 from opentrons.types import DeckSlotName, Point
 
@@ -81,9 +87,10 @@ def test_get_empty_slot(
     subject: Deck,
 ) -> None:
     """It should return None for slots if empty."""
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
     decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(None)
 
     assert subject[42] is None
@@ -96,17 +103,18 @@ def test_get_slot_invalid_key(
     subject: Deck,
 ) -> None:
     """It should map a ValueError from validation to a KeyError."""
-    decoy.when(mock_validation.ensure_deck_slot(1, api_version)).then_raise(
-        TypeError("uh oh")
-    )
-    decoy.when(mock_validation.ensure_deck_slot(2, api_version)).then_raise(
-        ValueError("oh no")
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(1, api_version, "OT-3 Standard")
+    ).then_raise(TypeError("uh oh"))
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(2, api_version, "OT-3 Standard")
+    ).then_raise(ValueError("oh no"))
 
-    with pytest.raises(KeyError, match="uh oh"):
+    with pytest.raises(KeyError, match="1"):
         subject[1]
 
-    with pytest.raises(KeyError, match="oh no"):
+    with pytest.raises(KeyError, match="2"):
         subject[2]
 
 
@@ -121,15 +129,99 @@ def test_get_slot_item(
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_labware = decoy.mock(cls=Labware)
 
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
     decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(
         mock_labware_core
     )
     decoy.when(mock_core_map.get(mock_labware_core)).then_return(mock_labware)
 
     assert subject[42] is mock_labware
+
+
+def test_delitem_aliases_to_move_labware(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should be equivalent to a manual labware move to off-deck, without pausing."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
+    decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(
+        mock_labware_core
+    )
+
+    del subject[42]
+
+    decoy.verify(
+        mock_protocol_core.move_labware(
+            mock_labware_core,
+            OFF_DECK,
+            use_gripper=False,
+            pause_for_manual_move=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_delitem_raises_on_api_2_14(
+    subject: Deck,
+) -> None:
+    """It should raise on apiLevel 2.14."""
+    with pytest.raises(APIVersionError):
+        del subject[1]
+
+
+def test_delitem_noops_if_slot_is_empty(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should do nothing, and not raise anything, if you try to delete from an empty slot."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(1, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_1)).then_return(None)
+
+    del subject[1]
+
+
+def test_delitem_raises_if_slot_has_module(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should raise a descriptive error if you try to delete a module."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    mock_module_core = decoy.mock(cls=ModuleCore)
+    decoy.when(mock_module_core.get_display_name()).then_return("<module display name>")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(2, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
+    decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(
+        mock_module_core
+    )
+
+    with pytest.raises(
+        TypeError,
+        match=(
+            "Slot 2 contains a module, <module display name>."
+            " You can only delete labware, not modules."
+        ),
+    ):
+        del subject[2]
 
 
 @pytest.mark.parametrize(
@@ -170,28 +262,13 @@ def test_slot_keys_iter(subject: Deck) -> None:
         },
     ],
 )
-def test_get_slots(
-    decoy: Decoy,
-    mock_protocol_core: ProtocolCore,
-    api_version: APIVersion,
-    subject: Deck,
-) -> None:
+def test_slots_property(subject: Deck) -> None:
     """It should provide slot definitions."""
-    decoy.when(mock_validation.ensure_deck_slot(222, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
-    decoy.when(mock_protocol_core.robot_type).then_return("OT-2 Standard")
-    decoy.when(
-        mock_validation.ensure_deck_slot_string(DeckSlotName.SLOT_2, "OT-2 Standard")
-    ).then_return("fee")
-
     assert subject.slots == [
         {"id": "fee"},
         {"id": "foe"},
         {"id": "fum"},
     ]
-
-    assert subject.get_slot_definition(222) == {"id": "fee"}
 
 
 @pytest.mark.parametrize(
@@ -200,7 +277,38 @@ def test_get_slots(
         {
             "locations": {
                 "orderedSlots": [
-                    {"id": "foo", "position": [1.0, 2.0, 3.0]},
+                    {"id": DeckSlotName.SLOT_2.id, "displayName": "foobar"},
+                ],
+                "calibrationPoints": [],
+            }
+        },
+    ],
+)
+def test_get_slot_definition(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should provide slot definitions."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
+
+    assert subject.get_slot_definition(222) == {
+        "id": DeckSlotName.SLOT_2.id,
+        "displayName": "foobar",
+    }
+
+
+@pytest.mark.parametrize(
+    "deck_definition",
+    [
+        {
+            "locations": {
+                "orderedSlots": [
+                    {"id": DeckSlotName.SLOT_3.id, "position": [1.0, 2.0, 3.0]},
                 ],
                 "calibrationPoints": [],
             }
@@ -214,12 +322,14 @@ def test_get_position_for(
     subject: Deck,
 ) -> None:
     """It should return a `Location` for a deck slot."""
-    decoy.when(mock_validation.ensure_deck_slot(333, api_version)).then_return(
-        DeckSlotName.SLOT_3
-    )
     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
-        mock_validation.ensure_deck_slot_string(DeckSlotName.SLOT_3, "OT-3 Standard")
+        mock_validation.ensure_and_convert_deck_slot(333, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_3)
+    decoy.when(
+        mock_validation.internal_slot_to_public_string(
+            DeckSlotName.SLOT_3, "OT-3 Standard"
+        )
     ).then_return("foo")
 
     result = subject.position_for(333)
@@ -250,17 +360,19 @@ def test_right_of_and_left_of(
     left_labware = decoy.mock(cls=Labware)
     right_labware = decoy.mock(cls=Labware)
 
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+
     decoy.when(mock_adjacent_slots.get_east_slot(4)).then_return(111)
     decoy.when(mock_adjacent_slots.get_west_slot(4)).then_return(999)
-    decoy.when(mock_validation.ensure_deck_slot(444, api_version)).then_return(
-        DeckSlotName.SLOT_4
-    )
-    decoy.when(mock_validation.ensure_deck_slot(111, api_version)).then_return(
-        DeckSlotName.SLOT_1
-    )
-    decoy.when(mock_validation.ensure_deck_slot(999, api_version)).then_return(
-        DeckSlotName.SLOT_9
-    )
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(444, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_4)
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(111, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_1)
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(999, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_9)
 
     decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_1)).then_return(
         right_labware_core
@@ -317,9 +429,10 @@ def test_get_slot_center(
     subject: Deck,
 ) -> None:
     """It should get the geometric center of a slot."""
-    decoy.when(mock_validation.ensure_deck_slot(222, api_version)).then_return(
-        DeckSlotName.SLOT_2
-    )
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
     decoy.when(mock_protocol_core.get_slot_center(DeckSlotName.SLOT_2)).then_return(
         Point(1, 2, 3)
     )

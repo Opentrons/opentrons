@@ -154,6 +154,7 @@ export function DeviceReset({
         gridGap={SPACING.spacing24}
         flexDirection={DIRECTION_COLUMN}
         paddingX={SPACING.spacing40}
+        marginTop="7.75rem"
       >
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           {availableOptions.map(option => {

@@ -69,6 +69,7 @@ from opentrons_shared_data.pipette.types import (
     PipetteModelType,
     PipetteChannelType,
     PipetteVersionType,
+    LiquidClasses,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
@@ -81,6 +82,9 @@ from opentrons.hardware_control.modules import (
     SpeedStatus,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
+
+
+# TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
 
 
 @pytest.fixture
@@ -478,6 +482,7 @@ async def test_blow_out_position(
     load_configs: List[Dict[str, Any]],
     blowout_volume: float,
 ) -> None:
+    liquid_class = LiquidClasses.default
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
             await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
@@ -486,8 +491,8 @@ async def test_blow_out_position(
         )
 
         max_allowed_input_distance = (
-            instr_data["config"].plunger_positions_configurations.blow_out
-            - instr_data["config"].plunger_positions_configurations.bottom
+            instr_data["config"].plunger_positions_configurations[liquid_class].blow_out
+            - instr_data["config"].plunger_positions_configurations[liquid_class].bottom
         )
         max_input_vol = (
             max_allowed_input_distance * instr_data["config"].shaft_ul_per_mm
@@ -498,11 +503,13 @@ async def test_blow_out_position(
         position_result = await ot3_hardware.current_position_ot3(mount)
         expected_position = (
             blowout_volume / instr_data["config"].shaft_ul_per_mm
-        ) + instr_data["config"].plunger_positions_configurations.bottom
+        ) + instr_data["config"].plunger_positions_configurations[liquid_class].bottom
         # make sure target distance is not more than max blowout position
         assert (
             position_result[pipette_axis]
-            < instr_data["config"].plunger_positions_configurations.blow_out
+            < instr_data["config"]
+            .plunger_positions_configurations[liquid_class]
+            .blow_out
         )
         # make sure calculated position is roughly what we expect
         assert position_result[pipette_axis] == pytest.approx(
@@ -524,6 +531,7 @@ async def test_blow_out_error(
     load_configs: List[Dict[str, Any]],
     blowout_volume: float,
 ) -> None:
+    liquid_class = LiquidClasses.default
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
             await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
@@ -532,8 +540,8 @@ async def test_blow_out_error(
         )
 
         max_allowed_input_distance = (
-            instr_data["config"].plunger_positions_configurations.blow_out
-            - instr_data["config"].plunger_positions_configurations.bottom
+            instr_data["config"].plunger_positions_configurations[liquid_class].blow_out
+            - instr_data["config"].plunger_positions_configurations[liquid_class].bottom
         )
         max_input_vol = (
             max_allowed_input_distance * instr_data["config"].shaft_ul_per_mm

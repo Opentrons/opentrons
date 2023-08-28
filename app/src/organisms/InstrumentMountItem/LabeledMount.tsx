@@ -26,9 +26,7 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isAttached }) =>
     isAttached ? COLORS.green3 : COLORS.light1};
-  &:hover,
-  &:active,
-  &:focus {
+  &:active {
     background-color: ${({ isAttached }) =>
       isAttached ? COLORS.green3Pressed : COLORS.light1Pressed};
   }
@@ -42,7 +40,7 @@ interface LabeledMountProps {
 export function LabeledMount(props: LabeledMountProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { mount, instrumentName, handleClick } = props
-  const ninetySixDislayName = 'Flex 96-Channel 1000 μL'
+  const ninetySixDisplayName = 'Flex 96-Channel 1000 μL'
 
   return (
     <MountButton onClick={handleClick} isAttached={instrumentName != null}>
@@ -64,7 +62,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSize28}
             width="15.625rem"
           >
-            {instrumentName === ninetySixDislayName
+            {instrumentName === ninetySixDisplayName
               ? t('left_right')
               : t('mount', { side: mount })}
           </StyledText>

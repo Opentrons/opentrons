@@ -3,6 +3,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
+  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 import {
   getPipetteNameSpecs,
@@ -84,6 +85,51 @@ export const LoadCommandText = ({
           ),
           module_name: moduleName,
         })
+      } else if (
+        command.params.location !== 'offDeck' &&
+        'labwareId' in command.params.location
+      ) {
+        const labwareId = command.params.location.labwareId
+        const labwareName = command.result?.definition.metadata.displayName
+        const matchingAdapter = robotSideAnalysis.commands.find(
+          (command): command is LoadLabwareRunTimeCommand =>
+            command.commandType === 'loadLabware' &&
+            command.result?.labwareId === labwareId
+        )
+        const adapterName =
+          matchingAdapter?.result?.definition.metadata.displayName
+        const adapterLoc = matchingAdapter?.params.location
+        if (adapterLoc === 'offDeck') {
+          return t('load_labware_info_protocol_setup_adapter_off_deck', {
+            labware: labwareName,
+            adapter_name: adapterName,
+          })
+        } else if (adapterLoc != null && 'slotName' in adapterLoc) {
+          return t('load_labware_info_protocol_setup_adapter', {
+            labware: labwareName,
+            adapter_name: adapterName,
+            slot_name: adapterLoc?.slotName,
+          })
+        } else if (adapterLoc != null && 'moduleId' in adapterLoc) {
+          const moduleModel = getModuleModel(
+            robotSideAnalysis,
+            adapterLoc?.moduleId ?? ''
+          )
+          const moduleName =
+            moduleModel != null ? getModuleDisplayName(moduleModel) : ''
+          return t('load_labware_info_protocol_setup_adapter_module', {
+            labware: labwareName,
+            adapter_name: adapterName,
+            module_name: moduleName,
+            slot_name: getModuleDisplayLocation(
+              robotSideAnalysis,
+              adapterLoc?.moduleId ?? ''
+            ),
+          })
+        } else {
+          //  shouldn't reach here, adapter shouldn't have location  type labwareId
+          return null
+        }
       } else {
         const labware = command.result?.definition.metadata.displayName
         return command.params.location === 'offDeck'

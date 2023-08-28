@@ -74,6 +74,7 @@ export function RobotSystemVersion({
           gridGap="16rem"
           flexDirection={DIRECTION_COLUMN}
           paddingX={SPACING.spacing40}
+          marginTop="7.75rem"
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <StyledText as="p">{`${t(

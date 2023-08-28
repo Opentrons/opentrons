@@ -29,7 +29,7 @@ import {
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
-  toggleHistoricOffsets 
+  toggleHistoricOffsets,
 } from '../../../redux/config'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
@@ -39,11 +39,11 @@ import { useNetworkConnection } from '../hooks'
 import { RobotSettingButton } from './RobotSettingButton'
 
 import type { Dispatch, State } from '../../../redux/types'
+import type { RobotSettings } from '../../../redux/robot-settings/types'
 import type { SetSettingOption } from './'
 import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
-
 
 const ROBOT_ANALYTICS_SETTING_ID = 'disableLogAggregation'
 interface RobotSettingsListProps {
@@ -55,15 +55,16 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_settings', 'app_settings'])
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
- const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
 
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
-  const isRobotAnalyticsOn = useSelector((state: State) =>
-    getRobotSettings(state, robotName)
-  )?.find(({id}) => id === ROBOT_ANALYTICS_SETTING_ID)?.value ?? false
+  const isRobotAnalyticsOn =
+    useSelector((state: State) => getRobotSettings(state, robotName))?.find(
+      ({ id }) => id === ROBOT_ANALYTICS_SETTING_ID
+    )?.value ?? false
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
@@ -74,7 +75,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
@@ -82,14 +82,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         <RobotSettingButton
           settingName={t('network_settings')}
           settingInfo={networkConnection?.connectionStatus}
-          onClick={() => setCurrentOption("NetworkSettings")}
+          onClick={() => setCurrentOption('NetworkSettings')}
           iconName="wifi"
         />
         <Link to="/robot-settings/rename-robot">
           <RobotSettingButton
             settingName={t('robot_name')}
             settingInfo={robotName}
-            onClick={() => setCurrentOption("RobotName")}
+            onClick={() => setCurrentOption('RobotName')}
             iconName="flex-robot"
           />
         </Link>
@@ -100,20 +100,23 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')
           }
-          onClick={() => setCurrentOption("RobotSystemVersion")}
+          onClick={() => setCurrentOption('RobotSystemVersion')}
           iconName="update"
-          rightElement={(
+          rightElement={
             <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
               {isUpdateAvailable ? (
                 <InlineNotification
                   type="alert"
-                  heading={i18n.format(t('app_settings:update_available'), 'capitalize')}
+                  heading={i18n.format(
+                    t('app_settings:update_available'),
+                    'capitalize'
+                  )}
                   hug={true}
                 />
               ) : null}
               <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
             </Flex>
-          )}
+          }
         />
         <RobotSettingButton
           settingName={t('display_led_lights')}
@@ -124,12 +127,12 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         />
         <RobotSettingButton
           settingName={t('touchscreen_sleep')}
-          onClick={() => setCurrentOption("TouchscreenSleep")}
+          onClick={() => setCurrentOption('TouchscreenSleep')}
           iconName="sleep"
         />
         <RobotSettingButton
           settingName={t('touchscreen_brightness')}
-          onClick={() => setCurrentOption("TouchscreenBrightness")}
+          onClick={() => setCurrentOption('TouchscreenBrightness')}
           iconName="brightness"
         />
         <RobotSettingButton
@@ -141,18 +144,29 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         />
         <RobotSettingButton
           settingName={t('device_reset')}
-          onClick={() => setCurrentOption("DeviceReset")}
+          onClick={() => setCurrentOption('DeviceReset')}
           iconName="reset"
         />
         <RobotSettingButton
-          settingName={i18n.format(t('app_settings:share_analytics_short'), 'titleCase')}
+          settingName={i18n.format(
+            t('app_settings:share_analytics_short'),
+            'titleCase'
+          )}
           rightElement={<OnOffToggle isOn={isRobotAnalyticsOn} />}
-          onClick={() => dispatch(updateSetting(robotName, ROBOT_ANALYTICS_SETTING_ID, !isRobotAnalyticsOn))}
+          onClick={() =>
+            dispatch(
+              updateSetting(
+                robotName,
+                ROBOT_ANALYTICS_SETTING_ID,
+                !isRobotAnalyticsOn
+              )
+            )
+          }
           iconName="analytics"
         />
         <RobotSettingButton
           settingName={t('app_settings:update_channel')}
-          onClick={() => setCurrentOption("UpdateChannel")}
+          onClick={() => setCurrentOption('UpdateChannel')}
           iconName="update-channel"
         />
         <RobotSettingButton

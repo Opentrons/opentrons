@@ -45,6 +45,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
+    adapterId: lastTiprackCheckStep.adapterId,
   }
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
@@ -53,6 +54,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
+    adapterId: lastTiprackCheckStep.adapterId,
   }
 
   return [
@@ -130,11 +132,12 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 
     return [
       ...acc,
-      ...labwareLocations.map(({ location }) => ({
+      ...labwareLocations.map(({ location, adapterId }) => ({
         section: SECTIONS.CHECK_TIP_RACKS,
         labwareId: params.labwareId,
         pipetteId: params.pipetteId,
         location,
+        adapterId,
       })),
     ]
   }, [])
@@ -155,7 +158,8 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       )
     }
     const isTiprack = getIsTiprack(labwareDef)
-    if (isTiprack) return acc // skip any labware that is a tiprack
+    const adapter = (labwareDef?.allowedRoles ?? []).includes('adapter')
+    if (isTiprack || adapter) return acc // skip any labware that is a tiprack or adapter
 
     const labwareLocationCombos = getLabwareLocationCombos(
       commands,
@@ -165,7 +169,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     return [
       ...acc,
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
-        (innerAcc, { location, labwareId, moduleId }) => {
+        (innerAcc, { location, labwareId, moduleId, adapterId }) => {
           if (labwareId !== currentLabware.id) {
             return innerAcc
           }
@@ -178,6 +182,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
               pipetteId: primaryPipetteId,
               location,
               moduleId,
+              adapterId,
             },
           ]
         },

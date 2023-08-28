@@ -13,10 +13,12 @@
   "dropTipConfigurations": { "current": 1.5, "speed": 5.5, "distance": 26.5 },
   "plungerMotorConfigurations": { "idle": 0.3, "run": 2.0 },
   "plungerPositionsConfigurations": {
-    "top": 0,
-    "bottom": 66,
-    "blowout": 71,
-    "drop": 80
+    "default": {
+      "top": 0,
+      "bottom": 66,
+      "blowout": 71,
+      "drop": 80
+    }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],

@@ -39,7 +39,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   const is96ChannelPipette =
     memoizedAttachedPipettes[mount]?.instrumentName === 'p1000_96'
   const handle96ChannelProceed = (): void => {
-    chainRunCommands(
+    chainRunCommands?.(
       [
         {
           commandType: 'calibration/moveToMaintenancePosition' as const,

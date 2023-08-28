@@ -4,7 +4,6 @@ import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
-import { format } from 'date-fns'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -49,6 +48,7 @@ import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
+import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
@@ -224,9 +224,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
         <StyledText as="p">{`${t('protocol_info:date_added')}: ${
-          date != null
-            ? format(new Date(date), 'MM/dd/yy k:mm')
-            : t('shared:no_data')
+          date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
         }`}</StyledText>
       </Flex>
     </Flex>

@@ -36,6 +36,7 @@ class AbstractModuleCore(ABC):
     def get_deck_slot_id(self) -> str:
         """Get the module's deck slot in a robot accurate format."""
 
+    @abstractmethod
     def get_display_name(self) -> str:
         """Get the module's display name."""
 

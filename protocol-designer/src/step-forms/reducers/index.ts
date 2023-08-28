@@ -610,7 +610,6 @@ export const savedStepForms = (
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
       }
-
       return {
         ...savedStepForms,
         [INITIAL_DECK_SETUP_STEP_ID]: {

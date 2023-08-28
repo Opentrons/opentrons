@@ -45,9 +45,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green3 : COLORS.yellow3};
-  &:hover,
-  &:active,
-  &:focus {
+  &:active {
     background-color: ${({ isReady }) =>
       isReady ? COLORS.green3Pressed : COLORS.yellow3Pressed};
   }

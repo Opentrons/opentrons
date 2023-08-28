@@ -25,6 +25,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.ordered_set import OrderedSet
 
+from .api_support.definitions import MIN_SUPPORTED_VERSION_FOR_FLEX
 from .api_support.types import APIVersion
 from .types import (
     RUN_FUNCTION_MESSAGE,
@@ -49,9 +50,6 @@ MODULE_LOG = logging.getLogger(__name__)
 API_VERSION_RE = re.compile(r"^(\d+)\.(\d+)$")
 MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
 API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
-
-
-_MIN_API_VERSION_FOR_FLEX = APIVersion(2, 15)
 
 
 class JSONSchemaVersionTooNewError(RuntimeError):
@@ -167,11 +165,11 @@ def _validate_v2_static_info(static_info: StaticPythonInfo) -> None:
 
 
 def _validate_robot_type_at_version(robot_type: RobotType, version: APIVersion) -> None:
-    if robot_type == "OT-3 Standard" and version < _MIN_API_VERSION_FOR_FLEX:
+    if robot_type == "OT-3 Standard" and version < MIN_SUPPORTED_VERSION_FOR_FLEX:
         raise MalformedPythonProtocolError(
             short_message=(
                 f"The Opentrons Flex only supports apiLevel"
-                f" {_MIN_API_VERSION_FOR_FLEX} or newer."
+                f" {MIN_SUPPORTED_VERSION_FOR_FLEX} or newer."
             )
         )
 

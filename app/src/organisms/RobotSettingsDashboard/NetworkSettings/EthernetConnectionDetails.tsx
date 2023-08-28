@@ -50,6 +50,7 @@ export function EthernetConnectionDetails(
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing40}
+        marginTop="7.75rem"
       >
         {/* IP Address */}
         <EthernetDetailsRow

@@ -31,6 +31,7 @@ describe('OffDeckLabwareList', () => {
     const { container } = render({
       labwareItems: [],
       isOt3: false,
+      commands: [],
     })
     expect(container.firstChild).toBeNull()
   })
@@ -46,6 +47,7 @@ describe('OffDeckLabwareList', () => {
         },
       ],
       isOt3: false,
+      commands: [],
     })
     getByText('Additional Off-Deck Labware')
     getByText('mock labware list item')
