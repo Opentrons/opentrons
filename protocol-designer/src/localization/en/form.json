@@ -37,7 +37,7 @@
       "mixLabware": "labware",
       "movedLabware": "labware",
       "errors": {
-        "labwareSlotIncompatible": "The selected labware and new location are incompatible"
+        "labwareSlotIncompatible": "The {{labwareName}} in {{slot}} is incompatible"
       }
     },
     "mixVolumeLabel": "mix volume",
