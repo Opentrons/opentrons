@@ -2,11 +2,11 @@
 from time import sleep
 from typing import Optional, Tuple, List, Dict
 
-from opentrons.protocol_api import ProtocolContext, Well, Labware
+from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
-from hardware_testing.opentrons_api.types import Point, OT3Mount
+from hardware_testing.opentrons_api.types import Point, OT3Mount, Axis
 
 from . import report
 from . import config
@@ -61,6 +61,9 @@ def _minimum_z_height(cfg: config.GravimetricConfig) -> int:
 
 
 def _generate_callbacks_for_trial(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    test_report: CSVReport,
     recorder: GravimetricRecorder,
     volume: Optional[float],
     channel: int,
@@ -72,6 +75,46 @@ def _generate_callbacks_for_trial(
     # very helpful for debugging and learning more about the system.
     if blank_measurement:
         volume = None
+
+    hw_api = ctx._core.get_hardware()
+    hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+    pip_ax = Axis.of_main_tool_actuator(hw_mount)
+    estimate_bottom: float = -1
+    estimate_aspirated: float = -1
+    encoder_bottom: float = -1
+    encoder_aspirated: float = -1
+
+    def _on_aspirating() -> None:
+        nonlocal estimate_bottom, encoder_bottom
+        recorder.set_sample_tag(
+            create_measurement_tag("aspirate", volume, channel, trial)
+        )
+        if not volume:
+            return
+        estimate_bottom = hw_api.current_position_ot3(hw_mount)[pip_ax]
+        encoder_bottom = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
+
+    def _on_retracting() -> None:
+        nonlocal estimate_aspirated, encoder_aspirated
+        recorder.set_sample_tag(
+            create_measurement_tag("retract", volume, channel, trial)
+        )
+        if not volume or estimate_aspirated >= 0 or encoder_aspirated >= 0:
+            # NOTE: currently in dispense, because trial was already recorded
+            return
+        estimate_aspirated = hw_api.current_position_ot3(hw_mount)[pip_ax]
+        encoder_aspirated = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
+        report.store_encoder(
+            test_report,
+            volume,
+            channel,
+            trial,
+            estimate_bottom,
+            encoder_bottom,
+            estimate_aspirated,
+            encoder_aspirated,
+        )
+
     return PipettingCallbacks(
         on_submerging=lambda: recorder.set_sample_tag(
             create_measurement_tag("submerge", volume, channel, trial)
@@ -79,12 +122,8 @@ def _generate_callbacks_for_trial(
         on_mixing=lambda: recorder.set_sample_tag(
             create_measurement_tag("mix", volume, channel, trial)
         ),
-        on_aspirating=lambda: recorder.set_sample_tag(
-            create_measurement_tag("aspirate", volume, channel, trial)
-        ),
-        on_retracting=lambda: recorder.set_sample_tag(
-            create_measurement_tag("retract", volume, channel, trial)
-        ),
+        on_aspirating=_on_aspirating,
+        on_retracting=_on_retracting,
         on_dispensing=lambda: recorder.set_sample_tag(
             create_measurement_tag("dispense", volume, channel, trial)
         ),
@@ -187,7 +226,14 @@ def _run_trial(
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     global _PREV_TRIAL_GRAMS
     pipetting_callbacks = _generate_callbacks_for_trial(
-        trial.recorder, trial.volume, trial.channel, trial.trial, trial.blank
+        trial.ctx,
+        trial.pipette,
+        trial.test_report,
+        trial.recorder,
+        trial.volume,
+        trial.channel,
+        trial.trial,
+        trial.blank,
     )
 
     def _tag(m_type: MeasurementType) -> str:
