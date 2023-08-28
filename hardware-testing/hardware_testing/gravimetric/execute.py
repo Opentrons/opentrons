@@ -246,9 +246,7 @@ def _run_trial(
         )
     else:
         # center channel over well
-        trial.pipette.move_to(
-            trial.well.top(50).move(trial.channel_offset)
-        )
+        trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
     mnt = OT3Mount.RIGHT if trial.pipette.mount == "right" else OT3Mount.LEFT
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
@@ -466,7 +464,7 @@ def _get_liquid_height(
     return _liquid_height
 
 
-def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
+def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noqa: C901
     """Run."""
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
@@ -546,7 +544,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         ui.print_info("dropping tip")
         if not cfg.same_tip:
             _drop_tip(
-                resources.pipette, return_tip=False, minimum_z_height=_minimum_z_height(cfg)
+                resources.pipette,
+                return_tip=False,
+                minimum_z_height=_minimum_z_height(cfg),
             )  # always trash calibration tips
         calibration_tip_in_use = False
         trial_count = 0
@@ -640,7 +640,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                     )
                     ui.print_info("dropping tip")
                     if not cfg.same_tip:
-                        _drop_tip(resources.pipette, cfg.return_tip, _minimum_z_height(cfg))
+                        _drop_tip(
+                            resources.pipette, cfg.return_tip, _minimum_z_height(cfg)
+                        )
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
                 aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(

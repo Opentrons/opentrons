@@ -156,7 +156,7 @@ def _retract(
     hw_api.set_gantry_load(hw_api.gantry_load)
 
 
-def _pipette_with_liquid_settings(
+def _pipette_with_liquid_settings(  # noqa: C901
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     liquid_class: LiquidClassSettings,
@@ -237,7 +237,9 @@ def _pipette_with_liquid_settings(
                 _dispense_with_added_blow_out()
             ctx.delay(liquid_class.dispense.delay)
         # don't go all the way up to retract position, but instead just above liquid
-        _retract(ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc)
+        _retract(
+            ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
+        )
         _blow_out_remaining_air()
         hw_api.prepare_for_aspirate(hw_mount)
         assert pipette.current_volume == 0
