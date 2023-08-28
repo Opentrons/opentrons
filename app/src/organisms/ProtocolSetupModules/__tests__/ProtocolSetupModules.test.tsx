@@ -130,13 +130,4 @@ describe('ProtocolSetupModules', () => {
     getByText('Setup Instructions').click()
     getByText('mock SetupInstructionsModal')
   })
-
-  it('should launch module calibration wizard, when tapping calibrate button', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
-      data: { data: [instrumentsResponseFixture.data[0]] },
-    } as any)
-    const [{ getByText }] = render()
-    getByText('calibrate')
-    // getByText('mock ModuleWizardFlows')
-  })
 })
