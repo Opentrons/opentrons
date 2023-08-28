@@ -235,7 +235,7 @@ def _pipette_with_liquid_settings(
                 pipette.dispense(mix)
             else:
                 _dispense_with_added_blow_out()
-            ctx.delay(liquid_class.aspirate.delay)
+            ctx.delay(liquid_class.dispense.delay)
         # don't go all the way up to retract position, but instead just above liquid
         _retract(ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc)
         _blow_out_remaining_air()
