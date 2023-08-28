@@ -3,14 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
   ModuleLocation,
-  ModuleType,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  getModuleType,
 } from '@opentrons/shared-data'
 import {
   RESPONSIVENESS,
@@ -65,8 +60,6 @@ export const SelectLocation = (
   return (
     <GenericWizardTile
       header={t('select_location')}
-      // TODO: swap this out with the deck map
-      // if slot != null it will be pre-selected
       rightHandBody={
         <DeckLocationSelect
           deckDef={deckDef}
