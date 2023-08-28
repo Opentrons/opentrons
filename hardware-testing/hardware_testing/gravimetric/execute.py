@@ -253,6 +253,16 @@ def _run_trial(
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
+    # update the vials volumes, using the last-known weight
+    if _PREV_TRIAL_GRAMS is not None:
+        _evaporation_loss_ul = abs(
+            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
+        )
+        ui.print_info(f"{_evaporation_loss_ul} ul evaporated since last trial")
+        trial.liquid_tracker.update_affected_wells(
+            trial.well, aspirate=_evaporation_loss_ul, channels=1
+        )
+    _PREV_TRIAL_GRAMS = m_data_init
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(
@@ -288,16 +298,6 @@ def _run_trial(
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
-    # update the vials volumes, using the last-known weight
-    if _PREV_TRIAL_GRAMS is not None:
-        _evaporation_loss_ul = abs(
-            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_dispense)
-        )
-        ui.print_info(f"{_evaporation_loss_ul} ul evaporated since last trial")
-        trial.liquid_tracker.update_affected_wells(
-            trial.well, aspirate=_evaporation_loss_ul, channels=1
-        )
-    _PREV_TRIAL_GRAMS = m_data_dispense
     # calculate volumes
     volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
     volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense)
