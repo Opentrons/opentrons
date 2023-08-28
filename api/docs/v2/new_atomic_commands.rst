@@ -295,9 +295,9 @@ To check whether you should pick up a tip or not, you can utilize :py:meth:`.Ins
 
 .. start here, branch docs-liquid-control
 
-****************
 Liquid Control
-****************
+==============
+
 
 This section describes the :py:class:`.InstrumentContext` 's liquid-handling commands.
 
