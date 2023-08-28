@@ -39,7 +39,6 @@ import { useNetworkConnection } from '../hooks'
 import { RobotSettingButton } from './RobotSettingButton'
 
 import type { Dispatch, State } from '../../../redux/types'
-import type { RobotSettings } from '../../../redux/robot-settings/types'
 import type { SetSettingOption } from './'
 import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
