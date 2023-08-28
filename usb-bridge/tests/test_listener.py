@@ -82,6 +82,7 @@ def test_listen(monkeypatch: pytest.MonkeyPatch) -> None:
     ser = serial_mock()
 
     ser.read_all.return_value = SER_DATA
+    ser.write.return_value = len(TCP_DATA)
     tcp.read.return_value = TCP_DATA
 
     tcp.connected.return_value = False
