@@ -580,19 +580,15 @@ class PipetteHandlerProvider:
 
         if disp_vol == 0:
             return None
-
+        print(push_out)
         if push_out is None:
-            push_out_ul = self.get_attached_instrument(mount)["default_push_out_volume"]
+            push_out_ul = instrument.push_out_volume
         else:
             push_out_ul = push_out
-
+        print(push_out_ul)
         push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
 
-        if (
-            push_out_dist_mm
-            > instrument.plunger_positions.blow_out
-            - instrument.plunger_positions.bottom
-        ):
+        if not instrument.ok_to_push_out:
             raise ValueError("Cannot push-out more than pipette max blowout volume.")
 
         dist = self.plunger_position(
