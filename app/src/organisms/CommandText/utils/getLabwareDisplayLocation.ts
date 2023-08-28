@@ -9,9 +9,9 @@ import {
 } from '@opentrons/shared-data'
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
+import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/'
 import type { TFunction } from 'react-i18next'
-import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 
 export function getLabwareDisplayLocation(
   robotSideAnalysis: CompletedProtocolAnalysis,
@@ -38,19 +38,26 @@ export function getLabwareDisplayLocation(
       return isOnDevice
         ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
         : t('module_in_slot', {
-          count: getOccludedSlotCountForModule(
-            getModuleType(moduleModel),
-            robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
-          ),
-          module: getModuleDisplayName(moduleModel),
-          slot_name: slotName,
-        })
+            count: getOccludedSlotCountForModule(
+              getModuleType(moduleModel),
+              robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
+            ),
+            module: getModuleDisplayName(moduleModel),
+            slot_name: slotName,
+          })
     }
   } else if ('labwareId' in location) {
-    const adapter = robotSideAnalysis.labware.find(lw => lw.id === location.labwareId)
-    const allDefs = getLabwareDefinitionsFromCommands(robotSideAnalysis.commands)
-    const adapterDef = allDefs.find(def => getLabwareDefURI(def) === adapter?.definitionUri)
-    const adapterDisplayName = adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
+    const adapter = robotSideAnalysis.labware.find(
+      lw => lw.id === location.labwareId
+    )
+    const allDefs = getLabwareDefinitionsFromCommands(
+      robotSideAnalysis.commands
+    )
+    const adapterDef = allDefs.find(
+      def => getLabwareDefURI(def) === adapter?.definitionUri
+    )
+    const adapterDisplayName =
+      adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
 
     if (adapter == null) {
       console.warn('labware is located on an unknown adapter')
@@ -85,11 +92,13 @@ export function getLabwareDisplayLocation(
         slot_name: slotName,
       })
     } else {
-      console.warn('display location on adapter could not be established: ', location)
+      console.warn(
+        'display location on adapter could not be established: ',
+        location
+      )
       return ''
     }
-  }
-  else {
+  } else {
     console.warn('display location could not be established: ', location)
     return ''
   }

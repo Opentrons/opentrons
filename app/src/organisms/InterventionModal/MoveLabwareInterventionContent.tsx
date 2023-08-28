@@ -20,17 +20,6 @@ import {
   RESPONSIVENESS,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-
-import {
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
-  getLabwareNameFromRunData,
-  getModuleModelFromRunData,
-  getModuleDisplayLocationFromRunData,
-} from './utils'
-import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
-
 import {
   CompletedProtocolAnalysis,
   LabwareDefinitionsByUri,
@@ -46,8 +35,20 @@ import {
   getOccludedSlotCountForModule,
   getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
+import {
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
+  getLabwareNameFromRunData,
+  getModuleModelFromRunData,
+  getModuleDisplayLocationFromRunData,
+} from './utils'
+import { StyledText } from '../../atoms/text'
+import { Divider } from '../../atoms/structure'
+import {
+  getLoadedLabware,
+  getLoadedModule,
+} from '../CommandText/utils/accessors'
 import type { RunData } from '@opentrons/api-client'
-import { getLoadedLabware, getLoadedModule } from '../CommandText/utils/accessors'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -263,9 +264,13 @@ function LabwareDisplayLocation(
       })
     }
   } else if ('labwareId' in location) {
-    const adapter = protocolData.labware.find(lw => lw.id === location.labwareId)
-    const adapterDef = adapter != null ? labwareDefsByUri[adapter.definitionUri] : null
-    const adapterDisplayName = adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
+    const adapter = protocolData.labware.find(
+      lw => lw.id === location.labwareId
+    )
+    const adapterDef =
+      adapter != null ? labwareDefsByUri[adapter.definitionUri] : null
+    const adapterDisplayName =
+      adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
 
     if (adapter == null) {
       console.warn('labware is located on an unknown adapter')
@@ -284,9 +289,14 @@ function LabwareDisplayLocation(
       if (moduleModel == null) {
         console.warn('labware is located on an adapter on an unknown module')
       } else {
-        const slotName = getLoadedModule(protocolData, adapter.location.moduleId)?.location?.slotName ?? ''
+        const slotName =
+          getLoadedModule(protocolData, adapter.location.moduleId)?.location
+            ?.slotName ?? ''
         displayLocation = t('adapter_in_module_in_slot', {
-          count: getOccludedSlotCountForModule(getModuleType(moduleModel), robotType ?? OT2_ROBOT_TYPE),
+          count: getOccludedSlotCountForModule(
+            getModuleType(moduleModel),
+            robotType ?? OT2_ROBOT_TYPE
+          ),
           module: getModuleDisplayName(moduleModel),
           adapter: adapterDisplayName,
           slot_name: slotName,
