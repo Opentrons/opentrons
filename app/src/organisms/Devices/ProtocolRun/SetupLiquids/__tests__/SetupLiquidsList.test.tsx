@@ -130,7 +130,7 @@ describe('SetupLiquidsList', () => {
     getByText('Labware Name')
     getByText('Volume')
     getAllByText(nestedTextMatcher('200 µL'))
-    getByText('Slot 4')
+    getByText('4')
     getByText('mock labware name')
   })
 

@@ -140,7 +140,7 @@ describe('getLocationInfoNames', () => {
     const expected = {
       slotName: SLOT,
       labwareName: LABWARE_DISPLAY_NAME,
-      moduleName: MOCK_MODEL,
+      moduleModel: MOCK_MODEL,
     }
     expect(getLocationInfoNames(LABWARE_ID, MOCK_MOD_COMMANDS as any)).toEqual(
       expected
@@ -150,7 +150,7 @@ describe('getLocationInfoNames', () => {
     const expected = {
       slotName: SLOT,
       labwareName: LABWARE_DISPLAY_NAME,
-      moduleName: MOCK_MODEL,
+      moduleModel: MOCK_MODEL,
       adapterName: ADAPTER_DISPLAY_NAME,
     }
     expect(
