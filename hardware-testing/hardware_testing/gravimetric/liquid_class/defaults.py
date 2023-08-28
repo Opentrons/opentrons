@@ -9,7 +9,7 @@ from .definition import (
 )
 
 _default_submerge_mm = 1.5
-_default_retract_mm = 3.0
+_default_retract_mm = 5.0
 _default_retract_discontinuity = 20
 
 _default_aspirate_delay_seconds = 1.0
