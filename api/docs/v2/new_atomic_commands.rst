@@ -436,9 +436,9 @@ The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and d
 
 .. code-block:: python
 
-    # mix 3 times, 50uL, current location
+    # mix 3 times, 50 uL, current location
     pipette.mix(3, 50)
-    # mix 4 times, 100uL, from well A2
+    # mix 4 times, 100 uL, from well A2
     pipette.mix(4, 100, plate['A2'])
     # mix 2 times, use the pipette's max volume, current location
     pipette.mix(2)
@@ -454,13 +454,16 @@ The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and d
 Air Gap
 =======
 
-When dealing with certain liquids, you may need to aspirate air after aspirating the liquid to prevent it from sliding out of the pipette's tip. A call to :py:meth:`.InstrumentContext.air_gap` with a volume in µL will aspirate that much air into the tip. ``air_gap`` takes up to two arguments: ``air_gap(volume, height)``:
+The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to aspirate some air after a liquid. Creating an air gap can help prevent a liquid from leaking out of the pipette after drawing it from a well. Calling the ``air_gap()`` method without any arguments uses the remaining volume in the pipette tip. For example, if you load a 1000 uL pipette on a Flex and tell the robot to aspirate 500 uL of liquid, it will use the remaining 500 uL for the air gap::
 
-.. code-block:: python
+    pipette.aspirate(500, plate['A1'])
+    pipette.air_gap() # draws 500 uL of air
 
-    pipette.aspirate(100, plate['B4'])
-    pipette.air_gap(20)
-    pipette.drop_tip()
+The ``air_gap()`` method also accepts the ``volume`` and ``height`` arguments. These let you control the amount of air (in uL) drawn in and the height (in mm) above the well for aspirating air. By default, the pipette will move 5 mm above a well before creating the air gap. For example, this code aspirates 200 uL of liquid from well A1. The aspiration action is followed by an air gap of 75 uL taken from 20 mm above the well::
+
+    pipette.pick_up_tip()
+    pipette.aspirate(200, plate['A1'])
+    pipette.air_gap(75, 20)
 
 .. versionadded:: 2.0
 
