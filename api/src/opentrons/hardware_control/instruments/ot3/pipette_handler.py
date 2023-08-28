@@ -545,6 +545,7 @@ class PipetteHandlerProvider:
         mount: OT3Mount,
         volume: Optional[float],
         rate: float,
+        push_out: Optional[float],
     ) -> Optional[LiquidActionSpec]:
         """Check preconditions for dispense, parse args, and calculate positions.
 
@@ -580,6 +581,20 @@ class PipetteHandlerProvider:
         if disp_vol == 0:
             return None
 
+        if push_out is None:
+            push_out_ul = self.get_attached_instrument(mount)["default_push_out_volume"]
+        else:
+            push_out_ul = push_out
+
+        push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
+
+        if (
+            push_out_dist_mm
+            > instrument.plunger_positions.blow_out
+            - instrument.plunger_positions.bottom
+        ):
+            raise ValueError("Cannot push-out more than pipette max blowout volume.")
+
         dist = self.plunger_position(
             instrument, instrument.current_volume - disp_vol, "dispense"
         )
@@ -592,7 +607,7 @@ class PipetteHandlerProvider:
         return LiquidActionSpec(
             axis=Axis.of_main_tool_actuator(mount),
             volume=disp_vol,
-            plunger_distance=dist,
+            plunger_distance=dist + push_out_dist_mm,
             speed=speed,
             acceleration=acceleration,
             instr=instrument,
