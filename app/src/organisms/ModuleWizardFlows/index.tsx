@@ -15,7 +15,7 @@ import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
-import { SECTIONS } from './constants'
+import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
 import { PlaceAdapter } from './PlaceAdapter'
@@ -23,13 +23,13 @@ import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data'
+import { CreateCommand, getModuleType } from '@opentrons/shared-data'
 import { FirmwareUpdate } from './FirmwareUpdate'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
-  slotName?: string
+  initialSlotName?: string
   onComplete?: () => void
 }
 
@@ -38,13 +38,19 @@ const RUN_REFETCH_INTERVAL = 5000
 export const ModuleWizardFlows = (
   props: ModuleWizardFlowsProps
 ): JSX.Element | null => {
-  const { attachedModule, slotName, closeFlow, onComplete } = props
+  const { attachedModule, initialSlotName, closeFlow, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
+
+  const availableSlotNames =
+    FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
+  const [slotName, setSlotName] = React.useState(
+    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? 'D1'
+  )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
   const currentStep = moduleCalibrationSteps?.[currentStepIndex]
@@ -199,7 +205,14 @@ export const ModuleWizardFlows = (
   } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
     modalContent = <FirmwareUpdate {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
-    modalContent = <SelectLocation {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <SelectLocation
+        {...currentStep}
+        {...calibrateBaseProps}
+        availableSlotNames={availableSlotNames}
+        setSlotName={setSlotName}
+      />
+    )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
     modalContent = <PlaceAdapter {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {

@@ -1,11 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { BORDERS, COLORS, DIRECTION_COLUMN, Flex, POSITION_ABSOLUTE } from '@opentrons/components';
-import { WizardHeader } from "../../molecules/WizardHeader";
-import { ChooseLocation } from './ChooseLocation';
-import { AdjustLocation } from './AdjustLocation';
-import { Success } from './Success';
-import { SmallButton } from '../../atoms/buttons';
+import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  POSITION_ABSOLUTE,
+} from '@opentrons/components'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { ChooseLocation } from './ChooseLocation'
+import { AdjustLocation } from './AdjustLocation'
+import { Success } from './Success'
+import { SmallButton } from '../../atoms/buttons'
 
 interface DropTipWizardProps {
   close: () => void
@@ -25,11 +31,15 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
       proceed={stepForward}
       goBack={stepBack}
     />,
-    <Flex key="confirm">CONFIRM THIS IS WHAT YOU WANT<SmallButton onClick={stepForward} buttonText="YES" buttonType='primary'/></Flex>,
-    <Success
-      key="success"
-      proceed={close}
-    />,
+    <Flex key="confirm">
+      CONFIRM THIS IS WHAT YOU WANT
+      <SmallButton
+        onClick={stepForward}
+        buttonText="YES"
+        buttonType="primary"
+      />
+    </Flex>,
+    <Success key="success" proceed={close} />,
   ]
 
   return (

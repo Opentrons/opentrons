@@ -16,6 +16,8 @@ export const DropTipWizard: Story = {
     return <DropTipWizardComponent {...args} />
   },
   args: {
-    close: ( ) => {console.log('close clicked')}
-  }
+    close: () => {
+      console.log('close clicked')
+    },
+  },
 }

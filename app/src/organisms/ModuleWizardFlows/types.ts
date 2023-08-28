@@ -1,6 +1,6 @@
 import { AttachedModule } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data'
 import { SECTIONS } from './constants'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 export type ModuleCalibrationWizardStep =
   | BeforeBeginningStep
@@ -22,6 +22,7 @@ export interface ModuleCalibrationWizardStepProps {
   attachedModule: AttachedModule
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
+  slotName: string
 }
 
 export interface BeforeBeginningStep {

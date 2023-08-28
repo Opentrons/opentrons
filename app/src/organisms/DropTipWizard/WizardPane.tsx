@@ -1,8 +1,19 @@
-import * as React from "react"
+import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { ALIGN_CENTER, ALIGN_FLEX_END, COLORS, DIRECTION_COLUMN, Flex, JUSTIFY_FLEX_END, JUSTIFY_SPACE_BETWEEN, RESPONSIVENESS, SPACING, TYPOGRAPHY } from "@opentrons/components"
-import { SmallButton } from "../../atoms/buttons"
+import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { SmallButton } from '../../atoms/buttons'
 
 interface WizardPaneProps {
   proceed: () => void
@@ -18,14 +29,18 @@ export function WizardPane(props: WizardPaneProps): JSX.Element {
       flex="1"
       padding={SPACING.spacing32}
       flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
       {children}
-      <Flex justifyContent={goBack != null ? JUSTIFY_SPACE_BETWEEN : JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
-        {goBack != null ?
-          <GoBackButton onClick={goBack}>
-            {t('shared:go_back')}
-          </GoBackButton>
-          : null}
+      <Flex
+        justifyContent={
+          goBack != null ? JUSTIFY_SPACE_BETWEEN : JUSTIFY_FLEX_END
+        }
+        alignItems={ALIGN_CENTER}
+      >
+        {goBack != null ? (
+          <GoBackButton onClick={goBack}>{t('shared:go_back')}</GoBackButton>
+        ) : null}
         <SmallButton
           buttonType="primary"
           onClick={proceed}

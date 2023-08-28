@@ -1,3 +1,10 @@
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  ModuleType,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
   FIRMWARE_UPDATE: 'FIRMWARE_UPDATE',
@@ -9,3 +16,11 @@ export const SECTIONS = {
 
 export const CAL_PIN_LOADNAME = 'calibration_pin' as const
 export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
+
+export const FLEX_SLOT_NAMES_BY_MOD_TYPE: {
+  [moduleType in ModuleType]?: string[]
+} = {
+  [HEATERSHAKER_MODULE_TYPE]: ['A1', 'B1', 'C1', 'D1', 'A3', 'B3', 'C3', 'D3'],
+  [TEMPERATURE_MODULE_TYPE]: ['A1', 'B1', 'C1', 'D1', 'A3', 'B3', 'C3', 'D3'],
+  [THERMOCYCLER_MODULE_TYPE]: ['B1'],
+}

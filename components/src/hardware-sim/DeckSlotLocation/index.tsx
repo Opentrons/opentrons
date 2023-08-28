@@ -1,20 +1,28 @@
 import * as React from 'react'
 import { DeckDefinition, DeckSlot, ModuleType } from '@opentrons/shared-data'
 
-// TODO(BC, 8/2/2023): as soon as the deck definitions have a concept of base locations, use their 
-// identity to key this mapping instead of slotNames 
+// TODO(BC, 8/2/2023): as soon as the deck definitions have a concept of base locations, use their
+// identity to key this mapping instead of slotNames
 interface DeckSlotLocationProps extends React.SVGProps<SVGGElement> {
   slotName: DeckSlot['id']
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   slotBaseColor?: React.SVGProps<SVGPathElement>['fill']
   slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
+  showExtensions?: boolean
 }
 
 export function DeckSlotLocation(
-  props: DeckSlotLocationProps,
+  props: DeckSlotLocationProps
 ): JSX.Element | null {
-  const { slotName, deckDefinition, slotBaseColor, slotClipColor, ...restProps } = props
+  const {
+    slotName,
+    deckDefinition,
+    slotBaseColor,
+    slotClipColor,
+    showExtensions = false,
+    ...restProps
+  } = props
 
   const slotDef = deckDefinition?.locations.orderedSlots.find(
     s => s.id === slotName
@@ -29,10 +37,12 @@ export function DeckSlotLocation(
   const contentsBySlotName: { [slotName: string]: JSX.Element } = {
     A1: (
       <>
-        <SlotBase
-          fill={slotBaseColor}
-          d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"
-        />
+        {showExtensions ? (
+          <SlotBase
+            fill={slotBaseColor}
+            d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"
+          />
+        ) : null}
         <SlotBase
           fill={slotBaseColor}
           d="M-97.7,417.1h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4 C-102,415.1-100.1,417.1-97.7,417.1z"

@@ -162,7 +162,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 )}_slot_${slotName}`}
                 moduleModel={moduleDef.model}
                 displayName={moduleDef.displayName}
-                location={slotName}
+                slotName={slotName}
                 attachedModuleMatch={attachedModuleMatch}
                 heaterShakerModuleFromProtocol={
                   moduleRenderInfoForProtocolById[moduleId].moduleDef
@@ -183,7 +183,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 interface ModulesListItemProps {
   moduleModel: ModuleModel
   displayName: string
-  location: string
+  slotName: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isOt3: boolean
@@ -192,7 +192,7 @@ interface ModulesListItemProps {
 export function ModulesListItem({
   moduleModel,
   displayName,
-  location,
+  slotName,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
   isOt3,
@@ -262,7 +262,6 @@ export function ModulesListItem({
     if (attachedModuleMatch == null) {
       return (
         <StatusLabel
-          id={location}
           status={moduleConnectionStatus}
           backgroundColor={COLORS.warningBackgroundLight}
           iconColor={COLORS.warningEnabled}
@@ -272,7 +271,6 @@ export function ModulesListItem({
     } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
       return (
         <StatusLabel
-          id={location}
           status={moduleConnectionStatus}
           backgroundColor={COLORS.successBackgroundLight}
           iconColor={COLORS.successEnabled}
@@ -294,6 +292,7 @@ export function ModulesListItem({
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
+          initialSlotName={slotName}
         />
       ) : null}
       <Box
@@ -336,7 +335,7 @@ export function ModulesListItem({
                   ? isOt3
                     ? TC_MODULE_LOCATION_OT3
                     : TC_MODULE_LOCATION_OT2
-                  : location,
+                  : slotName,
             })}
           </StyledText>
           <Flex width="15%">

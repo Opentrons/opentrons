@@ -35,16 +35,24 @@ export const SlotLabels = ({
           width="2.5rem"
         >
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">A</Text>
+            <Text color={color} as="h3">
+              A
+            </Text>
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">B</Text>
+            <Text color={color} as="h3">
+              B
+            </Text>
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">C</Text>
+            <Text color={color} as="h3">
+              C
+            </Text>
           </Flex>
           <Flex alignItems={ALIGN_CENTER} flex="1">
-            <Text color={color} as="h3">D</Text>
+            <Text color={color} as="h3">
+              D
+            </Text>
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
@@ -65,21 +73,27 @@ export const SlotLabels = ({
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <Text color={color} as="h3">1</Text>
+            <Text color={color} as="h3">
+              1
+            </Text>
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <Text color={color} as="h3">2</Text>
+            <Text color={color} as="h3">
+              2
+            </Text>
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             flex="1"
           >
-            <Text color={color} as="h3">3</Text>
+            <Text color={color} as="h3">
+              3
+            </Text>
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
