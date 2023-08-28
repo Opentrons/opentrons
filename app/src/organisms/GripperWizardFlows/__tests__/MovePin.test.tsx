@@ -63,6 +63,7 @@ describe('MovePin', () => {
     const { getByRole } = render()[0]
     await getByRole('button', { name: 'Begin calibration' }).click()
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
         params: { axes: ['extensionZ', 'extensionJaw'] },
@@ -70,6 +71,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: { jaw: 'front' },
@@ -77,6 +79,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
         params: { mount: 'extension' },
@@ -117,6 +120,7 @@ describe('MovePin', () => {
     await getByRole('button', { name: 'Continue' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
         params: { axes: ['extensionZ', 'extensionJaw'] },
@@ -124,6 +128,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: {
@@ -134,6 +139,7 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
         params: { mount: 'extension' },

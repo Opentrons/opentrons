@@ -28,7 +28,8 @@ export function useLabwareOffsetForLabware(
   const labwareLocation = getLabwareOffsetLocation(
     labwareId,
     mostRecentAnalysis?.commands ?? [],
-    mostRecentAnalysis?.modules ?? []
+    mostRecentAnalysis?.modules ?? [],
+    mostRecentAnalysis?.labware ?? []
   )
   if (labwareLocation == null || labwareDefinitionUri == null) return null
   const labwareOffsets = runRecord?.data?.labwareOffsets ?? []

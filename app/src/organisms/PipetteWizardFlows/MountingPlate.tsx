@@ -25,7 +25,7 @@ export const MountingPlate = (
 
   const handleAttachMountingPlate = (): void => {
     setNumberOfTryAgains(numberOfTryAgains + 1)
-    chainRunCommands(
+    chainRunCommands?.(
       [
         {
           commandType: 'home' as const,

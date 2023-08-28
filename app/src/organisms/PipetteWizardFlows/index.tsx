@@ -7,11 +7,13 @@ import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   LoadedPipette,
+  CreateCommand,
 } from '@opentrons/shared-data'
 import {
   useHost,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
@@ -38,7 +40,10 @@ import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
+import type { CommandData } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
+
+const RUN_REFETCH_INTERVAL = 5000
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
@@ -75,7 +80,6 @@ export const PipetteWizardFlows = (
     pipette => pipette.mount === mount
   )
   const host = useHost()
-  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
@@ -94,16 +98,30 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+    string | null
+  >(null)
+  // we should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = React.useState<boolean>(false)
 
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: createdMaintenanceRunId != null,
+  })
+
   const {
     chainRunCommands,
     isCommandMutationLoading,
-  } = useChainMaintenanceCommands(maintenanceRunId)
+  } = useChainMaintenanceCommands()
 
   const {
     createMaintenanceRun,
@@ -111,11 +129,33 @@ export const PipetteWizardFlows = (
   } = useCreateMaintenanceRunMutation(
     {
       onSuccess: response => {
-        setMaintenanceRunId(response.data.id)
+        setCreatedMaintenanceRunId(response.data.id)
       },
     },
     host
   )
+
+  // this will close the modal in case the run was deleted by the terminate
+  // activity modal on the ODD
+  React.useEffect(() => {
+    if (
+      createdMaintenanceRunId !== null &&
+      maintenanceRunData?.data.id === createdMaintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    }
+    if (
+      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
+      closeFlow()
+    }
+  }, [
+    maintenanceRunData?.data.id,
+    createdMaintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    closeFlow,
+  ])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
@@ -143,11 +183,15 @@ export const PipetteWizardFlows = (
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunId == null) handleClose()
+    if (maintenanceRunData?.data.id == null) handleClose()
     else {
-      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+      chainRunCommands(
+        maintenanceRunData?.data.id,
+        [{ commandType: 'home' as const, params: {} }],
+        false
+      )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunId)
+          deleteMaintenanceRun(maintenanceRunData?.data.id)
         })
         .catch(error => {
           console.error(error.message)
@@ -171,11 +215,24 @@ export const PipetteWizardFlows = (
     }
   }, [isCommandMutationLoading, isExiting])
 
+  let chainMaintenanceRunCommands
+  if (maintenanceRunData?.data.id != null) {
+    chainMaintenanceRunCommands = (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ): Promise<CommandData[]> =>
+      chainRunCommands(
+        maintenanceRunData.data.id,
+        commands,
+        continuePastCommandFailure
+      )
+  }
+
   const calibrateBaseProps = {
-    chainRunCommands,
+    chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
-    maintenanceRunId,
+    maintenanceRunId: maintenanceRunData?.data.id,
     goBack,
     attachedPipettes,
     setShowErrorMessage,

@@ -2,7 +2,7 @@ export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 export interface GripperData {
   data: {
     jawState: string
-    calibratedOffset: {
+    calibratedOffset?: {
       offset: { x: number; y: number; z: number }
       source: string
       last_modified?: string
@@ -21,7 +21,7 @@ export interface PipetteData {
     channels: number
     min_volume: number
     max_volume: number
-    calibratedOffset: {
+    calibratedOffset?: {
       offset: { x: number; y: number; z: number }
       source: string
       last_modified?: string

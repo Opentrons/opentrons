@@ -60,7 +60,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
-    chainRunCommands(
+    chainRunCommands?.(
       [
         {
           commandType: 'home' as const,

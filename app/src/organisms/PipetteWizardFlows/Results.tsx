@@ -141,7 +141,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     ) {
       const axes: MotorAxes =
         mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
-      chainRunCommands(
+      chainRunCommands?.(
         [
           {
             commandType: 'loadPipette' as const,
@@ -171,7 +171,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.DETACH &&
       currentStepIndex !== totalStepCount
     ) {
-      chainRunCommands(
+      chainRunCommands?.(
         [
           {
             commandType: 'calibration/moveToMaintenancePosition' as const,

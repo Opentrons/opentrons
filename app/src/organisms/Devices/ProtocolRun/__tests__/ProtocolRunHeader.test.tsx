@@ -66,6 +66,7 @@ import {
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
+  useIsOT3,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
@@ -192,6 +193,7 @@ const mockRunFailedModal = RunFailedModal as jest.MockedFunction<
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -345,6 +347,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
+    mockUseIsOT3.mockReturnValue(true)
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
   })

@@ -82,6 +82,7 @@ export type LabwareDisplayCategory =
   | 'aluminumBlock'
   | 'trash'
   | 'other'
+  | 'adapter'
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
@@ -167,6 +168,8 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
+
 // NOTE: must be synced with shared-data/labware/schemas/2.json
 export interface LabwareDefinition2 {
   version: number
@@ -180,6 +183,7 @@ export interface LabwareDefinition2 {
   ordering: string[][]
   wells: LabwareWellMap
   groups: LabwareWellGroup[]
+  allowedRoles?: LabwareRoles[]
 }
 
 export type ModuleType =

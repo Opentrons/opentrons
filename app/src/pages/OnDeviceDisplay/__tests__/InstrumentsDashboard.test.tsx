@@ -7,10 +7,10 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { Navigation } from '../../../organisms/Navigation'
-import { formatTimestamp } from '../../../organisms/Devices/utils'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '../InstrumentsDashboard'
+import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
 import { InstrumentDetail } from '../InstrumentDetail'
 
 jest.mock('@opentrons/react-api-client')
@@ -140,7 +140,9 @@ describe('InstrumentsDashboard', () => {
     getByText('serial number')
     getByText(mockLeftPipetteData.serialNumber)
     getByText(
-      formatTimestamp(mockLeftPipetteData.data.calibratedOffset.last_modified)
+      formatTimeWithUtcLabel(
+        mockLeftPipetteData.data.calibratedOffset.last_modified
+      )
     )
   })
   it('should route to right mount detail when instrument attached and clicked', async () => {
@@ -149,7 +151,9 @@ describe('InstrumentsDashboard', () => {
     getByText('serial number')
     getByText(mockRightPipetteData.serialNumber)
     getByText(
-      formatTimestamp(mockRightPipetteData.data.calibratedOffset.last_modified)
+      formatTimeWithUtcLabel(
+        mockRightPipetteData.data.calibratedOffset.last_modified
+      )
     )
   })
   it('should route to extension mount detail when instrument attached and clicked', async () => {

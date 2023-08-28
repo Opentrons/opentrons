@@ -1,6 +1,15 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
+import {
+  getLabwareDisplayName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
+import {
+  getLabwareEntities,
+  getModuleEntities,
+} from '../../step-forms/selectors'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
@@ -15,6 +24,8 @@ interface MoveLabwareHeaderProps {
 //  TODO(jr, 7/31/23): add text to i18n
 export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   const { sourceLabwareNickname, destinationSlot, useGripper } = props
+  const moduleEntities = useSelector(getModuleEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
 
   const [sourceTargetProps, sourceTooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
@@ -26,7 +37,22 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     strategy: TOOLTIP_FIXED,
   })
 
-  const destSlot = destinationSlot === 'offDeck' ? 'off deck' : destinationSlot
+  let destSlot: string | null | undefined = null
+  if (destinationSlot === 'offDeck') {
+    destSlot = 'off deck'
+  } else if (
+    destinationSlot != null &&
+    moduleEntities[destinationSlot] != null
+  ) {
+    destSlot = `${getModuleDisplayName(moduleEntities[destinationSlot].model)}`
+  } else if (
+    destinationSlot != null &&
+    labwareEntities[destinationSlot] != null
+  ) {
+    destSlot = getLabwareDisplayName(labwareEntities[destinationSlot].def)
+  } else {
+    destSlot = destinationSlot
+  }
   return (
     <>
       <li className={styles.substep_header}>
@@ -35,7 +61,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
       <li className={styles.substep_header}>
         <span>LABWARE</span>
         <span className={styles.spacer} />
-        <span>DESTINATION SLOT</span>
+        <span>NEW LOCATION</span>
       </li>
 
       <Tooltip {...sourceTooltipProps}>
@@ -43,7 +69,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
       </Tooltip>
 
       <Tooltip {...destTooltipProps}>
-        <LabwareTooltipContents labwareNickname={destinationSlot} />
+        <LabwareTooltipContents labwareNickname={destSlot} />
       </Tooltip>
 
       <PDListItem

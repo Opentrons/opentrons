@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { format, formatDistance } from 'date-fns'
+import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
@@ -15,7 +15,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
@@ -27,6 +26,7 @@ import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -74,7 +74,7 @@ export function ProtocolCard(props: {
   ): void => {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
-    } else if (longpress.isLongPressed !== true) {
+    } else if (!longpress.isLongPressed) {
       history.push(`/protocols/${protocolId}`)
     }
   }
@@ -125,6 +125,17 @@ export function ProtocolCard(props: {
       )
     }
   }
+
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${longpress.isLongPressed
+        ? ''
+        : isFailedAnalysis
+        ? COLORS.red3Pressed
+        : COLORS.darkBlack40};
+    }
+  `
+
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
@@ -135,9 +146,10 @@ export function ProtocolCard(props: {
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}
       ref={longpress.ref}
+      css={PUSHED_STATE_STYLE}
     >
       <Flex
-        width="30.75rem"
+        width="28.9375rem"
         overflowWrap="anywhere"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
@@ -162,7 +174,7 @@ export function ProtocolCard(props: {
           {protocolName}
         </StyledText>
       </Flex>
-      <Flex width="9.25rem" justifyContent={JUSTIFY_CENTER}>
+      <Flex width="9.25rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
@@ -171,9 +183,9 @@ export function ProtocolCard(props: {
             : t('no_history')}
         </StyledText>
       </Flex>
-      <Flex width="10rem">
+      <Flex width="12.5rem" whiteSpace="nowrap">
         <StyledText as="p" color={COLORS.darkBlack70}>
-          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
+          {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal

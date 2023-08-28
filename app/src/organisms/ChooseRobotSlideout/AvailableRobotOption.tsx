@@ -160,7 +160,7 @@ export function AvailableRobotOption(
         >
           <Trans
             t={t}
-            i18nKey="a_software_update_is_available_please_update"
+            i18nKey="a_robot_software_update_is_available"
             components={{
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}

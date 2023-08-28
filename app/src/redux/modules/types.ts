@@ -13,6 +13,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { ModuleOffset } from '@opentrons/api-client'
+
 import * as ApiTypes from './api-types'
 export * from './api-types'
 
@@ -40,24 +42,28 @@ export interface TemperatureModule extends CommonModuleInfo {
   moduleType: typeof TEMPERATURE_MODULE_TYPE
   moduleModel: TemperatureModuleModel
   data: ApiTypes.TemperatureData
+  moduleOffset?: ModuleOffset
 }
 
 export interface MagneticModule extends CommonModuleInfo {
   moduleType: typeof MAGNETIC_MODULE_TYPE
   moduleModel: MagneticModuleModel
   data: ApiTypes.MagneticData
+  moduleOffset?: ModuleOffset
 }
 
 export interface ThermocyclerModule extends CommonModuleInfo {
   moduleType: typeof THERMOCYCLER_MODULE_TYPE
   moduleModel: ThermocyclerModuleModel
   data: ApiTypes.ThermocyclerData
+  moduleOffset?: ModuleOffset
 }
 
 export interface HeaterShakerModule extends CommonModuleInfo {
   moduleType: typeof HEATERSHAKER_MODULE_TYPE
   moduleModel: HeaterShakerModuleModel
   data: ApiTypes.HeaterShakerData
+  moduleOffset?: ModuleOffset
 }
 
 export type AttachedModule =

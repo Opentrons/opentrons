@@ -90,4 +90,12 @@ describe('RobotSettingsGripperCalibration', () => {
     calibrateButton.click()
     getByText('Mock Wizard Flow')
   })
+
+  it('render text when gripper is not attached instead calibration data', () => {
+    props = {
+      gripper: null as any,
+    }
+    const [{ getByText }] = render(props)
+    getByText('No gripper attached')
+  })
 })

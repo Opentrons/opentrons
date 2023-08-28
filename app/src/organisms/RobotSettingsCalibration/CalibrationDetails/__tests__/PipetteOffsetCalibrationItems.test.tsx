@@ -12,7 +12,7 @@ import {
   useAttachedPipettes,
   useIsOT3,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../../organisms/Devices/hooks'
+} from '../../../Devices/hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 import { formatLastCalibrated } from '../utils'

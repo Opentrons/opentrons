@@ -13,12 +13,12 @@ export type ModuleCalibrationWizardStep =
 export interface ModuleCalibrationWizardStepProps {
   proceed: () => void
   goBack: () => void
-  chainRunCommands: (
+  chainRunCommands?: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  maintenanceRunId: string
+  maintenanceRunId?: string
   attachedModule: AttachedModule
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
