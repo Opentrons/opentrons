@@ -1631,6 +1631,8 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         volume: Optional[float] = None,
         rate: float = 1.0,
+        # TODO (tz, 8-24-24): add implementation https://opentrons.atlassian.net/browse/RET-1373
+        push_out: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""

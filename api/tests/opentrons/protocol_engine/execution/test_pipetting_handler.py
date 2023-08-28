@@ -18,6 +18,7 @@ from opentrons.protocol_engine.execution.pipetting import (
 from opentrons.protocol_engine.errors.exceptions import (
     TipNotAttachedError,
     InvalidPipettingVolumeError,
+    InvalidPushOutVolumeError,
 )
 
 
@@ -153,9 +154,7 @@ async def test_dispense_in_place(
     )
 
     result = await hardware_subject.dispense_in_place(
-        pipette_id="pipette-id",
-        volume=25,
-        flow_rate=2.5,
+        pipette_id="pipette-id", volume=25, flow_rate=2.5, push_out=None
     )
 
     assert result == 25
@@ -164,11 +163,44 @@ async def test_dispense_in_place(
         mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
         ),
-        await mock_hardware_api.dispense(mount=Mount.RIGHT, volume=25),
+        await mock_hardware_api.dispense(mount=Mount.RIGHT, volume=25, push_out=None),
         mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=1.23, dispense=4.56, blow_out=7.89
         ),
     )
+
+
+async def test_dispense_in_place_raises_invalid_push_out(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+) -> None:
+    """It should raise an InvalidPushOutVolumeError."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes={},
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
+            ),
+        )
+    )
+
+    with pytest.raises(InvalidPushOutVolumeError):
+        await hardware_subject.dispense_in_place(
+            pipette_id="pipette-id", volume=25, flow_rate=2.5, push_out=-7
+        )
 
 
 async def test_aspirate_in_place(
@@ -331,9 +363,25 @@ async def test_dispense_in_place_virtual(
     )
 
     result = await subject.dispense_in_place(
-        pipette_id="pipette-id", volume=3, flow_rate=5
+        pipette_id="pipette-id", volume=3, flow_rate=5, push_out=None
     )
     assert result == 3
+
+
+async def test_dispense_in_place_virtual_raises_invalid_push_out(
+    decoy: Decoy, mock_state_view: StateView
+) -> None:
+    """Should raise an InvalidPushOutVolumeError."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
+    with pytest.raises(InvalidPushOutVolumeError):
+        await subject.dispense_in_place(
+            pipette_id="pipette-id", volume=3, flow_rate=5, push_out=-7
+        )
 
 
 async def test_validate_tip_attached_in_blow_out(
@@ -379,4 +427,6 @@ async def test_validate_tip_attached_in_dispense(
     with pytest.raises(
         TipNotAttachedError, match="Cannot perform dispense without a tip attached"
     ):
-        await subject.dispense_in_place("pipette-id", volume=20, flow_rate=1)
+        await subject.dispense_in_place(
+            "pipette-id", volume=20, flow_rate=1, push_out=None
+        )

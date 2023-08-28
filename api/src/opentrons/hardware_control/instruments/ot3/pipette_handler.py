@@ -269,6 +269,9 @@ class PipetteHandlerProvider:
             result[
                 "default_blow_out_volume"
             ] = instr.active_tip_settings.default_blowout_volume
+            result[
+                "default_push_out_volume"
+            ] = instr.active_tip_settings.default_push_out_volume
         return cast(PipetteDict, result)
 
     @property
