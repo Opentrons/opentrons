@@ -18,11 +18,14 @@ Database schema versions:
 
 - Version 0
     - Initial schema version
+
 - Version 1
-    - `run_table.state_summary` column added
-    - `run_table.commands` column added
-    - `run_table.engine_status` column added
-    - `run_table._updated_at` column added
+    This migration adds the following nullable columns to the run table:
+
+    - Column("state_summary, sqlalchemy.PickleType, nullable=True)
+    - Column("commands", sqlalchemy.PickleType, nullable=True)
+    - Column("engine_status", sqlalchemy.String, nullable=True)
+    - Column("_updated_at", sqlalchemy.DateTime, nullable=True)
 """
 import logging
 from datetime import datetime, timezone
@@ -33,7 +36,7 @@ import sqlalchemy
 
 from ._tables import migration_table, run_table
 
-_LATEST_SCHEMA_VERSION: Final = 1
+_LATEST_SCHEMA_VERSION: Final = 2
 
 _log = logging.getLogger(__name__)
 
@@ -48,26 +51,39 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
     NOTE: added columns should be nullable.
     """
     with sql_engine.begin() as transaction:
-        version = _get_schema_version(transaction)
+        starting_version = _get_schema_version(transaction)
 
-        if version is not None:
-            if version < 1:
-                _migrate_0_to_1(transaction)
-
+        if starting_version is None:
             _log.info(
-                f"Migrated database from schema {version}"
-                f" to version {_LATEST_SCHEMA_VERSION}"
+                f"Marking fresh database as schema version {_LATEST_SCHEMA_VERSION}."
             )
+            _stamp_schema_version(transaction)
+
+        elif starting_version == _LATEST_SCHEMA_VERSION:
+            _log.info(
+                f"Database has schema version {_LATEST_SCHEMA_VERSION}."
+                " no migrations needed."
+            )
+
         else:
             _log.info(
-                f"Marking fresh database as schema version {_LATEST_SCHEMA_VERSION}"
+                f"Database has schema version {starting_version}."
+                f" Migrating to {_LATEST_SCHEMA_VERSION}..."
             )
 
-        if version != _LATEST_SCHEMA_VERSION:
-            _insert_migration(transaction)
+            if starting_version < 1:
+                _log.info("Migrating database schema from 0 to 1...")
+                _migrate_0_to_1(transaction)
+            if starting_version < 2:
+                _log.info("Migrating database schema from 1 to 2...")
+                _migrate_1_to_2(transaction)
+
+            _log.info("Database migrations complete.")
+            _stamp_schema_version(transaction)
 
 
-def _insert_migration(transaction: sqlalchemy.engine.Connection) -> None:
+def _stamp_schema_version(transaction: sqlalchemy.engine.Connection) -> None:
+    """Mark the database as having the latest schema version."""
     transaction.execute(
         sqlalchemy.insert(migration_table).values(
             created_at=datetime.now(tz=timezone.utc),
@@ -77,7 +93,7 @@ def _insert_migration(transaction: sqlalchemy.engine.Connection) -> None:
 
 
 def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[int]:
-    """Get the starting version of the database.
+    """Get the current schema version of the database.
 
     Returns:
         The version found, or None if this is a fresh database that
@@ -112,15 +128,7 @@ def _is_version_0(transaction: sqlalchemy.engine.Connection) -> bool:
 
 
 def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
-    """Migrate to schema version 1.
-
-    This migration adds the following nullable columns to the run table:
-
-    - Column("state_summary, sqlalchemy.PickleType, nullable=True)
-    - Column("commands", sqlalchemy.PickleType, nullable=True)
-    - Column("engine_status", sqlalchemy.String, nullable=True)
-    - Column("_updated_at", sqlalchemy.DateTime, nullable=True)
-    """
+    """Migrate the database from schema 0 to schema 1."""
     add_summary_column = sqlalchemy.text("ALTER TABLE run ADD state_summary BLOB")
     add_commands_column = sqlalchemy.text("ALTER TABLE run ADD commands BLOB")
     # NOTE: The column type of `STRING` here is mistaken. SQLite won't recognize it,
@@ -135,3 +143,11 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
     transaction.execute(add_commands_column)
     transaction.execute(add_status_column)
     transaction.execute(add_updated_at_column)
+
+
+def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
+    """Migrate the database from schema 1 to schema 2."""
+    add_completed_analysis_as_document_column = sqlalchemy.text(
+        "ALTER TABLE analysis ADD completed_analysis_as_document VARCHAR"
+    )
+    transaction.execute(add_completed_analysis_as_document_column)
