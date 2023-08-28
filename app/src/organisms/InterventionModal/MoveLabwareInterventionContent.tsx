@@ -240,7 +240,8 @@ function LabwareDisplayLocation(
   const { protocolData, location, robotType, labwareDefsByUri } = props
   let displayLocation: React.ReactNode = ''
   if (location === 'offDeck') {
-    displayLocation = <LocationIcon slotName={t('offdeck')} />
+    // TODO(BC, 08/28/23): remove this string cast after update i18next to >23 (see https://www.i18next.com/overview/typescript#argument-of-type-defaulttfuncreturn-is-not-assignable-to-parameter-of-type-xyz)
+    displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
   } else if ('moduleId' in location) {
