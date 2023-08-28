@@ -400,31 +400,32 @@ To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.I
 Touch Tip
 =========
 
-The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps to knock off any droplets that might be hanging on to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well plate.
+The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps to knock off any droplets that might be hanging on to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well plate. By default, the ``touch_tip()`` method performs its action within the current well location::
 
-:py:meth:`.InstrumentContext.touch_tip` can take up to 4 arguments: ``touch_tip(location, radius, v_offset, speed)``.
+    pipette.touch_tip() # touch tip in current well location
 
-.. code-block:: python
+The ``touch_tip()`` method also includes optional arguments that control the location and speed of a touch procedure. For example::
 
-    pipette.touch_tip()            # touch tip within current location
-    pipette.touch_tip(v_offset=-2) # touch tip 2mm below the top of the current location
-    pipette.touch_tip(plate['B1']) # touch tip within plate:B1
-    pipette.touch_tip(plate['B1'], speed=100) # touch tip within plate:B1 at 100 mm/s
-    pipette.touch_tip(plate['B1'], # touch tip in plate:B1, at 75% of total radius and -2mm from top of well
+    # touch tip in well B1
+    pipette.touch_tip(plate['B1'])
+    # touch tip 2mm below the top of the current location
+    pipette.touch_tip(v_offset=-2) 
+    # touch tip in well B1 at 100 mm/s
+    pipette.touch_tip(plate['B1'], speed=100)
+    # touch tip in well B1, at 75% of total radius and -2mm from top of well
+    pipette.touch_tip(plate['B1'], 
                       radius=0.75,
                       v_offset=-2)
-
 
 .. versionadded:: 2.0
 
 .. note:
 
-    It is recommended that you change your API version to 2.4 to take advantage of new
-    features added into `touch_tip` such as:
+    We recommend changing your API version to 2.4 to take advantage of new ``touch_tip()``
+    features such as:
         - A lower minimum speed (1 mm/s)
-        - Better handling around near by geometry considerations
-        - Removed certain extraneous behaviors such as a diagonal move from X -> Y and
-        moving directly to the height offset specified.
+        - Improved handling
+        - Removed diagonal X -> Y position changes while moving the tip directly to the specified height offset.
 
 .. _mix:
 
