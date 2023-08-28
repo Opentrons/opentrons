@@ -279,13 +279,13 @@ def create_csv_test_report(
                 title="ENCODER",
                 lines=[
                     CSVLine(
-                        f"encoder-volume-{round(v, 2)}-channel-{c}"
-                        f"-trial_{t + 1}-{i}-{d}",
+                        f"encoder-volume-{round(v, 2)}-channel_{c}"
+                        f"-trial-{t + 1}-{i}-{d}",
                         [float],
                     )
                     for v in volumes
                     for c in range(pip_channels_tested)
-                    for t in range(cfg.trials)
+                    for t in range(trials)
                     for i in ["start", "end"]
                     for d in ["target", "encoder", "drift"]
                 ],
@@ -451,35 +451,36 @@ def store_encoder(
     estimate_aspirated: float,
     encoder_aspirated: float,
 ) -> None:
+    """Store encoder information."""
     vol_in_tag = str(round(volume, 2))
     report(
         "ENCODER",
-        f"encoder-volume-{vol_in_tag}-channel-{channel}-trial_{trial + 1}-start-target",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-target",
         [round(estimate_bottom, 2)],
     )
     report(
         "ENCODER",
-        f"encoder-volume-{vol_in_tag}-channel-{channel}-trial_{trial + 1}-start-encoder",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-encoder",
         [round(encoder_bottom, 2)],
     )
     report(
         "ENCODER",
-        f"encoder-volume-{vol_in_tag}-channel-{channel}-trial_{trial + 1}-start-drift",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-drift",
         [round(encoder_bottom - estimate_bottom, 2)],
     )
     report(
         "ENCODER",
-        f"encoder-volume-{vol_in_tag}-channel-{channel}-trial_{trial + 1}-end-target",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-target",
         [round(estimate_aspirated, 2)],
     )
     report(
         "ENCODER",
-        f"encoder-volume-{vol_in_tag}-channel-{channel}-trial_{trial + 1}-end-encoder",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-encoder",
         [round(encoder_aspirated, 2)],
     )
     report(
         "ENCODER",
-        f"encoder-volume-{vol_in_tag}-channel-{channel}-trial_{trial + 1}-end-drift",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-drift",
         [round(encoder_aspirated - estimate_aspirated, 2)],
     )
 
