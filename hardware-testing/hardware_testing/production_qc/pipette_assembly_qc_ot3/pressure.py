@@ -41,7 +41,7 @@ PRESSURE_FIXTURE_INSERT_DEPTH = {50: 28.5, 1000: 33.0}
 PRESSURE_ASPIRATE_DELTA_SPEC = {
     1: {
         50: {
-            "delta": 1400.0,
+            "delta": 1350.0,
             "margin": 0.1  # percent of delta
         },
         1000: {
@@ -51,7 +51,7 @@ PRESSURE_ASPIRATE_DELTA_SPEC = {
     },
     8: {
         50: {
-            "delta": 1400.0,
+            "delta": 1350.0,
             "margin": 0.1  # percent of delta
         },
         1000: {
