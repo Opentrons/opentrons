@@ -60,10 +60,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation('module_wizard_flows')
 
-  const pipetteId = attachedPipette.serialNumber
   const mount = attachedPipette.mount
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
-  const pipetteDisplayName = attachedPipette.displayName
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   const handleOnClick = (): void => {

@@ -50,14 +50,6 @@
           "awaiting_temperature": null
         }
       }
-    ],
-    "magdeck": [
-      {
-        "function_name": "engage",
-        "kwargs": {
-          "height": 4
-        }
-      }
     ]
   }
 }

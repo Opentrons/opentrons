@@ -11,13 +11,7 @@ import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import {
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SIZE_1,
-  SPACING,
-} from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -54,30 +48,38 @@ export const BeforeBeginning = (
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   let adapterLoadname
+  let adapterDisplaynameKey
   if (
     THERMOCYCLER_MODULE_MODELS.some(
       model => model === attachedModule.moduleModel
     )
   ) {
     adapterLoadname = 'calibration_adapter_thermocycler'
+    adapterDisplaynameKey = 'calibration_adapter_thermocycler'
   } else if (
     HEATERSHAKER_MODULE_MODELS.some(
       model => model === attachedModule.moduleModel
     )
   ) {
-    adapterLoadname = 'calibration_adapter_heater_shaker'
+    adapterLoadname = 'calibration_adapter_heatershaker'
+    adapterDisplaynameKey = 'calibration_adapter_heatershaker'
   } else if (
     TEMPERATURE_MODULE_MODELS.some(
       model => model === attachedModule.moduleModel
     )
   ) {
-    adapterLoadname = 'calibration_adapter_temperature_module'
+    adapterLoadname = 'calibration_adapter_temperature'
+    adapterDisplaynameKey = 'calibration_adapter_temperature'
   } else {
-    throw new Error('Invalid module for calibration.')
+    adapterLoadname = ''
+    console.error(
+      `Invalid module type for calibration: ${attachedModule.moduleModel}`
+    )
+    return null
   }
   const equipmentList = [
     { loadName: 'calibration_probe', displayName: t('pipette_probe') },
-    { loadName: adapterLoadname, displayName: t('cal_adapter') },
+    { loadName: adapterLoadname, displayName: t(adapterDisplaynameKey) },
   ]
 
   return errorMessage != null ? (
