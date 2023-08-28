@@ -109,7 +109,7 @@ class SupportedTipsDefinition(BaseModel):
         description="The default volume for a blowout command with this tip type.",
         alias="defaultBlowoutVolume",
     )
-    default_push_out_volume: Optional[float] = Field(
+    default_push_out_volume: float = Field(
         ...,
         description="The default volume for a push-out during dispense.",
         alias="defaultPushOutVolume",
