@@ -26,6 +26,7 @@ export interface ShellUpdateState {
   downloading: boolean
   available: boolean
   downloaded: boolean
+  downloadPercentage: number
   error: Error | null | undefined
   info: UpdateInfo | null | undefined
 }
@@ -39,6 +40,7 @@ export type ShellUpdateAction =
   | { type: 'shell:DOWNLOAD_UPDATE'; meta: { shell: true } }
   | { type: 'shell:DOWNLOAD_UPDATE_RESULT'; payload: { error?: Error } }
   | { type: 'shell:APPLY_UPDATE'; meta: { shell: true } }
+  | { type: 'shell:DOWNLOAD_PERCENTAGE'; payload: { percent: number } }
 
 export interface ShellState {
   update: ShellUpdateState
