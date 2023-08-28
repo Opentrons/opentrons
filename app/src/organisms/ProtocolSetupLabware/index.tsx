@@ -529,6 +529,8 @@ function LabwareLatch({
           ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
           : COLORS.darkBlackEnabled
       }
+      height="6.5rem"
+      alignSelf={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
       fontSize={TYPOGRAPHY.fontSize22}
       gridGap={SPACING.spacing8}
