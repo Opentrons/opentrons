@@ -376,7 +376,7 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 Utility Commands
 ================
 
-Utility commands are commands that perform small convenience actions in a protocol or that control a robot's behavior. These include:
+Utility commands include methods that perform small convenience actions in a protocol or that control a robot's behavior. These include:
 
 - :py:meth:`.ProtocolContext.delay`
 - :py:meth:`.ProtocolContext.pause`
@@ -388,19 +388,16 @@ Utility commands are commands that perform small convenience actions in a protoc
 
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
-Delay for an Amount of Time
----------------------------
+Delay and Resume
+----------------
 
-Sometimes you need to wait as a step in your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to wait your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol as a whole.
+Sometimes you need to delay a protocol for a set amount of time (e.g., for an incubation period). You can call the :py:meth:`~.ProtocolContext.delay` method to stop a protocol for a specific amount of time in seconds and minutes. For example::
 
-The values passed into ``delay()`` specify the number of minutes and seconds that the robot will wait until moving on to the next command.
+    protocol.delay(seconds=2)             # delays for 2 seconds
+    protocol.delay(minutes=5)             # delays for 5 minutes
+    protocol.delay(minutes=5, seconds=2)  # delays for 5 minutes and 2 seconds
 
-.. code-block:: python
-
-    protocol.delay(seconds=2)             # delay for 2 seconds
-    protocol.delay(minutes=5)             # delay for 5 minutes
-    protocol.delay(minutes=5, seconds=2)  # delay for 5 minutes and 2 seconds
-
+The robot will resume the protocol automatically after the delay interval expires.
 
 Pause Until Resumed
 -------------------
