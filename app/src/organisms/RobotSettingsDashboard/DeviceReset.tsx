@@ -10,10 +10,13 @@ import {
   COLORS,
   SPACING,
   BORDERS,
+  useConditionalConfirm,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { MediumButton } from '../../atoms/buttons'
+import { MediumButton, SmallButton } from '../../atoms/buttons'
+import { Modal } from '../../molecules/Modal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getResetConfigOptions,
@@ -25,6 +28,7 @@ import { useDispatchApiRequest } from '../../redux/robot-api'
 import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface LabelProps {
   isSelected?: boolean
@@ -52,7 +56,7 @@ export function DeviceReset({
   robotName,
   setCurrentOption,
 }: DeviceResetProps): JSX.Element {
-  const { t } = useTranslation(['device_settings'])
+  const { t } = useTranslation('device_settings')
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
@@ -63,40 +67,39 @@ export function DeviceReset({
     'pipetteOffsetCalibrations',
     'gripperOffsetCalibrations',
     'runsHistory',
-    'bootScripts',
   ]
   const availableOptions = options
     // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-    .filter(o => o.id !== 'onDeviceDisplay')
+    // filtering out boot scripts since product doesn't want this exposed to ODD users
+    .filter(({ id }) => !['onDeviceDisplay', 'bootScripts'].includes(id))
     .sort(
       (a, b) =>
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
     )
   const dispatch = useDispatch<Dispatch>()
 
-  console.log({resetOptions, options})
-
-  const totalOptionsSelected = Object.values(resetOptions).filter(
-    selected => selected === true
-  ).length
-
-  const isEveryOptionSelected =
-    totalOptionsSelected > 0 && totalOptionsSelected === availableOptions.length
-
   const handleClick = (): void => {
     if (resetOptions != null) {
-      if (isEveryOptionSelected) {
+      // remove clearAllStoredData since its not a setting on the backend
+      const { clearAllStoredData, ...serverResetOptions } = resetOptions
+      if (Boolean(clearAllStoredData)) {
         dispatchRequest(
           resetConfig(robotName, {
-            ...resetOptions,
+            ...serverResetOptions,
             onDeviceDisplay: true,
           })
         )
       } else {
-        dispatchRequest(resetConfig(robotName, resetOptions))
+        dispatchRequest(resetConfig(robotName, serverResetOptions))
       }
     }
   }
+
+  const {
+    confirm: confirmClearData,
+    showConfirmation: showConfirmationModal,
+    cancel: cancelClearData,
+  } = useConditionalConfirm(handleClick, true)
 
   const renderText = (
     optionId: string
@@ -113,11 +116,6 @@ export function DeviceReset({
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
         subText = t('clear_option_runs_history_subtext')
-        break
-
-      case 'bootScripts':
-        optionText = t('clear_option_boot_scripts')
-        subText = t('clear_option_boot_scripts_description')
         break
 
       case 'factoryReset':
@@ -138,6 +136,12 @@ export function DeviceReset({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
+      {showConfirmationModal && (
+        <ConfirmClearDataModal
+          confirmClearData={confirmClearData}
+          cancelClearData={cancelClearData}
+        />
+      )}
       <ChildNavigation
         header={t('device_reset')}
         inlineNotification={{
@@ -201,20 +205,25 @@ export function DeviceReset({
             type="checkbox"
             value={'clearAllStoredData'}
             onChange={() => {
-              console.log('in onchange, about to call setResetOptions')
               setResetOptions(
-                isEveryOptionSelected
+                Boolean(resetOptions.clearAllStoredData)
                   ? {}
-                  : availableOptions.reduce((acc, val) => {
-                      return {
-                        ...acc,
-                        [val.id]: true,
-                      }
-                    }, {})
+                  : availableOptions.reduce(
+                      (acc, val) => {
+                        return {
+                          ...acc,
+                          [val.id]: true,
+                        }
+                      },
+                      { clearAllStoredData: true }
+                    )
               )
             }}
           />
-          <OptionLabel isSelected={isEveryOptionSelected}>
+          <OptionLabel
+            htmlFor={'clearAllStoredData'}
+            isSelected={resetOptions.clearAllStoredData}
+          >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('clear_all_stored_data')}
@@ -222,7 +231,9 @@ export function DeviceReset({
               <StyledText
                 as="p"
                 color={
-                  isEveryOptionSelected ? COLORS.white : COLORS.darkBlack70
+                  resetOptions.clearAllStoredData === true
+                    ? COLORS.white
+                    : COLORS.darkBlack70
                 }
               >
                 {t('clear_all_stored_data_description')}
@@ -242,9 +253,63 @@ export function DeviceReset({
                 resetOptions[option.id] === undefined
             )
           }
-          onClick={handleClick}
+          onClick={confirmClearData}
         />
       </Flex>
     </Flex>
+  )
+}
+
+interface ConfirmClearDataModalProps {
+  cancelClearData: () => void
+  confirmClearData: () => void
+}
+
+export const ConfirmClearDataModal = ({
+  cancelClearData,
+  confirmClearData,
+}: ConfirmClearDataModalProps): JSX.Element => {
+  const { t } = useTranslation(['device_settings', 'shared'])
+  const modalHeader: ModalHeaderBaseProps = {
+    title: t('confirm_device_reset_heading'),
+    hasExitIcon: false,
+    iconName: 'ot-alert',
+    iconColor: COLORS.yellow2,
+  }
+  return (
+    <Modal
+      modalSize="medium"
+      header={modalHeader}
+      onOutsideClick={cancelClearData}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing12}
+          paddingBottom={SPACING.spacing32}
+        >
+          <StyledText as="p">
+            {t('confirm_device_reset_description')}
+          </StyledText>
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing8}
+          width="100%"
+        >
+          <SmallButton
+            flex="1"
+            buttonText={t('shared:go_back')}
+            onClick={cancelClearData}
+          />
+          <SmallButton
+            flex="1"
+            buttonType="alert"
+            buttonText={t('shared:confirm')}
+            onClick={confirmClearData}
+          />
+        </Flex>
+      </Flex>
+    </Modal>
   )
 }
