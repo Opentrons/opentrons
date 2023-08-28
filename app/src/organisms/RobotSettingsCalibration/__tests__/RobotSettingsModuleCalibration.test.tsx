@@ -37,7 +37,7 @@ describe('RobotSettingsModuleCalibration', () => {
     const [{ getByText }] = render(props)
     getByText('Module Calibration')
     getByText(
-      'Module calibration uses a pipette with probe attached to determine the module’s exact position relative the deck slots.'
+      "Module calibration uses a pipette and attached probe to determine the module's exact position relative to the deck."
     )
     getByText('mock ModuleCalibrationItems')
   })
@@ -47,7 +47,7 @@ describe('RobotSettingsModuleCalibration', () => {
     const [{ getByText }] = render(props)
     getByText('Module Calibration')
     getByText(
-      'Module calibration uses a pipette with probe attached to determine the module’s exact position relative the deck slots.'
+      "Module calibration uses a pipette and attached probe to determine the module's exact position relative to the deck."
     )
     getByText('No modules attached')
   })
