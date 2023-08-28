@@ -22,7 +22,6 @@ class VolumetricTrial:
     pipette: InstrumentContext
     test_report: CSVReport
     liquid_tracker: LiquidTracker
-    inspect: bool
     trial: int
     tip_volume: int
     volume: float
@@ -114,7 +113,6 @@ def build_gravimetric_trials(
                     test_report=test_report,
                     liquid_tracker=liquid_tracker,
                     blank=blank,
-                    inspect=cfg.inspect,
                     mix=cfg.mix,
                     stable=True,
                     scale_delay=cfg.scale_delay,
@@ -157,7 +155,6 @@ def build_gravimetric_trials(
                             test_report=test_report,
                             liquid_tracker=liquid_tracker,
                             blank=blank,
-                            inspect=cfg.inspect,
                             mix=cfg.mix,
                             stable=True,
                             scale_delay=cfg.scale_delay,
@@ -205,7 +202,6 @@ def build_photometric_trials(
                     volume=volume,
                     trial=trial,
                     liquid_tracker=liquid_tracker,
-                    inspect=cfg.inspect,
                     cfg=cfg,
                     mix=cfg.mix,
                     acceptable_cv=cv,

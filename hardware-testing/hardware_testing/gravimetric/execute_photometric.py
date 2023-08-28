@@ -157,8 +157,6 @@ def _run_trial(trial: PhotometricTrial) -> None:
         trial.liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=False,
-        inspect=trial.inspect,
-        mix=trial.mix,
         touch_tip=False,
     )
 
@@ -181,19 +179,15 @@ def _run_trial(trial: PhotometricTrial) -> None:
             trial.liquid_tracker,
             callbacks=pipetting_callbacks,
             blank=False,
-            inspect=trial.inspect,
-            mix=trial.mix,
             added_blow_out=(i + 1) == num_dispenses,
             touch_tip=trial.cfg.touch_tip,
         )
         _record_measurement_and_store(MeasurementType.DISPENSE)
-        trial.pipette.move_to(location=trial.dest["A1"].top().move(Point(0, 0, 133)))
+        trial.ctx._core.get_hardware().retract(OT3Mount.LEFT)
         if (i + 1) == num_dispenses:
-            _drop_tip(trial.pipette, trial.cfg.return_tip)
-        else:
-            trial.pipette.move_to(
-                location=trial.dest["A1"].top().move(Point(0, 107, 133))
-            )
+            if not trial.cfg.same_tip:
+                _drop_tip(trial.pipette, trial.cfg.return_tip)
+                trial.ctx._core.get_hardware().retract(OT3Mount.LEFT)
         if not trial.ctx.is_simulating():
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
@@ -307,9 +301,10 @@ def execute_trials(
                 ui.get_user_ready(f"put PLATE #{trial.trial + 1} and remove SEAL")
             next_tip: Well = _next_tip()
             next_tip_location = next_tip.top()
-            _pick_up_tip(
-                resources.ctx, resources.pipette, cfg, location=next_tip_location
-            )
+            if not cfg.same_tip:
+                _pick_up_tip(
+                    resources.ctx, resources.pipette, cfg, location=next_tip_location
+                )
             _run_trial(trial)
 
 
@@ -325,7 +320,7 @@ def _find_liquid_height(
     _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
     mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
     resources.ctx._core.get_hardware().retract(mnt)
-    if not resources.ctx.is_simulating():
+    if not resources.ctx.is_simulating() and not cfg.same_tip:
         ui.get_user_ready("REPLACE first tip with NEW TIP")
     required_ul = max(
         (volume_for_setup * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
@@ -372,9 +367,12 @@ def _find_liquid_height(
         raise RuntimeError(
             f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
         )
-    resources.pipette.drop_tip(home_after=False)  # always trash setup tips
-    # NOTE: the first tip-rack should have already been replaced
-    #       with new tips by the operator
+    resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
+    if not cfg.same_tip:
+        resources.pipette.drop_tip(home_after=False)  # always trash setup tips
+        resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
+        # NOTE: the first tip-rack should have already been replaced
+        #       with new tips by the operator
 
 
 def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
