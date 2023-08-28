@@ -31,7 +31,7 @@
         "default": { "1": [[1000.0, 0.0, 61.3275]] }
       },
       "defaultBlowoutVolume": 127.235,
-      "defaultPushOutVolume": 20
+      "defaultPushOutVolume": 0
     }
   },
   "defaultTipOverlapDictionary": {
