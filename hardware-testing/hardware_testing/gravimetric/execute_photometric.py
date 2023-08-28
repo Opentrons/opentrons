@@ -157,8 +157,6 @@ def _run_trial(trial: PhotometricTrial) -> None:
         trial.liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=False,
-        inspect=trial.inspect,
-        mix=trial.mix,
         touch_tip=False,
     )
 
@@ -181,8 +179,6 @@ def _run_trial(trial: PhotometricTrial) -> None:
             trial.liquid_tracker,
             callbacks=pipetting_callbacks,
             blank=False,
-            inspect=trial.inspect,
-            mix=trial.mix,
             added_blow_out=(i + 1) == num_dispenses,
             touch_tip=trial.cfg.touch_tip,
         )

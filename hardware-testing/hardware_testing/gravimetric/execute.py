@@ -215,7 +215,7 @@ def _run_trial(
             trial.pipette.mount,
             trial.stable,
             trial.env_sensor,
-            shorten=trial.inspect,
+            shorten=False,  # TODO: remove this
             delay_seconds=trial.scale_delay,
         )
         report.store_measurement(trial.test_report, m_tag, m_data)
@@ -527,7 +527,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         ui.print_info(
             f"software thinks there is {vial_volume} uL of liquid in the vial"
         )
-        if not cfg.blank or cfg.inspect:
+        if not cfg.blank:
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
         else:

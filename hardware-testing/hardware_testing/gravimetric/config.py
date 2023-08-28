@@ -29,7 +29,6 @@ class VolumetricConfig:
     increment: bool
     return_tip: bool
     mix: bool
-    inspect: bool
     user_volumes: bool
     kind: ConfigType
     extra: bool
