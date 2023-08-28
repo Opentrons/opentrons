@@ -307,7 +307,7 @@ After attaching a tip, your robot is ready to manipulate liquids. The API provid
 - :py:meth:`.InstrumentContext.mix`
 - :py:meth:`.InstrumentContext.air_gap`
 
-The following sections demonstrate how to use each method and include sample code. Each code snippet works with the sample code shown above. 
+The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`. 
 
 .. _new-aspirate:
 
