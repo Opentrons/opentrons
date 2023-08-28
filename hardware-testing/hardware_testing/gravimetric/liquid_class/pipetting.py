@@ -176,6 +176,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     # FIXME: stop using hwapi, and get those functions into core software
     hw_api = ctx._core.get_hardware()
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+    hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(mix, aspirate, dispense)
 
     def _dispense_with_added_blow_out() -> None:
@@ -189,8 +190,11 @@ def _pipette_with_liquid_settings(  # noqa: C901
         # FIXME: using the HW-API to specify that we want to blow-out the full
         #        available blow-out volume
         # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
-        max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
-        hw_api.blow_out(hw_mount, max_blow_out_volume)
+        blow_out_ul_per_mm = hw_pipette.config.shaft_ul_per_mm
+        bottom = hw_pipette.plunger_positions.bottom
+        blow_out = hw_pipette.plunger_positions.blow_out
+        max_blow_out_ul = (blow_out - bottom) * blow_out_ul_per_mm
+        hw_api.blow_out(hw_mount, max_blow_out_ul)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
