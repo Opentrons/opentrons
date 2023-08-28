@@ -14,6 +14,7 @@ export const CATEGORY_LABELS_BY_CATEGORY = {
 
 export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
   all: 'All',
+  adapter: 'Adapter',
   tubeRack: 'Tube Racks',
   tipRack: 'Tip Racks',
   wellPlate: 'Well Plates',

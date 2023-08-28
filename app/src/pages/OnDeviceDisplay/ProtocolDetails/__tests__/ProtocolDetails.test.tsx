@@ -2,7 +2,6 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
-import { format } from 'date-fns'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import {
@@ -21,6 +20,7 @@ import { i18n } from '../../../../i18n'
 import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
+import { formatTimeWithUtcLabel } from '../../../../resources/runs/utils'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
@@ -171,9 +171,8 @@ describe('ODDProtocolDetails', () => {
   it('renders the protocol date added', () => {
     const [{ getByText }] = render()
     getByText(
-      `Date Added: ${format(
-        new Date('2022-05-03T21:36:12.494778+00:00'),
-        'MM/dd/yy k:mm'
+      `Date Added: ${formatTimeWithUtcLabel(
+        '2022-05-03T21:36:12.494778+00:00'
       )}`
     )
   })

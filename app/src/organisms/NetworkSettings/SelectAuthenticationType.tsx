@@ -95,7 +95,7 @@ export function SelectAuthenticationType({
               />
             ))}
           </Flex>
-          <Flex marginTop="1.75rem">
+          <Flex marginY={SPACING.spacing24}>
             <StyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -106,11 +106,11 @@ export function SelectAuthenticationType({
           </Flex>
           <Btn
             display={DISPLAY_FLEX}
-            marginTop={SPACING.spacing40}
             width="100%"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             onClick={() => setShowAlternativeSecurityTypeModal(true)}
+            padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
             <StyledText
               as="p"

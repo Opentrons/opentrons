@@ -15,6 +15,7 @@ import {
   getVectorDifference,
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
+  MoveLabwareCreateCommand,
 } from '@opentrons/shared-data'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -62,6 +63,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     existingOffsets,
     workingOffsets,
     setFatalError,
+    adapterId,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
   const isOnDevice = useSelector(getIsOnDevice)
@@ -71,7 +73,6 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const pipetteMount = pipette?.mount
   if (pipetteName == null || labwareDef == null || pipetteMount == null)
     return null
-
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
@@ -104,6 +105,42 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       o.initialPosition != null
   )?.initialPosition
 
+  let moveLabware: MoveLabwareCreateCommand[]
+  if (adapterId != null) {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId: adapterId,
+          newLocation: { slotName: location.slotName },
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation:
+            adapterId != null
+              ? { labwareId: adapterId }
+              : { slotName: location.slotName },
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  } else {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation: location,
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  }
+
   const handleConfirmPlacement = (): void => {
     const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>(
       (acc, module) => {
@@ -123,14 +160,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     chainRunCommands(
       [
         ...modulePrepCommands,
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: location,
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabware,
         {
           commandType: 'moveToWell' as const,
           params: {
@@ -214,6 +244,37 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       })
   }
 
+  const moveLabwareOffDeck: MoveLabwareCreateCommand[] =
+    adapterId != null
+      ? [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: adapterId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
+      : [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
+
   const handleConfirmTipAttached = (): void => {
     chainRunCommands(
       [
@@ -231,14 +292,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           commandType: 'retractAxis' as const,
           params: { axis: 'y' },
         },
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabwareOffDeck,
       ],
       false
     )

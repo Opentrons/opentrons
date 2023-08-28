@@ -1,14 +1,13 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import clamp from 'lodash/clamp'
 
 import {
   ALIGN_CENTER,
   BORDERS,
   Box,
-  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -16,9 +15,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
@@ -27,16 +27,6 @@ import {
 
 import type { Dispatch } from '../../redux/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-
-const BUTTON_STYLE = css`
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-  }
-
-  &:active {
-    color: ${COLORS.darkBlack40};
-  }
-`
 
 interface BrightnessTileProps {
   isActive: boolean
@@ -95,15 +85,15 @@ export function TouchscreenBrightness({
         gridGap={SPACING.spacing24}
         paddingX={SPACING.spacing60}
         paddingY={SPACING.spacing120}
+        marginTop="7.75rem"
       >
-        <Btn
+        <IconButton
           disabled={brightness === LOWEST_BRIGHTNESS}
           onClick={() => handleClick('down')}
           data-testid="TouchscreenBrightness_decrease"
-          css={BUTTON_STYLE}
         >
           <Icon size="5rem" name="minus" />
-        </Btn>
+        </IconButton>
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
@@ -117,15 +107,34 @@ export function TouchscreenBrightness({
           ))}
         </Flex>
 
-        <Btn
+        <IconButton
           disabled={brightness === HIGHEST_BRIGHTNESS}
           onClick={() => handleClick('up')}
           data-testid="TouchscreenBrightness_increase"
-          css={BUTTON_STYLE}
         >
           <Icon size="5rem" name="plus" />
-        </Btn>
+        </IconButton>
       </Flex>
     </Flex>
   )
 }
+
+const IconButton = styled('button')`
+  border-radius: 50%;
+  max-height: 100%;
+  background-color: ${COLORS.white};
+
+  &:active {
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:disabled {
+    background-color: transparent;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+  }
+`

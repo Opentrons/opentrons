@@ -4,6 +4,7 @@ import * as Styles from '../styles'
 import { styleProps, isntStyleProp } from './style-props'
 
 import type { PrimitiveComponent } from './types'
+import { RESPONSIVENESS } from '../ui-style-constants'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'
@@ -19,6 +20,10 @@ const BUTTON_BASE_STYLE = css`
 
   &:disabled,
   &.disabled {
+    cursor: default;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     cursor: default;
   }
 `

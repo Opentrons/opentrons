@@ -30,8 +30,9 @@ import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { LabwareOffset, CommandData } from '@opentrons/api-client'
 import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 import { getGoldenCheckSteps } from './utils/getGoldenCheckSteps'
@@ -134,29 +135,30 @@ export const LabwarePositionCheckComponent = (
   const [isExiting, setIsExiting] = React.useState(false)
   const {
     createMaintenanceCommand: createSilentCommand,
-  } = useCreateMaintenanceCommandMutation(maintenanceRunId)
+  } = useCreateMaintenanceCommandMutation()
   const {
     chainRunCommands,
     isCommandMutationLoading: isCommandChainLoading,
-  } = useChainMaintenanceCommands(maintenanceRunId)
+  } = useChainMaintenanceCommands()
 
   const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
-      protocolData?.pipettes ?? []
-    ).map(pip => ({
-      commandType: 'dropTip' as const,
-      params: {
-        pipetteId: pip.id,
-        labwareId: FIXED_TRASH_ID,
-        wellName: 'A1',
-        wellLocation: { origin: 'default' as const },
-      },
-    }))
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] = goldenLPC
+      ? []
+      : (protocolData?.pipettes ?? []).map(pip => ({
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pip.id,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'default' as const },
+          },
+        }))
     chainRunCommands(
+      maintenanceRunId,
       [
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
@@ -196,6 +198,7 @@ export const LabwarePositionCheckComponent = (
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
       createSilentCommand({
+        maintenanceRunId,
         command: {
           commandType: 'moveRelative',
           params: { pipetteId: pipetteId, distance: step * dir, axis },
@@ -213,10 +216,15 @@ export const LabwarePositionCheckComponent = (
       setFatalError(`could not find pipette to jog with id: ${pipetteId ?? ''}`)
     }
   }
+  const chainMaintenanceRunCommands = (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ): Promise<CommandData[]> =>
+    chainRunCommands(maintenanceRunId, commands, continuePastCommandFailure)
   const movementStepProps = {
     proceed,
     protocolData,
-    chainRunCommands,
+    chainRunCommands: chainMaintenanceRunCommands,
     setFatalError,
     registerPosition,
     handleJog,

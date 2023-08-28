@@ -121,7 +121,7 @@ export function LabwareListItem(
         const module = commands.find(
           (command): command is LoadModuleRunTimeCommand =>
             command.commandType === 'loadModule' &&
-            command.params.moduleId === loadedAdapterLocation.moduleId
+            command.result?.moduleId === loadedAdapterLocation.moduleId
         )
         if (module != null) {
           slotInfo = t('adapter_slot_location_module', {
@@ -331,9 +331,7 @@ function StandaloneLabware(props: {
   const { definition } = props
   return (
     <LabwareThumbnail
-      viewBox={` 0 0 ${String(definition.dimensions.xDimension)} ${String(
-        definition.dimensions.yDimension
-      )}`}
+      viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
     >
       <LabwareRender
         definition={definition}

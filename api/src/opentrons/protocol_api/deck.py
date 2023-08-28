@@ -6,13 +6,17 @@ from opentrons_shared_data.deck.dev_types import SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckLocation, DeckSlotName, Location, Point
 from opentrons_shared_data.robot.dev_types import RobotType
 
+
 from .core.common import ProtocolCore
 from .core.core_map import LoadedCoreMap
+from .core.module import AbstractModuleCore
 from .labware import Labware
 from .module_contexts import ModuleContext
+from ._types import OFF_DECK
 from . import validation
 
 
@@ -90,6 +94,44 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         item = self._core_map.get(item_core)
 
         return item
+
+    def __delitem__(self, key: DeckLocation) -> None:
+        if self._api_version == APIVersion(2, 14):
+            # __delitem__() support history:
+            #
+            # * PAPIv<=2.13 (non Protocol Engine): Yes, but that goes through a different Deck class
+            # * PAPIv2.14 (Protocol Engine): No
+            # * PAPIv2.15 (Protocol Engine): Yes
+            raise APIVersionError(
+                f"Deleting deck elements is not supported with apiLevel {self._api_version}."
+                f" Try increasing your apiLevel to {APIVersion(2, 15)}."
+            )
+
+        slot_name = _get_slot_name(
+            key, self._api_version, self._protocol_core.robot_type
+        )
+        item_core = self._protocol_core.get_slot_item(slot_name)
+
+        if item_core is None:
+            # No-op if trying to delete from an empty slot.
+            # This matches pre-Protocol-Engine (PAPIv<=2.13) behavior.
+            pass
+        elif isinstance(item_core, AbstractModuleCore):
+            # Protocol Engine does not support removing modules from the deck.
+            # This is a change from pre-Protocol-Engine (PAPIv<=2.13) behavior, unfortunately.
+            raise TypeError(
+                f"Slot {repr(key)} contains a module, {item_core.get_display_name()}."
+                f" You can only delete labware, not modules."
+            )
+        else:
+            self._protocol_core.move_labware(
+                item_core,
+                new_location=OFF_DECK,
+                use_gripper=False,
+                pause_for_manual_move=False,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
 
     def __iter__(self) -> Iterator[str]:
         """Iterate through all deck slots."""
