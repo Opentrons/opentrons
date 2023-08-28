@@ -309,7 +309,7 @@ class CSVReport:
         sections: List[CSVSection],
         run_id: Optional[str] = None,
         start_time: Optional[float] = None,
-        validate_meta_data: bool = True
+        validate_meta_data: bool = True,
     ) -> None:
         """CSV Report init."""
         self._test_name = test_name
@@ -433,7 +433,11 @@ class CSVReport:
         """Store DUT serial number."""
         if self._validate_meta_data:
             result = CSVResult.from_bool(device_id == barcode_id)
-            self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id, barcode_id, result])
+            self(
+                META_DATA_TITLE,
+                META_DATA_TEST_DEVICE_ID,
+                [device_id, barcode_id, result],
+            )
         else:
             self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id])
 
