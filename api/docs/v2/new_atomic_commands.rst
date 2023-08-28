@@ -465,7 +465,6 @@ The ``air_gap()`` method also accepts the ``volume`` and ``height`` arguments. T
 
 .. versionadded:: 2.0
 
-**********************
 
 .. _new-utility-commands:
 
