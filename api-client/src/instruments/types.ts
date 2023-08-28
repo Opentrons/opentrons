@@ -1,6 +1,7 @@
 export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 
-export type Mount = 'left' | 'right' | 'extension'
+// pipettes module already exports type `Mount`
+type Mount = 'left' | 'right' | 'extension'
 
 export interface SharedInstrumentData {
   mount: Mount
