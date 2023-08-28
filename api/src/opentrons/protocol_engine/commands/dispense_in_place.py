@@ -24,7 +24,7 @@ class DispenseInPlaceParams(PipetteIdMixin, VolumeMixin, FlowRateMixin):
     """Payload required to dispense in place."""
 
     pushOut: Optional[float] = Field(
-        None, description="perform a small blow out for accurate dispensing"
+        None, description="push the plunger a small amount farther than necessary for accurate low-volume dispensing"
     )
 
 
