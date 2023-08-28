@@ -2257,7 +2257,7 @@ class OT3API(
             probe_settings.log_pressure,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
-            probe=probe,
+            probe=probe if probe else InstrumentProbeType.PRIMARY,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, probe_start_pos)
