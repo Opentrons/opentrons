@@ -11,7 +11,7 @@ import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { DeckSlotLocation } from '../../hardware-sim/DeckSlotLocation'
 
-const X_CROP_MM = 70
+const X_CROP_MM = 60
 export function useDeckLocationSelect(
   robotType: RobotType
 ): { DeckLocationSelect: JSX.Element; selectedLocation: ModuleLocation } {
