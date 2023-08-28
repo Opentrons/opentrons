@@ -21,7 +21,7 @@ export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
 export const LEFT_SLOTS: string[] = ['A1', 'B1', 'C1', 'D1']
 
 export const BODY_STYLE = css`
-  ${TYPOGRAPHY.Regular};
+  ${TYPOGRAPHY.pRegular};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.275rem;
