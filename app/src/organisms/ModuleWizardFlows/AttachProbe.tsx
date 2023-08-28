@@ -169,8 +169,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   if (isRobotMoving)
     return (
       <InProgressModal
-        // alternativeSpinner={isExiting ? null : pipetteProbingVid}
-        alternativeSpinner={null} // TODO: update proving video sources
+        alternativeSpinner={isExiting ? null : pipetteProbingVid}
         description={
           isExiting
             ? t('stand_back')
