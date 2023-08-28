@@ -64,38 +64,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
-  const handleOnClick = (): void => {
-    chainRunCommands?.(
-      [
-        {
-          commandType: 'home' as const,
-          params: {
-            axes: axes,
-          },
-        },
-        {
-          commandType: 'calibration/calibratePipette' as const,
-          params: {
-            mount: mount,
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: mount,
-          },
-        },
-      ],
-      false
-    )
-      .then(() => {
-        proceed()
-      })
-      .catch(error => {
-        setErrorMessage(error.message)
-      })
-  }
-
   const attachedPipetteChannels = attachedPipette.data.channels
   let pipetteAttachProbeVideoSource, pipetteProbingVideoSource, i18nKey
   switch (attachedPipetteChannels) {
@@ -229,7 +197,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       rightHandBody={pipetteAttachProbeVid}
       bodyText={bodyText}
       proceedButtonText={t('begin_calibration')}
-      proceed={handleOnClick}
+      proceed={proceed}
       back={goBack}
     />
   )
