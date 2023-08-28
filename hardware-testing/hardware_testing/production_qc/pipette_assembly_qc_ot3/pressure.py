@@ -38,6 +38,29 @@ class PressureEventConfig:
 PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 11.0, 1000: 12.0}
 PRESSURE_FIXTURE_INSERT_DEPTH = {50: 28.5, 1000: 33.0}
 
+PRESSURE_ASPIRATE_DELTA_SPEC = {
+    1: {
+        50: {
+            "delta": 1400.0,
+            "margin": 0.1  # percent of delta
+        },
+        1000: {
+            "delta": 1000.0,
+            "margin": 0.1  # percent of delta
+        }
+    },
+    8: {
+        50: {
+            "delta": 1400.0,
+            "margin": 0.1  # percent of delta
+        },
+        1000: {
+            "delta": 1000.0,
+            "margin": 0.1  # percent of delta
+        }
+    }
+}
+
 DEFAULT_PRESSURE_SAMPLE_DELAY = 0.25
 DEFAULT_PRESSURE_SAMPLE_COUNT = 10
 # FIXME: reduce once firmware latency is reduced

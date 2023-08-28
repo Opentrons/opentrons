@@ -47,6 +47,7 @@ from .pressure import (  # type: ignore[import]
     PressureEvent,
     PressureEventConfig,
     PRESSURE_FIXTURE_INSERT_DEPTH,
+    PRESSURE_ASPIRATE_DELTA_SPEC,
 )
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import (
@@ -492,12 +493,15 @@ def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
 
 async def _read_pressure_and_check_results(
     api: OT3API,
+    pipette_channels: int,
+    pipette_volume: int,
     fixture: PressureFixture,
     tag: PressureEvent,
     write_cb: Callable,
     accumulate_raw_data_cb: Callable,
     channels: int = 1,
-) -> bool:
+    previous: Optional[List[List[float]]] = None
+) -> Tuple[bool, List[List[float]]]:
     pressure_event_config: PressureEventConfig = PRESSURE_CFG[tag]
     if not api.is_simulator:
         await asyncio.sleep(pressure_event_config.stability_delay)
@@ -516,17 +520,23 @@ async def _read_pressure_and_check_results(
             and delay_time > 0
         ):
             await asyncio.sleep(pressure_event_config.sample_delay)
-    _samples_channel_1 = [s[c] for s in _samples for c in range(channels)]
-    _samples_channel_1.sort()
-    _samples_clipped = _samples_channel_1[1:-1]
-    _samples_min = min(_samples_clipped)
-    _samples_max = max(_samples_clipped)
-    if _samples_max - _samples_min > pressure_event_config.stability_threshold:
-        print(f"ERROR: samples are too far apart, "
-              f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}")
-        test_pass_stability = False
-    else:
-        test_pass_stability = True
+    _samples_per_channel = [
+        [s[c] for s in _samples]
+        for c in range(channels)
+    ]
+    _average_per_channel = [
+        sum(s) / len(s)
+        for s in _samples_per_channel
+    ]
+    test_pass_stability = True
+    for c in range(channels):
+        _samples_per_channel[c].sort()
+        _c_min = min(_samples_per_channel[c][1:])
+        _c_max = max(_samples_per_channel[c][1:])
+        if _c_max - _c_min > pressure_event_config.stability_threshold:
+            print(f"ERROR: channel {c + 1} samples are too far apart, "
+                  f"max={round(_c_max, 2)} and min={round(_c_min, 2)}")
+            test_pass_stability = False
     csv_data_stability = [
         f"pressure-{tag.value}",
         "stability",
@@ -534,6 +544,10 @@ async def _read_pressure_and_check_results(
     ]
     print(csv_data_stability)
     write_cb(csv_data_stability)
+    _all_samples = [s[c] for s in _samples for c in range(channels)]
+    _all_samples.sort()
+    _samples_min = min(_all_samples[1:-1])
+    _samples_max = max(_all_samples[1:-1])
     if (
         _samples_min < pressure_event_config.min
         or _samples_max > pressure_event_config.max
@@ -550,7 +564,28 @@ async def _read_pressure_and_check_results(
     ]
     print(csv_data_accuracy)
     write_cb(csv_data_accuracy)
-    return test_pass_stability and test_pass_accuracy
+    test_pass_delta = True
+    if previous:
+        assert len(previous[-1]) >= len(_average_per_channel)
+        for c in range(channels):
+            _delta = _average_per_channel[c] - previous[-1][c]
+            _delta_spec = PRESSURE_ASPIRATE_DELTA_SPEC[pipette_channels][pipette_volume]
+            _delta_target = PRESSURE_ASPIRATE_DELTA_SPEC[pipette_channels][pipette_volume]["delta"]
+            _delta_margin = PRESSURE_ASPIRATE_DELTA_SPEC[pipette_channels][pipette_volume]["margin"]
+            _delta_min = _delta_target - (_delta_target * _delta_margin)
+            _delta_max = _delta_target + (_delta_target * _delta_margin)
+            if _delta < _delta_min or _delta > _delta_max:
+                print(f"ERROR: channel {c + 1} pressure delta ({_delta}) "
+                      f"out of range: max={_delta_max}, min={_delta_min}")
+                test_pass_delta = False
+        csv_data_delta = [
+            f"pressure-{tag.value}",
+            "delta",
+            _bool_to_pass_fail(test_pass_delta),
+        ]
+        print(csv_data_delta)
+    _passed = test_pass_stability and test_pass_accuracy and test_pass_delta
+    return _passed, _samples
 
 
 async def _fixture_check_pressure(
@@ -567,16 +602,18 @@ async def _fixture_check_pressure(
     pip_vol = int(pip.working_volume)
     pip_channels = int(pip.channels)
     # above the fixture
-    r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb, pip_channels
+    r, _ = await _read_pressure_and_check_results(
+        api, pip_channels, pip_vol, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     # insert into the fixture
     # NOTE: unknown amount of pressure here (depends on where Z was calibrated)
     fixture_depth = PRESSURE_FIXTURE_INSERT_DEPTH[pip_vol]
     await api.move_rel(mount, Point(z=-fixture_depth))
-    r = await _read_pressure_and_check_results(
+    r, inserted_pressure_data = await _read_pressure_and_check_results(
         api,
+        pip_channels,
+        pip_vol,
         fixture,
         PressureEvent.INSERT,
         write_cb,
@@ -590,14 +627,16 @@ async def _fixture_check_pressure(
         asp_evt = PressureEvent.ASPIRATE_P50
     else:
         asp_evt = PressureEvent.ASPIRATE_P1000
-    r = await _read_pressure_and_check_results(
-        api, fixture, asp_evt, write_cb, accumulate_raw_data_cb, pip_channels
+    r, _ = await _read_pressure_and_check_results(
+        api, pip_channels, pip_vol, fixture, asp_evt, write_cb, accumulate_raw_data_cb, pip_channels, previous=inserted_pressure_data
     )
     results.append(r)
     # dispense
     await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
-    r = await _read_pressure_and_check_results(
+    r, _ = await _read_pressure_and_check_results(
         api,
+        pip_channels,
+        pip_vol,
         fixture,
         PressureEvent.DISPENSE,
         write_cb,
@@ -607,8 +646,8 @@ async def _fixture_check_pressure(
     results.append(r)
     # retract out of fixture
     await api.move_rel(mount, Point(z=fixture_depth))
-    r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.POST, write_cb, accumulate_raw_data_cb, pip_channels
+    r, _ = await _read_pressure_and_check_results(
+        api, pip_channels, pip_vol, fixture, PressureEvent.POST, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     return False not in results
