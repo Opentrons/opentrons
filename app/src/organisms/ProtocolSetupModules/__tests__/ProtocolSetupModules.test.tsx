@@ -6,7 +6,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { instrumentsResponseFixture } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
