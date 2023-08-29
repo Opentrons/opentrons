@@ -270,48 +270,47 @@ export function ModulesListItem({
     )
   }
 
-  const renderModuleStatus = (): JSX.Element => {
-    if (attachedModuleMatch == null) {
-      return (
-        <StatusLabel
-          id={location}
-          status={moduleConnectionStatus}
-          backgroundColor={COLORS.warningBackgroundLight}
-          iconColor={COLORS.warningEnabled}
-          textColor={COLORS.warningText}
-        />
-      )
-    } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
-      return (
-        <StatusLabel
+  let renderModuleStatus: JSX.Element
+  if (attachedModuleMatch == null) {
+    renderModuleStatus = (
+      <StatusLabel
+        id={location}
+        status={moduleConnectionStatus}
+        backgroundColor={COLORS.warningBackgroundLight}
+        iconColor={COLORS.warningEnabled}
+        textColor={COLORS.warningText}
+      />
+    )
+  } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
+    renderModuleStatus = (
+      <StatusLabel
+        {...targetProps}
+        id={location}
+        status={moduleConnectionStatus}
+        backgroundColor={COLORS.successBackgroundLight}
+        iconColor={COLORS.successEnabled}
+        textColor={COLORS.successText}
+      />
+    )
+  } else {
+    renderModuleStatus = (
+      <>
+        <TertiaryButton
           {...targetProps}
-          id={location}
-          status={moduleConnectionStatus}
-          backgroundColor={COLORS.successBackgroundLight}
-          iconColor={COLORS.successEnabled}
-          textColor={COLORS.successText}
-        />
-      )
-    } else {
-      return (
-        <>
-          <TertiaryButton
-            {...targetProps}
-            onClick={() => setShowModuleWizard(true)}
-            disabled={!calibrationStatus?.complete}
-          >
-            {t('calibrate_now')}
-          </TertiaryButton>
-          {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
-            <Tooltip tooltipProps={tooltipProps}>
-              {calibrationStatus.reason === 'attach_pipette_failure_reason'
-                ? t('attach_pipette_before_module_calibration')
-                : t('calibrate_pipette_before_module_calibration')}
-            </Tooltip>
-          ) : null}
-        </>
-      )
-    }
+          onClick={() => setShowModuleWizard(true)}
+          disabled={!calibrationStatus?.complete}
+        >
+          {t('calibrate_now')}
+        </TertiaryButton>
+        {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
+          <Tooltip tooltipProps={tooltipProps}>
+            {calibrationStatus.reason === 'attach_pipette_failure_reason'
+              ? t('attach_pipette_before_module_calibration')
+              : t('calibrate_pipette_before_module_calibration')}
+          </Tooltip>
+        ) : null}
+      </>
+    )
   }
 
   return (
@@ -369,7 +368,7 @@ export function ModulesListItem({
             {moduleModel === MAGNETIC_BLOCK_V1 ? (
               <StyledText as="p"> {t('n_a')}</StyledText>
             ) : (
-              renderModuleStatus()
+              renderModuleStatus
             )}
           </Flex>
         </Flex>
