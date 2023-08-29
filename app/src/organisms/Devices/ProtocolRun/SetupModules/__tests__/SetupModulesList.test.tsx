@@ -293,8 +293,6 @@ describe('SetupModulesList', () => {
     expect(
       await getByText('Calibrate pipette before running module calibration')
     ).toBeInTheDocument()
-    // fireEvent.click(button)
-    // getByText('Calibrate pipette before running module calibration')
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {
