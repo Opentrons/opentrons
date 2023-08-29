@@ -273,7 +273,7 @@ async def test_find_deck_checks_z_only(
         mount,
         z_prep_loc,
         ot3_hardware.config.calibration.z_offset.pass_settings,
-        probe=InstrumentProbeType.PRIMARY
+        probe=InstrumentProbeType.PRIMARY,
     )
     # first we move only to safe height from current position
     first_move_point = mock_move_to.call_args_list[0][0][1]

@@ -612,11 +612,7 @@ async def _calibrate_mount(
     nominal_center = Point(*get_calibration_square_position_in_slot(slot))
     if probe == InstrumentProbeType.SECONDARY and mount != OT3Mount.GRIPPER:
         pip = hcapi.hardware_instruments[mount.to_mount()]
-        pip_channels = int(pip.channels)  # type: ignore[union-attr]
-        assert (
-            pip_channels in OFFSET_SECONDARY_PROBE
-        ), f"no secondary probe to calibrate on {pip_channels}ch pipette"
-        nominal_center += OFFSET_SECONDARY_PROBE[pip_channels]
+        nominal_center += OFFSET_SECONDARY_PROBE.get(int(pip.channels), Point())
     async with hcapi.restore_system_constrants():
         await hcapi.set_system_constraints_for_calibration()
         try:
