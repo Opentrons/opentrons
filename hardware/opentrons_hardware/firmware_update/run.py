@@ -175,7 +175,7 @@ class RunUpdate:
         Args:
             messenger: The can messenger to use.
             update_details: Dict of nodes to be updated and their firmware files.
-            retry_count: Number of times to retry update.
+            retry_count: Number of times to retry.
             timeout_seconds: How much to wait for responses.
             erase: Whether to erase flash before updating.
 
@@ -280,6 +280,7 @@ class RunUpdate:
 
         target = Target.from_single_node(node_id)
 
+        logger.info(f"Initiating FW Update on {target}.")
         await self._status_queue.put((node_id, (FirmwareUpdateStatus.updating, 0)))
 
         await FirmwareUpdateInitiator(messenger).run(
@@ -310,7 +311,7 @@ class RunUpdate:
                     )
                 )
             except BaseException as e:
-                logger.warning(
+                logger.error(
                     f"Firmware up failed to enter bootloader mode for {target} {e}."
                 )
                 await self._status_queue.put(
@@ -342,62 +343,54 @@ class RunUpdate:
                 detail={"filepath": filepath, "target": node_id.application_for().name},
             )
 
-        for retry in range(retry_count):
-            logger.info(f"Initiating FW Update on {node_id.name} attempt: {retry+1}.")
-            try:
-                download_start_progress = await self._prep_can_update(
-                    messenger,
-                    node_id,
-                    retry_count,
-                    timeout_seconds,
-                    erase,
-                    erase_timeout_seconds,
-                )
+        try:
+            download_start_progress = await self._prep_can_update(
+                messenger,
+                node_id,
+                retry_count,
+                timeout_seconds,
+                erase,
+                erase_timeout_seconds,
+            )
 
-                # Start the transfer process
-                target = Target.from_single_node(node_id)
-                logger.info(f"Downloading {filepath} to {target.bootloader_node}.")
-                downloader = FirmwareUpdateDownloader(messenger)
-                with open(filepath) as f:
-                    hex_processor = HexRecordProcessor.from_file(f)
-                    async for download_progress in downloader.run(
-                        node_id=target.bootloader_node,
-                        hex_processor=hex_processor,
-                        ack_wait_seconds=timeout_seconds,
-                        retries=retry_count,
-                    ):
-                        await self._status_queue.put(
+            # Start the transfer process
+            target = Target.from_single_node(node_id)
+            logger.info(f"Downloading {filepath} to {target.bootloader_node}.")
+            downloader = FirmwareUpdateDownloader(messenger)
+            with open(filepath) as f:
+                hex_processor = HexRecordProcessor.from_file(f)
+                async for download_progress in downloader.run(
+                    node_id=target.bootloader_node,
+                    hex_processor=hex_processor,
+                    ack_wait_seconds=timeout_seconds,
+                    retries=retry_count,
+                ):
+                    await self._status_queue.put(
+                        (
+                            node_id,
                             (
-                                node_id,
-                                (
-                                    FirmwareUpdateStatus.updating,
-                                    download_start_progress
-                                    + (0.9 - download_start_progress)
-                                    * download_progress,
-                                ),
-                            )
+                                FirmwareUpdateStatus.updating,
+                                download_start_progress
+                                + (0.9 - download_start_progress) * download_progress,
+                            ),
                         )
-                break
-            except BaseException as e:
-                logger.error(f"Firmware Update failed for {target} {e}.")
-                if retry + 1 < retry_count:
-                    logger.warning(f"Retrying fw update for {target.system_node}.")
-                    continue
-
-                if isinstance(e, EnumeratedError):
-                    raise FirmwareUpdateFailedError(
-                        message="Device did not enter bootloader",
-                        detail={"node": target.bootloader_node.application_for().name},
-                        wrapping=[e],
                     )
-                elif isinstance(e, FirmwareUpdateFailedError):
-                    raise
-                else:
-                    raise FirmwareUpdateFailedError(
-                        "Unhandled exception during firmware update",
-                        detail={"node": target.bootloader_node.application_for().name},
-                        wrapping=[PythonException(e)],
-                    )
+        except BaseException as e:
+            logger.error(f"Firmware Update failed for {target} {e}.")
+            if isinstance(e, EnumeratedError):
+                raise FirmwareUpdateFailedError(
+                    message="Device did not enter bootloader",
+                    detail={"node": target.bootloader_node.application_for().name},
+                    wrapping=[e],
+                )
+            elif isinstance(e, FirmwareUpdateFailedError):
+                raise
+            else:
+                raise FirmwareUpdateFailedError(
+                    "Unhandled exception during firmware update",
+                    detail={"node": target.bootloader_node.application_for().name},
+                    wrapping=[PythonException(e)],
+                )
 
         logger.info(f"Restarting FW on {target.system_node}.")
         await messenger.send(
