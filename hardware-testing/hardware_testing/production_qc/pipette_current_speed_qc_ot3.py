@@ -28,7 +28,7 @@ DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
 
-MUST_PASS_CURRENT = 0.4  # the target spec (must pass here)
+MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
@@ -39,10 +39,10 @@ TEST_SPEEDS = [
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
 ]
 PLUNGER_CURRENTS_SPEED = {
-    0.3: TEST_SPEEDS,
-    0.4: TEST_SPEEDS,
-    0.5: TEST_SPEEDS,
-    0.75: TEST_SPEEDS,
+    MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
+    MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
+    MUST_PASS_CURRENT - 0.25: TEST_SPEEDS,
+    MUST_PASS_CURRENT: TEST_SPEEDS,
     DEFAULT_CURRENT: TEST_SPEEDS,
 }
 
@@ -65,11 +65,7 @@ def _get_section_tag(current: float) -> str:
 
 
 def _includes_result(current: float, speed: float) -> bool:
-    # TODO: figure out the current/speed thresholds
-    #       for what should be considered an overall PASS or FAIL.
-    #       Until then, give everything a PASS or FAIL, so we can
-    #       review the results more easily
-    return True
+    return current >= MUST_PASS_CURRENT
 
 
 def _build_csv_report(trials: int) -> CSVReport:
