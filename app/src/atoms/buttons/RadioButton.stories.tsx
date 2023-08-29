@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { customViewports } from '../../../../.storybook/preview'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 
 import { RadioButton } from './'
 import type { Story, Meta } from '@storybook/react'
@@ -16,12 +16,7 @@ export default {
     },
     onClick: { action: 'clicked' },
   },
-  parameters: {
-    viewport: {
-      viewports: customViewports,
-      defaultViewport: 'onDeviceDisplay',
-    },
-  },
+  parameters: touchScreenViewport,
 } as Meta
 
 const RadioButtonTemplate: Story<
