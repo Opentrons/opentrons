@@ -306,7 +306,7 @@ class OT3Simulator:
         log_pressure: bool = True,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
-        sensor_id: SensorId = SensorId.S0,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> Dict[NodeId, float]:
 
         head_node = axis_to_node(Axis.by_mount(mount))

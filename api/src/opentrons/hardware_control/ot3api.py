@@ -2207,6 +2207,7 @@ class OT3API(
         self,
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
+        probe: Optional[InstrumentProbeType] = None,
     ) -> float:
         """Search for and return liquid level height.
 
@@ -2262,6 +2263,7 @@ class OT3API(
             probe_settings.log_pressure,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
+            probe=probe if probe else InstrumentProbeType.PRIMARY,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, probe_start_pos)
@@ -2274,6 +2276,7 @@ class OT3API(
         target_pos: float,
         pass_settings: CapacitivePassSettings,
         retract_after: bool = True,
+        probe: Optional[InstrumentProbeType] = None,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -2327,26 +2330,22 @@ class OT3API(
         )
         pass_start_pos = moving_axis.set_in_point(here, pass_start)
         await self.move_to(mount, pass_start_pos)
-        if mount == OT3Mount.GRIPPER:
-            probe = self._gripper_handler.get_attached_probe()
-            assert probe
-            await self._backend.capacitive_probe(
-                mount,
-                moving_axis,
-                machine_pass_distance,
-                pass_settings.speed_mm_per_s,
-                pass_settings.sensor_threshold_pf,
-                GripperProbe.to_type(probe),
-            )
-        else:
-            await self._backend.capacitive_probe(
-                mount,
-                moving_axis,
-                machine_pass_distance,
-                pass_settings.speed_mm_per_s,
-                pass_settings.sensor_threshold_pf,
-                probe=InstrumentProbeType.PRIMARY,
-            )
+        if probe is None:
+            if mount == OT3Mount.GRIPPER:
+                gripper_probe = self._gripper_handler.get_attached_probe()
+                assert gripper_probe
+                probe = GripperProbe.to_type(gripper_probe)
+            else:
+                # default to primary (rear) probe
+                probe = InstrumentProbeType.PRIMARY
+        await self._backend.capacitive_probe(
+            mount,
+            moving_axis,
+            machine_pass_distance,
+            pass_settings.speed_mm_per_s,
+            pass_settings.sensor_threshold_pf,
+            probe=probe,
+        )
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:
             await self.move_to(mount, pass_start_pos)
