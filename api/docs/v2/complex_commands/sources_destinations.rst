@@ -60,6 +60,36 @@ On the other hand, a transfer command with the same arguments would aspirate fro
 Transfer Patterns
 =================
 
+Each complex command uses a different pattern of aspiration and dispensing. In addition, when you provide multiple wells as both the source and destination for :py:meth:`~.InstrumentContext.transfer`, it maps the source list onto the destination list in a certain way. This section covers both of these patterns.
+
+Aspirating and Dispensing
+-------------------------
+
+:py:meth:`~.InstrumentContext.transfer`
+
+
+
+Optimizing Patterns
+-------------------
+
+Choosing the right complex command optimizes gantry movement and ultimately can save time in your protocol. For example, say you want to take liquid from a reservoir and put 50 µL in each well of the first row of a plate. You could use ``transfer()``, like this::
+
+    pipette.transfer(
+        volume=50,
+        source=reservoir["A1"],
+        destination=plate.rows()[0],
+    )
+    
+This will produce 12 aspirate steps and 12 dispense steps. The steps alternate, with the pipette moving back and forth between the reservoir and plate each time. Using ``distribute()`` with the same arguments is more optimal in this scenario::
+
+    pipette.distribute(
+        volume=50,
+        source=reservoir["A1"],
+        destination=plate.rows()[0],
+    )
+    
+This will produce *just 1* aspirate step and 12 dispense steps (when using a 1000 µL pipette). The pipette will aspirate enough liquid to fill all the wells, plus a disposal volume. Then it will move to A1 of the plate, dispense, move the short distance to A2, dispense, and so on. This greatly reduces gantry movement and the time to perform this action. And even if you're using a smaller pipette, ``distribute()`` will fill the pipette, dispense as many times as possible, and only then return to the reservoir to refill.
+ 
 
 .. _complex-list-volumes:
 
