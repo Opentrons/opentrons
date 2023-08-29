@@ -4,9 +4,10 @@ import logging
 import select
 from typing import Optional, List, Any
 import serial  # type: ignore[import]
-import time
+from queue import Queue
 
 from . import usb_config, default_config, usb_monitor, tcp_conn
+from .serial_thread import QUEUE_TYPE
 
 LOG = logging.getLogger(__name__)
 
@@ -58,26 +59,12 @@ def check_monitor(monitor: usb_monitor.USBConnectionMonitor, msg_ready: bool) ->
         monitor.update_state()
 
 
-def try_write_all_data(serial: serial.Serial, data: bytes) -> None:
-    sent = 0
-    if len(data) == 0:
-        return
-    while sent < len(data):
-        try:
-            sent += serial.write(data[sent:])
-        except Exception as e:
-            # Any exception means we need to quit
-            return
-        if sent < len(data):
-            # Extremely short sleep to try to avoid battering the CPU
-            time.sleep(0.01)
-
-
 def listen(
     monitor: usb_monitor.USBConnectionMonitor,
     config: usb_config.SerialGadget,
     ser: Optional[serial.Serial],
     tcp: tcp_conn.TCPConnection,
+    worker_queue: QUEUE_TYPE,
 ) -> Optional[serial.Serial]:
     """Process any available incoming data.
 
@@ -121,5 +108,5 @@ def listen(
     if ser and tcp in ready:
         # Ready TCP data to echo to serial
         data = tcp.read()
-        try_write_all_data(ser, data)
+        worker_queue.put((ser, data))
     return ser
