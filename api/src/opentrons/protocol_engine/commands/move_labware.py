@@ -125,6 +125,14 @@ class MoveLabwareImplementation(
                     message="Labware movement using a gripper is not supported on the OT-2",
                     details={"strategy": params.strategy},
                 )
+            if labware_validation.validate_gripper_compatible(
+                current_labware_definition
+            ):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move labware '{current_labware_definition.parameters.loadName}' with gripper."
+                    f" If trying to move a labware on an adapter, load the adapter separately to allow"
+                    f" gripper movement."
+                )
             if labware_validation.validate_definition_is_adapter(
                 current_labware_definition
             ):
