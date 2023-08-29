@@ -19,19 +19,19 @@ def _try_write_all_data(serial: serial.Serial, data: bytes) -> None:
             sent += serial.write(data[sent:])
         except Exception as e:
             # Any exception means we need to quit
-            print(f'Failed to write: {e}')
+            print(f"Failed to write: {e}")
             return
         if sent < len(data):
             tries += 1
             # Extremely short sleep to try to avoid battering the CPU
-            print(f'DELAYED: sent {sent} of {len(data)} (try {tries})')
+            print(f"DELAYED: sent {sent} of {len(data)} (try {tries})")
             time.sleep(0.01)
 
 
 def _worker(queue: QUEUE_TYPE) -> None:
     while True:
         ser, data = queue.get()
-        #print(f'Sending {len(data)} bytes to {ser}')
+        # print(f'Sending {len(data)} bytes to {ser}')
         _try_write_all_data(ser, data)
 
 
