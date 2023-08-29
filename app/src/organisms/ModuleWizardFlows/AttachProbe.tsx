@@ -48,12 +48,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const {
     proceed,
     goBack,
-    chainRunCommands,
     isRobotMoving,
     attachedModule,
     attachedPipette,
     errorMessage,
-    setErrorMessage,
     isExiting,
     isOnDevice,
     slotName,
@@ -61,7 +59,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const { t, i18n } = useTranslation('module_wizard_flows')
 
   const mount = attachedPipette.mount
-  const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   const attachedPipetteChannels = attachedPipette.data.channels
