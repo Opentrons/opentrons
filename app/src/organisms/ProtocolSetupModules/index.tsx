@@ -79,7 +79,7 @@ function RenderModuleStatus({
   calibrationStatus,
   setShowModuleWizard,
 }: RenderModuleStatusProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   let moduleStatus: JSX.Element
 
   if (
@@ -105,8 +105,8 @@ function RenderModuleStatus({
   ) {
     moduleStatus = (
       <SmallButton
-        buttonText="rounded"
-        buttonType={t('calibrate')}
+        buttonCategory="rounded"
+        buttonText={i18n.format(t('calibrate'), 'capitalize')}
         onClick={() => setShowModuleWizard(true)}
       />
     )
@@ -171,7 +171,12 @@ function RowModule({
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
+        backgroundColor={
+          isModuleReady &&
+          module.attachedModuleMatch?.moduleOffset?.last_modified != null
+            ? COLORS.green3
+            : COLORS.yellow3
+        }
         borderRadius={BORDERS.borderRadiusSize3}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
         gridGap={SPACING.spacing24}
