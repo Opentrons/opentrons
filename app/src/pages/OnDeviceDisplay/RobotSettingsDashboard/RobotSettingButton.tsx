@@ -40,6 +40,7 @@ interface RobotSettingButtonProps {
   onClick: React.MouseEventHandler
   settingInfo?: string
   rightElement?: React.ReactNode
+  dataTestId?: string
 }
 
 export function RobotSettingButton({
@@ -48,6 +49,7 @@ export function RobotSettingButton({
   onClick,
   settingInfo,
   rightElement,
+  dataTestId,
 }: RobotSettingButtonProps): JSX.Element {
   return (
     <Btn
@@ -57,6 +59,7 @@ export function RobotSettingButton({
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
+      data-testid={dataTestId}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

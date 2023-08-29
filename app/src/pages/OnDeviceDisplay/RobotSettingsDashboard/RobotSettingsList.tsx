@@ -45,6 +45,7 @@ import { InlineNotification } from '../../../atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 
 const ROBOT_ANALYTICS_SETTING_ID = 'disableLogAggregation'
+const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
 }
@@ -60,10 +61,17 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
+  const allRobotSettings = useSelector((state: State) =>
+    getRobotSettings(state, robotName)
+  )
+
   const isRobotAnalyticsOn =
-    useSelector((state: State) => getRobotSettings(state, robotName))?.find(
-      ({ id }) => id === ROBOT_ANALYTICS_SETTING_ID
-    )?.value ?? false
+    allRobotSettings.find(({ id }) => id === ROBOT_ANALYTICS_SETTING_ID)
+      ?.value ?? false
+
+  const isHomeGantryIsOn =
+    allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??
+    false
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
@@ -80,6 +88,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
       <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
         <RobotSettingButton
           settingName={t('network_settings')}
+          dataTestId="RobotSettingButton_network_settings"
           settingInfo={networkConnection?.connectionStatus}
           onClick={() => setCurrentOption('NetworkSettings')}
           iconName="wifi"
@@ -94,6 +103,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         </Link>
         <RobotSettingButton
           settingName={t('robot_system_version')}
+          dataTestId="RobotSettingButton_robot_system_version"
           settingInfo={
             robotServerVersion != null
               ? `v${robotServerVersion}`
@@ -119,6 +129,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         />
         <RobotSettingButton
           settingName={t('display_led_lights')}
+          dataTestId="RobotSettingButton_display_led_lights"
           settingInfo={t('display_led_lights_description')}
           iconName="light"
           rightElement={<OnOffToggle isOn={lightsEnabled} />}
@@ -126,16 +137,19 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         />
         <RobotSettingButton
           settingName={t('touchscreen_sleep')}
+          dataTestId="RobotSettingButton_touchscreen_sleep"
           onClick={() => setCurrentOption('TouchscreenSleep')}
           iconName="sleep"
         />
         <RobotSettingButton
           settingName={t('touchscreen_brightness')}
+          dataTestId="RobotSettingButton_touchscreen_brightness"
           onClick={() => setCurrentOption('TouchscreenBrightness')}
           iconName="brightness"
         />
         <RobotSettingButton
           settingName={t('apply_historic_offsets')}
+          dataTestId="RobotSettingButton_apply_historic_offsets"
           settingInfo={t('historic_offsets_description')}
           iconName="reticle"
           rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
@@ -143,6 +157,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         />
         <RobotSettingButton
           settingName={t('device_reset')}
+          dataTestId="RobotSettingButton_device_reset"
           onClick={() => setCurrentOption('DeviceReset')}
           iconName="reset"
         />
@@ -151,6 +166,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
             t('app_settings:share_analytics_short'),
             'titleCase'
           )}
+          dataTestId="RobotSettingButton_share_analytics"
           rightElement={<OnOffToggle isOn={isRobotAnalyticsOn} />}
           onClick={() =>
             dispatch(
@@ -164,12 +180,30 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="analytics"
         />
         <RobotSettingButton
+          settingName={t('home_gantry_on_restart')}
+          dataTestId="RobotSettingButton_home_gantry_on_restart"
+          settingInfo={t('home_gantry_subtext')}
+          iconName="gantry-homing"
+          rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
+          onClick={() =>
+            dispatch(
+              updateSetting(
+                robotName,
+                HOME_GANTRY_SETTING_ID,
+                !isHomeGantryIsOn
+              )
+            )
+          }
+        />
+        <RobotSettingButton
           settingName={t('app_settings:update_channel')}
+          dataTestId="RobotSettingButton_update_channel"
           onClick={() => setCurrentOption('UpdateChannel')}
           iconName="update-channel"
         />
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
+          dataTestId="RobotSettingButton_enable_dev_tools"
           settingInfo={t('dev_tools_description')}
           iconName="build"
           rightElement={<OnOffToggle isOn={devToolsOn} />}
