@@ -10,6 +10,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   Icon,
+  SPACING,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -24,8 +25,9 @@ export function ServerInitializing(): JSX.Element {
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
       borderRadius={BORDERS.borderRadiusSize3}
+      gridGap={SPACING.spacing32}
     >
-      <Icon name="ot-spinner" spin size="2rem" />
+      <Icon name="ot-spinner" spin size="6rem" color={COLORS.darkBlack70} />
       <StyledText
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}

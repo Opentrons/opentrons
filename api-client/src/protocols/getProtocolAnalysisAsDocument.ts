@@ -7,7 +7,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 export function getProtocolAnalysisAsDocument(
   config: HostConfig,
   protocolId: string,
-  analysisId: string,
+  analysisId: string
 ): ResponsePromise<CompletedProtocolAnalysis> {
   return request<CompletedProtocolAnalysis>(
     GET,

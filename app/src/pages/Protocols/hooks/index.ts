@@ -53,11 +53,11 @@ export const useRequiredProtocolHardware = (
   protocolId: string
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
   const { data: protocolData } = useProtocolQuery(protocolId)
-  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(protocolId, protocolData?.data.analysisSummaries[0].id ?? null, { enabled: protocolData != null })
-  // const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-  //   staleTime: Infinity,
-  // })
-  // const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    protocolData?.data.analysisSummaries[0].id ?? null,
+    { enabled: protocolData != null }
+  )
 
   const {
     data: attachedModulesData,
@@ -71,24 +71,19 @@ export const useRequiredProtocolHardware = (
   } = useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
-  if (
-    analysis == null ||
-    analysis?.status !== 'completed'
-  ) {
+  if (analysis == null || analysis?.status !== 'completed') {
     return { requiredProtocolHardware: [], isLoading: true }
   }
 
-  const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(
-    analysis
-  )
+  const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(analysis)
     ? [
-      {
-        hardwareType: 'gripper',
-        connected:
-          attachedInstruments.some(i => i.instrumentType === 'gripper') ??
-          false,
-      },
-    ]
+        {
+          hardwareType: 'gripper',
+          connected:
+            attachedInstruments.some(i => i.instrumentType === 'gripper') ??
+            false,
+        },
+      ]
     : []
 
   const requiredModules: ProtocolModule[] = analysis.modules.map(

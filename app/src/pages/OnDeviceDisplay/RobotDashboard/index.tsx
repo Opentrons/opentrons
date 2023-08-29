@@ -50,9 +50,12 @@ export function RobotDashboard(): JSX.Element {
     .slice(0, MAXIMUM_RECENT_RUN_PROTOCOLS)
 
   let contents: JSX.Element = <EmptyRecentRun />
+  // GET runs query will error with 503 if database is initializing
+  // this should be momentary, and the type of error to come from this endpoint
+  // so, all errors will be mapped to an initializing spinner
   if (allRunsQueryError != null) {
-    contents = <ServerInitializing /> 
-  }else if (recentRunsOfUniqueProtocols.length > 0) {
+    contents = <ServerInitializing />
+  } else if (recentRunsOfUniqueProtocols.length > 0) {
     contents = (
       <>
         <StyledText

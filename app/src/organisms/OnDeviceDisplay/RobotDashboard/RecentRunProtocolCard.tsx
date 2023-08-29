@@ -87,8 +87,8 @@ export function ProtocolWithLastRun({
     flex: 1 0 0;
     &:active {
       background-color: ${isReadyToBeReRun
-      ? COLORS.green3Pressed
-      : COLORS.yellow3Pressed};
+        ? COLORS.green3Pressed
+        : COLORS.yellow3Pressed};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
