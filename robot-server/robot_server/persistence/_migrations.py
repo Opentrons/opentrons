@@ -35,6 +35,7 @@ from typing_extensions import Final
 import sqlalchemy
 
 from ._tables import migration_table, run_table
+from . import legacy_pickle
 
 _LATEST_SCHEMA_VERSION: Final = 2
 
@@ -147,7 +148,45 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
 
 def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     """Migrate the database from schema 1 to schema 2."""
+    from robot_server.protocols.analysis_models import CompletedAnalysis
+    from ._tables import analysis_table
+    from robot_server.protocols import completed_analysis_store
+
     add_completed_analysis_as_document_column = sqlalchemy.text(
         "ALTER TABLE analysis ADD completed_analysis_as_document VARCHAR"
     )
     transaction.execute(add_completed_analysis_as_document_column)
+
+    v1_completed_analysis_column = sqlalchemy.column(
+        "completed_analysis",
+        sqlalchemy.PickleType(pickler=legacy_pickle)
+        # Originally declared nullable=False in schema v1.
+    )
+
+    # TODO: It looks like when this raises, the transaction is still committing. Why?
+
+    select_v1_rows = sqlalchemy.select(
+        analysis_table.c.id, v1_completed_analysis_column
+    ).select_from(analysis_table)
+    v1_rows = transaction.execute(select_v1_rows)
+
+    for v1_row in v1_rows:
+        v1_id = v1_row.id
+        assert isinstance(v1_id, str)
+        v1_completed_analysis_dict = v1_row.completed_analysis
+        assert isinstance(v1_completed_analysis_dict, dict)
+
+        parsed_completed_analysis = CompletedAnalysis.parse_obj(
+            v1_completed_analysis_dict
+        )
+
+        # TODO: by_alias, etc.
+        v2_completed_analysis = parsed_completed_analysis.json()
+
+        # Reinsert using the new column definitions.
+        update = (
+            sqlalchemy.update(analysis_table)
+            .where(analysis_table.c.id == v1_id)
+            .values(completed_analysis_as_document=v2_completed_analysis)
+        )
+        transaction.execute(update)
