@@ -134,13 +134,16 @@ class CSVLine:
         assert self._start_time, "no start time saved"
         self._elapsed_time = time() - self._start_time
         for i, expected_type in enumerate(self._data_types):
-            try:
-                self._data[i] = expected_type(data[i])
-            except ValueError:
-                raise ValueError(
-                    f"[{self.tag}] unexpected data type {type(data[i])} "
-                    f'with value "{data[i]}" at index {i}'
-                )
+            if data[i] is None:
+                self._data[i] = data[i]
+            else:
+                try:
+                    self._data[i] = expected_type(data[i])
+                except ValueError:
+                    raise ValueError(
+                        f"[{self.tag}] unexpected data type {type(data[i])} "
+                        f'with value "{data[i]}" at index {i}'
+                    )
         self._stored = True
         if print_results and CSVResult in self._data_types:
             print_csv_result(self.tag, CSVResult.from_bool(self.result_passed))
@@ -386,6 +389,8 @@ class CSVReport:
                 line.store(CSVResult.PASS, print_results=False)
             elif s.result_passed is False:
                 line.store(CSVResult.FAIL, print_results=False)
+            else:
+                line.store(None, print_results=False)
 
     def __str__(self) -> str:
         """CSV Report string."""
