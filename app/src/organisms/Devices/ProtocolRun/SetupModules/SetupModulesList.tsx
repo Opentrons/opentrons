@@ -15,6 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -28,6 +30,7 @@ import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { Tooltip } from '../../../../atoms/Tooltip'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import {
@@ -35,6 +38,7 @@ import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
+  useRunCalibrationStatus,
 } from '../../hooks'
 import { HeaterShakerWizard } from '../../HeaterShakerWizard'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
@@ -171,6 +175,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     : null
                 }
                 isOt3={isOt3}
+                robotName={robotName}
+                runId={runId}
               />
             )
           }
@@ -187,6 +193,8 @@ interface ModulesListItemProps {
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isOt3: boolean
+  robotName: string
+  runId: string
 }
 
 export function ModulesListItem({
@@ -196,6 +204,8 @@ export function ModulesListItem({
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
   isOt3,
+  robotName,
+  runId,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const moduleConnectionStatus =
@@ -212,6 +222,11 @@ export function ModulesListItem({
       ? attachedModuleMatch
       : null
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+
   let subText: JSX.Element | null = null
   if (moduleModel === HEATERSHAKER_MODULE_V1) {
     subText = (
@@ -256,9 +271,6 @@ export function ModulesListItem({
   }
 
   const RenderModuleStatus = (): JSX.Element => {
-    const handleCalibrate = (): void => {
-      setShowModuleWizard(true)
-    }
     if (attachedModuleMatch == null) {
       return (
         <StatusLabel
@@ -281,9 +293,22 @@ export function ModulesListItem({
       )
     } else {
       return (
-        <TertiaryButton onClick={handleCalibrate}>
-          {t('calibrate_now')}
-        </TertiaryButton>
+        <>
+          <TertiaryButton
+            onClick={() => setShowModuleWizard(true)}
+            disabled={!calibrationStatus?.complete}
+            {...targetProps}
+          >
+            {t('calibrate_now')}
+          </TertiaryButton>
+          {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {calibrationStatus.reason === 'attach_pipette_failure_reason'
+                ? t('attach_pipette_before_module_calibration')
+                : t('calibrate_pipette_before_module_calibration')}
+            </Tooltip>
+          ) : null}
+        </>
       )
     }
   }
