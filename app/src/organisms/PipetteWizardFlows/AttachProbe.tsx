@@ -16,22 +16,13 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
-import { SECTIONS, FLOWS } from './constants'
+import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
 }
-
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 const IN_PROGRESS_STYLE = css`
   ${TYPOGRAPHY.pRegular};
