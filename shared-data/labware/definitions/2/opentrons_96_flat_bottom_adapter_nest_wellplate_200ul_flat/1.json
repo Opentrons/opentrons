@@ -1011,7 +1011,7 @@
   ],
   "parameters": {
     "format": "96Standard",
-    "quirks": [],
+    "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
