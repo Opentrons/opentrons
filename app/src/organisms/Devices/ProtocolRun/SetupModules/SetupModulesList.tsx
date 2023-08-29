@@ -46,6 +46,7 @@ import { getModuleImage } from './utils'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
+import type { ProtocolCalibrationStatus } from '../../hooks'
 
 interface SetupModulesListProps {
   robotName: string
@@ -65,6 +66,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
   const isOt3 = useIsOT3(robotName)
+
+  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
   const [
     showMultipleModulesModal,
@@ -171,8 +174,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     : null
                 }
                 isOt3={isOt3}
-                robotName={robotName}
-                runId={runId}
+                calibrationStatus={calibrationStatus}
               />
             )
           }
@@ -189,8 +191,7 @@ interface ModulesListItemProps {
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isOt3: boolean
-  robotName: string
-  runId: string
+  calibrationStatus: ProtocolCalibrationStatus
 }
 
 export function ModulesListItem({
@@ -200,8 +201,7 @@ export function ModulesListItem({
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
   isOt3,
-  robotName,
-  runId,
+  calibrationStatus,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const moduleConnectionStatus =
@@ -218,7 +218,6 @@ export function ModulesListItem({
       ? attachedModuleMatch
       : null
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
-  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
