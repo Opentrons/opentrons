@@ -607,10 +607,8 @@ class OT3API(
         and set up hardware controller internal state if necessary.
         """
         skip_configure = await self._cache_instruments(require)
-        self._log.info(
-            f"Instrument model cache updated, skip configure: {skip_configure}"
-        )
         if not skip_configure:
+            self._log.info("Instrument model cache updated, reconfiguring")
             await self._configure_instruments()
 
     async def _cache_instruments(  # noqa: C901
