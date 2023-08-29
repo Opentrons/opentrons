@@ -270,7 +270,7 @@ export function ModulesListItem({
     )
   }
 
-  const RenderModuleStatus = (): JSX.Element => {
+  const renderModuleStatus = (): JSX.Element => {
     if (attachedModuleMatch == null) {
       return (
         <StatusLabel
@@ -284,6 +284,7 @@ export function ModulesListItem({
     } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
       return (
         <StatusLabel
+          {...targetProps}
           id={location}
           status={moduleConnectionStatus}
           backgroundColor={COLORS.successBackgroundLight}
@@ -295,9 +296,9 @@ export function ModulesListItem({
       return (
         <>
           <TertiaryButton
+            {...targetProps}
             onClick={() => setShowModuleWizard(true)}
             disabled={!calibrationStatus?.complete}
-            {...targetProps}
           >
             {t('calibrate_now')}
           </TertiaryButton>
@@ -368,7 +369,7 @@ export function ModulesListItem({
             {moduleModel === MAGNETIC_BLOCK_V1 ? (
               <StyledText as="p"> {t('n_a')}</StyledText>
             ) : (
-              <RenderModuleStatus />
+              renderModuleStatus()
             )}
           </Flex>
         </Flex>

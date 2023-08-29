@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { findByText, fireEvent, getByText } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
