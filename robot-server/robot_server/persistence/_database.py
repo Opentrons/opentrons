@@ -60,4 +60,15 @@ def _open_db_no_cleanup(db_file_path: Path) -> sqlalchemy.engine.Engine:
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
 
+    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[misc]
+    def do_connect(dbapi_connection, connection_record):
+        # disable pysqlite's emitting of the BEGIN statement entirely.
+        # also stops it from emitting COMMIT before any DDL.
+        dbapi_connection.isolation_level = None
+
+    @sqlalchemy.event.listens_for(engine, "begin")  # type: ignore[misc]
+    def do_begin(conn):
+        # emit our own BEGIN
+        conn.exec_driver_sql("BEGIN")
+
     return engine
