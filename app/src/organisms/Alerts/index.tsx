@@ -5,11 +5,11 @@ import head from 'lodash/head'
 
 import * as AppAlerts from '../../redux/alerts'
 import { getHasJustUpdated, toggleConfigValue } from '../../redux/config'
+import { SUCCESS_TOAST, WARNING_TOAST } from '../../atoms/Toast'
+import { useToaster } from '../ToasterOven'
 import { AnalyticsSettingsModal } from '../AnalyticsSettingsModal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
-import { useToaster } from '../ToasterOven'
-import { SUCCESS_TOAST, WARNING_TOAST } from '../../atoms/Toast'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { AlertId } from '../../redux/alerts/types'
@@ -75,7 +75,8 @@ export function Alerts(): JSX.Element {
 
       {activeAlertId === AppAlerts.ALERT_U2E_DRIVER_OUTDATED ? (
         <U2EDriverOutdatedAlert dismissAlert={dismissAlert} />
-      ) : showUpdateModal ? (
+      ) : null}
+      {showUpdateModal ? (
         <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
       ) : null}
     </>

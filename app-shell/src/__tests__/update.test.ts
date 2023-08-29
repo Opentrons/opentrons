@@ -1,8 +1,8 @@
 // app-shell self-update tests
 import * as ElectronUpdater from 'electron-updater'
+import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 import { registerUpdate } from '../update'
 import * as Cfg from '../config'
-import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 
 import type { Dispatch } from '../types'
 

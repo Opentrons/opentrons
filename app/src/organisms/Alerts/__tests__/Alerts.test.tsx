@@ -2,11 +2,11 @@ import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components'
 import * as AppAlerts from '../../../redux/alerts'
+import { TOAST_ANIMATION_DURATION } from '../../../atoms/Toast'
 import { Alerts } from '..'
 import { AnalyticsSettingsModal } from '../../AnalyticsSettingsModal'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 import { UpdateAppModal } from '../../UpdateAppModal'
-import { TOAST_ANIMATION_DURATION } from '../../../atoms/Toast'
 
 import type { State } from '../../../redux/types'
 import type { AlertId } from '../../../redux/alerts/types'
