@@ -60,13 +60,46 @@ On the other hand, a transfer command with the same arguments would aspirate fro
 Transfer Patterns
 =================
 
-Each complex command uses a different pattern of aspiration and dispensing. In addition, when you provide multiple wells as both the source and destination for :py:meth:`~.InstrumentContext.transfer`, it maps the source list onto the destination list in a certain way. This section covers both of these patterns.
+Each complex command uses a different pattern of aspiration and dispensing. In addition, when you provide multiple wells as both the source and destination for ``transfer()``, it maps the source list onto the destination list in a certain way. This section covers both of these patterns.
 
 Aspirating and Dispensing
 -------------------------
 
-:py:meth:`~.InstrumentContext.transfer`
+``transfer()`` always alternates between aspirating and dispensing, regardless of how many wells are in the source and destination. Its default behavior is:
 
+    1. Pick up a tip.
+    2. Aspirate from the first source well.
+    3. Dispense in the first destination well.
+    4. Repeat the pattern of aspirating and dispensing, as needed.
+    5. Drop the tip in the trash.
+    
+``distribute()`` always fills the tip with as few aspirations as possible, and then dispenses to the destination wells in order. Its default behavior is:
+
+    1. Pick up a tip.
+    2. Aspirate enough to fill the destination wells, or as much will fit in the tip, whichever is smaller. This aspirate includes a disposal volume.
+    3. Dispense in the first destination well.
+    4. Continue to dispense in destination wells.
+    5. Drop the tip in the trash.
+    
+``consolidate()`` aspirates multiple times in a row, and then dispenses as few times as possible in the destination well. Its default behavior is:
+
+    1. Pick up a tip.
+    2. Aspirate from the first source well.
+    3. Continue aspirating from source wells.
+    4. Dispense in the destination well.
+    5. Drop the tip in the trash.    
+
+.. note::
+    By default all three commands begin by picking up a tip, and conclude by dropping a tip. In general, don't call :py:meth:`.pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with :ref:`complex_params`, by setting ``new_tip="never"``.
+
+Many-to-Many
+------------
+
+
+.. _complex-tip-refilling:
+
+Tip Refilling
+-------------
 
 
 Optimizing Patterns
