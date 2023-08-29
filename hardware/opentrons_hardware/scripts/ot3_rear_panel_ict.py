@@ -280,7 +280,7 @@ async def main() -> None:
         if response is None:
             print(f'READEPPOM=Fail')
         else:
-            print(f'READEPPROM={response}')
+            print(f'READEPPROM={response.decode()}'.replace(" ",""))
 
     if args.check_door_status:
         try:
