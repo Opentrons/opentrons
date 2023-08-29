@@ -153,10 +153,7 @@ async def _record_plunger_alignment(
         enc = est
     _stalled_mm = est - enc
     print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
-    if not api.is_simulator:
-        _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
-    else:
-        _did_pass = speed < MAX_SPEED
+    _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
     # NOTE: only tests that are required to PASS need to show a results in the file
     data = [round(current, 2), round(speed, 2), round(est, 2), round(enc, 2)]
     if _includes_result(current, speed):
@@ -186,6 +183,7 @@ async def _test_direction(
         api, mount, report, trial, current, speed, direction, "start"
     )
     if not aligned:
+        print("ERROR: unable to align at the start")
         return False
     # move the plunger
     _plunger_target = {"down": bottom, "up": top + 1.0}[direction]

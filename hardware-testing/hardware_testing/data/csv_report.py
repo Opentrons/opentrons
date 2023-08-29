@@ -23,12 +23,14 @@ class CSVResult(enum.Enum):
         return self.value
 
     @classmethod
-    def from_bool(cls, b: bool) -> "CSVResult":
+    def from_bool(cls, b: Optional[bool]) -> Optional["CSVResult"]:
         """From bool."""
+        if b is None:
+            return None
         return cls.PASS if b else cls.FAIL
 
 
-def print_csv_result(test: str, result: CSVResult) -> None:
+def print_csv_result(test: str, result: Optional[CSVResult]) -> None:
     """Print CSV Result."""
     if bool(result):
         highlight = ""
@@ -110,12 +112,17 @@ class CSVLine:
         return None
 
     @property
-    def result_passed(self) -> bool:
+    def result_passed(self) -> Optional[bool]:
         """Line result passed."""
-        for i, expected_type in enumerate(self._data_types):
-            if expected_type == CSVResult and self._data[i] != CSVResult.PASS:
+        if CSVResult in self._data_types:
+            if CSVResult.FAIL in self._data:
                 return False
-        return True
+            elif CSVResult.PASS in self._data:
+                return True
+            else:
+                return None
+        else:
+            return None
 
     def store(self, *data: Any, print_results: bool = True) -> None:
         """Line store data."""
@@ -164,12 +171,18 @@ class CSVLineRepeating:
         return True
 
     @property
-    def result_passed(self) -> bool:
+    def result_passed(self) -> Optional[bool]:
         """CSV Line Repeating result passed."""
-        for line in self._lines:
-            if not line.result_passed:
-                return False
-        return True
+        results = [
+            line.result_passed
+            for line in self._lines
+        ]
+        if False in results:
+            return False
+        elif True in results:
+            return True
+        else:
+            return None
 
     def __getitem__(self, item: int) -> CSVLine:
         """CSV Line Repeating get item."""
@@ -252,12 +265,18 @@ class CSVSection:
         return True
 
     @property
-    def result_passed(self) -> bool:
+    def result_passed(self) -> Optional[bool]:
         """CSV Section result passed."""
-        for line in self.lines:
-            if not line.result_passed:
-                return False
-        return True
+        results = [
+            line.result_passed
+            for line in self.lines
+        ]
+        if False in results:
+            return False
+        elif True in results:
+            return True
+        else:
+            return None
 
 
 def _generate_meta_data_section(validate_meta_data: bool) -> CSVSection:
@@ -363,12 +382,10 @@ class CSVReport:
                 continue
             line = results_section[f"RESULT_{s.title}"]
             assert isinstance(line, CSVLine)
-            line.store(CSVResult.PASS, print_results=False)
             if s.result_passed:
-                result = CSVResult.PASS
-            else:
-                result = CSVResult.FAIL
-            line.store(result, print_results=False)
+                line.store(CSVResult.PASS, print_results=False)
+            elif s.result_passed is False:
+                line.store(CSVResult.FAIL, print_results=False)
 
     def __str__(self) -> str:
         """CSV Report string."""
