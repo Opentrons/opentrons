@@ -568,12 +568,12 @@ async def _read_pressure_and_check_results(
     if previous:
         assert len(previous[-1]) >= len(_average_per_channel)
         for c in range(channels):
-            _delta = _average_per_channel[c] - previous[-1][c]
             _delta_spec = PRESSURE_ASPIRATE_DELTA_SPEC[pipette_channels][pipette_volume]
             _delta_target = PRESSURE_ASPIRATE_DELTA_SPEC[pipette_channels][pipette_volume]["delta"]
             _delta_margin = PRESSURE_ASPIRATE_DELTA_SPEC[pipette_channels][pipette_volume]["margin"]
             _delta_min = _delta_target - (_delta_target * _delta_margin)
             _delta_max = _delta_target + (_delta_target * _delta_margin)
+            _delta = abs(_average_per_channel[c] - previous[-1][c])  # absolute value
             if _delta < _delta_min or _delta > _delta_max:
                 print(f"ERROR: channel {c + 1} pressure delta ({_delta}) "
                       f"out of range: max={_delta_max}, min={_delta_min}")
