@@ -7,11 +7,7 @@ import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
-import { MotorAxes } from '@opentrons/shared-data/js/types'
-import {
-  LEFT,
-  THERMOCYCLER_MODULE_MODELS,
-} from '@opentrons/shared-data/js/constants'
+import { THERMOCYCLER_MODULE_MODELS } from '@opentrons/shared-data/js/constants'
 import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { BODY_STYLE } from './constants'
@@ -58,7 +54,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation('module_wizard_flows')
 
-  const mount = attachedPipette.mount
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   const attachedPipetteChannels = attachedPipette.data.channels
