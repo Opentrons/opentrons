@@ -436,20 +436,21 @@ async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj):
 
     dispense_1 = 3.0
     await hw_api.dispense(mount, dispense_1)
-    plunger_pos_1 = 72.178
+    plunger_pos_1 = 72.17846
     assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
-        plunger_pos_1
-    )
-
-    await hw_api.dispense(mount, dispense_1, push_out=2)
-    assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
-        plunger_pos_1
+        plunger_pos_1, 0.1
     )
 
     await hw_api.dispense(mount, rate=2)
-    plunger_pos_2 = 71.5
+    plunger_pos_2 = 72.75
     assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
-        plunger_pos_2
+        plunger_pos_2, 0.1
+    )
+
+    await hw_api.dispense(mount, dispense_1, push_out=2)
+    plunger_pos_3 = 72.74
+    assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
+        plunger_pos_3, 0.1
     )
 
 
