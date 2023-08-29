@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from mock import patch, AsyncMock, Mock, call as mock_call
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis, InstrumentProbeType
 from opentrons.config.types import OT3CalibrationSettings
 from opentrons.hardware_control.ot3_calibration import (
     find_edge_binary,
@@ -273,6 +273,7 @@ async def test_find_deck_checks_z_only(
         mount,
         z_prep_loc,
         ot3_hardware.config.calibration.z_offset.pass_settings,
+        probe=InstrumentProbeType.PRIMARY,
     )
     # first we move only to safe height from current position
     first_move_point = mock_move_to.call_args_list[0][0][1]
