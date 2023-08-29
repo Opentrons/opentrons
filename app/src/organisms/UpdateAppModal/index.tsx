@@ -29,10 +29,6 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import type { Dispatch } from '../../redux/types'
 import { StyledText } from '../../atoms/text'
 
-export interface UpdateAppModalProps {
-  closeModal: (arg0: boolean) => void
-}
-
 interface PlaceHolderErrorProps {
   errorMessage?: string
 }
@@ -80,6 +76,10 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: 1.5rem;
   border-radius: ${BORDERS.borderRadiusSize3};
 `
+
+export interface UpdateAppModalProps {
+  closeModal: (arg0: boolean) => void
+}
 
 export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { closeModal } = props
@@ -129,7 +129,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           <PlaceholderError errorMessage={error.message} />
         </LegacyModal>
       ) : null}
-      {downloading || (downloaded && error == null) ? (
+      {(downloading || downloaded) && error == null ? (
         <LegacyModal title={t('opentrons_app_update')}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
