@@ -75,7 +75,6 @@ export function ModuleCalibrationOverflowMenu({
       {showModuleWizard ? (
         <ModuleWizardFlows
           attachedModule={attachedModule}
-          slotName="A1"
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
