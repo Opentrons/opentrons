@@ -32,6 +32,10 @@ interface LabwareInfoProps {
 }
 
 const labwareDisplayNameStyle = css`
+  font-size: ${TYPOGRAPHY.fontSizeH6};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  line-height: ${TYPOGRAPHY.lineHeight12};
+  text-transform: none;
   overflow: hidden;
   white-space: initial;
   text-overflow: ellipsis;
@@ -61,7 +65,6 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
       >
         <StyledText
           as="h6"
-          lineHeight={TYPOGRAPHY.fontSizeCaption}
           css={labwareDisplayNameStyle}
           title={definitionDisplayName}
         >
@@ -75,7 +78,6 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
         <>
           <StyledText
             as="h6"
-            lineHeight={TYPOGRAPHY.fontSizeCaption}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textTransform="uppercase"
           >
