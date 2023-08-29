@@ -746,7 +746,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 print(f"acceptable cv {acceptable_cv} acceptable_d {acceptable_d}")
                 print(f"dispense cv {dispense_cv} aspirate_cv {aspirate_cv}")
                 print(f"dispense d {dispense_cv} aspirate_d {aspirate_d}")
-                if acceptable_cv is not None and acceptable_d is not None:
+                if (
+                    not cfg.ignore_fail
+                    and acceptable_cv is not None
+                    and acceptable_d is not None
+                ):
                     acceptable_cv /= 100
                     acceptable_d /= 100
                     if (
