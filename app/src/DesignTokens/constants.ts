@@ -16,4 +16,3 @@ export const touchScreenViewport = {
     defaultViewport: 'onDeviceDisplay',
   },
 }
-
