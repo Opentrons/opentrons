@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from pydantic import Field
+
 from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
@@ -24,7 +26,10 @@ DispenseCommandType = Literal["dispense"]
 class DispenseParams(PipetteIdMixin, VolumeMixin, FlowRateMixin, WellLocationMixin):
     """Payload required to dispense to a specific well."""
 
-    pass
+    pushOut: Optional[float] = Field(
+        None,
+        description="push the plunger a small amount farther than necessary for accurate low-volume dispensing",
+    )
 
 
 class DispenseResult(BaseLiquidHandlingResult, DestinationPositionResult):
@@ -54,6 +59,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
             pipette_id=params.pipetteId,
             volume=params.volume,
             flow_rate=params.flowRate,
+            push_out=params.pushOut,
         )
 
         return DispenseResult(

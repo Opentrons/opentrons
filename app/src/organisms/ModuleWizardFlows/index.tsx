@@ -43,7 +43,7 @@ export const ModuleWizardFlows = (
   const { t } = useTranslation('module_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-
+  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
   const moduleCalibrationSteps = getModuleCalibrationSteps()
 
   const availableSlotNames =
@@ -174,9 +174,9 @@ export const ModuleWizardFlows = (
         continuePastCommandFailure
       )
   }
-
+  if (currentStep == null || attachedPipette == null) return null
   const calibrateBaseProps = {
-    attachedPipettes,
+    attachedPipette,
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
@@ -187,8 +187,8 @@ export const ModuleWizardFlows = (
     isOnDevice,
     attachedModule,
     slotName,
+    isExiting,
   }
-  if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />

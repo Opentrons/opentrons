@@ -1,9 +1,9 @@
 """Dispense-in-place command request, result, and implementation models."""
-
-
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
+
+from pydantic import Field
 
 from .pipetting_common import (
     PipetteIdMixin,
@@ -23,7 +23,10 @@ DispenseInPlaceCommandType = Literal["dispenseInPlace"]
 class DispenseInPlaceParams(PipetteIdMixin, VolumeMixin, FlowRateMixin):
     """Payload required to dispense in place."""
 
-    pass
+    pushOut: Optional[float] = Field(
+        None,
+        description="push the plunger a small amount farther than necessary for accurate low-volume dispensing",
+    )
 
 
 class DispenseInPlaceResult(BaseLiquidHandlingResult):
@@ -46,6 +49,7 @@ class DispenseInPlaceImplementation(
             pipette_id=params.pipetteId,
             volume=params.volume,
             flow_rate=params.flowRate,
+            push_out=params.pushOut,
         )
         return DispenseInPlaceResult(volume=volume)
 

@@ -57,7 +57,6 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     instrument != null &&
     instrument.ok &&
     instrument.mount !== 'extension' &&
-    // @ts-expect-error the mount acts as a type narrower here
     instrument.data?.channels === 96
 
   const handleDetach: React.MouseEventHandler = () => {
