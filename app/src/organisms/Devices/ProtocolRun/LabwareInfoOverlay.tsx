@@ -32,9 +32,6 @@ interface LabwareInfoProps {
 }
 
 const labwareDisplayNameStyle = css`
-  font-size: ${TYPOGRAPHY.fontSizeH6};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  line-height: ${TYPOGRAPHY.lineHeight12};
   text-transform: none;
   overflow: hidden;
   white-space: initial;
