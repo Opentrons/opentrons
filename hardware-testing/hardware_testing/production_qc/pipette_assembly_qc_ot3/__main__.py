@@ -164,15 +164,15 @@ HUMIDITY_THRESH = [10, 90]
 # THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = {
     1: [3.0, 7.0],
-    8: [5.0, 12.0],
+    8: [8.0, 16.0],
 }
 CAP_THRESH_PROBE = {
     1: [4.0, 8.0],
-    8: [8.0, 20.0],
+    8: [8.0, 16.0],
 }
 CAP_THRESH_SQUARE = {
     1: [8.0, 15.0],
-    8: [12.0, 30.0],
+    8: [18.0, 26.0],
 }
 
 # THRESHOLDS: air-pressure sensor
