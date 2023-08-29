@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { customViewports } from '../../../../.storybook/preview'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { InlineNotification } from '.'
 import type { Story, Meta } from '@storybook/react'
 
@@ -26,12 +26,7 @@ export default {
       defaultValue: true,
     },
   },
-  parameters: {
-    viewport: {
-      viewports: customViewports,
-      defaultViewport: 'onDeviceDisplay',
-    },
-  },
+  parameters: touchScreenViewport,
 } as Meta
 
 const Template: Story<

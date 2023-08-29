@@ -4,7 +4,7 @@ import { Flex, SPACING } from '@opentrons/components'
 import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
 
 import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
-import { customViewports } from '../../../../.storybook/preview'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { LocationIcon } from '.'
 
 import type { Story, Meta } from '@storybook/react'
@@ -47,12 +47,7 @@ export default {
     },
   },
   component: LocationIcon,
-  parameters: {
-    viewport: {
-      viewports: customViewports,
-      defaultViewport: 'onDeviceDisplay',
-    },
-  },
+  parameters: touchScreenViewport,
   decorators: [
     Story => (
       <>

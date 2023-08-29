@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-import { customViewports } from '../../../../.storybook/preview'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { configReducer } from '../../redux/config/reducer'
 import { EstopMissingModal } from '.'
 
@@ -12,12 +12,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Organisms/EstopMissingModal',
   component: EstopMissingModal,
-  parameters: {
-    viewport: {
-      viewports: customViewports,
-      defaultViewport: 'onDeviceDisplay',
-    },
-  },
+  parameters: touchScreenViewport,
 } as Meta
 
 const dummyConfig = {
