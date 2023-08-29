@@ -313,39 +313,59 @@ The following sections demonstrate how to use each method and include sample cod
 Aspirate
 --------
 
-To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method's arguments let you specify the aspirated volume in µL, the well to aspirate from, and how fast to draw liquid into the pipette. For example, this snippet tells the robot to remove 200 µL from well location A1 at the pipette's default flow rate::
+To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method lets you specify the aspiration volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to remove 200 µL from well location A1.
 
+.. code-block:: python
+
+    pipette.pick_up_tip()
     pipette.aspirate(200, plate['A1'])
 
-The location parameter is either the well location (``plate['A']``) or a specified position within a well, relative to its bottom or top center. The code snippet above uses the well location. By default, the robot will aspirate 1 mm from the bottom of the well. To change the clearance, you would call :py:obj:`.well_bottom_clearance` like this::
+If the pipette doesn't move, you can also specify an additional aspiration action without including a location. To demonstrate, lets pause the protocol, automatically resume it, and aspirate a second time from ``plate['A1'])``.
 
-    pipette.well_bottom_clearance.aspirate=2 # aspirate 2 mm above well bottom
+.. code-block:: python
+
+    pipette.pick_up_tip()
     pipette.aspirate(200, plate['A1'])
-
-TBD NEED EXAMPLE HERE ``Well.top()`` and ``Well.bottom()``
-
-The ``rate`` parameter is a multiplication factor of the pipette's :ref:`default flow rate <new-plunger-flow-rates>`. You can add a value to the ``rate`` argument to increase the pipette's aspiration speed. For example, this code causes the pipette to aspirate at twice its normal rate::
-
-    pipette.aspirate(200, plate['A1'], rate=2.0)
-
-You can also just specify the volume to aspirate, and not mention a location. In this example, the pipette aspirates a second time from its current location, which we previously set as ``plate['A1'])``::
-
-    pipette.aspirate(100)  # aspirate 100 uL from current position
+    protocol.delay(seconds=5) # pause for 5 seconds
+    pipette.aspirate(100)     # aspirate 100 uL from current position
 
 Now our pipette holds 300 µL.
 
-.. Version 1 mention in note. Is this too old to keep? Can we remove it?
-.. note::
+Aspirate by Well or Location
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    In version 1 of this API, ``aspirate`` (and ``dispense``) would inspect the types of the ``volume`` and ``location`` arguments and do the right thing if you specified only a location or specified location and volume out of order. In this and future versions of the Python Protocol API, this is no longer true. Like any other Python function, if you are specifying arguments by position without using their names, you must always specify them in order.
+The ``aspirate()`` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``. 
 
-.. note::
+**By Well**
 
-    By default, the pipette will moves to 1 mm above the bottom of the target well before aspirating.
-    You can change this by using a well position function like :py:meth:`.Well.bottom` (see
-    :ref:`v2-location-within-wells`) every time you call ``aspirate``, or - if you want to change
-    the default throughout your protocol - you can change the default offset with
-    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of a well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below. See also, :ref:`new-default-op-positions` for information about controlling pipette height for based on well location.
+
+.. code-block:: python
+
+    pipette.pick_up_tip
+    pipette.well_bottom_clearance.aspirate=2 # aspirate 2 mm above well bottom
+    pipette.aspirate(200, plate['A1'])
+
+**By Location**
+
+You can also aspirate on a point along the center, z-axis within a well. For example, the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods let you aspirate a set distances from the top or bottom center of a well as shown below. See also, :ref:`position-relative-labware` for information about on controlling pipette height from within a well.
+
+.. code-block:: python
+
+    pipette.pick_up_tip()
+    depth = plate['A1'].bottom(z=2) # aspirate 2mm above well bottom
+    pipette.aspirate(200, depth)
+
+Aspiration Flow Rates
+^^^^^^^^^^^^^^^^^^^^^
+
+Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Adding a number to the ``rate`` parameter multiplies the flow rate by that value. For example, this code causes the pipette to aspirate at twice its normal rate::
+
+    pipette.aspirate(200, plate['A1'], rate=2.0)
+
+.. Removed note related to API v1
+
+.. Removed note because pipette clearance defaults and locations are now covered
 
 .. versionadded:: 2.0
 
@@ -353,20 +373,30 @@ Now our pipette holds 300 µL.
 
 Dispense
 --------
+To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method lets you specify the aspiration volume in µL, the well location, and aspiration speed. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to remove 200 µL from well location A1.
 
-To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.dispense` method. This method's arguments let you specify the dispensed volume µL, where to deposit a liquid (e.g. a well location on a plate or reservoir), and how quickly to dispense it in uL/s. For example, this snippet tells the robot to dispense 50 µL into well location B1 at a specific rate in µL/s::
+To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.dispense` method. This method lets you specify the dispense volume in µL, the well location, and pipette flow rate. For example, this snippet tells the robot to dispense 200 µL into well location B1.
 
-    pipette.dispense(50, plate['B1'], rate=2.0)
+.. code-block:: python
+
+    pipette.dispense(200, plate['B1'])
     
-In this example:
+Dispense by Well or Location
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``aspirate()`` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``.
 
-- The location parameter (e.g., ``plate['A1']``) tells the robot to aspirate from the default position in a well. You can also aspirate from a the top or bottom of a well by adding an optional location argument (e.g., ``plate['A1'].top`` or ``plate['A1'].bottom``).
-
-- The ``rate`` parameter is a multiplication factor of the pipette's default aspiration flow rate. See  :ref:`new-plunger-flow-rates` for a list of Flex and OT-2 pipette flow rates.
+**By Well**
 
 You can also just specify the volume to aspirate, and not mention a location. For example, if our pipette holds 100 uL and you want to dispense a second time from its current location (``plate['A1'])``), you could call the ``dispense()`` method again without a location argument:: 
     
     pipette.dispense(50)
+
+**By Location**
+
+Dispense Flow Rates
+-------------------
+
+- The ``rate`` parameter is a multiplication factor of the pipette's default aspiration flow rate. See  :ref:`new-plunger-flow-rates` for a list of Flex and OT-2 pipette flow rates.
 
 .. same question as with aspirate. Note below is kinda old (api v1 reference). Can we remove?
 .. note::
