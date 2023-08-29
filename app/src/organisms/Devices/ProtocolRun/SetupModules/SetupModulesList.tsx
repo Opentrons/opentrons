@@ -122,14 +122,12 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           marginBottom={SPACING.spacing8}
-          data-testid="SetupModulesList_module_name"
           width="45%"
         >
           {t('module_name')}
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_location"
           marginRight={SPACING.spacing16}
           width="15%"
         >
@@ -137,7 +135,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_connection_status"
           marginRight={SPACING.spacing16}
           width="15%"
         >
@@ -148,7 +145,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         flexDirection={DIRECTION_COLUMN}
         width="100%"
         overflowY="auto"
-        data-testid="SetupModulesList_ListView"
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
@@ -302,7 +298,6 @@ export function ModulesListItem({
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
-        data-testid="ModulesListItem_Row"
       >
         {showHeaterShakerFlow && heaterShakerModuleFromProtocol != null ? (
           <HeaterShakerWizard

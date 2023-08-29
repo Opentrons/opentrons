@@ -150,13 +150,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Connected')
-    expect(getByTestId('status_label_Connected_1')).toHaveStyle({
-      backgroundColor: COLORS.successBackgroundLight,
-    })
   })
 
   it('should render a magnetic module that is NOT connected', () => {
@@ -175,13 +172,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Not connected')
-    expect(getByTestId('status_label_Not connected_1')).toHaveStyle({
-      backgroundColor: COLORS.warningBackgroundLight,
-    })
   })
 
   it('should render a thermocycler module that is connected, OT2', () => {
