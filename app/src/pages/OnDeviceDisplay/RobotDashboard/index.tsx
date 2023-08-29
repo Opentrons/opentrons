@@ -21,12 +21,13 @@ import {
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
 import { WelcomedModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
+import { ServerInitializing } from '../../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
-  const allRuns = useAllRunsQuery().data?.data ?? []
+  const { data: allRunsQueryData, error: allRunsQueryError } = useAllRunsQuery()
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
@@ -35,7 +36,7 @@ export function RobotDashboard(): JSX.Element {
     unfinishedUnboxingFlowRoute !== null
   )
 
-  const recentRunsOfUniqueProtocols = allRuns
+  const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
     .reverse() // newest runs first
     .reduce<RunData[]>((acc, run) => {
       if (
@@ -48,6 +49,26 @@ export function RobotDashboard(): JSX.Element {
     }, [])
     .slice(0, MAXIMUM_RECENT_RUN_PROTOCOLS)
 
+  let contents: JSX.Element = <EmptyRecentRun />
+  if (allRunsQueryError != null) {
+    contents = <ServerInitializing /> 
+  }else if (recentRunsOfUniqueProtocols.length > 0) {
+    contents = (
+      <>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={COLORS.darkBlack70}
+        >
+          {t('run_again')}
+        </StyledText>
+        <RecentRunProtocolCarousel
+          recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
+        />
+      </>
+    )
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
@@ -59,22 +80,7 @@ export function RobotDashboard(): JSX.Element {
         {showWelcomeModal ? (
           <WelcomedModal setShowWelcomeModal={setShowWelcomeModal} />
         ) : null}
-        {recentRunsOfUniqueProtocols.length === 0 ? (
-          <EmptyRecentRun />
-        ) : (
-          <>
-            <StyledText
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack70}
-            >
-              {t('run_again')}
-            </StyledText>
-            <RecentRunProtocolCarousel
-              recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
-            />
-          </>
-        )}
+        {contents}
       </Flex>
     </Flex>
   )

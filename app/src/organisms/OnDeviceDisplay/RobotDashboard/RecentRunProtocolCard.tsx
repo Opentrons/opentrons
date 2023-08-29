@@ -23,7 +23,6 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingHardwareText } from './hooks'
 import {
   RUN_STATUS_FAILED,
@@ -73,7 +72,8 @@ export function ProtocolWithLastRun({
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
   const chipText = useMissingHardwareText(missingProtocolHardware)
-  // const trackEvent = useTrackEvent()
+  const trackEvent = useTrackEvent()
+  // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(`runs/${createRunResponse.data.id}/setup`)
@@ -87,8 +87,8 @@ export function ProtocolWithLastRun({
     flex: 1 0 0;
     &:active {
       background-color: ${isReadyToBeReRun
-        ? COLORS.green3Pressed
-        : COLORS.yellow3Pressed};
+      ? COLORS.green3Pressed
+      : COLORS.yellow3Pressed};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -117,10 +117,11 @@ export function ProtocolWithLastRun({
   const handleCardClick = (): void => {
     setShowSpinner(true)
     cloneRun()
-    // trackEvent({
-    //   name: 'proceedToRun',
-    //   properties: { sourceLocation: 'RecentRunProtocolCard' },
-    // })
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RecentRunProtocolCard' },
+    })
+    // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
     // trackProtocolRunEvent({ name: 'runAgain' })
   }
 
