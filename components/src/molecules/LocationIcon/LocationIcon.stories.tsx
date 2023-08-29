@@ -47,6 +47,7 @@ export default {
     },
   },
   component: LocationIcon,
+  // Note (kk:08/29/2023) this component is located in components so avoid importing const from app
   parameters: {
     viewport: {
       viewports: customViewports,
