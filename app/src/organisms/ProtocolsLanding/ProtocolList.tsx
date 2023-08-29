@@ -203,8 +203,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               <MenuItem onClick={() => handleProtocolsSortKey('alphabetical')}>
                 {t('shared:alphabetical')}
               </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('flex')}>
-                {t('robot_type_first', { robotType: FLEX })}
+              <MenuItem onClick={() => handleProtocolsSortKey('reverse')}>
+                {t('shared:reverse')}
               </MenuItem>
               <MenuItem onClick={() => handleProtocolsSortKey('recent')}>
                 {t('most_recent_updates')}
@@ -212,11 +212,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               <MenuItem onClick={() => handleProtocolsSortKey('oldest')}>
                 {t('oldest_updates')}
               </MenuItem>
+              <MenuItem onClick={() => handleProtocolsSortKey('flex')}>
+                {t('robot_type_first', { robotType: FLEX })}
+              </MenuItem>
               <MenuItem onClick={() => handleProtocolsSortKey('ot2')}>
                 {t('robot_type_first', { robotType: OT2 })}
-              </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('reverse')}>
-                {t('shared:reverse')}
               </MenuItem>
             </Flex>
           )}
