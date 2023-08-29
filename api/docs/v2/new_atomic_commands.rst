@@ -373,7 +373,6 @@ Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-ra
 
 Dispense
 --------
-To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method lets you specify the aspiration volume in µL, the well location, and aspiration speed. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to remove 200 µL from well location A1.
 
 To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.dispense` method. This method lets you specify the dispense volume in µL, the well location, and pipette flow rate. For example, this snippet tells the robot to dispense 200 µL into well location B1.
 
@@ -383,8 +382,10 @@ To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.di
     
 Dispense by Well or Location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 The ``aspirate()`` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``.
 
+.. copy from aspirate section
 **By Well**
 
 You can also just specify the volume to aspirate, and not mention a location. For example, if our pipette holds 100 uL and you want to dispense a second time from its current location (``plate['A1'])``), you could call the ``dispense()`` method again without a location argument:: 
