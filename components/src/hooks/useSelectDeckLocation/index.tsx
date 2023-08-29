@@ -61,7 +61,7 @@ export function DeckLocationSelect({
         if (isSelected) fill = COLORS.highlightPurple1
         if (isDisabled) fill = COLORS.darkGreyDisabled
         return (
-          <>
+          <React.Fragment key={slot.id}>
             <DeckSlotLocation
               slotName={slot.id}
               slotBaseColor={fill}
@@ -90,7 +90,7 @@ export function DeckLocationSelect({
                 </Text>
               </RobotCoordsForeignDiv>
             ) : null}
-          </>
+          </React.Fragment>
         )
       })}
       <SlotLabels
