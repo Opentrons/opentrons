@@ -225,6 +225,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
+        hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
