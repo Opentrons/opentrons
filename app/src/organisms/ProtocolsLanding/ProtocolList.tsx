@@ -49,7 +49,8 @@ const SORT_BY_BUTTON_STYLE = css`
     background-color: ${COLORS.medGreyEnabled};
   }
 `
-
+const FLEX = 'Flex'
+const OT2 = 'OT-2'
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
@@ -106,6 +107,12 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     },
     oldest: {
       label: t('oldest_updates'),
+    },
+    flex: {
+      label: t('robot_type_first', { robotType: FLEX }),
+    },
+    ot2: {
+      label: t('robot_type_first', { robotType: OT2 }),
     },
   }
 
@@ -196,14 +203,20 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               <MenuItem onClick={() => handleProtocolsSortKey('alphabetical')}>
                 {t('shared:alphabetical')}
               </MenuItem>
+              <MenuItem onClick={() => handleProtocolsSortKey('flex')}>
+                {t('robot_type_first', { robotType: FLEX })}
+              </MenuItem>
               <MenuItem onClick={() => handleProtocolsSortKey('recent')}>
                 {t('most_recent_updates')}
               </MenuItem>
-              <MenuItem onClick={() => handleProtocolsSortKey('reverse')}>
-                {t('shared:reverse')}
-              </MenuItem>
               <MenuItem onClick={() => handleProtocolsSortKey('oldest')}>
                 {t('oldest_updates')}
+              </MenuItem>
+              <MenuItem onClick={() => handleProtocolsSortKey('ot2')}>
+                {t('robot_type_first', { robotType: OT2 })}
+              </MenuItem>
+              <MenuItem onClick={() => handleProtocolsSortKey('reverse')}>
+                {t('shared:reverse')}
               </MenuItem>
             </Flex>
           )}
