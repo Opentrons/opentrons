@@ -218,9 +218,14 @@ def _finish_test(
     return_tip: bool,
 ) -> None:
     if resources.pipette.has_tip:
+        resources.ctx.home()
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
             trash = resources.pipette.trash_container.wells()[0]
+            if resources.pipette.channels == 96:
+                geometry = trash.geometry
+                geometry._position = geometry._position + Point(-36.0, -25.5, 0)
+                trash.geometry = geometry  # type: ignore[misc]
             # FIXME: this should be a blow_out() at max volume,
             #        but that is not available through PyAPI yet
             #        so instead just dispensing.

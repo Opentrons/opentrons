@@ -31,6 +31,8 @@ def alert_user_ready(message: str, hw: SyncHardwareAPI, delay: int = 0) -> None:
     hw.set_status_bar_state(StatusBarState.PAUSED)
     get_user_ready(message)
     hw.set_status_bar_state(StatusBarState.CONFIRMATION)
+    if delay > 0:
+        print_info(f"Waiting {delay} seconds for scale to stablalize")
     sleep(delay)
 
 

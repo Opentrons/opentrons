@@ -539,7 +539,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         if not support_tip_resupply:
             raise ValueError(f"more trials ({trial_total}) than tips ({total_tips})")
         elif not resources.ctx.is_simulating():
-            ui.get_user_ready(f"prepare {trial_total - total_tips} extra tip-racks")
+            ui.get_user_ready(
+                f"prepare {(trial_total + 1) - total_tips} extra tip-racks"
+            )
     assert resources.recorder is not None
     recorder = resources.recorder
     if resources.ctx.is_simulating():
@@ -653,6 +655,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             cfg,
                             location=next_tip_location,
                         )
+                        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+                        resources.ctx._core.get_hardware().retract(mnt)
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -695,6 +699,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     )
                     ui.print_info("dropping tip")
                     if not cfg.same_tip:
+                        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+                        resources.ctx._core.get_hardware().retract(mnt)
                         _drop_tip(
                             resources.pipette, cfg.return_tip, _minimum_z_height(cfg)
                         )
