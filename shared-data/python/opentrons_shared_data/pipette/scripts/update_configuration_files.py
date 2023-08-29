@@ -260,15 +260,19 @@ def load_and_update_file_from_config(
             model_to_update.pipette_version,
         )
 
-        print("Please select what liquid class you wish to update.\n If you want to update all liquid classes then type 'all'.\n")
-  
+        print(
+            "Please select what liquid class you wish to update.\n If you want to update all liquid classes then type 'all'.\n"
+        )
+
         print(f"choose {LiquidClasses.__name__} or type 'all':")
         for row in list_available_enum(LiquidClasses):
             print(f"\t{row}")
         liquid_classes = input("liquid class: ")
         if liquid_classes == "all":
             for c in LiquidClasses:
-                liquid = update(liquid[c.name.lower()], camel_list_to_update, value_to_update)
+                liquid = update(
+                    liquid[c.name.lower()], camel_list_to_update, value_to_update
+                )
 
                 PipetteLiquidPropertiesDefinition.parse_obj(liquid)
                 filepath = (
@@ -285,16 +289,18 @@ def load_and_update_file_from_config(
                 )
         else:
             lc = list(LiquidClasses)[int(liquid_classes)]
-            liquid = update(liquid[lc.name.lower()], camel_list_to_update, value_to_update)
+            liquid = update(
+                liquid[lc.name.lower()], camel_list_to_update, value_to_update
+            )
             PipetteLiquidPropertiesDefinition.parse_obj(liquid)
 
             filepath = (
-                    ROOT
-                    / "liquid"
-                    / model_to_update.pipette_channels.name.lower()
-                    / model_to_update.pipette_type.value
-                    / lc.name.lower()
-                )
+                ROOT
+                / "liquid"
+                / model_to_update.pipette_channels.name.lower()
+                / model_to_update.pipette_type.value
+                / lc.name.lower()
+            )
             save_data_to_file(
                 filepath,
                 f"{model_to_update.pipette_version.major}_{model_to_update.pipette_version.minor}",
