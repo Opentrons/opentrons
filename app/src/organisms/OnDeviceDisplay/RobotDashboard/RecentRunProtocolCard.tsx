@@ -73,8 +73,8 @@ export function ProtocolWithLastRun({
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
   const chipText = useMissingHardwareText(missingProtocolHardware)
-  const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
+  // const trackEvent = useTrackEvent()
+  // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(`runs/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
@@ -117,11 +117,11 @@ export function ProtocolWithLastRun({
   const handleCardClick = (): void => {
     setShowSpinner(true)
     cloneRun()
-    trackEvent({
-      name: 'proceedToRun',
-      properties: { sourceLocation: 'RecentRunProtocolCard' },
-    })
-    trackProtocolRunEvent({ name: 'runAgain' })
+    // trackEvent({
+    //   name: 'proceedToRun',
+    //   properties: { sourceLocation: 'RecentRunProtocolCard' },
+    // })
+    // trackProtocolRunEvent({ name: 'runAgain' })
   }
 
   const terminationTypeMap: { [runStatus in RunStatus]?: string } = {

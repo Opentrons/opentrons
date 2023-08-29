@@ -3,6 +3,8 @@ import {
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysesQuery,
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { getLabwareSetupItemGroups } from '../utils'
 
@@ -50,10 +52,12 @@ export type ProtocolHardware =
 export const useRequiredProtocolHardware = (
   protocolId: string
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(protocolId, protocolData?.data.analysisSummaries[0].id ?? null, { enabled: protocolData != null })
+  // const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+  //   staleTime: Infinity,
+  // })
+  // const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
   const {
     data: attachedModulesData,
@@ -68,26 +72,26 @@ export const useRequiredProtocolHardware = (
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   if (
-    mostRecentAnalysis == null ||
-    mostRecentAnalysis?.status !== 'completed'
+    analysis == null ||
+    analysis?.status !== 'completed'
   ) {
     return { requiredProtocolHardware: [], isLoading: true }
   }
 
   const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(
-    mostRecentAnalysis
+    analysis
   )
     ? [
-        {
-          hardwareType: 'gripper',
-          connected:
-            attachedInstruments.some(i => i.instrumentType === 'gripper') ??
-            false,
-        },
-      ]
+      {
+        hardwareType: 'gripper',
+        connected:
+          attachedInstruments.some(i => i.instrumentType === 'gripper') ??
+          false,
+      },
+    ]
     : []
 
-  const requiredModules: ProtocolModule[] = mostRecentAnalysis.modules.map(
+  const requiredModules: ProtocolModule[] = analysis.modules.map(
     ({ location, model }) => {
       return {
         hardwareType: 'module',
@@ -99,7 +103,7 @@ export const useRequiredProtocolHardware = (
     }
   )
 
-  const requiredPipettes: ProtocolPipette[] = mostRecentAnalysis.pipettes.map(
+  const requiredPipettes: ProtocolPipette[] = analysis.pipettes.map(
     ({ mount, pipetteName }) => ({
       hardwareType: 'pipette',
       pipetteName: pipetteName,
