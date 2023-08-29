@@ -99,7 +99,7 @@ This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the r
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.15'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -155,7 +155,7 @@ This protocol accomplishes the same thing as the previous example, but does it a
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.15'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -219,7 +219,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -259,7 +259,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel':'2.15'}
+            requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -294,7 +294,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -338,7 +338,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
 
             from opentrons import protocol_api
 
-            requirements = {'robotType':'Flex', 'apiLevel': '2.15'}
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -381,7 +381,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.15'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -478,7 +478,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             :substitutions:
 
             from opentrons import protocol_api
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
                 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(

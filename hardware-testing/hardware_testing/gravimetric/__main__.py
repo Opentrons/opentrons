@@ -195,6 +195,7 @@ class RunArgs:
             vls = helpers._get_volumes(
                 _ctx,
                 args.increment,
+                args.channels,
                 args.pipette,
                 tip,
                 args.user_volumes,
@@ -215,6 +216,7 @@ class RunArgs:
                 vls = helpers._get_volumes(
                     _ctx,
                     args.increment,
+                    args.channels,
                     args.pipette,
                     tip,
                     args.user_volumes,
@@ -313,13 +315,13 @@ def build_gravimetric_cfg(
     return_tip: bool,
     blank: bool,
     mix: bool,
-    inspect: bool,
     user_volumes: bool,
     gantry_speed: int,
     scale_delay: int,
     isolate_channels: List[int],
     extra: bool,
     jog: bool,
+    same_tip: bool,
     run_args: RunArgs,
 ) -> GravimetricConfig:
     """Build."""
@@ -338,7 +340,6 @@ def build_gravimetric_cfg(
         return_tip=return_tip,
         blank=blank,
         mix=mix,
-        inspect=inspect,
         user_volumes=user_volumes,
         gantry_speed=gantry_speed,
         scale_delay=scale_delay,
@@ -346,6 +347,7 @@ def build_gravimetric_cfg(
         kind=ConfigType.gravimetric,
         extra=extra,
         jog=jog,
+        same_tip=same_tip,
     )
 
 
@@ -354,12 +356,12 @@ def build_photometric_cfg(
     tip_volume: int,
     return_tip: bool,
     mix: bool,
-    inspect: bool,
     user_volumes: bool,
     touch_tip: bool,
     refill: bool,
     extra: bool,
     jog: bool,
+    same_tip: bool,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
@@ -379,13 +381,13 @@ def build_photometric_cfg(
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
         return_tip=return_tip,
         mix=mix,
-        inspect=inspect,
         user_volumes=user_volumes,
         touch_tip=touch_tip,
         refill=refill,
         kind=ConfigType.photometric,
         extra=extra,
         jog=jog,
+        same_tip=same_tip,
     )
 
 
@@ -402,12 +404,12 @@ def _main(
             tip,
             args.return_tip,
             args.mix,
-            args.inspect,
             args.user_volumes,
             args.touch_tip,
             args.refill,
             args.extra,
             args.jog,
+            args.same_tip,
             run_args,
         )
         union_cfg = cfg_pm
@@ -419,13 +421,13 @@ def _main(
             args.return_tip,
             False if args.no_blank else True,
             args.mix,
-            args.inspect,
             args.user_volumes,
             args.gantry_speed,
             args.scale_delay,
             args.isolate_channels if args.isolate_channels else [],
             args.extra,
             args.jog,
+            args.same_tip,
             run_args,
         )
 
@@ -473,7 +475,6 @@ if __name__ == "__main__":
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--no-blank", action="store_true")
     parser.add_argument("--mix", action="store_true")
-    parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
@@ -483,6 +484,7 @@ if __name__ == "__main__":
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
     parser.add_argument("--extra", action="store_true")
     parser.add_argument("--jog", action="store_true")
+    parser.add_argument("--same-tip", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     try:

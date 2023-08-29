@@ -16,7 +16,7 @@ The examples in this section would be added to the following:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -123,7 +123,7 @@ For this section, instead of using the protocol defined above, consider this set
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -212,7 +212,7 @@ The examples in this section should be inserted in the following:
 .. code-block:: python
     :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -420,7 +420,7 @@ will be displayed in the Opentrons App when protocol execution pauses.
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
@@ -452,7 +452,7 @@ None of these functions take any arguments:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
@@ -474,7 +474,7 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
@@ -493,7 +493,7 @@ You can turn the robot rail lights on or off in the protocol using :py:meth:`.Pr
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # turn on robot rail lights

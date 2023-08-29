@@ -2,11 +2,11 @@
 from time import sleep
 from typing import Optional, Tuple, List, Dict
 
-from opentrons.protocol_api import ProtocolContext, Well, Labware
+from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
-from hardware_testing.opentrons_api.types import Point, OT3Mount
+from hardware_testing.opentrons_api.types import Point, OT3Mount, Axis
 from hardware_testing.drivers import asair_sensor
 
 from . import report
@@ -28,6 +28,7 @@ from .trial import (
     _finish_test,
 )
 from .liquid_class.pipetting import (
+    mix_with_liquid_class,
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
     PipettingCallbacks,
@@ -65,6 +66,9 @@ def _minimum_z_height(cfg: config.GravimetricConfig) -> int:
 
 
 def _generate_callbacks_for_trial(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    test_report: CSVReport,
     recorder: GravimetricRecorder,
     volume: Optional[float],
     channel: int,
@@ -76,6 +80,46 @@ def _generate_callbacks_for_trial(
     # very helpful for debugging and learning more about the system.
     if blank_measurement:
         volume = None
+
+    hw_api = ctx._core.get_hardware()
+    hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+    pip_ax = Axis.of_main_tool_actuator(hw_mount)
+    estimate_bottom: float = -1
+    estimate_aspirated: float = -1
+    encoder_bottom: float = -1
+    encoder_aspirated: float = -1
+
+    def _on_aspirating() -> None:
+        nonlocal estimate_bottom, encoder_bottom
+        recorder.set_sample_tag(
+            create_measurement_tag("aspirate", volume, channel, trial)
+        )
+        if not volume:
+            return
+        estimate_bottom = hw_api.current_position_ot3(hw_mount)[pip_ax]
+        encoder_bottom = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
+
+    def _on_retracting() -> None:
+        nonlocal estimate_aspirated, encoder_aspirated
+        recorder.set_sample_tag(
+            create_measurement_tag("retract", volume, channel, trial)
+        )
+        if not volume or estimate_aspirated >= 0 or encoder_aspirated >= 0:
+            # NOTE: currently in dispense, because trial was already recorded
+            return
+        estimate_aspirated = hw_api.current_position_ot3(hw_mount)[pip_ax]
+        encoder_aspirated = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
+        report.store_encoder(
+            test_report,
+            volume,
+            channel,
+            trial,
+            estimate_bottom,
+            encoder_bottom,
+            estimate_aspirated,
+            encoder_aspirated,
+        )
+
     return PipettingCallbacks(
         on_submerging=lambda: recorder.set_sample_tag(
             create_measurement_tag("submerge", volume, channel, trial)
@@ -83,12 +127,8 @@ def _generate_callbacks_for_trial(
         on_mixing=lambda: recorder.set_sample_tag(
             create_measurement_tag("mix", volume, channel, trial)
         ),
-        on_aspirating=lambda: recorder.set_sample_tag(
-            create_measurement_tag("aspirate", volume, channel, trial)
-        ),
-        on_retracting=lambda: recorder.set_sample_tag(
-            create_measurement_tag("retract", volume, channel, trial)
-        ),
+        on_aspirating=_on_aspirating,
+        on_retracting=_on_retracting,
         on_dispensing=lambda: recorder.set_sample_tag(
             create_measurement_tag("dispense", volume, channel, trial)
         ),
@@ -191,7 +231,14 @@ def _run_trial(
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     global _PREV_TRIAL_GRAMS
     pipetting_callbacks = _generate_callbacks_for_trial(
-        trial.recorder, trial.volume, trial.channel, trial.trial, trial.blank
+        trial.ctx,
+        trial.pipette,
+        trial.test_report,
+        trial.recorder,
+        trial.volume,
+        trial.channel,
+        trial.trial,
+        trial.blank,
     )
 
     def _tag(m_type: MeasurementType) -> str:
@@ -214,7 +261,7 @@ def _run_trial(
             trial.pipette.mount,
             trial.stable,
             trial.env_sensor,
-            shorten=trial.inspect,
+            shorten=False,  # TODO: remove this
             delay_seconds=trial.scale_delay,
         )
         report.store_measurement(trial.test_report, m_tag, m_data)
@@ -229,14 +276,28 @@ def _run_trial(
 
     ui.print_info("recorded weights:")
 
-    # RUN INIT
-    trial.pipette.move_to(
-        trial.well.top(50).move(trial.channel_offset)
-    )  # center channel over well
+    # RUN MIX
+    if trial.mix:
+        mix_with_liquid_class(
+            trial.ctx,
+            trial.pipette,
+            trial.tip_volume,
+            max(trial.volume, 5),
+            trial.well,
+            trial.channel_offset,
+            trial.channel_count,
+            trial.liquid_tracker,
+            callbacks=pipetting_callbacks,
+            blank=trial.blank,
+        )
+    else:
+        # center channel over well
+        trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
     mnt = OT3Mount.RIGHT if trial.pipette.mount == "right" else OT3Mount.LEFT
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
+    # update the vials volumes, using the last-known weight
     if _PREV_TRIAL_GRAMS is not None:
         _evaporation_loss_ul = abs(
             calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
@@ -259,8 +320,6 @@ def _run_trial(
         trial.liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=trial.blank,
-        inspect=trial.inspect,
-        mix=trial.mix,
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -279,8 +338,6 @@ def _run_trial(
         trial.liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=trial.blank,
-        inspect=trial.inspect,
-        mix=trial.mix,
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
@@ -453,7 +510,7 @@ def _get_liquid_height(
     return _liquid_height
 
 
-def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
+def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noqa: C901
     """Run."""
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
@@ -498,6 +555,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
         mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
         resources.ctx._core.get_hardware().retract(mnt)
+        if not resources.ctx.is_simulating():
+            if not cfg.same_tip:
+                ui.get_user_ready("REPLACE first tip with NEW TIP")
+                ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         _liquid_height = _get_liquid_height(resources, cfg, well)
@@ -510,7 +571,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         ui.print_info(
             f"software thinks there is {vial_volume} uL of liquid in the vial"
         )
-        if not cfg.blank or cfg.inspect:
+        if not cfg.blank:
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
         else:
@@ -527,9 +588,12 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             )
 
         ui.print_info("dropping tip")
-        _drop_tip(
-            resources.pipette, return_tip=False, minimum_z_height=_minimum_z_height(cfg)
-        )  # always trash calibration tips
+        if not cfg.same_tip:
+            _drop_tip(
+                resources.pipette,
+                return_tip=False,
+                minimum_z_height=_minimum_z_height(cfg),
+            )  # always trash calibration tips
         calibration_tip_in_use = False
         trial_count = 0
         trials = build_gravimetric_trials(
@@ -574,12 +638,13 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         cfg, resources, channel, total_tips
                     )
                     next_tip_location = next_tip.top().move(channel_offset)
-                    _pick_up_tip(
-                        resources.ctx,
-                        resources.pipette,
-                        cfg,
-                        location=next_tip_location,
-                    )
+                    if not cfg.same_tip:
+                        _pick_up_tip(
+                            resources.ctx,
+                            resources.pipette,
+                            cfg,
+                            location=next_tip_location,
+                        )
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -620,7 +685,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         disp_with_evap,
                     )
                     ui.print_info("dropping tip")
-                    _drop_tip(resources.pipette, cfg.return_tip, _minimum_z_height(cfg))
+                    if not cfg.same_tip:
+                        _drop_tip(
+                            resources.pipette, cfg.return_tip, _minimum_z_height(cfg)
+                        )
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
                 aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(

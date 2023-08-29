@@ -92,7 +92,6 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
-    SensorId,
     ErrorCode,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
