@@ -1,10 +1,17 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
+import {
+  HEATERSHAKER_MODULE_MODELS,
+  TEMPERATURE_MODULE_MODELS,
+  THERMOCYCLER_MODULE_MODELS,
+} from '@opentrons/shared-data/js/constants'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+import { COLORS } from '@opentrons/components'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -20,6 +27,7 @@ interface BeforeBeginningProps extends ModuleCalibrationWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  errorMessage: string | null
 }
 
 export const BeforeBeginning = (
@@ -31,19 +39,57 @@ export const BeforeBeginning = (
     isCreateLoading,
     attachedModule,
     maintenanceRunId,
+    errorMessage,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   React.useEffect(() => {
     createMaintenanceRun({})
   }, [])
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
-  // TODO: get the image for calibration adapter
+
+  let adapterLoadname
+  let adapterDisplaynameKey
+  if (
+    THERMOCYCLER_MODULE_MODELS.some(
+      model => model === attachedModule.moduleModel
+    )
+  ) {
+    adapterLoadname = 'calibration_adapter_thermocycler'
+    adapterDisplaynameKey = 'calibration_adapter_thermocycler'
+  } else if (
+    HEATERSHAKER_MODULE_MODELS.some(
+      model => model === attachedModule.moduleModel
+    )
+  ) {
+    adapterLoadname = 'calibration_adapter_heatershaker'
+    adapterDisplaynameKey = 'calibration_adapter_heatershaker'
+  } else if (
+    TEMPERATURE_MODULE_MODELS.some(
+      model => model === attachedModule.moduleModel
+    )
+  ) {
+    adapterLoadname = 'calibration_adapter_temperature'
+    adapterDisplaynameKey = 'calibration_adapter_temperature'
+  } else {
+    adapterLoadname = ''
+    console.error(
+      `Invalid module type for calibration: ${attachedModule.moduleModel}`
+    )
+    return null
+  }
   const equipmentList = [
     { loadName: 'calibration_probe', displayName: t('pipette_probe') },
-    { loadName: 'calibration_adapter', displayName: t('cal_adapter') },
+    { loadName: adapterLoadname, displayName: t(adapterDisplaynameKey) },
   ]
 
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={t('calibration', { module: moduleDisplayName })}
       rightHandBody={

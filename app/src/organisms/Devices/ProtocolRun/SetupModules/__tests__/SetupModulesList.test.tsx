@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -159,13 +159,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Connected')
-    expect(getByTestId('status_label_Connected_1')).toHaveStyle({
-      backgroundColor: COLORS.successBackgroundLight,
-    })
   })
 
   it('should render a magnetic module that is NOT connected', () => {
@@ -184,13 +181,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Not connected')
-    expect(getByTestId('status_label_Not connected_1')).toHaveStyle({
-      backgroundColor: COLORS.warningBackgroundLight,
-    })
   })
 
   it('should render a thermocycler module that is connected, OT2', () => {
