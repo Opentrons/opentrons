@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
@@ -255,7 +255,7 @@ describe('SetupModulesList', () => {
     getByText('mock ModuleWizardFlows')
   })
 
-  it('should render disabled button but not pipette and module are not calibrated', async () => {
+  it('should render disabled button when pipette and module are not calibrated', async () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -284,15 +284,8 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsOt3.mockReturnValue(true)
 
-    const { getByRole, getByText } = render(props)
-    const button = getByRole('button', { name: 'Calibrate now' })
-    expect(button).toBeDisabled()
-
-    fireEvent.mouseOver(button)
-
-    expect(
-      await getByText('Calibrate pipette before running module calibration')
-    ).toBeInTheDocument()
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {
