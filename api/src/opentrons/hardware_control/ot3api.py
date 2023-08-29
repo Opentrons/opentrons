@@ -34,6 +34,7 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs, feature_flags as ff
@@ -1288,11 +1289,18 @@ class OT3API(
             if origin[axis] - target_pos[axis] > axis_home_dist:
                 target_pos[axis] += axis_home_dist
                 moves = self._build_moves(origin, target_pos)
-                await self._backend.move(
-                    origin,
-                    moves[0],
-                    MoveStopCondition.none,
-                )
+                try:
+                    await self._backend.move(
+                        origin,
+                        moves[0],
+                        MoveStopCondition.none,
+                    )
+                except StallOrCollisionDetectedError:
+                    self._log.warning(
+                        f"Stall on {axis} during fast home, encoder may have missed an overflow"
+                    )
+                    await self._backend.home([axis], self.gantry_load)
+
             await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home
