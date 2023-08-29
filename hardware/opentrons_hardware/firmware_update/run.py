@@ -286,7 +286,7 @@ class RunUpdate:
         await FirmwareUpdateInitiator(messenger).run(
             target=target,
             retry_count=retry_count,
-            ready_wait_time_sec=erase_timeout_seconds,
+            ready_wait_time_sec=timeout_seconds,
         )
 
         prep_progress = 0.1

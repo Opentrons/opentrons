@@ -104,7 +104,7 @@ async def test_run_update(
             erase=should_erase,
         )
     mock_initiator_run.assert_called_once_with(
-        target=target, retry_count=12, ready_wait_time_sec=60
+        target=target, retry_count=12, ready_wait_time_sec=11
     )
     if should_erase:
         mock_eraser_run.assert_called_once_with(
@@ -159,8 +159,8 @@ async def test_run_updates(
 
     mock_initiator_run.assert_has_calls(
         [
-            mock.call(target=target_1, retry_count=3, ready_wait_time_sec=60),
-            mock.call(target=target_2, retry_count=3, ready_wait_time_sec=60),
+            mock.call(target=target_1, retry_count=3, ready_wait_time_sec=5),
+            mock.call(target=target_2, retry_count=3, ready_wait_time_sec=5),
         ]
     )
 
