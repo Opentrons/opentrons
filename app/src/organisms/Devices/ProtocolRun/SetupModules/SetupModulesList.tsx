@@ -122,14 +122,12 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           marginBottom={SPACING.spacing8}
-          data-testid="SetupModulesList_module_name"
           width="45%"
         >
           {t('module_name')}
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_location"
           marginRight={SPACING.spacing16}
           width="15%"
         >
@@ -137,7 +135,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_connection_status"
           marginRight={SPACING.spacing16}
           width="15%"
         >
@@ -148,7 +145,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         flexDirection={DIRECTION_COLUMN}
         width="100%"
         overflowY="auto"
-        data-testid="SetupModulesList_ListView"
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
@@ -162,7 +158,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 )}_slot_${slotName}`}
                 moduleModel={moduleDef.model}
                 displayName={moduleDef.displayName}
-                location={slotName}
+                slotName={slotName}
                 attachedModuleMatch={attachedModuleMatch}
                 heaterShakerModuleFromProtocol={
                   moduleRenderInfoForProtocolById[moduleId].moduleDef
@@ -183,7 +179,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 interface ModulesListItemProps {
   moduleModel: ModuleModel
   displayName: string
-  location: string
+  slotName: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isOt3: boolean
@@ -192,7 +188,7 @@ interface ModulesListItemProps {
 export function ModulesListItem({
   moduleModel,
   displayName,
-  location,
+  slotName,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
   isOt3,
@@ -262,7 +258,6 @@ export function ModulesListItem({
     if (attachedModuleMatch == null) {
       return (
         <StatusLabel
-          id={location}
           status={moduleConnectionStatus}
           backgroundColor={COLORS.warningBackgroundLight}
           iconColor={COLORS.warningEnabled}
@@ -272,7 +267,6 @@ export function ModulesListItem({
     } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
       return (
         <StatusLabel
-          id={location}
           status={moduleConnectionStatus}
           backgroundColor={COLORS.successBackgroundLight}
           iconColor={COLORS.successEnabled}
@@ -294,6 +288,7 @@ export function ModulesListItem({
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
+          initialSlotName={slotName}
         />
       ) : null}
       <Box
@@ -303,7 +298,6 @@ export function ModulesListItem({
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
-        data-testid="ModulesListItem_Row"
       >
         {showHeaterShakerFlow && heaterShakerModuleFromProtocol != null ? (
           <HeaterShakerWizard
@@ -336,7 +330,7 @@ export function ModulesListItem({
                   ? isOt3
                     ? TC_MODULE_LOCATION_OT3
                     : TC_MODULE_LOCATION_OT2
-                  : location,
+                  : slotName,
             })}
           </StyledText>
           <Flex width="15%">

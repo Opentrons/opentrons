@@ -10,7 +10,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import { THERMOCYCLER_MODULE_MODELS } from '@opentrons/shared-data/js/constants'
 import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { BODY_STYLE } from './constants'
 import {
   Flex,
   RESPONSIVENESS,
@@ -26,7 +25,6 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
   isExiting: boolean
-  slotName: string | undefined
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -37,6 +35,14 @@ const IN_PROGRESS_STYLE = css`
     font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
     margin-top: ${SPACING.spacing4};
+  }
+`
+const BODY_STYLE = css`
+  ${TYPOGRAPHY.pRegular};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: 1.275rem;
+    line-height: 1.75rem;
   }
 `
 

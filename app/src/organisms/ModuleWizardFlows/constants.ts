@@ -1,5 +1,9 @@
-import { css } from 'styled-components'
-import { RESPONSIVENESS, TYPOGRAPHY } from '@opentrons/components'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  ModuleType,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
@@ -18,13 +22,11 @@ export const FLOWS = {
 export const CAL_PIN_LOADNAME = 'calibration_pin' as const
 export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
 
+export const FLEX_SLOT_NAMES_BY_MOD_TYPE: {
+  [moduleType in ModuleType]?: string[]
+} = {
+  [HEATERSHAKER_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3'],
+  [TEMPERATURE_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3'],
+  [THERMOCYCLER_MODULE_TYPE]: ['B1'],
+}
 export const LEFT_SLOTS: string[] = ['A1', 'B1', 'C1', 'D1']
-
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
