@@ -51,7 +51,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveTarget,
     ZeroLengthMoveError,
 )
-
+from opentrons_shared_data.pipette.types import LiquidClasses
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from .util import use_or_initialize_loop, check_motion_bounds
@@ -1572,7 +1572,10 @@ class OT3API(
 
     # Pipette action API
     async def prepare_for_aspirate(
-        self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        rate: float = 1.0,
+        liquid_class: Optional[LiquidClasses] = None,
     ) -> None:
         """Prepare the pipette for aspiration."""
         checked_mount = OT3Mount.from_mount(mount)
@@ -1580,6 +1583,7 @@ class OT3API(
         self._pipette_handler.ready_for_tip_action(
             instrument, HardwareAction.PREPARE_ASPIRATE
         )
+        instrument.configure_liquid_class(liquid_class)
         if instrument.current_volume == 0:
             await self._move_to_plunger_bottom(checked_mount, rate)
             instrument.ready_to_aspirate = True

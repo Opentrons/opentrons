@@ -1,10 +1,10 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import commands as cmd
@@ -592,7 +592,9 @@ def test_set_movement_speed(subject: PipetteStore) -> None:
 
 def test_add_pipette_config(
     subject: PipetteStore,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should issue an action to add a pipette config."""
     subject.handle_action(
@@ -602,16 +604,8 @@ def test_add_pipette_config(
             config=LoadedStaticPipetteData(
                 model="pipette-model",
                 display_name="pipette name",
-                min_volume=1.23,
-                max_volume=4.56,
                 channels=7,
-                flow_rates=FlowRates(
-                    default_aspirate={"a": 1},
-                    default_dispense={"b": 2},
-                    default_blow_out={"c": 3},
-                ),
-                tip_configuration_lookup_table={4: supported_tip_fixture},
-                nominal_tip_overlap={"default": 5},
+                liquid_properties=pipette_liquid_properties_fixture,
                 home_position=8.9,
                 nozzle_offset_z=10.11,
             ),
@@ -622,11 +616,8 @@ def test_add_pipette_config(
         model="pipette-model",
         serial_number="pipette-serial",
         display_name="pipette name",
-        min_volume=1.23,
-        max_volume=4.56,
         channels=7,
-        tip_configuration_lookup_table={4: supported_tip_fixture},
-        nominal_tip_overlap={"default": 5},
+        liquid_properties=pipette_liquid_properties_fixture,
         home_position=8.9,
         nozzle_offset_z=10.11,
     )

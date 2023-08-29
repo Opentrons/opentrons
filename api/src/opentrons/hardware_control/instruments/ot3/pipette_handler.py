@@ -228,7 +228,7 @@ class PipetteHandlerProvider:
                 "default_blow_out_flow_rates",
                 "default_dispense_flow_rates",
                 "back_compat_names",
-                "supported_tips",
+                "liquid_properties",
             ]
 
             instr_dict = instr.as_dict()

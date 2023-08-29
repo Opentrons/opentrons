@@ -191,9 +191,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def liquid_class(self) -> PipetteLiquidPropertiesDefinition:
         return self._liquid_class
 
-    def configure_liquid_class(self, liquid_class: pip_types.LiquidClasses) -> None:
-        self._liquid_class = self._config.liquid_properties[liquid_class]
-        self._update_active_settings_from_liquid_class()
+    def configure_liquid_class(
+        self, liquid_class: Optional[pip_types.LiquidClasses]
+    ) -> None:
+        if liquid_class:
+            self._liquid_class_name = liquid_class
+            self._liquid_class = self._config.liquid_properties[liquid_class]
+            self._update_active_settings_from_liquid_class()
 
     @property
     def nozzle_offset(self) -> List[float]:

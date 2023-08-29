@@ -3,10 +3,10 @@ import pytest
 import inspect
 from datetime import datetime
 from decoy import Decoy, matchers
-from typing import Any, Optional, cast
+from typing import Any, Optional, cast, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -36,7 +36,6 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleDefinition,
     OFF_DECK_LOCATION,
-    FlowRates,
 )
 
 from opentrons.protocol_engine.state import Config, StateStore
@@ -128,22 +127,16 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
 
 @pytest.fixture
 def loaded_static_pipette_data(
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> LoadedStaticPipetteData:
     """Get a pipette config data value object."""
     return LoadedStaticPipetteData(
         model="pipette_model",
         display_name="pipette name",
-        min_volume=1.23,
-        max_volume=4.56,
         channels=7,
-        flow_rates=FlowRates(
-            default_blow_out={"a": 1.23},
-            default_aspirate={"b": 4.56},
-            default_dispense={"c": 7.89},
-        ),
-        tip_configuration_lookup_table={4.56: supported_tip_fixture},
-        nominal_tip_overlap={"default": 9.87},
+        liquid_properties=pipette_liquid_properties_fixture,
         home_position=10.11,
         nozzle_offset_z=12.13,
     )

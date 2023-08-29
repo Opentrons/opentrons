@@ -15,11 +15,7 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     ChannelCount,
 )
-from opentrons_shared_data.pipette.types import PipetteTipType
-from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    SupportedTipsDefinition,
-)
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 from opentrons_shared_data.gripper import (
     GripperModel,
     GripperDefinition,
@@ -43,7 +39,7 @@ class GripperSpec(InstrumentSpec):
 
 
 class AttachedPipette(TypedDict):
-    config: Optional[PipetteConfigurations]
+    config: Optional[pipette_definition.PipetteConfigurations]
     id: Optional[str]
 
 
@@ -93,7 +89,9 @@ class PipetteDict(InstrumentDict):
     ready_to_aspirate: bool
     has_tip: bool
     default_blow_out_volume: float
-    supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
+    liquid_properties: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ]
 
 
 class PipetteStateDict(TypedDict):

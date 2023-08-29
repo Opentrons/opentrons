@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Tuple
 
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.types import LiquidClasses
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
@@ -42,6 +43,7 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
+    UpdateLiquidClassAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -69,15 +71,16 @@ class StaticPipetteConfig:
     model: str
     serial_number: str
     display_name: str
-    min_volume: float
-    max_volume: float
     channels: int
+    home_position: float
+    nozzle_offset_z: float
     tip_configuration_lookup_table: Dict[
         float, pipette_definition.SupportedTipsDefinition
     ]
-    nominal_tip_overlap: Dict[str, float]
-    home_position: float
-    nozzle_offset_z: float
+    current_liquid_class: pipette_definition.PipetteLiquidPropertiesDefinition
+    liquid_properties: Dict[
+        LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ]
 
 
 @dataclass
@@ -120,19 +123,34 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
         elif isinstance(action, AddPipetteConfigAction):
             config = action.config
+            liquid_class = LiquidClasses.default
             self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
                 serial_number=action.serial_number,
                 model=config.model,
                 display_name=config.display_name,
-                min_volume=config.min_volume,
-                max_volume=config.max_volume,
                 channels=config.channels,
-                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
-                nominal_tip_overlap=config.nominal_tip_overlap,
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
+                tip_configuration_lookup_table={
+                    k.value: v
+                    for k, v in config.liquid_properties[
+                        liquid_class
+                    ].supported_tips.items()
+                },
+                liquid_properties=config.liquid_properties,
+                current_liquid_class=config.liquid_properties[liquid_class],
             )
             self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
+        elif isinstance(action, UpdateLiquidClassAction):
+            conf = self._state.static_config_by_id[action.pipette_id]
+            conf.current_liquid_class = conf.liquid_properties[action.liquid_class]
+            conf.tip_configuration_lookup_table = (
+                {
+                    k.value: v
+                    for k, v in conf.current_liquid_class.supported_tips.items()
+                },
+            )
+            self._state.static_config_by_id[action.pipette_id] = conf
 
     def _handle_command(self, command: Command) -> None:  # noqa: ANN101, C901
         self._update_current_well(command)
@@ -182,7 +200,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     ]
                 except KeyError:
                     tip_configuration = static_config.tip_configuration_lookup_table[
-                        static_config.max_volume
+                        static_config.current_liquid_class.max_volume
                     ]
                 self._state.flow_rates_by_id[pipette_id] = FlowRates(
                     default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
@@ -198,7 +216,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             static_config = self._state.static_config_by_id.get(pipette_id)
             if static_config:
                 tip_configuration = static_config.tip_configuration_lookup_table[
-                    static_config.max_volume
+                    static_config.current_liquid_class.max_volume
                 ]
                 self._state.flow_rates_by_id[pipette_id] = FlowRates(
                     default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
@@ -520,11 +538,11 @@ class PipetteView(HasState[PipetteState]):
 
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""
-        return self.get_config(pipette_id).min_volume
+        return self.get_config(pipette_id).current_liquid_class.min_volume
 
     def get_maximum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's maximum volume."""
-        return self.get_config(pipette_id).max_volume
+        return self.get_config(pipette_id).current_liquid_class.max_volume
 
     def get_instrument_max_height_ot2(self, pipette_id: str) -> float:
         """Get calculated max instrument height for an OT-2."""
@@ -559,7 +577,9 @@ class PipetteView(HasState[PipetteState]):
 
     def get_nominal_tip_overlap(self, pipette_id: str, labware_uri: str) -> float:
         """Get the nominal tip overlap for a given labware from config."""
-        tip_overlaps_by_uri = self.get_config(pipette_id).nominal_tip_overlap
+        tip_overlaps_by_uri = self.get_config(
+            pipette_id
+        ).current_liquid_class.nominal_tip_overlap
 
         try:
             return tip_overlaps_by_uri[labware_uri]

@@ -21,16 +21,12 @@ class LoadedStaticPipetteData:
 
     model: str
     display_name: str
-    min_volume: float
-    max_volume: float
     channels: int
     home_position: float
     nozzle_offset_z: float
-    flow_rates: FlowRates
-    tip_configuration_lookup_table: Dict[
-        float, pipette_definition.SupportedTipsDefinition
+    liquid_properties: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
     ]
-    nominal_tip_overlap: Dict[str, float]
 
 
 def get_virtual_pipette_static_config(
@@ -44,32 +40,13 @@ def get_virtual_pipette_static_config(
         pipette_model.pipette_version,
     )
 
-    # TODO the liquid classes should be made configurable
-    # in a follow-up PR.
-    liquid_class = pip_types.LiquidClasses.default
-    tip_configuration = config.liquid_properties[liquid_class].supported_tips[
-        pip_types.PipetteTipType(config.liquid_properties[liquid_class].max_volume)
-    ]
     return LoadedStaticPipetteData(
         model=str(pipette_model),
         display_name=config.display_name,
-        min_volume=config.liquid_properties[liquid_class].min_volume,
-        max_volume=config.liquid_properties[liquid_class].max_volume,
         channels=config.channels,
         home_position=config.mount_configurations.homePosition,
         nozzle_offset_z=config.nozzle_offset[2],
-        tip_configuration_lookup_table={
-            k.value: v
-            for k, v in config.liquid_properties[liquid_class].supported_tips.items()
-        },
-        flow_rates=FlowRates(
-            default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
-            default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
-            default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
-        ),
-        nominal_tip_overlap=config.liquid_properties[
-            liquid_class
-        ].tip_overlap_dictionary,
+        liquid_properties=config.liquid_properties,
     )
 
 
@@ -78,20 +55,10 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
     return LoadedStaticPipetteData(
         model=pipette_dict["model"],
         display_name=pipette_dict["display_name"],
-        min_volume=pipette_dict["min_volume"],
-        max_volume=pipette_dict["max_volume"],
         channels=pipette_dict["channels"],
-        flow_rates=FlowRates(
-            default_blow_out=pipette_dict["default_blow_out_flow_rates"],
-            default_aspirate=pipette_dict["default_aspirate_flow_rates"],
-            default_dispense=pipette_dict["default_dispense_flow_rates"],
-        ),
-        tip_configuration_lookup_table={
-            k.value: v for k, v in pipette_dict["supported_tips"].items()
-        },
-        nominal_tip_overlap=pipette_dict["tip_overlap"],
         # TODO(mc, 2023-02-28): these two values are not present in PipetteDict
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
         nozzle_offset_z=0,
+        liquid_properties=pipette_dict["liquid_properties"],
     )

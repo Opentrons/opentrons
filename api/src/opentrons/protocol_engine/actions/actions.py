@@ -13,6 +13,7 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
 
 from opentrons_shared_data.errors import EnumeratedError
+from opentrons_shared_data.pipette.types import LiquidClasses
 
 from ..resources import pipette_data_provider
 from ..commands import Command, CommandCreate
@@ -189,6 +190,14 @@ class AddPipetteConfigAction:
     config: pipette_data_provider.LoadedStaticPipetteData
 
 
+@dataclass(frozen=True)
+class UpdateLiquidClassAction:
+    """Update a pipette's current liquid class in the state store."""
+
+    pipette_id: str
+    liquid_class: str
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -206,4 +215,5 @@ Action = Union[
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     AddPipetteConfigAction,
+    UpdateLiquidClassAction,
 ]

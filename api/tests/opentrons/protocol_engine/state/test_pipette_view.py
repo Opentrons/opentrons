@@ -3,7 +3,7 @@ import pytest
 from typing import cast, Dict, List, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.types import MountType, Mount as HwMount
@@ -230,6 +230,9 @@ def test_get_aspirated_volume() -> None:
 
 def test_get_pipette_working_volume(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should get the minimum value of tip volume and max volume."""
     subject = get_pipette_view(
@@ -238,14 +241,15 @@ def test_get_pipette_working_volume(
         },
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                min_volume=1,
-                max_volume=9001,
                 channels=5,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
                 tip_configuration_lookup_table={9001: supported_tip_fixture},
-                nominal_tip_overlap={},
+                current_liquid_class=pipette_liquid_properties_fixture[
+                    pip_types.LiquidClasses.default
+                ],
+                liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
             )
@@ -257,6 +261,9 @@ def test_get_pipette_working_volume(
 
 def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """Should raise an exception that no tip is attached."""
     subject = get_pipette_view(
@@ -265,14 +272,15 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
         },
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                min_volume=1,
-                max_volume=9001,
                 channels=5,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
                 tip_configuration_lookup_table={9001: supported_tip_fixture},
-                nominal_tip_overlap={},
+                current_liquid_class=pipette_liquid_properties_fixture[
+                    pip_types.LiquidClasses.default
+                ],
+                liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
             )
@@ -288,6 +296,9 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
 
 def test_get_pipette_available_volume(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should get the available volume for a pipette."""
     subject = get_pipette_view(
@@ -301,26 +312,28 @@ def test_get_pipette_available_volume(
         aspirated_volume_by_id={"pipette-id": 58},
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                min_volume=1,
-                max_volume=123,
                 channels=3,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
                 tip_configuration_lookup_table={123: supported_tip_fixture},
-                nominal_tip_overlap={},
+                current_liquid_class=pipette_liquid_properties_fixture[
+                    pip_types.LiquidClasses.default
+                ],
+                liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
             ),
             "pipette-id-none": StaticPipetteConfig(
-                min_volume=1,
-                max_volume=123,
                 channels=5,
                 model="blah",
                 display_name="bleh",
                 serial_number="",
                 tip_configuration_lookup_table={123: supported_tip_fixture},
-                nominal_tip_overlap={},
+                current_liquid_class=pipette_liquid_properties_fixture[
+                    pip_types.LiquidClasses.default
+                ],
+                liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
             ),
@@ -418,17 +431,21 @@ def test_get_deck_point(
 
 def test_get_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should return the static pipette configuration that was set for the given pipette."""
     config = StaticPipetteConfig(
         model="pipette-model",
         display_name="display name",
         serial_number="serial-number",
-        min_volume=1.23,
-        max_volume=4.56,
         channels=9,
         tip_configuration_lookup_table={4.56: supported_tip_fixture},
-        nominal_tip_overlap={},
+        current_liquid_class=pipette_liquid_properties_fixture[
+            pip_types.LiquidClasses.default
+        ],
+        liquid_properties=pipette_liquid_properties_fixture,
         home_position=10.12,
         nozzle_offset_z=12.13,
     )
@@ -462,20 +479,25 @@ def test_get_static_config(
 
 def test_get_nominal_tip_overlap(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should return the static pipette configuration that was set for the given pipette."""
     config = StaticPipetteConfig(
         model="",
         display_name="",
         serial_number="",
-        min_volume=0,
-        max_volume=0,
         channels=10,
         tip_configuration_lookup_table={0: supported_tip_fixture},
         nominal_tip_overlap={
             "some-uri": 100,
             "default": 10,
         },
+        current_liquid_class=pipette_liquid_properties_fixture[
+            pip_types.LiquidClasses.default
+        ],
+        liquid_properties=pipette_liquid_properties_fixture,
         home_position=0,
         nozzle_offset_z=0,
     )

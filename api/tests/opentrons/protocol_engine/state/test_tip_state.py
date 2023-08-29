@@ -1,13 +1,13 @@
 """Tests for tip state store and selectors."""
 import pytest
 
-from typing import Optional
+from typing import Optional, Dict
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     Parameters as LabwareParameters,
 )
-from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state.tips import TipStore, TipView
@@ -175,7 +175,9 @@ def test_get_next_tip_skips_picked_up_tip(
     get_next_tip_tips: int,
     input_starting_tip: Optional[str],
     result_well_name: Optional[str],
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should get the next tip in the column if one has been picked up."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
@@ -185,17 +187,9 @@ def test_get_next_tip_skips_picked_up_tip(
             serial_number="pipette-serial",
             config=LoadedStaticPipetteData(
                 channels=input_tip_amount,
-                max_volume=15,
-                min_volume=3,
                 model="gen a",
                 display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
+                liquid_properties=pipette_liquid_properties_fixture,
                 nozzle_offset_z=1.23,
                 home_position=4.56,
             ),
@@ -232,7 +226,9 @@ def test_reset_tips(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
     pick_up_tip_command: commands.PickUpTip,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should be able to reset tip tracking state."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
@@ -242,17 +238,9 @@ def test_reset_tips(
             serial_number="pipette-serial",
             config=LoadedStaticPipetteData(
                 channels=8,
-                max_volume=15,
-                min_volume=3,
                 model="gen a",
                 display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
+                liquid_properties=pipette_liquid_properties_fixture,
                 nozzle_offset_z=1.23,
                 home_position=4.56,
             ),
@@ -271,7 +259,10 @@ def test_reset_tips(
 
 
 def test_handle_pipette_config_action(
-    subject: TipStore, supported_tip_fixture: pipette_definition.SupportedTipsDefinition
+    subject: TipStore,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """Should add pipette channel to state."""
     subject.handle_action(
@@ -280,17 +271,9 @@ def test_handle_pipette_config_action(
             serial_number="pipette-serial",
             config=LoadedStaticPipetteData(
                 channels=8,
-                max_volume=15,
-                min_volume=3,
                 model="gen a",
                 display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
+                liquid_properties=pipette_liquid_properties_fixture,
                 nozzle_offset_z=1.23,
                 home_position=4.56,
             ),
@@ -337,7 +320,9 @@ def test_drop_tip(
     pick_up_tip_command: commands.PickUpTip,
     drop_tip_command: commands.DropTip,
     drop_tip_in_place_command: commands.DropTipInPlace,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    pipette_liquid_properties_fixture: Dict[
+        pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+    ],
 ) -> None:
     """It should be clear tip length when a tip is dropped."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
@@ -347,17 +332,9 @@ def test_drop_tip(
             serial_number="pipette-serial",
             config=LoadedStaticPipetteData(
                 channels=8,
-                max_volume=15,
-                min_volume=3,
                 model="gen a",
                 display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
+                liquid_properties=pipette_liquid_properties_fixture,
                 nozzle_offset_z=1.23,
                 home_position=4.56,
             ),

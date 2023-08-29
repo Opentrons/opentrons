@@ -23,6 +23,7 @@ from typing import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
+from opentrons_shared_data.pipette.types import LiquidClasses
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons import types as top_types
@@ -929,14 +930,17 @@ class API(
 
     # Pipette action API
     async def prepare_for_aspirate(
-        self, mount: top_types.Mount, rate: float = 1.0
+        self,
+        mount: top_types.Mount,
+        rate: float = 1.0,
+        liquid_class: Optional[LiquidClasses] = None,
     ) -> None:
         """
         Prepare the pipette for aspiration.
         """
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE)
-
+        instrument.configure_liquid_class(liquid_class)
         if instrument.current_volume == 0:
             speed = self.plunger_speed(
                 instrument, instrument.blow_out_flow_rate, "aspirate"

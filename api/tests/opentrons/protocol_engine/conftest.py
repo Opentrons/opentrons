@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 import pytest
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
@@ -225,3 +225,20 @@ def supported_tip_fixture() -> pipette_definition.SupportedTipsDefinition:
         dispense=pipette_definition.ulPerMMDefinition(default={"1": [(0, 0, 0)]}),
         defaultBlowoutVolume=5,
     )
+
+
+@pytest.fixture(scope="session")
+def pipette_liquid_properties_fixture(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> Dict[
+    pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
+]:
+    return {
+        pip_types.LiquidClasses.default: pipette_definition.PipetteLiquidPropertiesDefinition(
+            supportedTips={pip_types.PipetteTipType.t1000: supported_tip_fixture},
+            defaultTipOverlapDictionary={},
+            maxVolume=1000,
+            minVolume=5,
+            defaultTipracks=[],
+        )
+    }
