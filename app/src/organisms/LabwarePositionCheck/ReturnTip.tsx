@@ -7,6 +7,7 @@ import {
   getLabwareDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
+  MoveLabwareCreateCommand,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -42,6 +43,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     isRobotMoving,
     chainRunCommands,
     setFatalError,
+    adapterId,
   } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
@@ -70,6 +72,73 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     />,
   ]
 
+  let moveLabware: MoveLabwareCreateCommand[]
+  if (adapterId != null) {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId: adapterId,
+          newLocation: { slotName: location.slotName },
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation:
+            adapterId != null
+              ? { labwareId: adapterId }
+              : { slotName: location.slotName },
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  } else {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation: location,
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  }
+
+  const moveLabwareOffDeck: MoveLabwareCreateCommand[] =
+    adapterId != null
+      ? [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: adapterId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
+      : [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
+
   const handleConfirmPlacement = (): void => {
     const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>(
       (acc, module) => {
@@ -89,14 +158,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     chainRunCommands(
       [
         ...modulePrepCommands,
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: location,
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabware,
         {
           commandType: 'moveToWell' as const,
           params: {
@@ -121,14 +183,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
             },
           },
         },
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabwareOffDeck,
         { commandType: 'home' as const, params: {} },
       ],
       false

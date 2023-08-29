@@ -463,7 +463,7 @@
         },
         "pushOut": {
           "title": "Pushout",
-          "description": "perform a small blow out for accurate dispensing",
+          "description": "push the plunger a small amount farther than necessary for accurate low-volume dispensing",
           "type": "number"
         }
       },
@@ -523,7 +523,7 @@
         },
         "pushOut": {
           "title": "Pushout",
-          "description": "perform a small blow out for accurate dispensing",
+          "description": "push the plunger a small amount farther than necessary for accurate low-volume dispensing",
           "type": "number"
         }
       },

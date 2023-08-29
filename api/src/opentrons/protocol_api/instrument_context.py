@@ -101,7 +101,18 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def starting_tip(self) -> Union[labware.Well, None]:
-        """The starting tip from which the pipette pick up"""
+        """
+        Which well of a tip rack the pipette should start at when automatically choosing tips to pick up.
+
+        See :py:meth:`.pick_up_tip()`.
+
+        .. note::
+
+            In robot software versions 6.3.0 and 6.3.1, protocols specifying API level 2.14 would
+            not respect ``starting_tip`` on the second and subsequent calls to
+            :py:meth:`.InstrumentContext.pick_up_tip` with no argument. This is fixed for all API
+            levels as of robot software version 7.0.0.
+        """
         return self._starting_tip
 
     @starting_tip.setter
@@ -669,6 +680,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will pick up the next available
         tip in its :py:attr:`InstrumentContext.tip_racks` list.
+        Within each tip rack, tips will be picked up in the order specified by
+        the labware definition and :py:meth:`.Labware.wells`.
+        To adjust where the sequence starts, see :py:obj:`.starting_tip`.
 
         The tip to pick up can be manually specified with the `location`
         argument. The `location` argument can be specified in several ways:

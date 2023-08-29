@@ -160,9 +160,9 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - By default, repeated calls to :py:meth:`.drop_tip` cycle through multiple locations above the trash bin to prevent tips from stacking up.
   
-- Known limitations
+- Bug fixes
 
-  - :py:attr:`.InstrumentContext.starting_tip` is not respected on the second and subsequent calls to :py:meth:`.InstrumentContext.pick_up_tip` with no argument.
+  - :py:attr:`.InstrumentContext.starting_tip` is now respected on the second and subsequent calls to :py:meth:`.InstrumentContext.pick_up_tip` with no argument.
 
   
 
