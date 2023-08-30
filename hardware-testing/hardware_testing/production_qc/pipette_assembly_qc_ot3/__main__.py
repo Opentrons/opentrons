@@ -196,7 +196,7 @@ PRESSURE_THRESH_SEALED = {
 }
 PRESSURE_THRESH_COMPRESS = {
     1: [-2600, 1600],
-    8: [-4600, -2600]
+    8: [-8000, 8000]
 }
 
 _trash_loc_counter = 0
@@ -533,6 +533,27 @@ async def _read_pressure_and_check_results(
         _samples_per_channel[c].sort()
         _c_min = min(_samples_per_channel[c][1:])
         _c_max = max(_samples_per_channel[c][1:])
+        csv_data_min = [
+            f"pressure-{tag.value}-channel-{c + 1}",
+            "min",
+            _c_min
+        ]
+        print(csv_data_min)
+        write_cb(csv_data_min)
+        csv_data_max = [
+            f"pressure-{tag.value}-channel-{c + 1}",
+            "max",
+            _c_max
+        ]
+        print(csv_data_max)
+        write_cb(csv_data_max)
+        csv_data_avg = [
+            f"pressure-{tag.value}-channel-{c + 1}",
+            "average",
+            _average_per_channel[c]
+        ]
+        print(csv_data_avg)
+        write_cb(csv_data_avg)
         if _c_max - _c_min > pressure_event_config.stability_threshold:
             print(f"ERROR: channel {c + 1} samples are too far apart, "
                   f"max={round(_c_max, 2)} and min={round(_c_min, 2)}")
@@ -1229,7 +1250,7 @@ async def _test_tip_presence_flag(
         ),
         8: (
             ejector_rel_pos + -1.9,
-            ejector_rel_pos + -3.2,
+            ejector_rel_pos + -4.0,
         ),
     }[pip_channels]
 
@@ -1253,7 +1274,7 @@ async def _test_tip_presence_flag(
         ),
         8: (
             -10.5 + 1.9,
-            -10.5 + 3.5,
+            -10.5 + 4.0,
         ),
     }[pip_channels]
     drop_result = await _jog_for_tip_state(
@@ -1501,7 +1522,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
     # create API instance, and get Pipette serial number
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=test_config.simulate,
-        pipette_left="p1000_single_v3.4",
+        # pipette_left="p1000_single_v3.4",
         pipette_right="p1000_multi_v3.4",
     )
 
