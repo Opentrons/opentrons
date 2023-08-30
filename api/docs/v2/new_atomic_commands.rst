@@ -338,7 +338,7 @@ The ``aspirate()`` method includes a ``location`` parameter that accepts either 
 
 **By Well**
 
-If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of a well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below. See also, :ref:`new-default-op-positions` for information about controlling pipette height for based on well location.
+If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of the well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below. See also, :ref:`new-default-op-positions` for information about controlling pipette height for based on well location.
 
 .. code-block:: python
 
@@ -353,8 +353,8 @@ You can also aspirate on a point along the center, z-axis within a well. For exa
 .. code-block:: python
 
     pipette.pick_up_tip()
-    depth = plate['A1'].bottom(z=2) # aspirate 2mm above well bottom
-    pipette.aspirate(200, depth)
+    depth = plate['A1'].bottom(z=2) # set pipette tp 2mm above well bottom
+    pipette.aspirate(200, depth)    # aspirate 2mm above well bottom
 
 Aspiration Flow Rates
 ^^^^^^^^^^^^^^^^^^^^^
