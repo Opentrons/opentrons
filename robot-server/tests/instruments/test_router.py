@@ -35,6 +35,7 @@ from robot_server.instruments.instrument_models import (
     InstrumentCalibrationData,
     BadPipette,
     BadGripper,
+    PipetteState,
 )
 from robot_server.instruments.router import (
     get_attached_instruments,
@@ -115,7 +116,7 @@ async def test_get_all_attached_instruments(
         subsystem=SubSystem.pipette_right,
     )
 
-    def rehearse_instrument_retrievals() -> None:
+    async def rehearse_instrument_retrievals() -> None:
         decoy.when(ot3_hardware_api.attached_gripper).then_return(
             cast(
                 GripperDict,
@@ -138,6 +139,45 @@ async def test_get_all_attached_instruments(
             {
                 Mount.LEFT: left_pipette_dict,
                 Mount.RIGHT: right_pipette_dict,
+            }
+        )
+
+        decoy.when(await ot3_hardware_api.get_instrument_state(Mount.LEFT)).then_return(
+            {"tip_detected": True}
+        )
+
+        decoy.when(
+            await ot3_hardware_api.get_instrument_state(Mount.RIGHT)
+        ).then_return({"tip_detected": False})
+        decoy.when(ot3_hardware_api.attached_subsystems).then_return(
+            {
+                HWSubSystem.pipette_left: SubSystemState(
+                    ok=True,
+                    current_fw_version=10,
+                    next_fw_version=11,
+                    fw_update_needed=False,
+                    current_fw_sha="some-sha",
+                    pcba_revision="A1",
+                    update_state=None,
+                ),
+                HWSubSystem.pipette_right: SubSystemState(
+                    ok=True,
+                    current_fw_version=11,
+                    next_fw_version=11,
+                    fw_update_needed=False,
+                    current_fw_sha="some-other-sha",
+                    pcba_revision="A1",
+                    update_state=None,
+                ),
+                HWSubSystem.gripper: SubSystemState(
+                    ok=True,
+                    current_fw_version=11,
+                    next_fw_version=11,
+                    fw_update_needed=False,
+                    current_fw_sha="some-other-sha",
+                    pcba_revision="A1",
+                    update_state=None,
+                ),
             }
         )
 
@@ -175,6 +215,7 @@ async def test_get_all_attached_instruments(
             instrumentModel=PipetteModel("abc"),
             serialNumber="my-pipette-id",
             subsystem=SubSystem.pipette_left,
+            firmwareVersion="10",
             data=PipetteData(
                 channels=1,
                 min_volume=1,
@@ -185,10 +226,12 @@ async def test_get_all_attached_instruments(
                     last_modified=None,
                 ),
             ),
+            state=PipetteState(tip_detected=True),
         ),
         Pipette.construct(
             ok=True,
             mount="right",
+            firmwareVersion="11",
             instrumentType="pipette",
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
@@ -204,10 +247,12 @@ async def test_get_all_attached_instruments(
                     last_modified=None,
                 ),
             ),
+            state=PipetteState(tip_detected=False),
         ),
         Gripper.construct(
             ok=True,
             mount="extension",
+            firmwareVersion="11",
             instrumentType="gripper",
             instrumentModel=GripperModelStr("gripperV1"),
             serialNumber="GripperID321",

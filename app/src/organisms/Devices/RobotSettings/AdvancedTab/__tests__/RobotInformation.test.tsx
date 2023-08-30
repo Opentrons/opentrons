@@ -75,4 +75,14 @@ describe('RobotSettings RobotInformation', () => {
     expect(queryByText('4.5.6')).not.toBeInTheDocument()
     expect(queryByText('v0.0 - v5.1')).not.toBeInTheDocument()
   })
+
+  it('should render only one version when min supported protocol version and max supported protocol version are equal', () => {
+    mockGetRobotProtocolApiVersion.mockReturnValue({
+      min: '2.15',
+      max: '2.15',
+    })
+    const [{ getByText, queryByText }] = render()
+    getByText('v2.15')
+    expect(queryByText('v2.15 - v2.15')).not.toBeInTheDocument()
+  })
 })

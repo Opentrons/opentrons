@@ -72,8 +72,16 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 3
+          totalLength: 4
         data:
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -110,6 +118,8 @@ stages:
               createdAt: !anystr
               detail: 'Cannot perform DROPTIP without a tip attached'
               errorCode: '4000'
+              errorInfo: !anydict
+              wrappedErrors: !anylist
             params:
               pipetteId: !anystr
               labwareId: !anystr
@@ -120,4 +130,4 @@ stages:
                   x: 0
                   y: 0
                   z: 0
-              randomizeDropLocation: false
+              alternateDropLocation: false

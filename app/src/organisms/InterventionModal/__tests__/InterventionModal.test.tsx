@@ -1,17 +1,22 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { OT2_STANDARD_MODEL } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
+
 import { i18n } from '../../../i18n'
 import { InterventionModal } from '..'
 import {
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
-  mockMoveLabwareCommand,
+  mockMoveLabwareCommandFromSlot,
+  mockMoveLabwareCommandFromModule,
   truncatedCommandMessage,
 } from '../__fixtures__'
+import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
 
 const ROBOT_NAME = 'Otie'
-const LABWARE_NAME = 'Mock 96 Well Plate'
 
 const mockOnResumeHandler = jest.fn()
 
@@ -28,26 +33,37 @@ describe('InterventionModal', () => {
       robotName: ROBOT_NAME,
       command: mockPauseCommandWithStartTime,
       onResume: mockOnResumeHandler,
+      run: { labware: [], modules: [] } as any,
+      analysis: {
+        commands: [
+          {
+            commandType: 'loadLabware',
+            result: { definition: mockTipRackDefinition },
+          },
+        ],
+      } as CompletedProtocolAnalysis,
     }
   })
 
   it('renders an InterventionModal with the robot name in the header, learn more link, and confirm button', () => {
     const { getByText, getByRole } = render(props)
-    expect(getByText('Perform manual step on Otie')).toBeTruthy()
-    expect(getByText('Learn more about manual steps')).toBeTruthy()
-    expect(getByRole('button', { name: 'Confirm and resume' })).toBeTruthy()
+    getByText('Pause on Otie')
+    getByText('Learn more about manual steps')
+    getByRole('button', { name: 'Confirm and resume' })
   })
 
   it('renders a pause intervention modal given a pause-type command', () => {
     const { getByText } = render(props)
-    expect(getByText(truncatedCommandMessage)).toBeTruthy()
-    expect(getByText(/Paused for [0-9]{2}:[0-9]{2}:[0-9]{2}/)).toBeTruthy()
+    getByText(truncatedCommandMessage)
+    getByText('Paused for')
+    getByText(/[0-9]{2}:[0-9]{2}:[0-9]{2}/)
   })
 
   it('renders a pause intervention modal with an empty timestamp when no start time given', () => {
     props = { ...props, command: mockPauseCommandWithoutStartTime }
     const { getByText } = render(props)
-    expect(getByText('Paused for --:--:--')).toBeTruthy()
+    getByText('Paused for')
+    getByText('--:--:--')
   })
 
   it('clicking "Confirm and resume" triggers the resume handler', () => {
@@ -56,22 +72,67 @@ describe('InterventionModal', () => {
     expect(mockOnResumeHandler).toHaveBeenCalled()
   })
 
-  it('renders a move labware intervention modal given a move labware command', () => {
+  it('renders a move labware intervention modal given a move labware command - slot starting point', () => {
     props = {
       ...props,
-      command: mockMoveLabwareCommand,
-      robotType: OT2_STANDARD_MODEL,
-      moduleRenderInfo: {},
-      labwareRenderInfo: {},
-      labwareName: LABWARE_NAME,
-      oldDisplayLocation: 'Slot 1',
-      newDisplayLocation: 'Slot 2',
+      command: mockMoveLabwareCommandFromSlot,
+      run: {
+        labware: [
+          {
+            id: mockMoveLabwareCommandFromSlot.params.labwareId,
+            displayName: 'mockLabware',
+            location: { slotName: 'A1' },
+            definitionUri: getLabwareDefURI(mockTipRackDefinition),
+          },
+          {
+            id: 'fixedTrash',
+            location: { slotName: 'A3' },
+            loadName: 'opentrons_1_trash_3200ml_fixed',
+          },
+        ],
+        modules: [],
+      } as any,
     }
-    const { getByText } = render(props)
-    getByText('Move Labware')
+    const { getByText, queryAllByText } = render(props)
+    getByText('Move labware on Otie')
     getByText('Labware Name')
-    getByText('Mock 96 Well Plate')
-    getByText('Labware Location')
-    getByText('Slot 1 → Slot 2')
+    getByText('mockLabware')
+    queryAllByText('A1')
+    queryAllByText('D3')
+  })
+
+  it('renders a move labware intervention modal given a move labware command - module starting point', () => {
+    props = {
+      ...props,
+      command: mockMoveLabwareCommandFromModule,
+      run: {
+        labware: [
+          {
+            id: mockMoveLabwareCommandFromModule.params.labwareId,
+            displayName: 'mockLabware',
+            location: { moduleId: 'mockModuleId' },
+            definitionUri: getLabwareDefURI(mockTipRackDefinition),
+          },
+          {
+            id: 'fixedTrash',
+            location: { slotName: 'A3' },
+            loadName: 'opentrons_1_trash_3200ml_fixed',
+          },
+        ],
+        modules: [
+          {
+            id: 'mockModuleId',
+            model: 'heaterShakerModuleV1',
+            location: { slotName: 'C3' },
+          },
+        ],
+      } as any,
+    }
+    const { getByText, queryAllByText } = render(props)
+    getByText('Move labware on Otie')
+    getByText('Labware Name')
+    getByText('mockLabware')
+    queryAllByText('A1')
+    queryAllByText('C1')
   })
 })

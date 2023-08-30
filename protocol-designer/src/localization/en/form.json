@@ -34,7 +34,11 @@
     "labwareLabel": {
       "aspirate": "source",
       "dispense": "destination",
-      "mixLabware": "labware"
+      "mixLabware": "labware",
+      "movedLabware": "labware",
+      "errors": {
+        "labwareSlotIncompatible": "The selected labware and new location are incompatible"
+      }
     },
     "mixVolumeLabel": "mix volume",
     "mixRepetitions": "repetitions",
@@ -110,11 +114,11 @@
       "touchTip": { "label": "touch tip" },
       "moduleActionLabware": { "label": "module" },
       "moduleLabwarePrefix": {
-        "magneticModuleType": "MAG",
-        "temperatureModuleType": "TEMP",
-        "thermocyclerModuleType": "THERMO",
-        "heaterShakerModuleType": "HS",
-        "magneticBlockType": "MAG"
+        "magneticModuleType": "Magnetic Module",
+        "temperatureModuleType": "Temperature Module",
+        "thermocyclerModuleType": "Thermocycler",
+        "heaterShakerModuleType": "Heater-Shaker",
+        "magneticBlockType": "Magnetic Block"
       },
       "magnetAction": {
         "label": "Magnet action",
@@ -183,6 +187,14 @@
         "timer": {
           "heaterShakerSetTimer": "Set timer"
         }
+      },
+      "useGripper": {
+        "label": "use gripper",
+        "toggleOff": "Move labware manually (protocol will pause and prompt)",
+        "toggleOn": "Use gripper to move labware"
+      },
+      "newLocation": {
+        "label": "new location"
       }
     }
   },

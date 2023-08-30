@@ -32,7 +32,7 @@ export function RobotDashboard(): JSX.Element {
     getOnDeviceDisplaySettings
   )
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
-    unfinishedUnboxingFlowRoute === '/robot-settings/rename-robot'
+    unfinishedUnboxingFlowRoute !== null
   )
 
   const recentRunsOfUniqueProtocols = allRuns
@@ -49,9 +49,13 @@ export function RobotDashboard(): JSX.Element {
     .slice(0, MAXIMUM_RECENT_RUN_PROTOCOLS)
 
   return (
-    <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <Flex
+        paddingX={SPACING.spacing40}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing16}
+      >
         {showWelcomeModal ? (
           <WelcomedModal setShowWelcomeModal={setShowWelcomeModal} />
         ) : null}

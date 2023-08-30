@@ -3,7 +3,9 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from typing import Optional, TypeVar, Callable, AsyncIterator, List
+from typing import Optional, TypeVar, Callable, AsyncIterator, List, Tuple
+
+from opentrons_shared_data.errors.exceptions import CommandTimedOutError
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -135,8 +137,17 @@ class SensorScheduler:
                     self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
-            except asyncio.TimeoutError:
-                log.warning("Sensor poll timed out")
+            except asyncio.TimeoutError as te:
+                msg = f"Sensor poll of {sensor_info.node_id.name} timed out"
+                log.warning(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": sensor_info.node_id.name,
+                        "sensor": sensor_info.sensor_type.name,
+                        "sensor_id": sensor_info.sensor_id.name,
+                    },
+                ) from te
             finally:
                 return data_list
 
@@ -160,7 +171,7 @@ class SensorScheduler:
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to write sensor info to {str(sensor_info.node_id)}"
+                f"recieved error {str(error)} trying to write sensor info to {sensor_info.node_id.name}"
             )
 
     async def send_read(
@@ -195,8 +206,17 @@ class SensorScheduler:
                     self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
-            except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
+            except asyncio.TimeoutError as te:
+                msg = f"Sensor Read from {sensor_info.node_id.name} timed out"
+                log.warning(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": sensor_info.node_id.name,
+                        "sensor": sensor_info.sensor_type.name,
+                        "sensor_id": sensor_info.sensor_id.name,
+                    },
+                ) from te
             finally:
                 return data_list
 
@@ -226,7 +246,7 @@ class SensorScheduler:
                     timeout,
                 )
             except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
+                log.warning(f"Sensor Read from {node_id.name} timed out")
             finally:
                 return data_list
 
@@ -268,9 +288,17 @@ class SensorScheduler:
                     self._wait_for_response(reader, _format),
                     timeout,
                 )
-            except asyncio.TimeoutError:
-                log.error(f"Sensor Threshold Read from {sensor_info.node_id} timed out")
-                raise
+            except asyncio.TimeoutError as te:
+                msg = f"Sensor Threshold Read from {sensor_info.node_id.name} timed out"
+                log.error(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": sensor_info.node_id.name,
+                        "sensor": sensor_info.sensor_type.name,
+                        "sensor_id": sensor_info.sensor_id.name,
+                    },
+                ) from te
 
     @staticmethod
     async def _multi_wait_for_response(
@@ -334,8 +362,18 @@ class SensorScheduler:
                 return await asyncio.wait_for(
                     self._read_peripheral_response(reader), timeout
                 )
-            except asyncio.TimeoutError:
-                log.warning(f"No PeripheralStatusResponse from node {node_id}")
+            except asyncio.TimeoutError as te:
+                msg = f"No PeripheralStatusResponse from node {node_id}"
+                log.warning(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": node_id.name,
+                        "sensor": sensor.name,
+                        "sensor_id": sensor_id.name,
+                        "timeout": str(timeout),
+                    },
+                ) from te
                 return False
 
     @staticmethod
@@ -469,3 +507,84 @@ class SensorScheduler:
                 log.error(
                     f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
                 )
+
+    @asynccontextmanager
+    async def monitor_exceed_max_threshold(
+        self,
+        target_sensors: List[SensorInformation],
+        can_messenger: CanMessenger,
+    ) -> AsyncIterator["asyncio.Queue[Tuple[NodeId, ErrorCode]]"]:
+        """While acquired, monitor that a sensor does not exceed its rated."""
+        error_response_queue: "asyncio.Queue[Tuple[NodeId, ErrorCode]]" = (
+            asyncio.Queue()
+        )
+
+        def _async_error_listener(
+            message: MessageDefinition, arb_id: ArbitrationId
+        ) -> None:
+            # FIXME could possibly make this error more generalized for other
+            # sensors in the future
+            # FIXME we don't quite have a way to access the sensor id
+            # from which this message was thrown.
+            if (
+                isinstance(message, ErrorMessage)
+                and message.payload.error_code.value == ErrorCode.over_pressure.value
+            ):
+                error_response_queue.put_nowait(
+                    (
+                        NodeId(arb_id.parts.originating_node_id),
+                        ErrorCode(message.payload.error_code.value),
+                    )
+                )
+
+        def _filter(arbitration_id: ArbitrationId) -> bool:
+            node_id_match = any(
+                NodeId(arbitration_id.parts.originating_node_id) == s.node_id
+                for s in target_sensors
+            )
+            return (node_id_match) and (
+                MessageId(arbitration_id.parts.message_id) == MessageId.error_message
+            )
+
+        for sensor in target_sensors:
+            error = await can_messenger.ensure_send(
+                node_id=sensor.node_id,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(sensor.sensor_type),
+                        sensor_id=SensorIdField(sensor.sensor_id),
+                        binding=SensorOutputBindingField(
+                            SensorOutputBinding.max_threshold_sync.value
+                        ),
+                    )
+                ),
+                expected_nodes=[sensor.node_id],
+            )
+            if error != ErrorCode.ok:
+                log.error(
+                    f"recieved error {str(error)} trying to bind sensor output on {str(sensor.node_id)}"
+                )
+
+        try:
+            can_messenger.add_listener(_async_error_listener, _filter)
+            yield error_response_queue
+        finally:
+            can_messenger.remove_listener(_async_error_listener)
+            for sensor in target_sensors:
+                error = await can_messenger.ensure_send(
+                    node_id=sensor.node_id,
+                    message=BindSensorOutputRequest(
+                        payload=BindSensorOutputRequestPayload(
+                            sensor=SensorTypeField(sensor.sensor_type),
+                            sensor_id=SensorIdField(sensor.sensor_id),
+                            binding=SensorOutputBindingField(
+                                SensorOutputBinding.none.value
+                            ),
+                        )
+                    ),
+                    expected_nodes=[sensor.node_id],
+                )
+                if error != ErrorCode.ok:
+                    log.error(
+                        f"recieved error {str(error)} trying to write unbind sensor output on {str(sensor.node_id)}"
+                    )

@@ -6,6 +6,7 @@ import {
   Box,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
@@ -13,6 +14,7 @@ import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+
 import { ModuleInfo } from '../../ModuleInfo'
 import {
   useModuleRenderInfoForProtocolById,
@@ -49,17 +51,19 @@ export const SetupModulesMap = ({
           deckDef={deckDef}
           viewBox={getStandardDeckViewBox(robotType)}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+          deckFill="#e6e6e6"
+          trashSlotName="A3"
           id="ModuleSetup_deckMap"
         >
           {() => (
             <>
               {map(
                 moduleRenderInfoForProtocolById,
-                ({ x, y, moduleDef, attachedModuleMatch }) => {
+                ({ x, y, moduleDef, attachedModuleMatch, moduleId }) => {
                   const { model } = moduleDef
                   return (
                     <React.Fragment
-                      key={`ModuleSetup_Module_${String(model)}_${x}${y}`}
+                      key={`ModuleSetup_Module_${moduleId}_${x}${y}`}
                     >
                       <Module
                         x={x}
@@ -70,8 +74,7 @@ export const SetupModulesMap = ({
                         <ModuleInfo
                           moduleModel={model}
                           isAttached={attachedModuleMatch != null}
-                          usbPort={attachedModuleMatch?.usbPort.port ?? null}
-                          hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                          physicalPort={attachedModuleMatch?.usbPort ?? null}
                           runId={runId}
                         />
                       </Module>
@@ -79,6 +82,7 @@ export const SetupModulesMap = ({
                   )
                 }
               )}
+              <SlotLabels robotType={robotType} />
             </>
           )}
         </RobotWorkSpace>

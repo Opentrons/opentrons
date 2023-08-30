@@ -7,7 +7,10 @@ import anyio
 from pydantic import ValidationError as PydanticValidationError
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6 as JsonProtocolV6
+from opentrons_shared_data.protocol.models import (
+    ProtocolSchemaV6 as JsonProtocolV6,
+    ProtocolSchemaV7 as JsonProtocolV7,
+)
 
 from opentrons.protocols.models import JsonProtocol as JsonProtocolUpToV5
 
@@ -57,7 +60,9 @@ async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> Non
 async def _validate_json_protocol(info: IdentifiedJsonMain) -> None:
     def validate_sync() -> None:
         try:
-            if info.schema_version == 6:
+            if info.schema_version == 7:
+                JsonProtocolV7.parse_obj(info.unvalidated_json)
+            elif info.schema_version == 6:
                 JsonProtocolV6.parse_obj(info.unvalidated_json)
             else:
                 JsonProtocolUpToV5.parse_obj(info.unvalidated_json)

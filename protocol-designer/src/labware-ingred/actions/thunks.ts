@@ -11,6 +11,7 @@ import {
   DuplicateLabwareAction,
 } from './actions'
 import { ThunkAction } from '../../types'
+import { getRobotType } from '../../file-data/selectors'
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {
@@ -52,7 +53,9 @@ export const createContainer: (
 ) => {
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-  const slot = args.slot || getNextAvailableDeckSlot(initialDeckSetup)
+  const robotType = getRobotType(state)
+  const slot =
+    args.slot || getNextAvailableDeckSlot(initialDeckSetup, robotType)
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]
@@ -84,6 +87,7 @@ export const duplicateLabware: (
   getState
 ) => {
   const state = getState()
+  const robotType = state.fileData.robotType
   const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
     templateLabwareId
   ].labwareDefURI
@@ -92,7 +96,7 @@ export const duplicateLabware: (
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-  const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup)
+  const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
   if (!duplicateSlot)
     console.warn('no slots available, cannot duplicate labware')
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
@@ -108,7 +112,7 @@ export const duplicateLabware: (
       payload: {
         duplicateLabwareNickname,
         templateLabwareId,
-        duplicateLabwareId: uuid(),
+        duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
         slot: duplicateSlot,
       },
     })

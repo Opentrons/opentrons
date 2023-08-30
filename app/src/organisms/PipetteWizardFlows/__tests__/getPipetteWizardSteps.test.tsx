@@ -50,6 +50,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
         section: SECTIONS.RESULTS,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -119,6 +124,11 @@ describe('getPipetteWizardSteps', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -207,6 +217,11 @@ describe('getPipetteWizardSteps', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },

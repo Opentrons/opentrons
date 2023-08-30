@@ -11,13 +11,15 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { BackButton } from '../../atoms/buttons/BackButton'
 import { InstrumentInfo } from '../../organisms/InstrumentInfo'
 
-import type { InstrumentData } from '@opentrons/api-client'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 export const InstrumentDetail = (): JSX.Element => {
-  const { mount } = useParams<{ mount: InstrumentData['mount'] }>()
+  const { mount } = useParams<{ mount: PipetteData['mount'] }>()
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrument =
-    (attachedInstruments?.data ?? []).find(i => i.mount === mount) ?? null
+    (attachedInstruments?.data ?? []).find(
+      (i): i is PipetteData | GripperData => i.ok && i.mount === mount
+    ) ?? null
 
   const displayName =
     instrument?.mount !== 'extension'

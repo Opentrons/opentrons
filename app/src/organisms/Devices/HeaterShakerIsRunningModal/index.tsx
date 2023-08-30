@@ -14,13 +14,13 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
-import { Modal } from '../../../molecules/Modal'
+import { LegacyModal } from '../../../molecules/LegacyModal'
 import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
@@ -83,7 +83,7 @@ export const HeaterShakerIsRunningModal = (
   }
 
   return (
-    <Modal onClose={closeModal} title={title}>
+    <LegacyModal onClose={closeModal} title={title}>
       <Box>
         <HeaterShakerModuleCard module={module} />
       </Box>
@@ -110,6 +110,6 @@ export const HeaterShakerIsRunningModal = (
           {t('keep_shaking_start_run')}
         </PrimaryButton>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

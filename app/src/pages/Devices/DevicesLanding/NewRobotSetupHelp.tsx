@@ -12,7 +12,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { Portal } from '../../../App/portal'
-import { Modal } from '../../../molecules/Modal'
+import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
@@ -35,7 +35,7 @@ export function NewRobotSetupHelp(): JSX.Element {
       </Link>
       <Portal level="top">
         {showNewRobotHelpModal ? (
-          <Modal
+          <LegacyModal
             title={t('how_to_setup_a_robot')}
             onClose={() => setShowNewRobotHelpModal(false)}
           >
@@ -54,7 +54,7 @@ export function NewRobotSetupHelp(): JSX.Element {
                 {t('shared:close')}
               </PrimaryButton>
             </Flex>
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
     </>

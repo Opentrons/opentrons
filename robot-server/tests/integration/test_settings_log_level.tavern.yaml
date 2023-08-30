@@ -38,6 +38,7 @@ stages:
       status_code: 422
       json:
         message: "body.log_level: '{tavern.request_vars.json.log_level}' is not a valid LogLevels"
+        errorCode: '4000'
 ---
 test_name: POST Set log level to nothing
 marks:
@@ -54,3 +55,4 @@ stages:
       status_code: 422
       json:
         message: "log_level must be set"
+        errorCode: '4000'

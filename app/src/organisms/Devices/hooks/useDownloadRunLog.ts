@@ -7,7 +7,6 @@ import {
   getCommands,
   getProtocol,
 } from '@opentrons/api-client'
-import { DEFAULT_PARAMS as DEFAULT_COMMANDS_PARAMS } from '@opentrons/react-api-client/src/runs/useAllCommandsQuery'
 import { IconProps } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
@@ -33,42 +32,62 @@ export function useDownloadRunLog(
       icon: toastIcon,
     })
 
-    getCommands(host as HostConfig, runId as string, DEFAULT_COMMANDS_PARAMS)
+    // first getCommands to get total length of commands
+    getCommands(host as HostConfig, runId as string, {
+      cursor: null,
+      pageLength: 0,
+    })
       .then(response => {
-        const commands = response.data
-        getRun(host as HostConfig, runId as string)
+        const { totalLength } = response.data.meta
+        getCommands(host as HostConfig, runId as string, {
+          cursor: 0,
+          pageLength: totalLength,
+        })
           .then(response => {
-            const runRecord = response.data
-            const runDetails = {
-              ...runRecord,
-              commands,
-            }
-            const protocolId = response.data.data.protocolId ?? null
-            const createdAt = new Date(runRecord.data.createdAt).toISOString()
-            let fileName = `${robotName}_${
-              runRecord.data.protocolId ?? ''
-            }_${createdAt}.json`
+            const commands = response.data
+            getRun(host as HostConfig, runId as string)
+              .then(response => {
+                const runRecord = response.data
+                const runDetails = {
+                  ...runRecord,
+                  commands,
+                }
+                const protocolId = response.data.data.protocolId ?? null
+                const createdAt = new Date(
+                  runRecord.data.createdAt
+                ).toISOString()
+                let fileName = `${robotName}_${
+                  runRecord.data.protocolId ?? ''
+                }_${createdAt}.json`
 
-            if (protocolId != null) {
-              getProtocol(host as HostConfig, protocolId)
-                .then(response => {
-                  const protocolName = response.data.data.metadata.protocolName
+                if (protocolId != null) {
+                  getProtocol(host as HostConfig, protocolId)
+                    .then(response => {
+                      const protocolName =
+                        response.data.data.metadata.protocolName
 
-                  fileName =
-                    protocolName != null
-                      ? `${robotName}_${String(protocolName)}_${createdAt}.json`
-                      : fileName
+                      fileName =
+                        protocolName != null
+                          ? `${robotName}_${String(
+                              protocolName
+                            )}_${createdAt}.json`
+                          : fileName
+                      setIsLoading(false)
+                      downloadFile(runDetails, fileName)
+                    })
+                    .catch((e: Error) => {
+                      setIsLoading(false)
+                      makeToast(e.message, ERROR_TOAST)
+                    })
+                } else {
                   setIsLoading(false)
                   downloadFile(runDetails, fileName)
-                })
-                .catch((e: Error) => {
-                  setIsLoading(false)
-                  makeToast(e.message, ERROR_TOAST)
-                })
-            } else {
-              setIsLoading(false)
-              downloadFile(runDetails, fileName)
-            }
+                }
+              })
+              .catch((e: Error) => {
+                setIsLoading(false)
+                makeToast(e.message, ERROR_TOAST)
+              })
           })
           .catch((e: Error) => {
             setIsLoading(false)

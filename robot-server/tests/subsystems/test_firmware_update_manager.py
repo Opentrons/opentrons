@@ -66,7 +66,10 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 
 
 @pytest.fixture
-def subject(task_runner: TaskRunner, ot3_hardware_api: OT3API) -> FirmwareUpdateManager:
+def subject(
+    task_runner: TaskRunner,
+    ot3_hardware_api: OT3API,
+) -> FirmwareUpdateManager:
     """Get a FirmwareUpdateManager to test."""
     return FirmwareUpdateManager(task_runner, ot3_hardware_api)
 

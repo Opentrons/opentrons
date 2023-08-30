@@ -16,10 +16,10 @@ import {
   TYPOGRAPHY,
   LabwareRender,
 } from '@opentrons/components'
-import { Modal as OddModal } from '../../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
@@ -124,7 +124,7 @@ export const LiquidsLabwareDetailsModal = (
   })
 
   return isOnDevice ? (
-    <OddModal
+    <Modal
       modalSize="large"
       onOutsideClick={closeModal}
       header={{
@@ -155,9 +155,9 @@ export const LiquidsLabwareDetailsModal = (
           </svg>
         </Flex>
       </Flex>
-    </OddModal>
+    </Modal>
   ) : (
-    <Modal
+    <LegacyModal
       onClose={closeModal}
       closeOnOutsideClick
       title={labwareName}
@@ -233,6 +233,6 @@ export const LiquidsLabwareDetailsModal = (
           </Flex>
         </Flex>
       </Box>
-    </Modal>
+    </LegacyModal>
   )
 }

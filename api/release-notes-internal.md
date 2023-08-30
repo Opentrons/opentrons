@@ -4,57 +4,43 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.12.0
+# Internal Release 0.14.0
 
 ## New Stuff In This Release
 
-- If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
+- Return tip heights and some other pipette behaviors are now properly executed based on the kind of tip being used
+- Release Flex robot software builds are now cryptographically signed. If you run a release build, you can only install other properly signed release builds. Note that if the robot was previously on a non-release build this won't latch; remove the update server config file at ``/var/lib/otupdate/config.json`` to go back to signed builds only. 
+- Error handling has been overhauled; all errors now display with an error code for easier reporting. Many of those error codes are the 4000 catchall still but this will improve over time.
+- If there's an error during the post-run cleanup steps, where the robot homes and drops tips, the run should no longer get stuck in a permanent "finishing" state. It should get marked as failed.
+- Further updates to Flex motion control parameters from hardware testing for both gantry and plunger speeds and acceleration
+- Pipette overpressure detection is now integrated.
+- All instrument flows should now show errors if they occur instead of skipping a step
+- Fixes to several incorrect status displays in ODD (i.e. protocols skipping the full-color outcome splash)
+- Robot can now handle json protocol v7
+- Support for PVT (v1.1) grippers
+- Update progress should get displayed after restart for firmware updates
+- Removed `use_pick_up_location_lpc_offset` and `use_drop_location_lpc_offset` from `protocol_context.move_labware` arguments. So they should be removed from any protocols that used them. This change also requires resetting the protocol run database on the robot.
+- Added 'contextual' gripper offsets to deck, labware and module definitions. So, any labware movement offsets that were previously being specified in the protocol should now be removed or adjusted or they will get added twice.
 
-# Internal Release 0.11.0
-
-This is internal release 0.11.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
-
-Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
-
-## Update Notes
-
-- ⚠️ After upgrading your robot to 0.11.0, you'll need to factory-reset its run history before you can use it.
-
-  1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
-  2. Under **Advanced > Factory reset**, select **Choose reset settings.**
-  3. Choose **Clear protocol run history,** and then select **Clear data and restart robot.**
-
-  Note that this will remove all of your saved labware offsets.
-
-  You will need to follow these steps if you subsequently downgrade back to a prior release, too.
-
-## New Stuff In This Release
-
-- The HTTP API will now accept both styles of deck slot name: coordinates like "C2", and integers like "5". Flexes will now return the "C2" style, and OT-2s will continue to return the "5" style.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
-### ODD
-- While many individual flows work, going in between them often does not, you have to use the secret menu
-- The ODD generally won't synch up to what the robot is doing if the app is controlling it - for instance, if you start a protocol from the app the ODD won't follow along on its own
-- The ODD doesn't really tell you if the robot server hasn't started yet; if a robot looks on but has the name "opentrons", or says it's not network-connected when you know it is, probably the server isn't up yet, give it another little bit
-- It can take a while for the robot to start after installing an update (it's the firmware updates happening on boot). Allow 10 minutes after an update that has a firmware change.
-
 ### Robot Control
-- Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot or restart the robot server
-- Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
+- Pipette pressure sensing for liquid-level sensing purposes
 - Labware pick up failure with gripper
+- E-stop integrated handling especially with modules
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
-- Liquid handling protocols with 1 and 8 channel pipettes
+- Protocol behavior
 - Labware movement between slots/modules, both manual and with gripper, from python protocols
 - Labware drop/gripper crash errors, but they're very insensitive
 - Pipette and gripper automated offset calibration
 - Network connectivity and discoverability
-- Firmware update for all devices attached when the robot turns on
+- Firmware update for all devices 
 - Cancelling a protocol run. We're even more sure we fixed this so definitely tell us if it's not.
 - USB connectivity
+- Stall detection firing basically ever unless you clearly ran into something
 
 ### ODD
 - Protocol execution including end-of-protocol screen

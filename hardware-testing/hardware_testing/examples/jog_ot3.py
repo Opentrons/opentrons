@@ -1,6 +1,7 @@
 """Test Jogging."""
 import argparse
 import asyncio
+from typing import Optional
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -60,11 +61,13 @@ async def _exercise_gripper(api: OT3API) -> None:
             print(f"unexpected input: {inp}")
 
 
-async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
+async def _main(
+    is_simulating: bool, mount: types.OT3Mount, speed: Optional[float]
+) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     while True:
-        await helpers_ot3.jog_mount_ot3(api, mount)
+        await helpers_ot3.jog_mount_ot3(api, mount, speed=speed)
         if mount == types.OT3Mount.GRIPPER:
             await _exercise_gripper(api)
         else:
@@ -82,6 +85,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
+    parser.add_argument("--speed", type=float)
     args = parser.parse_args()
     _mount = mount_options[args.mount]
-    asyncio.run(_main(args.simulate, _mount))
+    asyncio.run(_main(args.simulate, _mount, args.speed))

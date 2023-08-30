@@ -10,6 +10,9 @@ from pydantic import BaseModel
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.errors.exceptions import (
+    EStopActivatedError as PE_EStopActivatedError,
+)
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.actions import (
@@ -35,7 +38,10 @@ from opentrons.protocol_engine.execution import (
     TipHandler,
     RunControlHandler,
     RailLightsHandler,
+    StatusBarHandler,
 )
+
+from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
 
 
 @pytest.fixture
@@ -111,6 +117,12 @@ def rail_lights(decoy: Decoy) -> RailLightsHandler:
 
 
 @pytest.fixture
+def status_bar(decoy: Decoy) -> StatusBarHandler:
+    """Get a mocked out StatusBarHandler."""
+    return decoy.mock(cls=StatusBarHandler)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -123,6 +135,7 @@ def subject(
     mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
@@ -139,6 +152,7 @@ def subject(
         run_control=run_control,
         model_utils=model_utils,
         rail_lights=rail_lights,
+        status_bar=status_bar,
     )
 
 
@@ -168,6 +182,7 @@ async def test_execute(
     mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
 ) -> None:
@@ -240,6 +255,7 @@ async def test_execute(
             tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            status_bar=status_bar,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -261,19 +277,27 @@ async def test_execute(
 
 
 @pytest.mark.parametrize(
-    ["command_error", "expected_error"],
+    ["command_error", "expected_error", "unexpected_error"],
     [
         (
-            errors.ProtocolEngineError("oh no"),
+            errors.ProtocolEngineError(message="oh no"),
             matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
+            False,
+        ),
+        (
+            EStopActivatedError("oh no"),
+            matchers.ErrorMatching(PE_EStopActivatedError, match="oh no"),
+            True,
         ),
         (
             RuntimeError("oh no"),
-            matchers.ErrorMatching(errors.UnexpectedProtocolError, match="oh no"),
+            matchers.ErrorMatching(PythonException, match="oh no"),
+            True,
         ),
         (
             asyncio.CancelledError(),
             matchers.ErrorMatching(errors.RunStoppedError),
+            False,
         ),
     ],
 )
@@ -290,10 +314,12 @@ async def test_execute_raises_protocol_engine_error(
     mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
     command_error: Exception,
     expected_error: Any,
+    unexpected_error: bool,
 ) -> None:
     """It should handle an error occuring during execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
@@ -349,6 +375,7 @@ async def test_execute_raises_protocol_engine_error(
             tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            status_bar=status_bar,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]

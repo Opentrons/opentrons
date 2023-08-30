@@ -54,6 +54,8 @@ const mockGripperData = {
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: 'ghi789',
+  ok: true,
+  subsystem: 'gripper',
   data: {
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
@@ -67,6 +69,8 @@ const mockRightPipetteData = {
   instrumentType: 'p50',
   mount: 'right',
   serialNumber: 'abc123',
+  ok: true,
+  subsystem: 'pipette_right',
   data: {
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
@@ -80,6 +84,8 @@ const mockLeftPipetteData = {
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
+  ok: true,
+  subsystem: 'pipette_left',
   data: {
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
@@ -93,7 +99,10 @@ const mock96ChannelData = {
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
+  ok: true,
+  subsystem: 'pipette_left',
   data: {
+    channels: 96,
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
       source: 'default',

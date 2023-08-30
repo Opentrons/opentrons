@@ -1,66 +1,13 @@
-diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index 89696c5b2a..4c2d6184b8 100644
---- a/api/src/opentrons/config/defaults_ot3.py
-+++ b/api/src/opentrons/config/defaults_ot3.py
-@@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
-         OT3AxisKind.X: 375,
-         OT3AxisKind.Y: 375,
-         OT3AxisKind.Z: 35,
--        OT3AxisKind.P: 5,
-+        OT3AxisKind.P: 20,
-         OT3AxisKind.Z_G: 50,
-         OT3AxisKind.Q: 5.5,
-     },
-@@ -98,18 +98,18 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
- 
- DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-     high_throughput={
--        OT3AxisKind.X: 600,
--        OT3AxisKind.Y: 600,
-+        OT3AxisKind.X: 500,
-+        OT3AxisKind.Y: 500,
-         OT3AxisKind.Z: 120,
--        OT3AxisKind.P: 30,
-+        OT3AxisKind.P: 1000,
-         OT3AxisKind.Z_G: 150,
-         OT3AxisKind.Q: 10,
-     },
-     low_throughput={
--        OT3AxisKind.X: 600,
--        OT3AxisKind.Y: 600,
-+        OT3AxisKind.X: 500,
-+        OT3AxisKind.Y: 200,
-         OT3AxisKind.Z: 300,
--        OT3AxisKind.P: 100,
-+        OT3AxisKind.P: 1500,
-         OT3AxisKind.Z_G: 150,
-     },
- )
-@@ -120,7 +120,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
-     high_throughput={
-         OT3AxisKind.X: 10,
-         OT3AxisKind.Y: 10,
--        OT3AxisKind.Z: 5,
-+        OT3AxisKind.Z: 15,
-         OT3AxisKind.P: 5,
-         OT3AxisKind.Z_G: 10,
-         OT3AxisKind.Q: 5,
-@@ -176,8 +176,8 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
-     high_throughput={
-         OT3AxisKind.X: 1.4,
-         OT3AxisKind.Y: 1.4,
--        OT3AxisKind.Z: 1.4,
--        OT3AxisKind.P: 2.2,
-+        OT3AxisKind.Z: 1.5,
-+        OT3AxisKind.P: 0.8,
-         OT3AxisKind.Z_G: 0.67,
-         OT3AxisKind.Q: 1.5,
-     },
+diff --cc hardware-testing/hardware_testing/gravimetric/overrides/api.patch
+index 4035e961fa,1dfde3aa43..0000000000
+deleted file mode 100644,100644
+--- a/hardware-testing/hardware_testing/gravimetric/overrides/api.patch
++++ /dev/null
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-index 3610fc8857..6b4db5dfe5 100644
+index 815dada3b9..30121fc4c8 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 +++ b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-@@ -427,11 +427,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -422,11 +422,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
  
      def set_current_volume(self, new_volume: float) -> None:
          assert new_volume >= 0
@@ -74,7 +21,7 @@ index 3610fc8857..6b4db5dfe5 100644
          self._current_volume += volume_incr
  
      def remove_current_volume(self, volume_incr: float) -> None:
-@@ -439,7 +439,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -434,7 +434,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
          self._current_volume -= volume_incr
  
      def ok_to_add_volume(self, volume_incr: float) -> bool:

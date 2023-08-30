@@ -31,7 +31,7 @@ class StatusBarStateController:
     async def _status_bar_running(self) -> None:
         self._status_bar_state = StatusBarState.RUNNING
         if self._enabled:
-            await self._controller.static_color(status_bar.BLUE)
+            await self._controller.static_color(status_bar.GREEN)
 
     async def _status_bar_paused(self) -> None:
         self._status_bar_state = StatusBarState.PAUSED
@@ -46,7 +46,7 @@ class StatusBarStateController:
     async def _status_bar_software_error(self) -> None:
         self._status_bar_state = StatusBarState.SOFTWARE_ERROR
         if self._enabled:
-            await self._controller.static_color(status_bar.RED)
+            await self._controller.static_color(status_bar.YELLOW)
 
     async def _status_bar_confirm(self) -> None:
         # Confirm should revert to IDLE
@@ -57,7 +57,7 @@ class StatusBarStateController:
     async def _status_bar_run_complete(self) -> None:
         self._status_bar_state = StatusBarState.RUN_COMPLETED
         if self._enabled:
-            await self._controller.static_color(status_bar.GREEN)
+            await self._controller.pulse_color(status_bar.GREEN)
 
     async def _status_bar_updating(self) -> None:
         self._status_bar_state = StatusBarState.UPDATING
@@ -71,7 +71,8 @@ class StatusBarStateController:
         # This animation uses an intermediate color between the blue and the white.
         # This results in a sort of light-blue effect.
         steps: List[status_bar.ColorStep] = [
-            status_bar.ColorStep(LightTransitionType.instant, 1000, status_bar.OFF),
+            status_bar.ColorStep(LightTransitionType.linear, 250, status_bar.OFF),
+            status_bar.ColorStep(LightTransitionType.linear, 750, status_bar.OFF),
             status_bar.ColorStep(LightTransitionType.linear, 1000, status_bar.BLUE),
             status_bar.ColorStep(
                 LightTransitionType.linear,

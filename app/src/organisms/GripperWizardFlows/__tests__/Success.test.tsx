@@ -25,6 +25,7 @@ describe('Success', () => {
           proceed={mockProceed}
           section={SECTIONS.SUCCESS}
           successfulAction={SUCCESSFULLY_ATTACHED_AND_CALIBRATED}
+          isRobotMoving={false}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -46,7 +47,7 @@ describe('Success', () => {
     const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
     })[0]
-    getByText('Gripper Successfully Attached and Calibrated')
+    getByText('Flex Gripper Successfully Attached and Calibrated')
     getByRole('button', { name: 'exit' })
   })
 
@@ -54,7 +55,7 @@ describe('Success', () => {
     const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_CALIBRATED,
     })[0]
-    getByText('Gripper Successfully Calibrated')
+    getByText('Flex Gripper Successfully Calibrated')
     getByRole('button', { name: 'exit' })
   })
 
@@ -62,7 +63,7 @@ describe('Success', () => {
     const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_ATTACHED,
     })[0]
-    getByText('Gripper Successfully Attached')
+    getByText('Flex Gripper Successfully Attached')
     getByRole('button', { name: 'Calibrate gripper' })
   })
 
@@ -70,7 +71,7 @@ describe('Success', () => {
     const { getByText, getByRole } = render({
       successfulAction: SUCCESSFULLY_DETACHED,
     })[0]
-    getByText('Gripper Successfully Detached')
+    getByText('Flex Gripper Successfully Detached')
     getByRole('button', { name: 'exit' })
   })
 })

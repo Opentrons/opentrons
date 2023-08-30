@@ -45,16 +45,18 @@ export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 
 export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
 export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
-export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1]
+export const GRIPPER_V1_2: 'gripperV1.2' = 'gripperV1.2'
+export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2]
 
 // pipette display categories
-export const GEN3: 'GEN3' = 'GEN3'
+export const FLEX: 'FLEX' = 'FLEX'
 export const GEN2: 'GEN2' = 'GEN2'
 export const GEN1: 'GEN1' = 'GEN1'
 
 // pipette mounts
 export const LEFT: 'left' = 'left'
 export const RIGHT: 'right' = 'right'
+export const EXTENSION: 'extension' = 'extension'
 
 // fake slot that PD uses to represent the slot the thermocycler sits in
 export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
@@ -108,15 +110,32 @@ export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
 export const IDENTITY_VECTOR = { x: 0, y: 0, z: 0 }
 
 export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
+export const OT2_ROBOT_TYPE = 'OT-2 Standard' as const
+export const FLEX_ROBOT_TYPE = 'OT-3 Standard' as const
 
+//  TODO(jr, 7/13/23): rename this constant to FLEX_PIPETTES
 export const OT3_PIPETTES = [
-  'p300_single_gen3',
-  'p1000_single_gen3',
-  'p20_single_gen3',
-  'p50_single_gen3',
-  'p50_multi_gen3',
-  'p1000_multi_gen3',
+  'p300_single_flex',
+  'p1000_single_flex',
+  'p20_single_flex',
+  'p50_single_flex',
+  'p50_multi_flex',
+  'p1000_multi_flex',
   'p1000_96',
+]
+export const OT2_PIPETTES = [
+  'p300_single',
+  'p300_multi',
+  'p300_single_gen2',
+  'p300_multi_gen2',
+  'p1000_single',
+  'p1000_single_gen2',
+  'p20_single_gen2',
+  'p20_multi_gen2',
+  'p50_single',
+  'p50_multi',
+  'p10_single',
+  'p10_multi',
 ]
 
 //  magnetic module info
@@ -146,8 +165,8 @@ export const MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM = 53
 
 export const OT2_STANDARD_MODEL: 'OT-2 Standard' = 'OT-2 Standard'
 export const OT2_STANDARD_DECKID: 'ot2_standard' = 'ot2_standard'
-export const OT3_STANDARD_MODEL: 'OT-3 Standard' = 'OT-3 Standard'
-export const OT3_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
+export const FLEX_STANDARD_MODEL: 'OT-3 Standard' = 'OT-3 Standard'
+export const FLEX_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
 
 export const SINGLE_CHANNEL: 'Single-Channel' = 'Single-Channel'
 export const EIGHT_CHANNEL: '8-Channel' = '8-Channel'

@@ -11,7 +11,7 @@ import {
   SPACING,
   Link,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 
 interface DeckCalibrationConfirmModalProps {
@@ -26,7 +26,7 @@ export function DeckCalibrationConfirmModal({
   const { t } = useTranslation(['device_settings', 'shared'])
 
   return (
-    <Modal
+    <LegacyModal
       type="warning"
       title={t('deck_calibration_modal_title')}
       onClose={cancel}
@@ -65,6 +65,6 @@ export function DeckCalibrationConfirmModal({
           </PrimaryButton>
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

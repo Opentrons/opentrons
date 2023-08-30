@@ -11,7 +11,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
 const ROBOT_CAL_HELP_ARTICLE =
@@ -26,7 +26,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
-      <Modal
+      <LegacyModal
         title={t('how_offset_data_works')}
         onClose={props.onCloseClick}
         width="31.25rem"
@@ -75,7 +75,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
             {t('shared:close')}
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }

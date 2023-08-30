@@ -20,6 +20,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  GripperModel,
   getGripperDisplayName,
   getModuleDisplayName,
   getPipetteModelSpecs,
@@ -44,6 +45,7 @@ import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
+import { GripperData } from '@opentrons/api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -161,14 +163,15 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
     data: attachedInstruments,
     isLoading: isInstrumentsQueryLoading,
   } = useInstrumentsQuery({ enabled: isOT3 })
-  const extensionInstrument =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
+  const attachedGripper =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+    ) ?? null
   const leftPipetteModel = pipettesData?.left?.model ?? null
   const rightPipetteModel = pipettesData?.right?.model ?? null
-  const extensionMountDisplayName =
-    extensionInstrument != null &&
-    extensionInstrument.instrumentModel === 'gripperV1'
-      ? getGripperDisplayName(extensionInstrument.instrumentModel)
+  const gripperDisplayName =
+    attachedGripper != null
+      ? getGripperDisplayName(attachedGripper.instrumentModel as GripperModel)
       : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
@@ -186,11 +189,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
         {t('shared:instruments')}
       </StyledText>
 
-      {isInstrumentsQueryLoading ? 'INSTRUMENTS' : null}
-      {isPipetteQueryLoading ? 'PIPETTES' : null}
-      {isPipetteQueryLoading || isInstrumentsQueryLoading ? (
-        <StyledText as="h5">{t('loading').toUpperCase()}</StyledText>
-      ) : (
+      {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
           {leftAndRightMountsPipetteDisplayName != null ? (
             <InstrumentContainer
@@ -211,8 +210,8 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
               }
             />
           ) : null}
-          {extensionMountDisplayName != null ? (
-            <InstrumentContainer displayName={extensionMountDisplayName} />
+          {gripperDisplayName != null ? (
+            <InstrumentContainer displayName={gripperDisplayName} />
           ) : null}
         </Flex>
       )}

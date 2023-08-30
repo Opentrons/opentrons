@@ -21,6 +21,8 @@ def mock_log_control() -> Iterator[MagicMock]:
     argvalues=[
         "/logs/serial.log",
         "/logs/api.log",
+        "/logs/server.log",
+        "/logs/combined_api_server.log",
         "/",
     ],
 )

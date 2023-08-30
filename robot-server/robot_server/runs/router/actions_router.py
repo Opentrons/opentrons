@@ -10,6 +10,7 @@ from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 from robot_server.service.task_runner import TaskRunner, get_task_runner
+from robot_server.robot.control.dependencies import require_estop_in_good_state
 
 from ..engine_store import EngineStore
 from ..run_store import RunStore
@@ -87,6 +88,7 @@ async def create_run_action(
     maintenance_engine_store: MaintenanceEngineStore = Depends(
         get_maintenance_engine_store
     ),
+    check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -101,6 +103,7 @@ async def create_run_action(
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
         maintenance_engine_store: The maintenance run's EngineStore
+        check_estop: Dependency to verify the estop is in a valid state.
     """
     action_type = request_body.data.actionType
     if (
@@ -116,12 +119,10 @@ async def create_run_action(
         )
 
     except RunActionNotAllowedError as e:
-        raise RunActionNotAllowed(detail=str(e)).as_error(
-            status.HTTP_409_CONFLICT
-        ) from e
+        raise RunActionNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e
 
     except RunNotFoundError as e:
-        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),

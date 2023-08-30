@@ -4,6 +4,7 @@ import {
   PAUSE_UNTIL_TEMP,
 } from './constants'
 import { IconName } from '@opentrons/components'
+import { LabwareLocation } from '@opentrons/shared-data'
 import {
   ChangeTipOptions,
   LabwareEntity,
@@ -46,6 +47,7 @@ export type StepFieldName = string
 // | 'labwareLocationUpdate'
 // | 'mix_mmFromBottom'
 // | 'mix_touchTip_mmFromBottom'
+// | 'newLocation'
 // | 'path'
 // | 'pauseAction'
 // | 'pauseHour'
@@ -58,6 +60,7 @@ export type StepFieldName = string
 // | 'stepName'
 // | 'times'
 // | 'touchTip'
+// | 'useGripper'
 // | 'volume'
 // | 'wells'
 // // deck setup form fields
@@ -73,6 +76,7 @@ export type StepFieldName = string
 // | 'aspirate_disposalVol_volume'
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
+  | 'moveLabware'
   | 'moveLiquid'
   | 'mix'
   | 'pause'
@@ -82,6 +86,7 @@ export type StepType =
   | 'thermocycler'
   | 'heaterShaker'
 export const stepIconsByType: Record<StepType, IconName> = {
+  moveLabware: 'move-xy',
   moveLiquid: 'ot-transfer',
   mix: 'ot-mix',
   pause: 'pause',
@@ -210,6 +215,18 @@ export interface HydratedMoveLiquidFormData {
     disposalVolume_volume: number | null | undefined
     blowout_checkbox: boolean
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
+  }
+}
+
+export interface HydratedMoveLabwareFormData {
+  id: string
+  stepType: 'moveLabware'
+  stepName: string
+  description: string | null | undefined
+  fields: {
+    labware: LabwareEntity
+    newLocation: LabwareLocation
+    useGripper: boolean
   }
 }
 export interface HydratedMixFormDataLegacy {

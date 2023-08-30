@@ -307,7 +307,11 @@ class FirmwareUpdateManager:
     _task_runner: TaskRunner
     _hardware_handle: "OT3API"
 
-    def __init__(self, task_runner: TaskRunner, hw_handle: "OT3API") -> None:
+    def __init__(
+        self,
+        task_runner: TaskRunner,
+        hw_handle: "OT3API",
+    ) -> None:
         self._all_updates_by_id = {}
         self._running_updates_by_subsystem = {}
         self._task_runner = task_runner

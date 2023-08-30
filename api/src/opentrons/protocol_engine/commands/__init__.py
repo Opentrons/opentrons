@@ -239,6 +239,23 @@ from .blow_out_in_place import (
     BlowOutInPlace,
 )
 
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarImplementation,
+    SetStatusBarCommandType,
+)
+
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -310,6 +327,12 @@ __all__ = [
     "HomeCreate",
     "HomeResult",
     "HomeCommandType",
+    # retract axis command models
+    "RetractAxis",
+    "RetractAxisCreate",
+    "RetractAxisParams",
+    "RetractAxisResult",
+    "RetractAxisCommandType",
     # load labware command models
     "LoadLabware",
     "LoadLabwareCreate",
@@ -400,6 +423,13 @@ __all__ = [
     "BlowOutInPlaceCreate",
     "BlowOutInPlaceImplementation",
     "BlowOutInPlace",
+    # set status bar command models
+    "SetStatusBar",
+    "SetStatusBarParams",
+    "SetStatusBarCreate",
+    "SetStatusBarResult",
+    "SetStatusBarImplementation",
+    "SetStatusBarCommandType",
     # load liquid command models
     "LoadLiquid",
     "LoadLiquidCreate",

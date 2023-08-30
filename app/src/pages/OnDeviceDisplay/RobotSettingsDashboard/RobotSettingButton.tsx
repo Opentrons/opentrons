@@ -22,20 +22,13 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
-import { toggleDevtools } from '../../../redux/config'
+import { toggleDevtools, toggleHistoricOffsets } from '../../../redux/config'
+import { updateSetting } from '../../../redux/robot-settings'
 
 import type { IconName } from '@opentrons/components'
 import type { Dispatch } from '../../../redux/types'
-
-export type SettingOption =
-  | 'NetworkSettings'
-  | 'RobotName'
-  | 'RobotSystemVersion'
-  | 'TouchscreenSleep'
-  | 'TouchscreenBrightness'
-  | 'TextSize'
-  | 'DeviceReset'
-  | 'UpdateChannel'
+import type { RobotSettingsField } from '../../../redux/robot-settings/types'
+import type { SettingOption, SetSettingOption } from '../RobotSettingsDashboard'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -43,6 +36,10 @@ const SETTING_BUTTON_STYLE = css`
   background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
+
+  &:active {
+    background-color: ${COLORS.darkBlack40};
+  }
 `
 
 interface RobotSettingButtonProps {
@@ -50,14 +47,18 @@ interface RobotSettingButtonProps {
   iconName: IconName
   settingInfo?: string
   currentOption?: SettingOption
-  setCurrentOption?: (currentOption: SettingOption) => void
+  setCurrentOption?: SetSettingOption
   robotName?: string
   isUpdateAvailable?: boolean
   enabledDevTools?: boolean
+  enabledHistoricOffsets?: boolean
   devToolsOn?: boolean
+  historicOffsetsOn?: boolean
   ledLights?: boolean
   lightsOn?: boolean
   toggleLights?: () => void
+  enabledHomeGantry?: boolean
+  homeGantrySettings?: RobotSettingsField
 }
 
 export function RobotSettingButton({
@@ -65,24 +66,39 @@ export function RobotSettingButton({
   settingInfo,
   currentOption,
   setCurrentOption,
+  robotName,
   isUpdateAvailable,
   iconName,
   enabledDevTools,
+  enabledHistoricOffsets,
   devToolsOn,
+  historicOffsetsOn,
   ledLights,
   lightsOn,
   toggleLights,
+  enabledHomeGantry,
+  homeGantrySettings,
 }: RobotSettingButtonProps): JSX.Element {
   const { t, i18n } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const settingValue = homeGantrySettings?.value
+    ? homeGantrySettings.value
+    : false
+  const settingId = homeGantrySettings?.id
+    ? homeGantrySettings.id
+    : 'disableHomeOnBoot'
 
   const handleClick = (): void => {
     if (currentOption != null && setCurrentOption != null) {
       setCurrentOption(currentOption)
     } else if (Boolean(enabledDevTools)) {
       dispatch(toggleDevtools())
+    } else if (Boolean(enabledHistoricOffsets)) {
+      dispatch(toggleHistoricOffsets())
     } else if (Boolean(ledLights)) {
       if (toggleLights != null) toggleLights()
+    } else if (Boolean(enabledHomeGantry) && robotName != null) {
+      dispatch(updateSetting(robotName, settingId, !settingValue))
     }
   }
 
@@ -92,7 +108,6 @@ export function RobotSettingButton({
       onClick={handleClick}
       display={DISPLAY_FLEX}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing24}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
     >
@@ -100,6 +115,8 @@ export function RobotSettingButton({
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
+        width="100%"
+        whiteSpace="nowrap"
       >
         <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
         <Flex
@@ -129,7 +146,7 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing10} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
@@ -137,22 +154,39 @@ export function RobotSettingButton({
           </StyledText>
         </Flex>
       ) : null}
-
+      {enabledHistoricOffsets != null ? (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing12}
+          alignItems={ALIGN_CENTER}
+          backgroundColor={COLORS.transparent}
+          padding={`${SPACING.spacing10} ${SPACING.spacing12}`}
+          borderRadius={BORDERS.borderRadiusSize4}
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {Boolean(historicOffsetsOn) ? t('shared:on') : t('shared:off')}
+          </StyledText>
+        </Flex>
+      ) : null}
       {ledLights != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing10} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadiusSize4}
         >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText
+            data-testid="RobotSettingButton_LED_Lights"
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
             {Boolean(lightsOn) ? t('shared:on') : t('shared:off')}
           </StyledText>
         </Flex>
       ) : null}
-      <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+      <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
         {isUpdateAvailable ?? false ? (
           <InlineNotification
             type="alert"
@@ -160,7 +194,28 @@ export function RobotSettingButton({
             hug={true}
           />
         ) : null}
-        {enabledDevTools == null && ledLights == null ? (
+        {enabledHomeGantry != null ? (
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing12}
+            alignItems={ALIGN_CENTER}
+            backgroundColor={COLORS.transparent}
+            padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+            borderRadius={BORDERS.borderRadiusSize4}
+          >
+            <StyledText
+              data-testid="RobotSettingButton_Home_Gantry"
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+            >
+              {Boolean(settingValue) ? t('shared:on') : t('shared:off')}
+            </StyledText>
+          </Flex>
+        ) : null}
+        {enabledDevTools == null &&
+        enabledHistoricOffsets == null &&
+        ledLights == null &&
+        enabledHomeGantry == null ? (
           <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         ) : null}
       </Flex>

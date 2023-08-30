@@ -152,6 +152,8 @@ class MessageId(int, Enum):
     brushed_motor_conf_request = 0x45
     brushed_motor_conf_response = 0x46
     set_gripper_error_tolerance = 0x47
+    gripper_jaw_state_request = 0x48
+    gripper_jaw_state_response = 0x49
 
     acknowledgement = 0x50
 
@@ -226,6 +228,7 @@ class ErrorCode(int, Enum):
     estop_released = 0x0A
     motor_busy = 0x0B
     stop_requested = 0x0C
+    over_pressure = 0x0D
 
 
 @unique
@@ -292,6 +295,7 @@ class SensorOutputBinding(int, Enum):
     none = 0x0
     sync = 0x01
     report = 0x02
+    max_threshold_sync = 0x04
 
 
 @unique
@@ -362,3 +366,13 @@ class MoveAckId(int, Enum):
     stopped_by_condition = 0x2
     timeout = 0x3
     position_error = 0x4
+
+
+@unique
+class GripperJawState(int, Enum):
+    """Gripper jaw states."""
+
+    unhomed = 0x0
+    force_controlling_home = 0x1
+    force_controlling = 0x2
+    position_controlling = 0x3

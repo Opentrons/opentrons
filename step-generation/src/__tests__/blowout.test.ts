@@ -4,6 +4,7 @@ import {
   makeContext,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
+  getInitialRobotStateWithOffDeckLabwareStandard,
   getErrorResult,
   getSuccessResult,
   DEFAULT_PIPETTE,
@@ -11,6 +12,7 @@ import {
 } from '../fixtures'
 import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { RobotState, InvariantContext } from '../types'
+
 describe('blowout', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState
@@ -76,6 +78,27 @@ describe('blowout', () => {
     expect(res.errors).toHaveLength(1)
     expect(res.errors[0]).toMatchObject({
       type: 'NO_TIP_ON_PIPETTE',
+    })
+  })
+  it('should return an error when blowing out from labware off deck', () => {
+    initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
+      invariantContext
+    )
+    const result = blowout(
+      {
+        flowRate: 10,
+        offsetFromBottomMm: 5,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as BlowoutParams,
+      invariantContext,
+      initialRobotState
+    )
+    expect(getErrorResult(result).errors).toHaveLength(2)
+    expect(getErrorResult(result).errors[1]).toMatchObject({
+      type: 'LABWARE_OFF_DECK',
     })
   })
 })

@@ -10,6 +10,7 @@ import {
 import {
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useChainMaintenanceCommands } from '../../../resources/runs/hooks'
@@ -58,6 +59,9 @@ const mockUseCreateMaintenanceRunMutation = useCreateMaintenanceRunMutation as j
 >
 const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
   typeof useDeleteMaintenanceRunMutation
+>
+const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useCurrentMaintenanceRun
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -139,6 +143,13 @@ describe('PipetteWizardFlows', () => {
     mockUsePipetteFlowWizardHeaderText.mockReturnValue(
       'mock wizard header text'
     )
+    mockUseCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        data: {
+          id: 'mockRunId',
+        } as any,
+      },
+    } as any)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
     const { getByText, getByRole } = render(props)
@@ -155,13 +166,14 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'loadPipette',
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -181,7 +193,12 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(initiate)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
           {
             commandType: 'calibration/calibratePipette',
             params: { mount: LEFT },
@@ -332,6 +349,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           { commandType: 'home' as const, params: {} },
           {
@@ -389,6 +407,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           { commandType: 'home' as const, params: {} },
           {
@@ -449,6 +468,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'loadPipette',
@@ -520,6 +540,7 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           { commandType: 'home' as const, params: {} },
           {
@@ -549,6 +570,7 @@ describe('PipetteWizardFlows', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
           {
             commandType: 'loadPipette',
@@ -574,7 +596,12 @@ describe('PipetteWizardFlows', () => {
     getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
+        'mockRunId',
         [
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
           {
             commandType: 'calibration/calibratePipette',
             params: { mount: LEFT },

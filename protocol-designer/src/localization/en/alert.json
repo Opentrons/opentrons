@@ -49,11 +49,11 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v6_protocol_6_20": {
+    "export_v7_protocol_7_0": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "6.2 or higher",
-      "body3": ". Please ensure your OT-2 is updated to the correct version."
+      "body2": "7.0 or higher",
+      "body3": ". Please ensure your robot is updated to the correct version."
     },
     "change_magnet_module_model": {
       "title": "All existing engage heights will be cleared"
@@ -112,15 +112,15 @@
       },
       "THERMOCYCLER_LID_CLOSED": {
         "title": "Thermocycler lid is closed",
-        "body": "Before a pipette can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
+        "body": "Before the robot can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
       },
       "HEATER_SHAKER_LATCH_OPEN": {
         "title": "Heater-Shaker labware latch is open",
-        "body": "Before a pipette can interact with labware on the Heater-Shaker module, the labware latch must be closed. To resolve this error, please add a Heater-Shaker step ahead of the current step, and set the labware latch status to \"closed\"."
+        "body": "Before the robot can interact with labware on the Heater-Shaker module, the labware latch must be closed. To resolve this error, please add a Heater-Shaker step ahead of the current step, and set the labware latch status to \"closed\"."
       },
       "HEATER_SHAKER_IS_SHAKING": {
         "title": "Heater-Shaker is shaking",
-        "body": "A pipette cannot interact with labware on the Heater-Shaker Module while it is shaking."
+        "body": "the robot cannot interact with labware on the Heater-Shaker Module while it is shaking."
       },
       "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
         "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
@@ -139,6 +139,14 @@
       "HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL": {
         "title": "8-Channel pipette cannot access labware",
         "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
+      },
+      "LABWARE_OFF_DECK": {
+        "title": "Labware is off deck",
+        "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
+      },
+      "HEATER_SHAKER_LATCH_CLOSED": {
+        "title": "Heater-Shaker labware latch is closed",
+        "body": "The Heater-Shaker’s labware latch must be open when moving labware to or from the module. Add a Heater-Shaker step that opens the latch before this step."
       }
     },
     "warning": {
@@ -185,12 +193,12 @@
     "unused_pipette_and_module": {
       "heading": "Unused pipette and module",
       "body1": "The {{pipettesDetails}} and {{modulesDetails}} in your protocol are not currently used in any step. In order to run this protocol you will need to attach this pipette as well as power up and connect the module to your robot.",
-      "body2": "If you don't intend to use them, please consider removing them from your protocol."
+      "body2": "If you don't intend to use them, please consider removing them from your protocol.  Keep in mind that all JSON protocols must specify at least one pipette."
     },
     "unused_pipette": {
       "heading": "Unused pipette",
       "body1": "The {{pipettesDetails}} specified in your protocol is currently not used in any step. In order to run this protocol you will need to attach this pipette to your robot.",
-      "body2": "If you don't intend to use the pipette, please consider removing it from your protocol."
+      "body2": "If you don’t intend to use the pipette, remove it on the File tab. Keep in mind that all JSON protocols must specify at least one pipette."
     },
     "unused_module": {
       "heading": "Unused module",
@@ -201,6 +209,11 @@
       "heading": "Unused modules",
       "body1": "The {{modulesDetails}} specified in your protocol are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.",
       "body2": "If you don't intend to use these modules, please consider removing them from your protocol."
+    },
+    "unused_gripper": {
+      "heading": "Unused gripper",
+      "body1": "The Flex Gripper specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
+      "body2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
     }
   },
   "crash": {

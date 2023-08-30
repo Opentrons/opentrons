@@ -18,6 +18,7 @@ describe('MovePin', () => {
     props?: Partial<React.ComponentProps<typeof MovePin>>
   ) => ReturnType<typeof renderWithProviders>
   let mockCreateRunCommand: jest.Mock
+  let mockSetErrorMessage: jest.Mock
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
@@ -44,6 +45,9 @@ describe('MovePin', () => {
           setFrontJawOffset={mockSetFrontJawOffset}
           frontJawOffset={{ x: 0, y: 0, z: 0 }}
           createRunCommand={mockCreateRunCommand}
+          errorMessage={null}
+          setErrorMessage={mockSetErrorMessage}
+          isExiting={false}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -59,10 +63,15 @@ describe('MovePin', () => {
     const { getByRole } = render()[0]
     await getByRole('button', { name: 'Begin calibration' }).click()
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
-      command: { commandType: 'home', params: { axes: [] } },
+      maintenanceRunId: 'fakeRunId',
+      command: {
+        commandType: 'home',
+        params: { axes: ['extensionZ', 'extensionJaw'] },
+      },
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: { jaw: 'front' },
@@ -70,9 +79,10 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
-        params: { mount: 'left' },
+        params: { mount: 'extension' },
       },
       waitUntilComplete: true,
     })
@@ -96,7 +106,7 @@ describe('MovePin', () => {
 
   it('renders correct loader for move pin to front jaw', () => {
     const { getByText } = render({ isRobotMoving: true })[0]
-    getByText('Stand Back, Gripper is Calibrating')
+    getByText('Stand Back, Flex Gripper is Calibrating')
   })
 
   it('renders correct text for move pin from front jaw to rear with correct callbacks', async () => {
@@ -107,13 +117,18 @@ describe('MovePin', () => {
     getByText(
       'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
     )
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
-      command: { commandType: 'home', params: { axes: [] } },
+      maintenanceRunId: 'fakeRunId',
+      command: {
+        commandType: 'home',
+        params: { axes: ['extensionZ', 'extensionJaw'] },
+      },
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: {
@@ -124,9 +139,10 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
-        params: { mount: 'left' },
+        params: { mount: 'extension' },
       },
       waitUntilComplete: true,
     })
@@ -138,7 +154,7 @@ describe('MovePin', () => {
       isRobotMoving: true,
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
-    getByText('Stand Back, Gripper is Calibrating')
+    getByText('Stand Back, Flex Gripper is Calibrating')
   })
 
   it('renders correct text for remove pin from rear jaw', () => {
@@ -157,6 +173,15 @@ describe('MovePin', () => {
     const { getByText } = render({
       isRobotMoving: true,
       movement: REMOVE_PIN_FROM_REAR_JAW,
+    })[0]
+    getByText('Stand Back, Robot is in Motion')
+  })
+
+  it('renders correct loader for early exiting', () => {
+    const { getByText } = render({
+      isRobotMoving: true,
+      isExiting: true,
+      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
     getByText('Stand Back, Robot is in Motion')
   })

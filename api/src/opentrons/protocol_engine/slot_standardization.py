@@ -24,8 +24,10 @@ from .types import (
     OFF_DECK_LOCATION,
     DeckSlotLocation,
     LabwareLocation,
+    NonStackedLocation,
     LabwareOffsetCreate,
     ModuleLocation,
+    OnLabwareLocation,
 )
 
 
@@ -119,6 +121,18 @@ _standardize_command_functions: Dict[
 def _standardize_labware_location(
     original: LabwareLocation, robot_type: RobotType
 ) -> LabwareLocation:
+    if isinstance(original, DeckSlotLocation):
+        return _standardize_deck_slot_location(original, robot_type)
+    elif (
+        isinstance(original, (ModuleLocation, OnLabwareLocation))
+        or original == OFF_DECK_LOCATION
+    ):
+        return original
+
+
+def _standardize_adapter_location(
+    original: NonStackedLocation, robot_type: RobotType
+) -> NonStackedLocation:
     if isinstance(original, DeckSlotLocation):
         return _standardize_deck_slot_location(original, robot_type)
     elif isinstance(original, ModuleLocation) or original == OFF_DECK_LOCATION:

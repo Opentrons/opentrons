@@ -23,7 +23,7 @@ const Table = styled('table')`
   border-collapse: separate
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing4};
+  border-spacing: 0 ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
@@ -77,8 +77,8 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
-              fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.darkBlack70}
+              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
@@ -87,10 +87,12 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
           </TableHeader>
           <TableHeader>
             <StyledText
-              fontSize={TYPOGRAPHY.fontSize20}
+              alignItems={ALIGN_CENTER}
               color={COLORS.darkBlack70}
+              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingRight={SPACING.spacing12}
+              textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {i18n.format(t('quantity'), 'sentenceCase')}
             </StyledText>
@@ -121,11 +123,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
-                  <StyledText
-                    as="p"
-                    alignItems={ALIGN_CENTER}
-                    color={COLORS.darkBlack100}
-                  >
+                  <StyledText as="p" alignItems={ALIGN_CENTER}>
                     {name}
                   </StyledText>
                 </Flex>
@@ -134,7 +132,6 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                 <StyledText
                   as="p"
                   alignItems={ALIGN_CENTER}
-                  color={COLORS.darkBlack100}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {count}

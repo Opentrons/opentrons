@@ -133,3 +133,7 @@
 .module_model {
   height: 3rem;
 }
+
+.pipette_select {
+  width: 100%;
+}

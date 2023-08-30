@@ -6,7 +6,7 @@
 Building Block Commands
 #######################
 
-Building block, or basic, commands are the smallest individual actions that can be completed on an OT-2.
+Building block, or basic, commands are the smallest individual actions that can be completed on an Opentrons robot.
 For example, the complex command ``transfer`` (see :ref:`v2-complex-commands`) executes a series of ``pick_up_tip()``, ``aspirate()``, ``dispense()`` and ``drop_tip()`` basic commands.
 
 The examples in this section would be added to the following:
@@ -28,11 +28,11 @@ The examples in this section would be added to the following:
 This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 3, and uses a P300 Single GEN2 pipette.
 
 
-**************
+************
 Tip Handling
-**************
+************
 
-When the OT-2 handle liquids with, it constantly exchanges old, used tips for new ones to prevent cross-contamination between wells. Tip handling uses the functions :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`.
+By default, the robot constantly exchanges old, used tips for new ones to prevent cross-contamination between wells. Tip handling uses the functions :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`.
 
 Pick Up Tip
 ===========
@@ -256,7 +256,7 @@ Now our pipette's tip is holding 100 µL.
 
 .. note::
 
-    By default, the OT-2 will move to 1mm above the bottom of the target well before aspirating.
+    By default, the pipette will move to 1 mm above the bottom of the target well before aspirating.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``aspirate``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
@@ -283,7 +283,7 @@ The ``rate`` parameter is a multiplication factor of the pipette's default dispe
 
 .. note::
 
-    By default, the OT-2 will move to 1mm above the bottom of the target well before dispensing.
+    By default, the pipette will move to 1 mm above the bottom of the target well before dispensing.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``dispense``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
@@ -397,9 +397,9 @@ Utility Commands
 Delay for an Amount of Time
 ===========================
 
-Sometimes you need to wait as a step in your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to wait your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol and the OT-2 as a whole.
+Sometimes you need to wait as a step in your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to wait your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol as a whole.
 
-The values passed into ``delay()`` specify the number of minutes and seconds that the OT-2 will wait until moving on to the next command.
+The values passed into ``delay()`` specify the number of minutes and seconds that the robot will wait until moving on to the next command.
 
 .. code-block:: python
 
@@ -425,7 +425,7 @@ will be displayed in the Opentrons App when protocol execution pauses.
     def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
 
-        # The OT-2 stops here until you press resume. It will display the message in
+        # The protocol stops here until you press resume. The optional message appears in
         # the Opentrons App. You do not need to specify a message, but it makes things
         # more clear.
         protocol.pause('Time to take a break')
@@ -435,11 +435,11 @@ will be displayed in the Opentrons App when protocol execution pauses.
 Homing
 ======
 
-You can manually request that the OT-2 home during protocol execution. This is typically
+You can manually request for the robot to home during protocol execution. This is typically
 not necessary; however, if at any point you will disengage motors or move
 the gantry with your hand, you may want to command a home afterwards.
 
-To home the entire OT-2, you can call :py:meth:`.ProtocolContext.home`.
+To home the all axes, you can call :py:meth:`.ProtocolContext.home`.
 
 To home a specific pipette's Z axis and plunger, you can call :py:meth:`.InstrumentContext.home`.
 
@@ -515,6 +515,8 @@ You can also check whether the rail lights are on or off in the protocol using :
 
 .. versionadded:: 2.5
 
+
+.. TODO clarify that this is specific to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
 
 Monitor Robot Door
 ==================

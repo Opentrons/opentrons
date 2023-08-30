@@ -8,17 +8,19 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { ConnectionTroubleshootingModal } from '../ConnectionTroubleshootingModal'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsRobotBusy } from '../hooks'
 
 import {
   mockUnreachableRobot,
   mockConnectedRobot,
 } from '../../../redux/discovery/__fixtures__'
 
-jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot-update/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../ChooseProtocolSlideout')
 jest.mock('../ConnectionTroubleshootingModal')
+jest.mock('../hooks')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -29,8 +31,11 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockConnectionTroubleshootingModal = ConnectionTroubleshootingModal as jest.MockedFunction<
   typeof ConnectionTroubleshootingModal
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const render = (props: React.ComponentProps<typeof RobotOverflowMenu>) => {
@@ -60,6 +65,7 @@ describe('RobotOverflowMenu', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -102,5 +108,21 @@ describe('RobotOverflowMenu', () => {
     fireEvent.click(btn)
     const run = getByText('Run a protocol')
     expect(run).toBeDisabled()
+  })
+
+  it('should only render robot settings when e-stop is pressed or disconnected', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const { getByText, getByLabelText, queryByText } = render(props)
+    const btn = getByLabelText('RobotOverflowMenu_button')
+    fireEvent.click(btn)
+    expect(queryByText('Run a protocol')).not.toBeInTheDocument()
+    getByText('Robot settings')
   })
 })

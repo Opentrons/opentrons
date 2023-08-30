@@ -10,6 +10,7 @@ from opentrons.protocol_engine import (
     slot_standardization as subject,
     CommandIntent,
     DeckSlotLocation,
+    OnLabwareLocation,
     LabwareLocation,
     LabwareMovementStrategy,
     LabwareOffsetCreate,
@@ -81,11 +82,16 @@ def test_standardize_labware_offset(
             "OT-3 Standard",
             DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
         ),
-        # ModuleLocations and OFF_DECK_LOCATIONs should be left alone.
+        # ModuleLocations, OnLabwareLocations, and OFF_DECK_LOCATIONs should be left alone.
         (
             ModuleLocation(moduleId="module-id"),
             "OT-3 Standard",
             ModuleLocation(moduleId="module-id"),
+        ),
+        (
+            OnLabwareLocation(labwareId="labware-id"),
+            "OT-3 Standard",
+            OnLabwareLocation(labwareId="labware-id"),
         ),
         (
             OFF_DECK_LOCATION,
@@ -158,6 +164,11 @@ def test_standardize_load_labware_command(
             ModuleLocation(moduleId="module-id"),
         ),
         (
+            OnLabwareLocation(labwareId="labware-id"),
+            "OT-3 Standard",
+            OnLabwareLocation(labwareId="labware-id"),
+        ),
+        (
             OFF_DECK_LOCATION,
             "OT-3 Standard",
             OFF_DECK_LOCATION,
@@ -177,8 +188,6 @@ def test_standardize_move_labware_command(
             newLocation=original_location,
             labwareId="labwareId",
             strategy=LabwareMovementStrategy.USING_GRIPPER,
-            usePickUpLocationLpcOffset=True,
-            useDropLocationLpcOffset=True,
             pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
             dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
         ),
@@ -190,8 +199,6 @@ def test_standardize_move_labware_command(
             newLocation=expected_location,
             labwareId="labwareId",
             strategy=LabwareMovementStrategy.USING_GRIPPER,
-            usePickUpLocationLpcOffset=True,
-            useDropLocationLpcOffset=True,
             pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
             dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
         ),

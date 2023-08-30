@@ -3,9 +3,9 @@ import type {
   LoadedModule,
   LoadedPipette,
   ModuleModel,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { ResourceLink } from '../types'
-import type { RunCommandSummary } from './commands/types'
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
@@ -99,6 +99,7 @@ export interface CreateRunActionData {
 export interface LabwareOffsetLocation {
   slotName: string
   moduleModel?: ModuleModel
+  definitionUri?: string
 }
 export interface LabwareOffsetCreateData {
   definitionUri: string
@@ -107,12 +108,15 @@ export interface LabwareOffsetCreateData {
 }
 
 export interface CommandData {
-  data: RunCommandSummary
+  data: RunTimeCommand
 }
 
 export interface RunError {
   id: string
   errorType: string
+  errorInfo: { [key: string]: string }
+  wrappedErrors: RunError[]
+  errorCode: string
   createdAt: string
   detail: string
 }

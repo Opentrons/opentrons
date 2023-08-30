@@ -93,6 +93,7 @@ export interface PositionProps {
   bottom?: string | number
   left?: string | number
   transform?: string
+  filter?: string
   transformOrigin?: CSSProperties['transformOrigin']
 }
 

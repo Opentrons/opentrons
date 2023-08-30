@@ -2,6 +2,7 @@ import * as React from 'react'
 import { when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
 
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
@@ -24,8 +25,10 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
 
 const ROBOT_NAME = 'opentrons-robot-name'
 
-const render = () => {
-  return renderWithProviders(<EthernetConnectionDetails />, {
+const render = (
+  props: React.ComponentProps<typeof EthernetConnectionDetails>
+) => {
+  return renderWithProviders(<EthernetConnectionDetails {...props} />, {
     i18nInstance: i18n,
   })
 }
@@ -38,7 +41,11 @@ const mockEthernet = {
 }
 
 describe('EthernetConnectionDetails', () => {
+  let props: React.ComponentProps<typeof EthernetConnectionDetails>
   beforeEach(() => {
+    props = {
+      handleGoBack: jest.fn(),
+    }
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
@@ -53,7 +60,7 @@ describe('EthernetConnectionDetails', () => {
   })
 
   it('should render ip address, subnet mask, mac address, text and button when ethernet is connected', () => {
-    const [{ getByText, queryByText }] = render()
+    const [{ getByText, queryByText }] = render(props)
     getByText('IP Address')
     getByText('Subnet Mask')
     getByText('MAC Address')
@@ -80,7 +87,7 @@ describe('EthernetConnectionDetails', () => {
         wifi: null,
         ethernet: notConnectedMockEthernet,
       })
-    const [{ getByText, getAllByText }] = render()
+    const [{ getByText, getAllByText }] = render(props)
     getByText('IP Address')
     getByText('Subnet Mask')
     getByText('MAC Address')
@@ -89,5 +96,12 @@ describe('EthernetConnectionDetails', () => {
     getByText(
       'Connect an Ethernet cable to the back of the robot and a network switch or hub.'
     )
+  })
+
+  it('should call handleGoBack when pressing back', () => {
+    const [{ getByRole }] = render(props)
+    const backButton = getByRole('button')
+    fireEvent.click(backButton)
+    expect(props.handleGoBack).toHaveBeenCalled()
   })
 })

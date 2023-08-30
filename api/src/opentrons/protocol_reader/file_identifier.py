@@ -1,6 +1,5 @@
 """File identifier interface."""
 
-import ast
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, Sequence, Union
@@ -10,12 +9,9 @@ import anyio
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.parse import (
-    extract_static_python_info,
-    version_from_static_python_info,
-)
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.types import StaticPythonInfo
+from opentrons.protocols import parse
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 from .file_reader_writer import BufferedFile
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
@@ -105,7 +101,9 @@ class FileIdentifier:
     """File identifier interface."""
 
     @staticmethod
-    async def identify(files: Sequence[BufferedFile]) -> Sequence[IdentifiedFile]:
+    async def identify(
+        files: Sequence[BufferedFile], python_parse_mode: parse.PythonParseMode
+    ) -> Sequence[IdentifiedFile]:
         """Identify the type and extract basic information from each file.
 
         This is intended to take ≲1 second per protocol on an OT-2, so it can extract
@@ -113,15 +111,19 @@ class FileIdentifier:
         and validating protocols can take 10-100x longer, so that's left to other units,
         for only when it's really needed.
         """
-        return [await _identify(file) for file in files]
+        return [await _identify(file, python_parse_mode) for file in files]
 
 
-async def _identify(file: BufferedFile) -> IdentifiedFile:
+async def _identify(
+    file: BufferedFile, python_parse_mode: parse.PythonParseMode
+) -> IdentifiedFile:
     lower_file_name = file.name.lower()
     if lower_file_name.endswith(".json"):
         return await _analyze_json(json_file=file)
     elif lower_file_name.endswith(".py"):
-        return _analyze_python_protocol(py_file=file)
+        return _analyze_python_protocol(
+            py_file=file, python_parse_mode=python_parse_mode
+        )
     elif lower_file_name.endswith(".csv") or lower_file_name.endswith(".txt"):
         return IdentifiedData(original_file=file)
     else:
@@ -203,65 +205,34 @@ def _analyze_json_protocol(
     )
 
 
-# todo(mm, 2021-09-13): This duplicates opentrons.protocols.parse.parse()
-# and misses some of its functionality. For example, this misses looking at import
-# statements to see if a protocol looks like APIv1, and this misses statically
-# validating the structure of an APIv2 protocol to make sure it has exactly 1 run()
-# function, etc.
 def _analyze_python_protocol(
     py_file: BufferedFile,
+    python_parse_mode: parse.PythonParseMode,
 ) -> IdentifiedPythonMain:
     try:
-        # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave
-        # the Python compilation flags at their defaults. For example, we probably
-        # don't truly want the protocol to inherit our own __future__ features.
-        module_ast = ast.parse(source=py_file.contents, filename=py_file.name)
-    except (SyntaxError, ValueError) as e:
-        # ast.parse() raises SyntaxError for most errors,
-        # but ValueError if the source contains null bytes.
-        raise FileIdentificationError(f"Unable to parse {py_file.name}.") from e
+        parsed = parse.parse(
+            protocol_file=py_file.contents,
+            filename=py_file.name,
+            python_parse_mode=python_parse_mode,
+        )
+    except MalformedPythonProtocolError as e:
+        raise FileIdentificationError(e.short_message) from e
 
-    try:
-        static_info = extract_static_python_info(module_ast)
-    except ValueError as e:
-        raise FileIdentificationError(
-            f"Unable to extract metadata from {py_file.name}."
-        ) from e
+    # We know this should never be a JsonProtocol. Help out the type-checker.
+    assert isinstance(
+        parsed, PythonProtocol
+    ), "Parsing a Python file returned something other than a Python protocol."
 
-    try:
-        api_version = version_from_static_python_info(static_info)
-    except ValueError as e:
-        raise FileIdentificationError(str(e)) from e
-    if api_version is None:
-        raise FileIdentificationError(f"apiLevel not declared in {py_file.name}")
-    if api_version > MAX_SUPPORTED_VERSION:
+    if parsed.api_level > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(
-            f"API version {api_version} is not supported by this "
+            f"API version {parsed.api_level} is not supported by this "
             f"robot software. Please either reduce your requested API "
             f"version or update your robot."
         )
 
-    robot_type = _robot_type_from_static_python_info(static_info)
-
     return IdentifiedPythonMain(
         original_file=py_file,
-        metadata=static_info.metadata or {},
-        robot_type=robot_type,
-        api_level=api_version,
+        metadata=parsed.metadata or {},
+        robot_type=parsed.robot_type,
+        api_level=parsed.api_level,
     )
-
-
-def _robot_type_from_static_python_info(
-    static_python_info: StaticPythonInfo,
-) -> RobotType:
-    python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
-    if python_robot_type in (None, "OT-2"):
-        return "OT-2 Standard"
-    # Allow "OT-3" as a deprecated alias of "Flex" to support internal-to-Opentrons Python protocols
-    # that were written before the "Flex" name existed.
-    elif python_robot_type in ("Flex", "OT-3"):
-        return "OT-3 Standard"
-    else:
-        raise FileIdentificationError(
-            f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
-        )

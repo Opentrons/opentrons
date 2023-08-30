@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -24,14 +25,16 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import { getIsOnDevice } from '../../redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 
-import type { RobotType } from '@opentrons/shared-data'
-import type { RunCommandSummary } from '@opentrons/api-client'
-import type { LabwareRenderInfoById } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import type { ModuleRenderInfoById } from '../Devices/hooks'
+import type { RunCommandSummary, RunData } from '@opentrons/api-client'
+import type { IconName } from '@opentrons/components'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -51,23 +54,19 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  margin: SPACING.spacing24,
-  border: `6px ${String(BORDERS.styleSolid)} ${String(COLORS.blueEnabled)}`,
+  border: `6px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
 } as const
 
 const HEADER_STYLE = {
-  display: DISPLAY_FLEX,
-  flexDirection: DIRECTION_COLUMN,
-  alignItems: ALIGN_FLEX_START,
-  justifyContent: JUSTIFY_CENTER,
-  padding: `0px ${SPACING.spacing32}`,
+  alignItems: ALIGN_CENTER,
+  gridGap: SPACING.spacing12,
+  padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
   color: COLORS.white,
   backgroundColor: COLORS.blueEnabled,
   position: POSITION_STICKY,
   top: 0,
-  height: '3.25rem',
 } as const
 
 const CONTENT_STYLE = {
@@ -84,6 +83,7 @@ const CONTENT_STYLE = {
 const FOOTER_STYLE = {
   display: DISPLAY_FLEX,
   width: '100%',
+  alignItems: ALIGN_CENTER,
   justifyContent: JUSTIFY_SPACE_BETWEEN,
 } as const
 
@@ -91,59 +91,93 @@ export interface InterventionModalProps {
   robotName: string
   onResume: () => void
   command: RunCommandSummary
-  robotType?: RobotType
-  moduleRenderInfo?: ModuleRenderInfoById
-  labwareRenderInfo?: LabwareRenderInfoById
-  labwareName?: string
-  oldDisplayLocation?: string
-  newDisplayLocation?: string
+  run: RunData
+  analysis: CompletedProtocolAnalysis | null
 }
 
 export function InterventionModal({
   robotName,
   onResume,
   command,
-  robotType,
-  moduleRenderInfo,
-  labwareRenderInfo,
-  labwareName,
-  oldDisplayLocation,
-  newDisplayLocation,
+  run,
+  analysis,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
+  const isOnDevice = useSelector(getIsOnDevice)
 
-  let modalContent: JSX.Element | null = null
-
-  switch (command.commandType) {
-    case 'pause': // legacy pause command
-    case 'waitForResume':
-      modalContent = (
+  const childContent = React.useMemo(() => {
+    if (
+      command.commandType === 'waitForResume' ||
+      command.commandType === 'pause' // legacy pause command
+    ) {
+      return (
         <PauseInterventionContent
           startedAt={command.startedAt ?? null}
-          message={command.params?.message ?? null}
+          message={command.params.message ?? null}
         />
       )
-      break
-    case 'moveLabware':
-      modalContent =
-        robotType != null &&
-        moduleRenderInfo != null &&
-        oldDisplayLocation != null &&
-        newDisplayLocation != null &&
-        labwareRenderInfo != null ? (
-          <MoveLabwareInterventionContent
-            robotType={robotType}
-            moduleRenderInfo={moduleRenderInfo}
-            labwareRenderInfo={labwareRenderInfo}
-            labwareName={labwareName ?? ''}
-            oldDisplayLocation={oldDisplayLocation}
-            newDisplayLocation={newDisplayLocation}
-          />
-        ) : null
-      break
+    } else if (command.commandType === 'moveLabware') {
+      return (
+        <MoveLabwareInterventionContent
+          {...{ command, run, analysis }}
+          isOnDevice={isOnDevice}
+        />
+      )
+    } else {
+      return null
+    }
+  }, [
+    command.id,
+    analysis?.status,
+    run.labware.map(l => l.id).join(),
+    run.modules.map(m => m.id).join(),
+  ])
+
+  let iconName: IconName | null = null
+  let headerTitle = ''
+  let headerTitleOnDevice = ''
+  if (
+    command.commandType === 'waitForResume' ||
+    command.commandType === 'pause' // legacy pause command
+  ) {
+    iconName = 'pause-circle'
+    headerTitle = t('pause_on', { robot_name: robotName })
+    headerTitleOnDevice = t('pause')
+  } else if (command.commandType === 'moveLabware') {
+    iconName = 'move-xy-circle'
+    headerTitle = t('move_labware_on', { robot_name: robotName })
+    headerTitleOnDevice = t('move_labware')
   }
 
-  return (
+  // TODO(bh, 2023-7-18): this is a one-off modal implementation for desktop
+  // reimplement when design system shares a modal component between desktop/ODD
+  return isOnDevice ? (
+    <Modal
+      border={`8px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`}
+      modalSize="large"
+      header={{
+        backgroundColor: COLORS.blueEnabled,
+        color: COLORS.white,
+        iconColor: COLORS.white,
+        iconName: iconName ?? undefined,
+        title: headerTitleOnDevice,
+      }}
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing32}
+        paddingTop={SPACING.spacing32}
+        width="100%"
+      >
+        {childContent}
+        <SmallButton
+          buttonText={t('confirm_and_resume')}
+          onClick={onResume}
+          buttonType="secondary"
+        />
+      </Flex>
+    </Modal>
+  ) : (
     <Flex
       position={POSITION_FIXED}
       left="0"
@@ -161,24 +195,23 @@ export function InterventionModal({
             e.stopPropagation()
           }}
         >
-          <Box {...HEADER_STYLE}>
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('perform_manual_step', { robot_name: robotName })}
-            </StyledText>
-          </Box>
+          <Flex {...HEADER_STYLE}>
+            {iconName != null ? (
+              <Icon name={iconName} size={SPACING.spacing32} />
+            ) : null}
+            <StyledText as="h1">{headerTitle}</StyledText>
+          </Flex>
           <Box {...CONTENT_STYLE}>
-            {modalContent}
+            {childContent}
             <Box {...FOOTER_STYLE}>
-              <StyledText>
-                <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} href="" external>
-                  {t('protocol_info:manual_steps_learn_more')}
-                  <Icon
-                    name="open-in-new"
-                    marginLeft={SPACING.spacing4}
-                    size="0.5rem"
-                  />
-                </Link>
-              </StyledText>
+              <Link css={TYPOGRAPHY.darkLinkH4SemiBold} href="" external>
+                {t('protocol_info:manual_steps_learn_more')}
+                <Icon
+                  name="open-in-new"
+                  marginLeft={SPACING.spacing4}
+                  size="0.5rem"
+                />
+              </Link>
               <PrimaryButton onClick={onResume}>
                 {t('confirm_and_resume')}
               </PrimaryButton>

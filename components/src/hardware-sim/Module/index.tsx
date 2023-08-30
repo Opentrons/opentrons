@@ -1,9 +1,13 @@
 import * as React from 'react'
 import {
   getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   ModuleDefinition,
+  OT2_STANDARD_DECKID,
+  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 import {
   C_DARK_GRAY,
@@ -16,14 +20,17 @@ import {
   ALIGN_CENTER,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
-
+import { multiplyMatrices } from '../utils'
 import { Thermocycler } from './Thermocycler'
 import { ModuleFromDef } from './ModuleFromDef'
+import { HeaterShaker } from './HeaterShaker'
+import { Temperature } from './Temperature'
 
 export * from './Thermocycler'
 export * from './ModuleFromDef'
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
+
 interface Props {
   x: number
   y: number
@@ -32,9 +39,13 @@ interface Props {
   innerProps?:
     | React.ComponentProps<typeof Thermocycler>
     | React.ComponentProps<typeof ModuleFromDef>
+    | React.ComponentProps<typeof HeaterShaker>
+    | React.ComponentProps<typeof Temperature>
     | {}
   statusInfo?: React.ReactNode // contents of small status rectangle, not displayed if absent
   children?: React.ReactNode // contents to be rendered on top of the labware mating surface of the module
+  targetSlotId?: string
+  targetDeckId?: string
 }
 
 const statusInfoWrapperProps = {
@@ -60,11 +71,17 @@ export const Module = (props: Props): JSX.Element => {
     innerProps = {},
     statusInfo,
     children,
+    targetSlotId,
+    targetDeckId = OT2_STANDARD_DECKID,
   } = props
   const moduleType = getModuleType(def.model)
 
   const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
-  const { x: translateX, y: translateY } = def.cornerOffsetFromSlot
+  const {
+    x: translateX,
+    y: translateY,
+    z: translateZ,
+  } = def.cornerOffsetFromSlot
   const {
     xDimension,
     yDimension,
@@ -79,7 +96,45 @@ export const Module = (props: Props): JSX.Element => {
 
   // apply translation to compensate for the offset of the overall module's
   // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
-  const offsetTransform = `translate(${translateX}, ${translateY})`
+  let offsetTransform = `translate(${translateX}, ${translateY})`
+
+  let nestedLabwareOffsetX = labwareOffsetX
+  let nestedLabwareOffsetY = labwareOffsetY
+
+  // additional transforms to apply to vectors in certain deck/slot combinations
+  const transformsForDeckBySlot = def?.slotTransforms?.[targetDeckId]
+  const slotTransformsForDeckSlot =
+    targetSlotId != null &&
+    transformsForDeckBySlot != null &&
+    targetSlotId in transformsForDeckBySlot
+      ? transformsForDeckBySlot[targetSlotId]
+      : null
+  const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
+  if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
+    const [
+      [slotTranslateX],
+      [slotTranslateY],
+    ] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [
+      [translateX],
+      [translateY],
+      [translateZ],
+      [1],
+    ])
+    offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
+  }
+  if (deckSpecificTransforms?.labwareOffset != null) {
+    const [
+      [slotLabwareOffsetX],
+      [slotLabwareOffsetY],
+    ] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [
+      [labwareOffsetX],
+      [labwareOffsetY],
+      [1],
+      [1],
+    ])
+    nestedLabwareOffsetX = slotLabwareOffsetX
+    nestedLabwareOffsetY = slotLabwareOffsetY
+  }
 
   // find coordinates of center of footprint, fallback to overall center if not defined
   const rotationCenterX = (footprintXDimension ?? xDimension) / 2
@@ -92,12 +147,12 @@ export const Module = (props: Props): JSX.Element => {
 
   // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
   const clampedLabwareOffsetX =
-    Math.abs(labwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-      ? labwareOffsetX
+    Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
+      ? nestedLabwareOffsetX
       : 0
   const clampedLabwareOffsetY =
-    Math.abs(labwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-      ? labwareOffsetY
+    Math.abs(nestedLabwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD
+      ? nestedLabwareOffsetY
       : 0
   // transform to be applied to children which render within the labware interfacing surface of the module
   const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
@@ -125,25 +180,42 @@ export const Module = (props: Props): JSX.Element => {
 
   const magneticBlockLayerBlockList = ['Module_Title', 'Well_Labels', 'Wells']
 
+  let moduleViz: JSX.Element = (
+    <ModuleFromDef
+      layerBlocklist={
+        moduleType === MAGNETIC_BLOCK_TYPE
+          ? magneticBlockLayerBlockList
+          : undefined
+      }
+      {...(innerProps as React.ComponentProps<typeof ModuleFromDef>)}
+      def={def}
+    />
+  )
+  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+    const thermocyclerProps = {
+      ...innerProps,
+      model: def.model as ThermocyclerModuleModel,
+    }
+
+    moduleViz = <Thermocycler {...thermocyclerProps} />
+  } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
+    moduleViz = (
+      <HeaterShaker
+        {...(innerProps as React.ComponentProps<typeof HeaterShaker>)}
+      />
+    )
+  } else if (moduleType === TEMPERATURE_MODULE_TYPE) {
+    moduleViz = (
+      <Temperature
+        {...(innerProps as React.ComponentProps<typeof Temperature>)}
+      />
+    )
+  }
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>
       <g transform={orientationTransform}>
         <g transform={offsetTransform} style={{ fill: C_DARK_GRAY }}>
-          {moduleType === THERMOCYCLER_MODULE_TYPE ? (
-            <Thermocycler
-              {...(innerProps as React.ComponentProps<typeof Thermocycler>)}
-            />
-          ) : (
-            <ModuleFromDef
-              layerBlocklist={
-                moduleType === MAGNETIC_BLOCK_TYPE
-                  ? magneticBlockLayerBlockList
-                  : undefined
-              }
-              {...(innerProps as React.ComponentProps<typeof ModuleFromDef>)}
-              def={def}
-            />
-          )}
+          {moduleViz}
         </g>
       </g>
       {renderStatusInfo()}

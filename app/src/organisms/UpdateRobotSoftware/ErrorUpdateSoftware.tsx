@@ -18,7 +18,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
-import { startBuildrootUpdate } from '../../redux/buildroot'
+import { startRobotUpdate } from '../../redux/robot-update'
 
 import type { Dispatch } from '../../redux/types'
 
@@ -35,7 +35,7 @@ export function ErrorUpdateSoftware({
   const dispatch = useDispatch<Dispatch>()
 
   const handleTryAgain = (): void => {
-    dispatch(startBuildrootUpdate(robotName))
+    dispatch(startRobotUpdate(robotName))
   }
 
   return (
@@ -76,7 +76,7 @@ export function ErrorUpdateSoftware({
           flex="1"
           buttonType="secondary"
           buttonText={t('proceed_without_updating')}
-          onClick={() => history.push('/robot-settings/rename-robot')}
+          onClick={() => history.push('/emergency-stop')}
         />
         <MediumButton
           flex="1"

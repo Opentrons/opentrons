@@ -74,20 +74,18 @@ export function DeviceResetSlideout({
   )
 
   const ot2CalibrationOptions =
-    // TODO(bh, 2022-11-07): update OT-2 filter when gripper calibration reset config option available
     options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
-  const ot3CalibrationOptions =
+  const flexCalibrationOptions =
     options != null
       ? options.filter(
           opt =>
             opt.id === 'pipetteOffsetCalibrations' ||
-            // TODO(bh, 2022-11-07): confirm or update when gripper calibration reset config option available
-            opt.id === 'gripperCalibration'
+            opt.id === 'gripperOffsetCalibrations'
         )
       : []
 
   const calibrationOptions = isOT3
-    ? ot3CalibrationOptions
+    ? flexCalibrationOptions
     : ot2CalibrationOptions
 
   const bootScriptOption =
@@ -133,6 +131,17 @@ export function DeviceResetSlideout({
     onCloseClick()
   }
 
+  const totalOptionsSelected = Object.values(resetOptions).filter(
+    selected => selected === true
+  ).length
+
+  // filtering out ODD setting because this gets implicitly cleared if all settings are selected
+  const allOptionsWithoutODD = options.filter(o => o.id !== 'onDeviceDisplay')
+
+  const isEveryOptionSelected =
+    totalOptionsSelected > 0 &&
+    totalOptionsSelected === allOptionsWithoutODD.length
+
   return (
     <Slideout
       title={t('device_reset')}
@@ -166,25 +175,35 @@ export function DeviceResetSlideout({
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>
-        {/* Note: (kj:06/07/2023) this part will be updated when be is ready */}
         {isOT3 ? (
           <>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {t('factory_reset')}
+                  {t('clear_all_data')}
                 </StyledText>
-                <StyledText as="p" marginTop={SPACING.spacing8}>
-                  {t('factory_reset_description')}
-                </StyledText>
-              </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {t('clear_all_stored_data')}
-                </StyledText>
-                <StyledText as="p" marginTop={SPACING.spacing8}>
+                <StyledText as="p" marginY={SPACING.spacing8}>
                   {t('clear_all_stored_data_description')}
                 </StyledText>
+                <CheckboxField
+                  onChange={() => {
+                    setResetOptions(
+                      isEveryOptionSelected
+                        ? {}
+                        : allOptionsWithoutODD.reduce((acc, val) => {
+                            return {
+                              ...acc,
+                              [val.id]: true,
+                            }
+                          }, {})
+                    )
+                  }}
+                  value={isEveryOptionSelected}
+                  label={t(`select_all_settings`)}
+                  isIndeterminate={
+                    !isEveryOptionSelected && totalOptionsSelected > 0
+                  }
+                />
               </Flex>
             </Flex>
             <Divider marginY={SPACING.spacing16} />
@@ -225,40 +244,30 @@ export function DeviceResetSlideout({
                 gridGap={-SPACING.spacing4}
               >
                 {calibrationOptions.map(opt => {
-                  const calibrationName =
-                    isOT3 && opt.id === 'pipetteOffsetCalibrations'
+                  let calibrationName = ''
+                  if (opt.id === 'pipetteOffsetCalibrations') {
+                    calibrationName = isOT3
                       ? t('clear_option_pipette_calibrations')
                       : t(`clear_option_${snakeCase(opt.id)}`)
+                  } else {
+                    calibrationName = t(`clear_option_${snakeCase(opt.id)}`)
+                  }
                   return (
-                    <CheckboxField
-                      key={opt.id}
-                      onChange={() =>
-                        setResetOptions({
-                          ...resetOptions,
-                          [opt.id]: !(resetOptions[opt.id] ?? false),
-                        })
-                      }
-                      value={resetOptions[opt.id]}
-                      label={calibrationName}
-                    />
+                    calibrationName !== '' && (
+                      <CheckboxField
+                        key={opt.id}
+                        onChange={() =>
+                          setResetOptions({
+                            ...resetOptions,
+                            [opt.id]: !(resetOptions[opt.id] ?? false),
+                          })
+                        }
+                        value={resetOptions[opt.id]}
+                        label={calibrationName}
+                      />
+                    )
                   )
                 })}
-                {/* TODO(bh, 2022-11-02): placeholder, remove when gripper calibration reset config option available */}
-                {isOT3 ? (
-                  <CheckboxField
-                    key="gripperCalibration"
-                    onChange={() =>
-                      setResetOptions({
-                        ...resetOptions,
-                        gripperCalibration: !(
-                          resetOptions.gripperCalibration ?? false
-                        ),
-                      })
-                    }
-                    value={resetOptions.gripperCalibration}
-                    label={t('clear_option_gripper_calibration')}
-                  />
-                ) : null}
               </Flex>
             </Box>
             <Box>

@@ -209,6 +209,22 @@ from .blow_out_in_place import (
     BlowOutInPlaceResult,
 )
 
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarCommandType,
+)
+
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -221,6 +237,7 @@ Command = Union[
     DropTip,
     DropTipInPlace,
     Home,
+    RetractAxis,
     LoadLabware,
     LoadLiquid,
     LoadModule,
@@ -235,6 +252,7 @@ Command = Union[
     SavePosition,
     SetRailLights,
     TouchTip,
+    SetStatusBar,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -274,6 +292,7 @@ CommandParams = Union[
     DropTipParams,
     DropTipInPlaceParams,
     HomeParams,
+    RetractAxisParams,
     LoadLabwareParams,
     LoadLiquidParams,
     LoadModuleParams,
@@ -288,6 +307,7 @@ CommandParams = Union[
     SavePositionParams,
     SetRailLightsParams,
     TouchTipParams,
+    SetStatusBarParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -328,6 +348,7 @@ CommandType = Union[
     DropTipCommandType,
     DropTipInPlaceCommandType,
     HomeCommandType,
+    RetractAxisCommandType,
     LoadLabwareCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
@@ -342,6 +363,7 @@ CommandType = Union[
     SavePositionCommandType,
     SetRailLightsCommandType,
     TouchTipCommandType,
+    SetStatusBarCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -381,6 +403,7 @@ CommandCreate = Union[
     DropTipCreate,
     DropTipInPlaceCreate,
     HomeCreate,
+    RetractAxisCreate,
     LoadLabwareCreate,
     LoadLiquidCreate,
     LoadModuleCreate,
@@ -395,6 +418,7 @@ CommandCreate = Union[
     SavePositionCreate,
     SetRailLightsCreate,
     TouchTipCreate,
+    SetStatusBarCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -434,6 +458,7 @@ CommandResult = Union[
     DropTipResult,
     DropTipInPlaceResult,
     HomeResult,
+    RetractAxisResult,
     LoadLabwareResult,
     LoadLiquidResult,
     LoadModuleResult,
@@ -448,6 +473,7 @@ CommandResult = Union[
     SavePositionResult,
     SetRailLightsResult,
     TouchTipResult,
+    SetStatusBarResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,

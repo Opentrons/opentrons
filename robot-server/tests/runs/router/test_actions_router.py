@@ -103,7 +103,7 @@ async def test_play_action_clears_maintenance_run(
 @pytest.mark.parametrize(
     ("exception", "expected_error_id", "expected_status_code"),
     [
-        (RunActionNotAllowedError("oh no"), "RunActionNotAllowed", 409),
+        (RunActionNotAllowedError(message="oh no"), "RunActionNotAllowed", 409),
         (RunNotFoundError("oh no"), "RunNotFound", 404),
     ],
 )

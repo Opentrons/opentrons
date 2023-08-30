@@ -43,6 +43,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinxext.opengraph',
+    'sphinx_tabs.tabs',
     # todo(mm, 2021-09-30): Remove numpydoc when we're done transitioning to
     # Google-style docstrings. github.com/Opentrons/opentrons/issues/7051
     'numpydoc'
@@ -70,8 +71,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'OT-2 API V2'
-copyright = '2010, Opentrons'
+project = 'Python Protocol API v2'
+copyright = '2010–23, Opentrons'
 author = 'Opentrons Labworks'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -175,7 +176,8 @@ html_theme_options = {
     'font_family': "'Open Sans', sans-serif",
     'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
-    'fixed_sidebar': 'False',
+    'fixed_sidebar': 'True',
+    'sidebar_width': '270px',
     'github_user': 'opentrons',
     'github_repo': 'opentrons',
     'github_button': True,
@@ -203,7 +205,7 @@ html_title = 'Opentrons Python API V2 Documentation'
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
-html_logo = '../img/logo.png'
+# html_logo = '../img/logo.png'
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or
@@ -421,3 +423,7 @@ ogp_site_name = "Opentrons Python Protocol API"
 ogp_image = "_static/PythonAPI.png"
 ogp_description_length = 170
 ogp_enable_meta_description = False
+
+# -- Options for tabs -----------------------------------------------------
+
+sphinx_tabs_disable_tab_closing = True

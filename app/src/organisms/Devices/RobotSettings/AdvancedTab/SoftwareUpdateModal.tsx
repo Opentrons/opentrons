@@ -17,7 +17,7 @@ import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { Banner } from '../../../../atoms/Banner'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
 import { Divider } from '../../../../atoms/structure'
 import { useRobot } from '../../hooks'
@@ -66,7 +66,7 @@ export function SoftwareUpdateModal({
   return showUpdateModal ? (
     <UpdateBuildroot robot={robot} close={handleCloseModal} />
   ) : (
-    <Modal title={t('robot_update_available')} onClose={closeModal}>
+    <LegacyModal title={t('robot_update_available')} onClose={closeModal}>
       <Banner type="informing">{t('requires_restarting_the_robot')}</Banner>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing16}>
         {/* <ReleaseNotes source={releaseNotes} /> ToDo: align with new design */}
@@ -126,6 +126,6 @@ export function SoftwareUpdateModal({
           </PrimaryButton>
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

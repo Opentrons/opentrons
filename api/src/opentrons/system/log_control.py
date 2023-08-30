@@ -15,18 +15,22 @@ LOG = logging.getLogger(__name__)
 MAX_RECORDS = 100000
 DEFAULT_RECORDS = 50000
 
+UNIT_SELECTORS = ["opentrons-robot-server", "opentrons-robot-app"]
+
 
 async def get_records_dumb(selector: str, records: int, mode: str) -> bytes:
     """Dump the log files.
 
     :param selector: The syslog selector to limit responses to
     :param records: The maximum number of records to print
-    :param mode: A journalctl dump mode. Should be either "short" or "json".
+    :param mode: A journalctl dump mode. Should be either "short-precise" or "json".
     """
+    selector_flag = "-u" if selector in UNIT_SELECTORS else "-t"
+
     proc = await asyncio.create_subprocess_exec(
         "journalctl",
         "--no-pager",
-        "-t",
+        selector_flag,
         selector,
         "-n",
         str(records),

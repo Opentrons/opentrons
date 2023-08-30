@@ -48,11 +48,21 @@ async def flash_serials(
             return
 
 
+def _read_input_and_confirm(prompt: str) -> str:
+    inp = input(prompt).strip()
+    if "y" in input(f"read serial '{inp}', write to gripper? (y/n): "):
+        return inp
+    else:
+        return _read_input_and_confirm(prompt)
+
+
 async def get_serial(prompt: str, base_log: logging.Logger) -> Tuple[int, bytes]:
     """Get a serial number that is correct and parseable."""
     loop = asyncio.get_running_loop()
     while True:
-        serial = await loop.run_in_executor(None, lambda: input(prompt))
+        serial = await loop.run_in_executor(
+            None, lambda: _read_input_and_confirm(prompt)
+        )
         try:
             model, data = serials.gripper_info_from_serial_string(serial)
         except Exception as e:

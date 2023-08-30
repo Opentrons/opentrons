@@ -1,38 +1,41 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
-import { useSelector } from 'react-redux'
-import { Portal } from '../../App/portal'
-// import { useTrackEvent } from '../../redux/analytics'
-import { IntroScreen } from './IntroScreen'
-import { ExitConfirmation } from './ExitConfirmation'
-import { CheckItem } from './CheckItem'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { getIsOnDevice } from '../../redux/config'
-import { PickUpTip } from './PickUpTip'
-import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
+import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
-
-import type { LabwareOffset } from '@opentrons/api-client'
 import {
   CompletedProtocolAnalysis,
   Coordinates,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type { RegisterPositionAction, WorkingOffset } from './types'
-import { LabwareOffsetCreateData } from '@opentrons/api-client'
-import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { Portal } from '../../App/portal'
+// import { useTrackEvent } from '../../redux/analytics'
+import { IntroScreen } from './IntroScreen'
+import { ExitConfirmation } from './ExitConfirmation'
+import { CheckItem } from './CheckItem'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { getIsOnDevice, useFeatureFlag } from '../../redux/config'
+import { AttachProbe } from './AttachProbe'
+import { DetachProbe } from './DetachProbe'
+import { PickUpTip } from './PickUpTip'
+import { ReturnTip } from './ReturnTip'
+import { ResultsSummary } from './ResultsSummary'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
+import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+import type { LabwareOffset, CommandData } from '@opentrons/api-client'
+import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { RegisterPositionAction, WorkingOffset } from './types'
+import { getGoldenCheckSteps } from './utils/getGoldenCheckSteps'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -132,12 +135,13 @@ export const LabwarePositionCheckComponent = (
   const [isExiting, setIsExiting] = React.useState(false)
   const {
     createMaintenanceCommand: createSilentCommand,
-  } = useCreateMaintenanceCommandMutation(maintenanceRunId)
+  } = useCreateMaintenanceCommandMutation()
   const {
     chainRunCommands,
     isCommandMutationLoading: isCommandChainLoading,
-  } = useChainMaintenanceCommands(maintenanceRunId)
+  } = useChainMaintenanceCommands()
 
+  const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
@@ -154,6 +158,7 @@ export const LabwarePositionCheckComponent = (
       },
     }))
     chainRunCommands(
+      maintenanceRunId,
       [
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
@@ -177,7 +182,9 @@ export const LabwarePositionCheckComponent = (
     )
   }
   if (protocolData == null) return null
-  const LPCSteps = getLabwarePositionCheckSteps(protocolData)
+  const LPCSteps = goldenLPC
+    ? getGoldenCheckSteps(protocolData)
+    : getLabwarePositionCheckSteps(protocolData)
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
@@ -191,6 +198,7 @@ export const LabwarePositionCheckComponent = (
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
       createSilentCommand({
+        maintenanceRunId,
         command: {
           commandType: 'moveRelative',
           params: { pipetteId: pipetteId, distance: step * dir, axis },
@@ -208,10 +216,15 @@ export const LabwarePositionCheckComponent = (
       setFatalError(`could not find pipette to jog with id: ${pipetteId ?? ''}`)
     }
   }
+  const chainMaintenanceRunCommands = (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ): Promise<CommandData[]> =>
+    chainRunCommands(maintenanceRunId, commands, continuePastCommandFailure)
   const movementStepProps = {
     proceed,
     protocolData,
-    chainRunCommands,
+    chainRunCommands: chainMaintenanceRunCommands,
     setFatalError,
     registerPosition,
     handleJog,
@@ -252,10 +265,15 @@ export const LabwarePositionCheckComponent = (
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
     modalContent = <IntroScreen {...movementStepProps} />
   } else if (
+    currentStep.section === 'CHECK_POSITIONS' ||
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
     modalContent = <CheckItem {...currentStep} {...movementStepProps} />
+  } else if (currentStep.section === 'ATTACH_PROBE') {
+    modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
+  } else if (currentStep.section === 'DETACH_PROBE') {
+    modalContent = <DetachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
     modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'RETURN_TIP') {
@@ -296,14 +314,14 @@ export const LabwarePositionCheckComponent = (
   return (
     <Portal level="top">
       {isOnDevice ? (
-        <ModalShell fullPage>
+        <LegacyModalShell fullPage>
           {wizardHeader}
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
-        <ModalShell width="47rem" header={wizardHeader}>
+        <LegacyModalShell width="47rem" header={wizardHeader}>
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

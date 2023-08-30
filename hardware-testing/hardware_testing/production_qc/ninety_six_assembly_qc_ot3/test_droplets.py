@@ -14,7 +14,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Point, OT3Axis
+from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
 
 TIP_VOLUME = 1000
 ASPIRATE_VOLUME = 1000
@@ -23,7 +23,7 @@ HOVER_HEIGHT_MM = 50
 DEPTH_INTO_RESERVOIR_FOR_ASPIRATE = -24
 DEPTH_INTO_RESERVOIR_FOR_DISPENSE = DEPTH_INTO_RESERVOIR_FOR_ASPIRATE
 
-TIP_RACK_LABWARE = f"opentrons_ot3_96_tiprack_{TIP_VOLUME}ul"
+TIP_RACK_LABWARE = f"opentrons_flex_96_tiprack_{TIP_VOLUME}ul"
 RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
 
 TIP_RACK_96_SLOT = 4
@@ -153,7 +153,7 @@ async def _partial_pick_up_z_motion(
     api: OT3API, current: float, distance: float, speed: float
 ) -> None:
     async with api._backend.restore_current():
-        await api._backend.set_active_current({OT3Axis.Z_L: current})
+        await api._backend.set_active_current({Axis.Z_L: current})
         target_down = target_position_from_relative(
             OT3Mount.LEFT, Point(z=-distance), api._current_position
         )
@@ -162,7 +162,7 @@ async def _partial_pick_up_z_motion(
         OT3Mount.LEFT, Point(z=distance), api._current_position
     )
     await api._move(target_up)
-    await api._update_position_estimation([OT3Axis.Z_L])
+    await api._update_position_estimation([Axis.Z_L])
 
 
 async def _partial_pick_up(api: OT3API, position: Point, current: float) -> None:

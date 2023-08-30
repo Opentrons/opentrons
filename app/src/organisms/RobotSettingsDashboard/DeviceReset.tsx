@@ -5,20 +5,16 @@ import styled from 'styled-components'
 
 import {
   Flex,
-  Btn,
   DIRECTION_COLUMN,
-  Icon,
-  ALIGN_CENTER,
   TYPOGRAPHY,
-  AlertPrimaryButton,
-  DIRECTION_ROW,
   COLORS,
   SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
+import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
@@ -28,7 +24,7 @@ import { useDispatchApiRequest } from '../../redux/robot-api'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
-import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface LabelProps {
   isSelected?: boolean
@@ -40,17 +36,16 @@ const OptionButton = styled.input`
 
 const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border: 2px solid
-    ${({ isSelected }) =>
-      isSelected === true ? COLORS.blueEnabled : COLORS.light2};
   border-radius: ${BORDERS.borderRadiusSize4};
+  color: ${({ isSelected }) =>
+    isSelected === true ? COLORS.white : COLORS.darkBlack100};
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.medBlue : COLORS.white};
+    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
 `
 
 interface DeviceResetProps {
   robotName: string
-  setCurrentOption: (currentOption: SettingOption | null) => void
+  setCurrentOption: SetSettingOption
 }
 
 export function DeviceReset({
@@ -64,35 +59,76 @@ export function DeviceReset({
   )
   const [dispatchRequest] = useDispatchApiRequest()
 
-  // ToDo (kj:02/07/2023) gripperCalibration might be different since the option isn't implemented yet
-  // Currently boot script will be added in the future
-  const targetOptions = [
+  const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
-    'gripperCalibration',
+    'gripperOffsetCalibrations',
     'runsHistory',
+    'bootScripts',
   ]
-  const availableOptions = options.filter(option =>
-    targetOptions.includes(option.id)
-  )
+  const availableOptions = options
+    // filtering out ODD setting because this gets implicitly cleared if all settings are selected
+    .filter(o => o.id !== 'onDeviceDisplay')
+    .sort(
+      (a, b) =>
+        targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
+    )
   const dispatch = useDispatch<Dispatch>()
 
   const handleClick = (): void => {
     if (resetOptions != null) {
-      dispatchRequest(resetConfig(robotName, resetOptions))
+      const totalOptionsSelected = Object.values(resetOptions).filter(
+        selected => selected === true
+      ).length
+
+      const isEveryOptionSelected =
+        totalOptionsSelected > 0 &&
+        totalOptionsSelected === availableOptions.length
+
+      if (isEveryOptionSelected) {
+        dispatchRequest(
+          resetConfig(robotName, {
+            ...resetOptions,
+            onDeviceDisplay: true,
+          })
+        )
+      } else {
+        dispatchRequest(resetConfig(robotName, resetOptions))
+      }
     }
   }
 
-  const renderText = (optionId: string): string => {
+  const renderText = (
+    optionId: string
+  ): { optionText: string; subText?: string } => {
+    let optionText = ''
+    let subText
     switch (optionId) {
       case 'pipetteOffsetCalibrations':
-        return t('clear_option_pipette_calibrations')
-      // ToDo (kj:02/07/2023) gripperCalibration same as the above
-      case 'gripperCalibration':
-        return t('clear_option_gripper_calibration')
+        optionText = t('clear_option_pipette_calibrations')
+        break
+      case 'gripperOffsetCalibrations':
+        optionText = t('clear_option_gripper_calibration')
+        break
       case 'runsHistory':
-        return t('clear_option_runs_history')
+        optionText = t('clear_option_runs_history')
+        subText = t('clear_option_runs_history_subtext')
+        break
+
+      case 'bootScripts':
+        optionText = t('clear_option_boot_scripts')
+        subText = t('clear_option_boot_scripts_description')
+        break
+
+      case 'factoryReset':
+        optionText = t('factory_reset')
+        subText = t('factory_reset_description')
+        break
       default:
-        return ''
+        break
+    }
+    return {
+      optionText,
+      subText,
     }
   }
   React.useEffect(() => {
@@ -100,84 +136,81 @@ export function DeviceReset({
   }, [dispatch, robotName])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
-      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex flexDirection={DIRECTION_ROW}>
-          <Btn onClick={() => setCurrentOption(null)}>
-            <Icon name="back" size="3rem" />
-          </Btn>
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-            {t('device_reset')}
-          </StyledText>
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          backgroundColor={COLORS.warningBackgroundMed}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing12}
-          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-          borderRadius={BORDERS.borderRadiusSize3}
-        >
-          <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
-          <StyledText
-            fontSize="1.375rem"
-            lineHeight="1.875rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {t('device_resets_cannot_be_undone')}
-          </StyledText>
-        </Flex>
-      </Flex>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <ChildNavigation
+        header={t('device_reset')}
+        inlineNotification={{
+          heading: t('device_resets_cannot_be_undone'),
+          type: 'alert',
+        }}
+        onClickBack={() => setCurrentOption(null)}
+      />
       <Flex
-        marginTop={SPACING.spacing24}
-        gridGap={SPACING.spacing8}
+        gridGap={SPACING.spacing24}
         flexDirection={DIRECTION_COLUMN}
+        paddingX={SPACING.spacing40}
+        marginTop="7.75rem"
       >
-        {availableOptions.map(option => (
-          <React.Fragment key={option.id}>
-            <OptionButton
-              id={option.id}
-              type="checkbox"
-              value={option.id}
-              onChange={() =>
-                setResetOptions({
-                  ...resetOptions,
-                  [option.id]: !(resetOptions[option.id] ?? false),
-                })
-              }
-            />
-            <OptionLabel
-              htmlFor={option.id}
-              isSelected={resetOptions[option.id]}
-            >
-              <StyledText
-                fontSize="1.375rem"
-                lineHeight="1.875rem"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {renderText(option.id)}
-              </StyledText>
-            </OptionLabel>
-          </React.Fragment>
-        ))}
+        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+          {availableOptions.map(option => {
+            const { optionText, subText } = renderText(option.id)
+            return (
+              <React.Fragment key={option.id}>
+                <OptionButton
+                  id={option.id}
+                  type="checkbox"
+                  value={option.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [option.id]: !(resetOptions[option.id] ?? false),
+                    })
+                  }
+                />
+                <OptionLabel
+                  htmlFor={option.id}
+                  isSelected={resetOptions[option.id]}
+                >
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {optionText}
+                    </StyledText>
+                    {subText != null ? (
+                      <StyledText
+                        as="p"
+                        color={
+                          resetOptions[option.id]
+                            ? COLORS.white
+                            : COLORS.darkBlack70
+                        }
+                      >
+                        {subText}
+                      </StyledText>
+                    ) : null}
+                  </Flex>
+                </OptionLabel>
+              </React.Fragment>
+            )
+          })}
+        </Flex>
+        <MediumButton
+          data-testid="DeviceReset_clear_data_button"
+          buttonText={t('clear_data_and_restart_robot')}
+          buttonType="alert"
+          disabled={
+            Object.keys(resetOptions).length === 0 ||
+            availableOptions.every(
+              option =>
+                resetOptions[option.id] === false ||
+                resetOptions[option.id] === undefined
+            )
+          }
+          onClick={handleClick}
+        />
       </Flex>
-      <AlertPrimaryButton
-        paddingY={SPACING.spacing24}
-        marginTop="3.5rem"
-        disabled={
-          Object.keys(resetOptions).length === 0 ||
-          availableOptions.every(option => resetOptions[option.id] === false)
-        }
-        onClick={handleClick}
-      >
-        <StyledText
-          fontSize="1.5rem"
-          lineHeight="1.375rem"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
-          {t('clear_data_and_restart_robot')}
-        </StyledText>
-      </AlertPrimaryButton>
     </Flex>
   )
 }

@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
+import {
+  THERMOCYCLER_MODULE_MODELS,
+  getModuleDef2,
+} from '@opentrons/shared-data'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
 
@@ -25,7 +28,7 @@ const Template: Story<ThermocyclerVizProps> = args => {
           <Module
             x={x}
             y={y}
-            def={getModuleDef2(THERMOCYCLER_MODULE_V1)}
+            def={getModuleDef2(args.model)}
             innerProps={{ lidMotorState: args.lidMotorState }}
           />
         )
@@ -41,5 +44,12 @@ Thermocycler.argTypes = {
       options: lidMotorStates,
     },
     defaultValue: lidMotorStates[0],
+  },
+  model: {
+    control: {
+      type: 'select',
+      options: THERMOCYCLER_MODULE_MODELS,
+    },
+    defaultValue: THERMOCYCLER_MODULE_MODELS[0],
   },
 }

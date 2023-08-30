@@ -41,6 +41,14 @@ def mock_cal_pipette_offset(
 
 
 @pytest.fixture
+def mock_cal_gripper_offset(
+    robot_model: "RobotModel",
+) -> Generator[MagicMock, None, None]:
+    with patch("opentrons.config.reset.reset_gripper_offset") as m:
+        yield m
+
+
+@pytest.fixture
 def mock_cal_tip_length(robot_model: "RobotModel") -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.reset.clear_tip_length_calibration") as m:
         yield m
@@ -52,6 +60,14 @@ def mock_cal_robot_attitude(
 ) -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.reset.delete_robot_deck_attitude") as m:
         yield m
+
+
+def test_get_options() -> None:
+    options = reset.reset_options("OT-2 Standard")
+    assert list(options.keys()) == reset._OT_2_RESET_OPTIONS
+
+    options = reset.reset_options("OT-3 Standard")
+    assert list(options.keys()) == reset._FLEX_RESET_OPTIONS
 
 
 def test_reset_empty_set(
@@ -106,3 +122,8 @@ def test_tip_length_calibrations_reset(
 def test_pipette_offset_reset(mock_cal_pipette_offset: MagicMock) -> None:
     reset.reset_pipette_offset()
     mock_cal_pipette_offset.assert_called_once()
+
+
+def test_gripper_offset_reset(mock_cal_gripper_offset: MagicMock) -> None:
+    reset.reset_gripper_offset()
+    mock_cal_gripper_offset.assert_called_once()

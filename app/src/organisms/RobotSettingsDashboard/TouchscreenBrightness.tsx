@@ -1,44 +1,32 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import clamp from 'lodash/clamp'
 
 import {
   ALIGN_CENTER,
   BORDERS,
   Box,
-  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  JUSTIFY_FLEX_START,
   SPACING,
-  TYPOGRAPHY,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+
+import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../redux/config'
 
 import type { Dispatch } from '../../redux/types'
-import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
-
-const BUTTON_STYLE = css`
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-  }
-
-  &:active {
-    color: ${COLORS.darkBlack40};
-  }
-`
+import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface BrightnessTileProps {
   isActive: boolean
@@ -59,7 +47,7 @@ const LOWEST_BRIGHTNESS = 6
 const HIGHEST_BRIGHTNESS = 1
 
 interface TouchscreenBrightnessProps {
-  setCurrentOption: (currentOption: SettingOption | null) => void
+  setCurrentOption: SetSettingOption
 }
 
 export function TouchscreenBrightness({
@@ -85,35 +73,27 @@ export function TouchscreenBrightness({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
-      <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
-        <Btn
-          onClick={() => setCurrentOption(null)}
-          data-testid="TouchscreenBrightness_back_button"
-        >
-          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
-        </Btn>
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {t('touchscreen_brightness')}
-        </StyledText>
-      </Flex>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <ChildNavigation
+        header={t('touchscreen_brightness')}
+        onClickBack={() => setCurrentOption(null)}
+      />
       <Flex
         flexDirection={DIRECTION_ROW}
-        width="56.5rem"
-        height="8.75rem"
-        marginTop="7.625rem"
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing24}
+        paddingX={SPACING.spacing60}
+        paddingY={SPACING.spacing120}
+        marginTop="7.75rem"
       >
-        <Btn
+        <IconButton
           disabled={brightness === LOWEST_BRIGHTNESS}
           onClick={() => handleClick('down')}
           data-testid="TouchscreenBrightness_decrease"
-          css={BUTTON_STYLE}
         >
           <Icon size="5rem" name="minus" />
-        </Btn>
+        </IconButton>
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
@@ -127,15 +107,34 @@ export function TouchscreenBrightness({
           ))}
         </Flex>
 
-        <Btn
+        <IconButton
           disabled={brightness === HIGHEST_BRIGHTNESS}
           onClick={() => handleClick('up')}
           data-testid="TouchscreenBrightness_increase"
-          css={BUTTON_STYLE}
         >
           <Icon size="5rem" name="plus" />
-        </Btn>
+        </IconButton>
       </Flex>
     </Flex>
   )
 }
+
+const IconButton = styled('button')`
+  border-radius: 50%;
+  max-height: 100%;
+  background-color: ${COLORS.white};
+
+  &:active {
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:disabled {
+    background-color: transparent;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+  }
+`

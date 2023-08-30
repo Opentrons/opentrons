@@ -3,20 +3,20 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
-  Flex,
-  COLORS,
-  Icon,
-  Link,
-  DIRECTION_COLUMN,
-  FLEX_NONE,
-  SPACING,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  COLORS,
+  DIRECTION_COLUMN,
+  FLEX_NONE,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
+  Link,
   SIZE_2,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import logoSvg from '../assets/images/logo_nav.svg'
@@ -76,7 +76,7 @@ const IconLink = styled(Link)`
 const NavbarIcon = styled(Icon)`
   width: ${SIZE_2};
   height: ${SIZE_2};
-  padding: 0.375rem;
+  padding: ${SPACING.spacing6};
   border-radius: 50%;
   color: ${COLORS.medGreyEnabled};
   background-color: ${COLORS.transparent};

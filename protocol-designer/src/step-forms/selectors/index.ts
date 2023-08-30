@@ -15,7 +15,10 @@ import {
   PipetteName,
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import {
+  NormalizedAdditionalEquipmentById,
+  TEMPERATURE_DEACTIVATED,
+} from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
   getFormWarnings,
@@ -26,6 +29,7 @@ import {
   ProfileFormError,
   getProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
+import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
@@ -147,10 +151,21 @@ export const _getPipetteEntitiesRootState: (
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
+
 export const getPipetteEntities: Selector<
   BaseState,
   PipetteEntities
 > = createSelector(rootSelector, _getPipetteEntitiesRootState)
+
+export const _getAdditionalEquipmentRootState: (
+  arg: RootState
+) => NormalizedAdditionalEquipmentById = rs =>
+  rs.additionalEquipmentInvariantProperties
+
+export const getAdditionalEquipment: Selector<
+  BaseState,
+  NormalizedAdditionalEquipmentById
+> = createSelector(rootSelector, _getAdditionalEquipmentRootState)
 
 const _getInitialDeckSetupStepFormRootState: (
   arg: RootState
@@ -510,6 +525,12 @@ const _dynamicFieldFormErrors = (
   return getProfileFormErrors(hydratedForm)
 }
 
+const _dynamicMoveLabwareFieldFormErrors = (
+  hydratedForm: FormData,
+  invariantContext: InvariantContext
+): ProfileFormError[] => {
+  return getMoveLabwareFormErrors(hydratedForm, invariantContext)
+}
 // TODO type with hydrated form type
 export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
   for (const fieldName in hydratedForm) {
@@ -535,7 +556,10 @@ export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
   return false
 }
 // TODO type with hydrated form type
-export const _hasFormLevelErrors = (hydratedForm: FormData): boolean => {
+export const _hasFormLevelErrors = (
+  hydratedForm: FormData,
+  invariantContext: InvariantContext
+): boolean => {
   if (_formLevelErrors(hydratedForm).length > 0) return true
 
   if (
@@ -545,11 +569,24 @@ export const _hasFormLevelErrors = (hydratedForm: FormData): boolean => {
     return true
   }
 
+  if (
+    hydratedForm.stepType === 'moveLabware' &&
+    _dynamicMoveLabwareFieldFormErrors(hydratedForm, invariantContext).length >
+      0
+  ) {
+    return true
+  }
   return false
 }
 // TODO type with hydrated form type
-export const _formHasErrors = (hydratedForm: FormData): boolean => {
-  return _hasFieldLevelErrors(hydratedForm) || _hasFormLevelErrors(hydratedForm)
+export const _formHasErrors = (
+  hydratedForm: FormData,
+  invariantContext: InvariantContext
+): boolean => {
+  return (
+    _hasFieldLevelErrors(hydratedForm) ||
+    _hasFormLevelErrors(hydratedForm, invariantContext)
+  )
 }
 export const getInvariantContext: Selector<
   BaseState,
@@ -559,16 +596,19 @@ export const getInvariantContext: Selector<
   getModuleEntities,
   getPipetteEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
+  featureFlagSelectors.getAllowAllTipracks,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
-    disableModuleRestrictions
+    disableModuleRestrictions,
+    allowAllTipracks
   ) => ({
     labwareEntities,
     moduleEntities,
     pipetteEntities,
     config: {
+      OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
     },
   })
@@ -611,10 +651,14 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
 export const getCurrentFormCanBeSaved: Selector<
   BaseState,
   boolean
-> = createSelector(getHydratedUnsavedForm, hydratedForm => {
-  if (!hydratedForm) return false
-  return !_formHasErrors(hydratedForm)
-})
+> = createSelector(
+  getHydratedUnsavedForm,
+  getInvariantContext,
+  (hydratedForm, invariantContext) => {
+    if (!hydratedForm) return false
+    return !_formHasErrors(hydratedForm, invariantContext)
+  }
+)
 export const getArgsAndErrorsByStepId: Selector<
   BaseState,
   StepArgsAndErrorsById
@@ -627,8 +671,7 @@ export const getArgsAndErrorsByStepId: Selector<
       (acc, stepForm) => {
         const hydratedForm = _getHydratedForm(stepForm, contextualState)
 
-        const errors = _formHasErrors(hydratedForm)
-
+        const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
               stepArgs: stepFormToArgs(hydratedForm),

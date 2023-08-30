@@ -55,9 +55,36 @@ export type UsbRequestsAction =
   | { type: 'shell:USB_HTTP_REQUESTS_START'; meta: { shell: true } }
   | { type: 'shell:USB_HTTP_REQUESTS_STOP'; meta: { shell: true } }
 
+export interface AppRestartAction {
+  type: 'shell:APP_RESTART'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
+export interface SendLogAction {
+  type: 'shell:SEND_LOG'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
+export interface UpdateBrightnessAction {
+  type: 'shell:UPDATE_BRIGHTNESS'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
   | RobotLogsAction
   | RobotSystemAction
   | UsbRequestsAction
+  | AppRestartAction
+  | SendLogAction
+  | UpdateBrightnessAction

@@ -37,3 +37,5 @@ stages:
           - id: 'RunActionNotAllowed'
             title: 'Run Action Not Allowed'
             detail: 'Cannot pause a run that is not running.'
+            errorCode: '3000'
+            meta: !anydict

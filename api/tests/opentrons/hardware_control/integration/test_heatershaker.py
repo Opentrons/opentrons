@@ -94,3 +94,13 @@ async def test_temp(heatershaker: HeaterShaker) -> None:
 
     # Acceptable delta is 0.7 degrees
     assert 49.3 <= heatershaker.temperature <= 50.7
+
+
+async def test_forcible_deactivate(
+    heatershaker: HeaterShaker, execution_manager: ExecutionManager
+) -> None:
+    """Can override wait_for_is_running."""
+    await execution_manager.pause()
+    await heatershaker.deactivate(must_be_running=False)
+    await heatershaker.deactivate_heater(must_be_running=False)
+    await heatershaker.deactivate_shaker(must_be_running=False)

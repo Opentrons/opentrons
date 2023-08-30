@@ -92,11 +92,18 @@ stages:
               commandId: '{setup_command_id}'
               key: '{setup_command_key}'
               createdAt: '{setup_command_created_at}'
-              index: 14
+              index: 15
         meta:
           cursor: 0
-          totalLength: 15
+          totalLength: 16
         data:
+          # Initial home
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            status: queued
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -287,7 +294,7 @@ stages:
                   x: 0
                   y: 0
                   z: 0
-              randomizeDropLocation: false
+              alternateDropLocation: false
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
             intent: setup
@@ -338,8 +345,16 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 15
+          totalLength: 16
         data:
+          - id: !anystr
+            createdAt: !anystr
+            commandType: home
+            key: !anystr
+            status: succeeded
+            params: { }
+            startedAt: !anystr
+            completedAt: !anystr
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -558,7 +573,7 @@ stages:
                   x: 0
                   y: 0
                   z: 0
-              randomizeDropLocation: false
+              alternateDropLocation: false
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
             intent: setup

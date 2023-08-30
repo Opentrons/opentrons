@@ -266,7 +266,7 @@ class SubsystemManager:
                 usb_messenger=self._usb_messenger,
                 update_details=update_details,
                 retry_count=60,
-                timeout_seconds=1,
+                timeout_seconds=5,
                 erase=True,
             )
 
@@ -405,7 +405,7 @@ class SubsystemManager:
                 right=self._tool_if_ok(update.right, NodeId.pipette_right),
                 gripper=self._tool_if_ok(update.gripper, NodeId.gripper),
             )
-            self._present_tools = await self._tool_detector.resolve(to_resolve)
+            self._present_tools = await self._tool_detector.resolve(to_resolve, 10.0)
             log.info(f"Present tools are now {self._present_tools}")
             async with self._tool_task_condition:
                 self._tool_task_state = True

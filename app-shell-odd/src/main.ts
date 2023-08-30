@@ -1,12 +1,26 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
+import fse from 'fs-extra'
+import path from 'path'
 import { createUi } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
-import { registerUpdate, updateLatestVersion } from './update'
+import {
+  registerUpdate,
+  updateLatestVersion,
+  registerUpdateBrightness,
+} from './update'
 import { registerRobotSystemUpdate } from './system-update'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import { registerAppRestart } from './restart'
+import {
+  getConfig,
+  getStore,
+  getOverrides,
+  registerConfig,
+  resetStore,
+  ODD_DIR,
+} from './config'
 import systemd from './systemd'
 
 import type { BrowserWindow } from 'electron'
@@ -40,6 +54,15 @@ app.once('window-all-closed', () => {
 
 function startUp(): void {
   log.info('Starting App')
+  console.log('Starting App')
+  const storeNeedsReset = fse.existsSync(
+    path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
+  )
+  if (storeNeedsReset) {
+    log.debug('store marked to be reset, resetting store')
+    resetStore()
+    fse.removeSync(path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`))
+  }
   systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
@@ -71,6 +94,8 @@ function startUp(): void {
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerRobotSystemUpdate(dispatch),
+    registerAppRestart(),
+    registerUpdateBrightness(),
   ]
 
   ipcMain.on('dispatch', (_, action) => {

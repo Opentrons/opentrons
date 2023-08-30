@@ -49,7 +49,7 @@ def run():
     pass
 """
     )
-    with pytest.raises(execute_python.MalformedProtocolError) as e:
+    with pytest.raises(execute_python.MalformedPythonProtocolError) as e:
         execute.run_protocol(no_args, context=ctx)
         assert "Function 'run()' does not take any parameters" in str(e.value)
 
@@ -60,7 +60,7 @@ def run(a, b):
     pass
 """
     )
-    with pytest.raises(execute_python.MalformedProtocolError) as e:
+    with pytest.raises(execute_python.MalformedPythonProtocolError) as e:
         execute.run_protocol(many_args, context=ctx)
         assert "must be called with more than one argument" in str(e.value)
 

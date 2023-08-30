@@ -10,15 +10,39 @@ If you would like to remove those patches you can run `make remove-patches-gravi
 
 ### Updating the Patches
 
-In order to change the patches for testing first make sure you have checked out your branch
-use the `make apply-patches-gravimetric` to load the old changes first
-Now you can edit the source code and when you are ready you can run `make update-patches-gravimetric`
-
-the changes you made will now be updated in the hardware_testing/gravimetric/overrides/\*.patch files
-and you can commit those changes to your branch with a clean source code.
-the `make update-patches-gravimetric` will remove the patches so after creating your commit simply run
-`make apply-patches-gravimetric` again to resume working on your changes.
+There is a script that will automatically update the patches. from the base of the repository run
+`python hardware-testing/hardware_testing/scripts/update_patches.py`
+if you ware merging your branch onto something other than `origin/edge` you can use the following form
+and substitute `internal-release` for whatever branch you're merging in to.
+`python hardware-testing/hardware_testing/scripts/update_patches.py --upstream origin/internal-release`
 
 ## Photometric tests
 
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96 --photometric --tip 50
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96 --photometric --tip 200
+
 ## Gravimetric tests
+
+###P1000 single channel QC
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --extra
+###P1000 multi channel QC
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --extra
+###P1000 96 channel QC
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96
+###P50 single channel QC
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 1
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 1 --extra
+###P50 multi channel QC
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 8
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 8 --extra
+###Increment tests
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --increment --tip 50
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --increment --tip 200
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --increment --tip 1000
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --increment --tip 50
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --increment --tip 200
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --increment --tip 1000
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 1 --increment --tip 50
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 8 --increment --tip 50

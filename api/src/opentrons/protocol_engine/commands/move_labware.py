@@ -7,10 +7,13 @@ from typing_extensions import Literal
 
 from ..types import (
     LabwareLocation,
+    OnLabwareLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    ExperimentalOffsetData,
+    LabwareMovementOffsetData,
 )
+from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
+from ..resources import labware_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -31,16 +34,6 @@ class MoveLabwareParams(BaseModel):
         ...,
         description="Whether to use the gripper to perform the labware movement"
         " or to perform a manual movement with an option to pause.",
-    )
-    usePickUpLocationLpcOffset: bool = Field(
-        False,
-        description="Whether to use LPC offset of the labware associated with its "
-        "pick up location. Experimental param, subject to change.",
-    )
-    useDropLocationLpcOffset: bool = Field(
-        False,
-        description="Whether to use LPC offset of the labware associated with its "
-        "drop off location. Experimental param, subject to change.",
     )
     pickUpOffset: Optional[LabwareOffsetVector] = Field(
         None,
@@ -94,42 +87,69 @@ class MoveLabwareImplementation(
         """Move a loaded labware to a new location."""
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
+        current_labware_definition = self._state_view.labware.get_definition(
+            labware_id=params.labwareId
+        )
         definition_uri = current_labware.definitionUri
 
-        empty_new_location = self._state_view.geometry.ensure_location_not_occupied(
+        available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
         )
 
+        # Check that labware and destination do not have labware on top
+        self._state_view.labware.raise_if_labware_has_labware_on_top(
+            labware_id=params.labwareId
+        )
+        if isinstance(available_new_location, OnLabwareLocation):
+            self._state_view.labware.raise_if_labware_has_labware_on_top(
+                available_new_location.labwareId
+            )
+            # Ensure that labware can be placed on requested labware
+            self._state_view.labware.raise_if_labware_cannot_be_stacked(
+                top_labware_definition=current_labware_definition,
+                bottom_labware_id=available_new_location.labwareId,
+            )
+
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(
-            labware_definition_uri=definition_uri, labware_location=empty_new_location
+            labware_definition_uri=definition_uri,
+            labware_location=available_new_location,
         )
         await self._labware_movement.ensure_movement_not_obstructed_by_module(
-            labware_id=params.labwareId, new_location=empty_new_location
+            labware_id=params.labwareId, new_location=available_new_location
         )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
+            if self._state_view.config.robot_type == "OT-2 Standard":
+                raise NotSupportedOnRobotType(
+                    message="Labware movement using a gripper is not supported on the OT-2",
+                    details={"strategy": params.strategy},
+                )
+            if labware_validation.validate_definition_is_adapter(
+                current_labware_definition
+            ):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move adapter {params.labwareId} with gripper."
+                )
+
             validated_current_loc = (
-                self._labware_movement.ensure_valid_gripper_location(
+                self._state_view.geometry.ensure_valid_gripper_location(
                     current_labware.location
                 )
             )
-            validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
-                empty_new_location,
+            validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
+                available_new_location,
             )
-            experimental_offset_data = ExperimentalOffsetData(
-                usePickUpLocationLpcOffset=params.usePickUpLocationLpcOffset,
-                useDropLocationLpcOffset=params.useDropLocationLpcOffset,
-                pickUpOffset=params.pickUpOffset,
-                dropOffset=params.dropOffset,
+            user_offset_data = LabwareMovementOffsetData(
+                pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
+                dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
             )
             # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,
                 current_location=validated_current_loc,
                 new_location=validated_new_loc,
-                experimental_offset_data=experimental_offset_data,
-                new_offset_id=new_offset_id,
+                user_offset_data=user_offset_data,
             )
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement

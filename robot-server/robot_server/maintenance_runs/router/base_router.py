@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
+from robot_server.robot.control.dependencies import require_estop_in_good_state
 
 from robot_server.service.json_api import (
     RequestModel,
@@ -143,6 +144,7 @@ async def create_run(
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     protocol_run_has_been_played: bool = Depends(get_protocol_run_has_been_played),
+    check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
 
@@ -152,6 +154,7 @@ async def create_run(
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
         protocol_run_has_been_played: Whether a protocol run has been played yet.
+        check_estop: Dependency to verify the estop is in a valid state.
     """
     if protocol_run_has_been_played:
         raise ProtocolRunIsActive(

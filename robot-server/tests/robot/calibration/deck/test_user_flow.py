@@ -2,11 +2,15 @@ import pytest
 import datetime
 from mock import MagicMock, call
 from typing import List, Tuple
+from pathlib import Path
 from opentrons.calibration_storage import types as cal_types, models
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config import robot_configs
-from opentrons.config.pipette_config import load
+from opentrons_shared_data.pipette import (
+    mutable_configurations,
+    pipette_load_name_conversions as pipette_load_name,
+)
 from opentrons.protocol_api import labware
 from robot_server.robot.calibration.deck.user_flow import (
     DeckCalibrationUserFlow,
@@ -29,10 +33,16 @@ PIP_OFFSET = models.v1.InstrumentOffsetModel(
     last_modified=datetime.datetime.now(),
 )
 
+fake_path = Path("fake/path")
+
 
 @pytest.fixture
 def mock_hw(hardware):
-    pip = pipette.Pipette(load("p300_single_v2.1", "testiId"), PIP_OFFSET, "testId")
+    pipette_model = pipette_load_name.convert_pipette_model("p300_single_v2.1")
+    configurations = mutable_configurations.load_with_mutable_configurations(
+        pipette_model, fake_path, "testiId"
+    )
+    pip = pipette.Pipette(configurations, PIP_OFFSET, "testId")
     hardware.hardware_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
     hardware._current_pos = Point(0, 0, 0)
 
@@ -69,9 +79,17 @@ pipette_combos: List[Tuple[List[str], Mount]] = [
 def test_user_flow_select_pipette(pipettes, target_mount, hardware):
     pip, pip2 = None, None
     if pipettes[0]:
-        pip = pipette.Pipette(load(pipettes[0], "testId"), PIP_OFFSET, "testId")
+        pip1_model = pipette_load_name.convert_pipette_model(pipettes[0])
+        pip1_configurations = mutable_configurations.load_with_mutable_configurations(
+            pip1_model, fake_path, "testId"
+        )
+        pip = pipette.Pipette(pip1_configurations, PIP_OFFSET, "testId")
     if pipettes[1]:
-        pip2 = pipette.Pipette(load(pipettes[1], "testId"), PIP_OFFSET, "testId2")
+        pip2_model = pipette_load_name.convert_pipette_model(pipettes[1])
+        pip2_configurations = mutable_configurations.load_with_mutable_configurations(
+            pip2_model, fake_path, "testId"
+        )
+        pip2 = pipette.Pipette(pip2_configurations, PIP_OFFSET, "testId2")
     hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
 
     uf = DeckCalibrationUserFlow(hardware=hardware)
@@ -121,18 +139,22 @@ async def test_pick_up_tip(mock_user_flow):
 async def test_save_default_pick_up_current(mock_hw):
     # make sure pick up current for multi-channels is
     # modified during tip pick up
-    pip = pipette.Pipette(load("p20_multi_v2.1", "testId"), PIP_OFFSET, "testid")
+    pipette_model = pipette_load_name.convert_pipette_model("p20_multi_v2.1")
+    configurations = mutable_configurations.load_with_mutable_configurations(
+        pipette_model, fake_path, "testiId"
+    )
+    pip = pipette.Pipette(configurations, PIP_OFFSET, "testid")
     mock_hw.hardware_instruments[Mount.LEFT] = pip
     uf = DeckCalibrationUserFlow(hardware=mock_hw)
 
-    def mock_update_config_item(*args, **kwargs):
+    def mock_update_config_item(*args):
         pass
 
     uf._hw_pipette.update_config_item = MagicMock(side_effect=mock_update_config_item)
-    default_current = pip.config.pick_up_current
+    default_current = pip.pick_up_configurations.current
     update_config_calls = [
-        call("pick_up_current", 0.1),
-        call("pick_up_current", default_current),
+        call({"pick_up_current": 0.1}),
+        call({"pick_up_current": default_current}),
     ]
     await uf.pick_up_tip()
     uf._hw_pipette.update_config_item.assert_has_calls(update_config_calls)
@@ -142,7 +164,10 @@ async def test_return_tip(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
     uf._hw_pipette._has_tip = True
-    z_offset = uf._hw_pipette.config.return_tip_height * uf._get_tip_length()
+    z_offset = (
+        uf._hw_pipette.active_tip_settings.default_return_tip_height
+        * uf._get_tip_length()
+    )
     await uf.return_tip()
     # should move to return tip
     move_calls = [

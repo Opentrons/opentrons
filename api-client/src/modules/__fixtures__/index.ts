@@ -19,6 +19,8 @@ export const mockModulesResponse = [
     usbPort: {
       port: 0,
       path: '',
+      hub: false,
+      portGroup: 'unknown',
     },
   },
   {
@@ -36,10 +38,13 @@ export const mockModulesResponse = [
       currentSpeed: 0,
       temperatureStatus: 'idle',
       currentTemperature: 23.0,
+      targetSpeed: null,
     },
     usbPort: {
       port: 0,
       path: '',
+      hub: false,
+      portGroup: 'unknown',
     },
   },
   {
@@ -58,6 +63,8 @@ export const mockModulesResponse = [
     usbPort: {
       port: 0,
       path: '',
+      hub: false,
+      portGroup: 'unknown',
     },
   },
   {
@@ -76,6 +83,8 @@ export const mockModulesResponse = [
     usbPort: {
       port: 0,
       path: '',
+      hub: false,
+      portGroup: 'unknown',
     },
   },
 ]
@@ -87,8 +96,10 @@ export const v2MockModulesResponse = [
     moduleModel: 'thermocyclerModuleV1',
     port: '/dev/ot_module_sim_thermocycler0',
     usbPort: {
-      hub: null,
       port: 0,
+      hub: false,
+      portGroup: 'unknown',
+      path: '',
     },
     serial: 'dummySerialTC',
     model: 'dummyModelTC',
@@ -116,7 +127,9 @@ export const v2MockModulesResponse = [
     moduleModel: 'heaterShakerModuleV1',
     port: '/dev/ot_module_sim_heatershaker1',
     usbPort: {
-      hub: null,
+      hub: false,
+      portGroup: 'unknown',
+      path: '',
       port: 0,
     },
     serial: 'dummySerialHS',
@@ -142,7 +155,9 @@ export const v2MockModulesResponse = [
     moduleModel: 'temperatureModuleV1',
     port: '/dev/ot_module_sim_tempdeck2',
     usbPort: {
-      hub: null,
+      hub: false,
+      portGroup: 'unknown',
+      path: '',
       port: 0,
     },
     serial: 'dummySerialTD',
@@ -162,8 +177,10 @@ export const v2MockModulesResponse = [
     moduleModel: 'magneticModuleV1',
     port: '/dev/ot_module_sim_magdeck3',
     usbPort: {
-      hub: null,
       port: 0,
+      hub: false,
+      portGroup: 'unknown',
+      path: '',
     },
     serial: 'dummySerialMD',
     model: 'mag_deck_v1.1',

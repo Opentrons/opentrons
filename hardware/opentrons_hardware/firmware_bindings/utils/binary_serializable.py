@@ -3,25 +3,53 @@
 from __future__ import annotations
 import struct
 from dataclasses import dataclass, fields, astuple
-from typing import TypeVar, Generic, Type
+from typing import TypeVar, Generic, Type, Optional, Dict, Any, Sequence
+
+from opentrons_shared_data.errors.exceptions import (
+    InternalMessageFormatError,
+    EnumeratedError,
+    PythonException,
+)
 
 
-class BinarySerializableException(BaseException):
+class BinarySerializableException(InternalMessageFormatError):
     """Exception."""
 
-    pass
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a BinarySerializableException."""
+        submessage = f": {message}" if message else ""
+        super().__init__(
+            f"Could not create message object{submessage}",
+            detail=detail,
+            wrapping=wrapping,
+        )
 
 
 class InvalidFieldException(BinarySerializableException):
     """Field is wrong type."""
 
-    pass
+    def __init__(self, message: str, intended_bytes: bytes, exc: BaseException) -> None:
+        """Build an InvalidFieldException."""
+        super().__init__(
+            message=message,
+            detail={
+                "data": repr(intended_bytes),
+            },
+            wrapping=[PythonException(exc)],
+        )
 
 
 class SerializationException(BinarySerializableException):
     """Serialization error."""
 
-    pass
+    def __init__(self, exc: BaseException) -> None:
+        """Build a SerializationException."""
+        super().__init__("Serialization failed", wrapping=[PythonException(exc)])
 
 
 T = TypeVar("T")
@@ -162,7 +190,7 @@ class BinarySerializable:
         try:
             return struct.pack(string, *vals)
         except struct.error as e:
-            raise SerializationException(str(e))
+            raise SerializationException(e)
 
     @classmethod
     def build(cls, data: bytes) -> BinarySerializable:
@@ -207,7 +235,7 @@ class BinarySerializable:
                 ret_instance.message_index = message_index  # type: ignore[attr-defined]
             return ret_instance
         except struct.error as e:
-            raise InvalidFieldException(str(e))
+            raise InvalidFieldException("Bad data for field", data, e)
 
     @classmethod
     def _get_format_string(cls) -> str:
@@ -221,8 +249,10 @@ class BinarySerializable:
             format_string = (
                 f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
             )
-        except AttributeError:
-            raise InvalidFieldException(f"All fields must be of type {BinaryFieldBase}")
+        except AttributeError as e:
+            raise InvalidFieldException(
+                "All fields must be of type BinaryFieldBase", b"", e
+            )
 
         return format_string
 

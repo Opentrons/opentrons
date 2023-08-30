@@ -25,6 +25,7 @@ interface SP {
   moduleType: LabwareSelectionModalProps['moduleType']
   permittedTipracks: LabwareSelectionModalProps['permittedTipracks']
   isNextToHeaterShaker: boolean
+  adapterLoadName?: string
 }
 
 function mapStateToProps(state: BaseState): SP {
@@ -34,6 +35,7 @@ function mapStateToProps(state: BaseState): SP {
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
+  const labwareById = stepFormSelectors.getInitialDeckSetup(state).labware
   const parentModule =
     (slot != null &&
       initialModules.find(moduleOnDeck => moduleOnDeck.id === slot)) ||
@@ -45,6 +47,10 @@ function mapStateToProps(state: BaseState): SP {
       hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
       getAreSlotsHorizontallyAdjacent(hardwareModule.slot, parentSlot ?? slot)
   )
+  const adapterLoadNameOnDeck = Object.values(labwareById)
+    .filter(labwareOnDeck => slot === labwareOnDeck.id)
+    .map(labwareOnDeck => labwareOnDeck.def.parameters.loadName)[0]
+
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     slot,
@@ -52,6 +58,7 @@ function mapStateToProps(state: BaseState): SP {
     moduleType,
     isNextToHeaterShaker,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
+    adapterLoadName: adapterLoadNameOnDeck,
   }
 }
 

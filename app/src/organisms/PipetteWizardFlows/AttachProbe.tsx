@@ -4,13 +4,14 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TYPOGRAPHY,
+  COLORS,
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { NINETY_SIX_CHANNEL, LEFT, MotorAxes } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { CalibrationErrorModal } from './CalibrationErrorModal'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
@@ -55,20 +56,25 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
+  const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
-    chainRunCommands(
+    chainRunCommands?.(
       [
         {
-          // @ts-expect-error calibration type not yet supported
+          commandType: 'home' as const,
+          params: {
+            axes: axes,
+          },
+        },
+        {
           commandType: 'calibration/calibratePipette' as const,
           params: {
             mount: mount,
           },
         },
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,
@@ -132,13 +138,23 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     )
 
   return errorMessage != null ? (
-    <CalibrationErrorModal
-      proceed={proceed}
-      isOnDevice={isOnDevice}
-      errorMessage={errorMessage}
-      chainRunCommands={chainRunCommands}
-      mount={mount}
-      setShowErrorMessage={setShowErrorMessage}
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={
+        <Trans
+          t={t}
+          i18nKey={'return_probe_error'}
+          values={{ error: errorMessage }}
+          components={{
+            block: <StyledText as="p" />,
+            bold: (
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            ),
+          }}
+        />
+      }
     />
   ) : (
     <GenericWizardTile

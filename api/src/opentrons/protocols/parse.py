@@ -3,11 +3,13 @@ opentrons.protocols.parse: functions and state for parsing protocols
 """
 
 import ast
+import enum
 import functools
 import itertools
 import json
 import logging
 import re
+import traceback
 from io import BytesIO
 from zipfile import ZipFile
 from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
@@ -19,16 +21,21 @@ from opentrons_shared_data.protocol import (
     Schema as JSONProtocolSchema,
     load_schema as load_protocol_schema,
 )
+from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.ordered_set import OrderedSet
+
+from .api_support.definitions import MIN_SUPPORTED_VERSION_FOR_FLEX
 from .api_support.types import APIVersion
 from .types import (
+    RUN_FUNCTION_MESSAGE,
     Protocol,
     PythonProtocol,
     JsonProtocol,
     StaticPythonInfo,
     PythonProtocolMetadata,
     PythonProtocolRequirements,
-    MalformedProtocolError,
+    MalformedPythonProtocolError,
     ApiDeprecationError,
 )
 from .bundle import extract_bundle
@@ -58,6 +65,46 @@ class JSONSchemaVersionTooNewError(RuntimeError):
         )
 
 
+class PythonParseMode(enum.Enum):
+    """Configure optional rules for when `opentrons.protocols.parse.parse()` parses Python files.
+
+    This is an August 2023 temporary measure to let us add more validation to Python files without
+    disrupting our many internal users testing the Flex.
+    https://opentrons.atlassian.net/browse/RSS-306
+    """
+
+    NORMAL = enum.auto()
+    """Enforce the normal, strict, officially customer-facing rules.
+
+    You should use this mode when handling protocol files that are not already on a robot.
+    """
+
+    ALLOW_LEGACY_METADATA_AND_REQUIREMENTS = enum.auto()
+    """Disable enforcement of certain rules, allowing more questionable protocol files.
+
+    You should use this mode when handling protocol files that are already stored on a robot.
+
+    Certain rules were added late in Flex development, after protocol files that disobey them
+    were already put on internal testing robots. robot-server and the app generally do not
+    gracefully handle it when files that are already on a robot suddenly fail to parse; it currently
+    requires a disruptive factory-reset to get the robot usable again. To avoid making all our
+    internal users do that, we have this mode, as a temporary measure.
+
+    The specific differences from normal mode are:
+
+    1. Normally, if a protocol is for the Flex, it's an error to specify `apiLevel` 2.14 or older.
+       In this mode, the parser will allow those older `apiLevel`s. Actually running one of those
+       protocols may happen to work, or it may have obscure problems.
+
+    2. Normally, it's an error to specify unrecognized fields in the `requirements` dict.
+       In this mode, the parser ignores unrecognized fields.
+
+    3. Normally, it's an error to specify `apiLevel` in both the `metadata` and `requirements`
+       dicts simultaneously. You need to choose just one. In this mode, it's allowed, and
+       `requirements` will override `metadata` if they're different.
+    """
+
+
 def _validate_v2_ast(protocol_ast: ast.Module) -> None:
     defs = [fdef for fdef in protocol_ast.body if isinstance(fdef, ast.FunctionDef)]
     rundefs = [fdef for fdef in defs if fdef.name == "run"]
@@ -65,15 +112,65 @@ def _validate_v2_ast(protocol_ast: ast.Module) -> None:
     if len(rundefs) > 1:
         lines = [str(d.lineno) for d in rundefs]
         linestr = ", ".join(lines)
-        raise MalformedProtocolError(
-            f"More than one run function is defined (lines {linestr})"
+        raise MalformedPythonProtocolError(
+            short_message=f"More than one run function is defined (lines {linestr}).",
+            long_additional_message=RUN_FUNCTION_MESSAGE,
         )
     if not rundefs:
-        raise MalformedProtocolError("No function 'run(ctx)' defined")
+        raise MalformedPythonProtocolError(
+            short_message="No function 'run(ctx)' defined",
+            long_additional_message=RUN_FUNCTION_MESSAGE,
+        )
     if _has_api_v1_imports(protocol_ast):
-        raise MalformedProtocolError(
-            "Protocol API v1 modules such as robot, instruments, and labware "
-            "may not be imported in Protocol API V2 protocols"
+        raise MalformedPythonProtocolError(
+            short_message=(
+                "Protocol API v1 modules such as robot, instruments, and labware "
+                "may not be imported in Protocol API V2 protocols"
+            )
+        )
+
+
+def _validate_v2_static_info(static_info: StaticPythonInfo) -> None:
+    # Unlike the metadata dict, in the requirements dict, we only allow you to specify
+    # officially known keys. This lets us add new keys in the future without having to worry about
+    # conflicting with other random junk that people might have put there, and it prevents silly
+    # typos from causing confusing downstream problems.
+    allowed_requirements_keys = {
+        "apiLevel",
+        "robotType",
+        # NOTE(mm, 2023-08-08): If we add new allowed keys to this dict in the future,
+        # we should probably gate them behind new apiLevels.
+    }
+    # OrderedSet just to make the error message deterministic and easy to test.
+    actual_requirements_keys = OrderedSet((static_info.requirements or {}).keys())
+    unexpected_requirements_keys = actual_requirements_keys - allowed_requirements_keys
+    if unexpected_requirements_keys:
+        raise MalformedPythonProtocolError(
+            f"Unrecognized {'key' if len(unexpected_requirements_keys) == 1 else 'keys'}"
+            f" in requirements dict:"
+            f" {', '.join(repr(k) for k in unexpected_requirements_keys)}."
+            f" Allowed keys:"
+            f" {', '.join(repr(k) for k in allowed_requirements_keys)}."
+        )
+
+    api_level_in_metadata = "apiLevel" in (static_info.metadata or {})
+    api_level_in_requirements = "apiLevel" in (static_info.requirements or {})
+    if api_level_in_metadata and api_level_in_requirements:
+        # If a user does this, it's almost certainly a mistake. Forbid it to avoid complexity in
+        # which dict takes precedence, and in what happens when you upload to an old software
+        # version that only knows about the metadata dict, not the requirements dict.
+        raise MalformedPythonProtocolError(
+            "You may only put apiLevel in the metadata dict or the requirements dict, not both."
+        )
+
+
+def _validate_robot_type_at_version(robot_type: RobotType, version: APIVersion) -> None:
+    if robot_type == "OT-3 Standard" and version < MIN_SUPPORTED_VERSION_FOR_FLEX:
+        raise MalformedPythonProtocolError(
+            short_message=(
+                f"The Opentrons Flex only supports apiLevel"
+                f" {MIN_SUPPORTED_VERSION_FOR_FLEX} or newer."
+            )
         )
 
 
@@ -86,9 +183,11 @@ def version_from_string(vstr: str) -> APIVersion:
     """
     matches = API_VERSION_RE.match(vstr)
     if not matches:
-        raise ValueError(
-            f"apiLevel {vstr} is incorrectly formatted. It should "
-            "major.minor, where both major and minor are numbers."
+        raise MalformedPythonProtocolError(
+            short_message=(
+                f"apiLevel {vstr} is incorrectly formatted. It should be "
+                "major.minor, where both major and minor are numbers."
+            )
         )
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
@@ -104,11 +203,13 @@ def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonP
         schema_version=version,
         api_level=API_VERSION_FOR_JSON_V5_AND_BELOW,
         metadata=validated["metadata"],
+        robot_type=validated["robot"]["model"],
     )
 
 
 def _parse_python(
     protocol_contents: str,
+    python_parse_mode: PythonParseMode,
     filename: Optional[str] = None,
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
@@ -122,14 +223,35 @@ def _parse_python(
     else:
         ast_filename = filename_checked
 
-    parsed = ast.parse(protocol_contents, filename=ast_filename)
+    # todo(mm, 2021-09-13): By default, ast.parse will inherit compiler options
+    # and future features from this module. This may not be appropriate.
+    # Investigate switching to compile() with dont_inherit=True.
+    try:
+        parsed = ast.parse(protocol_contents, filename=ast_filename)
+    except SyntaxError as syntax_error:
+        raise MalformedPythonProtocolError(
+            short_message=str(syntax_error),
+            # Get Python's nice syntax error message with carets pointing to where in the line
+            # had the problem.
+            long_additional_message="\n".join(
+                traceback.format_exception_only(type(syntax_error), syntax_error)
+            ),
+        ) from syntax_error
+    except ValueError as null_bytes_error:
+        # ast.parse() raises SyntaxError for most errors,
+        # but ValueError if the source contains null bytes.
+        raise MalformedPythonProtocolError(short_message=str(null_bytes_error))
 
-    static_info = extract_static_python_info(parsed)
+    static_info = _extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
-    version = get_version(static_info, parsed)
+    version = _get_version(static_info, parsed, filename_checked)
+    robot_type = _robot_type_from_static_python_info(static_info)
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
+        if python_parse_mode != PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS:
+            _validate_v2_static_info(static_info)
+            _validate_robot_type_at_version(robot_type, version)
     else:
         raise ApiDeprecationError(version)
 
@@ -139,6 +261,7 @@ def _parse_python(
         contents=protocol,
         metadata=static_info.metadata,
         api_level=version,
+        robot_type=robot_type,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         bundled_python=bundled_python,
@@ -148,21 +271,24 @@ def _parse_python(
     return result
 
 
-def _parse_bundle(bundle: ZipFile, filename: Optional[str] = None) -> PythonProtocol:
+def _parse_bundle(
+    bundle: ZipFile, python_parse_mode: PythonParseMode, filename: Optional[str] = None
+) -> PythonProtocol:
     """Parse a bundled Python protocol"""
     contents = extract_bundle(bundle)
 
     result = _parse_python(
-        contents.protocol,
-        filename,
-        contents.bundled_labware,
-        contents.bundled_data,
-        contents.bundled_python,
+        protocol_contents=contents.protocol,
+        python_parse_mode=python_parse_mode,
+        filename=filename,
+        bundled_labware=contents.bundled_labware,
+        bundled_data=contents.bundled_data,
+        bundled_python=contents.bundled_python,
     )
 
     if result.api_level < APIVersion(2, 0):
-        raise RuntimeError(
-            "Bundled protocols must use Protocol API V2, " + f"got {result.api_level}"
+        raise MalformedPythonProtocolError(
+            short_message=f"Bundled protocols must use Protocol API v2, got {result.api_level}."
         )
 
     return result
@@ -173,6 +299,9 @@ def parse(
     filename: Optional[str] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     extra_data: Optional[Dict[str, bytes]] = None,
+    # TODO(mm, 2023-08-10): Remove python_parse_mode after the Flex launch, when the malformed
+    # protocols are no longer on any robots. https://opentrons.atlassian.net/browse/RSS-306
+    python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
 ) -> Protocol:
     """Parse a protocol from text.
 
@@ -187,6 +316,7 @@ def parse(
     :param extra_data: Any extra data files that should be provided to the
                        protocol. Ignored if the protocol is json or zipped
                        python.
+    :param python_parse_mode: See `PythonParseMode`.
     :return types.Protocol: The protocol holder, a named tuple that stores the
                         data in the protocol for later simulation or
                         execution.
@@ -198,7 +328,9 @@ def parse(
             )
 
         with ZipFile(BytesIO(protocol_file)) as bundle:
-            result = _parse_bundle(bundle, filename)
+            result = _parse_bundle(
+                bundle=bundle, python_parse_mode=python_parse_mode, filename=filename
+            )
         return result
     else:
         if isinstance(protocol_file, bytes):
@@ -210,8 +342,9 @@ def parse(
             return _parse_json(protocol_str, filename)
         elif filename and filename.endswith(".py"):
             return _parse_python(
-                protocol_str,
-                filename,
+                protocol_contents=protocol_str,
+                python_parse_mode=python_parse_mode,
+                filename=filename,
                 extra_labware=extra_labware,
                 bundled_data=extra_data,
             )
@@ -221,14 +354,15 @@ def parse(
             return _parse_json(protocol_str, filename)
         else:
             return _parse_python(
-                protocol_str,
-                filename,
+                protocol_contents=protocol_str,
+                python_parse_mode=python_parse_mode,
+                filename=filename,
                 extra_labware=extra_labware,
                 bundled_data=extra_data,
             )
 
 
-def extract_static_python_info(parsed: ast.Module) -> StaticPythonInfo:
+def _extract_static_python_info(parsed: ast.Module) -> StaticPythonInfo:
     """Extract statically analyzable info from a Python protocol, like its metadata.
 
     Raises:
@@ -273,7 +407,7 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
             for error reporting.
 
     Raises:
-        ValueError: If the dict is too complex for this function to understand
+        MalformedPythonError: If the dict is too complex for this function to understand
             statically, or if it contains unsupported types.
     """
     try:
@@ -282,10 +416,12 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
         # Undocumented, but ast.literal_eval() seems to raise ValueError for
         # expressions that aren't statically or "safely" evaluable, like
         # `{"o": object()}` or `{"s": "abc"[0]}`.
-        raise ValueError(
-            f"Could not read the contents of the {name} dict."
-            f" Make sure it doesn't contain any complex expressions, such as"
-            f" function calls or array indexings."
+        raise MalformedPythonProtocolError(
+            short_message=(
+                f"Could not read the contents of the {name} dict."
+                f" Make sure it doesn't contain any complex expressions, such as"
+                f" function calls or array indexings."
+            )
         ) from exception
 
     # ast.literal_eval() is typed as returning Any, but we're pretty sure it
@@ -295,14 +431,18 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
     # Make sure we don't return anything outside of our declared return type.
     for key, value in evaluated_literal.items():
         if not isinstance(key, str):
-            raise ValueError(
-                f'Keys in the {name} dict must be strings, but key "{key}"'
-                f' has type "{type(key).__name__}".'
+            raise MalformedPythonProtocolError(
+                short_message=(
+                    f'Keys in the {name} dict must be strings, but key "{key}"'
+                    f' has type "{type(key).__name__}".'
+                )
             )
         if not isinstance(value, str):
-            raise ValueError(
-                f'Values in the {name} dict must be strings, but value "{value}"'
-                f' has type "{type(value).__name__}".'
+            raise MalformedPythonProtocolError(
+                short_message=(
+                    f'Values in the {name} dict must be strings, but value "{value}"'
+                    f' has type "{type(value).__name__}".'
+                )
             )
 
     return evaluated_literal
@@ -344,7 +484,7 @@ def _has_api_v1_imports(parsed: ast.Module) -> bool:
     return bool(v1_markers.intersection(opentrons_imports))
 
 
-def version_from_static_python_info(
+def _version_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> Optional[APIVersion]:
     """Get an explicitly specified apiLevel from static info, if we can.
@@ -352,17 +492,6 @@ def version_from_static_python_info(
     If the protocol doesn't declare apiLevel at all, return None.
     If the protocol declares apiLevel incorrectly, raise a ValueError.
     """
-    # TODO(mm, 2022-10-21):
-    #
-    # This logic is quick and dirty, and might allow things that we don't want.
-    #
-    # - Require protocols with new `apiLevel`s to specify `apiLevel` in `requirements`
-    #   and not in `metadata`?
-    # - Forbid protocols from specifying `apiLevel` in both `requirements` and
-    #   `metadata`?
-    # - Be more careful with falsey values, like `"apiLevel": ""`?
-    # - Forbid unrecognized keys in `requirements`?
-
     from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
     from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
     requested_level = from_requirements or from_metadata
@@ -376,14 +505,38 @@ def version_from_static_python_info(
         return version_from_string(requested_level)
 
 
-def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> APIVersion:
+def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:
+    if python_robot_type == "OT-2":
+        return "OT-2 Standard"
+    # Allow "OT-3" as a deprecated alias of "Flex" to support internal-to-Opentrons Python protocols
+    # that were written before the "Flex" name existed.
+    elif python_robot_type in ("Flex", "OT-3"):
+        return "OT-3 Standard"
+    else:
+        raise MalformedPythonProtocolError(
+            short_message=f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
+        )
+
+
+def _robot_type_from_static_python_info(
+    static_python_info: StaticPythonInfo,
+) -> RobotType:
+    python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
+    if python_robot_type is None:
+        return "OT-2 Standard"
+    else:
+        return robot_type_from_python_identifier(python_robot_type)
+
+
+def _get_version(
+    static_python_info: StaticPythonInfo, parsed: ast.Module, filename: str
+) -> APIVersion:
     """
     Infer protocol API version based on a combination of metadata and imports.
 
     If a protocol specifies its API version using the 'apiLevel' key of a top-
     level dict variable named `metadata`, the value for that key will be
-    returned as the version (the value will be intified, so numeric values
-    only can be used).
+    returned as the version.
 
     If that variable does not exist or if it does not contain the 'apiLevel'
     key, the API version will be inferred from the imports. A script with an
@@ -392,16 +545,19 @@ def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> API
     APIv2 protocol (note that 'labware' is not in this list, as there is a
     valid APIv2 import named 'labware').
     """
-    declared_version = version_from_static_python_info(static_python_info)
+    declared_version = _version_from_static_python_info(static_python_info)
     if declared_version:
         return declared_version
     else:
         # No apiLevel key, may be apiv1
         if not _has_api_v1_imports(parsed):
-            raise RuntimeError(
-                "If this is not an API v1 protocol, you must specify the target "
-                "api level in the apiLevel key of the metadata. For instance, "
-                'metadata={"apiLevel": "2.0"}'
+            raise MalformedPythonProtocolError(
+                short_message=(
+                    f"apiLevel not declared in {filename}. "
+                    f"You must specify the target API version "
+                    f"in the apiLevel key of the metadata dict. For instance, "
+                    f'metadata={{"apiLevel": "2.0"}}'
+                )
             )
         return APIVersion(1, 0)
 

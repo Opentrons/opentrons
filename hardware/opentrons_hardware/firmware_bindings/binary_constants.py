@@ -31,6 +31,9 @@ class BinaryMessageId(int, Enum):
     aux_id_request = 0x11
     aux_id_response = 0x12
     estop_button_present_request = 0x13
+    estop_state_request = 0x14
+    sync_state_request = 0x15
+    sync_state_resposne = 0x16
 
     write_eeprom_request = 0x100
     read_eeprom_request = 0x101

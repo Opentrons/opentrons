@@ -9,8 +9,10 @@ import form from './form.json'
 import modal from './modal.json'
 import modules from './modules.json'
 import nav from './nav.json'
+import shared from './shared.json'
 import tooltip from './tooltip.json'
 import well_selection from './well_selection.json'
+
 export const en = {
   translation: {
     alert,
@@ -24,6 +26,7 @@ export const en = {
     modal,
     modules,
     nav,
+    shared,
     tooltip,
     well_selection,
   },

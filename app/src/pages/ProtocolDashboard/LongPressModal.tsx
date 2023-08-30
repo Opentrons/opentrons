@@ -9,7 +9,7 @@ import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { StyledText } from '../../atoms/text'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { SmallModalChildren } from '../../molecules/Modal/OnDeviceDisplay'
+import { SmallModalChildren } from '../../molecules/Modal'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../redux/config'
 

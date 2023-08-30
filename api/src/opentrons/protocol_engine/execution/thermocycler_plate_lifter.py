@@ -1,6 +1,7 @@
 """Thermocycler plate lift handling for labware movement using gripper."""
 from __future__ import annotations
 
+import asyncio
 from typing import TYPE_CHECKING, AsyncGenerator, Optional
 from opentrons.hardware_control.modules.thermocycler import Thermocycler
 from opentrons.protocol_engine.types import LabwareLocation, ModuleLocation, ModuleModel
@@ -66,12 +67,14 @@ class ThermocyclerPlateLifter:
         """
         thermocycler_hardware = self._get_tc_hardware(labware_location=labware_location)
         if thermocycler_hardware is not None:
+            await self._movement.home(axes=None)
+            await thermocycler_hardware.lift_plate()
             try:
-                await self._movement.home(axes=None)
-                await thermocycler_hardware.lift_plate()
                 await thermocycler_hardware.raise_plate()
                 yield
-            finally:
+            except asyncio.CancelledError as e:
+                raise e
+            else:
                 await thermocycler_hardware.return_from_raise_plate()
         else:
             yield

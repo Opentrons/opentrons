@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -16,11 +17,13 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
+import { CancelingRunModal } from './CancelingRunModal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -41,6 +44,7 @@ export function ConfirmCancelRunModal({
     dismissCurrentRun,
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
+  const runStatus = useRunStatus(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const history = useHistory()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -55,28 +59,32 @@ export function ConfirmCancelRunModal({
   const handleCancelRun = (): void => {
     setIsCanceling(true)
     stopRun(runId, {
-      onSuccess: () => {
-        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
-        dismissCurrentRun(runId)
-        if (!isActiveRun) {
-          if (protocolId != null) {
-            history.push(`/protocols/${protocolId}`)
-          } else {
-            history.push(`/protocols`)
-          }
-        }
-      },
       onError: () => {
         setIsCanceling(false)
       },
     })
   }
 
-  return (
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_STOPPED) {
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
+      dismissCurrentRun(runId)
+      if (!isActiveRun) {
+        if (protocolId != null) {
+          history.push(`/protocols/${protocolId}`)
+        } else {
+          history.push(`/protocols`)
+        }
+      }
+    }
+  }, [runStatus])
+
+  return isCanceling || isDismissing ? (
+    <CancelingRunModal />
+  ) : (
     <Modal
       modalSize="medium"
       header={modalHeader}
-      isError={isActiveRun}
       onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -96,7 +104,6 @@ export function ConfirmCancelRunModal({
         >
           <SmallButton
             flex="1"
-            buttonType="primary"
             buttonText={t('shared:go_back')}
             onClick={() => setShowConfirmCancelRunModal(false)}
           />
@@ -105,7 +112,6 @@ export function ConfirmCancelRunModal({
             buttonType="alert"
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
-            disabled={isCanceling || isDismissing}
           />
         </Flex>
       </Flex>

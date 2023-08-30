@@ -179,10 +179,6 @@ def get_protocol_api(
         >>> instr = protocol.load_instrument('p300_single', 'right')
         >>> instr.home()
 
-    If ``extra_labware`` is not specified, any labware definitions saved in
-    the ``labware`` directory of the Jupyter notebook directory will be
-    available.
-
     :param version: The API version to use. This must be lower than
                     ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
                     It may be specified either as a string (``'2.0'``) or
@@ -196,14 +192,11 @@ def get_protocol_api(
                             and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
-                         ``protocol_api.ProtocolContext.bundled_data``.
-    :param extra_labware: If specified, a mapping from labware names to
-                          labware definitions for labware to consider in the
-                          protocol in addition to those stored on the robot.
-                          If this is an empty dict, and this function is called
-                          on a robot, it will look in the 'labware'
-                          subdirectory of the Jupyter data directory for
-                          custom labware.
+                         :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
+    :param extra_labware: A mapping from labware load names to custom labware definitions.
+                          If this is ``None`` (the default), and this function is called on a robot,
+                          it will look for labware in the ``labware`` subdirectory of the Jupyter
+                          data directory.
     :param hardware_simulator: If specified, a hardware simulator instance.
     :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
                     determined from persistent settings.
@@ -220,7 +213,12 @@ def get_protocol_api(
         and IS_ROBOT
         and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir()  # type: ignore[union-attr]
     ):
-        extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(
+                [str(JUPYTER_NOTEBOOK_LABWARE_DIR)]
+            ).items()
+        }
 
     checked_hardware = _check_hardware_simulator(hardware_simulator, machine)
     return _build_protocol_context(
@@ -302,7 +300,7 @@ def bundle_from_sim(
 
 
 def simulate(  # noqa: C901
-    protocol_file: TextIO,
+    protocol_file: Union[BinaryIO, TextIO],
     file_name: Optional[str] = None,
     custom_labware_paths: Optional[List[str]] = None,
     custom_data_paths: Optional[List[str]] = None,
@@ -348,11 +346,11 @@ def simulate(  # noqa: C901
 
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
-    :param custom_labware_paths: A list of directories to search for custom
-                                 labware, or None. Ignored if the apiv2 feature
-                                 flag is not set. Loads valid labware from
-                                 these paths and makes them available to the
-                                 protocol context.
+    :param custom_labware_paths: A list of directories to search for custom labware.
+                                 Loads valid labware from these paths and makes them available
+                                 to the protocol context. If this is ``None`` (the default), and
+                                 this function is called on a robot, it will look in the ``labware``
+                                 subdirectory of the Jupyter data directory.
     :param custom_data_paths: A list of directories or files to load custom
                               data files from. Ignored if the apiv2 feature
                               flag if not set. Entries may be either files or
@@ -387,7 +385,10 @@ def simulate(  # noqa: C901
 
     contents = protocol_file.read()
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(custom_labware_paths).items()
+        }
     else:
         extra_labware = {}
 
@@ -537,8 +538,9 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         "Only directories specified directly by "
         "this argument are searched, not their children. JSON files that "
         "do not define labware will be ignored with a message. "
-        "By default, the current directory (the one from which you are "
-        "invoking this program) will be searched for labware.",
+        "The current directory (the one from which you are "
+        "invoking this program) will always be included implicitly, "
+        "in addition to any directories that you specify.",
     )
     parser.add_argument(
         "-D",
@@ -657,10 +659,10 @@ def main() -> int:
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
     runlog, maybe_bundle = simulate(
-        args.protocol,
-        args.protocol.name,
-        getattr(args, "custom_labware_path", []),
-        getattr(args, "custom_data_path", []) + getattr(args, "custom_data_file", []),
+        protocol_file=args.protocol,
+        file_name=args.protocol.name,
+        custom_labware_paths=args.custom_labware_path,
+        custom_data_paths=(args.custom_data_path + args.custom_data_file),
         duration_estimator=duration_estimator,
         hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
         log_level=args.log_level,

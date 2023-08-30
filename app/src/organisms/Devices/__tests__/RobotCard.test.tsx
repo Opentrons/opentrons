@@ -17,7 +17,7 @@ import {
   mockRightProtoPipette,
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getRobotModelByName } from '../../../redux/discovery'
 import {
   HEALTH_STATUS_OK,
@@ -32,7 +32,7 @@ import { RobotCard } from '../RobotCard'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot-update/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../hooks')
 jest.mock('../../UpdateRobotBanner')
@@ -99,8 +99,8 @@ const mockRobotOverflowMenu = RobotOverflowMenu as jest.MockedFunction<
 const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
   typeof RobotStatusHeader
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
@@ -178,12 +178,5 @@ describe('RobotCard', () => {
   it('renders a RobotStatusHeader component', () => {
     const [{ getByText }] = render(props)
     getByText('Mock RobotStatusHeader')
-  })
-
-  it('renders loading text while loading instruments', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('instruments')
-    getByText('LOADING')
   })
 })

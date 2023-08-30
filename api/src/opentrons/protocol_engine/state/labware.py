@@ -1,7 +1,6 @@
 """Basic labware data state and store."""
 from __future__ import annotations
 
-import random
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -18,6 +17,8 @@ from typing import (
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point, MountType
@@ -26,7 +27,7 @@ from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
-from ..resources import DeckFixedLabware
+from ..resources import DeckFixedLabware, labware_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -34,6 +35,8 @@ from ..commands import (
 )
 from ..types import (
     DeckSlotLocation,
+    OnLabwareLocation,
+    NonStackedLocation,
     Dimensions,
     LabwareOffset,
     LabwareOffsetVector,
@@ -41,9 +44,9 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
-    DropTipWellLocation,
-    DropTipWellOrigin,
-    WellOffset,
+    ModuleModel,
+    OverlapOffset,
+    LabwareMovementOffsetData,
 )
 from ..actions import (
     Action,
@@ -175,23 +178,24 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             if command.result.offsetId is not None:
                 assert command.result.offsetId in self._state.labware_offsets_by_id
 
-            labware_id = command.result.labwareId
             definition_uri = uri_from_details(
                 namespace=command.result.definition.namespace,
                 load_name=command.result.definition.parameters.loadName,
                 version=command.result.definition.version,
             )
 
-            self._state.labware_by_id[labware_id] = LoadedLabware.construct(
-                id=labware_id,
+            self._state.definitions_by_uri[definition_uri] = command.result.definition
+
+            self._state.labware_by_id[
+                command.result.labwareId
+            ] = LoadedLabware.construct(
+                id=command.result.labwareId,
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
                 displayName=command.params.displayName,
             )
-
-            self._state.definitions_by_uri[definition_uri] = command.result.definition
 
         elif isinstance(command.result, MoveLabwareResult):
             labware_id = command.params.labwareId
@@ -247,6 +251,29 @@ class LabwareView(HasState[LabwareState]):
         raise errors.exceptions.LabwareNotLoadedOnModuleError(
             "There is no labware loaded on this Module"
         )
+
+    def get_id_by_labware(self, labware_id: str) -> str:
+        """Return the ID of the labware loaded on the given labware."""
+        for labware in self.state.labware_by_id.values():
+            if (
+                isinstance(labware.location, OnLabwareLocation)
+                and labware.location.labwareId == labware_id
+            ):
+                return labware.id
+        raise errors.exceptions.LabwareNotLoadedOnLabwareError(
+            f"There is not labware loaded onto labware {labware_id}"
+        )
+
+    def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
+        """Raise if labware has another labware on top."""
+        for labware in self._state.labware_by_id.values():
+            if (
+                isinstance(labware.location, OnLabwareLocation)
+                and labware.location.labwareId == labware_id
+            ):
+                raise errors.LabwareIsInStackError(
+                    f"Cannot move to labware {labware_id}, labware has other labware stacked on top."
+                )
 
     # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
     # rather than shunting this work to callers via `allowed_ids`.
@@ -343,6 +370,13 @@ class LabwareView(HasState[LabwareState]):
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
         return self.get(labware_id).location
+
+    def get_parent_location(self, labware_id: str) -> NonStackedLocation:
+        """Get labware's non-labware parent location."""
+        parent = self.get_location(labware_id)
+        if isinstance(parent, OnLabwareLocation):
+            return self.get_parent_location(parent.labwareId)
+        return parent
 
     def get_all(self) -> List[LoadedLabware]:
         """Get a list of all labware entries in state."""
@@ -445,6 +479,10 @@ class LabwareView(HasState[LabwareState]):
             raise errors.LabwareIsTipRackError(
                 f"Given labware: {labware_id} is a tiprack. Can not load liquid."
             )
+        if LabwareRole.adapter in labware_definition.allowedRoles:
+            raise errors.LabwareIsAdapterError(
+                f"Given labware: {labware_id} is an adapter. Can not load liquid."
+            )
         if not contains_wells:
             raise errors.WellDoesNotExistError(
                 f"Some of the supplied wells do not match the labwareId: {labware_id}."
@@ -502,6 +540,30 @@ class LabwareView(HasState[LabwareState]):
             x=dims.xDimension,
             y=dims.yDimension,
             z=dims.zDimension,
+        )
+
+    def get_labware_overlap_offsets(
+        self, labware_id: str, below_labware_name: str
+    ) -> OverlapOffset:
+        """Get the labware's overlap with requested labware's load name."""
+        definition = self.get_definition(labware_id)
+        stacking_overlap = definition.stackingOffsetWithLabware.get(
+            below_labware_name, OverlapOffset(x=0, y=0, z=0)
+        )
+        return OverlapOffset(
+            x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
+        )
+
+    def get_module_overlap_offsets(
+        self, labware_id: str, module_model: ModuleModel
+    ) -> OverlapOffset:
+        """Get the labware's overlap with requested module model."""
+        definition = self.get_definition(labware_id)
+        stacking_overlap = definition.stackingOffsetWithModule.get(
+            str(module_model.value), OverlapOffset(x=0, y=0, z=0)
+        )
+        return OverlapOffset(
+            x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
@@ -618,23 +680,102 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def get_random_drop_tip_location(
-        self, labware_id: str, well_name: str
-    ) -> DropTipWellLocation:
-        """Get a random location along the x-axis within 3/4th length of the well top plane."""
-        well_dims = self.get_well_size(labware_id=labware_id, well_name=well_name)
-        random_offset_in_well = WellOffset(
-            x=random.randrange(
-                start=int(well_dims[0] * -3 / 8), stop=int(well_dims[0] * 3 / 8), step=1
-            ),
-            y=0,
-            z=0,
-        )
-        return DropTipWellLocation(
-            origin=DropTipWellOrigin.DEFAULT, offset=random_offset_in_well
-        )
+    def raise_if_labware_cannot_be_stacked(
+        self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
+    ) -> None:
+        """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
+        if labware_validation.validate_definition_is_adapter(top_labware_definition):
+            raise errors.LabwareCannotBeStackedError(
+                f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"
+                " on other labware."
+            )
+        below_labware = self.get(bottom_labware_id)
+        if not labware_validation.validate_labware_can_be_stacked(
+            top_labware_definition=top_labware_definition,
+            below_labware_load_name=below_labware.loadName,
+        ):
+            raise errors.LabwareCannotBeStackedError(
+                f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"
+            )
+        elif isinstance(below_labware.location, ModuleLocation):
+            below_definition = self.get_definition(labware_id=below_labware.id)
+            if not labware_validation.validate_definition_is_adapter(below_definition):
+                raise errors.LabwareCannotBeStackedError(
+                    f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
+                    f" onto a labware on top of a module"
+                )
+        elif isinstance(below_labware.location, OnLabwareLocation):
+            further_below_definition = self.get_definition(
+                labware_id=below_labware.location.labwareId
+            )
+            if labware_validation.validate_definition_is_adapter(
+                further_below_definition
+            ):
+                raise errors.LabwareCannotBeStackedError(
+                    f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
+                    f" onto labware on top of adapter"
+                )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_uri_from_definition(self.get_definition(labware_id))
         return uri in _MAGDECK_HALF_MM_LABWARE
+
+    def get_deck_default_gripper_offsets(self) -> Optional[LabwareMovementOffsetData]:
+        """Get the deck's default gripper offsets."""
+        parsed_offsets = (
+            self.get_deck_definition().get("gripperOffsets", {}).get("default")
+        )
+        return (
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(
+                    x=parsed_offsets["pickUpOffset"]["x"],
+                    y=parsed_offsets["pickUpOffset"]["y"],
+                    z=parsed_offsets["pickUpOffset"]["z"],
+                ),
+                dropOffset=LabwareOffsetVector(
+                    x=parsed_offsets["dropOffset"]["x"],
+                    y=parsed_offsets["dropOffset"]["y"],
+                    z=parsed_offsets["dropOffset"]["z"],
+                ),
+            )
+            if parsed_offsets
+            else None
+        )
+
+    def get_labware_gripper_offsets(
+        self,
+        labware_id: str,
+        slot_name: Optional[DeckSlotName],
+    ) -> Optional[LabwareMovementOffsetData]:
+        """Get the labware's gripper offsets of the specified type."""
+        parsed_offsets = self.get_definition(labware_id).gripperOffsets
+        offset_key = slot_name.name if slot_name else "default"
+        return (
+            LabwareMovementOffsetData(
+                pickUpOffset=cast(
+                    LabwareOffsetVector, parsed_offsets[offset_key].pickUpOffset
+                ),
+                dropOffset=cast(
+                    LabwareOffsetVector, parsed_offsets[offset_key].dropOffset
+                ),
+            )
+            if parsed_offsets
+            else None
+        )
+
+    def get_grip_force(self, labware_id: str) -> float:
+        """Get the recommended grip force for gripping labware using gripper."""
+        recommended_force = self.get_definition(labware_id).gripForce
+        return (
+            recommended_force if recommended_force is not None else LABWARE_GRIP_FORCE
+        )
+
+    def get_grip_height_from_labware_bottom(self, labware_id: str) -> float:
+        """Get the recommended grip height from labware bottom, if present."""
+        recommended_height = self.get_definition(labware_id).gripHeightFromLabwareBottom
+        return (
+            recommended_height
+            if recommended_height is not None
+            else self.get_dimensions(labware_id).z / 2
+        )

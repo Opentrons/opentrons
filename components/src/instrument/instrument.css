@@ -9,27 +9,10 @@
   grid-template-areas: 'left right';
 }
 
-.pipette {
-  display: grid;
-  vertical-align: top;
-}
-
-.left {
-  grid-area: left;
-  grid-template-columns: 80% 20%;
-  grid-template-areas: 'info img';
-  margin-right: 3rem;
-}
-
 .right {
   grid-area: right;
   grid-template-columns: 40% 80%;
   grid-template-areas: 'img info';
-}
-
-.disabled {
-  opacity: 0.3;
-  pointer-events: none;
 }
 
 .pipette_info {

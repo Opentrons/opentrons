@@ -1,5 +1,5 @@
 import { CommandsData, RunCommandSummary } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 
 export const mockAnonLoadCommand: CreateCommand = {
   commandType: 'loadLabware',
@@ -8,6 +8,9 @@ export const mockAnonLoadCommand: CreateCommand = {
     location: {
       slotName: '1',
     },
+    version: 1,
+    namespace: 'mockNamespace',
+    loadName: 'mockLoadname',
   },
 }
 
@@ -16,20 +19,19 @@ export const mockLoadLabwareRunCommandSummary: RunCommandSummary = {
   key: 'first_load_labware',
   commandType: 'loadLabware',
   params: {
+    version: 1,
+    namespace: 'mockNamespace',
+    loadName: 'mockLoadname',
     labwareId: 'abc123',
     location: {
       slotName: '1',
     },
   },
-  result: {
-    labwareId: 'abc123',
-    definition: {} as any,
-    offset: { x: 1, y: 2, z: 3 },
-  },
   status: 'running',
   createdAt: 'fake_created_at_timestamp',
   startedAt: 'fake_created_at_timestamp',
   completedAt: 'fake_created_at_timestamp',
+  error: null,
 }
 
 export const mockLoadPipetteRunCommandSummary: RunCommandSummary = {
@@ -39,14 +41,13 @@ export const mockLoadPipetteRunCommandSummary: RunCommandSummary = {
   params: {
     mount: 'left',
     pipetteId: 'fake_load_pipette_id',
-  },
-  result: {
-    pipetteId: 'abc123',
+    pipetteName: 'p10_single',
   },
   status: 'running',
   createdAt: 'fake_created_at_timestamp',
   startedAt: 'fake_created_at_timestamp',
   completedAt: 'fake_created_at_timestamp',
+  error: null,
 }
 
 export const mockCommandsResponse: CommandsData = {

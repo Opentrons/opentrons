@@ -17,12 +17,12 @@ import { SyncRobotMessage } from './SyncRobotMessage'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
-import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
+import type { RobotUpdateType } from '../../../../redux/robot-update/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 export interface VersionInfoModalProps {
   robot: ViewableRobot
-  robotUpdateType: BuildrootUpdateType | null
+  robotUpdateType: RobotUpdateType | null
   close: () => unknown
   goToViewUpdate: () => unknown
   installUpdate: () => unknown

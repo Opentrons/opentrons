@@ -17,9 +17,11 @@ import {
   DIRECTION_COLUMN,
   POSITION_STICKY,
   POSITION_STATIC,
+  BORDERS,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+
 import { useNetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
 import { getLocalRobot } from '../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
@@ -58,8 +60,21 @@ export function Navigation(props: NavigationProps): JSX.Element {
     }
     setShowNavMenu(openMenu)
   }
+
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+
+  const observer = new IntersectionObserver(([entry]) => {
+    setIsScrolled(!entry.isIntersecting)
+  })
+  if (scrollRef.current != null) {
+    observer.observe(scrollRef.current)
+  }
+
   return (
     <>
+      {/* Empty box to detect scrolling */}
+      <Flex ref={scrollRef} />
       <Flex
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
@@ -71,9 +86,11 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ? POSITION_STATIC
             : POSITION_STICKY
         }
+        paddingX={SPACING.spacing40}
         top="0"
         width="100%"
         backgroundColor={COLORS.white}
+        boxShadow={isScrolled ? BORDERS.shadowBig : ''}
         gridGap={SPACING.spacing24}
         aria-label="Navigation_container"
       >
@@ -141,6 +158,10 @@ const TouchNavLink = styled(NavLink)`
   &.active > div {
     background-color: ${COLORS.highlightPurple1};
   }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+  }
 `
 
 const IconButton = styled('button')`
@@ -148,11 +169,7 @@ const IconButton = styled('button')`
   max-height: 100%;
   background-color: ${COLORS.white};
 
-  &:hover {
-    background-color: ${COLORS.darkBlack20};
-  }
-  &:active,
-  &:focus {
+  &:active {
     background-color: ${COLORS.darkBlack20};
   }
   &:focus-visible {
@@ -161,5 +178,8 @@ const IconButton = styled('button')`
   }
   &:disabled {
     background-color: transparent;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
   }
 `

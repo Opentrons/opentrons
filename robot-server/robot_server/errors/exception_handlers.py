@@ -5,8 +5,9 @@ from fastapi.routing import APIRoute
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from traceback import format_exception, format_exception_only
 from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
+
+from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
 
 from robot_server.versioning import (
     API_VERSION,
@@ -36,6 +37,18 @@ from .error_responses import (
 
 
 log = getLogger(__name__)
+
+
+def _code_or_default(exc: BaseException) -> str:
+    if isinstance(exc, EnumeratedError):
+        # For a reason I cannot fathom, mypy thinks this is an Any.
+        # reveal_type(exc) # -> opentrons_shared_data.errors.exceptions.EnumeratedError
+        # reveal_type(exc.code) # -> opentrons_shared_data.errors.codes.ErrorCodes
+        # reveal_type(exc.code.value) # Any (????????????)
+        # This doesn't happen anywhere else or indeed in the else side of this clause.
+        return exc.code.value.code  # type: ignore [no-any-return]
+    else:
+        return ErrorCodes.GENERAL_ERROR.value.code
 
 
 def _route_is_legacy(request: Request) -> bool:
@@ -95,7 +108,9 @@ async def handle_framework_error(
 ) -> JSONResponse:
     """Map an HTTP exception from the framework to an API response."""
     if _route_is_legacy(request):
-        response: BaseErrorBody = LegacyErrorResponse(message=error.detail)
+        response: BaseErrorBody = LegacyErrorResponse(
+            message=error.detail, errorCode=ErrorCodes.GENERAL_ERROR.value.code
+        )
     else:
         response = BadRequest(detail=error.detail)
 
@@ -114,7 +129,9 @@ async def handle_validation_error(
             f"{'.'.join([str(v) for v in val_error['loc']])}: {val_error['msg']}"
             for val_error in validation_errors
         )
-        response: BaseErrorBody = LegacyErrorResponse(message=message)
+        response: BaseErrorBody = LegacyErrorResponse(
+            message=message, errorCode=ErrorCodes.GENERAL_ERROR.value.code
+        )
     else:
         response = MultiErrorResponse(
             errors=[
@@ -132,17 +149,19 @@ async def handle_validation_error(
     )
 
 
-async def handle_unexpected_error(request: Request, error: Exception) -> JSONResponse:
+async def handle_unexpected_error(
+    request: Request, error: BaseException
+) -> JSONResponse:
     """Map an unhandled Exception to an API response."""
-    detail = "".join(format_exception_only(type(error), error)).strip()
-    stacktrace = "".join(
-        format_exception(type(error), error, error.__traceback__, limit=-5)
-    ).strip()
+    if isinstance(error, EnumeratedError):
+        enumerated: EnumeratedError = error
+    else:
+        enumerated = PythonException(error)
 
     if _route_is_legacy(request):
-        response: BaseErrorBody = LegacyErrorResponse(message=detail)
+        response: BaseErrorBody = LegacyErrorResponse.from_exc(enumerated)
     else:
-        response = UnexpectedError(detail=detail, meta={"stacktrace": stacktrace})
+        response = UnexpectedError.from_exc(enumerated)
 
     return await handle_api_error(
         request,
@@ -154,15 +173,10 @@ async def handle_firmware_upgrade_required_error(
     request: Request, error: HWFirmwareUpdateRequired
 ) -> JSONResponse:
     """Map a FirmwareUpdateRequired error from hardware to an API response."""
-    detail = "".join(
-        format_exception(type(error), error, error.__traceback__, limit=0)
-    ).strip()
     if _route_is_legacy(request):
-        response: BaseErrorBody = LegacyErrorResponse(message=detail)
+        response: BaseErrorBody = LegacyErrorResponse.from_exc(error)
     else:
-        response = FirmwareUpdateRequired(
-            detail=detail, meta={"status_url": "/subsystems/status"}
-        )
+        response = FirmwareUpdateRequired.from_exc(error)
     return await handle_api_error(
         request, response.as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
     )

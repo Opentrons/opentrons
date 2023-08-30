@@ -1125,6 +1125,30 @@ exports[`icons folder-open renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons gantry-homing renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 48 48"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M42.8049 5.625H5.20488C4.54488 5.625 4.00488 6.155 4.00488 6.825C4.00488 12.245 4.00488 34.385 4.00488 37.515C4.00488 38.155 4.12488 38.785 4.37488 39.375C4.62488 39.965 4.97488 40.505 5.42488 40.955C5.87488 41.405 6.41488 41.765 7.00488 42.005C7.59488 42.245 8.22488 42.375 8.86488 42.375H39.1349C39.7749 42.375 40.4049 42.255 40.9949 42.005C41.5849 41.765 42.1249 41.405 42.5749 40.955C43.0249 40.505 43.3849 39.965 43.6249 39.375C43.8649 38.785 43.9949 38.155 43.9949 37.515V6.825C43.9949 6.165 43.4549 5.625 42.7949 5.625H42.8049ZM40.7649 12.115V19.625H37.0049V14.625C37.0049 14.075 36.5549 13.625 36.0049 13.625H29.0049C28.4549 13.625 28.0049 14.075 28.0049 14.625V19.625H7.24488V12.115H40.7549H40.7649ZM7.24488 35.895V27.625H28.0049V31.625C28.0049 32.175 28.4549 32.625 29.0049 32.625H36.0049C36.5549 32.625 37.0049 32.175 37.0049 31.625V27.625H40.7649V35.895H7.24488Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons gear renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
@@ -1173,7 +1197,7 @@ exports[`icons help-circle renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons home-robot-arm renders correctly 1`] = `
+exports[`icons home-gantry renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;

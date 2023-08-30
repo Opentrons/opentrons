@@ -13,9 +13,9 @@ import {
 import { Portal } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface TakeoverModalProps {
   showConfirmTerminateModal: boolean
@@ -50,7 +50,6 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             </StyledText>
             <Flex flex="1" gridGap={SPACING.spacing8}>
               <SmallButton
-                buttonType="primary"
                 onClick={() => setShowConfirmTerminateModal(false)}
                 buttonText={t('continue_activity')}
                 width="50%"

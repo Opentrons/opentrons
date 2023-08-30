@@ -20,16 +20,18 @@ def test_get_serial_log_with_defaults(api_client):
         body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("opentrons-api-serial", DEFAULT_RECORDS, "short")
+        m.assert_called_once_with(
+            "opentrons-api-serial", DEFAULT_RECORDS, "short-precise"
+        )
 
 
 @pytest.mark.parametrize(
     "format_param, records_param, mode_param",
     [
         ("json", MAX_RECORDS - 1, "json"),
-        ("text", MAX_RECORDS - 1, "short"),
+        ("text", MAX_RECORDS - 1, "short-precise"),
         ("json", 1, "json"),
-        ("text", 1, "short"),
+        ("text", 1, "short-precise"),
     ],
 )
 def test_get_serial_log_with_params(
@@ -94,16 +96,16 @@ def test_get_api_log_with_defaults(api_client):
         body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("opentrons-api", DEFAULT_RECORDS, "short")
+        m.assert_called_once_with("opentrons-api", DEFAULT_RECORDS, "short-precise")
 
 
 @pytest.mark.parametrize(
     "format_param, records_param, mode_param",
     [
         ("json", MAX_RECORDS - 1, "json"),
-        ("text", MAX_RECORDS - 1, "short"),
+        ("text", MAX_RECORDS - 1, "short-precise"),
         ("json", 1, "json"),
-        ("text", 1, "short"),
+        ("text", 1, "short-precise"),
     ],
 )
 def test_get_api_log_with_params(api_client, format_param, records_param, mode_param):
@@ -129,6 +131,59 @@ def test_get_api_log_with_params(api_client, format_param, records_param, mode_p
         assert response.status_code == 200
         assert body == expected
         m.assert_called_once_with("opentrons-api", records_param, mode_param)
+
+
+@pytest.mark.parametrize(
+    "format_param, records_param, mode_param",
+    [
+        ("json", MAX_RECORDS - 1, "json"),
+        ("text", MAX_RECORDS - 1, "short-precise"),
+        ("json", 1, "json"),
+        ("text", 1, "short-precise"),
+    ],
+)
+def test_get_odd_log_with_params(api_client, format_param, records_param, mode_param):
+    logs = '{"odd": "application programing interface logs"}'
+    res_bytes = logs.encode("utf-8")
+    if format_param == "json":
+        expected = json.loads(res_bytes)
+    else:
+        expected = logs
+
+    async def mock_get_records_dumb(identifier, records, format_type):
+        return res_bytes
+
+    with patch("opentrons.system.log_control.get_records_dumb") as m:
+        m.side_effect = mock_get_records_dumb
+        response = api_client.get(
+            f"/logs/touchscreen.log?format={format_param}&records={records_param}"
+        )
+        if format_param == "json":
+            body = response.json()
+        else:
+            body = response.text
+        assert response.status_code == 200
+        assert body == expected
+        m.assert_called_once_with("opentrons-robot-app", records_param, mode_param)
+
+
+def test_get_odd_log_with_defaults(api_client):
+    logs = '{"app": "application programing interface logs"}'
+    res_bytes = logs.encode("utf-8")
+    expected = res_bytes.decode("utf-8")
+
+    async def mock_get_records_dumb(identifier, records, format_type):
+        return res_bytes
+
+    with patch("opentrons.system.log_control.get_records_dumb") as m:
+        m.side_effect = mock_get_records_dumb
+        response = api_client.get("/logs/touchscreen.log")
+        body = response.text
+        assert response.status_code == 200
+        assert body == expected
+        m.assert_called_once_with(
+            "opentrons-robot-app", DEFAULT_RECORDS, "short-precise"
+        )
 
 
 @pytest.mark.parametrize(

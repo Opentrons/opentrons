@@ -54,6 +54,11 @@ export function AttachedInstrumentMountItem(
       setWizardProps({
         flowType: GRIPPER_FLOW_TYPES.ATTACH,
         attachedGripper: attachedInstrument,
+        onComplete: () => {
+          history.push(
+            attachedInstrument == null ? `/instruments` : `/instrument/${mount}`
+          )
+        },
         closeFlow: () => setWizardProps(null),
       })
       setODDMaintenanceFlowInProgress()
@@ -61,15 +66,17 @@ export function AttachedInstrumentMountItem(
       history.push(`/instruments/${mount}`)
     }
   }
-
-  const displayName =
-    attachedInstrument?.mount !== 'extension'
-      ? getPipetteModelSpecs(
-          attachedInstrument?.instrumentModel as PipetteModel
-        )?.displayName
-      : getGripperDisplayName(
-          attachedInstrument?.instrumentModel as GripperModel
-        )
+  let displayName
+  if (attachedInstrument != null && attachedInstrument.ok) {
+    displayName =
+      attachedInstrument?.mount !== 'extension'
+        ? getPipetteModelSpecs(
+            attachedInstrument?.instrumentModel as PipetteModel
+          )?.displayName
+        : getGripperDisplayName(
+            attachedInstrument?.instrumentModel as GripperModel
+          )
+  }
   return (
     <>
       <LabeledMount
@@ -93,7 +100,11 @@ export function AttachedInstrumentMountItem(
                 setShowChoosePipetteModal(false)
               },
               onComplete: () => {
-                history.push(`/instruments/${mount}`)
+                history.push(
+                  attachedInstrument == null
+                    ? `/instruments`
+                    : `/instrument/${mount}`
+                )
               },
             })
             setODDMaintenanceFlowInProgress()

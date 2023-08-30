@@ -8,7 +8,7 @@ const OT2_FILENAME = 'ot2-system.zip'
 const SYSTEM_FILENAME = 'system-update.zip'
 
 const getSystemFileName = (robotModel: RobotModel): string => {
-  if (robotModel === 'OT-2 Standard') {
+  if (robotModel === 'OT-2 Standard' || robotModel === null) {
     return OT2_FILENAME
   }
   return SYSTEM_FILENAME

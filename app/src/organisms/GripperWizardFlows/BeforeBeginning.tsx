@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
+import { COLORS } from '@opentrons/components'
+import { EXTENSION } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import {
@@ -15,9 +18,9 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
-import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { CreateCommand, LEFT } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -64,6 +67,9 @@ export const BeforeBeginning = (
     isCreateLoading,
     isRobotMoving,
     chainRunCommands,
+    errorMessage,
+    maintenanceRunId,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -71,33 +77,31 @@ export const BeforeBeginning = (
   }, [])
 
   const commandsOnProceed: CreateCommand[] = [
-    // TODO: this needs to go once we're properly handling the axes for the commands
-    // below instead of using the left pipette axis as a proxy, but until then we need
-    // to make sure that proxy axis is homed.
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+        mount: EXTENSION,
       },
     },
   ]
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, true)
+    chainRunCommands?.(commandsOnProceed, false)
       .then(() => {
         proceed()
       })
-      .catch(() => {})
+      .catch(error => {
+        setErrorMessage(error.message)
+      })
   }
 
   const equipmentInfoByLoadName: {
     [loadName: string]: { displayName: string; subtitle?: string }
   } = {
     calibration_pin: { displayName: t('calibration_pin') },
-    t10_torx_screwdriver: {
-      displayName: t('t10_torx_screwdriver'),
+    hex_screwdriver: {
+      displayName: t('hex_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
     [GRIPPER_LOADNAME]: { displayName: t('gripper') },
@@ -115,7 +119,14 @@ export const BeforeBeginning = (
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
       //  TODO(BC, 11/8/22): wire up this URL and unhide the link!
@@ -131,7 +142,7 @@ export const BeforeBeginning = (
         />
       }
       proceedButtonText={t('move_gantry_to_front')}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={handleOnClick}
     />
   )

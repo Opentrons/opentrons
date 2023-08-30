@@ -15,10 +15,14 @@ import {
   CheckboxField,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import { ModalHeader, ModalShell } from '../../molecules/Modal'
+import {
+  LegacyModalHeader,
+  LegacyModalShell,
+} from '../../molecules/LegacyModal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { StyledText } from '../../atoms/text'
+import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -105,10 +109,10 @@ export function ApplyHistoricOffsets(
       </Link>
       {showOffsetDataModal ? (
         <Portal level="top">
-          <ModalShell
+          <LegacyModalShell
             maxWidth="40rem"
             header={
-              <ModalHeader
+              <LegacyModalHeader
                 title={t(
                   noOffsetData
                     ? 'what_is_labware_offset_data'
@@ -151,17 +155,27 @@ export function ApplyHistoricOffsets(
                 isLabwareOffsetCodeSnippetsOn ? (
                   <LabwareOffsetTabs
                     TableComponent={
-                      <LabwareOffsetTable offsetCandidates={offsetCandidates} />
+                      <LabwareOffsetTable
+                        offsetCandidates={offsetCandidates}
+                        labwareDefinitions={getLabwareDefinitionsFromCommands(
+                          commands
+                        )}
+                      />
                     }
                     JupyterComponent={JupyterSnippet}
                     CommandLineComponent={CommandLineSnippet}
                   />
                 ) : (
-                  <LabwareOffsetTable offsetCandidates={offsetCandidates} />
+                  <LabwareOffsetTable
+                    offsetCandidates={offsetCandidates}
+                    labwareDefinitions={getLabwareDefinitionsFromCommands(
+                      commands
+                    )}
+                  />
                 )
               ) : null}
             </Flex>
-          </ModalShell>
+          </LegacyModalShell>
         </Portal>
       ) : null}
     </Flex>

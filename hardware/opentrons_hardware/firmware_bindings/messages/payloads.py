@@ -3,9 +3,11 @@
 #  dataclass fields interpretation.
 #  from __future__ import annotations
 from dataclasses import dataclass, field, asdict
-from . import message_definitions
 from typing import Iterator, List
 
+from opentrons_shared_data.errors.exceptions import InternalMessageFormatError
+
+from . import message_definitions
 from .fields import (
     FirmwareShortSHADataField,
     VersionFlagsField,
@@ -314,14 +316,16 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
         data_length = len(self.data.value)
         address = self.address.value
         if address % 8 != 0:
-            raise ValueError(
-                f"Data address needs to be doubleword aligned."
-                f" {address} mod 8 equals {address % 8} and should be 0"
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data address needs to be doubleword aligned."
+                f" {address} mod 8 equals {address % 8} and should be 0",
+                detail={"address": address},
             )
         if data_length > FirmwareUpdateDataField.NUM_BYTES:
-            raise ValueError(
-                f"Data cannot be more than"
-                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}."
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data cannot be more than"
+                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}.",
+                detail={"size": data_length},
             )
 
     @classmethod
@@ -517,11 +521,19 @@ class GripperInfoResponsePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class GripperJawStatePayload(EmptyPayload):
+    """A respones carrying info about the jaw state of a gripper."""
+
+    state: utils.UInt8Field
+
+
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
     duty_cycle: utils.UInt32Field
     encoder_position_um: utils.Int32Field
+    stay_engaged: utils.UInt8Field
 
 
 @dataclass(eq=False)
@@ -533,10 +545,41 @@ class GripperErrorTolerancePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
-class PushTipPresenceNotificationPayload(EmptyPayload):
+class _PushTipPresenceNotificationPayloadBase(EmptyPayload):
+    ejector_flag_status: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class PushTipPresenceNotificationPayload(_PushTipPresenceNotificationPayloadBase):
     """A notification that the ejector flag status has changed."""
 
-    ejector_flag_status: utils.UInt8Field
+    @classmethod
+    def build(cls, data: bytes) -> "PushTipPresenceNotificationPayload":
+        """Build a response payload from incoming bytes."""
+        consumed_by_super = _PushTipPresenceNotificationPayloadBase.get_size()
+        superdict = asdict(_PushTipPresenceNotificationPayloadBase.build(data))
+        message_index = superdict.pop("message_index")
+
+        # we want to parse this by adding extra 0s that may not be necessary,
+        # which is annoying and complex, so let's wrap it in an iterator
+        def _data_for_optionals(consumed: int, buf: bytes) -> Iterator[bytes]:
+            extended = buf + b"\x00\x00"
+            yield extended[consumed:]
+            consumed += 2
+            extended = extended + b"\x00"
+            yield extended[consumed : consumed + 1]
+
+        optionals_yielder = _data_for_optionals(consumed_by_super, data)
+        inst = cls(
+            **superdict,
+            sensor_id=SensorIdField.build(
+                int.from_bytes(next(optionals_yielder), "big")
+            ),
+        )
+        inst.message_index = message_index
+        return inst
+
+    sensor_id: SensorIdField
 
 
 @dataclass(eq=False)
@@ -546,6 +589,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
     request_stop_condition: MoveStopConditionField
+    acceleration: utils.Int32Field
 
 
 @dataclass(eq=False)
