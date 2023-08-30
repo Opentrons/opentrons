@@ -2,11 +2,10 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  HEATERSHAKER_MODULE_MODELS,
-  TEMPERATURE_MODULE_MODELS,
-  THERMOCYCLER_MODULE_MODELS,
-} from '@opentrons/shared-data/js/constants'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+  GantryMount,
+  MoveToMaintenancePositionCreateCommand,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -27,7 +26,7 @@ interface BeforeBeginningProps extends ModuleCalibrationWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
-  errorMessage: string | null
+  mount: GantryMount
 }
 
 export const BeforeBeginning = (
@@ -39,7 +38,9 @@ export const BeforeBeginning = (
     isCreateLoading,
     attachedModule,
     maintenanceRunId,
-    errorMessage,
+    chainRunCommands,
+    setErrorMessage,
+    mount,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -82,14 +83,22 @@ export const BeforeBeginning = (
     { loadName: adapterLoadname, displayName: t(adapterDisplaynameKey) },
   ]
 
-  return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.errorEnabled}
-      header={t('shared:error_encountered')}
-      subHeader={errorMessage}
-    />
-  ) : (
+  const handleMoveGantryToFront = () => {
+    const moveToMaintanancePosition: MoveToMaintenancePositionCreateCommand = {
+      commandType: 'calibration/moveToMaintenancePosition',
+      params: {
+        mount: mount,
+        maintenancePosition: 'attachInstrument',
+      },
+    }
+    chainRunCommands?.([moveToMaintanancePosition], false)
+      .then(proceed)
+      .catch((e: Error) =>
+        setErrorMessage(`error moving to maintenance position: ${e.message}`)
+      )
+  }
+
+  return (
     <GenericWizardTile
       header={t('calibration', { module: moduleDisplayName })}
       rightHandBody={
@@ -105,7 +114,7 @@ export const BeforeBeginning = (
       }
       proceedButtonText={t('move_gantry_to_front')}
       proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
-      proceed={proceed}
+      proceed={handleMoveGantryToFront}
     />
   )
 }
