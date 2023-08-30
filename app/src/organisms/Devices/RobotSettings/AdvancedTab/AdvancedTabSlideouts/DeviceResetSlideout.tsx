@@ -21,10 +21,10 @@ import {
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
-import { UNREACHABLE } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
+import { UNREACHABLE } from '../../../../../redux/discovery'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
@@ -51,6 +51,7 @@ interface DeviceResetSlideoutProps {
   updateResetStatus: (connected: boolean, rOptions?: ResetConfigRequest) => void
 }
 
+// Note (kk:08/30/2023) lines that are related to module calibration will be activated when the be is ready
 export function DeviceResetSlideout({
   isExpanded,
   onCloseClick,
@@ -81,6 +82,8 @@ export function DeviceResetSlideout({
           opt =>
             opt.id === 'pipetteOffsetCalibrations' ||
             opt.id === 'gripperOffsetCalibrations'
+          // ||
+          // opt.id === 'moduleCalibrations'
         )
       : []
 
