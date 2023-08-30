@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { updateConfigValue } from '../../../../redux/config'
-import { WelcomedModal } from '../WelcomeModal'
+import { WelcomeModal } from '../WelcomeModal'
 
 jest.mock('../../../../redux/config')
 
@@ -15,14 +15,14 @@ const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
   typeof updateConfigValue
 >
 
-const render = (props: React.ComponentProps<typeof WelcomedModal>) => {
-  return renderWithProviders(<WelcomedModal {...props} />, {
+const render = (props: React.ComponentProps<typeof WelcomeModal>) => {
+  return renderWithProviders(<WelcomeModal {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('WelcomeModal', () => {
-  let props: React.ComponentProps<typeof WelcomedModal>
+  let props: React.ComponentProps<typeof WelcomeModal>
 
   beforeEach(() => {
     props = {

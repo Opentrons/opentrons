@@ -46,6 +46,8 @@
   "clear_option_runs_history_subtext": "Clears information about past runs of all protocols.",
   "clear_option_runs_history": "Clear protocol run history",
   "clear_option_tip_length_calibrations": "Clear tip length calibrations",
+  "confirm_device_reset_description": "This will permanently delete all protocol, calibration, and other data. You’ll have to redo initial setup before using the robot again.",
+  "confirm_device_reset_heading": "Are you sure you want to reset your device?",
   "connect_the_estop_to_continue": "Connect the E-stop to continue",
   "connect_to_a_network": "Connect to a network",
   "connect_to_wifi_network": "Connect to Wi-Fi network",
