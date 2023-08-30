@@ -1,4 +1,5 @@
 """Test the CompletedAnalysisStore."""
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -137,6 +138,29 @@ async def test_get_by_analysis_id_stores_results_in_cache(
     from_sql = await subject.get_by_id("analysis-id")
     assert from_sql == resource
     decoy.verify(memcache.insert("analysis-id", from_sql))
+
+
+async def test_get_by_analysis_id_as_document(
+    subject: CompletedAnalysisStore,
+    protocol_store: ProtocolStore,
+) -> None:
+    resource = _completed_analysis_resource("analysis-id", "protocol-id")
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+    await subject.add(resource)
+    result = await subject.get_by_id_as_document("analysis-id")
+    assert result is not None
+    assert json.loads(result) == {
+        "id": "analysis-id",
+        "result": "ok",
+        "status": "completed",
+        "commands": [],
+        "errors": [],
+        "labware": [],
+        "liquids": [],
+        "modules": [],
+        "pipettes": [],
+        "result": "ok",
+    }
 
 
 async def test_get_ids_by_protocol(
