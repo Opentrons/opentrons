@@ -180,8 +180,13 @@ def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
             v1_completed_analysis_dict
         )
 
-        # TODO: by_alias, etc.
-        v2_completed_analysis = parsed_completed_analysis.json()
+        v2_completed_analysis = parsed_completed_analysis.json(
+            # by_alias and exclude_none should match how
+            # FastAPI + Pydantic + our customizations serialize these objects
+            # over the `GET /protocols/:id/analyses/:id` endpoint.
+            by_alias=True,
+            exclude_none=True,
+        )
 
         # Reinsert using the new column definitions.
         update = (

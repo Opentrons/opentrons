@@ -44,7 +44,13 @@ class CompletedAnalysisResource:
 
         def serialize_completed_analysis() -> Tuple[bytes, str]:
             pickle = legacy_pickle.dumps(self.completed_analysis.dict())
-            json = self.completed_analysis.json()  # TODO: exclude_none, by_alias, etc.?
+            json = self.completed_analysis.json(
+                # by_alias and exclude_none should match how
+                # FastAPI + Pydantic + our customizations serialize these objects
+                # over the `GET /protocols/:id/analyses/:id` endpoint.
+                by_alias=True,
+                exclude_none=True,
+            )
             return pickle, json
 
         serialized_pickle, serialized_json = await anyio.to_thread.run_sync(
