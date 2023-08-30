@@ -11,7 +11,7 @@ export function getFinalLabwareLocation(
   labwareId: string,
   commands: RunTimeCommand[]
 ): LabwareLocation | null {
-  return commands.reduce<LabwareLocation | null>((acc, c) => {
+  for (const c of commands.reverse()) {
     if (c.commandType === 'loadLabware' && c.result?.labwareId === labwareId) {
       return c.params.location
     } else if (
@@ -19,8 +19,7 @@ export function getFinalLabwareLocation(
       c.params.labwareId === labwareId
     ) {
       return c.params.newLocation
-    } else {
-      return acc
     }
-  }, null)
+  }
+  return null
 }
