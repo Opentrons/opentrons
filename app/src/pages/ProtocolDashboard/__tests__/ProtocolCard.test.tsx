@@ -8,7 +8,10 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ProtocolCard } from '../ProtocolCard'
 
-import type { CompletedProtocolAnalysis, ProtocolResource } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolResource,
+} from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 

@@ -309,7 +309,9 @@ export function ProtocolDetails(): JSX.Element | null {
   const pinned = pinnedProtocolIds.includes(protocolId)
 
   const { data: protocolData } = useProtocolQuery(protocolId)
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }

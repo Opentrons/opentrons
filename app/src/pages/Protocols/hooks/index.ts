@@ -2,7 +2,6 @@ import last from 'lodash/last'
 import {
   useInstrumentsQuery,
   useModulesQuery,
-  useProtocolAnalysesQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
@@ -134,7 +133,9 @@ export const useRequiredProtocolLabware = (
   protocolId: string
 ): LabwareSetupItem[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }

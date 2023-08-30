@@ -14,7 +14,10 @@ import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')
@@ -91,6 +94,7 @@ const NULL_COMMAND = {
 }
 const NULL_PROTOCOL_ANALYSIS = {
   ...PROTOCOL_ANALYSIS,
+  id: 'null_analysis',
   commands: [NULL_COMMAND],
 } as any
 
@@ -99,12 +103,19 @@ describe('useRequiredProtocolLabware', () => {
     when(mockUseProtocolQuery)
       .calledWith(PROTOCOL_ID)
       .mockReturnValue({
-        data: { data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] } },
+        data: {
+          data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
+        },
       } as UseQueryResult<Protocol>)
     when(mockUseProtocolAnalysisAsDocumentQuery)
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
       .mockReturnValue({
         data: PROTOCOL_ANALYSIS,
+      } as UseQueryResult<CompletedProtocolAnalysis>)
+    when(mockUseProtocolAnalysisAsDocumentQuery)
+      .calledWith(PROTOCOL_ID, NULL_PROTOCOL_ANALYSIS.id, { enabled: true })
+      .mockReturnValue({
+        data: NULL_PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
   })
 
@@ -126,7 +137,11 @@ describe('useRequiredProtocolLabware', () => {
     when(mockUseProtocolQuery)
       .calledWith(PROTOCOL_ID)
       .mockReturnValue({
-        data: { data: { analysisSummaries: [{ id: NULL_PROTOCOL_ANALYSIS.id } as any] } },
+        data: {
+          data: {
+            analysisSummaries: [{ id: NULL_PROTOCOL_ANALYSIS.id } as any],
+          },
+        },
       } as UseQueryResult<Protocol>)
     const { result } = renderHook(() => useRequiredProtocolLabware(PROTOCOL_ID))
     expect(result.current.length).toBe(0)
@@ -145,8 +160,13 @@ describe('useMissingProtocolHardware', () => {
       isLoading: false,
     } as any)
     mockUseProtocolQuery.mockReturnValue({
-      data: { data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] } },
+      data: {
+        data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
+      },
     } as UseQueryResult<Protocol>)
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: PROTOCOL_ANALYSIS,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
   })
 
   afterEach(() => {

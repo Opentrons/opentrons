@@ -19,7 +19,10 @@ import {
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
-import { useHost, useProtocolAnalysisAsDocumentQuery } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useProtocolAnalysisAsDocumentQuery,
+} from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 import { StyledText } from '../../atoms/text'
@@ -58,7 +61,9 @@ export function ProtocolCard(props: {
   const queryClient = useQueryClient()
   const host = useHost()
 
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
     protocol.id,
     last(protocol.analysisSummaries)?.id ?? null,
     { enabled: protocol != null }

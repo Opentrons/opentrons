@@ -35,10 +35,15 @@ export function useProtocolDetailsForRun(
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null && isPollingProtocolAnalyses, refetchInterval: ANALYSIS_POLL_MS }
+    {
+      enabled: protocolRecord != null && isPollingProtocolAnalyses,
+      refetchInterval: ANALYSIS_POLL_MS,
+    }
   )
 
   React.useEffect(() => {

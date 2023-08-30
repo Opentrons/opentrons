@@ -17,7 +17,9 @@ export function useProtocolAnalysisErrors(
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolData } = useProtocolQuery(protocolId)
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }

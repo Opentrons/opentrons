@@ -82,12 +82,18 @@ describe('useProtocolDetailsForRun hook', () => {
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .mockReturnValue({ data: PROTOCOL_RESPONSE } as UseQueryResult<Protocol>)
     when(mockUseProtocolAnalysisAsDocumentQuery)
-      .calledWith(PROTOCOL_ID, 'fake analysis', { enabled: true, refetchInterval: 5000 })
+      .calledWith(PROTOCOL_ID, 'fake analysis', {
+        enabled: true,
+        refetchInterval: 5000,
+      })
       .mockReturnValue({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis | null>)
     when(mockUseProtocolAnalysisAsDocumentQuery)
-      .calledWith(PROTOCOL_ID, 'fake analysis', { enabled: false, refetchInterval: 5000 })
+      .calledWith(PROTOCOL_ID, 'fake analysis', {
+        enabled: false,
+        refetchInterval: 5000,
+      })
       .mockReturnValue({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis | null>)

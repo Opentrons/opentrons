@@ -11,10 +11,9 @@ import { FloatingActionButton } from '..'
 import { i18n } from '../../../i18n'
 
 const render = (props: React.ComponentProps<typeof FloatingActionButton>) => {
-  return renderWithProviders(
-  <FloatingActionButton {...props} />,
-   { i18nInstance: i18n },
-  )[0]
+  return renderWithProviders(<FloatingActionButton {...props} />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 describe('FloatingActionButton', () => {
