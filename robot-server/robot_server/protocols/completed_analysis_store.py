@@ -43,15 +43,13 @@ class CompletedAnalysisResource:
         """
 
         def serialize_completed_analysis() -> Tuple[bytes, str]:
-            pickle = legacy_pickle.dumps(self.completed_analysis.dict())
-            json = self.completed_analysis.json(
-                # by_alias and exclude_none should match how
-                # FastAPI + Pydantic + our customizations serialize these objects
-                # over the `GET /protocols/:id/analyses/:id` endpoint.
-                by_alias=True,
-                exclude_none=True,
+            serialized_pickle = _serialize_completed_analysis_to_pickle(
+                self.completed_analysis
             )
-            return pickle, json
+            serialized_json = _serialize_completed_analysis_to_json(
+                self.completed_analysis
+            )
+            return serialized_pickle, serialized_json
 
         serialized_pickle, serialized_json = await anyio.to_thread.run_sync(
             serialize_completed_analysis,
@@ -180,10 +178,55 @@ class CompletedAnalysisStore:
         statement = sqlalchemy.select(
             analysis_table.c.completed_analysis_as_document
         ).where(analysis_table.c.id == analysis_id)
+
         with self._sql_engine.begin() as transaction:
-            # TODO: Sort out what to do if analysis_id is wrong.
-            # get_by_id() would return None but we're using that return value for something else here.
-            return transaction.execute(statement).scalar_one()
+            try:
+                document: Optional[str] = transaction.execute(statement).scalar_one()
+            except sqlalchemy.exc.NoResultFound:
+                # No analysis with this ID.
+                return None
+
+        if document is None:
+            # There is an analysis with this ID, but it isn't in the database as a document.
+            #
+            # This is an edge case.
+            # `document` should normally not be NULL (None), because our code to migrate the
+            # database from schema 1->2 will populate it for all rows. However! A user can
+            # do this:
+            #
+            # 1) Start on schema 1.
+            # 2) Update robot software, triggering a migration to schema 2.
+            # 3) Roll back to older robot software that doesn't understand schema 2.
+            #    Now we've got old software working in a schema 2 database,
+            #    causing rows to be added where this column is NULL.
+            # 4) Update robot software again. But this won't trigger a migration,
+            #    because the database was already migrated to schema 2 once.
+            #    So some rows will still have NULL for this column.
+
+            completed_analysis_resource = await self.get_by_id(analysis_id)
+            if completed_analysis_resource is None:
+                # No analysis with this ID.
+                # This shouldn't happen because we already checked this in the first transaction,
+                # but maybe it got deleted in some intervening transaction.
+                return None
+
+            new_document = await anyio.to_thread.run_sync(
+                _serialize_completed_analysis_to_json,
+                completed_analysis_resource.completed_analysis,
+            )
+
+            populate_document_column = (
+                sqlalchemy.update(analysis_table)
+                .where(analysis_table.c.id == analysis_id)
+                .values(completed_analysis_as_document=new_document)
+            )
+            with self._sql_engine.begin() as transaction:
+                transaction.execute(populate_document_column)
+
+            return new_document
+
+        else:
+            return document
 
     async def get_by_protocol(
         self, protocol_id: str
@@ -272,3 +315,19 @@ class CompletedAnalysisStore:
         self._memcache.insert(
             completed_analysis_resource.id, completed_analysis_resource
         )
+
+
+def _serialize_completed_analysis_to_pickle(
+    completed_analysis: CompletedAnalysis,
+) -> bytes:
+    return legacy_pickle.dumps(completed_analysis.dict())
+
+
+def _serialize_completed_analysis_to_json(completed_analysis: CompletedAnalysis) -> str:
+    return completed_analysis.json(
+        # by_alias and exclude_none should match how
+        # FastAPI + Pydantic + our customizations serialize these objects
+        # over the `GET /protocols/:id/analyses/:id` endpoint.
+        by_alias=True,
+        exclude_none=True,
+    )
