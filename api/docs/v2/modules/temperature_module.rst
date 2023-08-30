@@ -1,3 +1,5 @@
+:og:description: How to heat and cool with the Temperature Module in a Python protocol.
+
 .. _temperature-module:
 
 ******************

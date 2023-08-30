@@ -1,3 +1,5 @@
+:og:description: How to load Opentrons hardware modules with adapters and labware in a Python protocol.
+
 .. _module-setup:
 
 ************
