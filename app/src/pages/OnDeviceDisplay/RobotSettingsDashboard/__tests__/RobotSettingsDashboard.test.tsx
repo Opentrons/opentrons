@@ -144,7 +144,6 @@ describe('RobotSettingsDashboard', () => {
     expect(getAllByText('Off').length).toBe(5) // LED & DEV tools & share analytics & home gantry & historic offsets
   })
 
-  // Note(kj: 02/03/2023) This case will be changed in a following PR
   it('should render component when tapping robot name button', () => {
     const [{ getByText }] = render()
     const button = getByText('Robot Name')

@@ -202,9 +202,9 @@ export function DeviceReset({
           })}
 
           <OptionButton
-            id={'clearAllStoredData'}
+            id="clearAllStoredData"
             type="checkbox"
-            value={'clearAllStoredData'}
+            value="clearAllStoredData"
             onChange={() => {
               setResetOptions(
                 Boolean(resetOptions.clearAllStoredData)
@@ -222,7 +222,7 @@ export function DeviceReset({
             }}
           />
           <OptionLabel
-            htmlFor={'clearAllStoredData'}
+            htmlFor="clearAllStoredData"
             isSelected={resetOptions.clearAllStoredData}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>

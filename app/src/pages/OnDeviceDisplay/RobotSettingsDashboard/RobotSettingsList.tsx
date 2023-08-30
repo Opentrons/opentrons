@@ -31,6 +31,9 @@ import {
   toggleDevtools,
   toggleHistoricOffsets,
 } from '../../../redux/config'
+import { StyledText } from '../../../atoms/text'
+import { InlineNotification } from '../../../atoms/InlineNotification'
+import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
@@ -40,9 +43,6 @@ import { RobotSettingButton } from './RobotSettingButton'
 
 import type { Dispatch, State } from '../../../redux/types'
 import type { SetSettingOption } from './'
-import { StyledText } from '../../../atoms/text'
-import { InlineNotification } from '../../../atoms/InlineNotification'
-import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 
 const ROBOT_ANALYTICS_SETTING_ID = 'disableLogAggregation'
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
