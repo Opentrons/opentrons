@@ -17,6 +17,12 @@ from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 _POLL_INTERVAL = 0.1
 _RUN_TIMEOUT = 5
 
+# Our Tavern tests have servers that stay up for the duration of the test session.
+# We need to pick a different port for our servers to avoid colliding with those.
+# Beware that if there is a collision, these tests' manual DevServer() constructions will currently
+# *not* raise an error--the tests will try to use the preexisting session-scoped servers. :(
+_PORT = "15555"
+
 
 @dataclass
 class Snapshot:
@@ -79,14 +85,13 @@ snapshots: List[(Snapshot)] = [
 async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
     snapshot: Snapshot,
 ) -> None:
-    port = "15555"
     async with RobotClient.make(
-        base_url=f"http://localhost:{port}", version="*"
+        base_url=f"http://localhost:{_PORT}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
-        with DevServer(port=port, persistence_directory=snapshot.get_copy()) as server:
+        with DevServer(port=_PORT, persistence_directory=snapshot.get_copy()) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
@@ -147,10 +152,6 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
 # protocols. https://opentrons.atlassian.net/browse/RSS-306
-@pytest.mark.xfail(
-    # TODO(mm, 2023-08-12): Remove this xfail when we implement this special handling.
-    strict=True
-)
 async def test_rerun_flex_dev_compat() -> None:
     """Test re-running a stored protocol that has messed up requirements and metadata.
 
@@ -158,12 +159,17 @@ async def test_rerun_flex_dev_compat() -> None:
     during Flex development, so robots used for testing may already have them stored.
     """
     snapshot = flex_dev_compat_snapshot
-    with DevServer(persistence_directory=snapshot.get_copy()) as server:
-        server.start()
-        async with RobotClient.make(
-            base_url=f"http://localhost:{server.port}", version="*"
-        ) as client:
+    async with RobotClient.make(
+        base_url=f"http://localhost:{_PORT}", version="*"
+    ) as client:
+        assert (
+            await client.wait_until_dead()
+        ), "Dev Robot is running but it should not be."
+        with DevServer(persistence_directory=snapshot.get_copy(), port=_PORT) as server:
+            server.start()
             await client.wait_until_alive()
+            assert await client.wait_until_alive(), "Dev Robot never became available."
+
             [protocol] = (await client.get_protocols()).json()["data"]
             new_run = (
                 await client.post_run({"data": {"protocolId": protocol["id"]}})
