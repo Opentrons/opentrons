@@ -165,6 +165,45 @@ describe('moveLabware', () => {
       type: 'HEATER_SHAKER_LATCH_CLOSED',
     })
   })
+  it('should return an error when trying to move labware to an adapter on the heater-shaker when its latch is closed', () => {
+    const state = getInitialRobotStateStandard(invariantContext)
+    const HEATER_SHAKER_ID = 'heaterShakerId'
+    const HEATER_SHAKER_SLOT = 'A1'
+    const ADAPTER_ID = 'adapterId'
+
+    robotState = {
+      ...state,
+      labware: {
+        ...state.labware,
+        [ADAPTER_ID]: {
+          slot: HEATER_SHAKER_ID,
+        },
+      },
+      modules: {
+        ...state.modules,
+        [HEATER_SHAKER_ID]: {
+          slot: HEATER_SHAKER_SLOT,
+          moduleState: {
+            type: HEATERSHAKER_MODULE_TYPE,
+            latchOpen: false,
+            targetSpeed: null,
+          },
+        } as any,
+      },
+    }
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { labwareId: ADAPTER_ID },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_LATCH_CLOSED',
+    })
+  })
   it('should return an error when trying to move labware to the heater-shaker when its shaking', () => {
     const state = getInitialRobotStateStandard(invariantContext)
     const HEATER_SHAKER_ID = 'heaterShakerId'
