@@ -55,7 +55,7 @@ export const useRequiredProtocolHardware = (
   const { data: protocolData } = useProtocolQuery(protocolId)
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    protocolData?.data.analysisSummaries[0].id ?? null,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }
   )
 

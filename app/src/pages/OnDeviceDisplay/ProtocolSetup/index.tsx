@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
+import last from 'lodash/last'
 import { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
@@ -29,6 +30,7 @@ import {
   useProtocolQuery,
   useRunQuery,
   useInstrumentsQuery,
+  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
@@ -46,7 +48,6 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
 } from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
@@ -339,7 +340,13 @@ function PrepareToRun({
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name ??
     ''
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolRecord != null }
+  )
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
   const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
@@ -391,7 +398,7 @@ function PrepareToRun({
     (protocolHasModules && attachedModules == null)
 
   const speccedInstrumentCount =
-    mostRecentAnalysis !== null
+    mostRecentAnalysis != null
       ? mostRecentAnalysis.pipettes.length +
         (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
       : 0
