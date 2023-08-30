@@ -495,20 +495,20 @@ The touch speed controls how fast the pipette moves in mm/s during a touch actio
 Mix
 ---
 
-The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the mix repetitions, the amount of liquid (in µL) to mix, and the location of a well that contains the liquid you want to mix. Here are some examples::  
+The :py:meth:`~.InstrumentContext.mix` method performs a series of aspirate and dispense actions from a single well. It's designed to help mix well contents by using a single command rather than multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the mix repetitions, the amount of liquid (in µL) to mix, and the location of a well that contains the liquid you want to mix. The volume amount is optional. If omitted, the pipette will use its maximum rated volume as the amount. Here are some examples::  
 
-    # mix from the pipette's current location 
-    pipette.mix(repetitions=3, volume=50)
+    # mix 100 µL 3 times from the current location 
+    pipette.mix(repetitions=3, volume=100)
 
-    # mix 100 µL 4 times from well A2
-    pipette.mix(4, 100, plate['A2'])
+    # mix 100 µL 3 times from well A1
+    pipette.mix(3, 100, plate['A1'])
 
-The volume amount is optional. If omitted, the pipette will use its maximum rated volume as the amount. For example, 
-    pipette.mix(2)
+    # use the pipette's maximum volume 
+    pipette.mix(repetitions=3)
 
 .. note::
 
-    In API Versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette does not move between aspirate and dispense mixing actions. 
+    In API Versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette does not move while mixing. 
 
 .. versionadded:: 2.0
 
