@@ -495,15 +495,15 @@ The touch speed controls how fast the pipette moves in mm/s during a touch actio
 Mix
 ---
 
-The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the location of a well that contains the liquid you want to mix.   
+The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the mix repetitions, the amount of liquid (in µL) to mix, and the location of a well that contains the liquid you want to mix. Here are some examples::  
 
-.. code-block:: python
+    # mix from the pipette's current location 
+    pipette.mix(repetitions=3, volume=50)
 
-    # mix 3 times, 50 µL, current location
-    pipette.mix(3, 50)
-    # mix 4 times, 100 µL, from well A2
+    # mix 100 µL 4 times from well A2
     pipette.mix(4, 100, plate['A2'])
-    # mix 2 times, use the pipette's max volume, current location
+
+The volume amount is optional. If omitted, the pipette will use its maximum rated volume as the amount. For example, 
     pipette.mix(2)
 
 .. note::
