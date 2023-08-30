@@ -327,7 +327,7 @@ If the pipette doesn't move, you can also specify an additional aspiration actio
     pipette.pick_up_tip()
     pipette.aspirate(200, plate['A1'])
     protocol.delay(seconds=5) # pause for 5 seconds
-    pipette.aspirate(100)     # aspirate 100 uL from current position
+    pipette.aspirate(100)     # aspirate 100 µL from current position
 
 Now our pipette holds 300 µL.
 
@@ -363,7 +363,7 @@ See also, :ref:`position-relative-labware` for information about on controlling 
 Aspiration Flow Rates
 ^^^^^^^^^^^^^^^^^^^^^
 
-Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Adding a number to the ``rate`` parameter multiplies the flow rate by that value. For example, this code causes the pipette to aspirate at twice its normal rate::
+Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Adding a number to the ``rate`` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to aspirate at twice its normal rate::
 
     pipette.aspirate(200, plate['A1'], rate=2.0)
 
@@ -390,7 +390,7 @@ If the pipette doesn’t move, you can also specify an additional dispense actio
     
     pipette.dispense(100, plate['B1'])
     protocol.delay(seconds=5) # pause for 5 seconds
-    pipette.aspirate(100)     # aspirate 100 uL from current position
+    pipette.aspirate(100)     # aspirate 100 µL from current position
     
 Dispense by Well or Location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -422,7 +422,7 @@ See also, :ref:`position-relative-labware` for information about on controlling 
 Dispense Flow Rates
 ^^^^^^^^^^^^^^^^^^^
 
-Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Adding a number to the ``rate`` parameter multiplies the flow rate by that value. For example, this code causes the pipette to dispense at twice its normal rate::
+Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Adding a number to the ``rate`` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to dispense at twice its normal rate::
 
     pipette.dispense(200, plate['B1'], rate=2.0)
 
@@ -456,12 +456,15 @@ The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip
 Touch Location
 ^^^^^^^^^^^^^^
 
-    # touch tip in well B1
+These optional location arguments give you control over where the tip will touch the side of a well. Here are some examples::
+
+    # touch the tip in a specific well
     pipette.touch_tip(plate['B1'])
-    # touch tip 2mm below the top of the current location
+    
+    # touch the tip 2mm below the top of the current well
     pipette.touch_tip(v_offset=-2) 
 
-    # touch tip in well B1, at 75% of total radius and -2mm from top of well
+    # move 75% of well's total radius and 2 mm below the top of well
     pipette.touch_tip(plate['B1'], 
                       radius=0.75,
                       v_offset=-2)
@@ -469,15 +472,20 @@ Touch Location
 Touch Speed
 ^^^^^^^^^^^
 
-# touch tip in well B1 at 100 mm/s
-    pipette.touch_tip(plate['B1'], speed=100)
+The touch speed controls how fast the pipette moves in mm/s during a touch action. The default movement speed is 60 mm/s, the minimum is 20 mm/s, and the maximum is 80 mm/s. Here are some examples::
+
+    pipette.touch_tip() # touch at the default speed
+
+    # touch tip in well B1 at the maximum speed
+    pipette.touch_tip(plate['B1'], speed=80)
 
 .. versionadded:: 2.0
 
 .. note:
 
-    We recommend changing your API version to 2.4 (or higher) to take advantage of new ``touch_tip()``
+    We recommend using API version to 2.4 (or higher) to take advantage of new ``touch_tip()``
     features such as:
+
         - A lower minimum speed (1 mm/s)
         - Improved handling
         - Removed diagonal X -> Y position changes while moving the tip directly to the specified height offset.
@@ -487,13 +495,13 @@ Touch Speed
 Mix
 ---
 
-The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in uL) of liquid, and the location of a well that contains the liquid you want to mix.   
+The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and dispense on a single location. It's designed to help mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the location of a well that contains the liquid you want to mix.   
 
 .. code-block:: python
 
-    # mix 3 times, 50 uL, current location
+    # mix 3 times, 50 µL, current location
     pipette.mix(3, 50)
-    # mix 4 times, 100 uL, from well A2
+    # mix 4 times, 100 µL, from well A2
     pipette.mix(4, 100, plate['A2'])
     # mix 2 times, use the pipette's max volume, current location
     pipette.mix(2)
@@ -509,12 +517,12 @@ The :py:meth:`.InstrumentContext.mix` method performs a series of aspirate and d
 Air Gap
 -------
 
-The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to aspirate some air after a liquid. Creating an air gap can help prevent a liquid from leaking out of the pipette after drawing it from a well. Calling the ``air_gap()`` method without any arguments uses the remaining volume in the pipette tip. For example, if you load a 1000 uL pipette on a Flex and tell the robot to aspirate 500 uL of liquid, it will use the remaining 500 uL for the air gap::
+The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to aspirate some air after a liquid. Creating an air gap can help prevent a liquid from leaking out of the pipette after drawing it from a well. Calling the ``air_gap()`` method without any arguments uses the remaining volume in the pipette tip. For example, if you load a 1000 µL pipette on a Flex and tell the robot to aspirate 500 µL of liquid, it will use the remaining 500 µL for the air gap::
 
     pipette.aspirate(500, plate['A1'])
-    pipette.air_gap() # draws 500 uL of air
+    pipette.air_gap() # draws 500 µL of air
 
-The ``air_gap()`` method also accepts the ``volume`` and ``height`` arguments. These let you control the amount of air (in uL) drawn in and the height (in mm) above the well for aspirating air. By default, the pipette will move 5 mm above a well before creating the air gap. For example, this code aspirates 200 uL of liquid from well A1. The aspiration action is followed by an air gap of 75 uL taken from 20 mm above the well::
+The ``air_gap()`` method also accepts the ``volume`` and ``height`` arguments. These let you control the amount of air (in µL) drawn in and the height (in mm) above the well for aspirating air. By default, the pipette will move 5 mm above a well before creating the air gap. For example, this code aspirates 200 µL of liquid from well A1. The aspiration action is followed by an air gap of 75 µL taken from 20 mm above the well::
     
     pipette.aspirate(200, plate['A1'])
     pipette.air_gap(75, 20)
