@@ -50,6 +50,7 @@ import {
   getUnmatchedModulesForProtocol,
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -72,6 +73,7 @@ interface RenderModuleStatusProps {
   calibrationStatus: ProtocolCalibrationStatus
   setShowModuleWizard: (showModuleWizard: boolean) => void
 }
+
 function RenderModuleStatus({
   isModuleReady,
   isDuplicateModuleModel,
@@ -80,7 +82,24 @@ function RenderModuleStatus({
   setShowModuleWizard,
 }: RenderModuleStatusProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  let moduleStatus: JSX.Element
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
+
+  const handleCalibrate = (): void => {
+    setODDMaintenanceFlowInProgress()
+    setShowModuleWizard(true)
+  }
+
+  let moduleStatus: JSX.Element = (
+    <>
+      <Chip
+        text={t('module_disconnected')}
+        type="warning"
+        background={false}
+        iconName="connection-status"
+      />
+      {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
+    </>
+  )
 
   if (
     isModuleReady &&
@@ -107,7 +126,7 @@ function RenderModuleStatus({
       <SmallButton
         buttonCategory="rounded"
         buttonText={i18n.format(t('calibrate'), 'capitalize')}
-        onClick={() => setShowModuleWizard(true)}
+        onClick={handleCalibrate}
       />
     )
   } else if (!calibrationStatus.complete) {
@@ -117,20 +136,6 @@ function RenderModuleStatus({
           ? t('calibration_required_attach_pipette_first')
           : t('calibration_required_calibrate_pipette_first')}
       </StyledText>
-    )
-  } else {
-    moduleStatus = (
-      <>
-        <Chip
-          text={t('module_disconnected')}
-          type="warning"
-          background={false}
-          iconName="connection-status"
-        />
-        {isDuplicateModuleModel ? (
-          <Icon name="information" size="2rem" />
-        ) : null}
-      </>
     )
   }
   return moduleStatus
@@ -279,7 +284,7 @@ export function ProtocolSetupModules({
   // console.log('deckDef', deckDef)
   // console.log('attachedModules', attachedModules)
   // console.log('protocolModulesInfo', protocolModulesInfo)
-  console.log('attachedProtocolModuleMatches', attachedProtocolModuleMatches[0])
+  // console.log('attachedProtocolModuleMatches', attachedProtocolModuleMatches[0])
 
   const {
     missingModuleIds,

@@ -27,6 +27,7 @@
   "calibration_ready": "Calibration ready",
   "calibration_required_attach_pipette_first": "Calibration required Attach pipette first",
   "calibration_required_calibrate_pipette_first": "Calibration required Calibrate pipette first",
+  "calibration_required": "Calibration required",
   "calibration_status": "calibration status",
   "calibration": "Calibration",
   "closing": "Closing...",
