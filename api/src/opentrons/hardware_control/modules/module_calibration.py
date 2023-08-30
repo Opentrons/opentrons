@@ -26,7 +26,7 @@ class ModuleCalibrationOffset:
     module: ModuleType
     source: SourceType
     status: CalibrationStatus
-    slot: Optional[str] = None
+    slot: str
     mount: Optional[OT3Mount] = None
     instrument_id: Optional[str] = None
     last_modified: Optional[datetime] = None
@@ -35,22 +35,12 @@ class ModuleCalibrationOffset:
 def load_module_calibration_offset(
     module_type: ModuleType,
     module_id: str,
-    slot: Optional[str] = None,
-) -> ModuleCalibrationOffset:
+) -> Optional[ModuleCalibrationOffset]:
     """Loads the calibration offset for a module."""
-    # load default if module offset data do not exist
-    module_cal_obj = ModuleCalibrationOffset(
-        slot=slot,
-        offset=Point(*default_module_calibration_offset()),
-        module=module_type,
-        module_id=module_id,
-        source=SourceType.default,
-        status=CalibrationStatus(),
-    )
-    if module_id:
-        module_offset_data = get_module_offset(module_type, module_id)
-        if module_offset_data:
-            return ModuleCalibrationOffset(
+    module_offset: Optional[ModuleCalibrationOffset] = None
+    module_offset_data = get_module_offset(module_type, module_id)
+    if module_offset_data:
+        module_offset = ModuleCalibrationOffset(
                 module=module_type,
                 module_id=module_id,
                 slot=module_offset_data.slot,
@@ -64,8 +54,8 @@ def load_module_calibration_offset(
                     markedBad=module_offset_data.status.markedBad,
                     source=module_offset_data.status.source,
                 ),
-            )
-    return module_cal_obj
+        )
+    return module_offset
 
 
 def save_module_calibration_offset(
@@ -77,8 +67,7 @@ def save_module_calibration_offset(
     instrument_id: Optional[str] = None,
 ) -> None:
     """Save the calibration offset for a given module."""
-    if module_id:
-        save_module_calibration(offset, mount, slot, module, module_id, instrument_id)
+    save_module_calibration(offset, mount, slot, module, module_id, instrument_id)
 
 
 def load_all_module_calibrations() -> List[ModuleCalibrationOffset]:

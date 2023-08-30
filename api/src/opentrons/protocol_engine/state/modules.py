@@ -35,6 +35,7 @@ from ..types import (
     LoadedModule,
     ModuleModel,
     ModuleOffsetVector,
+    ModuleOffsetData,
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
@@ -144,7 +145,7 @@ class ModuleState:
     substate_by_module_id: Dict[str, ModuleSubStateType]
     """Information about each module that's specific to the module type."""
 
-    module_offset_by_serial: Dict[str, ModuleOffsetVector]
+    module_offset_by_serial: Dict[str, ModuleOffsetData]
     """Information about each modules offsets."""
 
 
@@ -154,7 +155,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     _state: ModuleState
 
     def __init__(
-        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None
+        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
@@ -195,6 +196,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._update_module_calibration(
                 module_id=command.params.moduleId,
                 module_offset=command.result.moduleOffset,
+                location=command.result.location,
             )
 
         if isinstance(
@@ -289,7 +291,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
 
     def _update_module_calibration(
-        self, module_id: str, module_offset: ModuleOffsetVector
+            self, module_id: str,
+            module_offset: ModuleOffsetVector,
+            location: DeckSlotLocation,
     ) -> None:
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
@@ -297,7 +301,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             assert (
                 module_serial is not None
             ), "Expected a module SN and got None instead."
-            self._state.module_offset_by_serial[module_serial] = module_offset
+            self._state.module_offset_by_serial[module_serial] = ModuleOffsetData(
+                moduleOffsetVector=module_offset,
+                location=location,
+            )
 
     def _handle_heater_shaker_commands(
         self,
@@ -654,8 +661,17 @@ class ModuleView(HasState[ModuleState]):
         """Get the stored module calibration offset."""
         module_serial = self.get(module_id).serialNumber
         if module_serial is not None:
-            offset = self._state.module_offset_by_serial.get(module_serial)
-            if offset:
+            offset_data = self._state.module_offset_by_serial.get(module_serial)
+            if offset_data:
+                offset = offset_data.moduleOffsetVector
+                location = offset_data.location
+                # Need to apply the rotation here if the module was rotated
+                # 180 degrees when it was moved, say from D1 -> D3.
+                # We can get this done by,
+                #   1. Expose the slot this module was calibrated in
+                #   2. Uses the calibrated slot and check if the current module slot match
+                #   3. If they dont match check if the new slot is in a rotated slot.
+                #   4. If in a rotated slot, rotate the offset by 180 on the x,y plane
                 return offset
         return ModuleOffsetVector(x=0, y=0, z=0)
 
