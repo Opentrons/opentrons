@@ -308,7 +308,7 @@ async def get_protocols(
 
 @protocols_router.get(
     path="/protocols/ids",
-    summary="[Internal] Get uploaded protocol ids",
+    summary="[Internal] Get uploaded protocol IDs",
     description=(
         "Get the IDs of all protocols stored on the server."
         "\n\n"
@@ -504,13 +504,36 @@ async def get_protocol_analysis_by_id(
     return await PydanticResponse.create(content=SimpleBody.construct(data=analysis))
 
 
-@protocols_router.get(path="/protocols/{protocolId}/analyses/{analysisId}/asDocument")
+@protocols_router.get(
+    path="/protocols/{protocolId}/analyses/{analysisId}/asDocument",
+    summary="[Experimental] Get one of a protocol's analyses as a raw document",
+    description=(
+        "**Warning:** This endpoint is experimental. We may change or remove it without warning."
+        "\n\n"
+        "This is a faster alternative to `GET /protocols/{protocolId}/analyses`"
+        " and `GET /protocols/{protocolId}/analyses/{analysisId}`."
+        " For large analyses (10k+ commands), those other endpoints can take minutes to respond,"
+        " whereas this one should only take a few seconds."
+        "\n\n"
+        "For a completed analysis, this returns the same JSON data as the"
+        " `GET /protocols/:id/analyses/:id` endpoint, except that it's not wrapped in a top-level"
+        " `data` object."
+        "\n\n"
+        "For a *pending* analysis, this returns a 404 response, unlike those other"
+        ' endpoints, which return a 200 response with `"status": "pending"`.'
+    ),
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorBody[Union[ProtocolNotFound, AnalysisNotFound]]
+        },
+    },
+)
 async def get_protocol_analysis_as_document(
     protocolId: str,
     analysisId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> PlainTextResponse:  # TODO: We want this to have a JSON MIME type.
+) -> PlainTextResponse:
     if not protocol_store.has(protocolId):
         raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
             status.HTTP_404_NOT_FOUND
@@ -525,4 +548,4 @@ async def get_protocol_analysis_as_document(
             status.HTTP_404_NOT_FOUND
         ) from error
 
-    return PlainTextResponse(content=analysis)
+    return PlainTextResponse(content=analysis, media_type="application/json")

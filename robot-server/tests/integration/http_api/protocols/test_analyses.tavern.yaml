@@ -79,4 +79,8 @@ stages:
     request:
       url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}/asDocument'
     response:
+      headers:
+        # This endpoint's steps outside our usual FastAPI implementation.
+        # We need to make sure we get the Content-Type right because FastAPI won't do it for us.
+        Content-Type: application/json
       json: !force_format_include '{analysis_data}'
