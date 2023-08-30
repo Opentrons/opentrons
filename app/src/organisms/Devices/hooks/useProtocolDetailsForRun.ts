@@ -57,7 +57,7 @@ export function useProtocolDetailsForRun(
     displayName: displayName ?? null,
     protocolData: mostRecentAnalysis ?? null,
     protocolKey: protocolRecord?.data.key ?? null,
-    isProtocolAnalyzing: mostRecentAnalysis != null,
+    isProtocolAnalyzing: protocolRecord != null && mostRecentAnalysis == null,
     // this should be deleted as soon as analysis tells us intended robot type
     robotType:
       mostRecentAnalysis?.status === 'completed'
