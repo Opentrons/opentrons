@@ -129,7 +129,7 @@ function RenderModuleStatus({
         onClick={handleCalibrate}
       />
     )
-  } else if (!calibrationStatus.complete) {
+  } else if (calibrationStatus?.complete === false) {
     moduleStatus = (
       <StyledText as="p">
         {calibrationStatus?.reason === 'attach_pipette_failure_reason'
@@ -162,8 +162,6 @@ function RowModule({
     isNonConnectingModule || module.attachedModuleMatch != null
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
-
-  console.log('module', module)
 
   return (
     <>
@@ -280,11 +278,6 @@ export function ProtocolSetupModules({
     attachedModules,
     protocolModulesInfo
   )
-
-  // console.log('deckDef', deckDef)
-  // console.log('attachedModules', attachedModules)
-  // console.log('protocolModulesInfo', protocolModulesInfo)
-  // console.log('attachedProtocolModuleMatches', attachedProtocolModuleMatches[0])
 
   const {
     missingModuleIds,
