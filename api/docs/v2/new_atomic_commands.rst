@@ -338,23 +338,27 @@ The ``aspirate()`` method includes a ``location`` parameter that accepts either 
 
 **By Well**
 
-If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of the well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below. See also, :ref:`new-default-op-positions` for information about controlling pipette height for based on well location.
+If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below.
 
 .. code-block:: python
 
     pipette.pick_up_tip
-    pipette.well_bottom_clearance.aspirate=2 # aspirate 2 mm above well bottom
+    pipette.well_bottom_clearance.aspirate=2 # place tip 2 mm above well bottom
     pipette.aspirate(200, plate['A1'])
+
+See also, :ref:`new-default-op-positions` for information about controlling pipette height for a particular well.
 
 **By Location**
 
-You can also aspirate on a point along the center, z-axis within a well. For example, the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods let you aspirate a set distances from the top or bottom center of a well as shown below. See also, :ref:`position-relative-labware` for information about on controlling pipette height from within a well.
+You can also aspirate from a point along the center vertical axis within a well using the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well. For example, you could change the default aspirate height as shown below.
 
 .. code-block:: python
 
     pipette.pick_up_tip()
-    depth = plate['A1'].bottom(z=2) # set pipette tp 2mm above well bottom
-    pipette.aspirate(200, depth)    # aspirate 2mm above well bottom
+    depth = plate['A1'].bottom(z=2) # place tip 2 mm above well bottom
+    pipette.aspirate(200, depth)
+
+See also, :ref:`position-relative-labware` for information about on controlling pipette height from within a well.
 
 Aspiration Flow Rates
 ^^^^^^^^^^^^^^^^^^^^^
@@ -379,39 +383,50 @@ To dispense liquid from a pipette tip, call the :py:meth:`~.InstrumentContext.di
 .. code-block:: python
 
     pipette.dispense(200, plate['B1'])
+
+If the pipette doesn’t move, you can also specify an additional dispense action without including a location. To demonstrate, lets assume the pipette currently holds 200 µL. Next, we'll pause the protocol, automatically resume it, and dispense a second time into well location B1.
+
+.. code-block:: python
+    
+    pipette.dispense(100, plate['B1'])
+    protocol.delay(seconds=5) # pause for 5 seconds
+    pipette.aspirate(100)     # aspirate 100 uL from current position
     
 Dispense by Well or Location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``aspirate()`` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``.
+The ``dispense()`` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``.
 
-.. copy from aspirate section
 **By Well**
 
-You can also just specify the volume to aspirate, and not mention a location. For example, if our pipette holds 100 uL and you want to dispense a second time from its current location (``plate['A1'])``), you could call the ``dispense()`` method again without a location argument:: 
-    
-    pipette.dispense(50)
+If you specify a well, like ``plate['B1']``, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below. 
+
+.. code-block:: python
+
+    pipette.well_bottom_clearance.dispense=2 # place tip 2 mm above well bottom
+    pipette.aspirate(200, plate['B1'])
+
+See also, :ref:`new-default-op-positions` for information about controlling pipette height for a particular well.
 
 **By Location**
 
+You can also dispense from a point along the center vertical axis within a well using the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well. For example, you could change the default dispense height as shown below.
+
+.. code-block:: python
+
+    depth = plate['B1'].bottom(z=2) # place tip 2 mm above well bottom
+    pipette.dispense(200, depth)
+
+See also, :ref:`position-relative-labware` for information about on controlling pipette height from within a well.
+
 Dispense Flow Rates
--------------------
+^^^^^^^^^^^^^^^^^^^
 
-- The ``rate`` parameter is a multiplication factor of the pipette's default aspiration flow rate. See  :ref:`new-plunger-flow-rates` for a list of Flex and OT-2 pipette flow rates.
+Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Adding a number to the ``rate`` parameter multiplies the flow rate by that value. For example, this code causes the pipette to dispense at twice its normal rate::
 
-.. same question as with aspirate. Note below is kinda old (api v1 reference). Can we remove?
-.. note::
+    pipette.dispense(200, plate['B1'], rate=2.0)
 
-    In version 1 of this API, ``dispense`` (and ``aspirate``) would inspect the types of the ``volume`` and ``location`` arguments and do the right thing if you specified only a location or specified location and volume out of order. In this and future versions of the Python Protocol API, this is no longer true. Like any other Python function, if you are specifying arguments by position without using their names, you must always specify them in order.
-
-.. note::
-
-    By default, the pipette moves to 1 mm above the bottom of the target well before dispensing.
-    You can change this by using a well position function like :py:meth:`.Well.bottom` (see
-    :ref:`v2-location-within-wells`) every time you call ``dispense``, or - if you want to change
-    the default throughout your protocol - you can change the default offset with
-    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
-
+.. Removing the 2 notes here from the original. Covered by new revisions.
 
 .. versionadded:: 2.0
 
