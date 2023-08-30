@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 
 import { AlertModal } from '@opentrons/components'
 import { UPGRADE } from '../../../../redux/robot-update'
-import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 import type { RobotUpdateType } from '../../../../redux/robot-update/types'
@@ -17,6 +17,21 @@ type MaybeButtonProps = ButtonProps | null | undefined
 
 const HEADING = 'Robot Operating System Update Available'
 
+const VIEW_UPDATE_BUTTON_STYLE = css`
+  width: auto;
+  min-width: 10rem;
+  padding: 0.5rem 1.5rem;
+`
+const SYSTEM_UPDATE_MODAL_STYLE = css`
+  padding: 0 1rem;
+  & > p {
+    margin-bottom: 1rem;
+  }
+`
+const SYSTEM_UPDATE_WARNING_STYLE = css`
+  font-weight: var(--fw-semibold);
+`
+
 export function MigrationWarningModal(
   props: MigrationWarningModalProps
 ): JSX.Element {
@@ -26,7 +41,7 @@ export function MigrationWarningModal(
     notNowButton,
     {
       children: updateType === UPGRADE ? 'view robot update' : 'update robot',
-      className: styles.view_update_button,
+      css: VIEW_UPDATE_BUTTON_STYLE,
       onClick: proceed,
     },
   ]
@@ -38,8 +53,8 @@ export function MigrationWarningModal(
       restrictOuterScroll={false}
       alertOverlay
     >
-      <div className={styles.system_update_modal}>
-        <p className={styles.system_update_warning}>
+      <div css={SYSTEM_UPDATE_MODAL_STYLE}>
+        <p css={SYSTEM_UPDATE_WARNING_STYLE}>
           This update is a little different than previous updates.
         </p>
 
