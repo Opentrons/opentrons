@@ -517,15 +517,17 @@ The :py:meth:`~.InstrumentContext.mix` method performs a series of aspirate and 
 Air Gap
 -------
 
-The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to aspirate some air after a liquid. Creating an air gap can help prevent a liquid from leaking out of the pipette after drawing it from a well. Calling the ``air_gap()`` method without any arguments uses the remaining volume in the pipette tip. For example, if you load a 1000 µL pipette on a Flex and tell the robot to aspirate 500 µL of liquid, it will use the remaining 500 µL for the air gap::
+The :py:meth:`~.InstrumentContext.air_gap` method tells the pipette to draw in air before and/or after aspiration. Creating an air gap helps keep liquid from seeping out of a pipette after drawing it from a well. Calling the this method without any arguments uses the remaining volume in the pipette tip for the air gap. For example, if you load a 1000 µL pipette on a Flex and tell the robot to aspirate 200 µL, it will use the remaining 800 µL for the air gap.
 
-    pipette.aspirate(500, plate['A1'])
-    pipette.air_gap() # draws 500 µL of air
+.. code-block:: python
 
-The ``air_gap()`` method also accepts the ``volume`` and ``height`` arguments. These let you control the amount of air (in µL) drawn in and the height (in mm) above the well for aspirating air. By default, the pipette will move 5 mm above a well before creating the air gap. For example, this code aspirates 200 µL of liquid from well A1. The aspiration action is followed by an air gap of 75 µL taken from 20 mm above the well::
+    pipette.aspirate(200, plate['A1']) # aspirate 200 µL from well A1
+    pipette.air_gap()                  # aspirate 800 µL of air
+
+The ``air_gap()`` method also accepts ``volume`` and ``height`` arguments. These let you control the amount of air (in µL) drawn in and the pipette's height (in mm) above the well. By default, the pipette moves 5 mm above a well before creating the air gap. For example, this code tells the robot to draw 200 µL of liquid from well A1 and create an air gap of 75 µL at 20 mm above well A1::
     
     pipette.aspirate(200, plate['A1'])
-    pipette.air_gap(75, 20)
+    pipette.air_gap(volume=75, height=20)
 
 .. versionadded:: 2.0
 
