@@ -6,6 +6,8 @@ from typing import List, Union, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
 from opentrons.protocol_api import ProtocolContext
 from . import report
+import subprocess
+from time import sleep
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.protocols import (
@@ -495,6 +497,13 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-fail", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
+    serial_logger = subprocess.Popen(
+        [
+            "python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log"
+        ],
+        shell=True,
+    )
+    sleep(1)
     try:
         if not run_args.ctx.is_simulating():
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
@@ -510,4 +519,6 @@ if __name__ == "__main__":
             run_args.recorder.stop()
             run_args.recorder.deactivate()
         _change_pipettes(run_args.ctx, run_args.pipette)
+        serial_logger.terminate()
+        del(run_args.ctx._core.get_hardware()._backend.eeprom_driver._gpio)
     print("done\n\n")

@@ -379,6 +379,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
     trial_total = len(resources.test_volumes) * cfg.trials
 
+    resources.ctx._core.get_hardware().home()
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)

@@ -655,7 +655,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             cfg,
                             location=next_tip_location,
                         )
-                        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+                        mnt = (
+                            OT3Mount.LEFT
+                            if cfg.pipette_mount == "left"
+                            else OT3Mount.RIGHT
+                        )
                         resources.ctx._core.get_hardware().retract(mnt)
                     (
                         actual_aspirate,
@@ -699,7 +703,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     )
                     ui.print_info("dropping tip")
                     if not cfg.same_tip:
-                        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+                        mnt = (
+                            OT3Mount.LEFT
+                            if cfg.pipette_mount == "left"
+                            else OT3Mount.RIGHT
+                        )
                         resources.ctx._core.get_hardware().retract(mnt)
                         _drop_tip(
                             resources.pipette, cfg.return_tip, _minimum_z_height(cfg)

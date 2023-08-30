@@ -2,6 +2,7 @@
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import StatusBarState
 from time import sleep
+
 PRINT_HEADER_NUM_SPACES = 4
 PRINT_HEADER_DASHES = "-" * PRINT_HEADER_NUM_SPACES
 PRINT_TITLE_POUNDS = "#" * PRINT_HEADER_NUM_SPACES
