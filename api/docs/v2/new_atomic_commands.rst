@@ -449,22 +449,28 @@ To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.I
 Touch Tip
 ---------
 
-The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps to knock off any droplets that might be hanging on to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well plate and the touch speed. Calling the ``touch_tip()`` method without arguments causes the pipette to touch the well walls from its current location::
+The :py:meth:`~.InstrumentContext.touch_tip` method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps knock off any droplets that might cling to the pipette's tip. This method includes optional arguments that let you specify where the tip will touch the inner walls of a well and the touch speed. Calling the ``touch_tip()`` method without arguments causes the pipette to touch the well walls from its current location::
 
     pipette.touch_tip() 
 
-The ``touch_tip()`` method also includes optional arguments that control the location and speed of a touch procedure. For example::
+Touch Location
+^^^^^^^^^^^^^^
 
     # touch tip in well B1
     pipette.touch_tip(plate['B1'])
     # touch tip 2mm below the top of the current location
     pipette.touch_tip(v_offset=-2) 
-    # touch tip in well B1 at 100 mm/s
-    pipette.touch_tip(plate['B1'], speed=100)
+
     # touch tip in well B1, at 75% of total radius and -2mm from top of well
     pipette.touch_tip(plate['B1'], 
                       radius=0.75,
                       v_offset=-2)
+
+Touch Speed
+^^^^^^^^^^^
+
+# touch tip in well B1 at 100 mm/s
+    pipette.touch_tip(plate['B1'], speed=100)
 
 .. versionadded:: 2.0
 
