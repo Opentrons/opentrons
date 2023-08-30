@@ -52,6 +52,7 @@ interface DeviceResetProps {
   setCurrentOption: SetSettingOption
 }
 
+// ToDo (kk:08/30/2023) lines that are related to module calibration will be activated when the be is ready.
 export function DeviceReset({
   robotName,
   setCurrentOption,
@@ -66,6 +67,7 @@ export function DeviceReset({
   const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
     'gripperOffsetCalibrations',
+    // 'moduleCalibrations',
     'runsHistory',
   ]
   const availableOptions = options
@@ -113,6 +115,9 @@ export function DeviceReset({
       case 'gripperOffsetCalibrations':
         optionText = t('clear_option_gripper_calibration')
         break
+      // case 'moduleCalibrations':
+      //   optionText = t('clear_option_module_calibrations')
+      //   break
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
         subText = t('clear_option_runs_history_subtext')
@@ -187,7 +192,7 @@ export function DeviceReset({
                       <StyledText
                         as="p"
                         color={
-                          resetOptions[option.id]
+                          resetOptions[option.id] ?? false
                             ? COLORS.white
                             : COLORS.darkBlack70
                         }
