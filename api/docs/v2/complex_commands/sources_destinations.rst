@@ -103,12 +103,12 @@ Aspirating and Dispensing
     4. Dispense in the destination well.
     5. Drop the tip in the trash.    
 
-.. figure:: ../../img/complex_commands/robote_consolidate.png
+.. figure:: ../../img/complex_commands/robot_consolidate.png
     :name: Transfer
     :scale: 35%
     :align: center
     
-    This transfer aspirates three times and dispenses one time.
+    This consolidate aspirates three times and dispenses one time.
     
 .. note::
     By default all three commands begin by picking up a tip, and conclude by dropping a tip. In general, don't call :py:meth:`.pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with :ref:`complex_params`, by setting ``new_tip="never"``.
