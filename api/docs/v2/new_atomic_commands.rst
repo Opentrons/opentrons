@@ -437,11 +437,10 @@ Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-ra
 Blow Out
 --------
 
-To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.InstrumentContext.blow_out` method. A blow out is useful to clear the pipette of any remaining liquid. When using this method, you can use a specific well in a well plate or reservoir as a blow out location. If no location is specified, the pipette will blow out from its current well position. For example::
+To blow an extra amount of air through the pipette's tip, call the :py:meth:`~.InstrumentContext.blow_out` method. You can use a specific well in a well plate or reservoir as the blow out location. If no location is specified, the pipette will blow out from its current well position. For example::
 
     pipette.blow_out()            # blow out from the current location
     pipette.blow_out(plate['B1']) # blow out into well B1
-
 
 .. versionadded:: 2.0
 
