@@ -76,10 +76,6 @@ describe('DeviceReset', () => {
     getByText('Clear gripper calibration')
     getByText('Clear protocol run history')
     getByText('Clears information about past runs of all protocols.')
-    getByText('Clear custom boot scripts')
-    getByText(
-      "Clears scripts that modify the robot's behavior when powered on."
-    )
     expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })
 
@@ -99,6 +95,8 @@ describe('DeviceReset', () => {
     fireEvent.click(getByText('Clear protocol run history'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
+    getByText('Are you sure you want to reset your device?')
+    fireEvent.click(getByText('Confirm'))
     expect(dispatchApiRequest).toBeCalledWith(
       mockResetConfig('mockRobot', clearMockResetOptions)
     )

@@ -698,7 +698,6 @@ class PipetteHandlerProvider(Generic[MountType]):
         presses,
         increment,
     ):
-
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:

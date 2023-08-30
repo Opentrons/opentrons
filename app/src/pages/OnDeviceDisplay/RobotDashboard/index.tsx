@@ -19,7 +19,7 @@ import {
   RecentRunProtocolCarousel,
 } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
-import { WelcomedModal } from './WelcomeModal'
+import { WelcomeModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
@@ -57,7 +57,7 @@ export function RobotDashboard(): JSX.Element {
         gridGap={SPACING.spacing16}
       >
         {showWelcomeModal ? (
-          <WelcomedModal setShowWelcomeModal={setShowWelcomeModal} />
+          <WelcomeModal setShowWelcomeModal={setShowWelcomeModal} />
         ) : null}
         {recentRunsOfUniqueProtocols.length === 0 ? (
           <EmptyRecentRun />

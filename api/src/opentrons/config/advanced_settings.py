@@ -152,7 +152,7 @@ settings = [
         old_id="disable-home-on-boot",
         title="Disable home on boot",
         description="Prevent robot from homing motors on boot",
-        robot_type=[RobotTypeEnum.OT2],
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="useOldAspirationFunctions",
