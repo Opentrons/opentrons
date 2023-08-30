@@ -451,13 +451,13 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plunger_speed(
         self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        mm_per_s = ul_per_s / instr.ul_per_mm(instr.working_volume, action)
+        mm_per_s = ul_per_s / instr.ul_per_mm(instr.liquid_class.max_volume, action)
         return round(mm_per_s, 6)
 
     def plunger_flowrate(
         self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        ul_per_s = mm_per_s * instr.ul_per_mm(instr.working_volume, action)
+        ul_per_s = mm_per_s * instr.ul_per_mm(instr.liquid_class.max_volume, action)
         return round(ul_per_s, 6)
 
     @overload
@@ -698,7 +698,6 @@ class PipetteHandlerProvider(Generic[MountType]):
         presses,
         increment,
     ):
-
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
