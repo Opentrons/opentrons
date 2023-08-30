@@ -249,7 +249,7 @@ describe('SetupModulesList', () => {
     getByText('mock ModuleWizardFlows')
   })
 
-  it('should render disabled button when pipette and module are not calibrated', async () => {
+  it('should render disabled button when pipette and module are not calibrated', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({

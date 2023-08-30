@@ -265,7 +265,25 @@ export function ModulesListItem({
     )
   }
 
-  let renderModuleStatus: JSX.Element
+  let renderModuleStatus: JSX.Element = (
+    <>
+      <TertiaryButton
+        {...targetProps}
+        onClick={() => setShowModuleWizard(true)}
+        disabled={!calibrationStatus?.complete}
+      >
+        {t('calibrate_now')}
+      </TertiaryButton>
+      {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
+        <Tooltip tooltipProps={tooltipProps}>
+          {calibrationStatus.reason === 'attach_pipette_failure_reason'
+            ? t('attach_pipette_before_module_calibration')
+            : t('calibrate_pipette_before_module_calibration')}
+        </Tooltip>
+      ) : null}
+    </>
+  )
+
   if (attachedModuleMatch == null) {
     renderModuleStatus = (
       <StatusLabel
@@ -283,25 +301,6 @@ export function ModulesListItem({
         iconColor={COLORS.successEnabled}
         textColor={COLORS.successText}
       />
-    )
-  } else {
-    renderModuleStatus = (
-      <>
-        <TertiaryButton
-          {...targetProps}
-          onClick={() => setShowModuleWizard(true)}
-          disabled={!calibrationStatus?.complete}
-        >
-          {t('calibrate_now')}
-        </TertiaryButton>
-        {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
-          <Tooltip tooltipProps={tooltipProps}>
-            {calibrationStatus.reason === 'attach_pipette_failure_reason'
-              ? t('attach_pipette_before_module_calibration')
-              : t('calibrate_pipette_before_module_calibration')}
-          </Tooltip>
-        ) : null}
-      </>
     )
   }
 
