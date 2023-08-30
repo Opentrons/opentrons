@@ -1,7 +1,7 @@
 {
   "warning": {
     "gen1multichannel": "No GEN1 8-Channel access",
-    "cancelForSure": "Are you sure you want to remove this adapter?"
+    "cancelForSure": "Are you sure you want to remove this {{adapterName}}?"
   },
   "blocked_slot": {
     "MODULE_INCOMPATIBLE_SINGLE_LABWARE": "Labware incompatible with this module",

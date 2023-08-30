@@ -79,7 +79,6 @@ export const AdapterControlsComponents = (
     (itemType !== DND_TYPES.LABWARE && itemType !== null)
   )
     return null
-
   const draggedDef = draggedItem?.labwareOnDeck?.def
   const isCustomLabware = draggedItem
     ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
@@ -146,18 +145,23 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<any>,
-  ownProps: OP
-): DP => ({
-  addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.labwareId })),
-  moveDeckItem: (sourceSlot, destSlot) =>
-    dispatch(moveDeckItem(sourceSlot, destSlot)),
-  deleteLabware: () => {
-    window.confirm(i18n.t('deck.warning.cancelForSure')) &&
-      dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
-  },
-})
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
+  const adapterName =
+    ownProps.allLabware.find(labware => labware.id === ownProps.labwareId)?.def
+      .metadata.displayName ?? ''
+
+  return {
+    addLabware: () =>
+      dispatch(openAddLabwareModal({ slot: ownProps.labwareId })),
+    moveDeckItem: (sourceSlot, destSlot) =>
+      dispatch(moveDeckItem(sourceSlot, destSlot)),
+    deleteLabware: () => {
+      window.confirm(
+        i18n.t('deck.warning.cancelForSure', { adapterName: adapterName })
+      ) && dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
+    },
+  }
+}
 
 const slotTarget = {
   drop: (props: SlotControlsProps, monitor: DropTargetMonitor) => {
