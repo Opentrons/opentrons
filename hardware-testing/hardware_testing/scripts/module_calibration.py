@@ -139,3 +139,4 @@ if __name__ == "__main__":
     finally:
         # home the gantry and cancel run
         opentrons_api.home(["leftZ", "rightZ"])
+        opentrons_api.cancel_run()
