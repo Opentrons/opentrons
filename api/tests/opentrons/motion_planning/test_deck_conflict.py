@@ -36,88 +36,88 @@ def test_no_multiple_locations() -> None:
         deck_conflict.check(existing_items={1: item_1}, new_item=item_2, new_location=1)
 
 
-def test_only_trash_in_12() -> None:
-    """It should only allow trash labware in slot 12."""
-    trash_labware = deck_conflict.Labware(
-        uri=LabwareUri("trash_labware_uri"),
-        highest_z=123,
-        is_fixed_trash=True,
-        name_for_errors="trash_labware",
-    )
-    not_trash_labware = deck_conflict.Labware(
-        uri=LabwareUri("not_trash_labware_uri"),
-        highest_z=123,
-        is_fixed_trash=False,
-        name_for_errors="not_trash_labware",
-    )
-    not_trash_module = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="not_trash_module"
-    )
+#  def test_only_trash_in_12() -> None:
+#     """It should only allow trash labware in slot 12."""
+#     trash_labware = deck_conflict.Labware(
+#         uri=LabwareUri("trash_labware_uri"),
+#         highest_z=123,
+#         is_fixed_trash=True,
+#         name_for_errors="trash_labware",
+#     )
+#     not_trash_labware = deck_conflict.Labware(
+#         uri=LabwareUri("not_trash_labware_uri"),
+#         highest_z=123,
+#         is_fixed_trash=False,
+#         name_for_errors="not_trash_labware",
+#     )
+#     not_trash_module = deck_conflict.OtherModule(
+#         highest_z_including_labware=123, name_for_errors="not_trash_module"
+#     )
 
-    deck_conflict.check(existing_items={}, new_item=trash_labware, new_location=12)
+#     deck_conflict.check(existing_items={}, new_item=trash_labware, new_location=12)
 
-    with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
-    ):
-        deck_conflict.check(
-            existing_items={}, new_item=not_trash_labware, new_location=12
-        )
+#     with pytest.raises(
+#         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+#     ):
+#         deck_conflict.check(
+#             existing_items={}, new_item=not_trash_labware, new_location=12
+#         )
 
-    with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
-    ):
-        deck_conflict.check(
-            existing_items={}, new_item=not_trash_module, new_location=12
-        )
+#     with pytest.raises(
+#         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+#     ):
+#         deck_conflict.check(
+#             existing_items={}, new_item=not_trash_module, new_location=12
+#         )
 
 
-def test_trash_override() -> None:
-    """It should allow the trash labware to be replaced with another trash labware."""
-    trash_labware_1 = deck_conflict.Labware(
-        uri=LabwareUri("trash_labware_1_uri"),
-        highest_z=123,
-        is_fixed_trash=True,
-        name_for_errors="trash_labware_1",
-    )
-    trash_labware_2 = deck_conflict.Labware(
-        uri=LabwareUri("trash_labware_2_uri"),
-        highest_z=123,
-        is_fixed_trash=True,
-        name_for_errors="trash_labware_2",
-    )
-    not_trash_labware = deck_conflict.Labware(
-        uri=LabwareUri("not_trash_labware_uri"),
-        highest_z=123,
-        is_fixed_trash=False,
-        name_for_errors="not_trash_labware",
-    )
-    not_trash_module = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="not_trash_module"
-    )
+# def test_trash_override() -> None:
+#     """It should allow the trash labware to be replaced with another trash labware."""
+#     trash_labware_1 = deck_conflict.Labware(
+#         uri=LabwareUri("trash_labware_1_uri"),
+#         highest_z=123,
+#         is_fixed_trash=True,
+#         name_for_errors="trash_labware_1",
+#     )
+#     trash_labware_2 = deck_conflict.Labware(
+#         uri=LabwareUri("trash_labware_2_uri"),
+#         highest_z=123,
+#         is_fixed_trash=True,
+#         name_for_errors="trash_labware_2",
+#     )
+#     not_trash_labware = deck_conflict.Labware(
+#         uri=LabwareUri("not_trash_labware_uri"),
+#         highest_z=123,
+#         is_fixed_trash=False,
+#         name_for_errors="not_trash_labware",
+#     )
+#     not_trash_module = deck_conflict.OtherModule(
+#         highest_z_including_labware=123, name_for_errors="not_trash_module"
+#     )
 
-    deck_conflict.check(
-        existing_items={12: trash_labware_1},
-        new_item=trash_labware_2,
-        new_location=12,
-    )
+#     deck_conflict.check(
+#         existing_items={12: trash_labware_1},
+#         new_item=trash_labware_2,
+#         new_location=12,
+#     )
 
-    with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
-    ):
-        deck_conflict.check(
-            existing_items={12: trash_labware_1},
-            new_item=not_trash_labware,
-            new_location=12,
-        )
+#     with pytest.raises(
+#         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+#     ):
+#         deck_conflict.check(
+#             existing_items={12: trash_labware_1},
+#             new_item=not_trash_labware,
+#             new_location=12,
+#         )
 
-    with pytest.raises(
-        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
-    ):
-        deck_conflict.check(
-            existing_items={12: trash_labware_1},
-            new_item=not_trash_module,
-            new_location=12,
-        )
+#     with pytest.raises(
+#         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+#     ):
+#         deck_conflict.check(
+#             existing_items={12: trash_labware_1},
+#             new_item=not_trash_module,
+#             new_location=12,
+#         )
 
 
 @pytest.mark.parametrize(

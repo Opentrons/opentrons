@@ -300,7 +300,7 @@ class Labware:
         self._core: LabwareCore = core
         self._protocol_core = protocol_core
         self._core_map = core_map
-
+        
         well_columns = core.get_well_columns()
         self._well_grid = well_grid.create(columns=well_columns)
         self._wells_by_name = {
