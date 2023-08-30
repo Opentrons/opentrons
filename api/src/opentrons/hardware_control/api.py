@@ -491,13 +491,13 @@ class API(
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     async def halt(self) -> None:
-        """Immediately stop motion.
+        """Immediately stop motion, cancel execution manager and cancel running tasks.
 
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
         await self._backend.hard_halt()
-        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
+        await self._execution_manager.cancel()
 
     async def stop(self, home_after: bool = True) -> None:
         """
@@ -507,7 +507,7 @@ class API(
         see :py:meth:`pause` for more detail), then home and reset the
         robot. After this call, no further recovery is necessary.
         """
-        await self._backend.halt()
+        await self._backend.halt()  # calls smoothie_driver.kill()
         self._log.info("Recovering from halt")
         await self.reset()
         await self.cache_instruments()
@@ -988,6 +988,7 @@ class API(
         mount: top_types.Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.

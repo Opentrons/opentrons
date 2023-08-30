@@ -98,6 +98,15 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+    string | null
+  >(null)
+  // we should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = React.useState<boolean>(false)
 
   const goBack = (): void => {
     setCurrentStepIndex(
@@ -106,14 +115,9 @@ export const PipetteWizardFlows = (
   }
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: createdMaintenanceRunId != null,
   })
-  const prevMaintenanceRunId = React.useRef<string | undefined>(
-    maintenanceRunData?.data.id
-  )
 
-  React.useEffect(() => {
-    prevMaintenanceRunId.current = maintenanceRunData?.data.id
-  }, [maintenanceRunData?.data.id])
   const {
     chainRunCommands,
     isCommandMutationLoading,
@@ -122,15 +126,36 @@ export const PipetteWizardFlows = (
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({}, host)
+  } = useCreateMaintenanceRunMutation(
+    {
+      onSuccess: response => {
+        setCreatedMaintenanceRunId(response.data.id)
+      },
+    },
+    host
+  )
 
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
-    if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
+    if (
+      createdMaintenanceRunId !== null &&
+      maintenanceRunData?.data.id === createdMaintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    }
+    if (
+      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
       closeFlow()
     }
-  }, [maintenanceRunData, closeFlow])
+  }, [
+    maintenanceRunData?.data.id,
+    createdMaintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    closeFlow,
+  ])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
@@ -191,7 +216,6 @@ export const PipetteWizardFlows = (
   }, [isCommandMutationLoading, isExiting])
 
   let chainMaintenanceRunCommands
-
   if (maintenanceRunData?.data.id != null) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],

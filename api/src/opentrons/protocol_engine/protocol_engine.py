@@ -292,7 +292,6 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
-        await self._hardware_stopper.do_halt()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -354,11 +353,17 @@ class ProtocolEngine:
         # order will be backwards because the stack is first-in-last-out.
         exit_stack = AsyncExitStack()
         exit_stack.push_async_callback(self._plugin_starter.stop)  # Last step.
+
         exit_stack.push_async_callback(
+            # Cleanup after hardware halt and reset the hardware controller
             self._hardware_stopper.do_stop_and_recover,
             drop_tips_and_home=drop_tips_and_home,
         )
         exit_stack.callback(self._door_watcher.stop)
+
+        # Halt any movements immediately. Requires a hardware stop & reset after, in order to
+        # recover from halt and resume hardware operations.
+        exit_stack.push_async_callback(self._hardware_stopper.do_halt)
         exit_stack.push_async_callback(self._queue_worker.join)  # First step.
 
         try:

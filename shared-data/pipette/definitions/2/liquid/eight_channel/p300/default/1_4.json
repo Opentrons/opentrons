@@ -28,7 +28,8 @@
           "1": [[309.2612689, 0.0, 19.29389273]]
         }
       },
-      "defaultBlowoutVolume": 39.27
+      "defaultBlowoutVolume": 39.27,
+      "defaultPushOutVolume": 0
     },
     "t300": {
       "defaultAspirateFlowRate": {
@@ -57,7 +58,8 @@
           "1": [[309.2612689, 0.0, 19.29389273]]
         }
       },
-      "defaultBlowoutVolume": 39.27
+      "defaultBlowoutVolume": 39.27,
+      "defaultPushOutVolume": 0
     }
   },
   "defaultTipOverlapDictionary": {

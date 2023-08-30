@@ -32,6 +32,7 @@ import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
+import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 import { RobotSettingsCalibration } from '..'
 
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
@@ -48,6 +49,7 @@ jest.mock('../RobotSettingsDeckCalibration')
 jest.mock('../RobotSettingsGripperCalibration')
 jest.mock('../RobotSettingsPipetteOffsetCalibration')
 jest.mock('../RobotSettingsTipLengthCalibration')
+jest.mock('../RobotSettingsModuleCalibration')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -97,6 +99,9 @@ const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstr
   typeof useAttachedPipettesFromInstrumentsQuery
 >
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockRobotSettingsModuleCalibration = RobotSettingsModuleCalibration as jest.MockedFunction<
+  typeof RobotSettingsModuleCalibration
+>
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -166,6 +171,9 @@ describe('RobotSettingsCalibration', () => {
     )
     mockRobotSettingsTipLengthCalibration.mockReturnValue(
       <div>Mock RobotSettingsTipLengthCalibration</div>
+    )
+    mockRobotSettingsModuleCalibration.mockReturnValue(
+      <div>Mock RobotSettingsModuleCalibration</div>
     )
   })
 
@@ -260,5 +268,12 @@ describe('RobotSettingsCalibration', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock RobotSettingsPipetteOffsetCalibration')
+  })
+
+  it('render a Module Calibration component for an OT-3 and module calibration feature flag is on', () => {
+    mockUseFeatureFlag.mockReturnValue(true)
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock RobotSettingsModuleCalibration')
   })
 })
