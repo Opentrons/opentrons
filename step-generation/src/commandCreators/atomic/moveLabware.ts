@@ -64,14 +64,15 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       : null
   const destModuleIdUnderAdapter =
     destAdapterId != null ? prevRobotState.labware[destAdapterId].slot : null
-  const destId =
+  const destinationModuleId =
     destModuleIdUnderAdapter != null ? destModuleIdUnderAdapter : destModuleId
 
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
   }
-  if (destId != null) {
-    const destModuleState = prevRobotState.modules[destId].moduleState
+  if (destinationModuleId != null) {
+    const destModuleState =
+      prevRobotState.modules[destinationModuleId].moduleState
     if (
       destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
       destModuleState.lidOpen !== true
