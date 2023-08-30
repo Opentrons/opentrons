@@ -53,6 +53,7 @@ interface DeviceResetProps {
 }
 
 // ToDo (kk:08/30/2023) lines that are related to module calibration will be activated when the be is ready.
+// The tests for that will be added.
 export function DeviceReset({
   robotName,
   setCurrentOption,
