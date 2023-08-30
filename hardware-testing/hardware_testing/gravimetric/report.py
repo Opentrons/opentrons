@@ -273,7 +273,7 @@ def create_csv_test_report(
                     )
                     for v in volumes
                     for c in range(pip_channels_tested)
-                    for t in range(trials)
+                    for t in range(cfg.trials)
                     for i in ["start", "end"]
                     for d in ["target", "encoder", "drift"]
                 ],
