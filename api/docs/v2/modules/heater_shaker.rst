@@ -1,3 +1,5 @@
+:og:description: How to use the Heater-Shaker Module in a Python protocol, and where it can be safely placed on the deck.
+
 .. _heater-shaker-module:
 
 ********************
