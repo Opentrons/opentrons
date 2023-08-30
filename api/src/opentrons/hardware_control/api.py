@@ -490,14 +490,15 @@ class API(
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    async def halt(self) -> None:
+    async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately stop motion, cancel execution manager and cancel running tasks.
 
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
-        await self._backend.hard_halt()
-        await self._execution_manager.cancel()
+        if disengage_before_stopping:
+            await self._backend.hard_halt()
+        await self._backend.halt()
 
     async def stop(self, home_after: bool = True) -> None:
         """
@@ -508,6 +509,7 @@ class API(
         robot. After this call, no further recovery is necessary.
         """
         await self._backend.halt()  # calls smoothie_driver.kill()
+        await self._execution_manager.cancel()
         self._log.info("Recovering from halt")
         await self.reset()
         await self.cache_instruments()
