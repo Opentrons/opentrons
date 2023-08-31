@@ -332,7 +332,7 @@ If you specify a well, like ``plate['A1']``, the pipette will aspirate from a de
 .. code-block:: python
 
     pipette.pick_up_tip
-    pipette.well_bottom_clearance.aspirate=2 # place tip 2 mm above well bottom
+    pipette.well_bottom_clearance.aspirate = 2 # place tip 2 mm above well bottom
     pipette.aspirate(200, plate['A1'])
 
 You can also aspirate from a point along the center vertical axis within a well using the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods (see also, :ref:`position-relative-labware`). These methods move the pipette to a specified distance relative to the top or bottom center of a well. For example, you could change the default aspirate height as shown below.
@@ -387,7 +387,7 @@ If you specify a well, like ``plate['B1']``, the pipette will dispense from a de
 .. code-block:: python
 
     pipette.well_bottom_clearance.dispense=2 # place tip 2 mm above well bottom
-    pipette.aspirate(200, plate['B1'])
+    pipette.dispense(200, plate['B1'])
 
 See also, :ref:`new-default-op-positions` for information about controlling pipette height for a particular well.
 
