@@ -192,7 +192,7 @@ PRESSURE_THRESH_OPEN_AIR = {
 }
 PRESSURE_THRESH_SEALED = {
     1: [-50, 50],
-    8: [0, 70]
+    8: [0, 200]
 }
 PRESSURE_THRESH_COMPRESS = {
     1: [-2600, 1600],
