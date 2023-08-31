@@ -994,7 +994,7 @@ class API(
         Dispense a volume of liquid in microliters(uL) using this pipette.
         """
 
-        dispense_spec = self.plan_check_dispense(mount, volume, rate)
+        dispense_spec = self.plan_check_dispense(mount, volume, rate, push_out)
         if not dispense_spec:
             return
         target_pos = target_position_from_plunger(

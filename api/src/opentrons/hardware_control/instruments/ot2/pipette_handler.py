@@ -18,6 +18,7 @@ from typing import (
 
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
 from opentrons_shared_data.pipette.types import Quirks
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 from opentrons import types as top_types
 from opentrons.hardware_control.types import (
@@ -539,22 +540,27 @@ class PipetteHandlerProvider(Generic[MountType]):
 
     @overload
     def plan_check_dispense(
-        self, mount: top_types.Mount, volume: Optional[float], rate: float
+        self,
+        mount: top_types.Mount,
+        volume: Optional[float],
+        rate: float,
+        push_out: Optional[float],
     ) -> Optional[LiquidActionSpec]:
         ...
 
     @overload
     def plan_check_dispense(
-        self, mount: OT3Mount, volume: Optional[float], rate: float
+        self,
+        mount: OT3Mount,
+        volume: Optional[float],
+        rate: float,
+        push_out: Optional[float],
     ) -> Optional[LiquidActionSpec]:
         ...
 
     def plan_check_dispense(  # type: ignore[no-untyped-def]
-        self,
-        mount,
-        volume,
-        rate,
-    ):
+        self, mount, volume, rate, push_out
+    ) -> Optional[LiquidActionSpec]:
         """Check preconditions for dispense, parse args, and calculate positions.
 
         While the mechanics of issuing a dispense move itself are left to child
@@ -589,6 +595,34 @@ class PipetteHandlerProvider(Generic[MountType]):
         if disp_vol == 0:
             return None
 
+        is_full_dispense = abs(instrument.current_volume - disp_vol) < (
+            instrument.minimum_volume / 10
+        )
+        if not is_full_dispense and push_out:
+            raise CommandPreconditionViolated(
+                message="Cannot push_out on a dispense that does not leave the pipette empty",
+                detail={
+                    "command": "dispense",
+                    "remaining-volume": instrument.current_volume - disp_vol,
+                },
+            )
+        if push_out is None and not is_full_dispense:
+            push_out_ul = instrument.push_out_volume
+        elif push_out and not is_full_dispense:
+            push_out_ul = push_out
+        else:
+            push_out_ul = 0
+
+        push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
+
+        if not instrument.ok_to_push_out(push_out_dist_mm):
+            raise CommandPreconditionViolated(
+                message="Cannot push_out more than pipette max blowout volume.",
+                detail={
+                    "command": "dispense",
+                },
+            )
+
         dist = self.plunger_position(
             instrument, instrument.current_volume - disp_vol, "dispense"
         )
@@ -599,7 +633,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             return LiquidActionSpec(
                 axis=Axis.of_plunger(mount),
                 volume=disp_vol,
-                plunger_distance=dist,
+                plunger_distance=dist + push_out_dist_mm,
                 speed=speed,
                 instr=instrument,
                 current=instrument.plunger_motor_current.run,
