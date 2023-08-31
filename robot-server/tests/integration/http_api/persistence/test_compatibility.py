@@ -121,6 +121,12 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
                     == analysis_ids_from_all_analyses_endpoint
                 )
 
+                for analysis_id in analysis_ids_from_all_protocols_endpoint:
+                    # Make sure this doesn't 404.
+                    await robot_client.get_analysis_as_document(
+                        protocol_id=protocol_id, analysis_id=analysis_id
+                    )
+
                 number_of_analyses = len(analysis_ids_from_all_protocols_endpoint)
                 if protocol_id in snapshot.protocols_with_no_analyses:
                     assert number_of_analyses == 0
