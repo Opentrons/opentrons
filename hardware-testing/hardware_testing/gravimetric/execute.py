@@ -499,7 +499,7 @@ def _get_liquid_height(
 ) -> float:
     resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
     if cfg.pipette_channels == 96:
-        if not resources.ctx.is_simulating():
+        if not resources.ctx.is_simulating() and not cfg.same_tip:
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
                 resources.ctx._core.get_hardware(),
@@ -565,10 +565,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
         mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
         resources.ctx._core.get_hardware().retract(mnt)
-        if not resources.ctx.is_simulating():
-            if not cfg.same_tip:
-                ui.get_user_ready("REPLACE first tip with NEW TIP")
-                ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         _liquid_height = _get_liquid_height(resources, cfg, well)
@@ -774,8 +770,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     and acceptable_cv is not None
                     and acceptable_d is not None
                 ):
-                    acceptable_cv /= 100
-                    acceptable_d /= 100
+                    acceptable_cv = abs(acceptable_cv /100)
+                    acceptable_d  = abs(acceptable_d / 100)
                     if (
                         dispense_cv > acceptable_cv
                         or aspirate_cv > acceptable_cv
