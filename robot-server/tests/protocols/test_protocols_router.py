@@ -648,7 +648,7 @@ async def test_get_protocol_analysis_by_id_analysis_not_found(
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
 ) -> None:
-    """It should get a single full analysis by ID."""
+    """It should 404 if the analysis does not exist."""
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
     decoy.when(await analysis_store.get("analysis-id")).then_raise(
         AnalysisNotFoundError("oh no")
@@ -715,7 +715,7 @@ async def test_get_protocol_analysis_as_document_analysis_not_found(
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
 ) -> None:
-    """It should get a single full analysis by ID."""
+    """It should 404 if the analysis document does not exist."""
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
     decoy.when(await analysis_store.get_as_document("analysis-id")).then_raise(
         AnalysisNotFoundError("oh no")
