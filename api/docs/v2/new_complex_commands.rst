@@ -8,7 +8,7 @@ Complex Commands
 
 .. toctree::
     complex_commands/sources_destinations
-    complex_commands/command_order
+    complex_commands/order_operations
     complex_commands/parameters
 
 Complex liquid handling commands combine multiple :ref:`v2-atomic-commands` into a single method call. These commands make it easier to handle larger groups of wells and repeat actions without having to write your own control flow code. They integrate tip-handling behavior and can pick up, use, and drop multiple tips depending on how you want to handle your liquids. They can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip.
@@ -24,39 +24,6 @@ Pages in this section of the documentation cover:
 Code samples throughout these pages assume that you've loaded the pipettes and labware from the basic :ref:`protocol-template`.
                 
 .. all content below here to be refactored into 3 pages.
-
-You can also refer to these images for further clarification.
-
-
-.. _transfer-image:
-
-Transfer
---------
-
-.. image:: ../img/complex_commands/transfer.png
-   :name: Transfer
-   :align: center
-
-
-.. _distribute-image:
-
-Distribute
-----------
-
-.. image:: ../img/complex_commands/robot_distribute.png
-   :name: Distribute
-   :align: center
-
-.. _consolidate-image:
-
-Consolidate
------------
-
-.. image:: ../img/complex_commands/robot_consolidate.png
-   :name: Consolidate
-   :align: center
-
-**********************
 
 .. _params_table:
 
@@ -160,78 +127,7 @@ will have the steps...
     Aspirating 200.0 uL from well A2 in "1" at 1 speed
     Dispensing 200.0 uL into well B2 in "1"
     Dropping tip well A1 in "12"
-
-One to One
------------
-
-Transfer commands are most useful when moving liquid between multiple wells. This will be a one to one transfer
-from where well ``A1``'s contents are transferred to well ``A2``, well ``B1``'s contents to ``B2``,and so on. This is the scenario displayed in the :ref:`transfer-image` visualization.
-
-.. code-block:: python
-
-    pipette.transfer(100, plate.columns_by_name()['1'], plate.columns_by_name()['2'])
-
-will have the steps...
-
-.. code-block:: python
-
-    Transferring 100 from wells A1...H1 in "1" to wells A2...H2 in "1"
-    Picking up tip well A1 in "2"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well A2 in "1"
-    Aspirating 100.0 uL from well B1 in "1" at 1 speed
-    Dispensing 100.0 uL into well B2 in "1"
-    Aspirating 100.0 uL from well C1 in "1" at 1 speed
-    Dispensing 100.0 uL into well C2 in "1"
-    Aspirating 100.0 uL from well D1 in "1" at 1 speed
-    Dispensing 100.0 uL into well D2 in "1"
-    Aspirating 100.0 uL from well E1 in "1" at 1 speed
-    Dispensing 100.0 uL into well E2 in "1"
-    Aspirating 100.0 uL from well F1 in "1" at 1 speed
-    Dispensing 100.0 uL into well F2 in "1"
-    Aspirating 100.0 uL from well G1 in "1" at 1 speed
-    Dispensing 100.0 uL into well G2 in "1"
-    Aspirating 100.0 uL from well H1 in "1" at 1 speed
-    Dispensing 100.0 uL into well H2 in "1"
-    Dropping tip well A1 in "12"
-
-.. versionadded:: 2.0
-
-One to Many
-------------
-
-You can transfer from a single source to multiple destinations, and the other way around (many sources to one destination).
-
-.. code-block:: python
-
-    pipette.transfer(100, plate.wells_by_name()['A1'], plate.columns_by_name()['2'])
-
-
-will have the steps...
-
-.. code-block:: python
-
-    Transferring 100 from well A1 in "1" to wells A2...H2 in "1"
-    Picking up tip well A1 in "2"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well A2 in "1"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well B2 in "1"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well C2 in "1"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well D2 in "1"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well E2 in "1"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well F2 in "1"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well G2 in "1"
-    Aspirating 100.0 uL from well A1 in "1" at 1 speed
-    Dispensing 100.0 uL into well H2 in "1"
-    Dropping tip well A1 in "12"
-
-.. versionadded:: 2.0
+    
 
 List of Volumes
 ---------------
@@ -284,147 +180,6 @@ will have the steps...
     Dispensing 60.0 uL into well B3 in "1"
     Dropping tip well A1 in "12"
 
-
-.. versionadded:: 2.0
-
-**********************
-
-Distribute and Consolidate
-==========================
-
-:py:meth:`.InstrumentContext.distribute` and :py:meth:`.InstrumentContext.consolidate` are similar to :py:meth:`.InstrumentContext.transfer`, but optimized for specific uses. :py:meth:`.InstrumentContext.distribute` is optimized for taking a large volume from a single (or a small number) of source wells, and distributing it to many smaller volumes in destination wells. Rather than using one-to-one transfers, it dispense many times for each aspirate. :py:meth:`.InstrumentContext.consolidate` is optimized for taking small volumes from many source wells and consolidating them into one (or a small number) of destination wells, aspirating many times for each dispense.
-
-Consolidate
------------
-
-Volumes going to the same destination well are combined within the same tip, so that multiple aspirates can be combined to a single dispense. This is the scenario described by the :ref:`consolidate-image` graphic.
-
-.. code-block:: python
-
-    pipette.consolidate(30, plate.columns_by_name()['2'], plate.wells_by_name()['A1'])
-
-will have the steps...
-
-.. code-block:: python
-
-    Consolidating 30 from wells A2...H2 in "1" to well A1 in "1"
-    Transferring 30 from wells A2...H2 in "1" to well A1 in "1"
-    Picking up tip well A1 in "2"
-    Aspirating 30.0 uL from well A2 in "1" at 1 speed
-    Aspirating 30.0 uL from well B2 in "1" at 1 speed
-    Aspirating 30.0 uL from well C2 in "1" at 1 speed
-    Aspirating 30.0 uL from well D2 in "1" at 1 speed
-    Aspirating 30.0 uL from well E2 in "1" at 1 speed
-    Aspirating 30.0 uL from well F2 in "1" at 1 speed
-    Aspirating 30.0 uL from well G2 in "1" at 1 speed
-    Aspirating 30.0 uL from well H2 in "1" at 1 speed
-    Dispensing 240.0 uL into well A1 in "1"
-    Dropping tip well A1 in "12"
-
-If there are multiple destination wells, the pipette will not combine the transfers - it will aspirate from one source, dispense into the target, then aspirate from the other source.
-
-.. code-block:: python
-
-    pipette.consolidate(
-      30,
-      plate.columns_by_name()['1'],
-      [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']])
-
-
-will have the steps...
-
-.. code-block:: python
-
-    Consolidating 30 from wells A1...H1 in "1" to wells A1...A2 in "1"
-    Transferring 30 from wells A1...H1 in "1" to wells A1...A2 in "1"
-    Picking up tip well A1 in "2"
-    Aspirating 30.0 uL from well A1 in "1" at 1 speed
-    Aspirating 30.0 uL from well B1 in "1" at 1 speed
-    Aspirating 30.0 uL from well C1 in "1" at 1 speed
-    Aspirating 30.0 uL from well D1 in "1" at 1 speed
-    Dispensing 120.0 uL into well A1 in "1"
-    Aspirating 30.0 uL from well E1 in "1" at 1 speed
-    Aspirating 30.0 uL from well F1 in "1" at 1 speed
-    Aspirating 30.0 uL from well G1 in "1" at 1 speed
-    Aspirating 30.0 uL from well H1 in "1" at 1 speed
-    Dispensing 120.0 uL into well A2 in "1"
-    Dropping tip well A1 in "12"
-
-
-.. versionadded:: 2.0
-
-Distribute
-----------
-
-Volumes from the same source well are combined within the same tip, so that one aspirate can provide for multiple dispenses. This is the scenario in the :ref:`distribute-image` graphic.
-
-.. code-block:: python
-
-    pipette.distribute(55, plate.wells_by_name()['A1'], plate.rows_by_name()['A'])
-
-
-will have the steps...
-
-.. code-block:: python
-
-    Distributing 55 from well A1 in "1" to wells A1...A12 in "1"
-    Transferring 55 from well A1 in "1" to wells A1...A12 in "1"
-    Picking up tip well A1 in "2"
-    Aspirating 250.0 uL from well A1 in "1" at 1 speed
-    Dispensing 55.0 uL into well A1 in "1"
-    Dispensing 55.0 uL into well A2 in "1"
-    Dispensing 55.0 uL into well A3 in "1"
-    Dispensing 55.0 uL into well A4 in "1"
-    Blowing out at well A1 in "12"
-    Aspirating 250.0 uL from well A1 in "1" at 1 speed
-    Dispensing 55.0 uL into well A5 in "1"
-    Dispensing 55.0 uL into well A6 in "1"
-    Dispensing 55.0 uL into well A7 in "1"
-    Dispensing 55.0 uL into well A8 in "1"
-    Blowing out at well A1 in "12"
-    Aspirating 250.0 uL from well A1 in "1" at 1 speed
-    Dispensing 55.0 uL into well A9 in "1"
-    Dispensing 55.0 uL into well A10 in "1"
-    Dispensing 55.0 uL into well A11 in "1"
-    Dispensing 55.0 uL into well A12 in "1"
-    Blowing out at well A1 in "12"
-    Dropping tip well A1 in "12"
-
-The pipette will aspirate more liquid than it intends to dispense by the minimum volume of the pipette. This is called the ``disposal_volume``, and can be specified in the call to ``distribute``.
-
-If there are multiple source wells, the pipette will never combine their volumes into the same tip.
-
-.. code-block:: python
-
-    pipette.distribute(
-      30,
-      [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']],
-      plate.rows()['A'])
-
-will have the steps...
-
-.. code-block:: python
-
-    Distributing 30 from wells A1...A2 in "1" to wells A1...A12 in "1"
-    Transferring 30 from wells A1...A2 in "1" to wells A1...A12 in "1"
-    Picking up tip well A1 in "2"
-    Aspirating 210.0 uL from well A1 in "1" at 1 speed
-    Dispensing 30.0 uL into well A1 in "1"
-    Dispensing 30.0 uL into well A2 in "1"
-    Dispensing 30.0 uL into well A3 in "1"
-    Dispensing 30.0 uL into well A4 in "1"
-    Dispensing 30.0 uL into well A5 in "1"
-    Dispensing 30.0 uL into well A6 in "1"
-    Blowing out at well A1 in "12"
-    Aspirating 210.0 uL from well A2 in "1" at 1 speed
-    Dispensing 30.0 uL into well A7 in "1"
-    Dispensing 30.0 uL into well A8 in "1"
-    Dispensing 30.0 uL into well A9 in "1"
-    Dispensing 30.0 uL into well A10 in "1"
-    Dispensing 30.0 uL into well A11 in "1"
-    Dispensing 30.0 uL into well A12 in "1"
-    Blowing out at well A1 in "12"
-    Dropping tip well A1 in "12"
 
 .. versionadded:: 2.0
 
