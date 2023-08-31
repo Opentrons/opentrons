@@ -605,6 +605,7 @@ async def _read_pressure_and_check_results(
             _bool_to_pass_fail(test_pass_delta),
         ]
         print(csv_data_delta)
+        write_cb(csv_data_delta)
     _passed = test_pass_stability and test_pass_accuracy and test_pass_delta
     return _passed, _samples
 
