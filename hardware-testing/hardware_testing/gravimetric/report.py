@@ -433,36 +433,36 @@ def store_encoder(
     encoder_aspirated: float,
 ) -> None:
     """Store encoder information."""
-    vol_in_tag = str(round(volume, 2))
+    vol_in_tag = str(round(volume, 4))
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-target",
-        [round(estimate_bottom, 2)],
+        [round(estimate_bottom, 4)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-encoder",
-        [round(encoder_bottom, 2)],
+        [round(encoder_bottom, 4)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-drift",
-        [round(encoder_bottom - estimate_bottom, 2)],
+        [round(encoder_bottom - estimate_bottom, 4)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-target",
-        [round(estimate_aspirated, 2)],
+        [round(estimate_aspirated, 4)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-encoder",
-        [round(encoder_aspirated, 2)],
+        [round(encoder_aspirated, 4)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-drift",
-        [round(encoder_aspirated - estimate_aspirated, 2)],
+        [round(encoder_aspirated - estimate_aspirated, 4)],
     )
 
 
