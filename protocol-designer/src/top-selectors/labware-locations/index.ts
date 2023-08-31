@@ -122,6 +122,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         const modIdWithAdapter = Object.keys(modules).find(
           modId => modId === labwareOnDeck.slot
         )
+        const adapterDisplayName =
+          labwareEntities[labwareId].def.metadata.displayName
         const modSlot =
           modIdWithAdapter != null ? modules[modIdWithAdapter].slot : null
         const isAdapter = getIsAdapter(labwareId, labwareEntities)
@@ -130,7 +132,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
           ? [
               ...acc,
               {
-                name: `Adapter on top of ${
+                name: `${adapterDisplayName} on top of ${
                   modIdWithAdapter != null
                     ? getModuleDisplayName(
                         moduleEntities[modIdWithAdapter].model
