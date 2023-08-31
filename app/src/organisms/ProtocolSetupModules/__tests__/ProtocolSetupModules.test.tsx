@@ -8,9 +8,16 @@ import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_st
 
 import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
-import { useAttachedModules } from '../../../organisms/Devices/hooks'
+import {
+  useAttachedModules,
+  useRunCalibrationStatus,
+} from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { mockApiHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
+import { getLocalRobot } from '../../../redux/discovery'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -19,6 +26,7 @@ import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { ProtocolSetupModules } from '..'
 
 jest.mock('@opentrons/shared-data/js/helpers')
+jest.mock('../../../redux/discovery')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -48,9 +56,29 @@ const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jes
 const mockSetupInstructionsModal = SetupInstructionsModal as jest.MockedFunction<
   typeof SetupInstructionsModal
 >
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
+const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
+  typeof useRunCalibrationStatus
+>
 
-const RUN_ID = "otie's run"
+const ROBOT_NAME = 'otie'
+const RUN_ID = '1'
 const mockSetSetupScreen = jest.fn()
+
+const calibratedMockApiHeaterShaker = {
+  ...mockApiHeaterShaker,
+  moduleOffset: {
+    offset: {
+      x: 0.1640625,
+      y: -1.2421875,
+      z: -1.759999999999991,
+    },
+    slot: '7',
+    last_modified: '2023-06-01T14:42:20.131798+00:00',
+  },
+}
 
 const render = () => {
   return renderWithProviders(
@@ -87,6 +115,15 @@ describe('ProtocolSetupModules', () => {
     mockSetupInstructionsModal.mockReturnValue(
       <div>mock SetupInstructionsModal</div>
     )
+    mockGetLocalRobot.mockReturnValue({
+      ...mockConnectedRobot,
+      name: ROBOT_NAME,
+    })
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: true,
+      })
   })
 
   afterEach(() => {
@@ -114,5 +151,108 @@ describe('ProtocolSetupModules', () => {
 
     getByText('Setup Instructions').click()
     getByText('mock SetupInstructionsModal')
+  })
+
+  it('should render module information when a protocol has module - connected', () => {
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith(calibratedMockApiHeaterShaker as any, mockProtocolModuleInfo)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: mockApiHeaterShaker as any,
+      })
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: calibratedMockApiHeaterShaker,
+      },
+    ])
+    const [{ getByText }] = render()
+    getByText('Heater-Shaker Module GEN1')
+    getByText('Connected')
+  })
+
+  it('should render module information when a protocol has module - disconnected', () => {
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: mockApiHeaterShaker as any,
+      })
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+      },
+    ])
+    const [{ getByText }] = render()
+    getByText('Heater-Shaker Module GEN1')
+    getByText('Disconnected')
+  })
+
+  it('should render module information with calibrate button when a protocol has module', () => {
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: mockApiHeaterShaker as any,
+      })
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: mockApiHeaterShaker,
+      },
+    ])
+    const [{ getByText }] = render()
+    getByText('Heater-Shaker Module GEN1')
+    getByText('Calibrate')
+  })
+
+  it('should render module information with text button when a protocol has module - attach pipette first', () => {
+    const ATTACH_FIRST = {
+      complete: false,
+      reason: 'attach_pipette_failure_reason',
+    }
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue(ATTACH_FIRST as any)
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: mockApiHeaterShaker as any,
+      })
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: mockApiHeaterShaker,
+      },
+    ])
+    const [{ getByText }] = render()
+    getByText('Heater-Shaker Module GEN1')
+    getByText('Calibration required Attach pipette first')
+  })
+
+  it('should render module information with text button when a protocol has module - calibrate pipette first', () => {
+    const CALIBRATE_FIRST = {
+      complete: false,
+      reason: 'calibrate_pipette_failure_reason',
+    }
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue(CALIBRATE_FIRST as any)
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: mockApiHeaterShaker as any,
+      })
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: mockApiHeaterShaker,
+      },
+    ])
+    const [{ getByText }] = render()
+    getByText('Heater-Shaker Module GEN1')
+    getByText('Calibration required Calibrate pipette first')
   })
 })

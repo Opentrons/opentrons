@@ -103,6 +103,7 @@ function RenderModuleStatus({
 
   if (
     isModuleReady &&
+    calibrationStatus.complete &&
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
@@ -120,6 +121,7 @@ function RenderModuleStatus({
     )
   } else if (
     isModuleReady &&
+    calibrationStatus.complete &&
     module.attachedModuleMatch?.moduleOffset?.last_modified == null
   ) {
     moduleStatus = (
@@ -129,7 +131,7 @@ function RenderModuleStatus({
         onClick={handleCalibrate}
       />
     )
-  } else if (calibrationStatus?.complete === false) {
+  } else if (!calibrationStatus?.complete) {
     moduleStatus = (
       <StyledText as="p">
         {calibrationStatus?.reason === 'attach_pipette_failure_reason'
