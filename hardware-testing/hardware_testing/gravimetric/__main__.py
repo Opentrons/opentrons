@@ -520,5 +520,5 @@ if __name__ == "__main__":
             run_args.recorder.deactivate()
         _change_pipettes(run_args.ctx, run_args.pipette)
         serial_logger.terminate()
-        del(run_args.ctx._core.get_hardware()._backend.eeprom_driver._gpio)
+        del run_args.ctx._core.get_hardware()._backend.eeprom_driver._gpio
     print("done\n\n")
