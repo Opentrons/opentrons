@@ -34,15 +34,15 @@ LOG.setLevel(logging.CRITICAL)
 FORCE_SPEED = 10
 FORCE_MARGIN = 15  # Percentage
 FORCE_TEST_SETTINGS = [
-    {"CURRENT": 0.15, "F_MAX": 50},
-    {"CURRENT": 0.2, "F_MAX": 73},
-    {"CURRENT": 0.3, "F_MAX": 120},
-    {"CURRENT": 0.4, "F_MAX": 160},
-    {"CURRENT": 0.5, "F_MAX": 200},
-    {"CURRENT": 0.6, "F_MAX": 230},
-    {"CURRENT": 0.7, "F_MAX": 260},
-    {"CURRENT": 1.4, "F_MAX": 480},
     {"CURRENT": 1.5, "F_MAX": 520},
+    {"CURRENT": 1.4, "F_MAX": 480},
+    {"CURRENT": 0.7, "F_MAX": 260},
+    {"CURRENT": 0.6, "F_MAX": 230},
+    {"CURRENT": 0.5, "F_MAX": 200},
+    {"CURRENT": 0.4, "F_MAX": 160},
+    {"CURRENT": 0.3, "F_MAX": 120},
+    {"CURRENT": 0.2, "F_MAX": 73},
+    {"CURRENT": 0.15, "F_MAX": 50},   
 ]
 CYCLES_CURRENT = 5
 
