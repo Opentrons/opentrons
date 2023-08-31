@@ -133,7 +133,8 @@ const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 export function updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): FormPatch {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch }
@@ -154,7 +155,8 @@ export function updatePatchPathField(
     pipetteCapacityExceeded = !volumeInCapacityForMulti(
       // @ts-expect-error(sa, 2021-6-14): appliedPatch is not of type FormData, address in #3161
       appliedPatch,
-      pipetteEntities
+      pipetteEntities,
+      labwareEntities
     )
   }
 
@@ -295,7 +297,8 @@ const clampAspirateAirGapVolume = (
 const clampDispenseAirGapVolume = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
@@ -319,7 +322,7 @@ const clampDispenseAirGapVolume = (
     pipetteId in pipetteEntities
   ) {
     const pipetteEntity = pipetteEntities[pipetteId]
-    const capacity = getPipetteCapacity(pipetteEntity, tipRack)
+    const capacity = getPipetteCapacity(pipetteEntity, labwareEntities, tipRack)
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
@@ -388,7 +391,8 @@ const updatePatchDisposalVolumeFields = (
 const clampDisposalVolume = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
@@ -399,7 +403,8 @@ const clampDisposalVolume = (
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
     // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
     appliedPatch,
-    pipetteEntities
+    pipetteEntities,
+    labwareEntities
   )
 
   if (maxDisposalVolume == null) {
@@ -615,15 +620,32 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch =>
       updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnWellRatioChange(chainPatch, rawForm),
-    chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
+    chainPatch =>
+      updatePatchPathField(
+        chainPatch,
+        rawForm,
+        pipetteEntities,
+        labwareEntities
+      ),
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       clampAspirateAirGapVolume(chainPatch, rawForm, pipetteEntities),
-    chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
+    chainPatch =>
+      clampDisposalVolume(
+        chainPatch,
+        rawForm,
+        pipetteEntities,
+        labwareEntities
+      ),
     chainPatch => updatePatchMixFields(chainPatch, rawForm),
     chainPatch => updatePatchBlowoutFields(chainPatch, rawForm),
     chainPatch =>
-      clampDispenseAirGapVolume(chainPatch, rawForm, pipetteEntities),
+      clampDispenseAirGapVolume(
+        chainPatch,
+        rawForm,
+        pipetteEntities,
+        labwareEntities
+      ),
   ])
 }

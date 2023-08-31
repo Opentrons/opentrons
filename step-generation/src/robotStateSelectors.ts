@@ -83,8 +83,10 @@ export function getNextTiprack(
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck = robotState.labware[labwareId].slot != null
-      const labwareIdDefUri = labwareId.split(':')[1]
-      const tipRackDefUri = tipRack.split(':')[1]
+      const labwareIdDefUri =
+        invariantContext.labwareEntities[labwareId].labwareDefURI
+      const tipRackDefUri =
+        invariantContext.labwareEntities[tipRack].labwareDefURI
       return isOnDeck && labwareIdDefUri === tipRackDefUri
     }
   )
@@ -121,12 +123,10 @@ export function getPipetteWithTipMaxVol(
   invariantContext: InvariantContext,
   tipRack: string
 ): number {
-  // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
-  // across the entire timeline
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
   const pipetteMaxVol = pipetteEntity.spec.maxVolume
   const tiprackDef = pipetteEntity.tiprackLabwareDef
-  const tipRackDefUri = tipRack?.split(':')[1]
+  const tipRackDefUri = invariantContext.labwareEntities[tipRack].labwareDefURI
   let chosenTipRack = null
   for (const def of tiprackDef) {
     if (getLabwareDefURI(def) === tipRackDefUri) {

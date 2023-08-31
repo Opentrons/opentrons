@@ -14,6 +14,7 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { StepFieldName } from '../../form-types'
+import { LabwareEntities } from '@opentrons/step-generation'
 
 /*******************
  ** Error Messages **
@@ -128,7 +129,10 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-export type FormErrorChecker = (arg: unknown) => FormError | null
+export type FormErrorChecker = (
+  arg: unknown,
+  labwareEntities?: LabwareEntities
+) => FormError | null
 // TODO: test these
 
 /*******************
@@ -212,10 +216,18 @@ export const wellRatioMoveLiquid = (
     ? null
     : WELL_RATIO_MOVE_LIQUID
 }
-export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
+export const volumeTooHigh = (
+  fields: HydratedFormData,
+  labwareEntities?: LabwareEntities
+): FormError | null => {
   const { pipette, tipRack } = fields
   const volume = Number(fields.volume)
-  const pipetteCapacity = getPipetteCapacity(pipette, tipRack)
+
+  const pipetteCapacity = getPipetteCapacity(
+    pipette,
+    labwareEntities ?? {},
+    tipRack
+  )
 
   if (
     !Number.isNaN(volume) &&

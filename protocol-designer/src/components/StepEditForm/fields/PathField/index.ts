@@ -22,6 +22,7 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
     tipRack,
   } = ownProps
   const pipetteEntities = stepFormSelectors.getPipetteEntities(state)
+  const labwareEntities = stepFormSelectors.getLabwareEntities(state)
   const disabledPathMap = getDisabledPathMap(
     {
       aspirate_airGap_checkbox,
@@ -33,7 +34,8 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
       volume,
       tipRack,
     },
-    pipetteEntities
+    pipetteEntities,
+    labwareEntities
   )
   return {
     disabledPathMap,

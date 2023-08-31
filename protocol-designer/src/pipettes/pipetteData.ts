@@ -7,7 +7,7 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
-import { PipetteEntity } from '@opentrons/step-generation'
+import { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 const supportedPipetteNames: PipetteName[] = [
   'p10_single',
   'p10_multi',
@@ -33,15 +33,18 @@ export const pipetteOptions: Options = supportedPipetteNames
     (option: DropdownOption | null): option is DropdownOption => Boolean(option)
   )
 
-// NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
-// be merged once multiple tiprack types per pipette is supported
+// NOTE: this is similar to getPipetteWithTipMaxVol, the fns
 export function getPipetteCapacity(
   pipetteEntity: PipetteEntity,
+  labwareEntities: LabwareEntities,
   tipRack?: string | null
 ): number {
   const spec = pipetteEntity.spec
   const tiprackDefs = pipetteEntity.tiprackLabwareDef
-  const tipRackDefUri = tipRack?.split(':')[1]
+  const tipRackDefUri =
+    tipRack != null && labwareEntities[tipRack] != null
+      ? labwareEntities[tipRack]?.labwareDefURI
+      : ''
   let chosenTipRack = null
 
   for (const def of tiprackDefs) {

@@ -136,7 +136,8 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
       volume,
       tipRack,
     },
-    stepFormSelectors.getPipetteEntities(state)
+    stepFormSelectors.getPipetteEntities(state),
+    stepFormSelectors.getLabwareEntities(state)
   )
 
   return {
