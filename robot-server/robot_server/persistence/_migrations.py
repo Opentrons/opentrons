@@ -103,6 +103,12 @@ def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[i
     if _is_version_0(transaction):
         return 0
 
+    # It's important that this takes the highest schema version that we've seen,
+    # not the most recent one to be added. If you downgrade robot software across
+    # a schema boundary, the old software will leave the database at its newer schema,
+    # but stamp it as having "migrated" to the old one. We need to see it as having the newer
+    # schema, to avoid incorrectly doing a redundant migration when the software is upgraded
+    # again later.
     select_latest_version = sqlalchemy.select(migration_table).order_by(
         sqlalchemy.desc(migration_table.c.version)
     )
