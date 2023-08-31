@@ -3,11 +3,12 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-
-from fastapi import APIRouter, Depends, File, UploadFile, status, Form
-from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 from typing_extensions import Literal
+
+from fastapi import APIRouter, Depends, File, UploadFile, status, Form
+from fastapi.responses import PlainTextResponse
+from pydantic import BaseModel, Field
 
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -50,8 +51,6 @@ from .dependencies import (
     get_file_reader_writer,
     get_file_hasher,
 )
-
-from starlette.responses import PlainTextResponse
 
 log = logging.getLogger(__name__)
 
