@@ -46,7 +46,7 @@ function PipetteGroup(props: Props): JSX.Element {
           imageStyle={
             robotType === FLEX_ROBOT_TYPE
               ? css`
-                  left: 36rem;
+                  left: 38.5rem;
                   position: fixed;
                 `
               : undefined
@@ -63,7 +63,7 @@ function PipetteGroup(props: Props): JSX.Element {
           imageStyle={
             robotType === FLEX_ROBOT_TYPE
               ? css`
-                  right: -2rem;
+                  right: -1.5rem;
                   position: fixed;
                 `
               : undefined
