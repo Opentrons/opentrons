@@ -92,9 +92,8 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
         #    Now we've got old software working in a schema 2 database, causing rows to be added
         #    where schema 2's `completed_analysis_as_document` column is NULL.
         # 4) Update robot software again. This won't trigger a schema migration, because the
-        #    database was already migrated to schema 2 once. But we don't want those
-        #    So some rows will have NULL in the `completed_analysis_as_document` column,
-        #    which we want to get rid of.
+        #    database was already migrated to schema 2 once. But we want to get rid of those NULL
+        #    `completed_analysis_as_document` values.
         _migrate_data_1_to_2(transaction)
 
 
@@ -109,7 +108,7 @@ def _stamp_schema_version(transaction: sqlalchemy.engine.Connection) -> None:
 
 
 def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[int]:
-    """Get the current schema version of the database.
+    """Get the current schema version of the given database.
 
     Returns:
         The version found, or None if this is a fresh database that
