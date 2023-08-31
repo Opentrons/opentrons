@@ -32,28 +32,21 @@ Certain liquid handling cases focus on moving liquid to or from a single well. :
 
 These restrictions and behaviors are summarized as follows:
 
-.. list-table::
-   :header-rows: 1
-
-   * - Method
-     - Accepted wells
-   * - ``transfer()``
-     - 
-       - **Source:** any number of wells
-       - **Destination:** any number of wells
-       - The larger group of wells must be evenly divisible by the smaller group.
-   * - ``distribute()``
-     - 
-       - **Source:** exactly one well
-       - **Destination:** any number of wells
-   * - ``consolidate()``
-     - 
-       - **Source:** any number of wells
-       - **Destination:** exactly one well
++-------------------+----------------------------------------------------+---------------------+
+| Method            | Valid sources                                      | Valid destinations  |
++===================+====================================================+=====================+
+| ``transfer()``    | Any number of wells                                | Any number of wells |
++                   +----------------------------------------------------+---------------------+
+|                   | The larger group of wells must be evenly divisible by the smaller group. |
++-------------------+----------------------------------------------------+---------------------+
+| ``distribute()``  | Exactly one well                                   | Any number of wells |
++-------------------+----------------------------------------------------+---------------------+
+| ``consolidate()`` | Any number of wells                                | Exactly one well    |
++-------------------+----------------------------------------------------+---------------------+
 
 Singleton wells can be passed by themselves or as a list with one item: ``source=plate['A1']`` and ``source=[plate['A1']]`` are equivalent.
     
-The section on :ref:`many-to-many transfers <many-to-many>` below covers transfer when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to ``transfer()`` in sequence or by using a :ref:`complex-list-volumes` to skip certain wells.
+The section on :ref:`many-to-many transfers <many-to-many>` below covers how ``transfer()`` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to ``transfer()`` in sequence or by using a :ref:`complex-list-volumes` to skip certain wells.
 
 For distributing and consolidating, the API will not raise an error if you use a list of wells as the argument that is limited to exactly one well. Instead, the API will ignore everything except the first well in the list. For example, the following command will only aspirate from well A1::
 
