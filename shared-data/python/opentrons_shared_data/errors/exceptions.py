@@ -746,7 +746,7 @@ class CommandPreconditionViolated(GeneralError):
                  message: Optional[str] = None,
             detail: Optional[Dict[str, Any]] = None,
             wrapping: Optional[Sequence[EnumeratedError]] = None) -> None:
-        super().__Init__(
+        super().__init__(
             ErrorCodes.COMMAND_PRECONDITION_VIOLATED,
             message, detail, wrapping
         )
