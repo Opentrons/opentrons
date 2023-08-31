@@ -43,21 +43,25 @@ export const migrateFile = (
     ?.pipetteTiprackAssignments as Record<string, string>
   const allLatestDefs = getOnlyLatestDefs()
 
-  // const savedStepForms = appData.designerApplication?.data
-  //   ?.savedStepForms as DesignerApplicationData['savedStepForms']
-  // const pipettingSavedSteps = Object.values(savedStepForms).filter(
-  //   form => form.stepName === 'transfer' || form.stepName === 'mix'
-  // )
-  // const pipettingSavedStepsWithTipRack = pipettingSavedSteps.reduce(
-  //   (acc, item) => {
-  //     const tipRack = tiprackAssignments[item.pipette]
-  //     const tipRackLoadName = labwareDefinitions[tipRack].parameters.loadName
-  //     const tipRackId = commands.filter(command => command)
-  //     acc[item.id] = { ...item, tipRack }
-  //     return acc
-  //   },
-  //   {}
-  // )
+  const savedStepForms = appData.designerApplication?.data
+    ?.savedStepForms as DesignerApplicationData['savedStepForms']
+  const pipettingSavedSteps = Object.values(savedStepForms).filter(
+    form => form.stepName === 'transfer' || form.stepName === 'mix'
+  )
+  //  todo(jr, 7/30/23): this assigns the first tiprack in labware that matches the defUri
+  //  and doesn't account for multi tipracks. no idea how to differentiate between the tiprack entities though?
+  const pipettingSavedStepsWithTipRack = pipettingSavedSteps.reduce(
+    (acc, item) => {
+      const tipRack = tiprackAssignments[item.pipette]
+      const tipRackId = Object.keys(labware).find(
+        key => labware[key].definitionId === tipRack
+      )
+      acc[item.id] = { ...item, tipRack: tipRackId }
+      return acc
+    },
+    {}
+  )
+
   const getIsAdapter = (labwareId: string): boolean => {
     const labwareEntity = labware[labwareId]
     if (labwareEntity == null) return false
@@ -296,7 +300,7 @@ export const migrateFile = (
               ...newLabwareLocationUpdate,
             },
           },
-          // ...pipettingSavedStepsWithTipRack,
+          ...pipettingSavedStepsWithTipRack,
         },
         pipetteTiprackAssignments: newTiprackAssignments,
       },
