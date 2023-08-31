@@ -15,6 +15,7 @@ from typing import (
 )
 from typing_extensions import Final
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 from opentrons import types as top_types
 from opentrons.hardware_control.types import (
@@ -577,21 +578,44 @@ class PipetteHandlerProvider:
 
         # Ensure we don't dispense more than the current volume
         disp_vol = min(instrument.current_volume, disp_vol)
+        is_full_dispense = abs(instrument.current_volume - disp_vol) < (
+            instrument.minimum_volume / 10
+        )
 
         if disp_vol == 0:
             return None
 
-        if push_out is None:
+
+        if not is_full_dispense and push_out:
+            raise CommandPreconditionViolated(
+                message="Cannot push_out on a dispense that does not leave the pipette empty",
+                detail={
+                    "command": "dispense",
+                    "remaining-volume": instrument.current_volume - disp_vol,
+                },
+            )
+        if push_out is None and not is_full_dispense:
             push_out_ul = instrument.push_out_volume
-        else:
+        elif push_out and not is_full_dispense:
             push_out_ul = push_out
+        else:
+            push_out_ul = 0
 
         push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
-        if not instrument.ok_to_push_out:
-            raise ValueError("Cannot push-out more than pipette max blowout volume.")
 
-        dist = self.plunger_position(
-            instrument, instrument.current_volume - disp_vol, "dispense"
+        if not instrument.ok_to_push_out(push_out_dist_mm):
+            raise CommandPreconditionViolated(
+                message="Cannot push_out more than pipette max blowout volume.",
+                detail={
+                    "command": "dispense",
+                },
+            )
+
+        dist = (
+            self.plunger_position(
+                instrument, instrument.current_volume - disp_vol, "dispense"
+            )
+            + push_out_dist_mm
         )
         speed = self.plunger_speed(
             instrument, instrument.dispense_flow_rate * rate, "dispense"

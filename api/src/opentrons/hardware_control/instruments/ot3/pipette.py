@@ -244,7 +244,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
-        self._push_out_volume = self._active_tip_settings.default_push_out_volume
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
 
@@ -454,6 +453,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._active_tip_settings = self.liquid_class.supported_tips[tip_size_type]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+
+    @property
+    def minimum_volume(self) -> float:
+        """The smallest controllable volume the pipette can handle."""
+        return self.liquid_class.min_volume
 
     @property
     def available_volume(self) -> float:
