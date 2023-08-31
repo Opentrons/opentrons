@@ -10,6 +10,12 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v7.0.0 release of the Opentrons App! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
 
+### Upgrade Note: Allow Extra Time for Restart
+
+When you first upgrade a robot to this version, it will take longer to restart, because it needs to convert some internal storage to a more efficient format.
+
+How much longer depends on how many different protocols you've recently run and how big they are. A lightly-loaded robot should only take an additional minute, but a heavily-loaded robot can take 10 minutes.
+
 ### New Features
 
 - Opentrons Flex features
@@ -20,6 +26,10 @@ Welcome to the v7.0.0 release of the Opentrons App! This release adds support fo
 - General app features
   - Manually move labware around the deck during protocols. The app shows animated instructions for which labware to move, and lets you resume the protocol when movement is complete.
   - See when your protocol will pause. During a run, marks on the protocol timeline show all pauses that require user attention, including labware movement.
+
+### Improved Features
+
+- Load times for various pages have been reduced.
 
 ---
 

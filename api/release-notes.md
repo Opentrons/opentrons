@@ -10,6 +10,12 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v7.0.0 release of the Opentrons robot software! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
 
+### Upgrade Note: Allow Extra Time for Restart
+
+When you first upgrade a robot to this version, it will take longer to restart, because it needs to convert some internal storage to a more efficient format.
+
+How much longer depends on how many different protocols you've recently run and how big they are. A lightly-loaded robot should only take an additional minute, but a heavily-loaded robot can take 10 minutes.
+
 ### New Features
 
 - Flex touchscreen
@@ -30,6 +36,7 @@ Welcome to the v7.0.0 release of the Opentrons robot software! This release adds
 
 - The API relaxes placement restrictions for the Heater-Shaker Module on Flex.
 - Pipettes drop tips in multiple locations above the trash bin to prevent tips from stacking up.
+- Load times for various parts of the Opentrons App have been reduced.
 
 ### Known Issues
 
