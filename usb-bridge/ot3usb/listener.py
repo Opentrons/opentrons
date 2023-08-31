@@ -4,7 +4,6 @@ import logging
 import select
 from typing import Optional, List, Any
 import serial  # type: ignore[import]
-from queue import Queue
 
 from . import usb_config, default_config, usb_monitor, tcp_conn
 from .serial_thread import QUEUE_TYPE
@@ -82,6 +81,8 @@ def listen(
         ser: Handle for the serial port
 
         tcp: Handle for the socket connection to the internal server
+
+        worker_queue: Handle for queue to the serial worker thread
     """
     rlist: List[Any] = [monitor]
     if ser is not None:

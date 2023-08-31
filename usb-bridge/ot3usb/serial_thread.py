@@ -1,12 +1,14 @@
+"""Worker thread to write serial data."""
 from typing import Tuple
+from typing_extensions import TypeAlias
 import serial  # type: ignore[import]
 import threading
 from queue import Queue
 import time
 
-QUEUE_WRITE_ITEM = Tuple[serial.Serial, bytes]
+QUEUE_WRITE_ITEM: TypeAlias = Tuple[serial.Serial, bytes]
 
-QUEUE_TYPE = "Queue[QUEUE_WRITE_ITEM]"
+QUEUE_TYPE: TypeAlias = "Queue[QUEUE_WRITE_ITEM]"
 
 
 def _try_write_all_data(serial: serial.Serial, data: bytes) -> None:
