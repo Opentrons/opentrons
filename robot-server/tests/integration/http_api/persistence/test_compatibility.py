@@ -13,6 +13,8 @@ from tests.integration.robot_client import RobotClient
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 
+# Allow plenty of time for database migrations, which can take a while in our CI runners.
+_STARTUP_TIMEOUT = 60
 
 _POLL_INTERVAL = 0.1
 _RUN_TIMEOUT = 5
@@ -93,8 +95,8 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
         ), "Dev Robot is running and must not be."
         with DevServer(port=_PORT, persistence_directory=snapshot.get_copy()) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
+            assert await robot_client.wait_until_alive(
+                _STARTUP_TIMEOUT
             ), "Dev Robot never became available."
             all_protocols = (await robot_client.get_protocols()).json()["data"]
 
@@ -173,8 +175,9 @@ async def test_rerun_flex_dev_compat() -> None:
         ), "Dev Robot is running but it should not be."
         with DevServer(persistence_directory=snapshot.get_copy(), port=_PORT) as server:
             server.start()
-            await client.wait_until_alive()
-            assert await client.wait_until_alive(), "Dev Robot never became available."
+            assert await client.wait_until_alive(
+                _STARTUP_TIMEOUT
+            ), "Dev Robot never became available."
 
             [protocol] = (await client.get_protocols()).json()["data"]
             new_run = (
