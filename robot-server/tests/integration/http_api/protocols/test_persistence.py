@@ -10,6 +10,10 @@ from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 
+# Allow plenty of time for database migrations, which can take a while in our CI runners.
+STARTUP_WAIT = 60
+
+
 @pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
 async def test_protocols_and_analyses_persist(
     protocol: Callable[[str], IO[bytes]]
@@ -28,8 +32,8 @@ async def test_protocols_and_analyses_persist(
         ), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
+            assert await robot_client.wait_until_alive(
+                STARTUP_WAIT
             ), "Dev Robot never became available."
 
             # Must not be so high that the server runs out of room and starts
@@ -55,8 +59,8 @@ async def test_protocols_and_analyses_persist(
             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
 
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
+            assert await robot_client.wait_until_alive(
+                STARTUP_WAIT
             ), "Dev Robot never became available."
 
             protocols_after_restart = (await robot_client.get_protocols()).json()[
@@ -94,8 +98,8 @@ async def test_protocol_labware_files_persist() -> None:
         ), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
+            assert await robot_client.wait_until_alive(
+                STARTUP_WAIT
             ), "Dev Robot never became available."
 
             protocol = await robot_client.post_protocol(
@@ -119,8 +123,8 @@ async def test_protocol_labware_files_persist() -> None:
             server.stop()
             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
+            assert await robot_client.wait_until_alive(
+                STARTUP_WAIT
             ), "Dev Robot never became available."
 
             result = await robot_client.get_protocol(protocol_id)
