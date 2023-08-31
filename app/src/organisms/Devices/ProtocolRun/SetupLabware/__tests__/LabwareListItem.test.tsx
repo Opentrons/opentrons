@@ -316,6 +316,7 @@ describe('LabwareListItem', () => {
     getByText('mock nested display name')
     getByText('nestedLabwareNickName')
     getByText('nickName')
+    getByText('On deck')
   })
 
   it('renders the correct info for a labware on top of a heater shaker', () => {
@@ -376,5 +377,6 @@ describe('LabwareListItem', () => {
       nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
+    getByText('Off deck')
   })
 })

@@ -182,11 +182,7 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText
-            as="p"
-            color={COLORS.darkGreyEnabled}
-            marginRight={SPACING.spacing16}
-          >
+          <StyledText as="p" color={COLORS.darkGreyEnabled} maxWidth="15.25rem">
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -302,11 +298,14 @@ export function LabwareListItem(
         gridGap={SPACING.spacing8}
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-          {moduleDisplayName != null ? (
-            <StyledText as="p">{moduleDisplayName}</StyledText>
-          ) : null}
+          <StyledText as="p">
+            {moduleDisplayName != null
+              ? moduleDisplayName
+              : t(initialLocation === 'offDeck' ? 'off_deck' : 'on_deck')}
+          </StyledText>
           {extraAttentionText != null ? extraAttentionText : null}
         </Flex>
+
         {isHeaterShakerInProtocol ? (
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="h6" minWidth="6.2rem">
