@@ -32,15 +32,13 @@ class ModuleDataProvider:
         for calibration in calibration_data:
             # NOTE module_id is really the module serial number, change this
             module_calibrations[calibration.module_id] = ModuleOffsetData(
-                    moduleOffsetVector=ModuleOffsetVector(
-                        x=calibration.offset.x,
-                        y=calibration.offset.y,
-                        z=calibration.offset.z,
-                    ),
-                    location=DeckSlotLocation(
-                        slotName=DeckSlotName.from_primitive(
-                            calibration.slot
-                        ),
-                    ),
+                moduleOffsetVector=ModuleOffsetVector(
+                    x=calibration.offset.x,
+                    y=calibration.offset.y,
+                    z=calibration.offset.z,
+                ),
+                location=DeckSlotLocation(
+                    slotName=DeckSlotName.from_primitive(calibration.slot),
+                ),
             )
         return module_calibrations

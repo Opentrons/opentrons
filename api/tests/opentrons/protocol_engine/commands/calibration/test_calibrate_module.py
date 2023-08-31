@@ -80,7 +80,12 @@ async def test_calibrate_module_implementation(
     result = await subject.execute(params)
 
     assert result == CalibrateModuleResult(
-        moduleOffset=ModuleOffsetVector(x=3, y=4, z=6)
+        moduleOffset=ModuleOffsetVector(
+            x=3,
+            y=4,
+            z=6,
+        ),
+        location=location,
     )
 
 

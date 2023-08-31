@@ -109,6 +109,24 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = (
 )
 
 
+def _needs_rotation(
+    module_id: str, calibrated_slot: DeckSlotName, module_slot: DeckSlotName
+) -> bool:
+    """Determine if the calibrated module offset needs to be rotated 180 degrees."""
+    A = (
+        DeckSlotName.SLOT_D1,
+        DeckSlotName.SLOT_C1,
+        DeckSlotName.SLOT_B1,
+        DeckSlotName.SLOT_A1,
+    )
+    B = (DeckSlotName.SLOT_D3, DeckSlotName.SLOT_C3, DeckSlotName.SLOT_B3)
+    if calibrated_slot in A and module_slot in B:
+        return True
+    elif calibrated_slot in B and module_slot in A:
+        return True
+    return False
+
+
 @dataclass(frozen=True)
 class HardwareModule:
     """Data describing an actually connected module."""
@@ -291,9 +309,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
 
     def _update_module_calibration(
-            self, module_id: str,
-            module_offset: ModuleOffsetVector,
-            location: DeckSlotLocation,
+        self,
+        module_id: str,
+        module_offset: ModuleOffsetVector,
+        location: DeckSlotLocation,
     ) -> None:
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
@@ -659,21 +678,27 @@ class ModuleView(HasState[ModuleState]):
 
     def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
         """Get the stored module calibration offset."""
+        offset = ModuleOffsetVector(x=0, y=0, z=0)
         module_serial = self.get(module_id).serialNumber
         if module_serial is not None:
             offset_data = self._state.module_offset_by_serial.get(module_serial)
             if offset_data:
                 offset = offset_data.moduleOffsetVector
-                location = offset_data.location
-                # Need to apply the rotation here if the module was rotated
-                # 180 degrees when it was moved, say from D1 -> D3.
-                # We can get this done by,
-                #   1. Expose the slot this module was calibrated in
-                #   2. Uses the calibrated slot and check if the current module slot match
-                #   3. If they dont match check if the new slot is in a rotated slot.
-                #   4. If in a rotated slot, rotate the offset by 180 on the x,y plane
-                return offset
-        return ModuleOffsetVector(x=0, y=0, z=0)
+                calibrated_slot = offset_data.location.slotName
+                module_slot = self.get_location(module_id).slotName
+                # NOTE (ba, 2023-08-31): If the module was physically moved and
+                # rotated to a different deck slot location, then we also need to
+                # rotate the calibrated module offset by 180 degrees around the Z axis.
+                if _needs_rotation(module_id, calibrated_slot, module_slot):
+                    pre_rotation = array([offset.x, offset.y, offset.z])
+                    rotation_vector = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
+                    offset_vector = dot(pre_rotation, rotation_vector)  # type: ignore[no-untyped-call]
+                    offset = ModuleOffsetVector(
+                        x=offset_vector[0],
+                        y=offset_vector[1],
+                        z=offset_vector[2],
+                    )
+        return offset
 
     def get_nominal_module_offset(
         self, module_id: str, deck_type: DeckType

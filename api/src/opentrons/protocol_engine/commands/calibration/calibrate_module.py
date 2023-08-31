@@ -89,7 +89,7 @@ class CalibrateModuleImplementation(
             moduleOffset=ModuleOffsetVector(
                 x=module_offset.x, y=module_offset.y, z=module_offset.z
             ),
-            location=slot
+            location=slot,
         )
 
 

@@ -16,7 +16,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     LabwareOffsetVector,
     DeckType,
-    ModuleOffsetVector,
+    ModuleOffsetData,
     HeaterShakerLatchStatus,
     LabwareMovementOffsetData,
 )
@@ -44,7 +44,7 @@ def make_module_view(
     requested_model_by_module_id: Optional[Dict[str, Optional[ModuleModel]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
-    module_offset_by_serial: Optional[Dict[str, ModuleOffsetVector]] = None,
+    module_offset_by_serial: Optional[Dict[str, ModuleOffsetData]] = None,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
