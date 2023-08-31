@@ -132,7 +132,9 @@ class RobotClient:
         multipart_upload_name = "files"
 
         with contextlib.ExitStack() as file_exit_stack:
-            opened_files: List[Union[BinaryIO, Tuple[str, bytes]],] = []
+            opened_files: List[
+                Union[BinaryIO, Tuple[str, bytes]],
+            ] = []
 
             for file in files:
                 if isinstance(file, Path):
@@ -259,7 +261,7 @@ class RobotClient:
         return response
 
     async def get_analysis(self, protocol_id: str, analysis_id: str) -> Response:
-        """GET /protocols/{protocol_id}/{analysis_id}."""
+        """GET /protocols/{protocol_id}/analyses/{analysis_id}."""
         response = await self.httpx_client.get(
             url=f"{self.base_url}/protocols/{protocol_id}/analyses/{analysis_id}"
         )
@@ -269,6 +271,7 @@ class RobotClient:
     async def get_analysis_as_document(
         self, protocol_id: str, analysis_id: str
     ) -> Response:
+        """GET /protocols/{protocol_id}/analyses/{analysis_id}/asDocument."""
         response = await self.httpx_client.get(
             url=f"{self.base_url}/protocols/{protocol_id}/analyses/{analysis_id}/asDocument"
         )

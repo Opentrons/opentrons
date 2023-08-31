@@ -533,6 +533,14 @@ async def get_protocol_analysis_as_document(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> PlainTextResponse:
+    """Get a protocol analysis by analysis ID.
+
+    Arguments:
+        protocolId: The ID of the protocol, pulled from the URL.
+        analysisId: The ID of the analysis, pulled from the URL.
+        protocol_store: Protocol resource storage.
+        analysis_store: Analysis resource storage.
+    """
     if not protocol_store.has(protocolId):
         raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
             status.HTTP_404_NOT_FOUND

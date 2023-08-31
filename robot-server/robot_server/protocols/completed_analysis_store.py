@@ -175,6 +175,11 @@ class CompletedAnalysisStore:
             return resource
 
     async def get_by_id_as_document(self, analysis_id: str) -> Optional[str]:
+        """Return the analysis with the given ID, if it exists.
+
+        This is like `get_by_id()`, except it returns the analysis as a pre-serialized JSON
+        document.
+        """
         statement = sqlalchemy.select(
             analysis_table.c.completed_analysis_as_document
         ).where(analysis_table.c.id == analysis_id)

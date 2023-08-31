@@ -144,6 +144,7 @@ async def test_get_by_analysis_id_as_document(
     subject: CompletedAnalysisStore,
     protocol_store: ProtocolStore,
 ) -> None:
+    """It should return the analysis serialized as a JSON string."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
     await subject.add(resource)
