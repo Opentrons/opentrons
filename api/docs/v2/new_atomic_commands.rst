@@ -175,8 +175,8 @@ To return the tip to the original location, you can call :py:meth:`.InstrumentCo
 
 .. note:
 
-    In API Version 2.0 and 2.1, the returned tips are added back into the tip-tracker and thus treated as `unused`. If you make a subsequent call to `pick_up_tip` then the software will treat returned tips as valid locations.
-    In API Version 2.2, returned tips are no longer added back into the tip tracker. This means that returned tips are no longer valid locations and the pipette will not attempt to pick up tips from these locations.
+    In API versions 2.0 and 2.1, the returned tips are added back into the tip-tracker and thus treated as `unused`. If you make a subsequent call to `pick_up_tip` then the software will treat returned tips as valid locations.
+    In API version 2.2, returned tips are no longer added back into the tip tracker. This means that returned tips are no longer valid locations and the pipette will not attempt to pick up tips from these locations.
     Also in API Version 2.2, the return tip height was corrected to utilize values determined by hardware testing. This is more in-line with return tip behavior from Python Protocol API Version 1.
 
 In API version 2.2 or above:
@@ -491,7 +491,7 @@ The :py:meth:`~.InstrumentContext.mix` method performs a series of aspirate and 
 
 .. note::
 
-    In API Versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette does not move while mixing. 
+    In API versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API versions 2.3 and later, the pipette does not move while mixing. 
 
 .. versionadded:: 2.0
 
