@@ -81,6 +81,29 @@ Since dispensing and touching the tip are both associated with the destination w
 Tip Refilling
 =============
 
+One factor that affects the exact order of steps for a complex command is whether the amount of liquid being moved can fit in the tip at once. If it won't fit, you don't have to adjust your command. The API will handle it for you by including additional steps to refill the tip when needed.
+
+For example, say you need to move 100 µL of liquid from one well to another, but you only have a 50 µL pipette attached to your robot. To accomplish this with building block commands, you'd need multiple aspirates and dispenses. ``aspirate(volume=100)`` would raise an error, since it exceeds the tip's volume. But you can accomplish this with a single transfer command::
+
+    pipette50.transfer(
+        volume=100,
+        source=plate["A1"],
+        dest=plate["B1"],
+    )
+
+To effect the transfer, the API will aspirate and dispense the maximum volume of the pipette (50 µL) twice:
+
+.. code-block:: text
+
+	Picking up tip from A1 of tip rack on 3
+	Aspirating 50.0 uL from A1 of well plate on 2 at 57 uL/sec
+	Dispensing 50.0 uL into B1 of well plate on 2 at 57 uL/sec
+	Aspirating 50.0 uL from A1 of well plate on 2 at 57 uL/sec
+	Dispensing 50.0 uL into B1 of well plate on 2 at 57 uL/sec
+	Dropping tip into A1 of Opentrons Fixed Trash on 12
+
+You can change ``volume`` to any value (above the minimum volume of the pipette) and the API will automatically calculate how many aspirates and dispenses are needed. ``volume=50`` would require just one repetition. ``volume=75`` would require two, split into 50 µL and 25 µL. ``volume=1000`` would repeat 20 times — not very efficient, but perhaps more useful than having to swap to a different pipette!
+
 .. _distribute-consolidate-volume-list:
 .. _complex-variable-volumes:
 
