@@ -34,8 +34,9 @@ from typing_extensions import Final
 
 import sqlalchemy
 
-from ._tables import migration_table, run_table
+from ._tables import analysis_table, migration_table, run_table
 from . import legacy_pickle
+
 
 _LATEST_SCHEMA_VERSION: Final = 2
 
@@ -74,13 +75,27 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
 
             if starting_version < 1:
                 _log.info("Migrating database schema from 0 to 1...")
-                _migrate_0_to_1(transaction)
+                _migrate_schema_0_to_1(transaction)
             if starting_version < 2:
                 _log.info("Migrating database schema from 1 to 2...")
-                _migrate_1_to_2(transaction)
+                _migrate_schema_1_to_2(transaction)
 
-            _log.info("Database migrations complete.")
+            _log.info("Database schema migrations complete.")
             _stamp_schema_version(transaction)
+
+        # We migrate data 1->2 unconditionally, even when we haven't just performed a 1->2 schema
+        # migration. This is to solve the following edge case:
+        #
+        # 1) Start on schema 1.
+        # 2) Update robot software, triggering a migration to schema 2.
+        # 3) Roll back to older robot software that doesn't understand schema 2.
+        #    Now we've got old software working in a schema 2 database, causing rows to be added
+        #    where schema 2's `completed_analysis_as_document` column is NULL.
+        # 4) Update robot software again. This won't trigger a schema migration, because the
+        #    database was already migrated to schema 2 once. But we don't want those
+        #    So some rows will have NULL in the `completed_analysis_as_document` column,
+        #    which we want to get rid of.
+        _migrate_data_1_to_2(transaction)
 
 
 def _stamp_schema_version(transaction: sqlalchemy.engine.Connection) -> None:
@@ -134,7 +149,7 @@ def _is_version_0(transaction: sqlalchemy.engine.Connection) -> bool:
     return True
 
 
-def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
+def _migrate_schema_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
     """Migrate the database from schema 0 to schema 1."""
     add_summary_column = sqlalchemy.text("ALTER TABLE run ADD state_summary BLOB")
     add_commands_column = sqlalchemy.text("ALTER TABLE run ADD commands BLOB")
@@ -152,41 +167,52 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
     transaction.execute(add_updated_at_column)
 
 
-def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
+def _migrate_schema_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     """Migrate the database from schema 1 to schema 2."""
-    from robot_server.protocols.analysis_models import CompletedAnalysis
-    from ._tables import analysis_table
-    from robot_server.protocols import completed_analysis_store
-
     add_completed_analysis_as_document_column = sqlalchemy.text(
         "ALTER TABLE analysis ADD completed_analysis_as_document VARCHAR"
     )
     transaction.execute(add_completed_analysis_as_document_column)
 
-    v1_completed_analysis_column = sqlalchemy.column(
-        "completed_analysis",
-        sqlalchemy.PickleType(pickler=legacy_pickle)
-        # Originally declared nullable=False in schema v1.
-    )
 
-    # TODO: It looks like when this raises, the transaction is still committing. Why?
+def _migrate_data_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
+    """Migrate the data that the database contains to take advantage of schema 2.
 
-    select_v1_rows = sqlalchemy.select(
-        analysis_table.c.id, v1_completed_analysis_column
-    ).select_from(analysis_table)
-    v1_rows = transaction.execute(select_v1_rows)
+    Find rows where the `completed_analysis_as_document` column, introduced in schema 2,
+    is NULL. Populate them with values computed from schema 1's `completed_analysis` column.
 
-    for v1_row in v1_rows:
-        v1_id = v1_row.id
-        assert isinstance(v1_id, str)
-        v1_completed_analysis_dict = v1_row.completed_analysis
-        assert isinstance(v1_completed_analysis_dict, dict)
+    The database is expected to already be at schema 2. This is safe to run again on a database
+    whose data has already been migrated by this function.
+    """
+    # Local import to work around a circular dependency:
+    # 1) This module is part of robot_server.persistence
+    # 2) We're trying to import something from robot_server.protocols
+    # 3) ...which re-exports stuff from robot_server.protocols.protocol_store
+    # 4) ...which depends on robot_server.persistence
+    from robot_server.protocols.analysis_models import CompletedAnalysis
 
-        parsed_completed_analysis = CompletedAnalysis.parse_obj(
-            v1_completed_analysis_dict
+    rows_needing_migration = transaction.execute(
+        sqlalchemy.select(
+            analysis_table.c.id, analysis_table.c.completed_analysis
+        ).where(analysis_table.c.completed_analysis_as_document.is_(None))
+    ).all()
+
+    if rows_needing_migration:
+        _log.info(
+            f"Migrating {len(rows_needing_migration)} analysis documents."
+            f" This may take a while..."
         )
 
-        v2_completed_analysis = parsed_completed_analysis.json(
+    for index, row in enumerate(rows_needing_migration):
+        _log.info(
+            f"Migrating analysis {index+1}/{len(rows_needing_migration)}, {row.id}..."
+        )
+
+        v1_completed_analysis = CompletedAnalysis.parse_obj(
+            legacy_pickle.loads(row.completed_analysis)
+        )
+
+        v2_completed_analysis_as_document = v1_completed_analysis.json(
             # by_alias and exclude_none should match how
             # FastAPI + Pydantic + our customizations serialize these objects
             # over the `GET /protocols/:id/analyses/:id` endpoint.
@@ -194,10 +220,11 @@ def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
             exclude_none=True,
         )
 
-        # Reinsert using the new column definitions.
-        update = (
+        transaction.execute(
             sqlalchemy.update(analysis_table)
-            .where(analysis_table.c.id == v1_id)
-            .values(completed_analysis_as_document=v2_completed_analysis)
+            .where(analysis_table.c.id == row.id)
+            .values(completed_analysis_as_document=v2_completed_analysis_as_document)
         )
-        transaction.execute(update)
+
+    if rows_needing_migration:
+        _log.info("Done migrating analysis documents.")

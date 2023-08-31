@@ -186,47 +186,11 @@ class CompletedAnalysisStore:
                 # No analysis with this ID.
                 return None
 
-        if document is None:
-            # There is an analysis with this ID, but it isn't in the database as a document.
-            #
-            # This is an edge case.
-            # `document` should normally not be NULL (None), because our code to migrate the
-            # database from schema 1->2 will populate it for all rows. However! A user can
-            # do this:
-            #
-            # 1) Start on schema 1.
-            # 2) Update robot software, triggering a migration to schema 2.
-            # 3) Roll back to older robot software that doesn't understand schema 2.
-            #    Now we've got old software working in a schema 2 database,
-            #    causing rows to be added where this column is NULL.
-            # 4) Update robot software again. But this won't trigger a migration,
-            #    because the database was already migrated to schema 2 once.
-            #    So some rows will still have NULL for this column.
+        # Although the completed_analysis_as_document column is nullable,
+        # our migration code is supposed to ensure that it's never NULL in practice.
+        assert document is not None
 
-            completed_analysis_resource = await self.get_by_id(analysis_id)
-            if completed_analysis_resource is None:
-                # No analysis with this ID.
-                # This shouldn't happen because we already checked this in the first transaction,
-                # but maybe it got deleted in some intervening transaction.
-                return None
-
-            new_document = await anyio.to_thread.run_sync(
-                _serialize_completed_analysis_to_json,
-                completed_analysis_resource.completed_analysis,
-            )
-
-            populate_document_column = (
-                sqlalchemy.update(analysis_table)
-                .where(analysis_table.c.id == analysis_id)
-                .values(completed_analysis_as_document=new_document)
-            )
-            with self._sql_engine.begin() as transaction:
-                transaction.execute(populate_document_column)
-
-            return new_document
-
-        else:
-            return document
+        return document
 
     async def get_by_protocol(
         self, protocol_id: str
