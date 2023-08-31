@@ -117,13 +117,13 @@ class DropTipSpec:
     ending_current: Dict[Axis, float]
 
 
-class PipetteHandlerProvider:
+class OT3PipetteHandler:
     IHP_LOG = MOD_LOG.getChild("InstrumentHandler")
 
     def __init__(self, attached_instruments: InstrumentsByMount[OT3Mount]):
         assert attached_instruments
         self._attached_instruments: InstrumentsByMount[OT3Mount] = attached_instruments
-        self._ihp_log = PipetteHandlerProvider.IHP_LOG.getChild(str(id(self)))
+        self._ihp_log = self.__class__.IHP_LOG
 
     def reset_instrument(self, mount: Optional[OT3Mount] = None) -> None:
         """
@@ -438,13 +438,11 @@ class PipetteHandlerProvider:
         If `cp_override` is specified, and that critical point actually exists,
         it will be used instead. Invalid `cp_override`s are ignored.
         """
-        pip = self._attached_instruments[mount]
+        pip = self._attached_instruments[OT3Mount.from_mount(mount)]
         if pip is not None and cp_override != CriticalPoint.MOUNT:
             return pip.critical_point(cp_override)
         else:
-            # This offset is required because the motor driver coordinate system is
-            # configured such that the end of a p300 single gen1's tip is 0.
-            return top_types.Point(0, 0, 30)
+            return top_types.Point(0, 0, 0)
 
     def ready_for_tip_action(self, target: Pipette, action: HardwareAction) -> None:
         if not target.has_tip:
@@ -461,7 +459,7 @@ class PipetteHandlerProvider:
         self, instr: Pipette, ul: float, action: "UlPerMmAction"
     ) -> float:
         mm = ul / instr.ul_per_mm(ul, action)
-        position = mm + instr.plunger_positions.bottom
+        position = instr.plunger_positions.bottom - mm
         return round(position, 6)
 
     def plunger_speed(
@@ -585,7 +583,6 @@ class PipetteHandlerProvider:
         if disp_vol == 0:
             return None
 
-
         if not is_full_dispense and push_out:
             raise CommandPreconditionViolated(
                 message="Cannot push_out on a dispense that does not leave the pipette empty",
@@ -611,11 +608,8 @@ class PipetteHandlerProvider:
                 },
             )
 
-        dist = (
-            self.plunger_position(
-                instrument, instrument.current_volume - disp_vol, "dispense"
-            )
-            + push_out_dist_mm
+        dist = self.plunger_position(
+            instrument, instrument.current_volume - disp_vol, "dispense"
         )
         speed = self.plunger_speed(
             instrument, instrument.dispense_flow_rate * rate, "dispense"
@@ -891,23 +885,3 @@ class PipetteHandlerProvider:
                 f"No pipette attached to {mount.name} mount"
             )
         return pip
-
-
-class OT3PipetteHandler(PipetteHandlerProvider):
-    """Override for correct plunger_position."""
-
-    def plunger_position(
-        self, instr: Pipette, ul: float, action: "UlPerMmAction"
-    ) -> float:
-        mm = ul / instr.ul_per_mm(ul, action)
-        position = instr.plunger_positions.bottom - mm
-        return round(position, 6)
-
-    def critical_point_for(
-        self, mount: OT3Mount, cp_override: Optional[CriticalPoint] = None
-    ) -> top_types.Point:
-        pip = self._attached_instruments[OT3Mount.from_mount(mount)]
-        if pip is not None and cp_override != CriticalPoint.MOUNT:
-            return pip.critical_point(cp_override)
-        else:
-            return top_types.Point(0, 0, 0)
