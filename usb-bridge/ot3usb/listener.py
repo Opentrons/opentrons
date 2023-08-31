@@ -110,4 +110,7 @@ def listen(
         # Ready TCP data to echo to serial
         data = tcp.read()
         worker_queue.put((ser, data))
+        pending = worker_queue.qsize()
+        if pending >= 100 and pending % 100 == 0:
+            LOG.warning(f"Worker queue has {pending} messages")
     return ser
