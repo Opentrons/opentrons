@@ -88,7 +88,7 @@ export const chainMaintenanceCommandsRecursive = (
 }
 
 const dateIsValid = (date: string): boolean => {
-  return !Number.isNaN(new Date(date).getTime())
+  return !isNaN(new Date(date).getTime())
 }
 
 export const formatTimeWithUtcLabel = (time: string | null): string => {
