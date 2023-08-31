@@ -297,23 +297,14 @@ To check whether you should pick up a tip or not, you can utilize :py:meth:`.Ins
 Liquid Control
 ==============
 
-After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API provides the following methods that help you manipulate liquids in your protocols. These include:
-
-- :py:meth:`.InstrumentContext.aspirate`
-- :py:meth:`.InstrumentContext.dispense`
-- :py:meth:`.InstrumentContext.blow_out`
-- :py:meth:`.InstrumentContext.touch_tip`
-- :py:meth:`.InstrumentContext.mix`
-- :py:meth:`.InstrumentContext.air_gap`
-
-The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`. 
+After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API includes methods that help you perform these actions and the following sections show how to use them. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`. 
 
 .. _new-aspirate:
 
 Aspirate
 --------
 
-To draw liquid up into a pipette tip, call the :py:meth:`~.InstrumentContext.aspirate` method. This method lets you specify the aspiration volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to remove 200 µL from well location A1.
+To draw liquid up into a pipette tip, call the :py:meth:`.InstrumentContext.aspirate` method. This method lets you specify the aspiration volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to aspirate 200 µL from well location A1.
 
 .. code-block:: python
 
@@ -334,11 +325,9 @@ Now our pipette holds 300 µL.
 Aspirate by Well or Location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``aspirate()`` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``. 
+The :py:meth:`~.InstrumentContext.aspirate` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``. 
 
-**By Well**
-
-If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below.
+If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of that well (see also, :ref:`new-default-op-positions`). To change the default clearance, you would call :py:obj:`.well_bottom_clearance` as shown below. 
 
 .. code-block:: python
 
@@ -346,19 +335,13 @@ If you specify a well, like ``plate['A1']``, the pipette will aspirate from a de
     pipette.well_bottom_clearance.aspirate=2 # place tip 2 mm above well bottom
     pipette.aspirate(200, plate['A1'])
 
-See also, :ref:`new-default-op-positions` for information about controlling pipette height for a particular well.
-
-**By Location**
-
-You can also aspirate from a point along the center vertical axis within a well using the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well. For example, you could change the default aspirate height as shown below.
+You can also aspirate from a point along the center vertical axis within a well using the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods (see also, :ref:`position-relative-labware`). These methods move the pipette to a specified distance relative to the top or bottom center of a well. For example, you could change the default aspirate height as shown below.
 
 .. code-block:: python
 
     pipette.pick_up_tip()
     depth = plate['A1'].bottom(z=2) # place tip 2 mm above well bottom
     pipette.aspirate(200, depth)
-
-See also, :ref:`position-relative-labware` for information about on controlling pipette height from within a well.
 
 Aspiration Flow Rates
 ^^^^^^^^^^^^^^^^^^^^^
