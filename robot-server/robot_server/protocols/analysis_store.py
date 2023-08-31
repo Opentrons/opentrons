@@ -179,7 +179,7 @@ class AnalysisStore:
         """Get a single protocol analysis by its ID.
 
         Raises:
-            AnalysisNotFoundError
+            AnalysisNotFoundError: If there is no analysis with the given ID.
         """
         pending_analysis = self._pending_store.get(analysis_id=analysis_id)
         completed_analysis_resource = await self._completed_store.get_by_id(
@@ -194,21 +194,16 @@ class AnalysisStore:
             raise AnalysisNotFoundError(analysis_id=analysis_id)
 
     async def get_as_document(self, analysis_id: str) -> str:
-        """Get a single protocol analysis by its ID, as a pre-serialized JSON document.
+        """Get a single completed protocol analysis by its ID, as a pre-serialized JSON document.
 
         Raises:
-            AnalysisNotFoundError
+            AnalysisNotFoundError: If there is no completed analysis with the given ID.
+                Unlike `get()`, this is raised if the analysis exists, but is pending.
         """
-        pending_analysis = self._pending_store.get(analysis_id=analysis_id)
         completed_analysis_document = await self._completed_store.get_by_id_as_document(
             analysis_id=analysis_id
         )
-
-        if pending_analysis is not None:
-            # TODO: Probably want this to be a separate HTTP status code so the pending case
-            # doesn't have to pollute the completed analysis schema.
-            return pending_analysis.json()
-        elif completed_analysis_document is not None:
+        if completed_analysis_document is not None:
             return completed_analysis_document
         else:
             raise AnalysisNotFoundError(analysis_id=analysis_id)
