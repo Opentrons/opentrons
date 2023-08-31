@@ -35,9 +35,7 @@ export function useProtocolDetailsForRun(
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
+  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
     {
