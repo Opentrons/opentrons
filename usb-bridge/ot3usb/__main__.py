@@ -7,6 +7,8 @@ from typing import NoReturn
 from . import cli, usb_config, usb_monitor, tcp_conn, listener
 from .default_config import get_gadget_config, PHY_NAME
 
+from .serial_thread import create_worker_thread
+
 LOG = logging.getLogger(__name__)
 
 
@@ -55,12 +57,16 @@ async def main() -> NoReturn:
 
     monitor.begin()
 
+    thread, queue = create_worker_thread()
+
+    thread.start()
+
     if monitor.host_connected():
         LOG.debug("USB connected on startup")
         ser = listener.update_ser_handle(config, ser, True, tcp)
 
     while True:
-        ser = listener.listen(monitor, config, ser, tcp)
+        ser = listener.listen(monitor, config, ser, tcp, queue)
 
 
 if __name__ == "__main__":
