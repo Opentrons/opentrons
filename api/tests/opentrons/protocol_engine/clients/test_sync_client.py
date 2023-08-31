@@ -442,6 +442,7 @@ def test_dispense(
             ),
             volume=10,
             flowRate=2.0,
+            pushOut=None,
         )
     )
 
@@ -458,6 +459,7 @@ def test_dispense(
         ),
         volume=10,
         flow_rate=2.0,
+        push_out=None,
     )
 
     assert result == response
@@ -471,9 +473,7 @@ def test_dispense_in_place(
     """It should execute a DispenceInPlace command."""
     request = commands.DispenseInPlaceCreate(
         params=commands.DispenseInPlaceParams(
-            pipetteId="123",
-            volume=10,
-            flowRate=2.0,
+            pipetteId="123", volume=10, flowRate=2.0, pushOut=None
         )
     )
 
@@ -482,9 +482,7 @@ def test_dispense_in_place(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.dispense_in_place(
-        pipette_id="123",
-        volume=10,
-        flow_rate=2.0,
+        pipette_id="123", volume=10, flow_rate=2.0, push_out=None
     )
 
     assert result == response

@@ -17,7 +17,7 @@ import {
   useDeckCalibrationData,
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
-} from '../../../../organisms/Devices/hooks'
+} from '../../../Devices/hooks'
 import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
 
 import { OverflowMenu } from '../OverflowMenu'

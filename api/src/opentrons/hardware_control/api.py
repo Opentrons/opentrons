@@ -988,6 +988,7 @@ class API(
         mount: top_types.Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.

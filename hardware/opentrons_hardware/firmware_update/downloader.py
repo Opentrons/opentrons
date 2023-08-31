@@ -35,6 +35,7 @@ class FirmwareUpdateDownloader:
         node_id: NodeId,
         hex_processor: HexRecordProcessor,
         ack_wait_seconds: float,
+        retries: int = 3,
     ) -> AsyncIterator[float]:
         """Download hex record chunks to node.
 
@@ -42,6 +43,7 @@ class FirmwareUpdateDownloader:
             node_id: The target node id.
             hex_processor: The producer of hex chunks.
             ack_wait_seconds: Number of seconds to wait for an ACK.
+            retries: Number of attempts when sending a chunk.
 
         Returns:
             None
@@ -52,23 +54,34 @@ class FirmwareUpdateDownloader:
             num_messages = 0
             crc32 = 0
             for chunk in chunks:
-                logger.debug(
-                    f"Sending chunk {num_messages} to address {chunk.address:x}."
-                )
-                # Create and send message from this chunk
-                data = bytes(chunk.data)
-                data_message = message_definitions.FirmwareUpdateData(
-                    payload=payloads.FirmwareUpdateData.create(
-                        address=chunk.address, data=data
+                passed = False
+                for retry in range(retries):
+                    logger.debug(
+                        f"Sending chunk {num_messages} to address {chunk.address:x} retry: {retry}."
                     )
-                )
-                await self._messenger.send(node_id=node_id, message=data_message)
-                try:
-                    # Wait for ack.
-                    await asyncio.wait_for(
-                        self._wait_data_message_ack(node_id, reader), ack_wait_seconds
+                    # Create and send message from this chunk
+                    data = bytes(chunk.data)
+                    data_message = message_definitions.FirmwareUpdateData(
+                        payload=payloads.FirmwareUpdateData.create(
+                            address=chunk.address, data=data
+                        )
                     )
-                except asyncio.TimeoutError:
+                    await self._messenger.send(node_id=node_id, message=data_message)
+                    try:
+                        # Wait for ack.
+                        await asyncio.wait_for(
+                            self._wait_data_message_ack(node_id, reader),
+                            ack_wait_seconds,
+                        )
+                        passed = True
+                        break
+                    except asyncio.TimeoutError:
+                        logger.warning(
+                            f"Firmware update data ack timed out for chunk {num_messages}"
+                        )
+
+                # message was not successful
+                if not passed:
                     raise TimeoutResponse(data_message, node_id)
 
                 crc32 = binascii.crc32(data, crc32)

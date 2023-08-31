@@ -15,6 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -28,6 +30,7 @@ import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { Tooltip } from '../../../../atoms/Tooltip'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import {
@@ -35,6 +38,7 @@ import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
+  useRunCalibrationStatus,
 } from '../../hooks'
 import { HeaterShakerWizard } from '../../HeaterShakerWizard'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
@@ -42,6 +46,7 @@ import { getModuleImage } from './utils'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
+import type { ProtocolCalibrationStatus } from '../../hooks'
 
 interface SetupModulesListProps {
   robotName: string
@@ -61,6 +66,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
   const isOt3 = useIsOT3(robotName)
+
+  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
   const [
     showMultipleModulesModal,
@@ -122,14 +129,12 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           marginBottom={SPACING.spacing8}
-          data-testid="SetupModulesList_module_name"
           width="45%"
         >
           {t('module_name')}
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_location"
           marginRight={SPACING.spacing16}
           width="15%"
         >
@@ -137,7 +142,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_connection_status"
           marginRight={SPACING.spacing16}
           width="15%"
         >
@@ -148,7 +152,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         flexDirection={DIRECTION_COLUMN}
         width="100%"
         overflowY="auto"
-        data-testid="SetupModulesList_ListView"
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
@@ -162,7 +165,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 )}_slot_${slotName}`}
                 moduleModel={moduleDef.model}
                 displayName={moduleDef.displayName}
-                location={slotName}
+                slotName={slotName}
                 attachedModuleMatch={attachedModuleMatch}
                 heaterShakerModuleFromProtocol={
                   moduleRenderInfoForProtocolById[moduleId].moduleDef
@@ -171,6 +174,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     : null
                 }
                 isOt3={isOt3}
+                calibrationStatus={calibrationStatus}
               />
             )
           }
@@ -183,19 +187,21 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 interface ModulesListItemProps {
   moduleModel: ModuleModel
   displayName: string
-  location: string
+  slotName: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isOt3: boolean
+  calibrationStatus: ProtocolCalibrationStatus
 }
 
 export function ModulesListItem({
   moduleModel,
   displayName,
-  location,
+  slotName,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
   isOt3,
+  calibrationStatus,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const moduleConnectionStatus =
@@ -212,6 +218,10 @@ export function ModulesListItem({
       ? attachedModuleMatch
       : null
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+
   let subText: JSX.Element | null = null
   if (moduleModel === HEATERSHAKER_MODULE_V1) {
     subText = (
@@ -255,37 +265,43 @@ export function ModulesListItem({
     )
   }
 
-  const RenderModuleStatus = (): JSX.Element => {
-    const handleCalibrate = (): void => {
-      setShowModuleWizard(true)
-    }
-    if (attachedModuleMatch == null) {
-      return (
-        <StatusLabel
-          id={location}
-          status={moduleConnectionStatus}
-          backgroundColor={COLORS.warningBackgroundLight}
-          iconColor={COLORS.warningEnabled}
-          textColor={COLORS.warningText}
-        />
-      )
-    } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
-      return (
-        <StatusLabel
-          id={location}
-          status={moduleConnectionStatus}
-          backgroundColor={COLORS.successBackgroundLight}
-          iconColor={COLORS.successEnabled}
-          textColor={COLORS.successText}
-        />
-      )
-    } else {
-      return (
-        <TertiaryButton onClick={handleCalibrate}>
-          {t('calibrate_now')}
-        </TertiaryButton>
-      )
-    }
+  let renderModuleStatus: JSX.Element = (
+    <>
+      <TertiaryButton
+        {...targetProps}
+        onClick={() => setShowModuleWizard(true)}
+        disabled={!calibrationStatus?.complete}
+      >
+        {t('calibrate_now')}
+      </TertiaryButton>
+      {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
+        <Tooltip tooltipProps={tooltipProps}>
+          {calibrationStatus.reason === 'attach_pipette_failure_reason'
+            ? t('attach_pipette_before_module_calibration')
+            : t('calibrate_pipette_before_module_calibration')}
+        </Tooltip>
+      ) : null}
+    </>
+  )
+
+  if (attachedModuleMatch == null) {
+    renderModuleStatus = (
+      <StatusLabel
+        status={moduleConnectionStatus}
+        backgroundColor={COLORS.warningBackgroundLight}
+        iconColor={COLORS.warningEnabled}
+        textColor={COLORS.warningText}
+      />
+    )
+  } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
+    renderModuleStatus = (
+      <StatusLabel
+        status={moduleConnectionStatus}
+        backgroundColor={COLORS.successBackgroundLight}
+        iconColor={COLORS.successEnabled}
+        textColor={COLORS.successText}
+      />
+    )
   }
 
   return (
@@ -294,6 +310,7 @@ export function ModulesListItem({
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
+          initialSlotName={slotName}
         />
       ) : null}
       <Box
@@ -303,7 +320,6 @@ export function ModulesListItem({
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
-        data-testid="ModulesListItem_Row"
       >
         {showHeaterShakerFlow && heaterShakerModuleFromProtocol != null ? (
           <HeaterShakerWizard
@@ -336,14 +352,14 @@ export function ModulesListItem({
                   ? isOt3
                     ? TC_MODULE_LOCATION_OT3
                     : TC_MODULE_LOCATION_OT2
-                  : location,
+                  : slotName,
             })}
           </StyledText>
           <Flex width="15%">
             {moduleModel === MAGNETIC_BLOCK_V1 ? (
               <StyledText as="p"> {t('n_a')}</StyledText>
             ) : (
-              <RenderModuleStatus />
+              renderModuleStatus
             )}
           </Flex>
         </Flex>

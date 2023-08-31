@@ -5,7 +5,9 @@ import select
 from typing import Optional, List, Any
 import serial  # type: ignore[import]
 
-from . import usb_config, default_config, usb_monitor, tcp_conn
+from . import usb_config, usb_monitor, tcp_conn
+
+from .default_config import DEFAULT_IP, DEFAULT_PORT
 from .serial_thread import QUEUE_TYPE
 
 LOG = logging.getLogger(__name__)
@@ -40,7 +42,7 @@ def update_ser_handle(
     elif connected and not ser:
         LOG.debug("New USB host connected")
         ser = config.get_handle()
-        tcp.connect(default_config.DEFAULT_IP, default_config.DEFAULT_PORT)
+        tcp.connect(DEFAULT_IP, DEFAULT_PORT)
     return ser
 
 
