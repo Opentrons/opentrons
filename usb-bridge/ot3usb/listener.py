@@ -8,7 +8,7 @@ import serial  # type: ignore[import]
 from . import usb_config, usb_monitor, tcp_conn
 
 from .default_config import DEFAULT_IP, DEFAULT_PORT
-from .serial_thread import QUEUE_TYPE
+from .serial_thread import QUEUE_TYPE, QUEUE_MAX_ITEMS
 
 LOG = logging.getLogger(__name__)
 
@@ -112,7 +112,6 @@ def listen(
         # Ready TCP data to echo to serial
         data = tcp.read()
         worker_queue.put((ser, data))
-        pending = worker_queue.qsize()
-        if pending >= 100 and pending % 100 == 0:
-            LOG.warning(f"Worker queue has {pending} messages")
+        if worker_queue.qsize() >= QUEUE_MAX_ITEMS:
+            LOG.warning("Worker queue appears full")
     return ser

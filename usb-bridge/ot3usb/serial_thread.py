@@ -10,6 +10,8 @@ QUEUE_WRITE_ITEM: TypeAlias = Tuple[serial.Serial, bytes]
 
 QUEUE_TYPE: TypeAlias = "Queue[QUEUE_WRITE_ITEM]"
 
+QUEUE_MAX_ITEMS = 100
+
 
 def _try_write_all_data(serial: serial.Serial, data: bytes) -> None:
     sent = 0
@@ -37,7 +39,7 @@ def _worker(queue: QUEUE_TYPE) -> None:
 
 def create_worker_thread() -> Tuple[threading.Thread, QUEUE_TYPE]:
     """Create a serial worker thread. Returns the comms queue."""
-    queue: QUEUE_TYPE = Queue(0)
+    queue: QUEUE_TYPE = Queue(QUEUE_MAX_ITEMS)
     thread = threading.Thread(
         target=_worker, name="serial worker", kwargs={"queue": queue}
     )
