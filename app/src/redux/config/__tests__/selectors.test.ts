@@ -44,7 +44,7 @@ describe('shell selectors', () => {
   })
 
   describe('getHasJustUpdated', () => {
-    it('should return null if config is unknown', () => {
+    it('should return false if config is unknown', () => {
       const state: State = { config: null } as any
       expect(Selectors.getHasJustUpdated(state)).toEqual(false)
     })
