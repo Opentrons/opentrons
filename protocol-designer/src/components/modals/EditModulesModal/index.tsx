@@ -233,6 +233,7 @@ const EditModulesModalComponent = (
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const robotType = useSelector(getRobotType)
 
   const noCollisionIssue =
@@ -252,6 +253,12 @@ const EditModulesModalComponent = (
   const slotIssue =
     errors?.selectedSlot && errors.selectedSlot.includes('occupied')
 
+  const tcGen2SlotIssue =
+    moduleType === 'thermocyclerModuleType' &&
+    getSlotIsEmpty(initialDeckSetup, 'B1')
+
+  console.log(moduleType === 'thermocyclerModuleType')
+  console.log(getSlotIsEmpty(initialDeckSetup, 'B1'))
   useResetSlotOnModelChange(supportedModuleSlot)
 
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -282,7 +289,7 @@ const EditModulesModalComponent = (
       contentsClassName={styles.modal_contents}
     >
       <>
-        {slotIssue && (
+        {(slotIssue || tcGen2SlotIssue) && (
           <PDAlert
             alertType="warning"
             title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
