@@ -125,7 +125,7 @@
   "must_have_labware_and_pip": "Protocol must load labware and a pipette",
   "n_a": "N/A",
   "no_data": "no data",
-  "no_labware_offset_data": "No Labware Offset Data yet",
+  "no_labware_offset_data": "no labware offset data yet",
   "no_modules_specified": "no modules are specified for this protocol.",
   "no_modules_used_in_this_protocol": "No modules used in this protocol",
   "no_tiprack_loaded": "Protocol must load a tip rack",
