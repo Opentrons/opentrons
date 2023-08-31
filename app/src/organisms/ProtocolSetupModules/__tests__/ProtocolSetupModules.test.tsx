@@ -23,6 +23,7 @@ import {
   getUnmatchedModulesForProtocol,
 } from '../utils'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
+import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { ProtocolSetupModules } from '..'
 
 jest.mock('@opentrons/shared-data/js/helpers')
@@ -34,6 +35,7 @@ jest.mock(
 jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../utils')
 jest.mock('../SetupInstructionsModal')
+jest.mock('../../ModuleWizardFlows')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -61,6 +63,9 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
 >
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
+  typeof ModuleWizardFlows
 >
 
 const ROBOT_NAME = 'otie'
@@ -124,6 +129,7 @@ describe('ProtocolSetupModules', () => {
       .mockReturnValue({
         complete: true,
       })
+    mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
   })
 
   afterEach(() => {
@@ -203,7 +209,8 @@ describe('ProtocolSetupModules', () => {
     ])
     const [{ getByText }] = render()
     getByText('Heater-Shaker Module GEN1')
-    getByText('Calibrate')
+    getByText('Calibrate').click()
+    getByText('mock ModuleWizardFlows')
   })
 
   it('should render module information with text button when a protocol has module - attach pipette first', () => {
