@@ -56,13 +56,17 @@ analysis_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "completed_analysis",
-        sqlalchemy.LargeBinary,  # A pickle.
+        # Stores a pickled dict. See CompletedAnalysisStore.
+        # TODO(mm, 2023-08-30): Remove this. See https://opentrons.atlassian.net/browse/RSS-98.
+        sqlalchemy.LargeBinary,
         nullable=False,
     ),
-    # TODO: Migration concerns, etc.  :)
     sqlalchemy.Column(
         "completed_analysis_as_document",
-        sqlalchemy.String,  # TODO: Is it better to store this as str or bytes?
+        # Stores the same data as completed_analysis, but serialized as a JSON string.
+        sqlalchemy.String,
+        # This column should never be NULL in practice.
+        # It needs to be nullable=True because of limitations in SQLite and our migration code.
         nullable=True,
     ),
 )
