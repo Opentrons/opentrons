@@ -16,7 +16,11 @@ import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
-import { useRunStatuses } from '../../Devices/hooks'
+import {
+  useRunStatuses,
+  useAttachedPipetteCalibrations,
+  useAttachedPipettes,
+} from '../../Devices/hooks'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -48,6 +52,16 @@ export function ModuleCalibrationOverflowMenu({
     onClickOutside: () => setShowOverflowMenu(false),
   })
 
+  const attachedPipettes = useAttachedPipettes()
+  const missingPipettes =
+    attachedPipettes.left == null && attachedPipettes.right == null
+  const attachedPipetteCalibrations = useAttachedPipetteCalibrations()
+  const missingPipetteCalibrations =
+    attachedPipetteCalibrations?.left?.offset?.lastModified == null ||
+    attachedPipetteCalibrations?.right?.offset?.lastModified == null
+  const requiredAttachOrCalibratePipette =
+    missingPipettes || missingPipetteCalibrations
+
   const handleCalibration = (): void => {
     setShowOverflowMenu(false)
     setShowModuleWizard(true)
@@ -70,7 +84,7 @@ export function ModuleCalibrationOverflowMenu({
         alignSelf={ALIGN_FLEX_END}
         aria-label="ModuleCalibrationOverflowMenu"
         onClick={handleOverflowClick}
-        disabled={isRunning}
+        disabled={isRunning || requiredAttachOrCalibratePipette}
       />
       {showModuleWizard ? (
         <ModuleWizardFlows
