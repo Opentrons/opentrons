@@ -1,7 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
-import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import {

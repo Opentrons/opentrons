@@ -18,6 +18,15 @@ const TiprackFieldSTP = (state: BaseState): SP => ({
 })
 
 export const TiprackField = connect(TiprackFieldSTP)((props: Props) => {
+  const options = props.options
+  const defaultValue = options[0].value
+
+  React.useEffect(() => {
+    if (props.value == null) {
+      props.updateValue(defaultValue)
+    }
+  }, [props.value, props.updateValue])
+
   return (
     <FormGroup
       label={i18n.t('form.step_edit_form.tipRack')}
@@ -26,7 +35,7 @@ export const TiprackField = connect(TiprackFieldSTP)((props: Props) => {
       <DropdownField
         options={props.options}
         name={props.name}
-        value={String(props.options[0].value)}
+        value={String(props.value) != null ? String(props.value) : defaultValue}
         onBlur={props.onFieldBlur}
         onFocus={props.onFieldFocus}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {

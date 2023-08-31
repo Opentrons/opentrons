@@ -39,9 +39,25 @@ export const migrateFile = (
       INITIAL_DECK_SETUP_STEP_ID
     ].labwareLocationUpdate
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
-
+  const tiprackAssignments = appData.designerApplication?.data
+    ?.pipetteTiprackAssignments as Record<string, string>
   const allLatestDefs = getOnlyLatestDefs()
 
+  // const savedStepForms = appData.designerApplication?.data
+  //   ?.savedStepForms as DesignerApplicationData['savedStepForms']
+  // const pipettingSavedSteps = Object.values(savedStepForms).filter(
+  //   form => form.stepName === 'transfer' || form.stepName === 'mix'
+  // )
+  // const pipettingSavedStepsWithTipRack = pipettingSavedSteps.reduce(
+  //   (acc, item) => {
+  //     const tipRack = tiprackAssignments[item.pipette]
+  //     const tipRackLoadName = labwareDefinitions[tipRack].parameters.loadName
+  //     const tipRackId = commands.filter(command => command)
+  //     acc[item.id] = { ...item, tipRack }
+  //     return acc
+  //   },
+  //   {}
+  // )
   const getIsAdapter = (labwareId: string): boolean => {
     const labwareEntity = labware[labwareId]
     if (labwareEntity == null) return false
@@ -252,6 +268,14 @@ export const migrateFile = (
   }
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
 
+  const newTiprackAssignments = Object.keys(tiprackAssignments).reduce(
+    (acc: Record<string, string[]>, key) => {
+      acc[key] = [tiprackAssignments[key]]
+      return acc
+    },
+    {}
+  )
+
   return {
     ...rest,
     designerApplication: {
@@ -272,7 +296,9 @@ export const migrateFile = (
               ...newLabwareLocationUpdate,
             },
           },
+          // ...pipettingSavedStepsWithTipRack,
         },
+        pipetteTiprackAssignments: newTiprackAssignments,
       },
     },
     schemaVersion: SCHEMA_VERSION,
