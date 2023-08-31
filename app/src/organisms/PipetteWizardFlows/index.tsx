@@ -11,17 +11,19 @@ import {
 } from '@opentrons/shared-data'
 import {
   useHost,
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+import {
+  useCreateTargetedMaintenanceRunMutation,
+  useChainMaintenanceCommands,
+} from '../../resources/runs/hooks'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
@@ -124,9 +126,9 @@ export const PipetteWizardFlows = (
   } = useChainMaintenanceCommands()
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation(
+  } = useCreateTargetedMaintenanceRunMutation(
     {
       onSuccess: response => {
         setCreatedMaintenanceRunId(response.data.id)
@@ -276,7 +278,7 @@ export const PipetteWizardFlows = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createMaintenanceRun={createMaintenanceRun}
+        createMaintenanceRun={createTargetedMaintenanceRun}
         isCreateLoading={isCreateLoading}
         requiredPipette={requiredPipette}
       />

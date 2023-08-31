@@ -12,7 +12,6 @@ import {
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
@@ -21,7 +20,10 @@ import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import {
+  useChainMaintenanceCommands,
+  useCreateTargetedMaintenanceRunMutation,
+} from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -74,9 +76,9 @@ export function GripperWizardFlows(
   ] = React.useState<boolean>(false)
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({
+  } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
       setCreatedMaintenanceRunId(response.data.id)
     },
@@ -147,7 +149,7 @@ export function GripperWizardFlows(
       createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
       attachedGripper={attachedGripper}
-      createMaintenanceRun={createMaintenanceRun}
+      createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
         isChainCommandMutationLoading || isCommandLoading || isExiting

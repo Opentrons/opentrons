@@ -41,7 +41,6 @@ import {
   ProtocolSetupStepSkeleton,
 } from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { useMaintenanceRunTakeover } from '../../../organisms/TakeoverModal'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -341,7 +340,6 @@ function PrepareToRun({
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -552,7 +550,6 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
-                setODDMaintenanceFlowInProgress()
                 launchLPC()
               }}
               title={t('labware_position_check')}
