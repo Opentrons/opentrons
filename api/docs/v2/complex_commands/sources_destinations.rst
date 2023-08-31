@@ -86,10 +86,12 @@ Aspirating and Dispensing
 ``distribute()`` always fills the tip with as few aspirations as possible, and then dispenses to the destination wells in order. Its default behavior is:
 
     1. Pick up a tip.
-    2. Aspirate enough to fill the destination wells, or as much will fit in the tip, whichever is smaller. This aspirate includes a disposal volume.
+    2. Aspirate enough to dispense in all the destination wells. This aspirate includes a disposal volume.
     3. Dispense in the first destination well.
     4. Continue to dispense in destination wells.
     5. Drop the tip in the trash.
+    
+See :ref:`complex-tip-refilling` below for cases where the total amount to be dispensed is greater than the capacity of the tip.
     
 .. figure:: ../../img/complex_commands/robot_distribute.png
     :name: Transfer
@@ -104,7 +106,9 @@ Aspirating and Dispensing
     2. Aspirate from the first source well.
     3. Continue aspirating from source wells.
     4. Dispense in the destination well.
-    5. Drop the tip in the trash.    
+    5. Drop the tip in the trash.
+    
+See :ref:`complex-tip-refilling` below for cases where the total amount to be aspirated is greater than the capacity of the tip.
 
 .. figure:: ../../img/complex_commands/robot_consolidate.png
     :name: Transfer
@@ -237,7 +241,7 @@ When the source and destination lists contain different numbers of wells, ``tran
       - B11
       - B12
 
-This is why the longer list must be evenly divisible by the shorter list. If we changed the destination in this example to a column instead of a row, the API will raise an error, because 8 is not evenly divisible by 3::
+This is why the longer list must be evenly divisible by the shorter list. Changing the destination in this example to a column instead of a row will cause the API to raise an error, because 8 is not evenly divisible by 3::
 
     pipette.transfer(
         volume=50,
@@ -246,7 +250,7 @@ This is why the longer list must be evenly divisible by the shorter list. If we 
     )
     # error: source and destination lists must be divisible
     
-The API raises this error rather than presuming which wells to aspirate from three times and which only two times. If you wanted to aspirate three times from A1, three times from A2, and three times from A3, use multiple ``transfer()`` commands in sequence::
+The API raises this error rather than presuming which wells to aspirate from three times and which only two times. If you want to aspirate three times from A1, three times from A2, and three times from A3, use multiple ``transfer()`` commands in sequence::
 
     pipette.transfer(50, plate["A1"], plate.columns()[3][:3])
     pipette.transfer(50, plate["A2"], plate.columns()[3][3:6])
@@ -260,7 +264,7 @@ Finally, be aware of the ordering of source and destination lists when construct
         dest=plate.rows()[1:],
     )
     
-However, because the well ordering of :py:meth:`Labware.rows` goes *across* wells instead of *down* wells, liquid from A1 will be dispensed in B1–B7, liquid from A2 will be dispensed in B8–C2, etc. The intended task is probably better accomplished by repeating transfers in a ``for`` loop::
+However, because the well ordering of :py:meth:`.Labware.rows` goes *across* wells instead of *down* wells, liquid from A1 will be dispensed in B1–B7, liquid from A2 will be dispensed in B8–C2, etc. The intended task is probably better accomplished by repeating transfers in a ``for`` loop::
 
     for i in range(12):        
         pipette.transfer(
