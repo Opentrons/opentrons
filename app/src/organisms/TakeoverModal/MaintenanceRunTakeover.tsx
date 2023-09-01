@@ -6,6 +6,7 @@ import {
 import { TakeoverModal } from './TakeoverModal'
 import { TakeoverModalContext } from './TakeoverModalContext'
 
+const MAINTENANCE_RUN_POLL_MS = 10000
 interface MaintenanceRunTakeoverProps {
   children: React.ReactNode
 }
@@ -17,7 +18,7 @@ export function MaintenanceRunTakeover(
     setIsODDMaintenanceInProgress,
   ] = React.useState<boolean>(false)
   const maintenanceRunId = useCurrentMaintenanceRun({
-    refetchInterval: 5000,
+    refetchInterval: MAINTENANCE_RUN_POLL_MS,
   }).data?.data.id
   const isMaintenanceRunCurrent = maintenanceRunId != null
 

@@ -14,7 +14,7 @@ import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
-  useProtocolAnalysesQuery,
+  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
@@ -67,8 +67,8 @@ const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
-const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
-  typeof useProtocolAnalysesQuery
+const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
+  typeof useProtocolAnalysisAsDocumentQuery
 >
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
@@ -130,14 +130,10 @@ describe('ODDProtocolDetails', () => {
       data: MOCK_DATA,
       isLoading: false,
     } as any)
-    mockUseProtocolAnalysesQuery.mockReturnValue({
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
       data: {
-        data: [
-          {
-            id: 'mockAnalysisId',
-            status: 'completed',
-          },
-        ],
+        id: 'mockAnalysisId',
+        status: 'completed',
       },
     } as any)
     when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
