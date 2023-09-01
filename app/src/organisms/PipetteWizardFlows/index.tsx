@@ -110,7 +110,7 @@ export const PipetteWizardFlows = (
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1
+      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
