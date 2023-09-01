@@ -13,6 +13,9 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     get_unit_vector,
     FLOAT_THRESHOLD,
     limit_max_speed,
+    split_unit_vector,
+    de_diagonalize_unit_vector,
+    MINIMUM_VECTOR_COMPONENT,
 )
 from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisConstraints,
@@ -362,6 +365,157 @@ def test_convert_targets_to_moves() -> None:
     )
 
 
+def test_convert_targets_to_moves_de_diagonilization() -> None:
+    """Test that conversion will split out problematic movements."""
+    targets = [
+        MoveTarget.build(
+            {
+                "X": np.float64(200),
+                "Y": np.float64(0.1),
+                "Z": np.float64(0),
+                "A": np.float64(0),
+            },
+            np.float64(1000),
+        ),
+        MoveTarget.build(
+            {
+                "X": np.float64(200),
+                "Y": np.float64(0),
+                "Z": np.float64(200),
+                "A": np.float64(0),
+            },
+            np.float64(1000),
+        ),
+    ]
+
+    expected = [
+        Move.build(
+            unit_vector={
+                "X": np.float64(0),
+                "Y": np.float64(1),
+                "Z": np.float64(0),
+                "A": np.float64(0),
+            },
+            distance=np.float64(0.1),
+            max_speed=np.float64(500),
+            blocks=(
+                Block(
+                    distance=np.float64(0.1 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(0.1 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(0.1 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+            ),
+        ),
+        Move.build(
+            unit_vector={
+                "X": np.float64(1),
+                "Y": np.float64(0),
+                "Z": np.float64(0),
+                "A": np.float64(0),
+            },
+            distance=np.float64(200),
+            max_speed=np.float64(500),
+            blocks=(
+                Block(
+                    distance=np.float64(200 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(200 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(200 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+            ),
+        ),
+        Move.build(
+            unit_vector={
+                "X": np.float64(0),
+                "Y": np.float64(-1),
+                "Z": np.float64(0),
+                "A": np.float64(0),
+            },
+            distance=np.float64(0.1),
+            max_speed=np.float64(500),
+            blocks=(
+                Block(
+                    distance=np.float64(0.1 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(0.1 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(0.1 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+            ),
+        ),
+        Move.build(
+            unit_vector={
+                "X": np.float64(0),
+                "Y": np.float64(0),
+                "Z": np.float64(1),
+                "A": np.float64(0),
+            },
+            distance=np.float64(200),
+            max_speed=np.float64(500),
+            blocks=(
+                Block(
+                    distance=np.float64(200 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(200 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(200 / 3),
+                    initial_speed=np.float64(np.float64(500)),
+                    acceleration=np.float64(0),
+                ),
+            ),
+        ),
+    ]
+
+    assert (
+        list(
+            targets_to_moves(
+                {
+                    "X": np.float64(0),
+                    "Y": np.float64(0),
+                    "Z": np.float64(0),
+                    "A": np.float64(0),
+                },
+                targets,
+                CONSTRAINTS,
+            )
+        )
+        == expected
+    )
+
+
 @pytest.mark.parametrize(
     argnames=["prev_move", "unit_vector", "max_speed", "expected"],
     argvalues=[
@@ -549,6 +703,75 @@ def test_get_unit_vector(x: List[float], y: List[float]) -> None:
     coord_1 = dict(zip(AXES, (np.float64(i) for i in y)))
     unit_v, _ = get_unit_vector(coord_1, coord_0)
     assert is_unit_vector(unit_v)
+
+
+def test_split_unit_vector() -> None:
+    """Given a unit vector, be able to split it."""
+    coord_0 = {
+        "X": 0,
+        "Y": 0,
+        "Z": 0,
+        "W": 0,
+    }
+    coord_1 = {
+        "X": 100,
+        "Y": -100,
+        "Z": 25,
+        "W": 0,
+    }
+    unit_v, dist = get_unit_vector(coord_0, coord_1)
+
+    split_1, split_2 = split_unit_vector(unit_v, dist, "X")
+    unit_1, dist_1 = split_1
+    unit_2, dist_2 = split_2
+    assert is_unit_vector(unit_1)
+    assert is_unit_vector(unit_2)
+    assert unit_1["X"] != np.float64(0)
+    assert unit_2["X"] == np.float64(0)
+    assert dist_1 == pytest.approx(np.float64(100))
+    assert dist_1 != dist_2
+
+
+def test_de_diagonalize_vectors() -> None:
+    """Given a unit vector, split out small distances."""
+    coord_0 = {
+        "X": 0,
+        "Y": 0,
+        "Z": 0,
+        "A": 0,
+    }
+    coord_1 = {
+        "X": 100,
+        "Y": -0.05,
+        "Z": 25,
+        "A": 0.07,
+    }
+    unit_v, dist = get_unit_vector(coord_0, coord_1)
+
+    split = de_diagonalize_unit_vector(unit_v, dist, MINIMUM_VECTOR_COMPONENT)
+    assert len(split) == 3
+
+    y_v, y_dist = split[0]
+    a_v, a_dist = split[1]
+    long_v, long_dist = split[2]
+
+    assert is_unit_vector(y_v)
+    assert is_unit_vector(a_v)
+    assert is_unit_vector(long_v)
+    assert y_v["Y"] == pytest.approx(np.float64(-1))
+    assert y_dist == pytest.approx(np.float64(0.05))
+    assert a_dist == pytest.approx(np.float64(0.07))
+    assert long_dist > y_dist
+    assert y_v["Y"] == pytest.approx(np.float64(-1))
+    assert a_v["A"] == pytest.approx(np.float64(1))
+    assert long_v["Y"] == np.float64(0)
+    assert long_v["A"] == np.float64(0)
+
+    split_again = de_diagonalize_unit_vector(
+        long_v, long_dist, MINIMUM_VECTOR_COMPONENT
+    )
+    assert len(split_again) == 1
+    assert split_again[0] == (long_v, long_dist)
 
 
 def test_triangle_matching() -> None:
