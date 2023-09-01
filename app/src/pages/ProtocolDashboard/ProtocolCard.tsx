@@ -217,6 +217,7 @@ export function ProtocolCard(props: {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
                 maxWidth="100%"
+                whiteSpace="break-spaces"
               >
                 <Trans
                   t={t}
