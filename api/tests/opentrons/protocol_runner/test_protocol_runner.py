@@ -11,6 +11,7 @@ from opentrons_shared_data.protocol.dev_types import (
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
@@ -275,7 +276,11 @@ async def test_stop_when_run_never_started(
     await subject.stop()
 
     decoy.verify(
-        await protocol_engine.finish(drop_tips_and_home=False, set_run_status=False),
+        await protocol_engine.finish(
+            drop_tips_after_run=False,
+            set_run_status=False,
+            post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+        ),
         times=1,
     )
 

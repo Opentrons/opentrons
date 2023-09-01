@@ -15,7 +15,7 @@ from opentrons.protocol_engine.execution import (
     TipHandler,
     HardwareStopper,
 )
-from opentrons.protocol_engine.types import MotorAxis, TipGeometry
+from opentrons.protocol_engine.types import MotorAxis, TipGeometry, PostRunHardwareState
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -69,9 +69,18 @@ async def test_hardware_halt(
     """It should halt the hardware API."""
     await subject.do_halt()
 
-    decoy.verify(await hardware_api.halt())
+    decoy.verify(await hardware_api.halt(disengage_before_stopping=False))
 
 
+@pytest.mark.parametrize(
+    argnames=["post_run_hardware_state", "expected_home_after"],
+    argvalues=[
+        (PostRunHardwareState.STAY_ENGAGED_IN_PLACE, False),
+        (PostRunHardwareState.DISENGAGE_IN_PLACE, False),
+        (PostRunHardwareState.HOME_AND_STAY_ENGAGED, True),
+        (PostRunHardwareState.HOME_THEN_DISENGAGE, True),
+    ],
+)
 async def test_hardware_stopping_sequence(
     decoy: Decoy,
     state_store: StateStore,
@@ -79,6 +88,8 @@ async def test_hardware_stopping_sequence(
     movement: MovementHandler,
     mock_tip_handler: TipHandler,
     subject: HardwareStopper,
+    post_run_hardware_state: PostRunHardwareState,
+    expected_home_after: bool,
 ) -> None:
     """It should stop the hardware, home the robot and perform drop tip if required."""
     decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
@@ -87,7 +98,9 @@ async def test_hardware_stopping_sequence(
         ]
     )
 
-    await subject.do_stop_and_recover(drop_tips_and_home=True)
+    await subject.do_stop_and_recover(
+        drop_tips_after_run=True, post_run_hardware_state=post_run_hardware_state
+    )
 
     decoy.verify(
         await hardware_api.stop(home_after=False),
@@ -104,7 +117,7 @@ async def test_hardware_stopping_sequence(
             well_name="A1",
         ),
         await mock_tip_handler.drop_tip(pipette_id="pipette-id", home_after=False),
-        await hardware_api.stop(home_after=True),
+        await hardware_api.stop(home_after=expected_home_after),
     )
 
 
@@ -117,14 +130,17 @@ async def test_hardware_stopping_sequence_without_pipette_tips(
     """Don't drop tip when there aren't any tips attached to pipettes."""
     decoy.when(state_store.pipettes.get_all_attached_tips()).then_return([])
 
-    await subject.do_stop_and_recover(drop_tips_and_home=True)
+    await subject.do_stop_and_recover(
+        drop_tips_after_run=True,
+        post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    )
 
     decoy.verify(
         await hardware_api.stop(home_after=True),
     )
 
 
-async def test_hardware_stopping_sequence_no_home(
+async def test_hardware_stopping_sequence_no_tip_drop(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
@@ -138,7 +154,10 @@ async def test_hardware_stopping_sequence_no_home(
         ]
     )
 
-    await subject.do_stop_and_recover(drop_tips_and_home=False)
+    await subject.do_stop_and_recover(
+        drop_tips_after_run=False,
+        post_run_hardware_state=PostRunHardwareState.DISENGAGE_IN_PLACE,
+    )
 
     decoy.verify(await hardware_api.stop(home_after=False), times=1)
 
@@ -172,7 +191,10 @@ async def test_hardware_stopping_sequence_no_pipette(
         ),
     ).then_raise(HwPipetteNotAttachedError("oh no"))
 
-    await subject.do_stop_and_recover(drop_tips_and_home=True)
+    await subject.do_stop_and_recover(
+        drop_tips_after_run=True,
+        post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    )
 
     decoy.verify(
         await hardware_api.stop(home_after=True),
@@ -202,7 +224,10 @@ async def test_hardware_stopping_sequence_with_gripper(
     )
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
-    await subject.do_stop_and_recover(drop_tips_and_home=True)
+    await subject.do_stop_and_recover(
+        drop_tips_after_run=True,
+        post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    )
 
     decoy.verify(
         await ot3_hardware_api.stop(home_after=False),
