@@ -58,7 +58,7 @@ stages:
             - id: !anystr
               errorType: PythonException
               createdAt: !anystr
-              detail: 'opentrons.hardware_control.errors.NoTipAttachedError: Cannot perform PREPARE_ASPIRATE without a tip attached'
+              detail: 'Pipette should have a tip attached, but does not.'
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
