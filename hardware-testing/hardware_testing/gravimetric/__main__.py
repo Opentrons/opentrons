@@ -15,10 +15,10 @@ from hardware_testing.protocols import (
     gravimetric_ot3_p50_multi,
     gravimetric_ot3_p1000_single,
     gravimetric_ot3_p1000_multi,
-    gravimetric_ot3_p1000_96_50ul_tip,
-    gravimetric_ot3_p1000_96_200ul_tip,
-    gravimetric_ot3_p1000_96_1000ul_tip,
-    gravimetric_ot3_p1000_96,
+    gravimetric_ot3_p1000_96_50ul_tip_increment,
+    gravimetric_ot3_p1000_96_200ul_tip_increment,
+    gravimetric_ot3_p1000_96_1000ul_tip_increment,
+    gravimetric_ot3_p1000_96_DO_NOT_CALIBRATE,
     photometric_ot3_p1000_96_50ul_tip,
     photometric_ot3_p1000_96_200ul_tip,
     gravimetric_ot3_p50_multi_50ul_tip_increment,
@@ -57,7 +57,7 @@ GRAVIMETRIC_CFG = {
     1000: {
         1: gravimetric_ot3_p1000_single,
         8: gravimetric_ot3_p1000_multi,
-        96: gravimetric_ot3_p1000_96,
+        96: gravimetric_ot3_p1000_96_DO_NOT_CALIBRATE,
     },
 }
 
@@ -78,9 +78,9 @@ GRAVIMETRIC_CFG_INCREMENT = {
             1000: gravimetric_ot3_p1000_multi_1000ul_tip_increment,
         },
         96: {
-            50: gravimetric_ot3_p1000_96_50ul_tip,
-            200: gravimetric_ot3_p1000_96_200ul_tip,
-            1000: gravimetric_ot3_p1000_96_1000ul_tip,
+            50: gravimetric_ot3_p1000_96_50ul_tip_increment,
+            200: gravimetric_ot3_p1000_96_200ul_tip_increment,
+            1000: gravimetric_ot3_p1000_96_1000ul_tip_increment,
         },
     },
 }
