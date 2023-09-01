@@ -166,28 +166,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
         .catch(error => {
           setShowErrorMessage(error.message)
         })
-    } else if (
-      isSuccess &&
-      flowType === FLOWS.DETACH &&
-      currentStepIndex !== totalStepCount
-    ) {
-      chainRunCommands?.(
-        [
-          {
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
-            },
-          },
-        ],
-        false
-      )
-        .then(() => {
-          proceed()
-        })
-        .catch(error => {
-          setShowErrorMessage(error.message)
-        })
     } else {
       proceed()
     }

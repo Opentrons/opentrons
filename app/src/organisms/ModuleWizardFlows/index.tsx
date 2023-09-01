@@ -180,12 +180,18 @@ export const ModuleWizardFlows = (
       )
   }
   if (currentStep == null || attachedPipette == null) return null
+
+  const maintenanceRunId =
+    maintenanceRunData?.data.id != null &&
+    maintenanceRunData?.data.id === createdMaintenanceRunId
+      ? createdMaintenanceRunId
+      : undefined
   const calibrateBaseProps = {
     attachedPipette,
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
-    maintenanceRunId: maintenanceRunData?.data.id,
+    maintenanceRunId,
     goBack,
     setErrorMessage,
     errorMessage,

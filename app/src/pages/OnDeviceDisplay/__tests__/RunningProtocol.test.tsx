@@ -10,6 +10,7 @@ import {
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  useAllCommandsQuery,
   useProtocolAnalysesQuery,
   useProtocolQuery,
   useRunQuery,
@@ -22,6 +23,7 @@ import {
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { mockUseAllCommandsResponseNonDeterministic } from '../../../organisms/RunProgressMeter/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -80,6 +82,9 @@ const mockRunningProtocolSkeleton = RunningProtocolSkeleton as jest.MockedFuncti
 >
 const mockCancelingRunModal = CancelingRunModal as jest.MockedFunction<
   typeof CancelingRunModal
+>
+const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
+  typeof useAllCommandsQuery
 >
 
 const RUN_ID = 'run_id'
@@ -165,6 +170,9 @@ describe('RunningProtocol', () => {
       <div>mock RunningProtocolSkeleton</div>
     )
     mockCancelingRunModal.mockReturnValue(<div>mock CancelingRunModal</div>)
+    when(mockUseAllCommandsQuery)
+      .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
+      .mockReturnValue(mockUseAllCommandsResponseNonDeterministic)
   })
 
   afterEach(() => {

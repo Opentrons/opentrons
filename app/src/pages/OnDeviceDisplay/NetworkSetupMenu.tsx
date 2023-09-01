@@ -62,7 +62,7 @@ export function NetworkSetupMenu(): JSX.Element {
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black}
           >
-            {t('connect_to_a_network')}
+            {t('choose_network_type')}
           </StyledText>
         </Flex>
         <Flex

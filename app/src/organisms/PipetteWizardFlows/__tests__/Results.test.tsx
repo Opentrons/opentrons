@@ -232,17 +232,7 @@ describe('Results', () => {
     getByText('attach pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: 'left',
-          },
-        },
-      ],
-      false
-    )
+    expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel', () => {
     props = {

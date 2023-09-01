@@ -15,6 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -28,6 +30,7 @@ import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { Tooltip } from '../../../../atoms/Tooltip'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import {
@@ -35,6 +38,7 @@ import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
+  useRunCalibrationStatus,
 } from '../../hooks'
 import { HeaterShakerWizard } from '../../HeaterShakerWizard'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
@@ -42,6 +46,7 @@ import { getModuleImage } from './utils'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
+import type { ProtocolCalibrationStatus } from '../../hooks'
 
 interface SetupModulesListProps {
   robotName: string
@@ -61,6 +66,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
   const isOt3 = useIsOT3(robotName)
+
+  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
   const [
     showMultipleModulesModal,
@@ -167,6 +174,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     : null
                 }
                 isOt3={isOt3}
+                calibrationStatus={calibrationStatus}
               />
             )
           }
@@ -183,6 +191,7 @@ interface ModulesListItemProps {
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isOt3: boolean
+  calibrationStatus: ProtocolCalibrationStatus
 }
 
 export function ModulesListItem({
@@ -192,6 +201,7 @@ export function ModulesListItem({
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
   isOt3,
+  calibrationStatus,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const moduleConnectionStatus =
@@ -208,6 +218,10 @@ export function ModulesListItem({
       ? attachedModuleMatch
       : null
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+
   let subText: JSX.Element | null = null
   if (moduleModel === HEATERSHAKER_MODULE_V1) {
     subText = (
@@ -251,35 +265,43 @@ export function ModulesListItem({
     )
   }
 
-  const RenderModuleStatus = (): JSX.Element => {
-    const handleCalibrate = (): void => {
-      setShowModuleWizard(true)
-    }
-    if (attachedModuleMatch == null) {
-      return (
-        <StatusLabel
-          status={moduleConnectionStatus}
-          backgroundColor={COLORS.warningBackgroundLight}
-          iconColor={COLORS.warningEnabled}
-          textColor={COLORS.warningText}
-        />
-      )
-    } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
-      return (
-        <StatusLabel
-          status={moduleConnectionStatus}
-          backgroundColor={COLORS.successBackgroundLight}
-          iconColor={COLORS.successEnabled}
-          textColor={COLORS.successText}
-        />
-      )
-    } else {
-      return (
-        <TertiaryButton onClick={handleCalibrate}>
-          {t('calibrate_now')}
-        </TertiaryButton>
-      )
-    }
+  let renderModuleStatus: JSX.Element = (
+    <>
+      <TertiaryButton
+        {...targetProps}
+        onClick={() => setShowModuleWizard(true)}
+        disabled={!calibrationStatus?.complete}
+      >
+        {t('calibrate_now')}
+      </TertiaryButton>
+      {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
+        <Tooltip tooltipProps={tooltipProps}>
+          {calibrationStatus.reason === 'attach_pipette_failure_reason'
+            ? t('attach_pipette_before_module_calibration')
+            : t('calibrate_pipette_before_module_calibration')}
+        </Tooltip>
+      ) : null}
+    </>
+  )
+
+  if (attachedModuleMatch == null) {
+    renderModuleStatus = (
+      <StatusLabel
+        status={moduleConnectionStatus}
+        backgroundColor={COLORS.warningBackgroundLight}
+        iconColor={COLORS.warningEnabled}
+        textColor={COLORS.warningText}
+      />
+    )
+  } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
+    renderModuleStatus = (
+      <StatusLabel
+        status={moduleConnectionStatus}
+        backgroundColor={COLORS.successBackgroundLight}
+        iconColor={COLORS.successEnabled}
+        textColor={COLORS.successText}
+      />
+    )
   }
 
   return (
@@ -337,7 +359,7 @@ export function ModulesListItem({
             {moduleModel === MAGNETIC_BLOCK_V1 ? (
               <StyledText as="p"> {t('n_a')}</StyledText>
             ) : (
-              <RenderModuleStatus />
+              renderModuleStatus
             )}
           </Flex>
         </Flex>

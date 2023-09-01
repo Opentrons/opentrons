@@ -1,29 +1,36 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { act, cleanup, waitFor } from '@testing-library/react'
 import { resetAllWhenMocks, when } from 'jest-when'
+
 import { renderWithProviders } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
+import { useToaster } from '../../../../../organisms/ToasterOven'
 import {
   mockConnectableRobot,
   mockUnreachableRobot,
 } from '../../../../../redux/discovery/__fixtures__'
-import { downloadLogs } from '../../../../../redux/shell/robot-logs/actions'
 import { useRobot } from '../../../hooks'
-
 import { Troubleshooting } from '../Troubleshooting'
 
-jest.mock('../../../../../redux/shell/robot-logs/actions')
-jest.mock('../../../../../redux/shell/robot-logs/selectors')
+import type { HostConfig } from '@opentrons/api-client'
+import { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
+
+jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../../organisms/ToasterOven')
 jest.mock('../../../../../redux/discovery/selectors')
 jest.mock('../../../hooks')
 
-const mockDownloadLogs = downloadLogs as jest.MockedFunction<
-  typeof downloadLogs
->
+const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 
 const ROBOT_NAME = 'otie'
+const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
+const MOCK_MAKE_TOAST = jest.fn()
+const MOCK_EAT_TOAST = jest.fn()
 
 const render = (robotName = ROBOT_NAME) => {
   return renderWithProviders(
@@ -37,10 +44,18 @@ const render = (robotName = ROBOT_NAME) => {
 describe('RobotSettings Troubleshooting', () => {
   beforeEach(() => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockUseToaster)
+      .calledWith()
+      .mockReturnValue(({
+        makeToast: MOCK_MAKE_TOAST,
+        eatToast: MOCK_EAT_TOAST,
+      } as unknown) as ToasterContextType)
   })
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
+    cleanup()
   })
   it('should render title, description, and button', () => {
     const [{ getByText, getByRole, getByTestId }] = render()
@@ -56,10 +71,22 @@ describe('RobotSettings Troubleshooting', () => {
     expect(downloadLogsButton).toBeDisabled()
   })
 
-  it('should call downloadLogs when clicking Download logs button', () => {
-    const [{ getByRole }] = render()
+  it('should initiate log download when clicking Download logs button', async () => {
+    const [{ getByRole, queryByText }] = render()
     const downloadLogsButton = getByRole('button', { name: 'Download logs' })
-    fireEvent.click(downloadLogsButton)
-    expect(mockDownloadLogs).toHaveBeenCalled()
+    act(() => {
+      downloadLogsButton.click()
+    })
+    expect(downloadLogsButton).toBeDisabled()
+    expect(MOCK_MAKE_TOAST).toBeCalledWith('Downloading logs...', 'info', {
+      disableTimeout: true,
+      icon: { name: 'ot-spinner', spin: true },
+    })
+    await waitFor(() => {
+      expect(queryByText('Downloading logs...')).toBeNull()
+    })
+    await waitFor(() => {
+      expect(downloadLogsButton).not.toBeDisabled()
+    })
   })
 })

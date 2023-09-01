@@ -228,11 +228,16 @@ export const PipetteWizardFlows = (
       )
   }
 
+  const maintenanceRunId =
+    maintenanceRunData?.data.id != null &&
+    maintenanceRunData?.data.id === createdMaintenanceRunId
+      ? createdMaintenanceRunId
+      : undefined
   const calibrateBaseProps = {
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
-    maintenanceRunId: maintenanceRunData?.data.id,
+    maintenanceRunId,
     goBack,
     attachedPipettes,
     setShowErrorMessage,

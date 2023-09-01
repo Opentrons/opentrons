@@ -144,6 +144,7 @@ export function GripperWizardFlows(
   return (
     <GripperWizard
       flowType={flowType}
+      createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
       attachedGripper={attachedGripper}
       createMaintenanceRun={createMaintenanceRun}
@@ -164,6 +165,7 @@ export function GripperWizardFlows(
 interface GripperWizardProps {
   flowType: GripperWizardFlowType
   maintenanceRunId?: string
+  createdMaintenanceRunId: string | null
   attachedGripper: InstrumentData | null
   createMaintenanceRun: UseMutateFunction<
     MaintenanceRun,
@@ -201,6 +203,7 @@ export const GripperWizard = (
     setErrorMessage,
     errorMessage,
     isExiting,
+    createdMaintenanceRunId,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
@@ -246,7 +249,10 @@ export const GripperWizard = (
 
   const sharedProps = {
     flowType,
-    maintenanceRunId,
+    maintenanceRunId:
+      maintenanceRunId != null && createdMaintenanceRunId === maintenanceRunId
+        ? maintenanceRunId
+        : undefined,
     isCreateLoading,
     isRobotMoving,
     attachedGripper,

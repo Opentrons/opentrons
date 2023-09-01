@@ -67,6 +67,7 @@ export const BeforeBeginning = (
     selectedPipette,
     isOnDevice,
     requiredPipette,
+    maintenanceRunId,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -256,7 +257,7 @@ export const BeforeBeginning = (
         </>
       }
       proceedButtonText={proceedButtonText}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={
         isGantryEmptyFor96ChannelAttachment ||
         (flowType === FLOWS.ATTACH && selectedPipette === SINGLE_MOUNT_PIPETTES)

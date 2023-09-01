@@ -140,10 +140,10 @@ describe('RobotSettingsDashboard', () => {
     getByText('Use stored data when setting up a protocol.')
     getByText('Developer Tools')
     getByText('Access additional logging and feature flags.')
-    expect(getAllByText('Off').length).toBe(3) // LED & DEV tools & historic offsets
+    getByText('Share Analytics')
+    expect(getAllByText('Off').length).toBe(5) // LED & DEV tools & share analytics & home gantry & historic offsets
   })
 
-  // Note(kj: 02/03/2023) This case will be changed in a following PR
   it('should render component when tapping robot name button', () => {
     const [{ getByText }] = render()
     const button = getByText('Robot Name')
@@ -171,7 +171,9 @@ describe('RobotSettingsDashboard', () => {
       toggleLights: mockToggleLights,
     })
     const [{ getByTestId }] = render()
-    expect(getByTestId('RobotSettingButton_LED_Lights')).toHaveTextContent('On')
+    expect(
+      getByTestId('RobotSettingButton_display_led_lights')
+    ).toHaveTextContent('On')
   })
 
   it('should render component when tapping network settings', () => {
@@ -209,16 +211,7 @@ describe('RobotSettingsDashboard', () => {
     getByText('Mock Update Channel')
   })
 
-  it('should call a mock function when tapping home gantry on restart', () => {
-    const [{ getByText, getByTestId }] = render()
-    getByText('Home gantry on restart')
-    getByText('By default, this setting is turned on.')
-    expect(getByTestId('RobotSettingButton_Home_Gantry')).toHaveTextContent(
-      'On'
-    )
-  })
-
-  it('should render text with home gantry  off', () => {
+  it('should render text with home gantry off', () => {
     mockGetRobotSettings.mockReturnValue([
       {
         id: 'disableHomeOnBoot',
@@ -229,9 +222,9 @@ describe('RobotSettingsDashboard', () => {
       },
     ])
     const [{ getByTestId }] = render()
-    expect(getByTestId('RobotSettingButton_LED_Lights')).toHaveTextContent(
-      'Off'
-    )
+    expect(
+      getByTestId('RobotSettingButton_home_gantry_on_restart')
+    ).toHaveTextContent('Off')
   })
 
   it('should call a mock function when tapping enable historic offset', () => {
@@ -253,12 +246,4 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     getByText('Update available')
   })
-
-  // The following cases will be activate when RobotSettings PRs are ready
-  it.todo('should render connection status - only wifi')
-  it.todo('should render connection status - wifi + ethernet')
-  it.todo('should render connection status - wifi + usb')
-  it.todo('should render connection status - ethernet + usb')
-  it.todo('should render connection status - all connected')
-  it.todo('should render connection status - all not connected')
 })
