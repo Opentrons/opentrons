@@ -30,6 +30,7 @@ import {
 import { LEFT_SLOTS } from './constants'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   slotName: string
@@ -55,6 +56,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     setErrorMessage,
     setCreatedAdapterId,
     attachedPipette,
+    isRobotMoving
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
@@ -92,6 +94,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
           loadName: calibrationAdapterLoadName,
         },
       },
+      { commandType: 'home' as const, params: {} },
       {
         commandType: 'calibration/moveToMaintenancePosition',
         params: {
@@ -160,6 +163,12 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     </Flex>
   )
 
+  if (isRobotMoving)
+    return (
+      <InProgressModal
+        description={t('shared:stand_back_robot_is_in_motion')}
+      />
+    )
   return (
     <GenericWizardTile
       header={t('place_adapter', { module: moduleDisplayName })}
