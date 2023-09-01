@@ -32,17 +32,24 @@ Certain liquid handling cases focus on moving liquid to or from a single well. :
 
 These restrictions and behaviors are summarized as follows:
 
-+-------------------+----------------------------------------------------+---------------------+
-| Method            | Valid sources                                      | Valid destinations  |
-+===================+====================================================+=====================+
-| ``transfer()``    | Any number of wells                                | Any number of wells |
-+                   +----------------------------------------------------+---------------------+
-|                   | The larger group of wells must be evenly divisible by the smaller group. |
-+-------------------+----------------------------------------------------+---------------------+
-| ``distribute()``  | Exactly one well                                   | Any number of wells |
-+-------------------+----------------------------------------------------+---------------------+
-| ``consolidate()`` | Any number of wells                                | Exactly one well    |
-+-------------------+----------------------------------------------------+---------------------+
+.. list-table::
+   :header-rows: 1
+
+   * - Method
+     - Accepted wells
+   * - ``transfer()``
+     - 
+       - **Source:** any number of wells
+       - **Destination:** any number of wells
+       - The larger group of wells must be evenly divisible by the smaller group.
+   * - ``distribute()``
+     - 
+       - **Source:** exactly one well
+       - **Destination:** any number of wells
+   * - ``consolidate()``
+     - 
+       - **Source:** any number of wells
+       - **Destination:** exactly one well
 
 Singleton wells can be passed by themselves or as a list with one item: ``source=plate['A1']`` and ``source=[plate['A1']]`` are equivalent.
     
