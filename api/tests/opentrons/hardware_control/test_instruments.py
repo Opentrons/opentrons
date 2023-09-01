@@ -374,7 +374,7 @@ async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instru
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
-async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
+async def test_aspirate_ot3_50(dummy_instruments_ot3, ot3_api_obj):
     hw_api = await ot3_api_obj(
         attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
     )
@@ -389,6 +389,26 @@ async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
     await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
     new_plunger_pos = 71.1968
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(new_plunger_pos)
+
+
+async def test_aspirate_ot3_1000(dummy_instruments_ot3, ot3_api_obj):
+    hw_api = await ot3_api_obj(
+        attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
+    )
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+
+    hw_api.set_working_volume(mount, 1000)
+    aspirate_ul = 3.0
+    aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
+    new_plunger_pos = 71.2122
     pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
