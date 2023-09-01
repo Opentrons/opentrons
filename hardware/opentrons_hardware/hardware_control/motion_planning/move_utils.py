@@ -159,6 +159,38 @@ def limit_max_speed(
     return max_linear_speed * scale
 
 
+def _unit_vector_to_move(
+    unit_vector: Coordinates[AxisKey, np.float64],
+    distance: np.float64,
+    max_speed: np.float64,
+    constraints: SystemConstraints[AxisKey],
+) -> Move[AxisKey]:
+    speed = limit_max_speed(unit_vector, max_speed, constraints)
+    third_distance = np.float64(distance / 3)
+    return Move(
+        unit_vector=unit_vector,
+        distance=distance,
+        max_speed=speed,
+        blocks=(
+            Block(
+                distance=third_distance,
+                initial_speed=speed,
+                acceleration=np.float64(0),
+            ),
+            Block(
+                distance=third_distance,
+                initial_speed=speed,
+                acceleration=np.float64(0),
+            ),
+            Block(
+                distance=third_distance,
+                initial_speed=speed,
+                acceleration=np.float64(0),
+            ),
+        ),
+    )
+
+
 def targets_to_moves(
     initial: Coordinates[AxisKey, CoordinateValue],
     targets: List[MoveTarget[AxisKey]],
@@ -179,29 +211,8 @@ def targets_to_moves(
             initial_unit_vector, initial_distance, MINIMUM_VECTOR_COMPONENT
         )
         for unit_vector, distance in de_diagonalized_vectors:
-            speed = limit_max_speed(unit_vector, target.max_speed, constraints)
-            third_distance = np.float64(distance / 3)
-            m = Move(
-                unit_vector=unit_vector,
-                distance=distance,
-                max_speed=speed,
-                blocks=(
-                    Block(
-                        distance=third_distance,
-                        initial_speed=speed,
-                        acceleration=np.float64(0),
-                    ),
-                    Block(
-                        distance=third_distance,
-                        initial_speed=speed,
-                        acceleration=np.float64(0),
-                    ),
-                    Block(
-                        distance=third_distance,
-                        initial_speed=speed,
-                        acceleration=np.float64(0),
-                    ),
-                ),
+            m = _unit_vector_to_move(
+                unit_vector, distance, target.max_speed, constraints
             )
             log.debug(f"Built move from {initial} to {target} as {m}")
             yield m
