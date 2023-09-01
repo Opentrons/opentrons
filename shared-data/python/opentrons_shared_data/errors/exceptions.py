@@ -739,14 +739,17 @@ class APIRemoved(GeneralError):
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
         )
 
+
 class CommandPreconditionViolated(GeneralError):
     """An error indicating that a command was issued in a robot state incompatible with it."""
+
     def __init__(
-            self,
-                 message: Optional[str] = None,
-            detail: Optional[Dict[str, Any]] = None,
-            wrapping: Optional[Sequence[EnumeratedError]] = None) -> None:
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandPreconditionViolated instance."""
         super().__init__(
-            ErrorCodes.COMMAND_PRECONDITION_VIOLATED,
-            message, detail, wrapping
+            ErrorCodes.COMMAND_PRECONDITION_VIOLATED, message, detail, wrapping
         )
