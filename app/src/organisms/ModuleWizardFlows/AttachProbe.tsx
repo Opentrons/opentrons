@@ -15,16 +15,16 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
+import type { CalibrateModuleCreateCommand } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
   isExiting: boolean
+  adapterId: string | null
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -50,10 +50,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const {
     proceed,
     goBack,
+    chainRunCommands,
+    setErrorMessage,
+    adapterId,
     isRobotMoving,
     attachedModule,
     attachedPipette,
-    errorMessage,
     isExiting,
     isOnDevice,
     slotName,
@@ -168,34 +170,34 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       <StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>
     )
 
+  const handleBeginCalibration = (): void => {
+    if (adapterId == null) {
+      setErrorMessage('calibration adapter has not been loaded yet')
+      return
+    }
+    const calibrateModuleCommand: CalibrateModuleCreateCommand = {
+      commandType: 'calibration/calibrateModule',
+      params: {
+        moduleId: attachedModule.id,
+        labwareId: adapterId,
+        mount: attachedPipette.mount,
+      },
+    }
+    chainRunCommands?.([calibrateModuleCommand], false)
+      .then(() => proceed())
+      .catch((e: Error) =>
+        setErrorMessage(`error starting module calibration: ${e.message}`)
+      )
+  }
+
   // TODO: add calibration loading screen and error screen
-  return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.errorEnabled}
-      header={t('shared:error_encountered')}
-      subHeader={
-        <Trans
-          t={t}
-          i18nKey={'return_probe_error'}
-          values={{ error: errorMessage }}
-          components={{
-            block: <StyledText as="p" />,
-            bold: (
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
-            ),
-          }}
-        />
-      }
-    />
-  ) : (
+  return (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
-      // TODO: make sure this is the right animation
       rightHandBody={pipetteAttachProbeVid}
       bodyText={bodyText}
       proceedButtonText={t('begin_calibration')}
-      proceed={proceed}
+      proceed={handleBeginCalibration}
       back={goBack}
     />
   )

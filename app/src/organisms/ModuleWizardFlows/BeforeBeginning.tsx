@@ -2,15 +2,14 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  GantryMount,
-  MoveToMaintenancePositionCreateCommand,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+  HEATERSHAKER_MODULE_MODELS,
+  TEMPERATURE_MODULE_MODELS,
+  THERMOCYCLER_MODULE_MODELS,
+} from '@opentrons/shared-data/js/constants'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { COLORS } from '@opentrons/components'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -26,7 +25,6 @@ interface BeforeBeginningProps extends ModuleCalibrationWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
-  mount: GantryMount
 }
 
 export const BeforeBeginning = (
@@ -38,9 +36,6 @@ export const BeforeBeginning = (
     isCreateLoading,
     attachedModule,
     maintenanceRunId,
-    chainRunCommands,
-    setErrorMessage,
-    mount,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -83,21 +78,6 @@ export const BeforeBeginning = (
     { loadName: adapterLoadname, displayName: t(adapterDisplaynameKey) },
   ]
 
-  const handleMoveGantryToFront = () => {
-    const moveToMaintanancePosition: MoveToMaintenancePositionCreateCommand = {
-      commandType: 'calibration/moveToMaintenancePosition',
-      params: {
-        mount: mount,
-        maintenancePosition: 'attachInstrument',
-      },
-    }
-    chainRunCommands?.([moveToMaintanancePosition], false)
-      .then(proceed)
-      .catch((e: Error) =>
-        setErrorMessage(`error moving to maintenance position: ${e.message}`)
-      )
-  }
-
   return (
     <GenericWizardTile
       header={t('calibration', { module: moduleDisplayName })}
@@ -112,9 +92,9 @@ export const BeforeBeginning = (
           components={{ block: <StyledText as="p" /> }}
         />
       }
-      proceedButtonText={t('move_gantry_to_front')}
+      proceedButtonText={t('start_setup')}
       proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
-      proceed={handleMoveGantryToFront}
+      proceed={proceed}
     />
   )
 }

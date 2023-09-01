@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { v4 as uuidv4 } from 'uuid'
 import HeaterShaker_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
 import HeaterShaker_PlaceAdapter_R from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
 import TempModule_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
@@ -13,7 +14,11 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  CreateCommand,
+  getCalibrationAdapterLoadName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -28,6 +33,7 @@ import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   slotName: string
+  setCreatedAdapterId: (adapterId: string) => void
 }
 
 export const BODY_STYLE = css`
@@ -40,13 +46,64 @@ export const BODY_STYLE = css`
 `
 
 export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
-  const { proceed, goBack, attachedModule, slotName } = props
+  const {
+    proceed,
+    goBack,
+    attachedModule,
+    slotName,
+    chainRunCommands,
+    setErrorMessage,
+    setCreatedAdapterId,
+    attachedPipette,
+  } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
+  const mount = attachedPipette.mount
   const handleOnClick = (): void => {
-    // TODO: send calibration/moveToMaintenance command here for the pipette
-    // that will be used in calibration
-    proceed()
+    const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
+      attachedModule.moduleModel
+    )
+    if (calibrationAdapterLoadName == null) {
+      console.error(
+        `could not get calibration adapter load name for ${attachedModule.moduleModel}`
+      )
+      return
+    }
+
+    const calibrationAdapterId = uuidv4()
+    const commands: CreateCommand[] = [
+      {
+        commandType: 'loadModule',
+        params: {
+          location: {
+            slotName: slotName,
+          },
+          model: attachedModule.moduleModel,
+          moduleId: attachedModule.id,
+        },
+      },
+      {
+        commandType: 'loadLabware',
+        params: {
+          labwareId: calibrationAdapterId,
+          location: { moduleId: attachedModule.id },
+          version: 1,
+          namespace: 'opentrons',
+          loadName: calibrationAdapterLoadName,
+        },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition',
+        params: {
+          mount: mount,
+          maintenancePosition: 'attachInstrument',
+        },
+      },
+    ]
+    chainRunCommands?.(commands, false)
+      .then(() => setCreatedAdapterId(calibrationAdapterId))
+      .then(() => proceed())
+      .catch((e: Error) => setErrorMessage(e.message))
   }
 
   const bodyText = (

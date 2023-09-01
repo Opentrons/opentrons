@@ -6,7 +6,8 @@ import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
-
+import { COLORS } from '@opentrons/components'
+import { CreateCommand, getModuleType } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -14,6 +15,7 @@ import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -21,10 +23,9 @@ import { AttachProbe } from './AttachProbe'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
+import { FirmwareUpdate } from './FirmwareUpdate'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import { CreateCommand, getModuleType } from '@opentrons/shared-data'
-import { FirmwareUpdate } from './FirmwareUpdate'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -63,6 +64,9 @@ export const ModuleWizardFlows = (
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
   >(null)
+  const [createdAdapterId, setCreatedAdapterId] = React.useState<string | null>(
+    null
+  )
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
   const [
@@ -190,10 +194,23 @@ export const ModuleWizardFlows = (
     isExiting,
   }
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (isExiting) {
+  if (errorMessage != null) {
+    modalContent = (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.errorEnabled}
+        header={t('error_during_calibration')}
+        subHeader={
+          <>
+            {t('module_calibration_failed')}
+            {errorMessage}
+          </>
+        }
+      />
+    )
+  } else if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />
-  }
-  if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
+  } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
       <BeforeBeginning
         {...currentStep}
@@ -214,9 +231,21 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
-    modalContent = <PlaceAdapter {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <PlaceAdapter
+        {...currentStep}
+        {...calibrateBaseProps}
+        setCreatedAdapterId={setCreatedAdapterId}
+      />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
-    modalContent = <AttachProbe {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <AttachProbe
+        {...currentStep}
+        {...calibrateBaseProps}
+        adapterId={createdAdapterId}
+      />
+    )
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     modalContent = (
       <Success

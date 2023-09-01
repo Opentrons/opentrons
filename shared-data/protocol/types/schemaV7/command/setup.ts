@@ -123,7 +123,7 @@ interface MoveLabwareResult {
   offsetId: string
 }
 interface LoadModuleParams {
-  moduleId: string
+  moduleId?: string
   location: ModuleLocation
   model: ModuleModel
 }
