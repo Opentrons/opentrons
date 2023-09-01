@@ -497,13 +497,14 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-fail", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
-    serial_logger = subprocess.Popen(
-        [
-            "python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log"
-        ],
-        shell=True,
-    )
-    sleep(1)
+    if not run_args.ctx.is_simulating():
+        serial_logger = subprocess.Popen(
+            [
+                "python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log"
+            ],
+            shell=True,
+        )
+        sleep(1)
     try:
         if not run_args.ctx.is_simulating():
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
@@ -519,6 +520,7 @@ if __name__ == "__main__":
             run_args.recorder.stop()
             run_args.recorder.deactivate()
         _change_pipettes(run_args.ctx, run_args.pipette)
-        serial_logger.terminate()
-        del run_args.ctx._core.get_hardware()._backend.eeprom_driver._gpio
+        if not run_args.ctx.is_simulating():
+            serial_logger.terminate()
+            del run_args.ctx._core.get_hardware()._backend.eeprom_driver._gpio
     print("done\n\n")

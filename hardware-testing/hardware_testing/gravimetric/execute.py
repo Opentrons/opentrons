@@ -770,8 +770,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     and acceptable_cv is not None
                     and acceptable_d is not None
                 ):
-                    acceptable_cv = abs(acceptable_cv /100)
-                    acceptable_d  = abs(acceptable_d / 100)
+                    acceptable_cv = abs(acceptable_cv / 100)
+                    acceptable_d = abs(acceptable_d / 100)
                     if (
                         dispense_cv > acceptable_cv
                         or aspirate_cv > acceptable_cv
