@@ -43,7 +43,7 @@ export const ModuleOverflowMenu = (
     isLoadedInRun,
   } = props
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunStill } = useRunStatuses()
@@ -51,8 +51,6 @@ export const ModuleOverflowMenu = (
   const isOT3 = useIsOT3(robotName)
   const isIncompatibleWithOT3 =
     isOT3 && module.moduleModel === 'thermocyclerModuleV1'
-
-  const enableModuleCalibration = useFeatureFlag('enableModuleCalibration')
 
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -78,9 +76,7 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        {enableModuleCalibration ? (
-          <MenuItem onClick={handleCalibrateClick}>{t('calibrate')}</MenuItem>
-        ) : null}
+        <MenuItem onClick={handleCalibrateClick}>{i18n.format(module.moduleOffset?.last_modified != null ? t('recalibrate') : t('calibrate'), 'capitalize')}</MenuItem>
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (

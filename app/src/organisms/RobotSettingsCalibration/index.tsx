@@ -102,7 +102,7 @@ export function RobotSettingsCalibration({
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-          Sessions.sharedCalCommands.JOG
+        Sessions.sharedCalCommands.JOG
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta
@@ -123,7 +123,6 @@ export function RobotSettingsCalibration({
   )
 
   // Modules Calibration
-  const enableModuleCalibration = useFeatureFlag('enableModuleCalibration')
   const attachedModules =
     useModulesQuery({
       refetchInterval: CALS_FETCH_MS,
@@ -327,15 +326,11 @@ export function RobotSettingsCalibration({
           />
           <Line />
           <RobotSettingsGripperCalibration gripper={attachedGripper} />
-          {enableModuleCalibration ? (
-            <>
-              <Line />
-              <RobotSettingsModuleCalibration
-                attachedModules={attachedModules}
-                updateRobotStatus={updateRobotStatus}
-              />
-            </>
-          ) : null}
+          <Line />
+          <RobotSettingsModuleCalibration
+            attachedModules={attachedModules}
+            updateRobotStatus={updateRobotStatus}
+          />
         </>
       ) : (
         <>

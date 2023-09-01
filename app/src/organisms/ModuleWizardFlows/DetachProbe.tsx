@@ -70,7 +70,7 @@ export const DetachProbe = (
       header={i18n.format(t('detach_probe'), 'capitalize')}
       rightHandBody={pipetteDetachProbeVid}
       bodyText={bodyText}
-      proceedButtonText={t('begin_calibration')}
+      proceedButtonText={t('complete_calibration')}
       proceed={proceed}
       back={goBack}
     />
