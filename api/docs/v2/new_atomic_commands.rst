@@ -335,7 +335,7 @@ If you specify a well, like ``plate['A1']``, the pipette will aspirate from a de
     pipette.well_bottom_clearance.aspirate = 2 # place tip 2 mm above well bottom
     pipette.aspirate(200, plate['A1'])
 
-You can also aspirate from a point along the center vertical axis within a well using the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods (see also, :ref:`position-relative-labware`). These methods move the pipette to a specified distance relative to the top or bottom center of a well. For example, you could change the default aspirate height as shown below.
+You can also aspirate from a location along the center vertical axis within a well using the :py:obj:`.Well.top` and :py:meth:`.Well.bottom` methods (see also, :ref:`position-relative-labware`). These methods move the pipette to a specified distance relative to the top or bottom center of a well. For example, you could change the default aspirate height as shown below.
 
 .. code-block:: python
 
@@ -478,15 +478,18 @@ The touch speed controls how fast the pipette moves in mm/s during a touch actio
 Mix
 ---
 
-The :py:meth:`~.InstrumentContext.mix` method performs a series of aspirate and dispense actions from a single well. It's designed to help mix well contents by using a single command rather than multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the mix repetitions, the amount of liquid (in µL) to mix, and the location of a well that contains the liquid you want to mix. The volume amount is optional. If omitted, the pipette will use its maximum rated volume as the amount. Here are some examples::  
+The :py:meth:`~.InstrumentContext.mix` method performs a series of aspirate and dispense actions from a single well. It's designed to help mix well contents by using a single command rather than making multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the mix repetitions, the amount of liquid (in µL) to mix, and the location of a well that contains the liquid you want to mix. The volume amount is optional. If omitted, the pipette will use its maximum rated volume as the amount. Let's look at a few examples. 
 
-    # mix 100 µL 3 times from the current location 
+This example aspirates 100 µL from the current well and mixes it three times::
+
     pipette.mix(repetitions=3, volume=100)
 
-    # mix 100 µL 3 times from well A1
-    pipette.mix(3, 100, plate['A1'])
+This example aspirates 100 µL from well B1 and mixes it three times:: 
 
-    # use the pipette's maximum volume 
+    pipette.mix(3, 100, plate['B1'])
+
+This example aspirates an amount equal to the pipette's maximum rated volume and mixes it three times::
+
     pipette.mix(repetitions=3)
 
 .. note::
@@ -500,17 +503,19 @@ The :py:meth:`~.InstrumentContext.mix` method performs a series of aspirate and 
 Air Gap
 -------
 
-The :py:meth:`~.InstrumentContext.air_gap` method tells the pipette to draw in air before and/or after aspiration. Creating an air gap helps keep liquid from seeping out of a pipette after drawing it from a well. Calling the this method without any arguments uses the remaining volume in the pipette tip for the air gap. For example, if you load a 1000 µL pipette on a Flex and tell the robot to aspirate 200 µL, it will use the remaining 800 µL for the air gap.
+The :py:meth:`~.InstrumentContext.air_gap` method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that let you control the amount of air to aspirate and the pipette's height (in mm) above the well. By default, the pipette moves 5 mm above a well before aspirating air. Calling this method without any arguments uses the remaining volume in the pipette tip for the air gap. Let's look at a few examples.
 
-.. code-block:: python
+This example aspirates 200 µL of air 5 mm above the current well::
 
-    pipette.aspirate(200, plate['A1']) # aspirate 200 µL from well A1
-    pipette.air_gap()                  # aspirate 800 µL of air
+    pipette.air_gap(volume=200)
 
-The ``air_gap()`` method also accepts ``volume`` and ``height`` arguments. These let you control the amount of air (in µL) drawn in and the pipette's height (in mm) above the well. By default, the pipette moves 5 mm above a well before creating the air gap. For example, this code tells the robot to draw 200 µL of liquid from well A1 and create an air gap of 75 µL at 20 mm above well A1::
-    
-    pipette.aspirate(200, plate['A1'])
-    pipette.air_gap(volume=75, height=20)
+This example aspirates 200 µL of air 20 mm above the the current well::
+
+    pipette.air_gap(volume=200, height=20)
+
+This example aspirates enough air to fill the remaining volume in a pipette after aspirating a liquid::
+
+    pipette.air_gap()
 
 .. versionadded:: 2.0
 
