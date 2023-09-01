@@ -621,7 +621,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
 
     const button = getByText('Run again')
-    getByText('Completed')
+    getByText('Failed')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
