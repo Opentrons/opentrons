@@ -56,9 +56,9 @@ stages:
           status: failed
           errors:
             - id: !anystr
-              errorType: PythonException
+              errorType: TipNotAttachedError
               createdAt: !anystr
-              detail: 'Pipette should have a tip attached, but does not.'
+              detail: Pipette should have a tip attached, but does not.
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'

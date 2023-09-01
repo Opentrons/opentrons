@@ -107,7 +107,7 @@ stages:
               mount: right
           - id: !anystr
             key: !anystr
-            commandType: dropTip
+            commandType: aspirate 
             createdAt: !anystr
             startedAt: !anystr
             completedAt: !anystr
@@ -116,7 +116,7 @@ stages:
               id: !anystr
               errorType: LegacyContextCommandError
               createdAt: !anystr
-              detail: 'Cannot perform DROPTIP without a tip attached'
+              detail: 'Cannot perform PREPARE_ASPIRATE without a tip attached'
               errorCode: '4000'
               errorInfo: !anydict
               wrappedErrors: !anylist
