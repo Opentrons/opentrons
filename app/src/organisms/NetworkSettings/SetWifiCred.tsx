@@ -21,6 +21,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
+import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: 2.125rem;
@@ -53,6 +54,7 @@ export function SetWifiCred({
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = React.useRef(null)
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   return (
     <>
@@ -60,7 +62,7 @@ export function SetWifiCred({
         width="100%"
         flexDirection={DIRECTION_COLUMN}
         padding={`0 6.25rem ${SPACING.spacing40}`}
-        marginTop="7.75rem"
+        marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
         <StyledText as="p" marginBottom={SPACING.spacing12}>
           {t('enter_password')}

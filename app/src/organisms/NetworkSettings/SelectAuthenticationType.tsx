@@ -18,6 +18,7 @@ import { StyledText } from '../../atoms/text'
 import { RadioButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
+import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
@@ -36,6 +37,7 @@ export function SelectAuthenticationType({
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const { wifi } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
@@ -81,7 +83,7 @@ export function SelectAuthenticationType({
         <Flex
           alignItems={ALIGN_CENTER}
           flexDirection={DIRECTION_COLUMN}
-          marginTop="7.75rem"
+          marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
         >
           <Flex
             flexDirection={DIRECTION_COLUMN}
