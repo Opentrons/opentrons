@@ -25,6 +25,7 @@ interface BeforeBeginningProps extends ModuleCalibrationWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
 }
 
 export const BeforeBeginning = (
@@ -36,10 +37,13 @@ export const BeforeBeginning = (
     isCreateLoading,
     attachedModule,
     maintenanceRunId,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
