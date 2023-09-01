@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   SPACING,
@@ -75,6 +76,7 @@ const UpdateAppBanner = styled(Banner)`
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: 1.5rem;
   border-radius: ${BORDERS.borderRadiusSize3};
+  background: ${COLORS.medGreyEnabled};
 `
 
 export interface UpdateAppModalProps {
@@ -152,6 +154,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           onClose={() => closeModal(true)}
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
+          maxHeight="80%"
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
