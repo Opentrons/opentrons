@@ -742,19 +742,18 @@ class OT3API(
         """Cancel execution manager and all running (hardware module) tasks."""
         await self._execution_manager.cancel()
 
-    async def halt(self) -> None:
+    async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately disengage all present motors and clear motor and module tasks."""
-        # TODO (spp, 2023-08-22): check if disengaging motors is really required
-        await self.disengage_axes(
-            [ax for ax in Axis if self._backend.axis_is_present(ax)]
-        )
+        if disengage_before_stopping:
+            await self.disengage_axes(
+                [ax for ax in Axis if self._backend.axis_is_present(ax)]
+            )
         await self._stop_motors()
-        await self._cancel_execution_and_running_tasks()
 
     async def stop(self, home_after: bool = True) -> None:
         """Stop motion as soon as possible, reset, and optionally home."""
         await self._stop_motors()
-
+        await self._cancel_execution_and_running_tasks()
         self._log.info("Resetting OT3API")
         await self.reset()
         if home_after:
