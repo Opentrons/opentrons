@@ -183,7 +183,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         mount: attachedPipette.mount,
       },
     }
-    chainRunCommands?.([calibrateModuleCommand], false)
+    Promise.resolve()
+      // chainRunCommands?.([calibrateModuleCommand], false)
       .then(() => proceed())
       .catch((e: Error) =>
         setErrorMessage(`error starting module calibration: ${e.message}`)
