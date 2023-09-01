@@ -224,6 +224,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         createMaintenanceRun={createMaintenanceRun}
         isCreateLoading={isCreateLoading}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {

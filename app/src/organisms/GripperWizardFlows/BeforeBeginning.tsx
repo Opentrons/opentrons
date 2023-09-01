@@ -70,10 +70,13 @@ export const BeforeBeginning = (
     errorMessage,
     maintenanceRunId,
     setErrorMessage,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
 
   const commandsOnProceed: CreateCommand[] = [
