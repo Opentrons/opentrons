@@ -159,17 +159,6 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock DeviceReset Section')
   })
 
-  it('should not render door safety switch toggle for OT-3', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
-    const [{ queryByText }] = render()
-    expect(queryByText('Pause protocol when robot door opens')).toBeNull()
-  })
-
-  it('should render door safety switch toggle for OT-2', () => {
-    const [{ getByText }] = render()
-    getByText('Pause protocol when robot door opens')
-  })
-
   it('should render LegacySettings section for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Mock LegacySettings Section')
@@ -220,6 +209,12 @@ describe('RobotSettings Advanced tab', () => {
   it('should render UsageSettings section', () => {
     const [{ getByText }] = render()
     getByText('Mock UsageSettings Section')
+  })
+
+  it('should not render UsageSettings for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock UsageSettings Section')).toBeNull()
   })
 
   it('should render UseOlderAspirateBehavior section for OT-2', () => {
