@@ -116,9 +116,9 @@ stages:
             status: failed
             error:
               id: !anystr
-              errorType: PythonException
+              errorType: TipNotAttachedError
               createdAt: !anystr
-              detail: 'opentrons.hardware_control.errors.NoTipAttachedError: Cannot perform DROPTIP without a tip attached'
+              detail: Pipette should have a tip attached, but does not.
               errorCode: '4000'
               errorInfo: !anydict
               wrappedErrors: !anylist
@@ -132,7 +132,8 @@ stages:
                   x: 0
                   y: 0
                   z: 0
-              alternateDropLocation: false
+              flowRate: 3.78
+              volume: 100
           - id: !anystr
             key: !anystr
             commandType: pickUpTip

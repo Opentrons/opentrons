@@ -130,4 +130,5 @@ stages:
                   x: 0
                   y: 0
                   z: 0
-              alternateDropLocation: false
+              flowRate: 150
+              volume: 100
