@@ -112,6 +112,7 @@ export function UpdateRobotModal({
       onClose={closeModal}
       closeOnOutsideClick={true}
       footer={robotUpdateFooter}
+      maxHeight="80%"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>

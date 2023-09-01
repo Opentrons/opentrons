@@ -159,6 +159,7 @@ export function RobotUpdateProgressModal({
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
     border-radius: ${BORDERS.borderRadiusSize3};
+    background: ${COLORS.medGreyEnabled};
   `
   const dontTurnOffMessage = css`
     color: ${COLORS.darkGreyEnabled};
