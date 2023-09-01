@@ -279,6 +279,7 @@ export const GripperWizard = (
         {...currentStep}
         {...sharedProps}
         createMaintenanceRun={createMaintenanceRun}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {
