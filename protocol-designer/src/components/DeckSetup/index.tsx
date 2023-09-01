@@ -526,6 +526,7 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const [offDeckSlideout, showOffDeckSlideout] = React.useState<boolean>(false)
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 

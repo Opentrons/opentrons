@@ -17,4 +17,5 @@
   align-items: stretch;
   max-height: calc(100vh - 3rem);
   overflow-y: hidden;
+  position: relative;
 }

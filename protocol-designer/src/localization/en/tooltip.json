@@ -3,6 +3,7 @@
   "advanced_settings": "Advanced Settings",
 
   "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
+  "disabled_off_deck": "Off deck labware cannot be added once steps have been created",
 
   "step_description": {
     "mix": "Mix contents of wells/tubes.",

@@ -12,6 +12,7 @@ import { DraggableStepItems } from './DraggableStepItems'
 import { MultiSelectToolbar } from './MultiSelectToolbar'
 
 import { StepIdType } from '../../form-types'
+import { OffDeckLabwareButton } from '../OffDeckLabwareButton'
 
 export interface StepListProps {
   isMultiSelectMode?: boolean | null
@@ -59,6 +60,9 @@ export class StepList extends React.Component<StepListProps> {
           reorderSteps={this.props.reorderSteps}
         />
         <PresavedStepItem />
+        <OffDeckLabwareButton
+          hasOrderedStepIds={this.props.orderedStepIds.length > 0}
+        />
         <StepCreationButton />
         <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
       </SidePanel>
