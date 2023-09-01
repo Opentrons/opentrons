@@ -413,6 +413,46 @@ async def test_aspirate_ot3_1000(dummy_instruments_ot3, ot3_api_obj):
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
+async def test_configure_ot3(ot3_api_obj):
+    instrs = {
+        types.Mount.LEFT: {
+            "model": "p50_multi_v3.3",
+            "id": "testy",
+            "name": "p50_multi_gen3",
+        },
+        types.Mount.RIGHT: {"model": None, "id": None, "name": None},
+        OT3Mount.GRIPPER: None,
+    }
+    hw_api = await ot3_api_obj(attached_instruments=instrs)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, 50)
+    # hysteresis: don't switch until below 25
+    await hw_api.configure_for_volume(mount, 26)
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(71.5)
+
+    await hw_api.configure_for_volume(mount, 1)
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(57.0)
+
+    # hysteresis: don't switch back until over 37.5
+    await hw_api.configure_for_volume(mount, 25)
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(57)
+
+    await hw_api.configure_for_volume(mount, 37.8)
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(71.5)
+
+
 async def test_dispense_ot2(dummy_instruments):
     hw_api = await API.build_hardware_simulator(
         attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()

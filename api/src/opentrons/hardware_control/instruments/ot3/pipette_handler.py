@@ -902,3 +902,11 @@ class OT3PipetteHandler:
                 f"No pipette attached to {mount.name} mount"
             )
         return pip
+
+    async def configure_for_volume(self, mount: OT3Mount, volume: float) -> None:
+        pip = self.get_pipette(mount)
+        if pip.current_volume > 0:
+            # Switching liquid classes can't happen when there's already liquid
+            return
+        new_class = pip.get_liquid_class_for_volume(volume + pip.current_volume)
+        pip.set_liquid_class_by_name(new_class)

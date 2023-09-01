@@ -599,8 +599,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def set_liquid_class_by_name(self, class_name: str) -> None:
         """Change the currently active liquid class."""
+        if self.current_volume > 0:
+            raise CommandPreconditionViolated(
+                "Cannot switch liquid classes when liquid is in the tip"
+            )
         try:
             new_name = pip_types.LiquidClasses[class_name]
+            if new_name == self._liquid_class_name:
+                return
             new_class = self._config.liquid_properties[self._liquid_class_name]
         except KeyError:
             raise InvalidLiquidClassName(
@@ -630,12 +636,15 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._active_tip_settings = self._liquid_class.supported_tips[
             self._active_tip_setting_name
         ]
+        self.ready_to_aspirate = False
 
     def set_tip_type_by_volume(self, tip_volume: float) -> None:
         """Change the currently active tip type."""
         intified = float(int(tip_volume))
         try:
             new_name = pip_types.PipetteTipType(int(intified))
+            if new_name == self._active_tip_setting_name:
+                return
             new_tips = self._liquid_class.supported_tips[new_name]
         except (ValueError, KeyError) as e:
             raise InvalidLiquidClassName(
@@ -654,6 +663,30 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._working_volume = intified
+
+    def get_liquid_class_for_volume(self, volume: float) -> str:
+        """Get the liquid class required for the specified volume.
+
+        Some pipettes have different liquid classes for different volumes. If applicable,
+        and if the volume is in the different range, this will return that liquid class.
+        Otherwise, it will return the current liquid class.
+
+        This function takes into account the current liquid class to provide hysteresis.
+        """
+        # For now, until we add more liquid classes, we're going to hardcode the default
+        # and lowVolumeDefault liquid classes as the ones to switch between.
+        has_lvd = (
+            pip_types.LiquidClasses.lowVolumeDefault in self._config.liquid_properties
+        )
+        if not has_lvd:
+            return self._liquid_class_name.name
+        if self._liquid_class_name == pip_types.LiquidClasses.lowVolumeDefault:
+            if volume > (self.liquid_class.max_volume * 0.75):
+                return pip_types.LiquidClasses.default.name
+        if self._liquid_class_name == pip_types.LiquidClasses.default:
+            if volume < (self.liquid_class.max_volume * 0.5):
+                return pip_types.LiquidClasses.lowVolumeDefault.name
+        return self._liquid_class_name.name
 
 
 def _reload_and_check_skip(

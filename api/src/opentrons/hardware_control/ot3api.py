@@ -1575,6 +1575,12 @@ class OT3API(
             acquire_lock=acquire_lock,
         )
 
+    async def configure_for_volume(
+        self, mount: Union[top_types.Mount, OT3Mount], volume: float
+    ) -> None:
+        checked_mount = OT3Mount.from_mount(mount)
+        await self._pipette_handler.configure_for_volume(checked_mount, volume)
+
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0
