@@ -211,6 +211,12 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock UsageSettings Section')
   })
 
+  it('should not render UsageSettings for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock UsageSettings Section')).toBeNull()
+  })
+
   it('should render UseOlderAspirateBehavior section for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Mock UseOlderAspirateBehavior Section')
