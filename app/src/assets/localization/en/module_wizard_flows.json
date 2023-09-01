@@ -12,6 +12,8 @@
   "checking_firmware": "Checking {{module}} firmware",
   "confirm_location": "Confirm location",
   "confirm_placement": "Confirm placement",
+  "detach_probe": "Remove pipette probe",
+  "detach_probe_description": "Unlock the pipette calibration probe, remove it from the nozzle, and return it to its storage location.",
   "error_during_calibration": "Error during calibration",
   "exit": "Exit",
   "firmware_updated": "{{module}} firmware updated!",

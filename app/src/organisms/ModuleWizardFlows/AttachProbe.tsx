@@ -20,7 +20,6 @@ import {
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
-import type { CalibrateModuleCreateCommand } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
   isExiting: boolean

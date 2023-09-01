@@ -26,6 +26,7 @@ import { Success } from './Success'
 import { FirmwareUpdate } from './FirmwareUpdate'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import { DetachProbe } from './DetachProbe'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -246,6 +247,8 @@ export const ModuleWizardFlows = (
         adapterId={createdAdapterId}
       />
     )
+  } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
+    modalContent = <DetachProbe {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     modalContent = (
       <Success
