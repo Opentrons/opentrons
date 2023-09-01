@@ -78,7 +78,11 @@ export function SelectAuthenticationType({
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       >
-        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          flexDirection={DIRECTION_COLUMN}
+          marginTop="7.75rem"
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
