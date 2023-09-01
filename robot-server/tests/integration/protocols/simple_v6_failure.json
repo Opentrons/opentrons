@@ -98,7 +98,14 @@
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
         "wellName": "A1",
-        "volume": 100
+        "volume": 100,
+        "wellLocation": {
+            "origin": "bottom",
+            "offset": {
+                "z": 1
+            }
+        },
+        "flowRate": 3.78
       }
     },
     {
