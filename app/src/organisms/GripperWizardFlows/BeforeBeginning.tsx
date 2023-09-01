@@ -55,6 +55,7 @@ interface BeforeBeginningProps extends GripperWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
 }
 
 export const BeforeBeginning = (
