@@ -186,9 +186,9 @@ def build_photometric_trials(
             d: Optional[float] = None
             cv: Optional[float] = None
             if not cfg.increment:
-                d, cv = config.QC_TEST_MIN_REQUIREMENTS[96][cfg.pipette_volume][
-                    cfg.tip_volume
-                ][volume]
+                d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
+                    cfg.pipette_volume
+                ][cfg.tip_volume][volume]
                 d = d * (1 - config.QC_TEST_SAFETY_FACTOR)
                 cv = cv * (1 - config.QC_TEST_SAFETY_FACTOR)
             trial_list[volume].append(

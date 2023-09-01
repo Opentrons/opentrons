@@ -21,6 +21,7 @@ from hardware_testing.protocols import (
     gravimetric_ot3_p1000_96,
     photometric_ot3_p1000_96_50ul_tip,
     photometric_ot3_p1000_96_200ul_tip,
+    photometric_ot3_p50_single,
     gravimetric_ot3_p50_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_200ul_tip_increment,
@@ -86,8 +87,13 @@ GRAVIMETRIC_CFG_INCREMENT = {
 }
 
 PHOTOMETRIC_CFG = {
-    50: photometric_ot3_p1000_96_50ul_tip,
-    200: photometric_ot3_p1000_96_200ul_tip,
+    1: {
+        50: photometric_ot3_p50_single,
+    },
+    96: {
+        50: photometric_ot3_p1000_96_50ul_tip,
+        200: photometric_ot3_p1000_96_200ul_tip,
+    },
 }
 
 
@@ -246,7 +252,7 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            protocol_cfg = PHOTOMETRIC_CFG[args.tip]
+            protocol_cfg = PHOTOMETRIC_CFG[args.channels][args.tip]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,
@@ -368,6 +374,8 @@ def build_photometric_cfg(
     jog: bool,
     same_tip: bool,
     ignore_fail: bool,
+    pipette_channels: int,
+    column_offset: int,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
@@ -375,7 +383,7 @@ def build_photometric_cfg(
         name=run_args.name,
         pipette_mount="left",
         pipette_volume=run_args.pipette_volume,
-        pipette_channels=96,
+        pipette_channels=pipette_channels,
         increment=False,
         tip_volume=tip_volume,
         trials=run_args.trials,
@@ -395,6 +403,7 @@ def build_photometric_cfg(
         jog=jog,
         same_tip=same_tip,
         ignore_fail=ignore_fail,
+        column_offset=column_offset,
     )
 
 
@@ -418,6 +427,8 @@ def _main(
             args.jog,
             args.same_tip,
             args.ignore_fail,
+            args.channels,
+            args.photo_col_offset,
             run_args,
         )
         union_cfg = cfg_pm
@@ -495,6 +506,7 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
+    parser.add_argument("--photo-col-offset", type=int, default=1)
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():

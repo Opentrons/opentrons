@@ -59,6 +59,7 @@ class PhotometricConfig(VolumetricConfig):
     reservoir_slot: int
     touch_tip: bool
     refill: bool
+    column_offset: int
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
@@ -260,6 +261,11 @@ QC_VOLUMES_EXTRA_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
 }
 
 QC_VOLUMES_P: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
+    1: {
+        50: [  # P50
+            (50, [1.0]),
+        ],
+    },
     96: {
         1000: [  # P1000
             (50, [5.0]),  # T50
@@ -276,6 +282,7 @@ QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
         96: 9,
     },
     ConfigType.photometric: {
+        1: 8,
         96: 5,
     },
 }
