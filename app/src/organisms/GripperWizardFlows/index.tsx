@@ -215,7 +215,7 @@ export const GripperWizard = (
   const currentStep = gripperWizardSteps?.[currentStepIndex]
   const isFinalStep = currentStepIndex === gripperWizardSteps.length - 1
   const goBack = (): void => {
-    setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
+    setCurrentStepIndex(currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1)
   }
 
   const handleProceed = (): void => {

@@ -70,10 +70,10 @@ export const PipetteWizardFlows = (
       memoizedPipetteInfo == null
         ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
-            attachedPipettes,
-            memoizedPipetteInfo,
-            mount
-          ),
+          attachedPipettes,
+          memoizedPipetteInfo,
+          mount
+        ),
     []
   )
   const requiredPipette = memoizedPipetteInfo?.find(
@@ -110,7 +110,7 @@ export const PipetteWizardFlows = (
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
+      currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1
     )
   }
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
@@ -409,8 +409,8 @@ export const PipetteWizardFlows = (
             //  changing modal height for now on BeforeBeginning 96 channel attach flow
             //  until we do design qa to normalize the modal sizes
             currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-            selectedPipette === NINETY_SIX_CHANNEL &&
-            flowType === FLOWS.ATTACH
+              selectedPipette === NINETY_SIX_CHANNEL &&
+              flowType === FLOWS.ATTACH
               ? '70%'
               : 'auto'
           }

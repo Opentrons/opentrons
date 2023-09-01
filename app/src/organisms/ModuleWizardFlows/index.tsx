@@ -7,7 +7,7 @@ import {
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
-import { CreateCommand, getModuleType } from '@opentrons/shared-data'
+import { CreateCommand, LEFT, getModuleType } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -27,6 +27,7 @@ import { FirmwareUpdate } from './FirmwareUpdate'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import { DetachProbe } from './DetachProbe'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -59,7 +60,7 @@ export const ModuleWizardFlows = (
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
+      currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1
     )
   }
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
@@ -221,7 +222,13 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = <FirmwareUpdate {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <FirmwareUpdateModal
+        proceed={proceed}
+        subsystem={attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        description={t('firmware_update')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
       <SelectLocation
@@ -255,7 +262,7 @@ export const ModuleWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isRobotMoving={isRobotMoving}
-        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
+        proceed={isRobotMoving ? () => { } : handleCleanUpAndClose}
       />
     )
   }
