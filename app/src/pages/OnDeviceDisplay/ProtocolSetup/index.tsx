@@ -449,14 +449,11 @@ function PrepareToRun({
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
       : t('multiple_modules_missing')
 
-  const modulesDetail = (): string => {
-    if (isMissingModules) {
-      return missingModulesText
-    } else if (requiredCalibration) {
-      return t('calibration_required')
-    } else {
-      return connectedModulesText
-    }
+  let modulesDetail = connectedModulesText
+  if (isMissingModules) {
+    modulesDetail = missingModulesText
+  } else if (requiredCalibration) {
+    modulesDetail = t('calibration_required')
   }
 
   // Labware information
