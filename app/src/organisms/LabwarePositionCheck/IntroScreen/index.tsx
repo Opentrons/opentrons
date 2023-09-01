@@ -38,7 +38,7 @@ import { getLabwareDefinitionsFromCommands } from '../utils/labware'
 
 export const INTERVAL_MS = 3000
 
-// TODO(BC, 09/01/23): replace updated support article link for LPC on OT-2/Flex 
+// TODO(BC, 09/01/23): replace updated support article link for LPC on OT-2/Flex
 const SUPPORT_PAGE_URL = 'https://support.opentrons.com/s/ot2-calibration'
 
 export const IntroScreen = (props: {
