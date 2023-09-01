@@ -1,4 +1,5 @@
 import * as React from 'react'
+import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
@@ -22,10 +23,9 @@ import {
 import {
   useCreateRunMutation,
   useHost,
-  useProtocolAnalysesQuery,
+  useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
@@ -308,20 +308,21 @@ export function ProtocolDetails(): JSX.Element | null {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
-  const mostRecentAnalysis =
-    (protocolAnalyses?.data ?? [])
-      .reverse()
-      .find(
-        (analysis): analysis is CompletedProtocolAnalysis =>
-          analysis.status === 'completed'
-      ) ?? null
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
+
   const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
   // I'd love to skip scraping altogether if we aren't applying
   // conditional offsets, but React won't let us use hooks conditionally.
   // So, we'll scrape regardless and just toss them if we don't need them.
   const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis
+    mostRecentAnalysis ?? null
   ).map(({ vector, location, definitionUri }) => ({
     vector,
     location,

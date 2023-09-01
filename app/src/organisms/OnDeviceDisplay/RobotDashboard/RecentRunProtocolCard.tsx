@@ -23,7 +23,6 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingHardwareText } from './hooks'
 import {
   RUN_STATUS_FAILED,
@@ -74,7 +73,8 @@ export function ProtocolWithLastRun({
   const isReadyToBeReRun = missingProtocolHardware.length === 0
   const chipText = useMissingHardwareText(missingProtocolHardware)
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
+  // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
+  // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(`runs/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
@@ -121,7 +121,8 @@ export function ProtocolWithLastRun({
       name: 'proceedToRun',
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
-    trackProtocolRunEvent({ name: 'runAgain' })
+    // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
+    // trackProtocolRunEvent({ name: 'runAgain' })
   }
 
   const terminationTypeMap: { [runStatus in RunStatus]?: string } = {
