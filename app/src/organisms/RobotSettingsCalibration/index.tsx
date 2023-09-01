@@ -27,7 +27,6 @@ import { CONNECTABLE } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
 import * as Sessions from '../../redux/sessions'
-import { useFeatureFlag } from '../../redux/config'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { CalibrationHealthCheck } from './CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
@@ -102,7 +101,7 @@ export function RobotSettingsCalibration({
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-        Sessions.sharedCalCommands.JOG
+          Sessions.sharedCalCommands.JOG
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta

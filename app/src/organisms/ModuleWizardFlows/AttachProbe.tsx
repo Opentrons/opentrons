@@ -7,7 +7,10 @@ import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
-import { LEFT, THERMOCYCLER_MODULE_MODELS } from '@opentrons/shared-data/js/constants'
+import {
+  LEFT,
+  THERMOCYCLER_MODULE_MODELS,
+} from '@opentrons/shared-data/js/constants'
 import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
@@ -141,8 +144,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           isExiting
             ? t('stand_back')
             : t('module_calibrating', {
-              moduleName: moduleDisplayName,
-            })
+                moduleName: moduleDisplayName,
+              })
         }
       >
         {isExiting ? undefined : (
@@ -174,28 +177,31 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       setErrorMessage('calibration adapter has not been loaded yet')
       return
     }
-    chainRunCommands?.([
-      {
-        commandType: 'home' as const,
-        params: {
-          axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ']
+    chainRunCommands?.(
+      [
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
+          },
         },
-      },
-      {
-        commandType: 'calibration/calibrateModule',
-        params: {
-          moduleId: attachedModule.id,
-          labwareId: adapterId,
-          mount: attachedPipette.mount,
+        {
+          commandType: 'calibration/calibrateModule',
+          params: {
+            moduleId: attachedModule.id,
+            labwareId: adapterId,
+            mount: attachedPipette.mount,
+          },
         },
-      },
-      {
-        commandType: 'calibration/moveToMaintenancePosition' as const,
-        params: {
-          mount: attachedPipette.mount,
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: attachedPipette.mount,
+          },
         },
-      },
-    ], false)
+      ],
+      false
+    )
       .then(() => proceed())
       .catch((e: Error) =>
         setErrorMessage(`error starting module calibration: ${e.message}`)

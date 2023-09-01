@@ -23,7 +23,6 @@ import { AttachProbe } from './AttachProbe'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
-import { FirmwareUpdate } from './FirmwareUpdate'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import { DetachProbe } from './DetachProbe'
@@ -225,7 +224,9 @@ export const ModuleWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        subsystem={
+          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
+        }
         description={t('firmware_update')}
       />
     )
@@ -262,7 +263,7 @@ export const ModuleWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isRobotMoving={isRobotMoving}
-        proceed={isRobotMoving ? () => { } : handleCleanUpAndClose}
+        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
       />
     )
   }

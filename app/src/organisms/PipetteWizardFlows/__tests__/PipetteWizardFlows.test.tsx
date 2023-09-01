@@ -251,7 +251,7 @@ describe('PipetteWizardFlows', () => {
       'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
     )
   })
-  it('renders 3rd page and clicking back button redirects to the first page', async () => {
+  it('renders 3rd page and clicking back button redirects to the second page', async () => {
     const { getByText, getByRole } = render(props)
     //  first page
     getByText('Before you begin')
@@ -269,8 +269,8 @@ describe('PipetteWizardFlows', () => {
     //  third page
     getByText('Remove calibration probe')
     getByRole('button', { name: 'back' }).click()
-    //   first page
-    getByText('Before you begin')
+    //   second page
+    getByText('Attach calibration probe')
   })
 
   it('renders the correct information, calling the correct commands for the detach flow', () => {

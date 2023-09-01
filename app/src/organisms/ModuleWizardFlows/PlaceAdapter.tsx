@@ -56,7 +56,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     setErrorMessage,
     setCreatedAdapterId,
     attachedPipette,
-    isRobotMoving
+    isRobotMoving,
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)

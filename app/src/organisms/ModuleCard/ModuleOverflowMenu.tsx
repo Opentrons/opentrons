@@ -5,7 +5,6 @@ import { Flex, POSITION_RELATIVE } from '@opentrons/components'
 
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useFeatureFlag } from '../../redux/config'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import {
   useIsOT3,
@@ -76,7 +75,14 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        <MenuItem onClick={handleCalibrateClick}>{i18n.format(module.moduleOffset?.last_modified != null ? t('recalibrate') : t('calibrate'), 'capitalize')}</MenuItem>
+        <MenuItem onClick={handleCalibrateClick}>
+          {i18n.format(
+            module.moduleOffset?.last_modified != null
+              ? t('recalibrate')
+              : t('calibrate'),
+            'capitalize'
+          )}
+        </MenuItem>
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
