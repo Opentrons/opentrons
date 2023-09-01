@@ -288,7 +288,7 @@
   "use_older_protocol_analysis_method": "Use older protocol analysis method",
   "validating_software": "Validating software...",
   "view_details": "View details",
-  "view_latest_release_notes_at": "View latest release notes at ",
+  "view_latest_release_notes_at": "View latest release notes at {{url}}",
   "view_network_details": "View network details",
   "view_opentrons_issue_tracker": "View Opentrons issue tracker",
   "view_opentrons_release_notes": "View full Opentrons release notes",
