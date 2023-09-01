@@ -77,7 +77,9 @@ export function RobotSystemVersion({
           marginTop="7.75rem"
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <StyledText as="p">{t('view_latest_release_notes_at', {url: GITHUB_URL})}</StyledText>
+            <StyledText as="p">
+              {t('view_latest_release_notes_at', { url: GITHUB_URL })}
+            </StyledText>
             <Flex
               backgroundColor={COLORS.light1}
               flexDirection={DIRECTION_ROW}
