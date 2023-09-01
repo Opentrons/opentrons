@@ -859,7 +859,6 @@ class PipetteHandlerProvider(Generic[MountType]):
         home_after,
     ):
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
 
         bottom = instrument.plunger_positions.bottom
         droptip = instrument.plunger_positions.drop_tip
