@@ -341,7 +341,7 @@ You can also aspirate from a location along the center vertical axis within a we
 
 See also:
 
-- :ref:`new-default-op-positions` for information about controlling pipette height for a particular well.
+- :ref:`new-default-op-positions` for information about controlling pipette height for a particular pipette.
 - :ref:`position-relative-labware` for formation about controlling pipette height from within a well.
 - :ref:`move-to` for information about moving a pipette to any reachable deck location.
 
@@ -394,7 +394,7 @@ You can also dispense from a location along the center vertical axis within a we
 
 See also:
 
-- :ref:`new-default-op-positions` for information about controlling pipette height for a particular well.
+- :ref:`new-default-op-positions` for information about controlling pipette height for a particular pipette.
 - :ref:`position-relative-labware` for formation about controlling pipette height from within a well.
 - :ref:`move-to` for information about moving a pipette to any reachable deck location.
 
