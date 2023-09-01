@@ -801,7 +801,6 @@ class PipetteHandlerProvider:
         home_after: bool,
     ) -> Tuple[DropTipSpec, Callable[[], None]]:
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
 
         is_96_chan = instrument.channels == 96
 

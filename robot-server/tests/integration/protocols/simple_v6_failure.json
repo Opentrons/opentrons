@@ -93,11 +93,12 @@
       }
     },
     {
-      "commandType": "dropTip",
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
-        "wellName": "A1"
+        "wellName": "A1",
+        "volume": 100
       }
     },
     {
