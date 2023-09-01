@@ -446,7 +446,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def minimum_volume(self) -> float:
-        """The smallest controllable volume the pipette can handle."""
+        """The smallest controllable volume the pipette can handle in this liquid class."""
         return self.liquid_class.min_volume
 
     @property

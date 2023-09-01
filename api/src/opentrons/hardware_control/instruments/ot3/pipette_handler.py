@@ -134,6 +134,7 @@ class OT3PipetteHandler:
         :param mount: If specified, reset that mount. If not specified,
                       reset both
         """
+
         # need to have a reset function on the pipette
         def _reset(m: OT3Mount) -> None:
             self._ihp_log.info(f"Resetting configuration for {m}")
@@ -583,19 +584,20 @@ class OT3PipetteHandler:
         if disp_vol == 0:
             return None
 
-        if not is_full_dispense and push_out:
-            raise CommandPreconditionViolated(
-                message="Cannot push_out on a dispense that does not leave the pipette empty",
-                detail={
-                    "command": "dispense",
-                    "remaining-volume": instrument.current_volume - disp_vol,
-                },
-            )
-        if push_out is None and not is_full_dispense:
-            push_out_ul = instrument.push_out_volume
-        elif push_out and not is_full_dispense:
-            push_out_ul = push_out
+        if is_full_dispense:
+            if push_out is None:
+                push_out_ul = instrument.push_out_volume
+            else:
+                push_out_ul = push_out
         else:
+            if push_out is not None and push_out != 0:
+                raise CommandPreconditionViolated(
+                    message="Cannot push_out on a dispense that does not leave the pipette empty",
+                    detail={
+                        "command": "dispense",
+                        "remaining-volume": instrument.current_volume - disp_vol,
+                    },
+                )
             push_out_ul = 0
 
         push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
@@ -679,7 +681,6 @@ class OT3PipetteHandler:
         presses: Optional[int],
         increment: Optional[float],
     ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
-
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
