@@ -152,7 +152,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
       >
         <Flex
           paddingY={SPACING.spacing16}
-          width="19.5rem"
+          width="17.6rem"
           height="100%"
           flex="0 1 auto"
           flexDirection={DIRECTION_COLUMN}

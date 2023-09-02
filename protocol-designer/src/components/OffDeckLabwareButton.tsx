@@ -1,32 +1,37 @@
 import * as React from 'react'
-import { DeprecatedPrimaryButton } from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import {
+  DeprecatedPrimaryButton,
+  Flex,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
+} from '@opentrons/components'
+import { getSelectedTerminalItemId } from '../ui/steps'
+import { i18n } from '../localization'
 import { OffDeckLabwareSlideout } from './OffDeckLabwareSlideout'
-import styles from './listButtons.css'
 
-interface OffDeckLabwareButtonProps {
-  hasOrderedStepIds: boolean
-}
+export const OffDeckLabwareButton = (): JSX.Element => {
+  const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
 
-export const OffDeckLabwareButton = (
-  props: OffDeckLabwareButtonProps
-): JSX.Element => {
-  const { hasOrderedStepIds } = props
   const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
 
   return (
-    <>
-      <div className={styles.list_item_button}>
+    <Flex position={POSITION_ABSOLUTE} right={SPACING.spacing16} zIndex={2}>
+      <Flex position={POSITION_RELATIVE} padding={SPACING.spacing16}>
         <DeprecatedPrimaryButton onClick={() => setShowSlideout(true)}>
-          {'edit off deck labware'}
+          {i18n.t('button.edit_off_deck')}
         </DeprecatedPrimaryButton>
-      </div>
+      </Flex>
       {showSlideout ? (
         <OffDeckLabwareSlideout
           isExpanded={showSlideout}
           onCloseClick={() => setShowSlideout(false)}
-          hasOrderedStepIds={hasOrderedStepIds}
+          initialSetupTerminalItemId={
+            selectedTerminalItemId === '__initial_setup__'
+          }
         />
       ) : null}
-    </>
+    </Flex>
   )
 }

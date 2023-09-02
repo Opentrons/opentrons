@@ -3,14 +3,16 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
+import type { LabwareEntity } from '@opentrons/step-generation'
+import type { ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '../../../step-forms'
+
 interface OP {
-  labwareOnDeck: LabwareOnDeck
+  labwareOnDeck: LabwareOnDeck | LabwareEntity
 }
 
 interface DP {

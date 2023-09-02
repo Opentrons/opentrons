@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 import {
   Tooltip,
   DeprecatedPrimaryButton,
   useHoverTooltip,
-  TOOLTIP_TOP,
-  TOOLTIP_FIXED,
   Flex,
   COLORS,
   Icon,
@@ -17,17 +16,27 @@ import {
   RobotWorkSpace,
   LabwareNameOverlay,
   RobotCoordsForeignDiv,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  TYPOGRAPHY,
+  truncateString,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { openAddLabwareModal } from '../labware-ingred/actions'
 import { getLabwareEntities } from '../step-forms/selectors'
+import { selectors } from '../labware-ingred/selectors'
+import { getAllWellContentsForActiveItem } from '../top-selectors/well-contents'
 import { getRobotStateAtActiveItem } from '../top-selectors/labware-locations'
+import { getLabwareNicknamesById } from '../ui/labware/selectors'
 import { EditLabwareOffDeck } from './DeckSetup/LabwareOverlays/EditLabwareOffDeck'
+import { BrowseLabware } from './DeckSetup/LabwareOverlays/BrowseLabware'
 import { Slideout } from './Slideout'
+import { wellFillFromWellContents } from './labware'
 
 interface OffDeckLabwareSlideoutProps {
-  hasOrderedStepIds: boolean
+  initialSetupTerminalItemId: boolean
   isExpanded: boolean
   onCloseClick: () => void
 }
@@ -35,13 +44,17 @@ interface OffDeckLabwareSlideoutProps {
 export const OffDeckLabwareSlideout = (
   props: OffDeckLabwareSlideoutProps
 ): JSX.Element => {
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_TOP,
-    strategy: TOOLTIP_FIXED,
-  })
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch()
+  const disabled = props.initialSetupTerminalItemId === false
   const robotState = useSelector(getRobotStateAtActiveItem)
   const labwareEntities = useSelector(getLabwareEntities)
+  const allWellContentsForActiveItem = useSelector(
+    getAllWellContentsForActiveItem
+  )
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
+  const labwareNickNames = useSelector(getLabwareNicknamesById)
+
   const offDeckEntries =
     robotState?.labware != null
       ? Object.entries(robotState?.labware).filter(
@@ -56,37 +69,36 @@ export const OffDeckLabwareSlideout = (
   return (
     <Slideout
       onCloseClick={props.onCloseClick}
-      title={'Off deck labware'}
+      title={i18n.t('deck.off_deck.slideout_title')}
       isExpanded={props.isExpanded}
       footer={
-        <>
+        <div {...targetProps}>
           <DeprecatedPrimaryButton
             onClick={() => dispatch(openAddLabwareModal({ slot: 'offDeck' }))}
-            marginTop="1rem"
-            marginRight="1rem"
-            disabled={props.hasOrderedStepIds}
-            {...targetProps}
+            marginTop={SPACING.spacing16}
+            marginRight={SPACING.spacing16}
+            disabled={disabled}
           >
             {i18n.t('button.add_off_deck')}
           </DeprecatedPrimaryButton>
-          {props.hasOrderedStepIds ? (
+          {disabled ? (
             <Tooltip {...tooltipProps}>
               {i18n.t(`tooltip.disabled_off_deck`)}
             </Tooltip>
           ) : null}
-        </>
+        </div>
       }
     >
       {offDeck == null ? (
         <Flex
           borderRadius={BORDERS.borderRadiusSize3}
-          alignItems="center"
+          alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.light1}
           flexDirection={DIRECTION_COLUMN}
-          padding="1rem"
-          textAlign="center"
+          padding={SPACING.spacing16}
+          textAlign={TYPOGRAPHY.textAlignCenter}
           height="100%"
-          justifyContent="center"
+          justifyContent={JUSTIFY_CENTER}
         >
           <Icon
             name="ot-alert"
@@ -94,28 +106,39 @@ export const OffDeckLabwareSlideout = (
             color={COLORS.darkBlack90}
             marginBottom={SPACING.spacing32}
           />
-          <Text>There is current no off deck labware in this protocol</Text>
+          <Text>{i18n.t('deck.off_deck.slideout_empty_state')}</Text>
         </Flex>
       ) : (
         Object.keys(offDeck).map(labwareId => {
+          const labwareNickName = labwareNickNames[labwareId]
+          const truncatedNickName =
+            labwareNickName != null
+              ? truncateString(labwareNickName, 75, 25)
+              : null
+          const wellContents =
+            allWellContentsForActiveItem != null
+              ? allWellContentsForActiveItem[labwareId]
+              : null
           const definition =
             labwareEntities[labwareId] != null
               ? labwareEntities[labwareId].def
               : null
-
           return definition != null ? (
             <RobotWorkSpace
               viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
               width="100%"
               height="8rem"
-              paddingBottom="0.5rem"
+              paddingBottom={SPACING.spacing8}
             >
               {() => (
                 <>
-                  <EditLabwareOffDeck
-                    labwareOnDeck={labwareEntities[labwareId]}
+                  <LabwareRender
+                    definition={definition}
+                    wellFill={wellFillFromWellContents(
+                      wellContents,
+                      liquidDisplayColors
+                    )}
                   />
-                  <LabwareRender definition={definition} />
                   <RobotCoordsForeignDiv
                     width={definition.dimensions.xDimension}
                     height={definition.dimensions.yDimension}
@@ -123,8 +146,33 @@ export const OffDeckLabwareSlideout = (
                     y={definition.cornerOffsetFromSlot.y}
                   >
                     <LabwareNameOverlay
-                      title={getLabwareDisplayName(definition)}
+                      title={
+                        truncatedNickName ?? getLabwareDisplayName(definition)
+                      }
                     />
+                    {disabled ? (
+                      <div
+                        css={css`
+                          z-index: 1;
+                          bottom: 0;
+                          position: ${POSITION_ABSOLUTE};
+                          width: 127.76px;
+                          height: 85.45px;
+                          opacity: 0;
+                          &:hover {
+                            opacity: 1;
+                          }
+                        `}
+                      >
+                        <BrowseLabware
+                          labwareOnDeck={labwareEntities[labwareId]}
+                        />
+                      </div>
+                    ) : (
+                      <EditLabwareOffDeck
+                        labwareOnDeck={labwareEntities[labwareId]}
+                      />
+                    )}
                   </RobotCoordsForeignDiv>
                 </>
               )}
