@@ -375,7 +375,8 @@ def build_photometric_cfg(
     same_tip: bool,
     ignore_fail: bool,
     pipette_channels: int,
-    column_offset: int,
+    photoplate_column_offset: int,
+    dye_well_column_offset: int,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
@@ -403,7 +404,8 @@ def build_photometric_cfg(
         jog=jog,
         same_tip=same_tip,
         ignore_fail=ignore_fail,
-        column_offset=column_offset,
+        photoplate_column_offset=photoplate_column_offset,
+        dye_well_column_offset=dye_well_column_offset,
     )
 
 
@@ -428,7 +430,8 @@ def _main(
             args.same_tip,
             args.ignore_fail,
             args.channels,
-            args.photo_col_offset,
+            args.photoplate_col_offset,
+            args.dye_well_col_offset,
             run_args,
         )
         union_cfg = cfg_pm
@@ -506,7 +509,8 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
-    parser.add_argument("--photo-col-offset", type=int, default=1)
+    parser.add_argument("--photoplate-col-offset", type=int, default=1)
+    parser.add_argument("--dye-well-col-offset", type=int, default=1)
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():

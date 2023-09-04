@@ -59,7 +59,8 @@ class PhotometricConfig(VolumetricConfig):
     reservoir_slot: int
     touch_tip: bool
     refill: bool
-    column_offset: int
+    photoplate_column_offset: int
+    dye_well_column_offset: int
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]

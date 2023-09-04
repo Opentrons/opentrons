@@ -23,6 +23,7 @@ class VolumetricTrial:
     test_report: CSVReport
     liquid_tracker: LiquidTracker
     trial: int
+    channel_count: int
     tip_volume: int
     volume: float
     mix: bool
@@ -38,7 +39,6 @@ class GravimetricTrial(VolumetricTrial):
     well: Well
     channel_offset: Point
     channel: int
-    channel_count: int
     recorder: GravimetricRecorder
     blank: bool
     stable: bool
@@ -199,6 +199,7 @@ def build_photometric_trials(
                     source=source,
                     dest=dest,
                     tip_volume=cfg.tip_volume,
+                    channel_count=cfg.pipette_channels,
                     volume=volume,
                     trial=trial,
                     liquid_tracker=liquid_tracker,

@@ -17,6 +17,7 @@ from . import report
 from . import config
 from .helpers import (
     _jog_to_find_liquid_height,
+    _sense_liquid_height,
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
@@ -51,8 +52,20 @@ _MIN_END_VOLUME_UL = {1: 3000, 96: 10000}
 _MAX_VOLUME_UL = {1: 15000, 96: 165000}
 
 
+def _next_tip(resources: TestResources, cfg: config.PhotometricConfig, pop: bool = True) -> Well:
+    # get the first channel's first-used tip
+    # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
+    #       and so we can use pick-up-tip from there again
+    if not len(resources.tips[0]):
+        if not resources.ctx.is_simulating():
+            ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
+        resources.tips = get_tips(resources.ctx, resources.pipette, cfg.tip_volume, True)
+    if pop:
+        return resources.tips[0].pop(0)
+    return resources.tips[0][0]
+
 def get_res_well_name(cfg: config.PhotometricConfig) -> str:
-    return f"A{cfg.column_offset}"
+    return f"A{cfg.dye_well_column_offset}"
 
 
 def get_photo_plate_dest(cfg: config.PhotometricConfig, trial: int) -> str:
@@ -60,7 +73,7 @@ def get_photo_plate_dest(cfg: config.PhotometricConfig, trial: int) -> str:
         return "A1"
     else:
         rows = "ABCDEFGH"
-        return f"{rows[trial]}{cfg.column_offset}"
+        return f"{rows[trial]}{cfg.photoplate_column_offset}"
 
 
 def _get_dye_type(volume: float) -> str:
@@ -143,7 +156,7 @@ def _run_trial(trial: PhotometricTrial) -> None:
         on_exiting=_no_op,
     )
 
-    channel_count = 96
+    channel_count = trial.channel_count
     # RUN INIT
     target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(trial.volume)
     photoplate_preped_vol = max(target_volume - volume_to_dispense, 0)
@@ -204,7 +217,7 @@ def _run_trial(trial: PhotometricTrial) -> None:
             if not trial.cfg.same_tip:
                 _drop_tip(trial.pipette, trial.cfg.return_tip)
                 trial.ctx._core.get_hardware().retract(OT3Mount.LEFT)
-        if not trial.ctx.is_simulating():
+        if not trial.ctx.is_simulating() and trial.channel_count == 96:
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
 
@@ -251,7 +264,7 @@ def _display_dye_information(
                 if not resources.ctx.is_simulating():
                     dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
-                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg}"'
+                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg} in well A{cfg.dye_well_column_offset}"'
                     )
 
 
@@ -297,34 +310,27 @@ def execute_trials(
     resources.ctx.home()
     resources.pipette.home_plunger()
 
-    def _next_tip() -> Well:
-        # get the first channel's first-used tip
-        # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
-        #       and so we can use pick-up-tip from there again
-        nonlocal tips
-        if not len(tips[0]):
-            if not resources.ctx.is_simulating():
-                ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
-            tips = get_tips(resources.ctx, resources.pipette, cfg.tip_volume, True)
-        return tips[0].pop(0)
-
     trial_total = len(resources.test_volumes) * cfg.trials
     trial_count = 0
     for volume in trials.keys():
         ui.print_title(f"{volume} uL")
+        if cfg.pipette_channels == 1 and not resources.ctx.is_simulating():
+            ui.get_user_ready(f"put PLATE with prepped column {cfg.photoplate_column_offset} and remove SEAL")
         for trial in trials[volume]:
             trial_count += 1
             ui.print_header(f"{volume} uL ({trial.trial + 1}/{cfg.trials})")
             ui.print_info(f"trial total {trial_count}/{trial_total}")
-            if not resources.ctx.is_simulating():
+            if not resources.ctx.is_simulating() and cfg.pipette_channels == 96:
                 ui.get_user_ready(f"put PLATE #{trial.trial + 1} and remove SEAL")
-            next_tip: Well = _next_tip()
+            next_tip: Well = _next_tip(resources, cfg)
             next_tip_location = next_tip.top()
             if not cfg.same_tip:
                 _pick_up_tip(
                     resources.ctx, resources.pipette, cfg, location=next_tip_location
                 )
             _run_trial(trial)
+        if not trial.ctx.is_simulating() and trial.channel_count == 1:
+            ui.get_user_ready("add SEAL to plate and remove from DECK")
 
 
 def _find_liquid_height(
@@ -334,12 +340,12 @@ def _find_liquid_height(
     reservoir: Well,
 ) -> None:
     channel_count = cfg.pipette_channels
-    setup_tip = resources.tips[0][0]
+    setup_tip = _next_tip(resources, cfg, cfg.pipette_channels == 1)
     volume_for_setup = max(resources.test_volumes)
     _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
     mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
     resources.ctx._core.get_hardware().retract(mnt)
-    if not resources.ctx.is_simulating() and not cfg.same_tip:
+    if not resources.ctx.is_simulating() and not cfg.same_tip and cfg.pipette_channels == 96:
         ui.get_user_ready("REPLACE first tip with NEW TIP")
     required_ul = max(
         (volume_for_setup * channel_count * cfg.trials)
@@ -347,9 +353,14 @@ def _find_liquid_height(
         _MIN_START_VOLUME_UL[cfg.pipette_channels],
     )
     if not resources.ctx.is_simulating():
-        _liquid_height = _jog_to_find_liquid_height(
-            resources.ctx, resources.pipette, reservoir
-        )
+        if cfg.jog:
+            _liquid_height = _jog_to_find_liquid_height(
+                resources.ctx, resources.pipette, reservoir
+            )
+        else:
+            _liquid_height = _sense_liquid_height(
+                resources.ctx, resources.pipette, reservoir, cfg
+            )
         height_below_top = reservoir.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of reservoir")
         liquid_tracker.set_start_volume_from_liquid_height(
