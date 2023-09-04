@@ -1,7 +1,7 @@
 """Radwag Scale Driver."""
 from abc import ABC, abstractmethod
 from typing import Tuple, Optional
-
+import datetime
 from serial import Serial  # type: ignore[import]
 
 from .commands import (
@@ -86,6 +86,7 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
+        self._raw_log = open("/data/testing_data/scale_raw.txt", "w")
 
     @classmethod
     def create(
@@ -117,6 +118,7 @@ class RadwagScale(RadwagScaleBase):
             self._connection.timeout = prev_timeout
         else:
             response = self._connection.readline()
+        self._raw_log.write(f"{datetime.datetime.now()} {response}")
         data = radwag_response_parse(response.decode("utf-8"), command)
         return data
 
@@ -150,6 +152,7 @@ class RadwagScale(RadwagScaleBase):
     def disconnect(self) -> None:
         """Disconnect."""
         self._connection.close()
+        self._raw_log.close()
 
     def read_serial_number(self) -> str:
         """Read serial number."""
