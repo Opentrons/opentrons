@@ -125,7 +125,7 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render setting buttons', () => {
-    const [{ getByText, getAllByText }] = render()
+    const [{ getByText }] = render()
     getByText('Robot Name')
     getByText('opentrons-robot-name')
     getByText('Robot System Version')
@@ -140,8 +140,8 @@ describe('RobotSettingsDashboard', () => {
     getByText('Use stored data when setting up a protocol.')
     getByText('Developer Tools')
     getByText('Access additional logging and feature flags.')
-    getByText('Share Analytics')
-    expect(getAllByText('Off').length).toBe(5) // LED & DEV tools & share analytics & home gantry & historic offsets
+    getByText('Share App Analytics')
+    getByText('Share Robot Logs')
   })
 
   it('should render component when tapping robot name button', () => {
