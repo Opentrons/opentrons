@@ -308,6 +308,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._pipette_type
 
     @property
+    def pipette_model(self) -> PipetteModelVersionType:
+        return self._pipette_model
+
+    @property
     def pipette_id(self) -> Optional[str]:
         return self._pipette_id
 

@@ -591,7 +591,7 @@ class LegacyCommandMapper:
             pipette_id=pipette_id,
             serial_number=instrument_load_info.pipette_dict["pipette_id"],
             config=pipette_data_provider.get_pipette_static_config(
-                instrument_load_info.pipette_dict
+                instrument_load_info.pipette_dict["model_version"]
             ),
         )
 

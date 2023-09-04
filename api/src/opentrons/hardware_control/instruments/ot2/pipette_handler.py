@@ -254,6 +254,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 alvl: self.plunger_speed(instr, fr, "aspirate")
                 for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
+            result["model_version"] = instr.pipette_model
         return cast(PipetteDict, result)
 
     @property

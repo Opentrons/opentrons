@@ -92,6 +92,7 @@ class PipetteDict(InstrumentDict):
     liquid_properties: Dict[
         pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
     ]
+    model_version: pipette_definition.PipetteModelVersionType
 
 
 class PipetteStateDict(TypedDict):

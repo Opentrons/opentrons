@@ -13,7 +13,6 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
 
 from opentrons_shared_data.errors import EnumeratedError
-from opentrons_shared_data.pipette.types import LiquidClasses
 
 from ..resources import pipette_data_provider
 from ..commands import Command, CommandCreate
