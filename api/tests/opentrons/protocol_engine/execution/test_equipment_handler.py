@@ -5,8 +5,12 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from typing import Any, Optional, cast, Dict
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.pipette import pipette_definition, types as pip_types
+from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette import (
+    pipette_definition,
+    pipette_load_name_conversions,
+    types as pip_types,
+)
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -597,7 +601,13 @@ async def test_load_pipette(
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
-    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+    model_version = pipette_load_name_conversions.convert_pipette_model(
+        PipetteModel("p300_single_v2.2")
+    )
+    pipette_dict = cast(
+        PipetteDict,
+        {"model": "hello", "pipette_id": "world", "model_version": model_version},
+    )
 
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -609,7 +619,7 @@ async def test_load_pipette(
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.get_pipette_static_config(pipette_dict["model_version"])
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -651,7 +661,13 @@ async def test_load_pipette_96_channels(
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
-    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+    model_version = pipette_load_name_conversions.convert_pipette_model(
+        PipetteModel("p1000_96_v3.3")
+    )
+    pipette_dict = cast(
+        PipetteDict,
+        {"model": "hello", "pipette_id": "world", "model_version": model_version},
+    )
 
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -659,7 +675,7 @@ async def test_load_pipette_96_channels(
         pipette_dict
     )
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.get_pipette_static_config(pipette_dict["model_version"])
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -695,14 +711,20 @@ async def test_load_pipette_uses_provided_id(
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
-    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+    model_version = pipette_load_name_conversions.convert_pipette_model(
+        PipetteModel("p300_single_v2.2")
+    )
+    pipette_dict = cast(
+        PipetteDict,
+        {"model": "hello", "pipette_id": "world", "model_version": model_version},
+    )
 
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
         pipette_dict
     )
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.get_pipette_static_config(pipette_dict["model_version"])
     ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(

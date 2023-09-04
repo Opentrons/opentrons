@@ -11,7 +11,7 @@ from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state.tips import TipStore, TipView
-from opentrons.protocol_engine.types import FlowRates, DeckPoint
+from opentrons.protocol_engine.types import DeckPoint
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )

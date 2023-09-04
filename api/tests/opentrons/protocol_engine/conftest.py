@@ -233,9 +233,10 @@ def pipette_liquid_properties_fixture(
 ) -> Dict[
     pip_types.LiquidClasses, pipette_definition.PipetteLiquidPropertiesDefinition
 ]:
+    """Get a mock liquid properties definition."""
     return {
         pip_types.LiquidClasses.default: pipette_definition.PipetteLiquidPropertiesDefinition(
-            supportedTips={pip_types.PipetteTipType.t1000: supported_tip_fixture},
+            supportedTips={"t1000": supported_tip_fixture},  # type: ignore
             defaultTipOverlapDictionary={},
             maxVolume=1000,
             minVolume=5,

@@ -69,6 +69,9 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         movement_speed_by_id={},
         static_config_by_id={},
         flow_rates_by_id={},
+        liquid_class_by_id={},
+        liquid_class_definition_by_id={},
+        tip_configuration_by_id={},
     )
 
 

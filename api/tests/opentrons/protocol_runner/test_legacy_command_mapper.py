@@ -36,7 +36,8 @@ from opentrons.protocol_runner.legacy_wrappers import (
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette import pipette_load_name_conversions
 from opentrons.types import DeckSlotName, Mount, MountType
 
 
@@ -292,7 +293,13 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
 
 def test_map_instrument_load(decoy: Decoy) -> None:
     """It should correctly map an instrument load."""
-    pipette_dict = cast(PipetteDict, {"pipette_id": "fizzbuzz"})
+    model_version = pipette_load_name_conversions.convert_pipette_model(
+        PipetteModel("p1000_single_v2.0")
+    )
+
+    pipette_dict = cast(
+        PipetteDict, {"pipette_id": "fizzbuzz", "model_version": model_version}
+    )
     input = LegacyInstrumentLoadInfo(
         instrument_load_name="p1000_single_gen2",
         mount=Mount.LEFT,
@@ -301,7 +308,7 @@ def test_map_instrument_load(decoy: Decoy) -> None:
     pipette_config = cast(LoadedStaticPipetteData, {"config": True})
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.get_pipette_static_config(pipette_dict["model_version"])
     ).then_return(pipette_config)
 
     result = LegacyCommandMapper().map_equipment_load(input)

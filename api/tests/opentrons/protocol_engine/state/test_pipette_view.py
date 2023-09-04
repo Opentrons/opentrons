@@ -38,6 +38,13 @@ def get_pipette_view(
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
     flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
+    liquid_class_by_id: Optional[Dict[str, pip_types.LiquidClasses]] = None,
+    liquid_class_definition_by_id: Optional[
+        Dict[str, pipette_definition.PipetteLiquidPropertiesDefinition]
+    ] = None,
+    tip_configuration_by_id: Optional[
+        Dict[str, pipette_definition.SupportedTipsDefinition]
+    ] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -49,6 +56,9 @@ def get_pipette_view(
         movement_speed_by_id=movement_speed_by_id or {},
         static_config_by_id=static_config_by_id or {},
         flow_rates_by_id=flow_rates_by_id or {},
+        liquid_class_by_id=liquid_class_by_id or {},
+        liquid_class_definition_by_id=liquid_class_definition_by_id or {},
+        tip_configuration_by_id=tip_configuration_by_id or {},
     )
 
     return PipetteView(state=state)
@@ -237,7 +247,7 @@ def test_get_pipette_working_volume(
     """It should get the minimum value of tip volume and max volume."""
     subject = get_pipette_view(
         attached_tip_by_id={
-            "pipette-id": TipGeometry(length=1, volume=1337, diameter=42.0),
+            "pipette-id": TipGeometry(length=1, volume=987, diameter=42.0),
         },
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
@@ -245,18 +255,19 @@ def test_get_pipette_working_volume(
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                tip_configuration_lookup_table={9001: supported_tip_fixture},
-                current_liquid_class=pipette_liquid_properties_fixture[
-                    pip_types.LiquidClasses.default
-                ],
                 liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
             )
         },
+        liquid_class_definition_by_id={
+            "pipette-id": pipette_liquid_properties_fixture[
+                pip_types.LiquidClasses.default
+            ]
+        },
     )
 
-    assert subject.get_working_volume("pipette-id") == 1337
+    assert subject.get_working_volume("pipette-id") == 987
 
 
 def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
@@ -276,14 +287,15 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                tip_configuration_lookup_table={9001: supported_tip_fixture},
-                current_liquid_class=pipette_liquid_properties_fixture[
-                    pip_types.LiquidClasses.default
-                ],
                 liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
             )
+        },
+        liquid_class_definition_by_id={
+            "pipette-id": pipette_liquid_properties_fixture[
+                pip_types.LiquidClasses.default
+            ]
         },
     )
 
@@ -316,10 +328,6 @@ def test_get_pipette_available_volume(
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                tip_configuration_lookup_table={123: supported_tip_fixture},
-                current_liquid_class=pipette_liquid_properties_fixture[
-                    pip_types.LiquidClasses.default
-                ],
                 liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
@@ -329,14 +337,15 @@ def test_get_pipette_available_volume(
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                tip_configuration_lookup_table={123: supported_tip_fixture},
-                current_liquid_class=pipette_liquid_properties_fixture[
-                    pip_types.LiquidClasses.default
-                ],
                 liquid_properties=pipette_liquid_properties_fixture,
                 home_position=0,
                 nozzle_offset_z=0,
             ),
+        },
+        liquid_class_definition_by_id={
+            "pipette-id": pipette_liquid_properties_fixture[
+                pip_types.LiquidClasses.default
+            ]
         },
     )
 
@@ -441,10 +450,6 @@ def test_get_static_config(
         display_name="display name",
         serial_number="serial-number",
         channels=9,
-        tip_configuration_lookup_table={4.56: supported_tip_fixture},
-        current_liquid_class=pipette_liquid_properties_fixture[
-            pip_types.LiquidClasses.default
-        ],
         liquid_properties=pipette_liquid_properties_fixture,
         home_position=10.12,
         nozzle_offset_z=12.13,
@@ -462,13 +467,18 @@ def test_get_static_config(
             "pipette-id": TipGeometry(length=1, volume=4.56, diameter=3),
         },
         static_config_by_id={"pipette-id": config},
+        liquid_class_definition_by_id={
+            "pipette-id": pipette_liquid_properties_fixture[
+                pip_types.LiquidClasses.default
+            ]
+        },
     )
 
     assert subject.get_config("pipette-id") == config
     assert subject.get_model_name("pipette-id") == "pipette-model"
     assert subject.get_display_name("pipette-id") == "display name"
     assert subject.get_serial_number("pipette-id") == "serial-number"
-    assert subject.get_minimum_volume("pipette-id") == 1.23
+    assert subject.get_minimum_volume("pipette-id") == 5.0
     assert subject.get_maximum_volume("pipette-id") == 4.56
     assert subject.get_return_tip_scale("pipette-id") == 0.5
     assert (
@@ -489,20 +499,19 @@ def test_get_nominal_tip_overlap(
         display_name="",
         serial_number="",
         channels=10,
-        tip_configuration_lookup_table={0: supported_tip_fixture},
-        nominal_tip_overlap={
-            "some-uri": 100,
-            "default": 10,
-        },
-        current_liquid_class=pipette_liquid_properties_fixture[
-            pip_types.LiquidClasses.default
-        ],
         liquid_properties=pipette_liquid_properties_fixture,
         home_position=0,
         nozzle_offset_z=0,
     )
 
-    subject = get_pipette_view(static_config_by_id={"pipette-id": config})
+    subject = get_pipette_view(
+        static_config_by_id={"pipette-id": config},
+        liquid_class_definition_by_id={
+            "pipette-id": pipette_liquid_properties_fixture[
+                pip_types.LiquidClasses.default
+            ]
+        },
+    )
 
     assert subject.get_nominal_tip_overlap("pipette-id", "some-uri") == 100
     assert subject.get_nominal_tip_overlap("pipette-id", "missing-uri") == 10
