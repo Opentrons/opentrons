@@ -52,17 +52,22 @@ _MIN_END_VOLUME_UL = {1: 3000, 96: 10000}
 _MAX_VOLUME_UL = {1: 15000, 96: 165000}
 
 
-def _next_tip(resources: TestResources, cfg: config.PhotometricConfig, pop: bool = True) -> Well:
+def _next_tip(
+    resources: TestResources, cfg: config.PhotometricConfig, pop: bool = True
+) -> Well:
     # get the first channel's first-used tip
     # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
     #       and so we can use pick-up-tip from there again
     if not len(resources.tips[0]):
         if not resources.ctx.is_simulating():
             ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
-        resources.tips = get_tips(resources.ctx, resources.pipette, cfg.tip_volume, True)
+        resources.tips = get_tips(
+            resources.ctx, resources.pipette, cfg.tip_volume, True
+        )
     if pop:
         return resources.tips[0].pop(0)
     return resources.tips[0][0]
+
 
 def get_res_well_name(cfg: config.PhotometricConfig) -> str:
     return f"A{cfg.dye_well_column_offset}"
@@ -315,7 +320,9 @@ def execute_trials(
     for volume in trials.keys():
         ui.print_title(f"{volume} uL")
         if cfg.pipette_channels == 1 and not resources.ctx.is_simulating():
-            ui.get_user_ready(f"put PLATE with prepped column {cfg.photoplate_column_offset} and remove SEAL")
+            ui.get_user_ready(
+                f"put PLATE with prepped column {cfg.photoplate_column_offset} and remove SEAL"
+            )
         for trial in trials[volume]:
             trial_count += 1
             ui.print_header(f"{volume} uL ({trial.trial + 1}/{cfg.trials})")
@@ -345,7 +352,11 @@ def _find_liquid_height(
     _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
     mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
     resources.ctx._core.get_hardware().retract(mnt)
-    if not resources.ctx.is_simulating() and not cfg.same_tip and cfg.pipette_channels == 96:
+    if (
+        not resources.ctx.is_simulating()
+        and not cfg.same_tip
+        and cfg.pipette_channels == 96
+    ):
         ui.get_user_ready("REPLACE first tip with NEW TIP")
     required_ul = max(
         (volume_for_setup * channel_count * cfg.trials)
