@@ -152,8 +152,10 @@ def _sense_liquid_height(
     hwapi = get_sync_hw_api(ctx)
     pipette.move_to(well.top())
     lps = config._get_liquid_probe_settings(cfg, well)
-    height = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
-    depth = well.depth - height
+    heights = []
+    for i in range(5):
+        heights.append(well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps))
+    depth = well.depth - (sum(heights) / len(heights))
     return depth
 
 
@@ -267,6 +269,8 @@ def _pick_up_tip(
             get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
             OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
         )
+
+    pipette.home_plunger()
 
 
 def _drop_tip(
