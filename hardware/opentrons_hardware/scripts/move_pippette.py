@@ -76,7 +76,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
-    speed = 10
+    speed = 90
     current = 0.4
     print('Speed = {}, current = {}'.format(speed,current))
     res = {node: (0,0,0)}
@@ -138,8 +138,9 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
             return position
         print('Coordinates: ', round(position['pipette'], 2), ',',
                                 'motor position: ', res[node][0], ', ',
-                                'encoder position: ', res[node][1], ', '
-                                'current:',current, ', '                                   
+                                'encoder position: ', res[node][1], ', ',
+                                'current:',current, ', ',   
+                                'speed:',speed, ', ',                               
                                 ' Motor Step: ',
                                 step_size[step_length_index],
                                 end = '')
