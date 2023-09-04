@@ -76,7 +76,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
-    speed = 90
+    speed = 10
     current = 0.4
     print('Speed = {}, current = {}'.format(speed,current))
     res = {node: (0,0,0)}
