@@ -38,7 +38,7 @@ export function SendProtocolToOT3Slideout(
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
-  const { t } = useTranslation(['protocol_details', 'protocol_list', 'shared'])
+  const { t } = useTranslation(['protocol_details', 'protocol_list'])
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
 
