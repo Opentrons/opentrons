@@ -146,7 +146,9 @@ export function ProtocolOverflowMenu(
               onClick={handleClickSendToOT3}
               data-testid="ProtocolOverflowMenu_sendToOT3"
             >
-              {t('send_to_ot3', { robot_display_name: FLEX_DISPLAY_NAME })}
+              {t('protocol_list:send_to_ot3_overflow', {
+                robot_display_name: FLEX_DISPLAY_NAME,
+              })}
             </MenuItem>
           ) : null}
           <MenuItem
