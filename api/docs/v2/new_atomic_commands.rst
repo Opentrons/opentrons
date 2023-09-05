@@ -458,7 +458,7 @@ This example moves the pipette 75% of well's total radius and 2 mm below the top
                       radius=0.75,
                       v_offset=-2)
 
-When ``radius=1``, the robot moves the centerline of the pipette’s plunger axis to the exact edge of the well. Sometimes this means a pipette tip hits the well edge or wall first and bends inwards. Setting the radius to < 1 helps avoid hitting the well wall prematurely. Test your protocol first, before using the ``radius`` argument in a touch tip step.
+When ``radius=1``, the robot moves the centerline of the pipette’s plunger axis to the exact edge of the well. Sometimes this means a pipette tip may hit the well wall or edge first and bends inwards. Setting the radius to < 1 helps avoid hitting the well wall prematurely. If you need to use it, test the radius argument first before starting a protocol production run.
 
 .. warning::
     *Do not* set the ``radius`` value greater than ``1.0``. When ``radius`` is > ``1.0``, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
@@ -512,7 +512,7 @@ This example draws an amount equal to the pipette's maximum rated volume and mix
 Air Gap
 -------
 
-The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that let you control the amount of air to aspirate and the pipette's height (in mm) above the well. By default, the pipette moves 5 mm above a well before aspirating air. Calling :py:meth:`~.InstrumentContext.air_gap` without any arguments uses the entire remaining volume in the pipette.
+The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that let you control the amount of air to aspirate and the pipette's height (in mm) above the well. By default, the pipette moves 5 mm above a well before aspirating air. Calling :py:meth:`~.InstrumentContext.air_gap` with no arguments uses the entire remaining volume in the pipette.
 
 This example aspirates 200 µL of air 5 mm above the current well::
 
