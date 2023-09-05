@@ -158,6 +158,7 @@ def build_nozzle_map(
 ) -> Dict[str, List[float]]:
     Y_OFFSET = 9
     X_OFFSET = -9
+    breakpoint()
     if channels == PipetteChannelType.SINGLE_CHANNEL:
         return {"A1": nozzle_offset}
     elif channels == PipetteChannelType.EIGHT_CHANNEL:
