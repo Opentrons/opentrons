@@ -929,9 +929,6 @@ class API(
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
 
-    async def configure_for_volume(self, mount: top_types.Mount, volume: float) -> None:
-        pass
-
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: top_types.Mount, rate: float = 1.0

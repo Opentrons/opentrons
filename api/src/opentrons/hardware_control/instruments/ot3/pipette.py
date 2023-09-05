@@ -630,9 +630,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._liquid_class_name = new_name
         self._liquid_class = new_class
         if not self.has_tip:
-            self._active_tip_setting_name = pip_types.PipetteTipType(
-                self._liquid_class.max_volume
-            )
+            self._active_tip_setting_name = sorted(
+                [tip for tip in self._liquid_class.supported_tips.keys()],
+                key=lambda tt: tt.value,
+            )[0]
+
         self._active_tip_settings = self._liquid_class.supported_tips[
             self._active_tip_setting_name
         ]
@@ -643,9 +645,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         intified = float(int(tip_volume))
         try:
             new_name = pip_types.PipetteTipType(int(intified))
-            if new_name == self._active_tip_setting_name:
-                return
-            new_tips = self._liquid_class.supported_tips[new_name]
         except (ValueError, KeyError) as e:
             raise InvalidLiquidClassName(
                 message=f"There is no configuration for tips of volume {intified} in liquid class {str(self._liquid_class_name)}",
@@ -655,38 +654,29 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 },
                 wrapping=[PythonException(e)],
             ) from e
+        self.set_tip_type(new_name)
+
+    def set_tip_type(self, tip_type: pip_types.PipetteTipType) -> None:
+        """Change the currently active tip by its exact type."""
+        try:
+            new_tips = self._liquid_class.supported_tips[tip_type]
+        except KeyError as e:
+            raise InvalidLiquidClassName(
+                message=f"There is no configuration for {tip_type.name} in liquid class {str(self._liquid_class_name)} on a {self._config.display_name}",
+                detail={
+                    "current-liquid-class": str(self._liquid_class_name),
+                    "requested-type": tip_type.name,
+                },
+                wrapping=[PythonException(e)],
+            ) from e
         old_tips = self._active_tip_settings
         self._update_feeds_and_speeds_defaults(old_tips, new_tips)
 
-        self._active_tip_setting_name = new_name
+        self._active_tip_setting_name = tip_type
         self._active_tip_settings = new_tips
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
-        self._working_volume = intified
-
-    def get_liquid_class_for_volume(self, volume: float) -> str:
-        """Get the liquid class required for the specified volume.
-
-        Some pipettes have different liquid classes for different volumes. If applicable,
-        and if the volume is in the different range, this will return that liquid class.
-        Otherwise, it will return the current liquid class.
-
-        This function takes into account the current liquid class to provide hysteresis.
-        """
-        # For now, until we add more liquid classes, we're going to hardcode the default
-        # and lowVolumeDefault liquid classes as the ones to switch between.
-        has_lvd = (
-            pip_types.LiquidClasses.lowVolumeDefault in self._config.liquid_properties
-        )
-        if not has_lvd:
-            return self._liquid_class_name.name
-        if self._liquid_class_name == pip_types.LiquidClasses.lowVolumeDefault:
-            if volume > (self.liquid_class.max_volume * 0.75):
-                return pip_types.LiquidClasses.default.name
-        if self._liquid_class_name == pip_types.LiquidClasses.default:
-            if volume < (self.liquid_class.max_volume * 0.5):
-                return pip_types.LiquidClasses.lowVolumeDefault.name
-        return self._liquid_class_name.name
+        self._working_volume = tip_type.value
 
 
 def _reload_and_check_skip(

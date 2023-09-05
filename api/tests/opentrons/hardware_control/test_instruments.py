@@ -430,24 +430,18 @@ async def test_configure_ot3(ot3_api_obj):
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
     hw_api.set_working_volume(mount, 50)
-    # hysteresis: don't switch until below 25
-    await hw_api.configure_for_volume(mount, 26)
+    await hw_api.set_liquid_class(mount, "default")
     await hw_api.prepare_for_aspirate(mount)
     pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == pytest.approx(71.5)
 
+    await hw_api.set_liquid_class(mount, "lowVolumeDefault")
     await hw_api.configure_for_volume(mount, 1)
     await hw_api.prepare_for_aspirate(mount)
     pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == pytest.approx(57.0)
 
-    # hysteresis: don't switch back until over 37.5
-    await hw_api.configure_for_volume(mount, 25)
-    await hw_api.prepare_for_aspirate(mount)
-    pos = await hw_api.current_position(mount)
-    assert pos[Axis.B] == pytest.approx(57)
-
-    await hw_api.configure_for_volume(mount, 37.8)
+    await hw_api.set_liquid_class(mount, "default")
     await hw_api.prepare_for_aspirate(mount)
     pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == pytest.approx(71.5)

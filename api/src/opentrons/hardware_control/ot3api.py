@@ -1575,11 +1575,11 @@ class OT3API(
             acquire_lock=acquire_lock,
         )
 
-    async def configure_for_volume(
-        self, mount: Union[top_types.Mount, OT3Mount], volume: float
+    async def set_liquid_class(
+        self, mount: Union[top_types.Mount, OT3Mount], liquid_class: str
     ) -> None:
         checked_mount = OT3Mount.from_mount(mount)
-        await self._pipette_handler.configure_for_volume(checked_mount, volume)
+        await self._pipette_handler.set_liquid_class(checked_mount, liquid_class)
 
     # Pipette action API
     async def prepare_for_aspirate(
