@@ -29,7 +29,7 @@ This simple statement works because the variable ``tiprack_1`` in the sample pro
     pipette.pick_up_tip()  # picks up tip from rack location B1
     pipette.drop_tip()     # drops tip in trash bin 
 
-If you omit the ``tip_rack`` argument from the ``pipette`` variable, then you must pass in the tip rack's location to ``pick_up_tip`` like this::
+If you omit the ``tip_rack`` argument from the ``pipette`` variable, the API will throw an error. You must pass in the tip rack's location to ``pick_up_tip`` like this::
     
     pipette.pick_up_tip(tiprack_1['A1'])
     pipette.drop_tip()
@@ -102,7 +102,7 @@ To return a tip to its original location, call the :py:meth:`~.InstrumentContext
 Working With Used Tips
 ----------------------
 
-API versions 2.2 or higher consider tips as "used" after being picked up. For example, if the robot picked up a tip from rack location A1 and then returned it to the same location, it will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example::
+Currently, the API considers tips as "used" after being picked up. For example, if the robot picked up a tip from rack location A1 and then returned it to the same location, it will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example::
 
     pipette.pick_up_tip()                # picks up tip from rack location A1
     pipette.return_tip()                 # drops tip in rack location A1
@@ -110,7 +110,7 @@ API versions 2.2 or higher consider tips as "used" after being picked up. For ex
     pipette.drop_tip()                   # drops tip in trash bin
     pipette.pick_up_tip(tiprack_1['A1']) # picks up tip from rack location A1
 
-API versions 2.0 and 2.1 treated returned tips as unused items. They could be picked up again without an explicit argument. For example:: 
+Early API versions treated returned tips as unused items. They could be picked up again without an explicit argument. For example:: 
 
     pipette.pick_up_tip()  # picks up tip from rack location A1
     pipette.return_tip()   # drops tip in rack location A1
