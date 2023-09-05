@@ -33,18 +33,16 @@ If you omit the ``tip_rack`` argument from the ``pipette`` variable, then you mu
     
     pipette.pick_up_tip(tiprack_1['A1'])
     pipette.drop_tip()
-    pipette.pick_up_tip(tiprack_1['B1'])
+    pipette.pick_up_tip(tiprack_1['B1']) 
 
-However, coding the location of each tip is inefficient. Let's use a ``for`` loop to automate a sequential tip pick up process.
-
-Coding the location of each tip is inefficient. Instead, let the API track and manage the tip pickup location for you. Adding a ``for`` loop to  your protocol is a great way to take advantage of API tip tracking.
+If coding the location of each tip seems inefficient or tedious, try using a ``for`` loop to automate a sequential tip pick up process. When using a loop, the API tracks and manages the tip pickup locations automatically. But ``pick_up_tip`` is still a powerful feature. It lets you maintain control over tip use when that’s important in your protocol.
 
 .. versionadded:: 2.0
 
-Loops and Tip Pick Up
----------------------
+Automating Tip Pick Up
+----------------------
 
-A ``for`` loop and Python's :py:class:`range` class brings automation to the tip pickup and tracking process. It eliminates the need to call ``pick_up_tip()`` multiple times. For example, this snippet tells the robot to sequentially use all the tips in a 96-tip rack::
+Adding a ``for`` loop to your protocol is a great way to take advantage of API tip tracking. When used with Python's :py:class:`range` class, a loop brings automation to the tip pickup and tracking process. It eliminates the need to call ``pick_up_tip()`` multiple times. For example, this snippet tells the robot to sequentially use all the tips in a 96-tip rack::
 
     for i in range(96):
         pipette.pick_up_tip()
@@ -79,16 +77,16 @@ For a more advanced "real-world" example, take a moment to review the :ref:`off-
 Dropping a Tip
 --------------
 
-To drop a tip in the trash bin, call the :py:meth:`~.InstrumentContext.drop_tip` method without any arguments::
+To drop a tip in the trash bin, call the :py:meth:`~.InstrumentContext.drop_tip` method with no arguments::
     
     pipette.pick_up_tip()
 
-You can also specify where to drop the tip by passing in a location. For example, this code drops a tip in the trash bin and returns another tip to the tip rack::
+You can also specify where to drop the tip by passing in a location. For example, this code drops a tip in the trash bin and returns another tip to to a previously used well in a tip rack::
 
     pipette.pick_up_tip()            # picks up tip from rack location A1
     pipette.drop_tip()               # drops tip in trash bin 
     pipette.pick_up_tip()            # picks up tip from rack location B1
-    pipette.drop_tip(tiprack['B1'])  # drops tip in rack location B1
+    pipette.drop_tip(tiprack['A1'])  # drops tip in rack location A1
 
 .. versionadded:: 2.0
 
@@ -97,14 +95,9 @@ You can also specify where to drop the tip by passing in a location. For example
 Return Tip
 ===========
 
-To return a tip to its original location, call the :py:meth:`~.InstrumentContext.return_tip` method without any arguments::
+To return a tip to its original location, call the :py:meth:`~.InstrumentContext.return_tip` method with no arguments::
 
     pipette.return_tip()
-
-.. this section below was a long note
-.. a lot of info for a call-out
-.. let's try it in a section
-.. important info, let's give it some attention
 
 Working With Used Tips
 ----------------------
@@ -117,15 +110,13 @@ API versions 2.2 or higher consider tips as "used" after being picked up. For ex
     pipette.drop_tip()                   # drops tip in trash bin
     pipette.pick_up_tip(tiprack_1['A1']) # picks up tip from rack location A1
 
-.. can this be removed, is it helpful?
-Also in API Version 2.2, the return tip height was corrected to utilize values determined by hardware testing. This is more in-line with return tip behavior from Python Protocol API Version 1.
-
 API versions 2.0 and 2.1 treated returned tips as unused items. They could be picked up again without an explicit argument. For example:: 
 
     pipette.pick_up_tip()  # picks up tip from rack location A1
     pipette.return_tip()   # drops tip in rack location A1
     pipette.pick_up_tip()  # picks up tip from rack location A1
 
+.. versionchanged: 2.2
 
 ****************
 Liquid Control
