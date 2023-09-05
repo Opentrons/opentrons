@@ -376,50 +376,31 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 Utility Commands
 ================
 
-Utility commands include methods that perform small convenience actions in a protocol or that control a robot's behavior. These include:
-
-- :py:meth:`.ProtocolContext.delay`
-- :py:meth:`.ProtocolContext.pause`
-- :py:meth:`.ProtocolContext.home`
-- :py:meth:`.ProtocolContext.comment`
-- :py:meth:`.ProtocolContext.set_rail_lights`
-- :py:meth:`.ProtocolContext.rail_lights_on`
-- :py:meth:`.ProtocolContext.door_closed`
-
-The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
+Utility commands let you perform convenience actions in a protocol that control a robot's behavior. For example, these commands let you delay or pause a protocol, home the gantry, display comments in the App, control robot lights, and manage the robot's door open/closed state. The following sections show how to these utility commands and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Delay and Resume
 ----------------
 
-Sometimes you need to delay a protocol for a set amount of time (e.g., for an incubation period). You can call the :py:meth:`~.ProtocolContext.delay` method to stop a protocol for a specific amount of time in seconds and minutes. For example::
+Call the :py:meth:`.ProtocolContext.delay` method to insert a timed delay (e.g. for an incubation period) into your protocol. This method accepts time increments in seconds, minutes, or combinations of both. Your protocol resumes automatically after the pause expires.
 
-    protocol.delay(seconds=2)             # delays for 2 seconds
-    protocol.delay(minutes=5)             # delays for 5 minutes
-    protocol.delay(minutes=5, seconds=2)  # delays for 5 minutes and 2 seconds
+This example delays a protocol for 10 seconds::
 
-The robot will resume the protocol automatically after the delay interval expires.
+    protocol.delay(seconds=10)
+
+This example delays a protocol for 5 minutes::
+
+    protocol.delay(minutes=5)
+
+This example delays a protocol for 5 minutes and 10 seconds::
+
+    protocol.delay(minutes=5, seconds=10)
 
 Pause Until Resumed
 -------------------
 
-The method :py:meth:`.ProtocolContext.pause` will pause protocol execution at a specific step.
-You can resume by pressing 'resume' in your Opentrons App. You can optionally specify a message that
-will be displayed in the Opentrons App when protocol execution pauses.
+Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. Instead, you'll respond to a prompt on the touchscreen or in the App. This method lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
 
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        # The start of your protocol goes here...
-
-        # The protocol stops here until you press resume. The optional message appears in
-        # the Opentrons App. You do not need to specify a message, but it makes things
-        # more clear.
-        protocol.pause('Time to take a break')
+    protocol.pause('Remember to get more pipette tips')
 
 .. versionadded:: 2.0
 
