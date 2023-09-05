@@ -8,7 +8,6 @@ import {
   DISENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
-  ENGAGED,
 } from '../../../EmergencyStop'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
