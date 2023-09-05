@@ -16,11 +16,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RunStatus,
 } from '@opentrons/api-client'
-import {
-  useRunQuery,
-  useModulesQuery,
-  useEstopQuery,
-} from '@opentrons/react-api-client'
+import { useRunQuery, useModulesQuery } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -83,14 +79,12 @@ import {
   useIsRobotViewable,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-  useIsOT3,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'
 import { getHighestPriorityError } from '../../OnDeviceDisplay/RunningProtocol'
 import { RunFailedModal } from './RunFailedModal'
-import { DISENGAGED } from '../../EmergencyStop'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -98,7 +92,6 @@ import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { RunProgressMeter } from '../../RunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000
-const ESTOP_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
@@ -142,21 +135,7 @@ export function ProtocolRunHeader({
   const highestPriorityError =
     runRecord?.data.errors?.[0] != null
       ? getHighestPriorityError(runRecord?.data?.errors)
-      : undefined
-  const { data: estopStatus } = useEstopQuery({
-    refetchInterval: ESTOP_POLL_MS,
-  })
-  const [
-    showEmergencyStopRunBanner,
-    setShowEmergencyStopRunBanner,
-  ] = React.useState<boolean>(false)
-  const isOT3 = useIsOT3(robotName)
-
-  React.useEffect(() => {
-    if (estopStatus?.data.status !== DISENGAGED) {
-      setShowEmergencyStopRunBanner(true)
-    }
-  }, [estopStatus?.data.status])
+      : null
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -288,13 +267,6 @@ export function ProtocolRunHeader({
               setShowRunFailedModal,
               highestPriorityError,
             }}
-          />
-        ) : null}
-        {estopStatus?.data.status !== DISENGAGED &&
-        isOT3 &&
-        showEmergencyStopRunBanner ? (
-          <EmergencyStopRunBanner
-            setShowEmergencyStopRunBanner={setShowEmergencyStopRunBanner}
           />
         ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
@@ -644,7 +616,7 @@ interface TerminalRunProps {
   handleClearClick: () => void
   isClosingCurrentRun: boolean
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
-  highestPriorityError?: RunError
+  highestPriorityError?: RunError | null
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   const {
@@ -697,24 +669,4 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     )
   }
   return null
-}
-
-interface EmergencyStopRunPropsBanner {
-  setShowEmergencyStopRunBanner: (showEmergencyStopRunBanner: boolean) => void
-}
-
-function EmergencyStopRunBanner({
-  setShowEmergencyStopRunBanner,
-}: EmergencyStopRunPropsBanner): JSX.Element {
-  const { t } = useTranslation('run_details')
-  return (
-    <Banner
-      type="error"
-      onCloseClick={() => setShowEmergencyStopRunBanner(false)}
-    >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-        {t('run_failed')}
-      </Flex>
-    </Banner>
-  )
 }

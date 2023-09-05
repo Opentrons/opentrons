@@ -843,31 +843,4 @@ describe('ProtocolRunHeader', () => {
     getByText('Run completed.')
     getByLabelText('ot-spinner')
   })
-
-  it('renders banner when estop pressed - physicallyEngaged', () => {
-    mockEstopStatus.data.status = PHYSICALLY_ENGAGED
-    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
-
-    mockUseEstopQuery({ data: mockEstopStatus } as any)
-    const [{ getByText }] = render()
-    getByText('Run failed.')
-  })
-
-  it('renders banner when estop pressed - logicallyEngaged', () => {
-    mockEstopStatus.data.status = LOGICALLY_ENGAGED
-    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
-
-    mockUseEstopQuery({ data: mockEstopStatus } as any)
-    const [{ getByText }] = render()
-    getByText('Run failed.')
-  })
-
-  it('renders banner when estop pressed - notPresent', () => {
-    mockEstopStatus.data.status = NOT_PRESENT
-    mockEstopStatus.data.leftEstopPhysicalStatus = NOT_PRESENT
-
-    mockUseEstopQuery({ data: mockEstopStatus } as any)
-    const [{ getByText }] = render()
-    getByText('Run failed.')
-  })
 })

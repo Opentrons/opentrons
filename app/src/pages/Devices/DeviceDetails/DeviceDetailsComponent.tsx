@@ -23,9 +23,11 @@ interface DeviceDetailsComponentProps {
 export function DeviceDetailsComponent({
   robotName,
 }: DeviceDetailsComponentProps): JSX.Element {
-  const { data: estopStatus, error: estopError } = useEstopQuery()
-  const { isEmergencyStopModalDismissed } = useEstopContext()
   const isOT3 = useIsOT3(robotName)
+  const { data: estopStatus, error: estopError } = useEstopQuery({
+    enabled: isOT3,
+  })
+  const { isEmergencyStopModalDismissed } = useEstopContext()
 
   return (
     <Box
@@ -35,9 +37,9 @@ export function DeviceDetailsComponent({
       paddingTop={SPACING.spacing16}
       paddingBottom={SPACING.spacing48}
     >
-      {estopStatus?.data.status !== DISENGAGED &&
+      {isOT3 &&
+      estopStatus?.data.status !== DISENGAGED &&
       estopError == null &&
-      isOT3 &&
       isEmergencyStopModalDismissed ? (
         <Flex marginBottom={SPACING.spacing16}>
           <EstopBanner status={estopStatus?.data.status} />
