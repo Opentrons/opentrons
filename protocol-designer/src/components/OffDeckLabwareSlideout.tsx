@@ -170,7 +170,7 @@ export const OffDeckLabwareSlideout = (
                       </div>
                     ) : (
                       <EditLabwareOffDeck
-                        labwareOnDeck={labwareEntities[labwareId]}
+                        labwareEntity={labwareEntities[labwareId]}
                       />
                     )}
                   </RobotCoordsForeignDiv>

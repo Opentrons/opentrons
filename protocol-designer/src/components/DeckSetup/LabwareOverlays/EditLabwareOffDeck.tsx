@@ -24,7 +24,7 @@ import type { LabwareEntity } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../../types'
 
 interface OP {
-  labwareOnDeck: LabwareEntity
+  labwareEntity: LabwareEntity
   handleDragHover?: () => void
 }
 interface SP {
@@ -38,9 +38,9 @@ interface DP {
 type Props = OP & SP & DP
 
 const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
-  const { labwareOnDeck, isYetUnnamed, editLiquids, deleteLabware } = props
+  const { labwareEntity, isYetUnnamed, editLiquids, deleteLabware } = props
 
-  const { isTiprack } = labwareOnDeck.def.parameters
+  const { isTiprack } = labwareEntity.def.parameters
   if (isYetUnnamed && !isTiprack) {
     return (
       <div
@@ -57,7 +57,7 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
         `}
       >
         <NameThisLabware
-          labwareOnDeck={labwareOnDeck}
+          labwareOnDeck={labwareEntity}
           editLiquids={editLiquids}
         />
       </div>
@@ -104,10 +104,10 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const { id } = ownProps.labwareOnDeck
+  const { id } = ownProps.labwareEntity
   const hasName = labwareIngredSelectors.getSavedLabware(state)[id]
   return {
-    isYetUnnamed: !ownProps.labwareOnDeck.def.parameters.isTiprack && !hasName,
+    isYetUnnamed: !ownProps.labwareEntity.def.parameters.isTiprack && !hasName,
   }
 }
 
@@ -116,13 +116,13 @@ const mapDispatchToProps = (
   ownProps: OP
 ): DP => ({
   editLiquids: () =>
-    dispatch(openIngredientSelector(ownProps.labwareOnDeck.id)),
+    dispatch(openIngredientSelector(ownProps.labwareEntity.id)),
   deleteLabware: () => {
     window.confirm(
       `Are you sure you want to permanently delete this ${getLabwareDisplayName(
-        ownProps.labwareOnDeck.def
+        ownProps.labwareEntity.def
       )}?`
-    ) && dispatch(deleteContainer({ labwareId: ownProps.labwareOnDeck.id }))
+    ) && dispatch(deleteContainer({ labwareId: ownProps.labwareEntity.id }))
   },
 })
 
