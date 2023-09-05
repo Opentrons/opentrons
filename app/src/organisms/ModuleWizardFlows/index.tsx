@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
@@ -13,7 +12,10 @@ import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import {
+  useChainMaintenanceCommands,
+  useCreateTargetedMaintenanceRunMutation,
+} from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
@@ -85,9 +87,9 @@ export const ModuleWizardFlows = (
   } = useChainMaintenanceCommands()
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({
+  } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
       setCreatedMaintenanceRunId(response.data.id)
     },
@@ -222,7 +224,7 @@ export const ModuleWizardFlows = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createMaintenanceRun={createMaintenanceRun}
+        createMaintenanceRun={createTargetedMaintenanceRun}
         isCreateLoading={isCreateLoading}
         createdMaintenanceRunId={createdMaintenanceRunId}
       />
