@@ -242,39 +242,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
 
-    def _update_feeds_and_speeds_defaults(
-        self,
-        old_tip_settings: SupportedTipsDefinition,
-        new_tip_settings: SupportedTipsDefinition,
-    ) -> None:
-        """
-        Changes the flow rates, speeds, and accelerations to new defaults after an update.
-
-        This function should be called after switching liquid class or tip and will set any
-        settings that were at the old defaults to the new defaults.
-        """
-        if (
-            self._aspirate_flow_rate
-            == old_tip_settings.default_aspirate_flowrate.default
-        ):
-            self._aspirate_flow_rate = (
-                new_tip_settings.default_aspirate_flowrate.default
-            )
-        if (
-            self._dispense_flow_rate
-            == old_tip_settings.default_dispense_flowrate.default
-        ):
-            self._dispense_flow_rate = (
-                new_tip_settings.default_dispense_flowrate.default
-            )
-        if (
-            self._blow_out_flow_rate
-            == old_tip_settings.default_blowout_flowrate.default
-        ):
-            self._blow_out_flow_rate = new_tip_settings.default_blowout_flowrate.default
-        if self._flow_acceleration == old_tip_settings.default_flow_acceleration:
-            self._flow_acceleration = new_tip_settings.default_flow_acceleration
-
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
         if to_default:
@@ -474,7 +441,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @working_volume.setter
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
-        self.set_tip_type_by_volume(min(tip_volume, self.liquid_class.max_volume))
+        self.set_tip_type_by_volume(tip_volume)
+        self._working_volume = min(tip_volume, self.liquid_class.max_volume)
 
     @property
     def minimum_volume(self) -> float:
@@ -607,7 +575,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             new_name = pip_types.LiquidClasses[class_name]
             if new_name == self._liquid_class_name:
                 return
-            new_class = self._config.liquid_properties[self._liquid_class_name]
+            new_class = self._config.liquid_properties[new_name]
         except KeyError:
             raise InvalidLiquidClassName(
                 message=f"Liquid class {class_name} is not valid for {self._config.display_name}",
@@ -630,14 +598,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._liquid_class_name = new_name
         self._liquid_class = new_class
         if not self.has_tip:
-            self._active_tip_setting_name = sorted(
+            new_tip_class = sorted(
                 [tip for tip in self._liquid_class.supported_tips.keys()],
                 key=lambda tt: tt.value,
             )[0]
+        else:
+            new_tip_class = self._active_tip_setting_name
+        self.set_tip_type(new_tip_class)
 
-        self._active_tip_settings = self._liquid_class.supported_tips[
-            self._active_tip_setting_name
-        ]
         self.ready_to_aspirate = False
 
     def set_tip_type_by_volume(self, tip_volume: float) -> None:
@@ -669,14 +637,22 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 },
                 wrapping=[PythonException(e)],
             ) from e
-        old_tips = self._active_tip_settings
-        self._update_feeds_and_speeds_defaults(old_tips, new_tips)
 
         self._active_tip_setting_name = tip_type
         self._active_tip_settings = new_tips
+
+        self._aspirate_flow_rate = (
+            self._active_tip_settings.default_aspirate_flowrate.default
+            )
+        self._dispense_flow_rate = (
+            self._active_tip_settings.default_dispense_flowrate.default
+        )
+        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate.default
+        self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
+
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
-        self._working_volume = tip_type.value
+        self._working_volume = min(tip_type.value, self.liquid_class.max_volume)
 
 
 def _reload_and_check_skip(
