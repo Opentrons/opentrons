@@ -1528,6 +1528,14 @@ async def test_home_axis(
     stepper_ok: bool,
     encoder_ok: bool,
 ) -> None:
+    if axis in Axis.pipette_axes():
+        pipette_config = load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 3),
+        )
+        instr_data = AttachedPipette(config=pipette_config, id="fakepip")
+        await ot3_hardware.cache_pipette(Axis.to_ot3_mount(axis), instr_data, None)
 
     backend = ot3_hardware.managed_obj._backend
     origin_pos = {ax: 100 for ax in Axis}

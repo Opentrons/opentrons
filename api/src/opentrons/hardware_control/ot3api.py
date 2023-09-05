@@ -1288,6 +1288,51 @@ class OT3API(
                 await self._cache_current_position()
                 await self._cache_encoder_position()
 
+    async def _set_plunger_current_and_home(
+        self,
+        axis: Axis,
+        motor_ok: bool,
+        encoder_ok: bool,
+    ) -> None:
+        mount = Axis.to_ot3_mount(axis)
+        instr = self._pipette_handler.hardware_instruments[mount]
+        if instr is None:
+            self._log.warning("no pipette found")
+            return
+
+        origin, target_pos = await self._retrieve_home_position(axis)
+
+        if encoder_ok and motor_ok:
+            if origin[axis] - target_pos[axis] > self._config.safe_home_distance:
+                target_pos[axis] += self._config.safe_home_distance
+                moves = self._build_moves(
+                    origin, target_pos, instr.config.plunger_homing_configurations.speed
+                )
+                async with self._backend.restore_current():
+                    await self._backend.set_active_current(
+                        {axis: instr.config.plunger_homing_configurations.current}
+                    )
+                    await self._backend.move(
+                        origin,
+                        moves[0],
+                        MoveStopCondition.none,
+                    )
+                    await self._backend.home([axis], self.gantry_load)
+        else:
+            async with self._backend.restore_current():
+                await self._backend.set_active_current(
+                    {axis: instr.config.plunger_homing_configurations.current}
+                )
+                await self._backend.home([axis], self.gantry_load)
+
+    async def _retrieve_home_position(
+        self, axis: Axis
+    ) -> Tuple[OT3AxisMap[float], OT3AxisMap[float]]:
+        origin = await self._backend.update_position()
+        target_pos = {ax: pos for ax, pos in origin.items()}
+        target_pos.update({axis: self._backend.home_position()[axis]})
+        return origin, target_pos
+
     async def _home_axis(self, axis: Axis) -> None:
         """
         Perform home; base on axis motor/encoder statuses, shorten homing time
@@ -1304,14 +1349,6 @@ class OT3API(
         switch will not be triggered.
         """
 
-        async def _retrieve_home_position() -> Tuple[
-            OT3AxisMap[float], OT3AxisMap[float]
-        ]:
-            origin = await self._backend.update_position()
-            target_pos = {ax: pos for ax, pos in origin.items()}
-            target_pos.update({axis: self._backend.home_position()[axis]})
-            return origin, target_pos
-
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [Axis.G, Axis.Q]
 
@@ -1326,10 +1363,14 @@ class OT3API(
             motor_ok = self._backend.check_motor_status([axis])
             encoder_ok = self._backend.check_encoder_status([axis])
 
+        if Axis.to_kind(axis) == OT3AxisKind.P:
+            await self._set_plunger_current_and_home(axis, motor_ok, encoder_ok)
+            return
+
         # we can move to safe home distance!
         if encoder_ok and motor_ok:
-            origin, target_pos = await _retrieve_home_position()
-            if Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
+            origin, target_pos = await self._retrieve_home_position(axis)
+            if Axis.to_kind(axis) == OT3AxisKind.Z:
                 axis_home_dist = self._config.safe_home_distance
             else:
                 # FIXME: (AA 2/15/23) This is a temporary workaround because of
@@ -1628,21 +1669,25 @@ class OT3API(
         # NOTE: plunger position (mm) decreases up towards homing switch
         # NOTE: if already at BOTTOM, we still need to run backlash-compensation movement,
         #       because we do not know if we arrived at BOTTOM from above or below.
-        if self._current_position[pip_ax] < backlash_pos[pip_ax]:
+        async with self._backend.restore_current():
+            await self._backend.set_active_current(
+                {pip_ax: instrument.config.plunger_homing_configurations.current}
+            )
+            if self._current_position[pip_ax] < backlash_pos[pip_ax]:
+                await self._move(
+                    backlash_pos,
+                    speed=(speed_down * rate),
+                    acquire_lock=acquire_lock,
+                )
+            # NOTE: This should ALWAYS be moving UP.
+            #       There should never be a time that this function is called and
+            #       the plunger doesn't physically move UP into it's BOTTOM position.
+            #       This is to make sure we are always engaged at the beginning of aspirate.
             await self._move(
-                backlash_pos,
-                speed=(speed_down * rate),
+                target_pos,
+                speed=(speed_up * rate),
                 acquire_lock=acquire_lock,
             )
-        # NOTE: This should ALWAYS be moving UP.
-        #       There should never be a time that this function is called and
-        #       the plunger doesn't physically move UP into it's BOTTOM position.
-        #       This is to make sure we are always engaged at the beginning of aspirate.
-        await self._move(
-            target_pos,
-            speed=(speed_up * rate),
-            acquire_lock=acquire_lock,
-        )
 
     # Pipette action API
     async def prepare_for_aspirate(
