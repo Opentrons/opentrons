@@ -4694,6 +4694,7 @@
   ],
   "parameters": {
     "format": "384Standard",
+    "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat"

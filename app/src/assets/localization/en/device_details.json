@@ -118,6 +118,7 @@
   "run_again": "Run again",
   "run_duration": "Run duration",
   "serial_number": "Serial Number",
+  "robot_initializing": "Initializing...",
   "set_block_temp": "Set temperature",
   "set_block_temperature": "Set block temperature",
   "set_engage_height": "Set Engage Height",

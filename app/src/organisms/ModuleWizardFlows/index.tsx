@@ -2,18 +2,22 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
-
+import { COLORS } from '@opentrons/components'
+import { CreateCommand, LEFT, getModuleType } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import {
+  useChainMaintenanceCommands,
+  useCreateTargetedMaintenanceRunMutation,
+} from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -23,8 +27,8 @@ import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import { CreateCommand, getModuleType } from '@opentrons/shared-data'
-import { FirmwareUpdate } from './FirmwareUpdate'
+import { DetachProbe } from './DetachProbe'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -57,12 +61,15 @@ export const ModuleWizardFlows = (
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
+      currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1
     )
   }
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
   >(null)
+  const [createdAdapterId, setCreatedAdapterId] = React.useState<string | null>(
+    null
+  )
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
   const [
@@ -80,9 +87,9 @@ export const ModuleWizardFlows = (
   } = useChainMaintenanceCommands()
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({
+  } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
       setCreatedMaintenanceRunId(response.data.id)
     },
@@ -196,20 +203,42 @@ export const ModuleWizardFlows = (
     isExiting,
   }
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (isExiting) {
+  if (errorMessage != null) {
+    modalContent = (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.errorEnabled}
+        header={t('error_during_calibration')}
+        subHeader={
+          <>
+            {t('module_calibration_failed')}
+            {errorMessage}
+          </>
+        }
+      />
+    )
+  } else if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />
-  }
-  if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
+  } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createMaintenanceRun={createMaintenanceRun}
+        createMaintenanceRun={createTargetedMaintenanceRun}
         isCreateLoading={isCreateLoading}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = <FirmwareUpdate {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <FirmwareUpdateModal
+        proceed={proceed}
+        subsystem={
+          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
+        }
+        description={t('firmware_update')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
       <SelectLocation
@@ -220,9 +249,23 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
-    modalContent = <PlaceAdapter {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <PlaceAdapter
+        {...currentStep}
+        {...calibrateBaseProps}
+        setCreatedAdapterId={setCreatedAdapterId}
+      />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
-    modalContent = <AttachProbe {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <AttachProbe
+        {...currentStep}
+        {...calibrateBaseProps}
+        adapterId={createdAdapterId}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
+    modalContent = <DetachProbe {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     modalContent = (
       <Success

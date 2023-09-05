@@ -500,6 +500,12 @@ async def _initialize_hardware_api(
             if callback[1]:
                 await callback[0](app_state, hardware.wrapped())
 
+        # This ties systemd notification to hardware initialization. We might want to move
+        # systemd notification so it also waits for DB migration+initialization.
+        # If we do that, we need to be careful:
+        # - systemd timeouts might need to be increased to allow for DB migration time
+        # - There might be UI implications for loading states on the Flex's on-device display,
+        #   because it polls for the server's systemd status.
         _systemd_notify(systemd_available)
 
         if should_use_ot3():

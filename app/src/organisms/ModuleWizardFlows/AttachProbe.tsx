@@ -7,7 +7,10 @@ import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
-import { THERMOCYCLER_MODULE_MODELS } from '@opentrons/shared-data/js/constants'
+import {
+  LEFT,
+  THERMOCYCLER_MODULE_MODELS,
+} from '@opentrons/shared-data/js/constants'
 import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
@@ -15,16 +18,15 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
   isExiting: boolean
+  adapterId: string | null
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -50,10 +52,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const {
     proceed,
     goBack,
+    chainRunCommands,
+    setErrorMessage,
+    adapterId,
     isRobotMoving,
     attachedModule,
     attachedPipette,
-    errorMessage,
     isExiting,
     isOnDevice,
     slotName,
@@ -168,34 +172,50 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       <StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>
     )
 
+  const handleBeginCalibration = (): void => {
+    if (adapterId == null) {
+      setErrorMessage('calibration adapter has not been loaded yet')
+      return
+    }
+    chainRunCommands?.(
+      [
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
+          },
+        },
+        {
+          commandType: 'calibration/calibrateModule',
+          params: {
+            moduleId: attachedModule.id,
+            labwareId: adapterId,
+            mount: attachedPipette.mount,
+          },
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: attachedPipette.mount,
+          },
+        },
+      ],
+      false
+    )
+      .then(() => proceed())
+      .catch((e: Error) =>
+        setErrorMessage(`error starting module calibration: ${e.message}`)
+      )
+  }
+
   // TODO: add calibration loading screen and error screen
-  return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.errorEnabled}
-      header={t('shared:error_encountered')}
-      subHeader={
-        <Trans
-          t={t}
-          i18nKey={'return_probe_error'}
-          values={{ error: errorMessage }}
-          components={{
-            block: <StyledText as="p" />,
-            bold: (
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
-            ),
-          }}
-        />
-      }
-    />
-  ) : (
+  return (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
-      // TODO: make sure this is the right animation
       rightHandBody={pipetteAttachProbeVid}
       bodyText={bodyText}
       proceedButtonText={t('begin_calibration')}
-      proceed={proceed}
+      proceed={handleBeginCalibration}
       back={goBack}
     />
   )
