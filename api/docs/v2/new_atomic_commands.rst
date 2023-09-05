@@ -1,10 +1,5 @@
 :og:description: Building block commands are the smallest individual actions that Opentrons robots can perform.
 
-.. adding a comment to make this different from edge to open a PR
-.. github won't allow PRs if the upstream resource is the same
-.. could do an empty pull request, but that seems wrong
-.. delete these comments when done with the project
-
 .. _v2-atomic-commands:
 
 ***********************
@@ -12,116 +7,6 @@ Building Block Commands
 ***********************
 
 Building block commands execute some of the most basic actions that your robot can complete. But basic doesn’t mean these commands lack capabilities. They perform important tasks in your protocols. They're also foundational to the :ref:`complex commands <v2-complex-commands>` that help you write and run longer, more intricate procedures. In this section, we'll look at building block commands that let you work with pipette tips, liquids, and robot utility features.
-
-.. I wonder if this should start w/ an H2 like "Getting Started" and make the
-.. 3 following H3 headers (code samples, instruments and labware, sample file)
-
-Using These Examples
-====================
-
-These code samples are designed for anyone using an Opentrons Flex or OT-2 liquid handling robot. For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we'll try to show code samples without horizontal scrolling and use `named arguments <https://en.wikipedia.org/wiki/Named_parameter>`_ instead of positional arguments. For example::
-
-    # This code uses named arguments
-    tiprack_1 = protocol.load_labware(
-        load_name="opentrons_flex_96_tiprack_1000ul", location="D2"
-    )
-
-    # This code uses positional arguments
-    tiprack_1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D2")   
-
-Both examples instantiate the variable ``tiprack_1`` with a Flex tip rack, but the former is more explicit. It shows the parameter name and its value together (e.g. ``location="D2"``), which may be helpful when you're unsure about what's going on in a protocol code sample.
-
-Python developers with more experience should feel free to ignore the code styling used here and work with these examples as you like.
-
-Instruments and Labware
-=======================
-
-The sample protocols all use the following pipettes:
-
-* Flex 1-Channel Pipette (5–1000 µL). The API load name for this pipette is ``flex_1channel_1000``. 
-* P300 Single-Channel GEN2 pipette for the OT-2. The API load name for this pipette is ``p300_single_gen2``. 
-
-They also use the labware listed below: 
-
-.. list-table::
-    :header-rows: 1
-
-    * - Labware type
-      - Labware name
-      - API load name
-    * - Well plate
-      - Corning 96 Well Plate 360 µL Flat
-      - ``corning_96_wellplate_360ul_flat``
-    * - Flex tip rack
-      - Opentrons Flex 96 Tip Rack 1000 µL
-      - ``opentrons_flex_96_tiprack_1000ul``
-    * - OT-2 tip rack
-      - Opentrons 96 Tip Rack 300 µL
-      - ``opentrons_96_tiprack_300ul``
-
-.. _atomic-file:
-
-Sample Protocol File 
-====================
-
-Depending on your robot model and/or API version, the foundation of a basic protocol file could look similar to the following examples. For information about variations in the code before the ``run()`` function, see the :ref:`Metadata <tutorial-metadata>` and :ref:`Requirements <tutorial-requirements>` sections of the :ref:`tutorial <tutorial>`. The examples in this section are based on and work with this starting code.
-
-.. tabs::
-
-    .. tab:: Flex 
-
-        .. code-block:: python
-            :substitutions:
-
-            from opentrons import protocol_api
-
-            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
-
-            def run(protocol: protocol_api.ProtocolContext):
-                # load well plate in deck slot D2
-                plate = protocol.load_labware(
-                    load_name="corning_96_wellplate_360ul_flat", location="D2"
-                )
-                # load tip rack in deck slot D3
-                tiprack_1 = protocol.load_labware(
-                    load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
-                )
-                # attach pipette to left mount
-                pipette = protocol.load_instrument(
-                    instrument_name="flex_1channel_1000",
-                    mount="left",
-                    tip_racks=[tip_rack_1],
-                )
-                # Put other protocol commands here
-    
-    .. tab:: OT-2 
-
-        .. code-block:: python
-            :substitutions:
-
-            from opentrons import protocol_api
-
-            metadata = {'apiLevel': '|apiLevel|'}
-
-            def run(protocol: protocol_api.ProtocolContext):
-                # load well plate in deck slot 2
-                plate = protocol.load_labware(
-                    load_name="corning_96_wellplate_360ul_flat", location=2
-                )
-                # load tip rack in deck slot 3
-                tiprack_1 = protocol.load_labware(
-                    load_name="opentrons_96_tiprack_300ul", location=3
-                )
-                # attach pipette to left mount
-                pipette = protocol.load_instrument(
-                    instrument_name="p300_single_gen2",
-                    mount="left",
-                    tip_racks=[tip_rack_1],
-                )  
-                # Put other protocol commands here
-
-Manipulating Pipette Tips
-=========================
 
 Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are :py:meth:`.InstrumentContext.pick_up_tip`, :py:meth:`.InstrumentContext.drop_tip`, and :py:meth:`.InstrumentContext.return_tip`. Respectively, these methods tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack.
 
