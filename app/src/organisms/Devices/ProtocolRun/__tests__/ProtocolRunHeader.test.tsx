@@ -75,13 +75,7 @@ import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import { RunFailedModal } from '../RunFailedModal'
-import {
-  DISENGAGED,
-  ENGAGED,
-  LOGICALLY_ENGAGED,
-  NOT_PRESENT,
-  PHYSICALLY_ENGAGED,
-} from '../../../EmergencyStop'
+import { DISENGAGED, NOT_PRESENT } from '../../../EmergencyStop'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
