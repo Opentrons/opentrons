@@ -15,13 +15,13 @@
   "plungerPositionsConfigurations": {
     "default": {
       "top": 0.0,
-      "bottom": 71.5,
+      "bottom": 57.5,
       "blowout": 76.5,
       "drop": 90.5
     },
     "lowVolumeDefault": {
       "top": 0.0,
-      "bottom": 57.0,
+      "bottom": 57.5,
       "blowout": 76.5,
       "drop": 90.5
     }
