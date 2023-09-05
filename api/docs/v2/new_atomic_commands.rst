@@ -149,13 +149,14 @@ If you omit the ``tip_rack`` argument from the ``pipette`` variable, then you mu
 
 However, coding the location of each tip is inefficient. Let's use a ``for`` loop to automate a sequential tip pick up process.
 
+Coding the location of each tip is inefficient. Instead, let the API track and manage the tip pickup location for you. Adding a ``for`` loop to  your protocol is a great way to take advantage of API tip tracking.
+
 .. versionadded:: 2.0
 
-.. needs better title?
 Loops and Tip Pick Up
 ---------------------
 
-A ``for`` loop and Python's :py:class:`range` class gives you a better way to automate the tip pickup process. It eliminates the need to call ``pick_up_tip()`` multiple times. For example, this snippet tells the robot to sequentially use all the tips in a 96-tip rack::
+A ``for`` loop and Python's :py:class:`range` class brings automation to the tip pickup and tracking process. It eliminates the need to call ``pick_up_tip()`` multiple times. For example, this snippet tells the robot to sequentially use all the tips in a 96-tip rack::
 
     for i in range(96):
         pipette.pick_up_tip()
