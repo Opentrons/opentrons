@@ -406,84 +406,62 @@ Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specif
 
 Homing
 ------
+..
+    original text mentions disengaging robot motors
+    can you do that? is it accurate to say that?
 
-You can manually request for the robot to home during protocol execution. This is typically
-not necessary; however, if at any point you will disengage motors or move
-the gantry with your hand, you may want to command a home afterwards.
+Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. Homing methods include :py:meth:`.ProtocolContext.home`, :py:meth:`.InstrumentContext.home` and :py:meth:`.InstrumentContext.home_plunger`. These methods home the gantry, the mounted pipette and plunger, and the pipette plunger, respectively. None of these functions take any arguments.
 
-To home the all axes, you can call :py:meth:`.ProtocolContext.home`.
+This example homes the gantry, z-axis, and pipette plungers::
 
-To home a specific pipette's Z axis and plunger, you can call :py:meth:`.InstrumentContext.home`.
+    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    protocol.home()
+..
+    original reads, "homes right z axis"
+    not sure what is meant by "right z axis"
+    is it because pipette is mounted on the right?
+This example homes the pipette and plunger::
 
-To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentContext.home_plunger`.
+    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    protocol.home()
 
-None of these functions take any arguments:
+To home a specific pipette's Z axis and plunger, you can call :py:meth:`.InstrumentContext.home`::
 
-.. code-block:: python
-    :substitutions:
+    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    pipette.home()
 
-    from opentrons import protocol_api, types
+To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentContext.home_plunger`::
 
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        pipette = protocol.load_instrument('p300_single', 'right')
-        protocol.home() # Homes the gantry, z axes, and plungers
-        pipette.home()  # Homes the right z axis and plunger
-        pipette.home_plunger() # Homes the right plunger
+    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    pipette.home_plunger()
 
 .. versionadded:: 2.0
-
 
 Comment
 -------
 
-The method :py:meth:`.ProtocolContext.comment` lets you display messages in the Opentrons App during protocol execution:
+Call the :py:meth:`.ProtocolContext.comment` method to create and display messages in the Opentrons App during protocol execution::
 
-
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api, types
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        protocol.comment('Hello, world!')
+    protocol.comment('Hello, world!')
 
 .. versionadded:: 2.0
-
 
 Control and Monitor Robot Rail Lights
 -------------------------------------
 
-You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
+Call the :py:meth:`.ProtocolContext.set_rail_lights` to turn the robot's rail lights on or off during a protocol. This method accepts boolean true (lights on) or false (lights off) arguments. Rail lights are off by default.
 
+This example turns the rail lights on::
 
-.. code-block:: python
-    :substitutions:
+    protocol.set_rail_lights(True)
 
-    from opentrons import protocol_api
+This example turns the rail lights off::
 
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        # turn on robot rail lights
-        protocol.set_rail_lights(True)
-
-        # turn off robot rail lights
-        protocol.set_rail_lights(False)
+    protocol.set_rail_lights(False)
 
 .. versionadded:: 2.5
 
-
-You can also check whether the rail lights are on or off in the protocol using :py:obj:`.ProtocolContext.rail_lights_on`:
-
-
-.. code-block:: python
-
-    protocol.rail_lights_on  # returns True when the lights are on,
-                             # False when the lights are off
+You can also check whether the rail lights are on or off in the protocol by using :py:obj:`.ProtocolContext.rail_lights_on`. For example, this method returns ``True`` when lights are on and ``False`` when the lights are off.
 
 .. versionadded:: 2.5
 
