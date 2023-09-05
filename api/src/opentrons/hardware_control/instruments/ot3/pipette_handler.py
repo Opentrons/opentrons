@@ -577,7 +577,7 @@ class OT3PipetteHandler:
 
         # Ensure we don't dispense more than the current volume
         disp_vol = min(instrument.current_volume, disp_vol)
-        is_full_dispense = abs(instrument.current_volume - disp_vol) < (
+        is_full_dispense = abs(instrument.current_volume - disp_vol) <= (
             instrument.minimum_volume / 10
         )
 

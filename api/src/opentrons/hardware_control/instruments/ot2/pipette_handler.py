@@ -595,22 +595,24 @@ class PipetteHandlerProvider(Generic[MountType]):
         if disp_vol == 0:
             return None
 
-        is_full_dispense = abs(instrument.current_volume - disp_vol) < (
+        is_full_dispense = abs(instrument.current_volume - disp_vol) <= (
             instrument.minimum_volume / 10
         )
-        if not is_full_dispense and push_out:
-            raise CommandPreconditionViolated(
-                message="Cannot push_out on a dispense that does not leave the pipette empty",
-                detail={
-                    "command": "dispense",
-                    "remaining-volume": instrument.current_volume - disp_vol,
-                },
-            )
-        if push_out is None and not is_full_dispense:
-            push_out_ul = instrument.push_out_volume
-        elif push_out and not is_full_dispense:
-            push_out_ul = push_out
+
+        if is_full_dispense:
+            if push_out is None:
+                push_out_ul = instrument.push_out_volume
+            else:
+                push_out_ul = push_out
         else:
+            if push_out is not None and push_out != 0:
+                raise CommandPreconditionViolated(
+                    message="Cannot push_out on a dispense that does not leave the pipette empty",
+                    detail={
+                        "command": "dispense",
+                        "remaining-volume": instrument.current_volume - disp_vol,
+                    },
+                )
             push_out_ul = 0
 
         push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
