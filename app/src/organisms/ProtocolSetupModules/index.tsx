@@ -50,7 +50,6 @@ import {
   getUnmatchedModulesForProtocol,
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
-import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -82,10 +81,8 @@ function RenderModuleStatus({
   setShowModuleWizard,
 }: RenderModuleStatusProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const handleCalibrate = (): void => {
-    setODDMaintenanceFlowInProgress()
     setShowModuleWizard(true)
   }
 
