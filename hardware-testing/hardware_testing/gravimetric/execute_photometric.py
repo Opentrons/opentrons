@@ -47,9 +47,9 @@ _DYE_MAP: Dict[str, Dict[str, float]] = {
     "C": {"min": 2, "max": 9.999},
     "D": {"min": 1, "max": 1.999},
 }
-_MIN_START_VOLUME_UL = {1: 3000, 96: 30000}
-_MIN_END_VOLUME_UL = {1: 3000, 96: 10000}
-_MAX_VOLUME_UL = {1: 15000, 96: 165000}
+_MIN_START_VOLUME_UL = {1: 500, 96: 30000}
+_MIN_END_VOLUME_UL = {1: 400, 96: 10000}
+_MAX_VOLUME_UL = {1: 2000, 96: 165000}
 
 
 def _next_tip(
