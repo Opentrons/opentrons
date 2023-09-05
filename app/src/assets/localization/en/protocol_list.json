@@ -10,7 +10,6 @@
   "reanalyze_or_view_error": "<analysisLink>Reanalyze</analysisLink> protocol or view <errorLink>error details</errorLink>",
   "right_mount": "right mount",
   "robot": "robot",
-  "send": "Send",
   "send_to_ot3": "Send protocol to Opentrons Flex",
   "should_delete_this_protocol": "Delete this protocol?",
   "show_in_folder": "Show in folder",
