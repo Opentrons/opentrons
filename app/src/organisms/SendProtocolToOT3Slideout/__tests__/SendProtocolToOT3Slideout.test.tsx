@@ -165,8 +165,8 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    getByText('Choose Robot to Run fakeSrcFileName')
-    getByRole('button', { name: 'Proceed to setup' })
+    getByText('Send protocol to Opentrons Flex')
+    getByRole('button', { name: 'Send' })
   })
 
   it('renders an available robot option for every connectable OT-3, and link for other robots', () => {
@@ -246,7 +246,7 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = getByRole('button', { name: 'Send' })
     expect(proceedButton).not.toBeDisabled()
     const otherRobot = getByText('otherRobot')
     otherRobot.click() // unselect default robot
@@ -273,7 +273,7 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = getByRole('button', { name: 'Send' })
     expect(proceedButton).toBeDisabled()
     expect(
       getByText(

@@ -104,7 +104,7 @@ describe('ProtocolOverflowMenu', () => {
     const [{ getByTestId, getByText }] = render()
     const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const sendToOT3Button = getByText('Send to Opentrons Flex')
+    const sendToOT3Button = getByText('Send protocol to Opentrons Flex')
     fireEvent.click(sendToOT3Button)
     expect(mockHandleSendProtocolToOT3).toHaveBeenCalledWith(storedProtocolData)
   })

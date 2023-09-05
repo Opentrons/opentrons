@@ -38,7 +38,7 @@ export function SendProtocolToOT3Slideout(
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t } = useTranslation(['protocol_details', 'protocol_list', 'shared'])
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
 
@@ -141,9 +141,7 @@ export function SendProtocolToOT3Slideout(
     <ChooseRobotSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}
-      title={t('choose_robot_to_run', {
-        protocol_name: protocolDisplayName,
-      })}
+      title={t('protocol_list:send_to_ot3')}
       footer={
         <PrimaryButton
           disabled={
@@ -152,7 +150,7 @@ export function SendProtocolToOT3Slideout(
           onClick={handleSendClick}
           width="100%"
         >
-          {t('shared:proceed_to_setup')}
+          {t('protocol_details:send')}
         </PrimaryButton>
       }
       selectedRobot={selectedRobot}
