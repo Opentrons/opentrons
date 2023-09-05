@@ -35,6 +35,7 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
+from ..protocol_engine.types import PostRunHardwareState
 
 
 class RunResult(NamedTuple):
@@ -80,8 +81,9 @@ class AbstractRunner(ABC):
             await self._protocol_engine.stop()
         else:
             await self._protocol_engine.finish(
-                drop_tips_and_home=False,
+                drop_tips_after_run=False,
                 set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
 
     @abstractmethod

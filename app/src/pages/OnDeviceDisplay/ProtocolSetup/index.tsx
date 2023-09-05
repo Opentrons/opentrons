@@ -376,6 +376,9 @@ function PrepareToRun({
     hasMissingModulesForOdd: isMissingModules,
     hasMissingCalForOdd: !areInstrumentsReady,
   })
+  const requiredCalibration = attachedModules.some(
+    module => module.moduleOffset?.last_modified == null
+  )
 
   const [
     showConfirmCancelModal,
@@ -399,7 +402,8 @@ function PrepareToRun({
   })
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
-  const modulesStatus = isMissingModules ? 'not ready' : 'ready'
+  const modulesStatus =
+    isMissingModules || requiredCalibration ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
 
@@ -443,9 +447,15 @@ function PrepareToRun({
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
       : t('multiple_modules_missing')
 
-  const modulesDetail = isMissingModules
-    ? missingModulesText
-    : connectedModulesText
+  const modulesDetail = (): string => {
+    if (isMissingModules) {
+      return missingModulesText
+    } else if (requiredCalibration) {
+      return t('calibration_required')
+    } else {
+      return connectedModulesText
+    }
+  }
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -544,7 +554,7 @@ function PrepareToRun({
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
               title={t('modules')}
-              detail={modulesDetail}
+              detail={modulesDetail()}
               status={modulesStatus}
               disabled={protocolModulesInfo.length === 0}
             />

@@ -8,7 +8,7 @@ from ..types import Axis, CriticalPoint, MotionChecks
 class MotionController(Protocol):
     """Protocol specifying fundamental motion controls."""
 
-    async def halt(self) -> None:
+    async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately stop motion.
 
         Calls to stop through the synch adapter while other calls
@@ -17,8 +17,9 @@ class MotionController(Protocol):
         smoothie. To provide actual immediate halting, call this method which
         does not require use of the loop.
 
-        After this call, the hardware will be in a bad state until a call to
-        stop
+        If disengage_before_stopping is True, the motors will disengage first and then
+        stop in place. Disengaging creates a smoother halt but requires homing after
+        in order to resume movement.
         """
         ...
 

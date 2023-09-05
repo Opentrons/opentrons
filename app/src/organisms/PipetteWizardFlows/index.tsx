@@ -279,6 +279,7 @@ export const PipetteWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         createMaintenanceRun={createTargetedMaintenanceRun}
+        createdMaintenanceRunId={createdMaintenanceRunId}
         isCreateLoading={isCreateLoading}
         requiredPipette={requiredPipette}
       />

@@ -875,7 +875,7 @@ describe('CommandText', () => {
           params: {
             strategy: 'manualMoveWithPause',
             labwareId: mockRobotSideAnalysis.labware[3].id,
-            newLocation: { moduleId: mockRobotSideAnalysis.modules[0].id },
+            newLocation: { slotName: 'A3' },
           },
           id: 'def456',
           result: { offsetId: 'fake_offset_id' },
@@ -892,7 +892,7 @@ describe('CommandText', () => {
       }
     )[0]
     getByText(
-      'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Magnetic Module GEN2 in Slot 1'
+      'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Slot A3'
     )
   })
   it('renders correct text for move labware with gripper off deck', () => {

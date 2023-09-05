@@ -18,21 +18,10 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-import {
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Banner } from '../../../atoms/Banner'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { PipetteWizardFlows } from '../../PipetteWizardFlows'
-import { FLOWS } from '../../PipetteWizardFlows/constants'
-import {
-  useDeckCalibrationData,
-  useAttachedPipettesFromInstrumentsQuery,
-  useIsOT3,
-} from '../hooks'
+import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 import type { Mount } from '../../../redux/pipettes/types'
@@ -53,18 +42,10 @@ export function SetupPipetteCalibrationItem({
   mount,
   robotName,
   runId,
-  instrumentsRefetch,
 }: SetupInstrumentCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const deviceDetailsUrl = `/devices/${robotName}`
-  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = React.useState<boolean>(
-    false
-  )
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
-  const attachedPipettesForFlex = useAttachedPipettesFromInstrumentsQuery()
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-
-  const isOT3 = useIsOT3(robotName)
 
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -75,9 +56,7 @@ export function SetupPipetteCalibrationItem({
   let pipetteMismatchInfo
 
   if (pipetteInfo == null) return null
-  const pipetteCalDate = isOT3
-    ? attachedPipettesForFlex[mount]?.data?.calibratedOffset?.last_modified
-    : pipetteInfo.pipetteCalDate
+  const pipetteCalDate = pipetteInfo.pipetteCalDate
 
   const attached =
     pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH ||
@@ -106,38 +85,22 @@ export function SetupPipetteCalibrationItem({
     )
   }
 
-  let flowType = ''
   if (pipetteCalDate != null && attached) {
     button = pipetteMismatchInfo
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
-    if (isOT3) {
-      flowType = FLOWS.ATTACH
-      button = (
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <TertiaryButton
-            id="PipetteCalibration_attachPipetteButton"
-            onClick={() => setShowFlexPipetteFlow(true)}
-          >
-            {t('attach_pipette_cta')}
-          </TertiaryButton>
-        </Flex>
-      )
-    } else {
-      button = (
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <TertiaryButton
-            as={RRDLink}
-            to={deviceDetailsUrl}
-            id="PipetteCalibration_attachPipetteButton"
-          >
-            {t('attach_pipette_cta')}
-          </TertiaryButton>
-        </Flex>
-      )
-    }
+    button = (
+      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <TertiaryButton
+          as={RRDLink}
+          to={deviceDetailsUrl}
+          id="PipetteCalibration_attachPipetteButton"
+        >
+          {t('attach_pipette_cta')}
+        </TertiaryButton>
+      </Flex>
+    )
   } else {
-    flowType = FLOWS.CALIBRATE
     button = (
       <>
         <Flex
@@ -148,27 +111,17 @@ export function SetupPipetteCalibrationItem({
           gridGap={SPACING.spacing8}
         >
           <Flex>{pipetteMismatchInfo}</Flex>
-          {isOT3 ? (
+          <RRDLink
+            to={`/devices/${robotName}/robot-settings/calibration/dashboard`}
+          >
             <TertiaryButton
+              disabled={!isDeckCalibrated}
               id="PipetteCalibration_calibratePipetteButton"
               {...targetProps}
-              onClick={() => setShowFlexPipetteFlow(true)}
             >
               {t('calibrate_now')}
             </TertiaryButton>
-          ) : (
-            <RRDLink
-              to={`/devices/${robotName}/robot-settings/calibration/dashboard`}
-            >
-              <TertiaryButton
-                disabled={!isDeckCalibrated}
-                id="PipetteCalibration_calibratePipetteButton"
-                {...targetProps}
-              >
-                {t('calibrate_now')}
-              </TertiaryButton>
-            </RRDLink>
-          )}
+          </RRDLink>
           {!isDeckCalibrated ? (
             <Tooltip {...tooltipProps}>
               <Box width={SIZE_4}>
@@ -184,30 +137,14 @@ export function SetupPipetteCalibrationItem({
   const attachedCalibratedDate = pipetteCalDate ?? null
 
   return (
-    <>
-      {showFlexPipetteFlow && (
-        <PipetteWizardFlows
-          flowType={flowType}
-          mount={mount}
-          closeFlow={() => setShowFlexPipetteFlow(false)}
-          selectedPipette={
-            pipetteInfo.pipetteSpecs.channels === 96
-              ? NINETY_SIX_CHANNEL
-              : SINGLE_MOUNT_PIPETTES
-          }
-          pipetteInfo={mostRecentAnalysis?.pipettes}
-          onComplete={instrumentsRefetch}
-        />
-      )}
-      <SetupCalibrationItem
-        button={button}
-        calibratedDate={attached ? attachedCalibratedDate : null}
-        subText={subText}
-        label={t(`devices_landing:${mount}_mount`)}
-        title={pipetteInfo.pipetteSpecs?.displayName}
-        id={`PipetteCalibration_${mount}MountTitle`}
-        runId={runId}
-      />
-    </>
+    <SetupCalibrationItem
+      button={button}
+      calibratedDate={attached ? attachedCalibratedDate : null}
+      subText={subText}
+      label={t(`devices_landing:${mount}_mount`)}
+      title={pipetteInfo.pipetteSpecs?.displayName}
+      id={`PipetteCalibration_${mount}MountTitle`}
+      runId={runId}
+    />
   )
 }

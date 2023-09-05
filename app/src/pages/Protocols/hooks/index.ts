@@ -2,7 +2,8 @@ import last from 'lodash/last'
 import {
   useInstrumentsQuery,
   useModulesQuery,
-  useProtocolAnalysesQuery,
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { getLabwareSetupItemGroups } from '../utils'
 
@@ -50,10 +51,12 @@ export type ProtocolHardware =
 export const useRequiredProtocolHardware = (
   protocolId: string
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
 
   const {
     data: attachedModulesData,
@@ -67,16 +70,11 @@ export const useRequiredProtocolHardware = (
   } = useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
-  if (
-    mostRecentAnalysis == null ||
-    mostRecentAnalysis?.status !== 'completed'
-  ) {
+  if (analysis == null || analysis?.status !== 'completed') {
     return { requiredProtocolHardware: [], isLoading: true }
   }
 
-  const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(
-    mostRecentAnalysis
-  )
+  const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(analysis)
     ? [
         {
           hardwareType: 'gripper',
@@ -87,7 +85,7 @@ export const useRequiredProtocolHardware = (
       ]
     : []
 
-  const requiredModules: ProtocolModule[] = mostRecentAnalysis.modules.map(
+  const requiredModules: ProtocolModule[] = analysis.modules.map(
     ({ location, model }) => {
       return {
         hardwareType: 'module',
@@ -99,7 +97,7 @@ export const useRequiredProtocolHardware = (
     }
   )
 
-  const requiredPipettes: ProtocolPipette[] = mostRecentAnalysis.pipettes.map(
+  const requiredPipettes: ProtocolPipette[] = analysis.pipettes.map(
     ({ mount, pipetteName }) => ({
       hardwareType: 'pipette',
       pipetteName: pipetteName,
@@ -134,10 +132,14 @@ export const useRequiredProtocolHardware = (
 export const useRequiredProtocolLabware = (
   protocolId: string
 ): LabwareSetupItem[] => {
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
   const commands =
     (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
   const { onDeckItems, offDeckItems } = getLabwareSetupItemGroups(commands)
