@@ -159,9 +159,12 @@ A ``for`` loop and Python's :py:class:`range` class gives you a better way to au
 
     for i in range(96):
         pipette.pick_up_tip()
+        # liquid handling commands
         pipette.drop_tip()
 
-If your protocol requires a lot of tips, add a second tip rack to the protocol, and sum the tip count in the range. The robot will loop through both racks. For example, let's add another tip rack to the sample protocol::
+If your protocol requires a lot of tips, add a second tip rack to the protocol. Then associate it with your pipette and increase the number of repetitions in the loop. The robot will loop through both racks. 
+
+First, add another tip rack to the sample protocol::
 
     tiprack_2 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul",
@@ -173,7 +176,7 @@ Next, revise the pipette's ``load_instrument()`` method to include the new tip r
     pipette = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
-        tip_racks=[tiprack_1, tip_rack_2],
+        tip_racks=[tiprack_1, tiprack_2],
     ) 
 
 Finally, sum the tip count in the range::
