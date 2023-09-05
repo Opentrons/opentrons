@@ -3477,7 +3477,9 @@ export const mockRecentAnalysis = {
               brand: {
                 brand: 'NEST',
                 brandId: ['503501', '503001'],
-                links: ['http://www.cell-nest.com/page94?product_id=101&_l=en'],
+                links: [
+                  'https://www.nest-biotech.com/deep-well-plates/59253726.html',
+                ],
               },
             },
           ],
@@ -3653,7 +3655,7 @@ export const mockRecentAnalysis = {
         labwareId: 'fixedTrash',
         wellName: 'A1',
         wellLocation: {
-          origin: 'default',
+          origin: 'bottom',
           offset: {
             x: 0,
             y: 0,
@@ -3672,7 +3674,7 @@ export const mockRecentAnalysis = {
       completedAt: '2023-03-13T18:20:41.944336+00:00',
     },
   ],
-  errors: [],
+  errors: [{}],
   liquids: [
     {
       id: '0',
@@ -5418,7 +5420,9 @@ export const mockProtocolModuleInfo = [
           brand: {
             brand: 'NEST',
             brandId: ['503501', '503001'],
-            links: ['http://www.cell-nest.com/page94?product_id=101&_l=en'],
+            links: [
+              'https://www.nest-biotech.com/deep-well-plates/59253726.html',
+            ],
           },
         },
       ],

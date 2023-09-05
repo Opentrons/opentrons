@@ -14,8 +14,8 @@ import { robotControlsReducer } from './robot-controls/reducer'
 // robot settings state
 import { robotSettingsReducer } from './robot-settings/reducer'
 
-// robot buildroot update state
-import { buildrootReducer } from './buildroot/reducer'
+// robot robot update state
+import { robotUpdateReducer } from './robot-update/reducer'
 
 // pipettes state
 import { pipettesReducer } from './pipettes/reducer'
@@ -31,9 +31,6 @@ import { configReducer } from './config/reducer'
 
 // discovery state
 import { discoveryReducer } from './discovery/reducer'
-
-// protocol state
-import { protocolReducer } from './protocol/reducer'
 
 // custom labware state
 import { customLabwareReducer } from './custom-labware/reducer'
@@ -66,13 +63,12 @@ export const rootReducer: Reducer<State, Action> = combineReducers<
   robotAdmin: robotAdminReducer,
   robotControls: robotControlsReducer,
   robotSettings: robotSettingsReducer,
-  buildroot: buildrootReducer,
+  robotUpdate: robotUpdateReducer,
   pipettes: pipettesReducer,
   networking: networkingReducer,
   config: configReducer,
   discovery: discoveryReducer,
   labware: customLabwareReducer,
-  protocol: protocolReducer,
   shell: shellReducer,
   systemInfo: systemInfoReducer,
   alerts: alertsReducer,

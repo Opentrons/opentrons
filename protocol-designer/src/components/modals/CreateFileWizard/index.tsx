@@ -19,9 +19,13 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   SPAN7_8_10_11_SLOT,
+  FIXED_TRASH_ID,
+  FLEX_ROBOT_TYPE,
+  MAGNETIC_MODULE_V2,
+  THERMOCYCLER_MODULE_V2,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
   actions as stepFormActions,
@@ -180,6 +184,20 @@ export function CreateFileWizard(): JSX.Element | null {
           },
         })
       )
+      // default trash labware locations in initial deck setup step
+      dispatch(
+        steplistActions.changeSavedStepForm({
+          stepId: INITIAL_DECK_SETUP_STEP_ID,
+          update: {
+            labwareLocationUpdate: {
+              [FIXED_TRASH_ID]: {
+                slotName:
+                  values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
+              },
+            },
+          },
+        })
+      )
       // create modules
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
@@ -268,17 +286,17 @@ const initialFormState: FormState = {
     },
     [MAGNETIC_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
+      model: MAGNETIC_MODULE_V2,
       slot: '1',
     },
     [TEMPERATURE_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
+      model: TEMPERATURE_MODULE_V2,
       slot: '3',
     },
     [THERMOCYCLER_MODULE_TYPE]: {
       onDeck: false,
-      model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
+      model: THERMOCYCLER_MODULE_V2,
       slot: SPAN7_8_10_11_SLOT,
     },
   },

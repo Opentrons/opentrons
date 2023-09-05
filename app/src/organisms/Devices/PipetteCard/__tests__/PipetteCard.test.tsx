@@ -169,7 +169,7 @@ describe('PipetteCard', () => {
   it('renders banner to calibrate for ot3 pipette if not calibrated', () => {
     when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(true)
     const { getByText } = render({
-      pipetteInfo: { ...mockLeftSpecs, name: 'p300_single_gen3' },
+      pipetteInfo: { ...mockLeftSpecs, name: 'p300_single_flex' },
       mount: LEFT,
       robotName: mockRobotName,
       is96ChannelAttached: false,

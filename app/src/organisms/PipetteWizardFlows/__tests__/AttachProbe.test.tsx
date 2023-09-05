@@ -9,15 +9,8 @@ import {
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { CalibrationErrorModal } from '../CalibrationErrorModal'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
-
-jest.mock('../CalibrationErrorModal')
-
-const mockCalibrationErrorModal = CalibrationErrorModal as jest.MockedFunction<
-  typeof CalibrationErrorModal
->
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
@@ -45,21 +38,22 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
-    mockCalibrationErrorModal.mockReturnValue(
-      <div>mock calibration error modal</div>
-    )
   })
   it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
         {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },
@@ -91,7 +85,7 @@ describe('AttachProbe', () => {
     const { getByText } = render(props)
     getByText(
       nestedTextMatcher(
-        'backmost pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+        'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the backmost pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
       )
     )
   })
@@ -147,7 +141,10 @@ describe('AttachProbe', () => {
       errorMessage: 'error shmerror',
     }
     const { getByText } = render(props)
-    getByText('mock calibration error modal')
+    getByText(
+      'Return the calibration probe to its storage location before exiting.'
+    )
+    getByText('error shmerror')
   })
 
   it('renders the correct text when is on device', async () => {
@@ -158,12 +155,16 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     getByRole('button', { name: 'Begin calibration' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
         {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },

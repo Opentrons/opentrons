@@ -14,11 +14,11 @@ import * as Sessions from '../sessions'
 import { getViewableRobots, getRobotApiVersion } from '../discovery'
 
 import {
-  getBuildrootUpdateVersion,
-  getBuildrootRobot,
-  getBuildrootSession,
+  getRobotUpdateVersion,
+  getRobotUpdateRobot,
+  getRobotUpdateSession,
   getRobotSystemType,
-} from '../buildroot'
+} from '../robot-update'
 
 import { getRobotSessionById } from '../sessions/selectors'
 
@@ -124,11 +124,13 @@ export function getBuildrootAnalyticsData(
   state: State,
   robotName: string | null = null
 ): BuildrootAnalyticsData | null {
-  const updateVersion = getBuildrootUpdateVersion(state)
-  const session = getBuildrootSession(state)
+  const updateVersion = robotName
+    ? getRobotUpdateVersion(state, robotName)
+    : null
+  const session = getRobotUpdateSession(state)
   const robot =
     robotName === null
-      ? getBuildrootRobot(state)
+      ? getRobotUpdateRobot(state)
       : getViewableRobots(state).find(r => r.name === robotName) || null
 
   if (updateVersion === null || robot === null) return null

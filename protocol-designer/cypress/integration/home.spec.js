@@ -23,7 +23,6 @@ describe('The Home Page', () => {
     cy.contains('HELP')
     cy.contains('Settings')
     cy.contains('Protocol Designer')
-    cy.contains('beta')
   })
 
   it('displays all the expected images', () => {})

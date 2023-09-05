@@ -97,3 +97,11 @@ async def test_deactivate(tempdeck: TempDeck) -> None:
         "status": "idle",
         "data": {"currentTemp": 23, "targetTemp": None},
     }
+
+
+async def test_forcible_deactivate(
+    tempdeck: TempDeck, execution_manager: ExecutionManager
+) -> None:
+    """Can override wait_for_is_running."""
+    await execution_manager.pause()
+    await tempdeck.deactivate(must_be_running=False)

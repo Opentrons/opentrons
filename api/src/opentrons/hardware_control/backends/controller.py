@@ -13,6 +13,7 @@ from typing import (
     TYPE_CHECKING,
     Union,
     Sequence,
+    cast,
 )
 from typing_extensions import Final
 
@@ -21,18 +22,24 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    mutable_configurations,
+)
+from opentrons_shared_data.pipette.dev_types import PipetteName
+
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
-from opentrons.config import pipette_config
 from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
 from ..module_control import AttachedModulesControl
 from ..types import AionotifyEvent, BoardRevision, Axis, DoorState
+from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
+    from opentrons_shared_data.pipette.dev_types import PipetteModel
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,
@@ -179,7 +186,7 @@ class Controller:
         ] = await self._smoothie_driver.read_pipette_model(  # type: ignore
             mount.name.lower()
         )
-        if found_model and found_model not in pipette_config.config_models:
+        if found_model and not pipette_load_name.supported_pipette(found_model):
             # TODO: Consider how to handle this error - it bubbles up now
             # and will cause problems at higher levels
             MODULE_LOG.error(f"Bad model on {mount.name}: {found_model}")
@@ -187,14 +194,25 @@ class Controller:
         found_id = await self._smoothie_driver.read_pipette_id(mount.name.lower())
 
         if found_model:
-            config = pipette_config.load(found_model, found_id)
+            path_to_overrides = opentrons.config.get_opentrons_path(
+                "pipette_config_overrides_dir"
+            )
+            converted_found_model = pipette_load_name.convert_pipette_model(found_model)
+            converted_found_name = pipette_load_name.convert_to_pipette_name_type(
+                found_model
+            )
+            config = mutable_configurations.load_with_mutable_configurations(
+                converted_found_model, path_to_overrides, found_id
+            )
             if expected:
-                acceptable = [config.name] + config.back_compat_names
+                acceptable = [
+                    cast(PipetteName, str(converted_found_name))
+                ] + config.pipette_backcompat_names
                 if expected not in acceptable:
                     raise RuntimeError(
                         f"mount {mount}: instrument"
                         f" {expected} was requested"
-                        f" but {config.model} is present"
+                        f" but {converted_found_model} is present"
                     )
             return {"config": config, "id": found_id}
         else:
@@ -231,7 +249,7 @@ class Controller:
         pipette axis to a low current (dwelling current) after each move
         """
         self._smoothie_driver.set_active_current(
-            {axis.name: amp for axis, amp in axis_currents.items()}
+            {ot2_axis_to_string(axis): amp for axis, amp in axis_currents.items()}
         )
 
     @contextmanager
@@ -347,17 +365,19 @@ class Controller:
         plunger_axis = Axis.of_plunger(mount)
 
         await self._smoothie_driver.update_steps_per_mm(
-            {plunger_axis.name: config["steps_per_mm"]}
+            {ot2_axis_to_string(plunger_axis): config["steps_per_mm"]}
         )
         await self._smoothie_driver.update_pipette_config(
-            mount_axis.name, {"home": config["home_pos"]}
+            ot2_axis_to_string(mount_axis), {"home": config["home_pos"]}
         )
         await self._smoothie_driver.update_pipette_config(
-            plunger_axis.name, {"max_travel": config["max_travel"]}
+            ot2_axis_to_string(plunger_axis), {"max_travel": config["max_travel"]}
         )
         self._smoothie_driver.set_dwelling_current(
-            {plunger_axis.name: config["idle_current"]}
+            {ot2_axis_to_string(plunger_axis): config["idle_current"]}
         )
         ms = config["splits"]
         if ms:
-            self._smoothie_driver.configure_splits_for({plunger_axis.name: ms})
+            self._smoothie_driver.configure_splits_for(
+                {ot2_axis_to_string(plunger_axis): ms}
+            )

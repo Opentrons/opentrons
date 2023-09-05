@@ -54,6 +54,11 @@ export function AttachedInstrumentMountItem(
       setWizardProps({
         flowType: GRIPPER_FLOW_TYPES.ATTACH,
         attachedGripper: attachedInstrument,
+        onComplete: () => {
+          history.push(
+            attachedInstrument == null ? `/instruments` : `/instrument/${mount}`
+          )
+        },
         closeFlow: () => setWizardProps(null),
       })
       setODDMaintenanceFlowInProgress()
@@ -95,7 +100,11 @@ export function AttachedInstrumentMountItem(
                 setShowChoosePipetteModal(false)
               },
               onComplete: () => {
-                history.push(`/instruments/${mount}`)
+                history.push(
+                  attachedInstrument == null
+                    ? `/instruments`
+                    : `/instrument/${mount}`
+                )
               },
             })
             setODDMaintenanceFlowInProgress()

@@ -286,13 +286,13 @@ class CheckCalibrationUserFlow:
                 info = PipetteInfo(
                     channels=pip.config.channels,
                     rank=PipetteRank.first,
-                    max_volume=pip.config.max_volume,
+                    max_volume=pip.liquid_class.max_volume,
                     mount=mount,
                     tip_rack=self._get_tiprack_by_pipette_volume(
-                        pip.config.max_volume, pip_calibration
+                        pip.liquid_class.max_volume, pip_calibration
                     ),
                     default_tipracks=uf.get_default_tipracks(
-                        pip.config.default_tipracks
+                        pip.liquid_class.default_tipracks
                     ),
                 )
                 return info, [info]
@@ -303,26 +303,30 @@ class CheckCalibrationUserFlow:
         l_calibration = self._get_stored_pipette_offset_cal(left_pip, Mount.LEFT)
         r_info = PipetteInfo(
             channels=right_pip.config.channels,
-            max_volume=right_pip.config.max_volume,
+            max_volume=right_pip.liquid_class.max_volume,
             rank=PipetteRank.first,
             mount=Mount.RIGHT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                right_pip.config.max_volume, r_calibration
+                right_pip.liquid_class.max_volume, r_calibration
             ),
-            default_tipracks=uf.get_default_tipracks(right_pip.config.default_tipracks),
+            default_tipracks=uf.get_default_tipracks(
+                right_pip.liquid_class.default_tipracks
+            ),
         )
         l_info = PipetteInfo(
             channels=left_pip.config.channels,
-            max_volume=left_pip.config.max_volume,
+            max_volume=left_pip.liquid_class.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                left_pip.config.max_volume, l_calibration
+                left_pip.liquid_class.max_volume, l_calibration
             ),
-            default_tipracks=uf.get_default_tipracks(left_pip.config.default_tipracks),
+            default_tipracks=uf.get_default_tipracks(
+                left_pip.liquid_class.default_tipracks
+            ),
         )
         if (
-            left_pip.config.max_volume > right_pip.config.max_volume
+            left_pip.liquid_class.max_volume > right_pip.liquid_class.max_volume
             or right_pip.config.channels > left_pip.config.channels
         ):
             r_info.rank = PipetteRank.second
@@ -533,7 +537,7 @@ class CheckCalibrationUserFlow:
             CheckAttachedPipette(
                 model=hw_pip.model,
                 name=hw_pip.name,
-                tipLength=hw_pip.config.tip_length,
+                tipLength=hw_pip.active_tip_settings.default_tip_length,
                 tipRackLoadName=info_pip.tip_rack.load_name,
                 tipRackDisplay=info_pip.tip_rack._core.get_definition()["metadata"][
                     "displayName"
@@ -558,7 +562,7 @@ class CheckCalibrationUserFlow:
         return CheckAttachedPipette(
             model=self.hw_pipette.model,
             name=self.hw_pipette.name,
-            tipLength=self.hw_pipette.config.tip_length,
+            tipLength=self.hw_pipette.active_tip_settings.default_tip_length,
             tipRackLoadName=self.active_pipette.tip_rack.load_name,
             tipRackDisplay=display_name,
             tipRackUri=self.active_pipette.tip_rack.uri,
@@ -840,8 +844,8 @@ class CheckCalibrationUserFlow:
                 self.active_tiprack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = self.hw_pipette.config.tip_overlap.get(
-                self.active_tiprack.uri, self.hw_pipette.config.tip_overlap["default"]
+            tip_overlap = self.hw_pipette.tip_overlap.get(
+                self.active_tiprack.uri, self.hw_pipette.tip_overlap["default"]
             )
             tip_length = self.active_tiprack.tip_length
             return tip_length - tip_overlap

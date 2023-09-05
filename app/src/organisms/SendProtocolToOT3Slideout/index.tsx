@@ -20,6 +20,7 @@ import type { IconProps, StyleProps } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
 
 interface SendProtocolToOT3SlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -51,6 +52,7 @@ export function SendProtocolToOT3Slideout(
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
+  const customLabwareFiles = useSelector(getValidCustomLabwareFiles)
 
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
@@ -82,7 +84,10 @@ export function SendProtocolToOT3Slideout(
       disableTimeout: true,
     })
 
-    createProtocolAsync({ files: srcFileObjects, protocolKey })
+    createProtocolAsync({
+      files: [...srcFileObjects, ...customLabwareFiles],
+      protocolKey,
+    })
       .then(() => {
         eatToast(toastId)
         makeToast(selectedRobot?.name ?? '', SUCCESS_TOAST, {

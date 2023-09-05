@@ -83,7 +83,12 @@ def test_analyses(
         assert error_details == protocol.app_analysis_error
         protocol_landing.click_popout_close()
     else:
-        assert protocol_landing.get_error_details_safe() is None, "Unexpected analysis error."
+        error_link = protocol_landing.get_error_details_safe()
+
+        if error_link is not None:
+            protocol_landing.base.click_webelement(error_link)
+            error_details = protocol_landing.get_popout_error().text
+            raise AssertionError(f"Unexpected analysis error: {error_details}")
 
     # Verifying elements on Protocol Landing Page
     # todo fix next line needs to be safe and print name not found

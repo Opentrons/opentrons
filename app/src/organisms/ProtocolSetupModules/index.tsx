@@ -11,8 +11,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LocationIcon,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -30,10 +32,9 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { LocationIcon } from '../../molecules/LocationIcon'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
@@ -48,6 +49,7 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -184,6 +186,11 @@ export function ProtocolSetupModules({
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
 
+  const modalHeader: ModalHeaderBaseProps = {
+    title: t('map_view'),
+    hasExitIcon: true,
+  }
+
   return (
     <>
       <Portal level="top">
@@ -198,39 +205,46 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showDeckMapModal ? (
-          <LegacyModal
-            title={t('map_view')}
-            onClose={() => setShowDeckMapModal(false)}
-            fullPage
+          <Modal
+            header={modalHeader}
+            modalSize="large"
+            onOutsideClick={() => setShowDeckMapModal(false)}
           >
             <RobotWorkSpace
               deckDef={deckDef}
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+              deckFill={COLORS.light1}
+              trashSlotName="A3"
               id="ModuleSetup_deckMap"
+              trashColor={COLORS.darkGreyEnabled}
             >
-              {() =>
-                attachedProtocolModuleMatches.map(module => (
-                  <Module
-                    key={module.moduleId}
-                    x={module.x}
-                    y={module.y}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      module.x
-                    )}
-                    def={module.moduleDef}
-                  >
-                    <ModuleInfo
-                      moduleModel={module.moduleDef.model}
-                      isAttached={module.attachedModuleMatch != null}
-                      usbPort={module.attachedModuleMatch?.usbPort.port ?? null}
-                      hubPort={module.attachedModuleMatch?.usbPort.hub ?? null}
-                      runId={runId}
-                    />
-                  </Module>
-                ))
-              }
+              {() => (
+                <>
+                  {attachedProtocolModuleMatches.map(module => (
+                    <Module
+                      key={module.moduleId}
+                      x={module.x}
+                      y={module.y}
+                      orientation={inferModuleOrientationFromXCoordinate(
+                        module.x
+                      )}
+                      def={module.moduleDef}
+                    >
+                      <ModuleInfo
+                        moduleModel={module.moduleDef.model}
+                        isAttached={module.attachedModuleMatch != null}
+                        physicalPort={
+                          module.attachedModuleMatch?.usbPort ?? null
+                        }
+                        runId={runId}
+                      />
+                    </Module>
+                  ))}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
+                </>
+              )}
             </RobotWorkSpace>
-          </LegacyModal>
+          </Modal>
         ) : null}
       </Portal>
       <Flex

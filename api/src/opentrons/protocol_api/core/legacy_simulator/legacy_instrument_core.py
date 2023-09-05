@@ -194,11 +194,11 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         location: Optional[types.Location],
         well_core: LegacyWellCore,
         home_after: Optional[bool],
-        randomize_drop_location: Optional[bool] = False,
+        alternate_drop_location: Optional[bool] = False,
     ) -> None:
-        if randomize_drop_location:
+        if alternate_drop_location:
             raise APIVersionError(
-                "Tip drop randomization is not supported in this API version."
+                "Tip drop alternation is not supported in this API version."
             )
         labware_core = well_core.geometry.parent
 

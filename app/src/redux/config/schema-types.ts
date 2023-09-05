@@ -1,4 +1,3 @@
-import { OT2_MANIFEST_URL, OT3_MANIFEST_URL } from './constants'
 import type { LogLevel } from '../../logger'
 import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
@@ -8,7 +7,10 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag = 'enableExtendedHardware'
+export type DevInternalFlag =
+  | 'enableExtendedHardware'
+  | 'lpcWithProbe'
+  | 'enableModuleCalibration'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -173,7 +175,7 @@ export interface ConfigV11 extends Omit<ConfigV10, 'version'> {
 export interface ConfigV12 extends Omit<ConfigV11, 'version' | 'buildroot'> {
   version: 12
   robotSystemUpdate: {
-    manifestUrls: { OT2: typeof OT2_MANIFEST_URL; OT3: typeof OT3_MANIFEST_URL }
+    manifestUrls: { OT2: string; OT3: string }
   }
 }
 
@@ -207,4 +209,16 @@ export interface ConfigV16 extends Omit<ConfigV15, 'version'> {
   }
 }
 
-export type Config = ConfigV16
+export interface ConfigV17 extends Omit<ConfigV16, 'version'> {
+  version: 17
+  protocols: ConfigV15['protocols'] & {
+    applyHistoricOffsets: boolean
+  }
+}
+
+export interface ConfigV18
+  extends Omit<ConfigV17, 'version' | 'robotSystemUpdate'> {
+  version: 18
+}
+
+export type Config = ConfigV18

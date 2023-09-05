@@ -10,6 +10,9 @@ from pydantic import BaseModel
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.errors.exceptions import (
+    EStopActivatedError as PE_EStopActivatedError,
+)
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.actions import (
@@ -37,6 +40,8 @@ from opentrons.protocol_engine.execution import (
     RailLightsHandler,
     StatusBarHandler,
 )
+
+from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
 
 
 @pytest.fixture
@@ -272,19 +277,27 @@ async def test_execute(
 
 
 @pytest.mark.parametrize(
-    ["command_error", "expected_error"],
+    ["command_error", "expected_error", "unexpected_error"],
     [
         (
             errors.ProtocolEngineError(message="oh no"),
             matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
+            False,
+        ),
+        (
+            EStopActivatedError("oh no"),
+            matchers.ErrorMatching(PE_EStopActivatedError, match="oh no"),
+            True,
         ),
         (
             RuntimeError("oh no"),
-            matchers.ErrorMatching(errors.UnexpectedProtocolError, match="oh no"),
+            matchers.ErrorMatching(PythonException, match="oh no"),
+            True,
         ),
         (
             asyncio.CancelledError(),
             matchers.ErrorMatching(errors.RunStoppedError),
+            False,
         ),
     ],
 )
@@ -306,6 +319,7 @@ async def test_execute_raises_protocol_engine_error(
     subject: CommandExecutor,
     command_error: Exception,
     expected_error: Any,
+    unexpected_error: bool,
 ) -> None:
     """It should handle an error occuring during execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)

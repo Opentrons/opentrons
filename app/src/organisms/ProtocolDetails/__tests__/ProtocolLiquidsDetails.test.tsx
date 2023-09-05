@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
-import { LiquidsListItemDetails } from '../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
+import { i18n } from '../../../i18n'
+import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
+import { LiquidsListItemDetails } from '../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
 jest.mock('../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList')
 jest.mock('@opentrons/api-client')
@@ -23,12 +24,24 @@ const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.Mocked
 >
 
 const render = (props: React.ComponentProps<typeof ProtocolLiquidsDetails>) => {
-  return renderWithProviders(<ProtocolLiquidsDetails {...props} />)
+  return renderWithProviders(<ProtocolLiquidsDetails {...props} />, {
+    i18nInstance: i18n,
+  })
 }
 
 describe('ProtocolLiquidsDetails', () => {
   let props: React.ComponentProps<typeof ProtocolLiquidsDetails>
   beforeEach(() => {
+    props = {
+      commands: [],
+      liquids: [
+        {
+          id: 'mockLiquid',
+          displayName: 'mockDisplayName',
+          description: 'mockDescription',
+        },
+      ],
+    }
     mockLiquidsListItemDetails.mockReturnValue(
       <div>mock liquids list item</div>
     )
@@ -47,5 +60,11 @@ describe('ProtocolLiquidsDetails', () => {
   it('renders the display name, description and total volume', () => {
     const [{ getAllByText }] = render(props)
     getAllByText('mock liquids list item')
+  })
+  it('renders the correct info for no liquids in the protocol', () => {
+    props.liquids = []
+    const [{ getByText, getByLabelText }] = render(props)
+    getByText('No liquids are specified for this protocol')
+    getByLabelText('ProtocolLIquidsDetails_noLiquidsIcon')
   })
 })

@@ -41,9 +41,11 @@ import {
   LabwareEntity,
   PipetteEntity,
   InvariantContext,
+  LabwareEntities,
 } from '@opentrons/step-generation'
 import { StepFieldName } from '../../form-types'
-import { LabwareLocation } from '@opentrons/shared-data'
+import type { LabwareLocation } from '@opentrons/shared-data'
+
 export type { StepFieldName }
 
 const getLabwareEntity = (
@@ -53,6 +55,15 @@ const getLabwareEntity = (
   return state.labwareEntities[id] || null
 }
 
+const getIsAdapterLocation = (
+  newLocation: string,
+  labwareEntities: LabwareEntities
+): boolean => {
+  if (labwareEntities[newLocation] == null) return false
+  return (
+    labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
+  )
+}
 const getLabwareLocation = (
   state: InvariantContext,
   newLocationString: string
@@ -61,8 +72,12 @@ const getLabwareLocation = (
     return 'offDeck'
   } else if (newLocationString in state.moduleEntities) {
     return { moduleId: newLocationString }
+  } else if (
+    newLocationString != null &&
+    getIsAdapterLocation(newLocationString, state.labwareEntities)
+  ) {
+    return { labwareId: newLocationString }
   } else {
-    // assume it is a slot
     return { slotName: newLocationString }
   }
 }

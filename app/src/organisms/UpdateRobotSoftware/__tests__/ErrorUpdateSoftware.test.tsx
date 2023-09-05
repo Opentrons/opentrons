@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { startBuildrootUpdate } from '../../../redux/buildroot'
+import { startRobotUpdate } from '../../../redux/robot-update'
 import { ErrorUpdateSoftware } from '../ErrorUpdateSoftware'
 
 const mockPush = jest.fn()
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -41,14 +41,14 @@ describe('ErrorUpdateSoftware', () => {
   it('call mockPush when tapping Proceed without updating', () => {
     const [{ getByText }] = render(props)
     getByText('Proceed without updating').click()
-    expect(mockPush).toBeCalledWith('/robot-settings/rename-robot')
+    expect(mockPush).toBeCalledWith('/emergency-stop')
   })
 
   it('call mock function when tapping Try again', () => {
     const [{ getByText }, store] = render(props)
     getByText('Try again').click()
     expect(store.dispatch).toHaveBeenCalledWith(
-      startBuildrootUpdate(props.robotName)
+      startRobotUpdate(props.robotName)
     )
   })
 })

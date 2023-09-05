@@ -1,11 +1,11 @@
+import { FIXED_TRASH_ID } from '../constants'
 import { tiprackWellNamesFlat } from './data'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   AspDispAirgapParams,
   BlowoutParams,
   TouchTipParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import { FIXED_TRASH_ID } from '../constants'
-import type { CreateCommand } from '@opentrons/shared-data'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
@@ -238,7 +238,7 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
 })
 export const delayCommand = (seconds: number): CreateCommand => ({
-  commandType: 'delay',
+  commandType: 'waitForDuration',
   key: expect.any(String),
   params: {
     seconds: seconds,
@@ -268,7 +268,7 @@ export const delayWithOffset = (
     },
   },
   {
-    commandType: 'delay',
+    commandType: 'waitForDuration',
     key: expect.any(String),
     params: {
       seconds: seconds ?? 12,

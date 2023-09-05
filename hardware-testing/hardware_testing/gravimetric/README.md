@@ -18,4 +18,31 @@ and substitute `internal-release` for whatever branch you're merging in to.
 
 ## Photometric tests
 
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96 --photometric --tip 50
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96 --photometric --tip 200
+
 ## Gravimetric tests
+
+###P1000 single channel QC
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --extra
+###P1000 multi channel QC
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --extra
+###P1000 96 channel QC
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 96
+###P50 single channel QC
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 1
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 1 --extra
+###P50 multi channel QC
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 8
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 8 --extra
+###Increment tests
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --increment --tip 50
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --increment --tip 200
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 1 --increment --tip 1000
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --increment --tip 50
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --increment --tip 200
+python3 -m hardware_testing.gravimetric --pipette 1000 --channels 8 --increment --tip 1000
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 1 --increment --tip 50
+python3 -m hardware_testing.gravimetric --pipette 50 --channels 8 --increment --tip 50

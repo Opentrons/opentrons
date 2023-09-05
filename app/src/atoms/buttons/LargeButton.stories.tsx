@@ -14,7 +14,6 @@ const LargeButtonTemplate: Story<
 export const PrimaryLargeButton = LargeButtonTemplate.bind({})
 PrimaryLargeButton.args = {
   buttonText: 'Button text',
-  buttonType: 'primary',
   disabled: false,
   iconName: 'play-round-corners',
 }

@@ -1,19 +1,19 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  IconProps,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_CENTER,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
   BORDERS,
   Btn,
-  SIZE_1,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  IconProps,
+  JUSTIFY_SPACE_BETWEEN,
   RESPONSIVENESS,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 
@@ -137,7 +137,7 @@ export function Banner(props: BannerProps): JSX.Element {
             <Icon
               width={SPACING.spacing24}
               height={SPACING.spacing24}
-              marginTop="0.375rem"
+              marginTop={SPACING.spacing6}
               name="close"
               aria-label="close_icon"
             />

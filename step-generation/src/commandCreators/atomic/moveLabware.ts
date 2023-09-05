@@ -43,7 +43,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     ) {
       errors.push(errorCreators.thermocyclerLidClosed())
     } else if (initialModuleState.type === HEATERSHAKER_MODULE_TYPE) {
-      if (initialModuleState.latchOpen === false) {
+      if (initialModuleState.latchOpen !== true) {
         errors.push(errorCreators.heaterShakerLatchClosed())
       } else if (initialModuleState.targetSpeed !== null) {
         errors.push(errorCreators.heaterShakerIsShaking())

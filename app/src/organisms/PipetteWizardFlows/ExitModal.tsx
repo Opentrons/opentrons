@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   SPACING,
-  Flex,
   TYPOGRAPHY,
   SecondaryButton,
   AlertPrimaryButton,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -46,21 +46,18 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       header={t('progress_will_be_lost', { flow: flowTitle })}
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
     >
       {isOnDevice ? (
         <>
-          <Flex marginRight={SPACING.spacing8}>
-            <SmallButton
-              onClick={proceed}
-              buttonText={capitalize(t('shared:exit'))}
-              buttonType="alert"
-            />
-          </Flex>
           <SmallButton
-            buttonText={t('shared:go_back')}
-            buttonType="primary"
-            onClick={goBack}
+            marginRight={SPACING.spacing8}
+            onClick={proceed}
+            buttonText={capitalize(t('shared:exit'))}
+            buttonType="alert"
           />
+
+          <SmallButton buttonText={t('shared:go_back')} onClick={goBack} />
         </>
       ) : (
         <>

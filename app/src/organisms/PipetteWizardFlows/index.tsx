@@ -7,18 +7,20 @@ import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   LoadedPipette,
+  CreateCommand,
 } from '@opentrons/shared-data'
 import {
   useHost,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
@@ -38,7 +40,10 @@ import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
+import type { CommandData } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
+
+const RUN_REFETCH_INTERVAL = 5000
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
@@ -75,7 +80,6 @@ export const PipetteWizardFlows = (
     pipette => pipette.mount === mount
   )
   const host = useHost()
-  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
@@ -100,22 +104,33 @@ export const PipetteWizardFlows = (
       currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+  })
+  const prevMaintenanceRunId = React.useRef<string | undefined>(
+    maintenanceRunData?.data.id
+  )
+
+  React.useEffect(() => {
+    prevMaintenanceRunId.current = maintenanceRunData?.data.id
+  }, [maintenanceRunData?.data.id])
   const {
     chainRunCommands,
     isCommandMutationLoading,
-  } = useChainMaintenanceCommands(maintenanceRunId)
+  } = useChainMaintenanceCommands()
 
   const {
     createMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation(
-    {
-      onSuccess: response => {
-        setMaintenanceRunId(response.data.id)
-      },
-    },
-    host
-  )
+  } = useCreateMaintenanceRunMutation({}, host)
+
+  // this will close the modal in case the run was deleted by the terminate
+  // activity modal on the ODD
+  React.useEffect(() => {
+    if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
+      closeFlow()
+    }
+  }, [maintenanceRunData, closeFlow])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
@@ -143,14 +158,18 @@ export const PipetteWizardFlows = (
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunId == null) handleClose()
+    if (maintenanceRunData?.data.id == null) handleClose()
     else {
-      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+      chainRunCommands(
+        maintenanceRunData?.data.id,
+        [{ commandType: 'home' as const, params: {} }],
+        false
+      )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunId)
+          deleteMaintenanceRun(maintenanceRunData?.data.id)
         })
         .catch(error => {
-          console.error(error)
+          console.error(error.message)
           handleClose()
         })
     }
@@ -171,11 +190,25 @@ export const PipetteWizardFlows = (
     }
   }, [isCommandMutationLoading, isExiting])
 
+  let chainMaintenanceRunCommands
+
+  if (maintenanceRunData?.data.id != null) {
+    chainMaintenanceRunCommands = (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ): Promise<CommandData[]> =>
+      chainRunCommands(
+        maintenanceRunData.data.id,
+        commands,
+        continuePastCommandFailure
+      )
+  }
+
   const calibrateBaseProps = {
-    chainRunCommands,
+    chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
-    maintenanceRunId,
+    maintenanceRunId: maintenanceRunData?.data.id,
     goBack,
     attachedPipettes,
     setShowErrorMessage,
@@ -314,11 +347,8 @@ export const PipetteWizardFlows = (
     (selectedPipette === NINETY_SIX_CHANNEL &&
       currentStep.section === SECTIONS.DETACH_PIPETTE)
 
-  const isCalibrationErrorExiting =
-    currentStep.section === SECTIONS.ATTACH_PROBE && errorMessage != null
-
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal || isCalibrationErrorExiting) {
+  if (isRobotMoving || showUnskippableStepModal) {
     exitWizardButton = undefined
   } else if (is96ChannelUnskippableStep) {
     exitWizardButton = () => setIsUnskippableStep(true)

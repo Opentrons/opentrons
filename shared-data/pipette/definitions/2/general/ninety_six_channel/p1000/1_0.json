@@ -1,8 +1,8 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "P1000 96 Channel GEN3",
+  "displayName": "Flex 96-Channel 1000 μL",
   "model": "p1000",
-  "displayCategory": "GEN3",
+  "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
     "current": 1.5,
     "presses": 0.0,
@@ -13,10 +13,12 @@
   "dropTipConfigurations": { "current": 1.5, "speed": 5.5, "distance": 26.5 },
   "plungerMotorConfigurations": { "idle": 0.3, "run": 2.0 },
   "plungerPositionsConfigurations": {
-    "top": 0,
-    "bottom": 66,
-    "blowout": 71,
-    "drop": 80
+    "default": {
+      "top": 0,
+      "bottom": 66,
+      "blowout": 71,
+      "drop": 80
+    }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
@@ -32,5 +34,6 @@
   "channels": 96,
   "shaftDiameter": 9.0,
   "shaftULperMM": 63.617,
-  "backlashDistance": 0.3
+  "backlashDistance": 0.3,
+  "quirks": []
 }

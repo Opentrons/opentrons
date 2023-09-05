@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import {
+  ALIGN_CENTER,
+  Flex,
   FormGroup,
+  SPACING,
   Tooltip,
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
@@ -10,18 +13,22 @@ import {
 import { i18n } from '../../../../localization'
 import {
   LabwareField,
-  ToggleRowField,
   LabwareLocationField,
+  CheckboxRowField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getRobotType } from '../../../../file-data/selectors'
-import { getAdditionalEquipment } from '../../../../step-forms/selectors'
-import { StepFormProps } from '../../types'
+import {
+  getAdditionalEquipment,
+  getCurrentFormCanBeSaved,
+} from '../../../../step-forms/selectors'
+import type { StepFormProps } from '../../types'
 
 export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
   const { propsForFields } = props
   const robotType = useSelector(getRobotType)
+  const canSave = useSelector(getCurrentFormCanBeSaved)
   const additionalEquipment = useSelector(getAdditionalEquipment)
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
@@ -30,7 +37,6 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
     placement: TOOLTIP_BOTTOM,
     strategy: TOOLTIP_FIXED,
   })
-
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -46,7 +52,11 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
           <LabwareField {...propsForFields.labware} />
         </FormGroup>
         {robotType === FLEX_ROBOT_TYPE ? (
-          <>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            marginTop={SPACING.spacing4}
+            marginLeft={SPACING.spacing16}
+          >
             {!isGripperAttached ? (
               <Tooltip {...tooltipProps}>
                 {i18n.t(
@@ -55,23 +65,15 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
               </Tooltip>
             ) : null}
             <div {...targetProps}>
-              <FormGroup
-                className={styles.small_field}
-                label={i18n.t('form.step_edit_form.field.useGripper.label')}
-              >
-                <ToggleRowField
+              <FormGroup>
+                <CheckboxRowField
                   {...propsForFields.useGripper}
                   disabled={!isGripperAttached}
-                  offLabel={i18n.t(
-                    'form.step_edit_form.field.useGripper.toggleOff'
-                  )}
-                  onLabel={i18n.t(
-                    'form.step_edit_form.field.useGripper.toggleOn'
-                  )}
+                  label={i18n.t('form.step_edit_form.field.useGripper.label')}
                 />
               </FormGroup>
             </div>
-          </>
+          </Flex>
         ) : null}
       </div>
       <div className={styles.form_row}>
@@ -82,6 +84,8 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
           <LabwareLocationField
             {...propsForFields.newLocation}
             useGripper={propsForFields.useGripper.value === true}
+            canSave={canSave}
+            labware={String(propsForFields.labware.value)}
           />
         </FormGroup>
       </div>

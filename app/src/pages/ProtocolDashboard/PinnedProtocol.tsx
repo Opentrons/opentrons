@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { format, formatDistance } from 'date-fns'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_START,
@@ -85,11 +85,18 @@ export function PinnedProtocol(props: {
     }
   }, [longpress.isLongPressed, longPress])
 
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${longpress.isLongPressed ? '' : COLORS.darkBlack40};
+    }
+  `
+
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
+      css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing24}
       height={cardStyleBySize[cardSize].height}
@@ -127,7 +134,7 @@ export function PinnedProtocol(props: {
           {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
         </StyledText>
       </Flex>
-      {longpress.isLongPressed === true && (
+      {longpress.isLongPressed && (
         <LongPressModal
           longpress={longpress}
           protocolId={protocol.id}
@@ -144,7 +151,7 @@ const ProtocolNameText = styled(StyledText)`
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>
     props.cardSize === 'full' ? 1 : 2};
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   font-size: ${(props: { cardSize: CardSizeType }) =>
     cardStyleBySize[props.cardSize].fontSize};
   font-weight: ${(props: { cardSize: CardSizeType }) =>

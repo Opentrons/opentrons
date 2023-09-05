@@ -1,3 +1,4 @@
+from json import load as json_load
 from pathlib import Path
 import pytest
 from typing import Tuple
@@ -9,12 +10,9 @@ from hardware_testing.gravimetric.liquid_height.height import (
     initialize_liquid_from_deck,
 )
 from hardware_testing.gravimetric.helpers import get_api_context
-from hardware_testing.gravimetric.labware.radwag_pipette_calibration_vial import (
-    VIAL_DEFINITION,
-)
 
 CUSTOM_LABWARE_DEFINITION_DIR = (
-    Path(__file__).parent.parent.parent.parent / "protocols" / "definitions"
+    Path(__file__).parent.parent.parent.parent / "hardware_testing" / "labware"
 )
 
 
@@ -26,8 +24,13 @@ def _load_labware(ctx: ProtocolContext) -> Tuple[Labware, Labware, Labware, Labw
     tiprack = ctx.load_labware(load_name="opentrons_96_tiprack_300uL", location="8")
     trough = ctx.load_labware(load_name="nest_12_reservoir_15ml", location="5")
     plate = ctx.load_labware(load_name="corning_96_wellplate_360ul_flat", location="2")
+    vial_path = (
+        CUSTOM_LABWARE_DEFINITION_DIR / "radwag_pipette_calibration_vial" / "1.json"
+    )
+    with open(vial_path, "r") as f:
+        vial_def = json_load(f)
     vial = ctx.load_labware_from_definition(
-        VIAL_DEFINITION,
+        vial_def,
         location="6",
     )
     return tiprack, trough, plate, vial

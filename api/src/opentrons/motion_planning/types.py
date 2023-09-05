@@ -29,3 +29,12 @@ class MoveType(Enum):
     GENERAL_ARC = auto_enum_value()
     IN_LABWARE_ARC = auto_enum_value()
     DIRECT = auto_enum_value()
+
+
+@dataclass(frozen=True)
+@final
+class GripperMovementWaypointsWithJawStatus:
+    """Gripper motion waypoint with expected jaw status while moving to the waypoint."""
+
+    position: Point
+    jaw_open: bool

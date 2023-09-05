@@ -3,7 +3,7 @@ from typing_extensions import Literal
 from typing import Dict, Optional, Type, Union, List, Tuple
 
 from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -20,6 +20,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleModel as EngineModuleModel,
     LabwareMovementStrategy,
     LabwareOffsetVector,
@@ -30,10 +31,12 @@ from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
     OFF_DECK_LOCATION,
     LabwareLocation,
+    NonStackedLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
     LabwareNotLoadedOnModuleError,
+    LabwareNotLoadedOnLabwareError,
 )
 
 from ... import validation
@@ -134,7 +137,9 @@ class ProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -160,6 +165,8 @@ class ProtocolCore(
             version=version,
             display_name=label,
         )
+        # FIXME(jbl, 2023-08-14) validating after loading the object issue
+        validation.ensure_definition_is_labware(load_result.definition)
 
         # FIXME(mm, 2023-02-21):
         #
@@ -193,16 +200,62 @@ class ProtocolCore(
 
         return labware_core
 
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LabwareCore:
+        """Load an adapter using its identifying parameters"""
+        load_location = self._get_non_stacked_location(location=location)
+
+        custom_labware_params = (
+            self._engine_client.state.labware.find_custom_labware_load_params()
+        )
+        namespace, version = load_labware_params.resolve(
+            load_name, namespace, version, custom_labware_params
+        )
+        load_result = self._engine_client.load_labware(
+            load_name=load_name,
+            location=load_location,
+            namespace=namespace,
+            version=version,
+        )
+        # FIXME(jbl, 2023-08-14) validating after loading the object issue
+        validation.ensure_definition_is_adapter(load_result.definition)
+
+        # FIXME(jbl, 2023-06-23) read fixme above:
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_labware_id=load_result.labwareId,
+            # It's important that we don't fetch these IDs from Protocol Engine, and
+            # use our own bookkeeping instead. If we fetched these IDs from Protocol
+            # Engine, it would have leaked state from Labware Position Check in the
+            # same HTTP run.
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+        )
+
+        labware_core = LabwareCore(
+            labware_id=load_result.labwareId,
+            engine_client=self._engine_client,
+        )
+
+        self._labware_cores_by_id[labware_core.labware_id] = labware_core
+
+        return labware_core
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareCore,
         new_location: Union[
-            DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
         ],
         use_gripper: bool,
-        use_pick_up_location_lpc_offset: bool,
-        use_drop_location_lpc_offset: bool,
         pick_up_offset: Optional[Tuple[float, float, float]],
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
@@ -234,8 +287,6 @@ class ProtocolCore(
             labware_id=labware_core.labware_id,
             new_location=to_location,
             strategy=strategy,
-            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
-            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
@@ -266,17 +317,23 @@ class ProtocolCore(
         """Load a module into the protocol."""
         assert configuration is None, "Module `configuration` is deprecated"
 
+        module_type = ModuleType.from_model(model)
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
-            if ModuleType.from_model(model) == ModuleType.THERMOCYCLER:
+            module_type = ModuleType.from_model(model)
+            if module_type == ModuleType.THERMOCYCLER:
                 deck_slot = DeckSlotName.SLOT_7
             else:
                 raise InvalidModuleLocationError(deck_slot, model.name)
 
+        robot_type = self._engine_client.state.config.robot_type
+        normalized_deck_slot = deck_slot.to_equivalent_for_robot_type(robot_type)
+        self._ensure_module_location(normalized_deck_slot, module_type)
+
         result = self._engine_client.load_module(
             model=EngineModuleModel(model),
-            location=DeckSlotLocation(slotName=deck_slot),
+            location=DeckSlotLocation(slotName=normalized_deck_slot),
         )
 
         module_core = self._get_module_core(load_module_result=result, model=model)
@@ -425,6 +482,17 @@ class ProtocolCore(
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
 
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+        return self._engine_client.state.labware.get_slot_definition(slot)
+
+    def _ensure_module_location(
+        self, slot: DeckSlotName, module_type: ModuleType
+    ) -> None:
+        slot_def = self.get_slot_definition(slot)
+        compatible_modules = slot_def["compatibleModuleTypes"]
+        if module_type.value not in compatible_modules:
+            raise ValueError(f"A {module_type.value} cannot be loaded into slot {slot}")
+
     def get_slot_item(
         self, slot_name: DeckSlotName
     ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
@@ -453,6 +521,18 @@ class ProtocolCore(
             )
             return self._labware_cores_by_id[labware_id]
         except LabwareNotLoadedOnModuleError:
+            return None
+
+    def get_labware_on_labware(
+        self, labware_core: LabwareCore
+    ) -> Optional[LabwareCore]:
+        """Get the item on top of a given labware, if any."""
+        try:
+            labware_id = self._engine_client.state.labware.get_id_by_labware(
+                labware_core.labware_id
+            )
+            return self._labware_cores_by_id[labware_id]
+        except LabwareNotLoadedOnLabwareError:
             return None
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
@@ -493,24 +573,37 @@ class ProtocolCore(
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[str, ModuleCore, NonConnectedModuleCore, OffDeckType]:
+    ) -> Union[str, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id
         )
         if isinstance(labware_location, DeckSlotLocation):
-            return validation.ensure_deck_slot_string(
+            return validation.internal_slot_to_public_string(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id[labware_location.moduleId]
+        elif isinstance(labware_location, OnLabwareLocation):
+            return self._labware_cores_by_id[labware_location.labwareId]
 
         return OffDeckType.OFF_DECK
 
-    @staticmethod
     def _convert_labware_location(
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+        self,
+        location: Union[
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
     ) -> LabwareLocation:
+        if isinstance(location, LabwareCore):
+            return OnLabwareLocation(labwareId=location.labware_id)
+        else:
+            return self._get_non_stacked_location(location)
+
+    @staticmethod
+    def _get_non_stacked_location(
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+    ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)
         elif location is OffDeckType.OFF_DECK:

@@ -34,7 +34,19 @@ class EnumeratedError(Exception):
 
     def __str__(self) -> str:
         """Get a human-readable string."""
-        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}'
+        _node = self.detail.get("node")
+        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}{f" ({_node})" if _node else ""}'
+
+    def __eq__(self, other: object) -> bool:
+        """Compare if two enumerated errors match."""
+        if not isinstance(other, EnumeratedError):
+            return NotImplemented
+        return (
+            self.code == other.code
+            and self.message == other.message
+            and self.detail == other.detail
+            and self.wrapping == other.wrapping
+        )
 
 
 class CommunicationError(EnumeratedError):
@@ -196,7 +208,7 @@ class PythonException(GeneralError):
         base_details["class"] = type(exc).__name__
 
         super().__init__(
-            message="\n".join(format_exception_only(type(exc), exc)),
+            message="\n".join(format_exception_only(type(exc), exc)).strip(),
             detail=base_details,
             wrapping=_descend_exc_ctx(exc),
         )
@@ -286,6 +298,49 @@ class FirmwareUpdateFailedError(CommunicationError):
         super().__init__(ErrorCodes.FIRMWARE_UPDATE_FAILED, message, detail, wrapping)
 
 
+class InternalMessageFormatError(CommunicationError):
+    """An error indicating that an internal message was formatted incorrectly."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InternalMesasgeFormatError."""
+        super().__init__(
+            ErrorCodes.INTERNAL_MESSAGE_FORMAT_ERROR, message, detail, wrapping
+        )
+
+
+class CANBusConfigurationError(CommunicationError):
+    """An error indicating a misconfiguration of the CANbus."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CANBus Configuration Error."""
+        super().__init__(
+            ErrorCodes.CANBUS_CONFIGURATION_ERROR, message, detail, wrapping
+        )
+
+
+class CANBusBusError(CommunicationError):
+    """An error indicating a low-level bus error on the CANbus like an error frame."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CANBus Bus Error."""
+        super().__init__(ErrorCodes.CANBUS_BUS_ERROR, message, detail, wrapping)
+
+
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
 
@@ -338,6 +393,139 @@ class MotionPlanningFailureError(RoboticsControlError):
     ) -> None:
         """Build a MotionPlanningFailureError."""
         super().__init__(ErrorCodes.MOTION_PLANNING_FAILURE, message, detail, wrapping)
+
+
+class PositionEstimationInvalidError(RoboticsControlError):
+    """An error indicating that a command failed because position estimation was invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PositionEstimationFailedError."""
+        super().__init__(
+            ErrorCodes.POSITION_ESTIMATION_INVALID, message, detail, wrapping
+        )
+
+
+class MoveConditionNotMetError(RoboticsControlError):
+    """An error indicating that a move completed without its condition being met."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MoveConditionNotMetError."""
+        super().__init__(
+            ErrorCodes.MOVE_CONDITION_NOT_MET,
+            message or "Move completed without its complete condition being met",
+            detail,
+            wrapping,
+        )
+
+
+class CalibrationStructureNotFoundError(RoboticsControlError):
+    """An error indicating that a calibration square was not able to be found."""
+
+    def __init__(
+        self,
+        structure_height: float,
+        lower_limit: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CalibrationStructureNotFoundError."""
+        super().__init__(
+            ErrorCodes.CALIBRATION_STRUCTURE_NOT_FOUND,
+            f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}.",
+            detail,
+            wrapping,
+        )
+
+
+class EdgeNotFoundError(RoboticsControlError):
+    """An error indicating that a calibration square edge was not able to be found."""
+
+    def __init__(
+        self,
+        edge_name: str,
+        stride: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a EdgeNotFoundError."""
+        super().__init__(
+            ErrorCodes.EDGE_NOT_FOUND,
+            f"Edge {edge_name} could not be verified at {stride} mm resolution.",
+            detail,
+            wrapping,
+        )
+
+
+class EarlyCapacitiveSenseTrigger(RoboticsControlError):
+    """An error indicating that a capacitive probe triggered too early."""
+
+    def __init__(
+        self,
+        found: float,
+        nominal: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a EarlyCapacitiveSenseTrigger."""
+        super().__init__(
+            ErrorCodes.EARLY_CAPACITIVE_SENSE_TRIGGER,
+            f"Calibration triggered early at z={found}mm, expected {nominal}",
+            detail,
+            wrapping,
+        )
+
+
+class InaccurateNonContactSweepError(RoboticsControlError):
+    """An error indicating that a capacitive sweep was inaccurate."""
+
+    def __init__(
+        self,
+        found: float,
+        nominal: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InaccurateNonContactSweepError."""
+        msg = (
+            f"Calibration detected a slot width of {found:.3f}mm, "
+            f"which is too far from the design width of {nominal:.3f}mm"
+        )
+        super().__init__(
+            ErrorCodes.INACCURATE_NON_CONTACT_SWEEP,
+            msg,
+            detail,
+            wrapping,
+        )
+
+
+class MisalignedGantryError(RoboticsControlError):
+    """An error indicating that the robot's gantry and deck are misaligned."""
+
+    def __init__(
+        self,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MisalignedGantryError."""
+        msg = "This machine is misaligned and requires maintenance."
+        if detail:
+            msg += str(detail)
+        super().__init__(
+            ErrorCodes.MISALIGNED_GANTRY,
+            msg,
+            detail,
+            wrapping,
+        )
 
 
 class LabwareDroppedError(RoboticsInteractionError):
@@ -513,6 +701,19 @@ class ModuleNotPresent(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.MODULE_NOT_PRESENT, checked_message, checked_detail, wrapping
         )
+
+
+class InvalidInstrumentData(RoboticsInteractionError):
+    """An error indicating that instrument data is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an GripperNotPresentError."""
+        super().__init__(ErrorCodes.INVALID_INSTRUMENT_DATA, message, detail, wrapping)
 
 
 class APIRemoved(GeneralError):

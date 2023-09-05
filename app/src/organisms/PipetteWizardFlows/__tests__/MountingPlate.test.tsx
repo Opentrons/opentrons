@@ -47,6 +47,10 @@ describe('MountingPlate', () => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
+            commandType: 'home',
+            params: { axes: ['rightZ'] },
+          },
+          {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
           },

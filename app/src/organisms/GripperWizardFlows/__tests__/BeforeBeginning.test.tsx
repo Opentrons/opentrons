@@ -37,6 +37,8 @@ describe('BeforeBeginning', () => {
       createMaintenanceRun: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
+      setErrorMessage: jest.fn(),
+      errorMessage: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -71,7 +73,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'extension' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -100,7 +102,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'extension' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -133,7 +135,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'extension' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()

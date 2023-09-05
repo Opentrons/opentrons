@@ -7,6 +7,7 @@ import {
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 import {
   C_DARK_GRAY,
@@ -19,6 +20,7 @@ import {
   ALIGN_CENTER,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
+import { multiplyMatrices } from '../utils'
 import { Thermocycler } from './Thermocycler'
 import { ModuleFromDef } from './ModuleFromDef'
 import { HeaterShaker } from './HeaterShaker'
@@ -28,16 +30,6 @@ export * from './Thermocycler'
 export * from './ModuleFromDef'
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
-
-// multiply two matrices together (dot product)
-function multiplyMatrices(a: number[][], b: number[][]): number[][] {
-  const transposedB = b[0].map((_val, index) => b.map(row => row[index]))
-  return a.map(rowA =>
-    transposedB.map(rowB =>
-      rowA.reduce((acc, valA, colIndexA) => acc + valA * rowB[colIndexA], 0)
-    )
-  )
-}
 
 interface Props {
   x: number
@@ -200,11 +192,12 @@ export const Module = (props: Props): JSX.Element => {
     />
   )
   if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-    moduleViz = (
-      <Thermocycler
-        {...(innerProps as React.ComponentProps<typeof Thermocycler>)}
-      />
-    )
+    const thermocyclerProps = {
+      ...innerProps,
+      model: def.model as ThermocyclerModuleModel,
+    }
+
+    moduleViz = <Thermocycler {...thermocyclerProps} />
   } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
     moduleViz = (
       <HeaterShaker

@@ -6,7 +6,6 @@ import {
   Box,
   Flex,
   DIRECTION_COLUMN,
-  OVERFLOW_SCROLL,
   SIZE_6,
   BORDERS,
   COLORS,
@@ -23,7 +22,7 @@ import {
   OPENTRONS_USB,
 } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
-import { getBuildrootSession } from '../../../redux/buildroot'
+import { getRobotUpdateSession } from '../../../redux/robot-update'
 import { getDevtoolsEnabled } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
@@ -49,7 +48,7 @@ export function RobotSettings(): JSX.Element | null {
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
   )
-  const buildrootUpdateSession = useSelector(getBuildrootSession)
+  const robotUpdateSession = useSelector(getRobotUpdateSession)
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
     if (isRobotBusy) setShowRobotBusyBanner(true)
@@ -86,7 +85,7 @@ export function RobotSettings(): JSX.Element | null {
     (robot == null ||
       robot?.status === UNREACHABLE ||
       (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')) &&
-    buildrootUpdateSession == null
+    robotUpdateSession == null
   ) {
     return <Redirect to={`/devices/${robotName}`} />
   }
@@ -105,12 +104,7 @@ export function RobotSettings(): JSX.Element | null {
   )
 
   return (
-    <Box
-      minWidth={SIZE_6}
-      height="100%"
-      overflow={OVERFLOW_SCROLL}
-      padding={SPACING.spacing16}
-    >
+    <Box minWidth={SIZE_6} height="max-content" padding={SPACING.spacing16}>
       <Flex
         backgroundColor={COLORS.white}
         border={BORDERS.lineBorder}

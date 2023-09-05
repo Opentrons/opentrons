@@ -27,12 +27,15 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
+  LoadModuleRunTimeCommand,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  RunTimeCommand,
+  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
@@ -42,7 +45,7 @@ import { SecureLabwareModal } from './SecureLabwareModal'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
@@ -61,6 +64,7 @@ interface LabwareListItemProps extends LabwareSetupItem {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
   isOt3: boolean
+  commands: RunTimeCommand[]
 }
 
 export function LabwareListItem(
@@ -75,6 +79,7 @@ export function LabwareListItem(
     moduleLocation,
     extraAttentionModules,
     isOt3,
+    commands,
   } = props
   const { t } = useTranslation('protocol_setup')
   const [
@@ -98,6 +103,36 @@ export function LabwareListItem(
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand
 
+  if (initialLocation !== 'offDeck' && 'labwareId' in initialLocation) {
+    const loadedAdapter = commands.find(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware' &&
+        command.result?.labwareId === initialLocation.labwareId
+    )
+    const loadedAdapterLocation = loadedAdapter?.params.location
+
+    if (loadedAdapterLocation != null && loadedAdapterLocation !== 'offDeck') {
+      if ('slotName' in loadedAdapterLocation) {
+        slotInfo = t('adapter_slot_location', {
+          slotName: loadedAdapterLocation.slotName,
+          adapterName: loadedAdapter?.result?.definition.metadata.displayName,
+        })
+      } else if ('moduleId' in loadedAdapterLocation) {
+        const module = commands.find(
+          (command): command is LoadModuleRunTimeCommand =>
+            command.commandType === 'loadModule' &&
+            command.params.moduleId === loadedAdapterLocation.moduleId
+        )
+        if (module != null) {
+          slotInfo = t('adapter_slot_location_module', {
+            slotName: module.params.location.slotName,
+            adapterName: loadedAdapter?.result?.definition.metadata.displayName,
+            moduleName: getModuleDisplayName(module.params.model),
+          })
+        }
+      }
+    }
+  }
   if (
     initialLocation !== 'offDeck' &&
     'moduleId' in initialLocation &&
@@ -296,9 +331,7 @@ function StandaloneLabware(props: {
   const { definition } = props
   return (
     <LabwareThumbnail
-      viewBox={` 0 0 ${String(definition.dimensions.xDimension)} ${String(
-        definition.dimensions.yDimension
-      )}`}
+      viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
     >
       <LabwareRender
         definition={definition}

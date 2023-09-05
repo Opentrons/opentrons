@@ -104,17 +104,22 @@ describe('ProtocolCard', () => {
     getByText('Delete protocol')
   })
 
-  it('should display modal after long click even when analysis failed', async () => {
+  it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing', async () => {
     mockUseProtocolAnalysesQuery.mockReturnValue({
       data: { data: [{ result: 'error' }] } as any,
     } as UseQueryResult<ProtocolAnalyses>)
-    const [{ getByText }] = render()
+    const [{ getByText, getByLabelText }] = render()
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     jest.advanceTimersByTime(1005)
     expect(props.longPress).toHaveBeenCalled()
-    getByText('Run protocol')
-    getByText('Pin protocol')
+    getByLabelText('failedAnalysis_icon')
+    getByText('Failed analysis')
+    getByText('yay mock protocol').click()
+    getByText('Protocol analysis failed')
+    getByText(
+      'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
+    )
     getByText('Delete protocol')
   })
 })

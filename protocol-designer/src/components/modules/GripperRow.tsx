@@ -7,6 +7,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  LabeledValue,
+  SPACING,
 } from '@opentrons/components'
 import gripperImage from '../../images/flex_gripper.svg'
 import styles from './styles.css'
@@ -26,6 +28,17 @@ export function GripperRow(props: GripperRowProps): JSX.Element {
         <h4 className={styles.row_title}>Flex Gripper</h4>
         <AdditionalItemImage src={gripperImage} alt="Opentrons Flex Gripper" />
       </Flex>
+      <div
+        className={styles.module_col}
+        style={{ marginLeft: SPACING.spacing32 }}
+      >
+        {isGripperAdded && (
+          <LabeledValue
+            label="Model"
+            value={i18n.t(`modules.model_display_name.gripperV1`)}
+          />
+        )}
+      </div>
       <div
         className={styles.modules_button_group}
         style={{ alignSelf: ALIGN_CENTER }}

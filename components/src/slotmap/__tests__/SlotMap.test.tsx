@@ -35,7 +35,7 @@ describe('SlotMap', () => {
     const wrapper = shallow(
       <SlotMap occupiedSlots={['D1']} robotType={FLEX_ROBOT_TYPE} />
     )
-    expect(wrapper.find('rect')).toHaveLength(12)
+    expect(wrapper.find('rect')).toHaveLength(11)
   })
 
   it('component renders crash info icon when collision slots present for flex', () => {

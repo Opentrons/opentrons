@@ -40,7 +40,7 @@ class FirmwareUpdateEraser:
                     self._wait_response(node_id, reader), timeout_sec
                 )
             except asyncio.TimeoutError:
-                raise TimeoutResponse(request)
+                raise TimeoutResponse(request, node_id)
 
     @staticmethod
     async def _wait_response(node_id: NodeId, reader: WaitableCallback) -> None:
@@ -52,6 +52,6 @@ class FirmwareUpdateEraser:
                 and arbitration_id.parts.originating_node_id == node_id
             ):
                 if response.payload.error_code.value != ErrorCode.ok:
-                    raise ErrorResponse(response)
+                    raise ErrorResponse(response, node_id)
                 else:
                     break

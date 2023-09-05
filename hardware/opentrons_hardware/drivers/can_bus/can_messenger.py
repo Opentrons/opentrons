@@ -16,40 +16,32 @@ from typing import (
 
 import logging
 
-from opentrons_hardware.drivers.errors import CANCommunicationError
+from opentrons_shared_data.errors.exceptions import (
+    CanbusCommunicationError,
+    EnumeratedError,
+    PythonException,
+)
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
 from opentrons_hardware.firmware_bindings.message import CanMessage
-from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
-    BinarySerializable,
-)
-
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     MessageId,
     FunctionCode,
-    ErrorSeverity,
     ErrorCode,
 )
-
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     Acknowledgement,
     ErrorMessage,
 )
-
 from opentrons_hardware.firmware_bindings.messages.messages import (
     MessageDefinition,
     get_definition,
 )
-
-from opentrons_hardware.firmware_bindings.messages.payloads import ErrorMessagePayload
-
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
-
-from .errors import AsyncHardwareError, CanError
 
 log = logging.getLogger(__name__)
 
@@ -238,11 +230,13 @@ class CanMessenger:
             await self._drive.send(
                 message=CanMessage(arbitration_id=arbitration_id, data=data)
             )
-        except CANCommunicationError:
+        except EnumeratedError:
             raise
         except Exception as exc:
             log.exception("Exception in CAN send")
-            raise CANCommunicationError(exc=exc) from exc
+            raise CanbusCommunicationError(
+                message="Exception in canbus.send", wrapping=[PythonException(exc)]
+            )
 
     async def ensure_send_exclusive(
         self,
@@ -293,11 +287,13 @@ class CanMessenger:
         )
         try:
             return await listener.send_and_verify_recieved()
-        except CANCommunicationError:
+        except EnumeratedError:
             raise
         except Exception as exc:
             log.exception("Exception in CAN ensure_send")
-            raise CANCommunicationError(exc=exc) from exc
+            raise CanbusCommunicationError(
+                message="Exception in CAN ensure_send", wrapping=[PythonException(exc)]
+            )
 
     async def __aenter__(self: CanMessenger) -> CanMessenger:
         """Start messenger."""
@@ -313,9 +309,10 @@ class CanMessenger:
         """Stop messenger."""
         await self.stop()
         if exc_val:
-            if isinstance(exc_val, CANCommunicationError):
+            if isinstance(exc_val, EnumeratedError):
                 raise exc_val
-            raise CANCommunicationError(exc=exc_val)
+            # Don't want a specific error here because this wraps other code
+            raise PythonException(exc_val)
 
     def start(self) -> None:
         """Start the reader task."""
@@ -354,12 +351,8 @@ class CanMessenger:
                 await self._read_task()
             except (asyncio.CancelledError, StopAsyncIteration):
                 return
-            except (CANCommunicationError, AsyncHardwareError, CanError) as e:
-                log.exception(f"Nonfatal error in CAN read task: {e}")
-                continue
-            except Exception as e:
-                # Log this separately if it's some unknown error
-                log.exception(f"Unexpected error in CAN read task: {e}")
+            except BaseException:
+                log.exception("Exception in read")
                 continue
 
     async def _read_task(self) -> None:
@@ -375,36 +368,26 @@ class CanMessenger:
                         f"Received <--\n\tarbitration_id: {message.arbitration_id},\n\t"
                         f"payload: {build}"
                     )
+                    handled = False
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
                             log.debug("message ignored by filter")
                             continue
                         listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
-                    if (
-                        message.arbitration_id.parts.message_id
-                        == MessageId.error_message
-                    ):
-                        await self._handle_error(build)
+                        handled = True
+                    if not handled:
+                        if (
+                            message.arbitration_id.parts.message_id
+                            == MessageId.error_message
+                        ):
+                            log.error(f"Asynchronous error message ignored: {message}")
+                        else:
+                            log.info(f"Message ignored: {message}")
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
         raise StopAsyncIteration
-
-    async def _handle_error(self, build: BinarySerializable) -> None:
-        err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
-        error_payload: ErrorMessagePayload = err_msg.payload
-        err_msg.log_error(log)
-
-        if error_payload.message_index == 0:
-            log.error(
-                f"error {str(err_msg)} recieved is asyncronous, raising exception"
-            )
-            raise AsyncHardwareError(
-                "Async firmware error: " + str(err_msg),
-                ErrorCode(error_payload.error_code.value),
-                ErrorSeverity(error_payload.severity.value),
-            )
 
     @property
     def exclusive_writer(self) -> asyncio.Lock:

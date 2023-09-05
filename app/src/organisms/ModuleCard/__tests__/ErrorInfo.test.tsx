@@ -35,7 +35,12 @@ const mockErrorThermocycler = {
     totalStepCount: null,
     status: 'error',
   },
-  usbPort: { path: '/dev/ot_module_thermocycler0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 } as ThermocyclerModule
 
 const mockErrorHeaterShaker = {
@@ -57,7 +62,12 @@ const mockErrorHeaterShaker = {
     errorDetails: 'errorDetails',
     status: 'error',
   },
-  usbPort: { path: '/dev/ot_module_heatershaker0', hub: null, port: 1 },
+  usbPort: {
+    path: '/dev/ot_module_heatershaker0',
+    hub: false,
+    port: 1,
+    portGroup: 'unknown',
+  },
 } as HeaterShakerModule
 
 const render = (props: React.ComponentProps<typeof ErrorInfo>) => {

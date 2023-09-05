@@ -3,7 +3,11 @@ import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  LabwareDefinition2,
+  OT2_ROBOT_TYPE,
+  OT2_STANDARD_DECKID,
+} from '@opentrons/shared-data'
 import {
   LabwareLiquidState,
   LabwareEntities,
@@ -65,3 +69,5 @@ export const labwareDefsByURI: LabwareDefByDefURI = {
   'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': fixture96Plate,
   'opentrons/opentrons_1_trash_1100ml_fixed/1': fixtureTrash,
 }
+
+export const ot2Robot = { model: OT2_ROBOT_TYPE, deckId: OT2_STANDARD_DECKID }

@@ -4,6 +4,8 @@ import logging
 import asyncio
 from typing import AsyncIterator, Set, Dict, Tuple, Union
 
+from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
+
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.messages import message_definitions
@@ -43,7 +45,7 @@ async def _await_one_result(callback: WaitableCallback) -> ToolDetectionResult:
             return _handle_detection_result(response)
         if isinstance(response, message_definitions.ErrorMessage):
             log.error(f"Recieved error message {str(response)}")
-    raise RuntimeError("Messenger closed before a tool was found")
+    raise CanbusCommunicationError(message="Messenger closed before a tool was found")
 
 
 def _decode_or_default(orig: bytes) -> str:

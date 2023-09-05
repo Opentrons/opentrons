@@ -6,6 +6,10 @@ import {
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import {
+  ProtocolAnalysisOutput,
+  protocolHasLiquids,
+} from '@opentrons/shared-data'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
@@ -25,11 +29,7 @@ import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
-
-import {
-  ProtocolAnalysisOutput,
-  protocolHasLiquids,
-} from '@opentrons/shared-data'
+import { EmptySetupStep } from '../EmptySetupStep'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
@@ -37,6 +37,7 @@ jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
 jest.mock('../SetupLiquids')
+jest.mock('../EmptySetupStep')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
@@ -74,6 +75,9 @@ const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
 >
 const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
   typeof protocolHasLiquids
+>
+const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
+  typeof EmptySetupStep
 >
 
 const ROBOT_NAME = 'otie'
@@ -137,6 +141,7 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue(<span>Mock SetupLabware</span>)
     when(mockSetupModules).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
+    when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -207,9 +212,9 @@ describe('ProtocolRunSetup', () => {
       labwareSetup.click()
       expect(getByText('Mock SetupLabware')).toBeVisible()
     })
-    it('does NOT render module setup', () => {
-      const { queryByText } = render()
-      expect(queryByText(/module setup/i)).toBeNull()
+    it('renders the empty states for modules and liquids when no modules in protocol', () => {
+      const { getAllByText } = render()
+      getAllByText('Mock EmptySetupStep')
     })
 
     it('defaults to no step expanded', () => {
@@ -239,7 +244,7 @@ describe('ProtocolRunSetup', () => {
       mockProtocolHasLiquids.mockReturnValue(true)
 
       const { getByText } = render()
-      getByText('STEP 3')
+      getByText('STEP 5')
       getByText('Initial Liquid Setup')
       getByText('View liquid starting locations and volumes')
       getByText('Mock SetupLiquids')

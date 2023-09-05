@@ -175,7 +175,6 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               }}
             />
             <SmallButton
-              buttonType="primary"
               buttonText={t('shared:confirm_position')}
               onClick={handleConfirmPosition}
             />
@@ -205,7 +204,6 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   <SmallButton
                     width="100%"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    buttonType="primary"
                     buttonText={t('shared:close')}
                     onClick={() => {
                       setShowFullJogControls(false)

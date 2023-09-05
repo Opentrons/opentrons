@@ -23,6 +23,7 @@ describe('MountGripper', () => {
   let mockGoBack: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
+  let mockSetErrorMessage: jest.Mock
 
   beforeEach(() => {
     mockGoBack = jest.fn()
@@ -39,6 +40,8 @@ describe('MountGripper', () => {
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
           goBack={mockGoBack}
+          errorMessage={null}
+          setErrorMessage={mockSetErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -69,14 +72,15 @@ describe('MountGripper', () => {
     await getByRole('button', { name: 'Continue' }).click()
     expect(mockProceed).not.toHaveBeenCalled()
     await getByText('Unable to detect Gripper')
-    const tryAgainButton = getByRole('button', { name: 'Try again' })
+    let tryAgainButton = getByRole('button', { name: 'Try again' })
     tryAgainButton.click()
     expect(mockProceed).not.toHaveBeenCalled()
-    await getByRole('button', { name: 'Continue' }).click()
-    expect(mockProceed).not.toHaveBeenCalled()
+    tryAgainButton = getByRole('button', { name: 'Try again' })
+    tryAgainButton.click()
     const goBackButton = await getByRole('button', { name: 'Go back' })
     goBackButton.click()
-    expect(mockGoBack).toHaveBeenCalled()
+    await getByRole('button', { name: 'Continue' }).click()
+    expect(mockProceed).not.toHaveBeenCalled()
   })
 
   it('clicking go back calls back', () => {
@@ -97,7 +101,7 @@ describe('MountGripper', () => {
     const { getByText } = render()[0]
     getByText('Connect and Screw In Gripper')
     getByText(
-      'Attach the gripper to the robot by alinging the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.'
+      'Attach the gripper to the robot by aligning the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.'
     )
   })
 })

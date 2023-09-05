@@ -17,12 +17,14 @@
     "increment": 0.0,
     "distance": 0.0
   },
-  "plungerMotorConfigurations": { "idle": 0.5, "run": 0.5 },
+  "plungerMotorConfigurations": { "idle": 0.05, "run": 0.5 },
   "plungerPositionsConfigurations": {
-    "top": 19.5,
-    "bottom": 2.5,
-    "blowout": 2.0,
-    "drop": -3.5
+    "default": {
+      "top": 19.5,
+      "bottom": 2.5,
+      "blowout": 2.0,
+      "drop": -3.5
+    }
   },
   "availableSensors": { "sensors": [] },
   "partialTipConfigurations": {
@@ -33,5 +35,6 @@
   "shaftDiameter": 2.0,
   "shaftULperMM": 3.142,
   "backCompatNames": [],
-  "backlashDistance": 0.0
+  "backlashDistance": 0.0,
+  "quirks": ["dropTipShake"]
 }

@@ -1,11 +1,7 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import {
-  CONFIG_VERSION_LATEST,
-  OT2_MANIFEST_URL,
-  OT3_MANIFEST_URL,
-} from '@opentrons/app/src/redux/config'
+import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -14,6 +10,8 @@ import type {
   ConfigV14,
   ConfigV15,
   ConfigV16,
+  ConfigV17,
+  ConfigV18,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
@@ -61,8 +59,8 @@ export const DEFAULTS_V12: ConfigV12 = {
   protocols: { sendAllProtocolsToOT3: false, protocolsStoredSortKey: null },
   robotSystemUpdate: {
     manifestUrls: {
-      OT2: OT2_MANIFEST_URL,
-      OT3: OT3_MANIFEST_URL,
+      OT2: 'dummy-ot2-manifest',
+      OT3: 'dummy-ot3-manifest',
     },
   },
 }
@@ -124,17 +122,54 @@ const toVersion16 = (prevConfig: ConfigV15): ConfigV16 => {
   return nextConfig
 }
 
+// config version 17 migration and defaults
+const toVersion17 = (prevConfig: ConfigV16): ConfigV17 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 17 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      applyHistoricOffsets: true,
+    },
+  }
+  return nextConfig
+}
+
+const toVersion18 = (prevConfig: ConfigV17): ConfigV18 => {
+  const { robotSystemUpdate, version, ...rest } = prevConfig
+  return {
+    version: 18 as const,
+    ...rest,
+  }
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
   (prevConfig: ConfigV13) => ConfigV14,
   (prevConfig: ConfigV14) => ConfigV15,
-  (prevConfig: ConfigV15) => ConfigV16
-] = [toVersion13, toVersion14, toVersion15, toVersion16]
+  (prevConfig: ConfigV15) => ConfigV16,
+  (prevConfig: ConfigV16) => ConfigV17,
+  (prevConfig: ConfigV17) => ConfigV18
+] = [
+  toVersion13,
+  toVersion14,
+  toVersion15,
+  toVersion16,
+  toVersion17,
+  toVersion18,
+]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
 
 export function migrate(
-  prevConfig: ConfigV12 | ConfigV13 | ConfigV14 | ConfigV15 | ConfigV16
+  prevConfig:
+    | ConfigV12
+    | ConfigV13
+    | ConfigV14
+    | ConfigV15
+    | ConfigV16
+    | ConfigV17
+    | ConfigV18
 ): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary

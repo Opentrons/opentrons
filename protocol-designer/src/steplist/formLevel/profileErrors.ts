@@ -1,6 +1,7 @@
 import uniqBy from 'lodash/uniqBy'
 import { THERMOCYCLER_PROFILE } from '../../constants'
 import { PROFILE_STEP, ProfileStepItem } from '../../form-types'
+
 // TODO: real HydratedFormData type
 type HydratedFormData = any
 export interface ProfileFormError {

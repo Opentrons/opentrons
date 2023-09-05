@@ -146,7 +146,7 @@ class LabwareNotLoadedError(ProtocolEngineError):
 
 
 class LabwareNotLoadedOnModuleError(ProtocolEngineError):
-    """Raised when referencing a labware on a module that has not been loaded."""
+    """Raised when there is no labware loaded on the requested module."""
 
     def __init__(
         self,
@@ -155,6 +155,19 @@ class LabwareNotLoadedOnModuleError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareNotLoadedOnModuleError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareNotLoadedOnLabwareError(ProtocolEngineError):
+    """Raised when there is no labware loaded on the requested labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotLoadedOnLabwareError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -194,32 +207,6 @@ class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareDefinitionDoesNotExistError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
-class LabwareDefinitionIsNotLabwareError(ProtocolEngineError):
-    """Raised when trying to load a labware via loadLabware that is not a labware."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a LabwareDefinitionIsNotLabwareError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
-class LabwareDefinitionIsNotAdapterError(ProtocolEngineError):
-    """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a LabwareDefinitionIsNotAdapterError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -285,6 +272,19 @@ class LabwareIsTipRackError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareIsTiprackError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsAdapterError(ProtocolEngineError):
+    """Raised when trying to use a command not allowed on adapter."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsAdapterError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -648,19 +648,6 @@ class CannotPerformModuleAction(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
-class ProtocolCommandFailedError(ProtocolEngineError):
-    """Raised if a fatal command execution error has occurred."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a ProtocolCommandFailedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
 class HardwareNotSupportedError(ProtocolEngineError):
     """Raised when executing a command on the wrong hardware."""
 
@@ -671,7 +658,9 @@ class HardwareNotSupportedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a HardwareNotSupportedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )
 
 
 class GripperNotAttachedError(ProtocolEngineError):
@@ -697,6 +686,19 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareMovementNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsNotAllowedInLocationError(ProtocolEngineError):
+    """Raised when attempting an illegal labware load into slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsNotAllowedInLocationError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -763,3 +765,31 @@ class InvalidAxisForRobotType(ProtocolEngineError):
     ) -> None:
         """Build a InvalidAxisForRobotType."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class EStopActivatedError(ProtocolEngineError):
+    """Raised when an operation's required pipette tip is not attached."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an EStopActivatedError."""
+        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+
+
+class NotSupportedOnRobotType(ProtocolEngineError):
+    """Raised when attempting to perform an action that is not supported for the given robot type."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NotSupportedOnRobotType exception."""
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )

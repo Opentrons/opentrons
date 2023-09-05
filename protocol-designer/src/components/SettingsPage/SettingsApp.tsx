@@ -88,13 +88,9 @@ function SettingsAppComponent(props: Props): JSX.Element {
             </div>
 
             <p className={styles.card_body}>
-              {i18n.t('card.body.reason_for_collecting_data')}
+              {i18n.t('card.body.reason_for_collecting_data')}{' '}
+              {i18n.t('card.body.data_collected_is_internal')}.
             </p>
-            <ul className={styles.card_point_list}>
-              <li>{i18n.t('card.body.data_collected_is_internal')}</li>
-              {/* TODO: BC 2018-09-26 uncomment when only using fullstory <li>{i18n.t('card.body.data_only_from_pd')}</li> */}
-              <li>{i18n.t('card.body.opt_out_of_data_collection')}</li>
-            </ul>
           </div>
         </Card>
       </div>

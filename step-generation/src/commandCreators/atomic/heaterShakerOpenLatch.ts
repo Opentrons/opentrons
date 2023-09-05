@@ -15,7 +15,7 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
     invariantContext.pipetteEntities[firstPipetteId]?.spec
 
   const isFlexPipette =
-    (firstPipetteSpec?.displayCategory === 'GEN3' ||
+    (firstPipetteSpec?.displayCategory === 'FLEX' ||
       firstPipetteSpec?.channels === 96) ??
     false
 

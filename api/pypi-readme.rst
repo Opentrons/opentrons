@@ -1,10 +1,10 @@
 .. _Full API Documentation: http://docs.opentrons.com
 
-The Opentrons API is a simple framework designed to make writing automated biology lab protocols for the Opentrons OT-2 easy.
+The Opentrons API is a simple framework designed to make it easy to write automated biology lab protocols for Opentrons robots.
 
 This package can be used to simulate protocols on your computer without connecting to a robot. Please refer to our `Full API Documentation`_ for detailed instructions on how to write and simulate your first protocol.
 
-This package is now for use with the Opentrons OT-2 only. For the software needed to run an Opentrons OT-1, please see versions_.
+This package is now for use with the Opentrons Flex and Opentrons OT-2 only. For the software needed to run an Opentrons OT-One, please see versions_.
 
 .. _simulating:
 
@@ -40,9 +40,9 @@ The module has a lot of configuration, some of which is only relevant when runni
 Note On Versions
 ----------------
 
-This API is for locally simulating protocols for the OT 2 without connecting to a robot. It no longer controls an OT 1.
+This API is for locally simulating protocols for the Flex or OT-2 without connecting to a robot. It no longer controls an OT-One.
 
-`Version 2.5.2 <https://pypi.org/project/opentrons/2.5.2/>`_ was the final release of this API for the OT 1. If you want to download this API to use the OT 1, you should download it with
+`Version 2.5.2 <https://pypi.org/project/opentrons/2.5.2/>`_ was the final release of this API for the OT-One. If you want to download this API to use the OT-One, you should download it with
 
 .. code-block:: shell
 

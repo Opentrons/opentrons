@@ -17,14 +17,14 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 
 import type { CommandsData } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 
 jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot-update/selectors')
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/analytics')
@@ -53,8 +53,8 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
   typeof useTrackProtocolRunEvent
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockUseDownloadRunLog = useDownloadRunLog as jest.MockedFunction<
   typeof useDownloadRunLog

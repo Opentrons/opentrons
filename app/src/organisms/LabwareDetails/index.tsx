@@ -20,11 +20,11 @@ import {
   useHoverTooltip,
   TOOLTIP_TOP_START,
 } from '@opentrons/components'
+import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
-import { getUniqueWellProperties } from './helpers/labwareInference'
 import { WellCount } from './WellCount'
 import { WellProperties } from './WellProperties'
 import { Dimensions } from './Dimensions'

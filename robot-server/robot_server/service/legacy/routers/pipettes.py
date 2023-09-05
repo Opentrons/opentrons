@@ -1,8 +1,13 @@
 import typing
 from fastapi import APIRouter, Query, Depends
 
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.util import ot2_axis_to_string
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
+from opentrons.protocol_engine.resources import ot3_validation
+from opentrons.types import Mount
 
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import pipettes
@@ -50,18 +55,31 @@ async def get_pipettes(
 
     attached = hardware.attached_instruments
 
-    def make_pipette(mount, o):
+    def make_pipette(mount: Mount, pipette_dict: PipetteDict, is_ot2: bool):
+        if is_ot2:
+            mount_axis = ot2_axis_to_string(Axis.by_mount(mount))
+            plunger_axis = ot2_axis_to_string(Axis.of_plunger(mount))
+        else:
+            mount_axis = Axis.by_mount(mount).name
+            plunger_axis = Axis.of_plunger(mount).name
         return pipettes.AttachedPipette(
-            model=o.get("model"),
-            name=o.get("name"),
-            id=o.get("pipette_id"),
-            mount_axis=str(Axis.by_mount(mount)).lower(),
-            plunger_axis=str(Axis.of_plunger(mount)).lower(),
-            tip_length=o.get("tip_length", 0) if o.get("model") else None,
+            model=pipette_dict.get("model"),
+            name=pipette_dict.get("name"),
+            id=pipette_dict.get("pipette_id"),
+            mount_axis=mount_axis.lower(),
+            plunger_axis=plunger_axis.lower(),
+            tip_length=pipette_dict.get("tip_length", 0)
+            if pipette_dict.get("model")
+            else None,
         )
 
+    try:
+        ot3_validation.ensure_ot3_hardware(hardware)
+        is_ot2 = False
+    except HardwareNotSupportedError:
+        is_ot2 = True
     e = {
-        mount.name.lower(): make_pipette(mount, data)
+        mount.name.lower(): make_pipette(mount=mount, pipette_dict=data, is_ot2=is_ot2)
         for mount, data in attached.items()
     }
 
