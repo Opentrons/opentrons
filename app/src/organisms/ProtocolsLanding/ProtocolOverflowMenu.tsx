@@ -11,6 +11,7 @@ import {
   ALIGN_FLEX_END,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -145,7 +146,7 @@ export function ProtocolOverflowMenu(
               onClick={handleClickSendToOT3}
               data-testid="ProtocolOverflowMenu_sendToOT3"
             >
-              {t('send_to_ot3')}
+              {t('send_to_ot3', { robot_display_name: FLEX_DISPLAY_NAME })}
             </MenuItem>
           ) : null}
           <MenuItem
