@@ -281,7 +281,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           label={i18n.format(t('mount', { side: mount }), 'capitalize')}
           description={t('instrument_attached')}
           banner={
-            <Banner type="error" marginBottom={SPACING.spacing4}>
+            <Banner
+              type={subsystemUpdateData != null ? 'warning' : 'error'}
+              marginBottom={SPACING.spacing4}
+            >
               <Trans
                 t={t}
                 i18nKey={

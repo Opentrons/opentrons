@@ -127,7 +127,10 @@ export function GripperCard({
           label={i18n.format(t('mount', { side: 'extension' }), 'capitalize')}
           description={t('instrument_attached')}
           banner={
-            <Banner type="error" marginBottom={SPACING.spacing4}>
+            <Banner
+              type={subsystemUpdateData != null ? 'warning' : 'error'}
+              marginBottom={SPACING.spacing4}
+            >
               <Trans
                 t={t}
                 i18nKey={
