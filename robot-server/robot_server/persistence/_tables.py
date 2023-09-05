@@ -2,6 +2,7 @@
 import sqlalchemy
 
 from . import legacy_pickle
+from .pickle_protocol_version import PICKLE_PROTOCOL_VERSION
 from ._utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
@@ -94,13 +95,13 @@ run_table = sqlalchemy.Table(
     # column added in schema v1
     sqlalchemy.Column(
         "state_summary",
-        sqlalchemy.PickleType(pickler=legacy_pickle),
+        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=True,
     ),
     # column added in schema v1
     sqlalchemy.Column(
         "commands",
-        sqlalchemy.PickleType(pickler=legacy_pickle),
+        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=True,
     ),
     # column added in schema v1
