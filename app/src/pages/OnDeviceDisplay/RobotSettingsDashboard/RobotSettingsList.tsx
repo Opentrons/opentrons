@@ -35,6 +35,10 @@ import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
+import {
+  getAnalyticsOptedIn,
+  toggleAnalyticsOptedIn,
+} from '../../../redux/analytics'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
@@ -64,6 +68,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const allRobotSettings = useSelector((state: State) =>
     getRobotSettings(state, robotName)
   )
+
+  const appAnalyticsOptedIn = useSelector(getAnalyticsOptedIn)
 
   const isRobotAnalyticsOn =
     allRobotSettings.find(({ id }) => id === ROBOT_ANALYTICS_SETTING_ID)
@@ -163,9 +169,21 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         />
         <RobotSettingButton
           settingName={i18n.format(
-            t('app_settings:share_analytics_short'),
+            t('app_settings:share_app_analytics_short'),
             'titleCase'
           )}
+          settingInfo={t('app_settings:share_app_analytics_description_short')}
+          dataTestId="RobotSettingButton_share_app_analytics"
+          rightElement={<OnOffToggle isOn={appAnalyticsOptedIn} />}
+          onClick={() => dispatch(toggleAnalyticsOptedIn())}
+          iconName="gear"
+        />
+        <RobotSettingButton
+          settingName={i18n.format(
+            t('share_logs_with_opentrons_short'),
+            'titleCase'
+          )}
+          settingInfo={t('share_logs_with_opentrons_description_short')}
           dataTestId="RobotSettingButton_share_analytics"
           rightElement={<OnOffToggle isOn={isRobotAnalyticsOn} />}
           onClick={() =>
@@ -177,7 +195,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
               )
             )
           }
-          iconName="analytics"
+          iconName="ot-file"
         />
         <RobotSettingButton
           settingName={t('home_gantry_on_restart')}
