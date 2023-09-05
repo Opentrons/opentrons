@@ -13,7 +13,7 @@ const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
     currentRunId: null,
     oddRunId: null,
   }),
-  setOddRunId: () => null,
+  setOddRunIds: () => null,
 }
 
 const useMaintenanceRunTakeover = mockUseMaintenanceRunTakeover as jest.MockedFunction<

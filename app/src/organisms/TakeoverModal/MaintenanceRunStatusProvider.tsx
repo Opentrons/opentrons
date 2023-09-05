@@ -8,12 +8,12 @@ interface MaintenanceRunIds {
 
 export interface MaintenanceRunStatus {
   getRunIds: () => MaintenanceRunIds
-  setOddRunId: (runId: string) => void
+  setOddRunIds: (state: MaintenanceRunIds) => void
 }
 
 export const MaintenanceRunContext = React.createContext<MaintenanceRunStatus>({
   getRunIds: () => ({ currentRunId: null, oddRunId: null }),
-  setOddRunId: () => {},
+  setOddRunIds: () => {},
 })
 
 interface MaintenanceRunProviderProps {
@@ -23,18 +23,28 @@ interface MaintenanceRunProviderProps {
 export function MaintenanceRunStatusProvider(
   props: MaintenanceRunProviderProps
 ): JSX.Element {
-  const [oddRunId, setOddRunId] = React.useState<string | null>(null)
+  const [oddRunIds, setOddRunIds] = React.useState<MaintenanceRunIds>({
+    currentRunId: null,
+    oddRunId: null,
+  })
 
-  const currentRunId = useCurrentMaintenanceRun({
+  const currentRunIdQueryResult = useCurrentMaintenanceRun({
     refetchInterval: 5000,
   }).data?.data.id
 
+  React.useEffect(() => {
+    setOddRunIds(prevState => ({
+      ...prevState,
+      currentRunId: currentRunIdQueryResult ?? null,
+    }))
+  }, [currentRunIdQueryResult])
+
   const maintenanceRunStatus = React.useMemo(
     () => ({
-      getRunIds: () => ({ currentRunId: currentRunId ?? null, oddRunId }),
-      setOddRunId,
+      getRunIds: () => oddRunIds,
+      setOddRunIds,
     }),
-    [oddRunId, currentRunId]
+    [oddRunIds]
   )
 
   return (

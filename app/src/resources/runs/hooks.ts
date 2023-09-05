@@ -113,7 +113,7 @@ export function useCreateTargetedMaintenanceRunMutation(
     hostOverride
   )
   const isOnDevice = useSelector(getIsOnDevice)
-  const { setOddRunId } = useMaintenanceRunTakeover()
+  const { setOddRunIds } = useMaintenanceRunTakeover()
 
   return {
     ...createMaintenanceRunMutation,
@@ -121,7 +121,8 @@ export function useCreateTargetedMaintenanceRunMutation(
       createMaintenanceRunMutation
         .createMaintenanceRun(variables, ...options)
         .then(res => {
-          if (isOnDevice) setOddRunId(res.data.id)
+          if (isOnDevice)
+            setOddRunIds({ currentRunId: res.data.id, oddRunId: res.data.id })
           return res
         })
         .catch(error => error),
