@@ -8,6 +8,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
+  Icon,
+  SIZE_1,
+  DIRECTION_ROW,
+  TYPOGRAPHY,
+  Link,
 } from '@opentrons/components'
 
 import { Line } from '../../../atoms/structure'
@@ -20,6 +25,7 @@ import {
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
+  ProtocolCalibrationStatus,
 } from '../hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { SetupLabware } from './SetupLabware'
@@ -29,6 +35,7 @@ import { SetupModules } from './SetupModules'
 import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
+import { HowLPCWorksModal } from './SetupLabwarePositionCheck/HowLPCWorksModal'
 
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
@@ -207,10 +214,10 @@ export function ProtocolRunSetup({
                         ? setExpandedStepKey(null)
                         : setExpandedStepKey(stepKey)
                     }
-                    calibrationStatusComplete={
-                      stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
-                        ? calibrationStatus.complete
-                        : null
+                    rightElement={
+                      <StepRightElement
+                        {...{ stepKey, runHasStarted, calibrationStatus }}
+                      />
                     }
                   >
                     {StepDetailMap[stepKey].stepInternals}
@@ -229,5 +236,72 @@ export function ProtocolRunSetup({
         </StyledText>
       )}
     </Flex>
+  )
+}
+
+interface StepRightElementProps {
+  stepKey: StepKey
+  calibrationStatus: ProtocolCalibrationStatus
+  runHasStarted: boolean
+}
+function StepRightElement(props: StepRightElementProps): JSX.Element | null {
+  const { stepKey, calibrationStatus, runHasStarted } = props
+  const { t } = useTranslation('protocol_setup')
+
+  if (stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted) {
+    return (
+      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Icon
+          size={SIZE_1}
+          color={
+            calibrationStatus.complete
+              ? COLORS.successEnabled
+              : COLORS.warningEnabled
+          }
+          marginRight={SPACING.spacing8}
+          name={calibrationStatus.complete ? 'ot-check' : 'alert-circle'}
+          id="RunSetupCard_calibrationIcon"
+        />
+        <StyledText
+          color={COLORS.black}
+          css={TYPOGRAPHY.pSemiBold}
+          marginRight={SPACING.spacing16}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          id="RunSetupCard_calibrationText"
+        >
+          {calibrationStatus.complete
+            ? t('calibration_ready')
+            : t('calibration_needed')}
+        </StyledText>
+      </Flex>
+    )
+  } else if (stepKey === LPC_KEY) {
+    return <LearnAboutLPC />
+  } else {
+    return null
+  }
+}
+
+function LearnAboutLPC(): JSX.Element {
+  const { t } = useTranslation('protocol_setup')
+  const [showLPCHelpModal, setShowLPCHelpModal] = React.useState(false)
+  return (
+    <>
+      <Link
+        css={TYPOGRAPHY.linkPSemiBold}
+        marginRight={SPACING.spacing16}
+        onClick={e => {
+          // clicking link shouldn't toggle step expanded state
+          e.preventDefault()
+          e.stopPropagation()
+          setShowLPCHelpModal(true)
+        }}
+      >
+        {t('learn_how_it_works')}
+      </Link>
+      {showLPCHelpModal ? (
+        <HowLPCWorksModal onCloseClick={() => setShowLPCHelpModal(false)} />
+      ) : null}
+    </>
   )
 }

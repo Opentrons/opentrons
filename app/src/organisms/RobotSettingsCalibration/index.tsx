@@ -7,6 +7,7 @@ import {
   useAllTipLengthCalibrationsQuery,
   useCalibrationStatusQuery,
   useInstrumentsQuery,
+  useModulesQuery,
 } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
@@ -32,6 +33,7 @@ import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
+import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
@@ -118,6 +120,12 @@ export function RobotSettingsCalibration({
       }
     }
   )
+
+  // Modules Calibration
+  const attachedModules =
+    useModulesQuery({
+      refetchInterval: CALS_FETCH_MS,
+    })?.data?.data ?? []
 
   // Note: following fetch need to reflect the latest state of calibrations
   // when a user does calibration or rename a robot.
@@ -317,6 +325,11 @@ export function RobotSettingsCalibration({
           />
           <Line />
           <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          <Line />
+          <RobotSettingsModuleCalibration
+            attachedModules={attachedModules}
+            updateRobotStatus={updateRobotStatus}
+          />
         </>
       ) : (
         <>

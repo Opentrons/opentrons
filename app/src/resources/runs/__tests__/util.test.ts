@@ -11,7 +11,12 @@ describe('formatTimeWithUtc', () => {
   })
 
   it('return formatted time with UTC only hh:mm', () => {
-    const result = formatTimeWithUtcLabel('21:35:04', true)
+    const result = formatTimeWithUtcLabel('21:35:04')
     expect(result).toEqual('21:35:04 UTC')
+  })
+
+  it('return unknown if time is null', () => {
+    const result = formatTimeWithUtcLabel(null)
+    expect(result).toEqual('unknown')
   })
 })

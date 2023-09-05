@@ -1,6 +1,7 @@
 """In-memory storage of ProtocolEngine instances."""
 from typing import List, NamedTuple, Optional
 
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
@@ -219,7 +220,11 @@ class EngineStore:
         state_view = engine.state_view
 
         if state_view.commands.get_is_okay_to_clear():
-            await engine.finish(drop_tips_and_home=False, set_run_status=False)
+            await engine.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 

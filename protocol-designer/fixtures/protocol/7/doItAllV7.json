@@ -2704,6 +2704,7 @@
       ],
       "parameters": {
         "format": "irregular",
+        "quirks": ["gripperIncompatible"],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
         "loadName": "opentrons_24_aluminumblock_nest_1.5ml_snapcap"

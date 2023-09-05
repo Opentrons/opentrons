@@ -10,6 +10,7 @@ const EXPECTED_VALID_QUIRKS = [
   'centerMultichannelOnWells',
   'touchTipDisabled',
   'fixedTrash',
+  'gripperIncompatible',
 ]
 
 describe('check quirks for all labware defs', () => {

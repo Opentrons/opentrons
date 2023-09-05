@@ -183,7 +183,8 @@ describe('SetupLabwareList', () => {
 
     getAllByText('mock labware list item')
     getByText('Labware Name')
-    getByText('Initial Location')
+    getByText('Location')
+    getByText('Placement')
   })
   it('renders null for the offdeck labware list when there are none', () => {
     const { queryByText } = render({

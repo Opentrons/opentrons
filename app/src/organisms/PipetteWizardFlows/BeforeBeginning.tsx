@@ -48,6 +48,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
   requiredPipette?: LoadedPipette
 }
 export const BeforeBeginning = (
@@ -67,10 +68,14 @@ export const BeforeBeginning = (
     selectedPipette,
     isOnDevice,
     requiredPipette,
+    maintenanceRunId,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
@@ -256,7 +261,7 @@ export const BeforeBeginning = (
         </>
       }
       proceedButtonText={proceedButtonText}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={
         isGantryEmptyFor96ChannelAttachment ||
         (flowType === FLOWS.ATTACH && selectedPipette === SINGLE_MOUNT_PIPETTES)

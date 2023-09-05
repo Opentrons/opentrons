@@ -3,8 +3,8 @@ import last from 'lodash/last'
 import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
 import {
   useProtocolQuery,
-  useProtocolAnalysesQuery,
   useRunQuery,
+  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 
 import type {
@@ -13,6 +13,7 @@ import type {
   PendingProtocolAnalysis,
 } from '@opentrons/shared-data'
 
+const ANALYSIS_POLL_MS = 5000
 export interface ProtocolDetails {
   displayName: string | null
   protocolData: CompletedProtocolAnalysis | PendingProtocolAnalysis | null
@@ -34,16 +35,14 @@ export function useProtocolDetailsForRun(
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
-
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(
+  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
+    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
     {
-      staleTime: Infinity,
-    },
-    isPollingProtocolAnalyses
+      enabled: protocolRecord != null && isPollingProtocolAnalyses,
+      refetchInterval: ANALYSIS_POLL_MS,
+    }
   )
-
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
   React.useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -61,8 +60,7 @@ export function useProtocolDetailsForRun(
     displayName: displayName ?? null,
     protocolData: mostRecentAnalysis ?? null,
     protocolKey: protocolRecord?.data.key ?? null,
-    isProtocolAnalyzing:
-      mostRecentAnalysis != null && mostRecentAnalysis?.status === 'pending',
+    isProtocolAnalyzing: protocolRecord != null && mostRecentAnalysis == null,
     // this should be deleted as soon as analysis tells us intended robot type
     robotType:
       mostRecentAnalysis?.status === 'completed'

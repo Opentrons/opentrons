@@ -310,6 +310,7 @@ class SyncClient:
         well_location: WellLocation,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> commands.DispenseResult:
         """Execute a ``Dispense`` command and return the result."""
         request = commands.DispenseCreate(
@@ -320,6 +321,7 @@ class SyncClient:
                 wellLocation=well_location,
                 volume=volume,
                 flowRate=flow_rate,
+                pushOut=push_out,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -330,6 +332,7 @@ class SyncClient:
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> commands.DispenseInPlaceResult:
         """Execute a ``DispenseInPlace`` command and return the result."""
         request = commands.DispenseInPlaceCreate(
@@ -337,6 +340,7 @@ class SyncClient:
                 pipetteId=pipette_id,
                 volume=volume,
                 flowRate=flow_rate,
+                pushOut=push_out,
             )
         )
         result = self._transport.execute_command(request=request)

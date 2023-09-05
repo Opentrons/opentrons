@@ -56,6 +56,7 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
             location=location,
             well_core=None,
             in_place=False,
+            push_out=None,
         )
 
 
@@ -129,6 +130,7 @@ def test_pick_up_tip_prep_after(
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
         in_place=False,
+        push_out=None,
     )
 
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
@@ -156,6 +158,7 @@ def test_pick_up_tip_prep_after(
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
         in_place=False,
+        push_out=None,
     )
 
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
@@ -258,6 +261,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
         in_place=False,
+        push_out=None,
     )
 
 

@@ -1,6 +1,5 @@
 {
   "__dev_internal__enableExtendedHardware": "Enable Extended Hardware",
-  "__dev_internal__enableModuleCalibration": "Enable Module Calibration",
   "__dev_internal__lpcWithProbe": "Golden Tip LPC",
   "add_folder_button": "Add labware source folder",
   "add_ip_button": "Add",
@@ -75,6 +74,7 @@
   "searching": "Searching for 30s",
   "setup_connection": "Set up connection",
   "share_analytics": "Share Robot and App Analytics with Opentrons",
+  "share_analytics_short": "share analytics",
   "show_labware_offset_snippets": "Show Labware Offset data code snippets",
   "show_labware_offset_snippets_description": "Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.",
   "software_update_available": "Software Update Available",

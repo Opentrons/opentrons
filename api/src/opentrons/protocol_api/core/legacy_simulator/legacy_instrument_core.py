@@ -122,6 +122,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        push_out: Optional[float],
     ) -> None:
         if not in_place:
             self.move_to(location=location, well_core=well_core)

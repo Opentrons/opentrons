@@ -35,6 +35,11 @@ def mock_settings_values_flex() -> Dict[str, Optional[bool]]:
 
 
 @pytest.fixture
+def mock_settings_values_empty() -> Dict[str, Optional[bool]]:
+    return {s.id: None for s in advanced_settings.settings}
+
+
+@pytest.fixture
 def mock_settings_version() -> int:
     return 1
 
@@ -71,6 +76,19 @@ def mock_read_settings_file_flex(
     with patch("opentrons.config.advanced_settings._read_settings_file") as p:
         p.return_value = advanced_settings.SettingsData(
             settings_map=mock_settings_values_flex,
+            version=mock_settings_version,
+        )
+        yield p
+
+
+@pytest.fixture
+def mock_read_settings_file_empty(
+    mock_settings_values_empty: Dict[str, Optional[bool]],
+    mock_settings_version: int,
+) -> Generator[MagicMock, None, None]:
+    with patch("opentrons.config.advanced_settings._read_settings_file") as p:
+        p.return_value = advanced_settings.SettingsData(
+            settings_map=mock_settings_values_empty,
             version=mock_settings_version,
         )
         yield p
@@ -274,3 +292,13 @@ async def test_disable_log_integration_side_effect_error() -> None:
             s = advanced_settings.DisableLogIntegrationSettingDefinition()
             with pytest.raises(advanced_settings.SettingException):
                 await s.on_change(True)
+
+
+def test_per_robot_true_defaults(mock_read_settings_file_empty: MagicMock) -> None:
+    with patch.object(advanced_settings, "settings_by_id", new={}):
+        assert (
+            advanced_settings.get_setting_with_env_overload(
+                "enableDoorSafetySwitch", RobotTypeEnum.FLEX
+            )
+            is True
+        )

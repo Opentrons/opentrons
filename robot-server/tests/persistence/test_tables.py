@@ -41,6 +41,7 @@ EXPECTED_STATEMENTS = [
         protocol_id VARCHAR NOT NULL,
         analyzer_version VARCHAR NOT NULL,
         completed_analysis BLOB NOT NULL,
+        completed_analysis_as_document VARCHAR,
         PRIMARY KEY (id),
         FOREIGN KEY(protocol_id) REFERENCES protocol (id)
     )

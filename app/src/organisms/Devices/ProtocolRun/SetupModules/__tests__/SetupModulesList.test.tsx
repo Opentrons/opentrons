@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -19,6 +19,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
+  useRunCalibrationStatus,
 } from '../../../hooks'
 import { HeaterShakerWizard } from '../../../HeaterShakerWizard'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
@@ -53,6 +54,9 @@ const mockMultipleModulesModal = MultipleModulesModal as jest.MockedFunction<
 >
 const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
   typeof ModuleWizardFlows
+>
+const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
+  typeof useRunCalibrationStatus
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -116,6 +120,11 @@ describe('SetupModulesList', () => {
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: true,
+      })
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
   })
   afterEach(() => resetAllWhenMocks())
@@ -150,13 +159,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Connected')
-    expect(getByTestId('status_label_Connected_1')).toHaveStyle({
-      backgroundColor: COLORS.successBackgroundLight,
-    })
   })
 
   it('should render a magnetic module that is NOT connected', () => {
@@ -175,13 +181,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Not connected')
-    expect(getByTestId('status_label_Not connected_1')).toHaveStyle({
-      backgroundColor: COLORS.warningBackgroundLight,
-    })
   })
 
   it('should render a thermocycler module that is connected, OT2', () => {
@@ -239,11 +242,44 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsOt3.mockReturnValue(true)
 
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('Thermocycler Module')
     getByText('Slot A1+B1')
-    getByText('Calibrate now').click()
+    getByRole('button', { name: 'Calibrate now' }).click()
     getByText('mock ModuleWizardFlows')
+  })
+
+  it('should render disabled button when pipette and module are not calibrated', () => {
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: false,
+        reason: 'calibrate_pipette_failure_reason',
+      })
+    mockUseModuleRenderInfoForProtocolById.mockReturnValue({
+      [mockTCModule.moduleId]: {
+        moduleId: mockTCModule.moduleId,
+        x: MOCK_TC_COORDS[0],
+        y: MOCK_TC_COORDS[1],
+        z: MOCK_TC_COORDS[2],
+        moduleDef: mockTCModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 0,
+        slotName: '7',
+        attachedModuleMatch: mockThermocycler,
+      },
+    } as any)
+    mockUseIsOt3.mockReturnValue(true)
+
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {

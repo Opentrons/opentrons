@@ -1,4 +1,11 @@
 export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
+
+// pipettes module already exports type `Mount`
+type Mount = 'left' | 'right' | 'extension'
+
+export interface SharedInstrumentData {
+  mount: Mount
+}
 export interface GripperData {
   data: {
     jawState: string
@@ -11,7 +18,7 @@ export interface GripperData {
   firmwareVersion?: string
   instrumentModel: string
   instrumentType: 'gripper'
-  mount: string
+  mount: 'extension'
   serialNumber: string
   subsystem: 'gripper'
   ok: true
@@ -31,7 +38,7 @@ export interface PipetteData {
   instrumentName: string
   instrumentModel: string
   instrumentType: 'pipette'
-  mount: string
+  mount: 'left' | 'right'
   serialNumber: string
   subsystem: 'pipette_left' | 'pipette_right'
   ok: true
