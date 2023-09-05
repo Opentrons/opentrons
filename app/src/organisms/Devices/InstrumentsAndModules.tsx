@@ -217,6 +217,7 @@ export function InstrumentsAndModules({
                   description={t('instrument_attached')}
                   banner={
                     <UpdateBanner
+                      robotName={robotName}
                       serialNumber={
                         attachedLeftPipette != null
                           ? attachedLeftPipette.serialNumber
@@ -243,6 +244,7 @@ export function InstrumentsAndModules({
                   description={t('instrument_attached')}
                   banner={
                     <UpdateBanner
+                      robotName={robotName}
                       serialNumber={
                         attachedGripper != null
                           ? attachedGripper.serialNumber
@@ -298,6 +300,7 @@ export function InstrumentsAndModules({
                   description={t('instrument_attached')}
                   banner={
                     <UpdateBanner
+                      robotName={robotName}
                       serialNumber={
                         attachedRightPipette != null
                           ? attachedRightPipette.serialNumber
