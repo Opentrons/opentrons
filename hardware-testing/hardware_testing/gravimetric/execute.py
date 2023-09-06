@@ -8,7 +8,7 @@ from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import Point, OT3Mount, Axis
 from hardware_testing.drivers import asair_sensor
-
+import os
 from . import report
 from . import config
 from .helpers import (
@@ -328,11 +328,13 @@ def _run_trial(
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     cam_pic_name = f"volume_{trial.volume}_trial_{trial.trial}.jpg"
-    if trial.ctx.is_simulating:
+    if trial.ctx.is_simulating():
         cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
-    cam_pic_path = trial.test_report.parent / cam_pic_name
+    cam_pic_path = (
+        f"{trial.test_report.parent}/{trial.test_report._run_id}/{cam_pic_name}"
+    )
     process_cmd = CAM_CMD_OT3.format(str(cam_pic_path))
-    if trial.ctx.is_simulating:
+    if trial.ctx.is_simulating():
         with open(cam_pic_path, "w") as f:
             f.write(str(cam_pic_name))  # create a test file
     else:
@@ -562,6 +564,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     if resources.ctx.is_simulating():
         start_sim_mass = {50: 15, 200: 200, 1000: 200}
         resources.recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
+    else:
+        os.mkdir(f"{resources.test_report.parent}/{resources.test_report._run_id}")
     recorder._recording = GravimetricRecording()
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
