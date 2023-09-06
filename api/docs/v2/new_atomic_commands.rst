@@ -376,7 +376,7 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 Utility Commands
 ================
 
-Utility commands let you perform convenience actions in a protocol that control a robot's behavior. For example, these commands let you delay or pause a protocol, home the gantry, display comments in the App, control robot lights, and check the robot's door open/closed state. The following sections show how to these utility commands and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
+With utility commands, you can control various robot functions such as pausing a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Delay and Resume
 ----------------
