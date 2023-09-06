@@ -35,6 +35,7 @@ class LoadedStaticPipetteData:
 
 def get_virtual_pipette_static_config(
     pipette_name: PipetteName,
+    liquid_class: pip_types.LiquidClasses = pip_types.LiquidClasses.default,
 ) -> LoadedStaticPipetteData:
     """Get the config for a virtual pipette, given only the pipette name."""
     pipette_model = pipette_load_name.convert_pipette_name(pipette_name)
@@ -44,9 +45,6 @@ def get_virtual_pipette_static_config(
         pipette_model.pipette_version,
     )
 
-    # TODO the liquid classes should be made configurable
-    # in a follow-up PR.
-    liquid_class = pip_types.LiquidClasses.default
     tip_configuration = config.liquid_properties[liquid_class].supported_tips[
         pip_types.PipetteTipType(config.liquid_properties[liquid_class].max_volume)
     ]
