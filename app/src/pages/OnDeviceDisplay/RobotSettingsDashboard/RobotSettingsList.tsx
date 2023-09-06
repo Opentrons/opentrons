@@ -77,7 +77,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
 
   const isHomeGantryIsOn =
     allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??
-    false
+    true
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
@@ -202,7 +202,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           dataTestId="RobotSettingButton_home_gantry_on_restart"
           settingInfo={t('home_gantry_subtext')}
           iconName="gantry-homing"
-          rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
+          rightElement={<OnOffToggle isOn={isHomeGantryIsOn} />}
           onClick={() =>
             dispatch(
               updateSetting(
