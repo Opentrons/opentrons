@@ -311,7 +311,7 @@ To draw liquid up into a pipette tip, call the :py:meth:`.InstrumentContext.aspi
     pipette.pick_up_tip()
     pipette.aspirate(200, plate['A1'])
 
-If the pipette doesn't move, you can also specify an additional aspiration action without including a location. To demonstrate, lets pause the protocol, automatically resume it, and aspirate a second time from ``plate['A1'])``.
+If the pipette doesn't move, you can also specify an additional aspiration action without including a location. To demonstrate, lets pause the protocol, automatically resume it, and aspirate a second time from ``plate['A1']``).
 
 .. code-block:: python
 
@@ -342,13 +342,13 @@ You can also aspirate from a location along the center vertical axis within a we
 See also:
 
 - :ref:`new-default-op-positions` for information about controlling pipette height for a particular pipette.
-- :ref:`position-relative-labware` for formation about controlling pipette height from within a well.
+- :ref:`position-relative-labware` for information about controlling pipette height from within a well.
 - :ref:`move-to` for information about moving a pipette to any reachable deck location.
 
 Aspiration Flow Rates
 ^^^^^^^^^^^^^^^^^^^^^
 
-Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Adding a number to the ``rate`` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to aspirate at twice its normal rate::
+Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Specifying the ``rate`` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to aspirate at twice its normal rate::
 
     pipette.aspirate(200, plate['A1'], rate=2.0)
 
@@ -480,7 +480,8 @@ This example uses the current well and sets the speed to 80 mm/s::
 
 .. versionadded:: 2.0
 
-.. there was a recommendation to remove the note
+.. versionchanged:: 2.4
+    Lowered minimum speed to 1 mm/s.
 
 .. _mix:
 
