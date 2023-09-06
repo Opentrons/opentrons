@@ -266,7 +266,7 @@ def save_config_(filename: str, data: str) -> Dict:
 
 async def calibrate_tiprack(api, home_position, mount):
     cp = CriticalPoint.NOZZLE
-    
+
     tiprack_loc = Point(
                     deck_slot['deck_slot'][args.tiprack_slot]['X'],
                     deck_slot['deck_slot'][args.tiprack_slot]['Y'],
@@ -290,7 +290,6 @@ async def calibrate_tiprack(api, home_position, mount):
     home_with_tip = await api.current_position(mount, cp)
     print("Calibrate Drop Tip Position")
     drop_tip_loc = await jog(api, home_with_tip, cp)
-    save_config_(path+cal_fn, drop_tip_loc)
     drop_tip_loc = Point(drop_tip_loc[Axis.X],
                         drop_tip_loc[Axis.Y],
                         drop_tip_loc[Axis.by_mount(mount)])
@@ -352,6 +351,11 @@ async def _main() -> None:
         # Calibrate to tiprack
         if (args.calibrate):
             pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
+            print(pickup_loc)
+            deck_slot['deck_slot'][args.tiprack_slot][Axis.X.name] = pickup_loc.x
+            deck_slot['deck_slot'][args.tiprack_slot][Axis.Y.name] = pickup_loc.y
+            deck_slot['deck_slot'][args.tiprack_slot]['Z'] = pickup_loc.z
+            save_config_(path+cal_fn, deck_slot)
 
         await hw_api.home_z(mount)
         cp = CriticalPoint.TIP
@@ -360,8 +364,8 @@ async def _main() -> None:
         if (args.calibrate):
             # cp = CriticalPoint.TIP
             initial_dial_loc = Point(
-                            slot_loc[args.dial_slot][0],
-                            slot_loc[args.dial_slot][1],
+                            deck_slot['deck_slot'][args.dial_slot]['X'],
+                            deck_slot['deck_slot'][args.dial_slot]['Y'],
                             home_w_tip[Axis.by_mount(mount)])
             print("Move to Dial Indicator")
             await move_to_point(hw_api, mount, initial_dial_loc, cp)
@@ -370,19 +374,30 @@ async def _main() -> None:
             dial_loc = Point(dial_loc[Axis.X],
                                 dial_loc[Axis.Y],
                                 dial_loc[Axis.by_mount(mount)])
-        if (args.calibrate):
-            cp = CriticalPoint.TIP
-            trough_loc = Point(slot_loc[args.trough_slot][0],
-                                slot_loc[args.trough_slot][1],
-                                home_w_tip[Axis.by_mount(mount)])
-            print("Move to Trough")
-            await move_to_point(hw_api, mount, trough_loc, cp)
-            current_position = await hw_api.current_position_ot3(mount, cp)
-            trough_loc = await jog(hw_api, current_position, cp)
-            save_config_( cal_fn, trough_loc)
-            trough_loc = Point(trough_loc[Axis.X],
-                                trough_loc[Axis.Y],
-                                trough_loc[Axis.by_mount(mount)])
+            deck_slot['deck_slot'][args.dial_slot][Axis.X.name] = dial_loc.x
+            deck_slot['deck_slot'][args.dial_slot][Axis.Y.name] = dial_loc.y
+            deck_slot['deck_slot'][args.dial_slot]['Z'] = dial_loc.z
+            save_config_(path+cal_fn, deck_slot)
+        # if (args.calibrate):
+        #     cp = CriticalPoint.TIP
+        #     # trough_loc = Point(slot_loc[args.trough_slot][0],
+        #     #                     slot_loc[args.trough_slot][1],
+        #     #                     home_w_tip[Axis.by_mount(mount)])
+        #     trough_loc = Point(deck_slot['deck_slot'][args.trough_slot]['X'],
+        #                         deck_slot['deck_slot'][args.trough_slot]['Y'],
+        #                         home_w_tip[Axis.by_mount(mount)])
+        #     print("Move to Trough")
+        #     await move_to_point(hw_api, mount, trough_loc, cp)
+        #     current_position = await hw_api.current_position_ot3(mount, cp)
+        #     trough_loc = await jog(hw_api, current_position, cp)
+        #     trough_loc = Point(trough_loc[Axis.X],
+        #                         trough_loc[Axis.Y],
+        #                         trough_loc[Axis.by_mount(mount)])
+        #     deck_slot['deck_slot'][args.trough_slot][Axis.X.name] = dial_loc.x
+        #     deck_slot['deck_slot'][args.trough_slot][Axis.Y.name] = dial_loc.y
+        #     deck_slot['deck_slot'][args.trough_slot]['Z'] = dial_loc.z
+        #     save_config_(path+cal_fn, deck_slot)
+
         num_of_columns = int(input("How many Columns: "))
         num_of_rows = int(input("Number of Rows: "))
         tips_to_use = (num_of_rows * num_of_columns)
@@ -423,15 +438,15 @@ async def _main() -> None:
                     if tip_count % num_of_columns == 0:
                         x_offset = 0
 
-            if args.trough:
-                await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.prepare_for_aspirate(mount)
-                await hw_api.aspirate(mount, test_volume)
-                await hw_api.home_z(mount)
-                await countdown(leak_test_time)
-                await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.dispense(mount)
-                await hw_api.home_z(mount)
+            # if args.trough:
+            #     await move_to_point(hw_api, mount, trough_loc, cp)
+            #     await hw_api.prepare_for_aspirate(mount)
+            #     await hw_api.aspirate(mount, test_volume)
+            #     await hw_api.home_z(mount)
+            #     await countdown(leak_test_time)
+            #     await move_to_point(hw_api, mount, trough_loc, cp)
+            #     await hw_api.dispense(mount)
+            #     await hw_api.home_z(mount)
                 #await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
             await hw_api.home_z(mount)
             hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
@@ -453,7 +468,6 @@ async def _main() -> None:
             await update_pick_up_current(hw_api, mount, m_current)
             await update_pick_up_speed(hw_api, mount, pick_up_speed)
             await update_pick_up_distance(hw_api, mount, pick_up_distance)
-            print("Clamp pick-up speed: ", hw_api.clamp_tip_speed)
             cp = CriticalPoint.NOZZLE
             if args.columns:
                 column = float(input("How many Columns to Move: "))
@@ -507,7 +521,7 @@ if __name__ == "__main__":
     parser.add_argument("--tiprack", action="store_true")
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
-    parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
+    parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C2")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
     parser.add_argument("--dial_indicator", action="store_true")
     parser.add_argument("--calibrate", action="store_true")
@@ -529,6 +543,10 @@ if __name__ == "__main__":
     path = '/data/testing_data/'
     cal_fn = 'calibrations.json'
     if args.calibrate:
+        with open(path + cal_fn, 'r') as openfile:
+            deck_slot = json.load(openfile)
+            print(deck_slot)
+    else:
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
     tip_length = {"T1K": 95.7, "T200": 58.35, "T50": 57.9}
