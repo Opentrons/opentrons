@@ -311,7 +311,7 @@ To draw liquid up into a pipette tip, call the :py:meth:`.InstrumentContext.aspi
     pipette.pick_up_tip()
     pipette.aspirate(200, plate['A1'])
 
-If the pipette doesn't move, you can also specify an additional aspiration action without including a location. To demonstrate, lets pause the protocol, automatically resume it, and aspirate a second time from ``plate['A1']``).
+If the pipette doesn't move, you can also specify an additional aspiration action without including a location. To demonstrate, this code snippet pauses the protocol, automatically resumes it, and aspirates a second time from ``plate['A1']``).
 
 .. code-block:: python
 
@@ -369,7 +369,7 @@ To dispense liquid from a pipette tip, call the :py:meth:`.InstrumentContext.dis
 
     pipette.dispense(200, plate['B1'])
 
-If the pipette doesn’t move, you can also specify an additional dispense action without including a location. To demonstrate, lets pause the protocol, automatically resume it, and dispense a second time from location B1.
+If the pipette doesn’t move, you can also specify an additional dispense action without including a location. To demonstrate, this code snippet pauses the protocol, automatically resumes it, and dispense a second time from location B1.
 
 .. code-block:: python
     
