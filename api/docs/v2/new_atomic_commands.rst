@@ -406,11 +406,8 @@ Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specif
 
 Homing
 ------
-..
-    original text mentions disengaging robot motors
-    can you do that? is it accurate to say that?
 
-Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. Homing methods include :py:meth:`.ProtocolContext.home`, :py:meth:`.InstrumentContext.home` and :py:meth:`.InstrumentContext.home_plunger`. These methods home the gantry, the mounted pipette and plunger, and the pipette plunger, respectively. None of these functions take any arguments.
+Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. Homing methods include :py:meth:`.ProtocolContext.home`, :py:meth:`.InstrumentContext.home` and :py:meth:`.InstrumentContext.home_plunger`. These methods home the gantry, home the mounted pipette and plunger, and home the pipette plunger, respectively. None of these functions take any arguments.
 
 This example homes the gantry, z-axis, and pipette plungers::
 
@@ -425,12 +422,12 @@ This example homes the pipette and plunger::
     pipette = protocol.load_instrument('flex_1channel_1000', 'right')
     protocol.home()
 
-To home a specific pipette's Z axis and plunger, you can call :py:meth:`.InstrumentContext.home`::
+To home a specific pipette's Z axis and plunger, you can call :py:meth:`~.InstrumentContext.home`::
 
     pipette = protocol.load_instrument('flex_1channel_1000', 'right')
     pipette.home()
 
-To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentContext.home_plunger`::
+To home a specific pipette's plunger only, you can call :py:meth:`~.InstrumentContext.home_plunger`::
 
     pipette = protocol.load_instrument('flex_1channel_1000', 'right')
     pipette.home_plunger()
@@ -465,17 +462,16 @@ You can also check whether the rail lights are on or off in the protocol by usin
 
 .. versionadded:: 2.5
 
-
 .. TODO clarify that this is specific to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
 
 OT-2 Door Safety Switch
 -----------------------
 
-To operate properly, the front door and top window of your OT-2 must be closed. Introduced with :ref:`robot software version <version-table>` 3.19, the safety switch feature prevents the OT-2, and your protocol, from running if the door is open.
+Introduced with :ref:`robot software version <version-table>` 3.19, the safety switch feature prevents the OT-2, and your protocol, from running if the door is open. To operate properly, the front door and top window of your OT-2 must be closed.
 
 .. image:: ../img/feature_flags/door_safety_switch.png
 
-To check if the robot's door is closed at a specific point during a protocol run, call :py:obj:`.ProtocolContext.door_closed`. It returns a boolean true (door closed) or false (door open) response. This object takes no arguments.
+To check if the robot's door is closed at a specific point during a protocol run, call :py:obj:`.ProtocolContext.door_closed`. It returns a boolean true (door closed) or false (door open) response.
 
 .. code-block:: python
 
