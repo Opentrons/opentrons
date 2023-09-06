@@ -16,7 +16,10 @@ from typing import (
 from typing_extensions import Final
 import numpy
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    CommandParameterLimitViolated,
+)
 
 from opentrons import types as top_types
 from opentrons.hardware_control.types import (
@@ -602,11 +605,11 @@ class OT3PipetteHandler:
         push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
 
         if not instrument.ok_to_push_out(push_out_dist_mm):
-            raise CommandPreconditionViolated(
-                message="Cannot push_out more than pipette max blowout volume.",
-                detail={
-                    "command": "dispense",
-                },
+            raise CommandParameterLimitViolated(
+                command_name="dispense",
+                parameter_name="push_out",
+                limit_statement="less than pipette max blowout volume",
+                actual_value=str(push_out_ul),
             )
 
         dist = self.plunger_position(
@@ -638,12 +641,26 @@ class OT3PipetteHandler:
         acceleration = self.plunger_acceleration(
             instrument, instrument.flow_acceleration
         )
+        max_distance = (
+            instrument.plunger_positions.blow_out - instrument.plunger_positions.bottom
+        )
         if volume is None:
             ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
+            distance_mm = max(
+                ul / instrument.ul_per_mm(ul, "blowout"),
+                max_distance,
+            )
         else:
             ul = volume
+            distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
+            if distance_mm > max_distance:
+                raise CommandParameterLimitViolated(
+                    command_name="blow_out",
+                    parameter_name="volume",
+                    limit_statement="less than the available distance for the plunger to move",
+                    actual_value=str(volume),
+                )
 
-        distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
         return LiquidActionSpec(
             axis=Axis.of_main_tool_actuator(mount),
             volume=0,
