@@ -1067,13 +1067,11 @@ class InstrumentContext(publisher.CommandPublisher):
         and :py:meth:`dispense`, designed to make protocol writing easier at
         the cost of specificity.
 
-        :param volume: The amount of volume to aspirate from each source and
+        :param volume: The amount, in µL, to aspirate from each source and
                        dispense to each destination.
-                       If volume is a list, each volume will be used for the
-                       sources/targets at the matching index. If volumes is a
-                       tuple with two elements, like `(20, 100)`, then a list
-                       of volumes will be generated with a linear gradient
-                       between the two volumes in the tuple.
+                       If ``volume`` is a list, each amount will be used for the
+                       source and target at the matching index. A list item of ``0``
+                       will skip the corresponding wells entirely.
         :param source: A single well or a list of wells from where liquid
                        will be aspirated.
         :param dest: A single well or a list of wells where liquid
