@@ -13,7 +13,7 @@ import re
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus import build, CanMessenger,  WaitableCallback
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName,PipetteTipActionType
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
@@ -36,6 +36,8 @@ from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_home_step,
     create_backoff_step,
+    create_tip_action_backoff_step,
+    MoveGroupTipActionStep
 )
 
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
@@ -128,7 +130,20 @@ async def move_for_encode(messenger: CanMessenger, node, position,xy,args) -> No
             print("READUSAG=Failed")
         elif xy == "up":
             print("READUSAG=Failed")
-
+async def move_for_tip_motor(messenger: CanMessenger, node, position,xy,args) -> None:
+    step_size = [0.1, 0.5, 1,5,10, 20, 50]
+    step_length_index = 4
+    step = step_size[step_length_index]
+    pos = 0
+    speed = 10
+    res = {node: (0,0,0)}
+    current = args.current
+    await set_pipette_current(messenger,current,node)
+    try:
+        await move_tip_motor(messenger, node, step, speed)
+        print("MOVETIPMOTOR=Pass")
+    except:
+        print("MOVETIPMOTOR=Fail")
 async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> None:
     step_size = [0.1, 0.5, 1,5,10, 20, 50]
     step_length_index = 4
@@ -292,12 +307,53 @@ async def home(messenger, node,args):
     except:
         print("MOVEHOME=Failed")
 
-async def move_to(messenger: CanMessenger, node, distance, velocity):
+async def home_tip_motor(messenger, node, args):
+    """Run a Backoff step for the tip motors"""
+    home_runner = MoveGroupRunner(
+        move_groups=[
+            [
+                create_tip_action_backoff_step(
+                    {node: float64(5)}
+                ),
+            ],
+        ]
+    )
+
+    current = args.current
+    try:
+        await set_pipette_current(messenger,current,node)
+        await home_runner.run(can_messenger = messenger)
+        print("MOVEHOME=Pass")
+    except:
+        print("MOVEHOME=Failed")
+
+
+async def move_tip_motor(messenger: CanMessenger, node, distance, velocity):
     move_runner = MoveGroupRunner(
         # Group 0
         move_groups=[
             [
                 {
+                    node: MoveGroupTipActionStep(
+                        duration_sec=float64(calc_time(distance,
+                                                        velocity)),
+                        velocity_mm_sec=float64(velocity),
+                        action=PipetteTipActionType.clamp,
+                        acceleration_mm_sec_sq=float64(0)
+                    )
+                }
+            ]
+        ],
+    )
+    axis_dict= await move_runner.run(can_messenger = messenger)
+    return axis_dict
+
+async def move_to(messenger: CanMessenger, node, distance, velocity):
+    move_runner = MoveGroupRunner(
+        # Group 0
+        move_groups=[
+            [
+                {         
                     node: MoveGroupSingleAxisStep(
                         distance_mm=float64(0),
                         velocity_mm_sec=float64(velocity),
@@ -310,6 +366,8 @@ async def move_to(messenger: CanMessenger, node, distance, velocity):
     )
     axis_dict= await move_runner.run(can_messenger = messenger)
     return axis_dict
+
+
 
 def determine_abbreviation(pipette_name):
     if pipette_name == 'p1000_single':
@@ -509,7 +567,10 @@ async def run(args: argparse.Namespace) -> None:
         #print('-------------------Test Homing--------------------------')
         await home(messenger, node,args)
         #print('Homed')
-
+    if args.hometipmotor:
+        await home_tip_motor(messenger,node,args)
+    if args.movetipmotor:
+        await move_for_tip_motor(messenger, node,position,"downward",args)
     if args.jog:
         print('\n')
         print('----------Read Motor Position and Encoder--------------')
@@ -531,6 +592,7 @@ async def run(args: argparse.Namespace) -> None:
     
     if args.downward:
         res = await move_for_input(messenger, node,position,"downward",args)
+
         #print("move=Pass")
         #return res
     if args.up:
@@ -643,6 +705,8 @@ def main() -> None:
     parser.add_argument("--read_detect", action="store_true")
 
     parser.add_argument("--home", action="store_true")
+    parser.add_argument("--hometipmotor", action="store_true")
+    parser.add_argument("--movetipmotor", action="store_true")
     parser.add_argument("--downward", action="store_true")
     parser.add_argument("--up", action="store_true")
     parser.add_argument(
