@@ -104,6 +104,24 @@ To effect the transfer, the API will aspirate and dispense the maximum volume of
 
 You can change ``volume`` to any value (above the minimum volume of the pipette) and the API will automatically calculate how many times the pipette needs to aspirate and dispense. ``volume=50`` would require just one repetition. ``volume=75`` would require two, split into 50 µL and 25 µL. ``volume=1000`` would repeat 20 times — not very efficient, but perhaps more useful than having to swap to a different pipette!
 
+Remember that ``distribute()`` includes a disposal volume by default, and this can affect the number of times the pipette refills its tip. Say you want to distribute 80 µL to each of the 12 wells in row A of a plate. That's 960 µL total — less than the capacity of the pipette — but the disposal volume will cause the pipette to refill.
+
+.. code-block:: text
+
+    Picking up tip from A1 of tip rack on 3
+    Aspirating 980.0 uL from A1 of well plate on 2 at 274.7 uL/sec
+    Dispensing 80.0 uL into B1 of well plate on 2 at 274.7 uL/sec
+    Dispensing 80.0 uL into B2 of well plate on 2 at 274.7 uL/sec
+    ... 
+    Dispensing 80.0 uL into B11 of well plate on 2 at 274.7 uL/sec
+    Blowing out at A1 of Opentrons Fixed Trash on 12
+    Aspirating 180.0 uL from A1 of well plate on 2 at 274.7 uL/sec
+    Dispensing 80.0 uL into B12 of well plate on 2 at 274.7 uL/sec
+    Blowing out at A1 of Opentrons Fixed Trash on 12
+    Dropping tip into A1 of Opentrons Fixed Trash on 12
+    
+This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use :ref:`complex_params` to reduce or eliminate the disposal volume, or to blow out in a location other than the trash.
+
 .. _distribute-consolidate-volume-list:
 .. _complex-variable-volumes:
 
