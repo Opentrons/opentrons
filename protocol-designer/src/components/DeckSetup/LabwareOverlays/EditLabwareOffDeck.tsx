@@ -14,6 +14,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
   deleteContainer,
+  duplicateLabware,
   openIngredientSelector,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
@@ -31,13 +32,20 @@ interface SP {
 }
 interface DP {
   editLiquids: () => void
+  duplicateLabware: () => void
   deleteLabware: () => void
 }
 
 type Props = OP & SP & DP
 
 const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
-  const { labwareEntity, isYetUnnamed, editLiquids, deleteLabware } = props
+  const {
+    labwareEntity,
+    isYetUnnamed,
+    editLiquids,
+    deleteLabware,
+    duplicateLabware,
+  } = props
 
   const { isTiprack } = labwareEntity.def.parameters
   if (isYetUnnamed && !isTiprack) {
@@ -93,6 +101,10 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
         ) : (
           <div className={styles.button_spacer} />
         )}
+        <a className={styles.overlay_button} onClick={duplicateLabware}>
+          <Icon className={styles.overlay_icon} name="content-copy" />
+          {i18n.t('deck.overlay.edit.duplicate')}
+        </a>
         <a className={styles.overlay_button} onClick={deleteLabware}>
           <Icon className={styles.overlay_icon} name="close" />
           {i18n.t('deck.overlay.edit.delete')}
@@ -116,6 +128,7 @@ const mapDispatchToProps = (
 ): DP => ({
   editLiquids: () =>
     dispatch(openIngredientSelector(ownProps.labwareEntity.id)),
+  duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareEntity.id)),
   deleteLabware: () => {
     window.confirm(
       `Are you sure you want to permanently delete this ${getLabwareDisplayName(
