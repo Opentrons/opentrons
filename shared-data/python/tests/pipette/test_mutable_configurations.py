@@ -262,5 +262,5 @@ def test_build_mutable_config_using_old_units() -> None:
         "max": 30,
     }
     assert (
-        types.MutableConfig.build(**old_units_config, name="dropTipSpeed") is not None
+        types.MutableConfig.build(**old_units_config, name="dropTipSpeed") is not None  # type: ignore
     )
