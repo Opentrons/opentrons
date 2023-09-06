@@ -253,6 +253,11 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         "D3": (341.03, 75.5, 110),
     }
 
+    ### just for save calibrate file
+    if args.only_calibrate:
+        await calibrate_tip_racks(api, mount, slot_loc, AXIS)
+        return
+
     ### optional arg for tip rack calibration
     if(not args.load_cal):
         calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
@@ -476,6 +481,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_robot", action="store_true")
     parser.add_argument("--restart_flag", action="store_true")
     parser.add_argument("--start_slot_row_col_totalTips_totalFailure", type=str, default="1:1:1:1:0")
+    parser.add_argument("--only_calibrate", action="store_true")
     # parser.add_argument("--check_tip", action="store_true")
     args = parser.parse_args()
     mount = mount_options[args.mount]
