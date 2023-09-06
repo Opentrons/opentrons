@@ -376,7 +376,7 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 Utility Commands
 ================
 
-Utility commands let you perform convenience actions in a protocol that control a robot's behavior. For example, these commands let you delay or pause a protocol, home the gantry, display comments in the App, control robot lights, and manage the robot's door open/closed state. The following sections show how to these utility commands and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
+Utility commands let you perform convenience actions in a protocol that control a robot's behavior. For example, these commands let you delay or pause a protocol, home the gantry, display comments in the App, control robot lights, and check the robot's door open/closed state. The following sections show how to these utility commands and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Delay and Resume
 ----------------
@@ -398,7 +398,7 @@ This example delays a protocol for 5 minutes and 10 seconds::
 Pause Until Resumed
 -------------------
 
-Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. Instead, you'll respond to a prompt on the touchscreen or in the App. This method lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
+Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the App. This method lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
 
     protocol.pause('Remember to get more pipette tips')
 
@@ -407,17 +407,9 @@ Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specif
 Homing
 ------
 
-Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. Homing methods include :py:meth:`.ProtocolContext.home`, :py:meth:`.InstrumentContext.home` and :py:meth:`.InstrumentContext.home_plunger`. These methods home the gantry, home the mounted pipette and plunger, and home the pipette plunger, respectively. None of these functions take any arguments.
+Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. Homing methods include :py:meth:`.ProtocolContext.home`, :py:meth:`.InstrumentContext.home` and :py:meth:`.InstrumentContext.home_plunger`. These methods home the gantry, home the mounted pipette and plunger, and home the pipette plunger, respectively. These functions take no arguments.
 
-This example homes the gantry, z-axis, and pipette plungers::
-
-    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
-    protocol.home()
-..
-    original reads, "homes right z axis"
-    not sure what is meant by "right z axis"
-    is it because pipette is mounted on the right?
-This example homes the pipette and plunger::
+This example homes the gantry::
 
     pipette = protocol.load_instrument('flex_1channel_1000', 'right')
     protocol.home()
@@ -446,7 +438,7 @@ Call the :py:meth:`.ProtocolContext.comment` method to create and display messag
 Control and Monitor Robot Rail Lights
 -------------------------------------
 
-Call the :py:meth:`.ProtocolContext.set_rail_lights` to turn the robot's rail lights on or off during a protocol. This method accepts boolean true (lights on) or false (lights off) arguments. Rail lights are off by default.
+Call the :py:meth:`.ProtocolContext.set_rail_lights` method to turn the robot's rail lights on or off during a protocol. This method accepts boolean true (lights on) or false (lights off) arguments. Rail lights are off by default.
 
 This example turns the rail lights on::
 
