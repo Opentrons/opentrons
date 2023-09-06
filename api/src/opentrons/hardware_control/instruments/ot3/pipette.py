@@ -643,11 +643,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
-            )
+        )
         self._dispense_flow_rate = (
             self._active_tip_settings.default_dispense_flowrate.default
         )
-        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate.default
+        self._blow_out_flow_rate = (
+            self._active_tip_settings.default_blowout_flowrate.default
+        )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
