@@ -102,12 +102,14 @@ def test_fix_transaction_fixes_transactional_ddl(
     class ExceptionInterruptingTransaction(Exception):
         pass
 
-    with pytest.raises(ExceptionInterruptingTransaction):
+    try:
         with scratch_engine.begin() as transaction:
             transaction.execute(
                 sqlalchemy.text("ALTER TABLE 'table' ADD str_col VARCHAR")
             )
             raise ExceptionInterruptingTransaction()
+    except ExceptionInterruptingTransaction:
+        pass
 
     column_names = [
         c["name"] for c in sqlalchemy.inspect(scratch_engine).get_columns("table")
