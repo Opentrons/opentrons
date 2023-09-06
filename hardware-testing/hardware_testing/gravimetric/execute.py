@@ -58,7 +58,7 @@ _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
 _tip_counter: Dict[int, int] = {}
 
 CAM_CMD_OT3 = (
-    "v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
+    "v4l2-ctl --device /dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
 
