@@ -148,7 +148,8 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         top="0"
         backgroundColor={COLORS.white}
         boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
-        height="100%"
+        height="92.5%"
+        marginTop="3rem"
       >
         <Flex
           paddingY={SPACING.spacing16}

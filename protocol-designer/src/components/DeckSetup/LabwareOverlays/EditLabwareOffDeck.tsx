@@ -25,7 +25,6 @@ import type { BaseState, ThunkDispatch } from '../../../types'
 
 interface OP {
   labwareEntity: LabwareEntity
-  handleDragHover?: () => void
 }
 interface SP {
   isYetUnnamed: boolean
