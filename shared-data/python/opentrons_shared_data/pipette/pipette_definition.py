@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple
 from pydantic import BaseModel, Field, validator
 from typing_extensions import Literal
 from dataclasses import dataclass

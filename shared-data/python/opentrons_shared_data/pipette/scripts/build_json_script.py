@@ -277,7 +277,6 @@ def fill_blowout_configs(
 
     general_config_files = Path(GENERAL_ROOT).glob("*")
     for pipette_type in general_config_files:  # single, eight, 96-channel
-        pipette_type_str = str(pipette_type).split("/")[-1]
         for volume in volumes:  # pipette max volume- p10, p20, p50, etc.
             shaft_diameter = shaft_diameters[volume]
             # calculate uL per mm, default blowout vol
