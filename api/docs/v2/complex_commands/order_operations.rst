@@ -95,14 +95,14 @@ To effect the transfer, the API will aspirate and dispense the maximum volume of
 
 .. code-block:: text
 
-	Picking up tip from A1 of tip rack on 3
-	Aspirating 50.0 uL from A1 of well plate on 2 at 57 uL/sec
-	Dispensing 50.0 uL into B1 of well plate on 2 at 57 uL/sec
-	Aspirating 50.0 uL from A1 of well plate on 2 at 57 uL/sec
-	Dispensing 50.0 uL into B1 of well plate on 2 at 57 uL/sec
-	Dropping tip into A1 of Opentrons Fixed Trash on 12
+	Picking up tip from A1 of tip rack on D3
+	Aspirating 50.0 uL from A1 of well plate on D2 at 57 uL/sec
+	Dispensing 50.0 uL into B1 of well plate on D2 at 57 uL/sec
+	Aspirating 50.0 uL from A1 of well plate on D2 at 57 uL/sec
+	Dispensing 50.0 uL into B1 of well plate on D2 at 57 uL/sec
+	Dropping tip into A1 of Opentrons Fixed Trash on A3
 
-You can change ``volume`` to any value (above the minimum volume of the pipette) and the API will automatically calculate how many aspirates and dispenses are needed. ``volume=50`` would require just one repetition. ``volume=75`` would require two, split into 50 µL and 25 µL. ``volume=1000`` would repeat 20 times — not very efficient, but perhaps more useful than having to swap to a different pipette!
+You can change ``volume`` to any value (above the minimum volume of the pipette) and the API will automatically calculate how many times the pipette needs to aspirate and dispense. ``volume=50`` would require just one repetition. ``volume=75`` would require two, split into 50 µL and 25 µL. ``volume=1000`` would repeat 20 times — not very efficient, but perhaps more useful than having to swap to a different pipette!
 
 .. _distribute-consolidate-volume-list:
 .. _complex-variable-volumes:
