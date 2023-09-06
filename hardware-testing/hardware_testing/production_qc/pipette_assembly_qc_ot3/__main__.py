@@ -55,6 +55,7 @@ from hardware_testing.opentrons_api.types import (
     Point,
     Axis,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 DEFAULT_SLOT_TIP_RACK_1000 = 7
 DEFAULT_SLOT_TIP_RACK_200 = 4
@@ -458,14 +459,19 @@ async def _aspirate_and_look_for_droplets(
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pipette_volume = pip.working_volume
+    airgap_vol = 0.5
     print(f"aspirating {pipette_volume} microliters")
     await api.move_rel(mount, Point(z=-ASPIRATE_SUBMERGE_MM))
-    await api.aspirate(mount, pipette_volume)
+    await api.aspirate(mount, pipette_volume-airgap_vol)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
+    await api.aspirate(mount, airgap_vol)
     for t in range(wait_time):
         print(f"waiting for leaking tips ({t + 1}/{wait_time})")
         if not api.is_simulator:
-            await asyncio.sleep(1)
+            for _ in range (10):
+                await helpers_ot3.get_pressure_ot3(api, mount, SensorId.S0)
+                await helpers_ot3.get_pressure_ot3(api, mount, SensorId.S1)
+                await asyncio.sleep(0.1)
     if api.is_simulator:
         leak_test_passed = True
     else:
