@@ -9,6 +9,7 @@ from .commands import (
     RadwagWorkingMode,
     RadwagFilter,
     RadwagValueRelease,
+    RadwagAmbiant,
     radwag_command_format,
 )
 from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_parse
@@ -189,6 +190,14 @@ class RadwagScale(RadwagScaleBase):
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
 
+    def ambiant(self, amb_rel: RadwagAmbiant) -> None:
+        """Set the value release type."""
+        cmd = RadwagCommand.SET_AMBIENT_CONDITIONS_STATE
+        res = self._write_command_and_read_response(cmd, append=str(amb_rel.value))
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
+
     def continuous_transmission(self, enable: bool) -> None:
         """Enable/disable continuous transmissions."""
         if enable:
@@ -274,6 +283,10 @@ class SimRadwagScale(RadwagScaleBase):
 
     def value_release(self, val_rel: RadwagValueRelease) -> None:
         """Value release."""
+        return
+
+    def ambiant(self, amb_rel: RadwagAmbiant) -> None:
+        """Set the value release type."""
         return
 
     def continuous_transmission(self, enable: bool) -> None:
