@@ -158,6 +158,9 @@ export function RobotSettingsCalibration({
       : null
   )
 
+  console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
+  // console.log('attachedInstruments', attachedInstruments)
+
   const createStatus = createRequest?.status
 
   const isJogging =
@@ -329,6 +332,9 @@ export function RobotSettingsCalibration({
           <RobotSettingsModuleCalibration
             attachedModules={attachedModules}
             updateRobotStatus={updateRobotStatus}
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
           />
         </>
       ) : (
