@@ -4,21 +4,15 @@
     "t200": {
       "defaultAspirateFlowRate": {
         "default": 94,
-        "valuesByApiLevel": {
-          "2.0": 94
-        }
+        "valuesByApiLevel": { "2.0": 94 }
       },
       "defaultDispenseFlowRate": {
         "default": 94,
-        "valuesByApiLevel": {
-          "2.0": 94
-        }
+        "valuesByApiLevel": { "2.0": 94 }
       },
       "defaultBlowOutFlowRate": {
         "default": 94,
-        "valuesByApiLevel": {
-          "2.0": 94
-        }
+        "valuesByApiLevel": { "2.0": 94 }
       },
       "defaultTipLength": 51.0,
       "defaultReturnTipHeight": 0.4,
@@ -92,27 +86,20 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 43.295,
       "defaultPushOutVolume": 0
     },
     "t300": {
       "defaultAspirateFlowRate": {
         "default": 94,
-        "valuesByApiLevel": {
-          "2.0": 94
-        }
+        "valuesByApiLevel": { "2.0": 94 }
       },
       "defaultDispenseFlowRate": {
         "default": 94,
-        "valuesByApiLevel": {
-          "2.0": 94
-        }
+        "valuesByApiLevel": { "2.0": 94 }
       },
       "defaultBlowOutFlowRate": {
         "default": 94,
-        "valuesByApiLevel": {
-          "2.0": 94
-        }
+        "valuesByApiLevel": { "2.0": 94 }
       },
       "defaultTipLength": 51.0,
       "defaultReturnTipHeight": 0.4,
@@ -186,7 +173,6 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 43.295,
       "defaultPushOutVolume": 0
     }
   },

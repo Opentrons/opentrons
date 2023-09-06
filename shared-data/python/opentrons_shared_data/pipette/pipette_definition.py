@@ -104,11 +104,6 @@ class SupportedTipsDefinition(BaseModel):
     dispense: ulPerMMDefinition = Field(
         ..., description="The default pipetting functions list for dispensing."
     )
-    default_blowout_volume: Optional[float] = Field(
-        ...,
-        description="The default volume for a blowout command with this tip type.",
-        alias="defaultBlowoutVolume",
-    )
     default_push_out_volume: float = Field(
         ...,
         description="The default volume for a push-out during dispense.",
