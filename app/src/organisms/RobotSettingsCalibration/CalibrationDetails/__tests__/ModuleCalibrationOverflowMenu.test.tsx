@@ -7,41 +7,39 @@ import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { mockMagneticModule } from '../../../../redux/modules/__fixtures__'
 import {
   useRunStatuses,
-  useAttachedPipettes,
-  useAttachedPipetteCalibrations,
 } from '../../../Devices/hooks'
-import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-} from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
+import type { Mount } from '@opentrons/components'
 import type { PipetteCalibrationsByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('../../../ModuleWizardFlows')
 jest.mock('../../../Devices/hooks')
 
-const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
-  left: {
-    offset: mockPipetteOffsetCalibration1,
+const mockPipetteOffsetCalibrations = [
+  {
+    modelName: 'mockPipetteModelLeft',
+    serialNumber: '1234567',
+    mount: 'left' as Mount,
+    tiprack: 'mockTiprackLeft',
+    lastCalibrated: '2022-11-10T18:14:01',
+    markedBad: false,
   },
-  right: {
-    offset: mockPipetteOffsetCalibration2,
+  {
+    modelName: 'mockPipetteModelRight',
+    serialNumber: '01234567',
+    mount: 'right' as Mount,
+    tiprack: 'mockTiprackRight',
+    lastCalibrated: '2022-11-10T18:15:02',
+    markedBad: false,
   },
-} as any
+]
 
 const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
   typeof ModuleWizardFlows
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
-const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
-  typeof useAttachedPipetteCalibrations
 >
 
 const render = (
@@ -60,21 +58,19 @@ describe('ModuleCalibrationOverflowMenu', () => {
       isCalibrated: false,
       attachedModule: mockMagneticModule,
       updateRobotStatus: jest.fn(),
+      formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
     }
     mockModuleWizardFlows.mockReturnValue(<div>module wizard flows</div>)
-    mockUseAttachedPipettes.mockReturnValue({
-      left: mockLeftProtoPipette,
-      right: null,
-    })
     mockUseRunStatuses.mockReturnValue({
       isRunRunning: false,
       isRunStill: false,
       isRunIdle: false,
       isRunTerminal: false,
     })
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('should render overflow menu buttons - not calibrated', () => {
@@ -100,19 +96,14 @@ describe('ModuleCalibrationOverflowMenu', () => {
   })
 
   it('should be disabled when not calibrated module and pipette is not attached', () => {
-    mockUseAttachedPipettes.mockReturnValue({
-      left: null,
-      right: null,
-    })
+    props.formattedPipetteOffsetCalibrations = [] as any
     const [{ getByLabelText }] = render(props)
     expect(getByLabelText('ModuleCalibrationOverflowMenu')).toBeDisabled()
   })
 
   it('should be disabled when not calibrated module and pipette is not calibrated', () => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue({
-      left: null,
-      right: null,
-    } as any)
+    props.formattedPipetteOffsetCalibrations[0].lastCalibrated = undefined
+    props.formattedPipetteOffsetCalibrations[1].lastCalibrated = undefined
     const [{ getByLabelText }] = render(props)
     expect(getByLabelText('ModuleCalibrationOverflowMenu')).toBeDisabled()
   })
