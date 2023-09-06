@@ -208,7 +208,7 @@ describe('VersionInfoModal', () => {
 
       expect(handleClose).not.toHaveBeenCalled()
 
-      wrapper.find(UpdateAppModal).invoke('closeModal')?.()
+      wrapper.find(UpdateAppModal).invoke('closeModal')?.(true)
 
       expect(handleClose).toHaveBeenCalled()
     })
