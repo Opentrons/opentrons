@@ -6,6 +6,7 @@ import type {
   ConfigV16,
   ConfigV17,
   ConfigV18,
+  ConfigV19,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V12: ConfigV12 = {
@@ -107,4 +108,13 @@ export const MOCK_CONFIG_V18: ConfigV18 = {
     return rest
   })(),
   version: 18,
+}
+
+export const MOCK_CONFIG_V19: ConfigV19 = {
+  ...MOCK_CONFIG_V18,
+  version: 19,
+  update: {
+    ...MOCK_CONFIG_V18.update,
+    hasJustUpdated: false,
+  },
 }
