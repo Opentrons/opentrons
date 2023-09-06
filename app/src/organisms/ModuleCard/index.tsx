@@ -74,8 +74,8 @@ interface ModuleCardProps {
   module: AttachedModule
   robotName: string
   isLoadedInRun: boolean
-  attachPipetteRequired?: boolean
-  updatePipetteFWRequired?: boolean
+  attachPipetteRequired: boolean
+  updatePipetteFWRequired: boolean
   runId?: string
   slotName?: string
 }
@@ -120,6 +120,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     },
   })
   const requireModuleCalibration = module.moduleOffset == null
+  const isPipetteReady =
+    (!attachPipetteRequired ?? false) && (!updatePipetteFWRequired ?? false)
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -432,6 +434,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               robotName={robotName}
               runId={runId}
               isLoadedInRun={isLoadedInRun}
+              isPipetteReady={isPipetteReady}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleInstructionsClick={handleInstructionsClick}
