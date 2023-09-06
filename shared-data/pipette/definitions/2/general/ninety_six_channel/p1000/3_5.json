@@ -29,9 +29,15 @@
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": { "count": 2 },
-    "capacitive": { "count": 2 },
-    "environment": { "count": 1 }
+    "pressure": {
+      "count": 2
+    },
+    "capacitive": {
+      "count": 2
+    },
+    "environment": {
+      "count": 1
+    }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -42,5 +48,9 @@
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904,
   "backlashDistance": 0.3,
-  "quirks": []
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 0.8,
+    "speed": 5
+  }
 }
