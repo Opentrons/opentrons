@@ -5,13 +5,10 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { mockMagneticModule } from '../../../../redux/modules/__fixtures__'
-import {
-  useRunStatuses,
-} from '../../../Devices/hooks'
+import { useRunStatuses } from '../../../Devices/hooks'
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
 import type { Mount } from '@opentrons/components'
-import type { PipetteCalibrationsByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('../../../ModuleWizardFlows')
 jest.mock('../../../Devices/hooks')
