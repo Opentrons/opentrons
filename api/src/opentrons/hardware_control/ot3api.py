@@ -2001,7 +2001,7 @@ class OT3API(
             self.gantry_load != GantryLoad.HIGH_THROUGHPUT
             and ff.tip_presence_detection_enabled()
         ):
-            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
 
         # home mount axis
         if home_after:
