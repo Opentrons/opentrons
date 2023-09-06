@@ -109,7 +109,7 @@ export function useProtocolReceiptToast(): void {
           createLiveCommand({
             command: animationCommand,
           }).catch((e: Error) =>
-            console.warn(`cannot run status bar animtion: ${e.message}`)
+            console.warn(`cannot run status bar animation: ${e.message}`)
           )
         })
         .catch((e: Error) => {
