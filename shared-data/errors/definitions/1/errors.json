@@ -185,6 +185,10 @@
     "4004": {
       "detail": "Command Precondition Violated",
       "category": "generalError"
+    },
+    "4005": {
+      "detail": "Command Parameter Limit Violated",
+      "category": "generalError"
     }
   }
 }

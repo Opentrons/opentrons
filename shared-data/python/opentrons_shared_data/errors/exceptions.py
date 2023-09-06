@@ -753,3 +753,32 @@ class CommandPreconditionViolated(GeneralError):
         super().__init__(
             ErrorCodes.COMMAND_PRECONDITION_VIOLATED, message, detail, wrapping
         )
+
+
+class CommandParameterLimitViolated(GeneralError):
+    """An error indicating that a command's parameter limit was violated."""
+
+    def __init__(
+        self,
+        command_name: str,
+        parameter_name: str,
+        limit_statement: str,
+        actual_value: str,
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
+    ) -> None:
+        """Build a CommandParameterLimitViolated error."""
+        wrapping_checked = wrapping or []
+        super().__init__(
+            ErrorCodes.COMMAND_PARAMETER_LIMIT_VIOLATED,
+            f"The parameter {parameter_name} of {command_name} must be {limit_statement} but is {actual_value}",
+            detail={
+                "command": command_name,
+                "argument": parameter_name,
+                "limit": limit_statement,
+                "value": actual_value,
+            },
+            wrapping=[
+                PythonException(e) if isinstance(e, BaseException) else e
+                for e in wrapping_checked
+            ],
+        )
