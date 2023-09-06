@@ -468,30 +468,22 @@ You can also check whether the rail lights are on or off in the protocol by usin
 
 .. TODO clarify that this is specific to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
 
-Monitor Robot Door
-------------------
+OT-2 Door Safety Switch
+-----------------------
 
-The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
+To operate properly, the front door and top window of your OT-2 must be closed. Introduced with :ref:`robot software version <version-table>` 3.19, the safety switch feature prevents the OT-2, and your protocol, from running if the door is open.
 
 .. image:: ../img/feature_flags/door_safety_switch.png
 
-You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:obj:`.ProtocolContext.door_closed`:
-
+To check if the robot's door is closed at a specific point during a protocol run, call :py:obj:`.ProtocolContext.door_closed`. It returns a boolean true (door closed) or false (door open) response. This object takes no arguments.
 
 .. code-block:: python
 
-    protocol.door_closed  # return True when the door is closed,
-                          # False when the door is open
-
-
-.. note::
-
-    Both the top window and the front door must be closed in order for the robot to report the door is closed.
-
+    protocol.door_closed
 
 .. warning::
 
-    If you chose to enable the door safety switch feature flag, you should only use :py:obj:`.ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:obj:`.ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
+    :py:obj:`~.ProtocolContext.door_closed` is a status check only. It does not control the robot's behavior. If you wish to implement a custom method to pause or resume a protocol using ``door_closed``, disable the door safety feature first (not recommended).
 
 .. versionadded:: 2.5
 
