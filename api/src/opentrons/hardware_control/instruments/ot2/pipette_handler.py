@@ -15,6 +15,7 @@ from typing import (
     TypeVar,
     overload,
 )
+import numpy
 
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
 from opentrons_shared_data.pipette.types import Quirks
@@ -595,9 +596,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         if disp_vol == 0:
             return None
 
-        is_full_dispense = abs(instrument.current_volume - disp_vol) <= (
-            instrument.minimum_volume / 10
-        )
+        is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
 
         if is_full_dispense:
             if push_out is None:

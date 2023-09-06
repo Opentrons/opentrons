@@ -14,6 +14,7 @@ from typing import (
     TypeVar,
 )
 from typing_extensions import Final
+import numpy
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
@@ -577,9 +578,7 @@ class OT3PipetteHandler:
 
         # Ensure we don't dispense more than the current volume
         disp_vol = min(instrument.current_volume, disp_vol)
-        is_full_dispense = abs(instrument.current_volume - disp_vol) <= (
-            instrument.minimum_volume / 10
-        )
+        is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
 
         if disp_vol == 0:
             return None
