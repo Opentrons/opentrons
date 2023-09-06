@@ -376,7 +376,7 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 Utility Commands
 ================
 
-With utility commands, you can control various robot functions such as pausing a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
+With utility commands, you can control various robot functions such as pausing or delaying a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Delay and Resume
 ----------------
@@ -429,7 +429,7 @@ To home a specific pipette's plunger only, you can call :py:meth:`~.InstrumentCo
 Comment
 -------
 
-Call the :py:meth:`.ProtocolContext.comment` method to create and display messages in the Opentrons App during protocol execution::
+Call the :py:meth:`.ProtocolContext.comment` method to write and display a brief message in the Opentrons App during a protocol run::
 
     protocol.comment('Hello, world!')
 
