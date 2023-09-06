@@ -1068,16 +1068,16 @@ async def test_monitor_pressure(
 @pytest.mark.parametrize(
     "tip_state_type, mocked_ejector_response, expectation",
     [
-        [TipStateType.PRESENT, 1, does_not_raise()],
-        [TipStateType.ABSENT, 0, does_not_raise()],
-        [TipStateType.PRESENT, 0, pytest.raises(FailedTipStateCheck)],
-        [TipStateType.ABSENT, 1, pytest.raises(FailedTipStateCheck)],
+        [TipStateType.PRESENT, [1, 1], does_not_raise()],
+        [TipStateType.ABSENT, [0, 0], does_not_raise()],
+        [TipStateType.PRESENT, [0, 0], pytest.raises(FailedTipStateCheck)],
+        [TipStateType.ABSENT, [1, 1], pytest.raises(FailedTipStateCheck)],
     ],
 )
 async def test_get_tip_present(
     controller: OT3Controller,
     tip_state_type: TipStateType,
-    mocked_ejector_response: int,
+    mocked_ejector_response: List[int],
     expectation: ContextManager[None],
 ) -> None:
     mount = OT3Mount.LEFT

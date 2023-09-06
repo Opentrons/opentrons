@@ -1922,11 +1922,11 @@ class OT3API(
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
 
-        if (
-            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
-            and ff.tip_presence_detection_enabled()
-        ):
-            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+        if ff.tip_presence_detection_enabled():
+            ninety_six_channel_attached = self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            await self._backend.get_tip_present(
+                realmount, TipStateType.PRESENT, ninety_six_channel_attached
+            )
 
         _add_tip_to_instrs()
 
@@ -1997,11 +1997,11 @@ class OT3API(
 
         await self._backend.set_active_current(spec.ending_current)
         # TODO: implement tip-detection sequence during drop-tip for 96ch
-        if (
-            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
-            and ff.tip_presence_detection_enabled()
-        ):
-            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
+        if ff.tip_presence_detection_enabled():
+            ninety_six_channel_attached = self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            await self._backend.get_tip_present(
+                realmount, TipStateType.PRESENT, ninety_six_channel_attached
+            )
 
         # home mount axis
         if home_after:
@@ -2065,8 +2065,11 @@ class OT3API(
         # TODO we should have a PipetteState that can be returned from
         # this function with additional state (such as critical points)
         realmount = OT3Mount.from_mount(mount)
-        res = await self._backend.get_tip_present_state(realmount)
-        pipette_state_for_mount: PipetteStateDict = {"tip_detected": bool(res)}
+        is_ninety_six_channel = self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+        res = await self._backend.get_tip_present_state(
+            realmount, is_ninety_six_channel
+        )
+        pipette_state_for_mount: PipetteStateDict = {"tip_detected": bool(res[0])}
         return pipette_state_for_mount
 
     def reset_instrument(

@@ -835,16 +835,24 @@ class OT3Controller:
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
-    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+    async def get_tip_present(
+        self,
+        mount: OT3Mount,
+        tip_state: TipStateType,
+        is_ninety_six_channel: bool = False,
+    ) -> None:
         """Raise an error if the expected tip state does not match the current state."""
-        res = await self.get_tip_present_state(mount)
-        if res != tip_state.value:
-            raise FailedTipStateCheck(tip_state, res)
+        res = await self.get_tip_present_state(mount, is_ninety_six_channel)
+        if res[0] != tip_state.value or res[0] != res[1]:
+            raise FailedTipStateCheck(tip_state, res[0])
 
-    async def get_tip_present_state(self, mount: OT3Mount) -> int:
+    async def get_tip_present_state(
+        self, mount: OT3Mount, is_ninety_six_channel: bool = False
+    ) -> List[int]:
         """Get the state of the tip ejector flag for a given mount."""
+        expected_responses = 2 if is_ninety_six_channel else 1
         res = await get_tip_ejector_state(
-            self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
+            self._messenger, sensor_node_for_mount(OT3Mount(mount.value)), expected_responses  # type: ignore
         )
         return res
 
