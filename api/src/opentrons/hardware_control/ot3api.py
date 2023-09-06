@@ -2065,9 +2065,9 @@ class OT3API(
         # TODO we should have a PipetteState that can be returned from
         # this function with additional state (such as critical points)
         realmount = OT3Mount.from_mount(mount)
-        is_ninety_six_channel = self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+        expect_multiple_responses = self._gantry_load == GantryLoad.HIGH_THROUGHPUT
         res = await self._backend.get_tip_present_state(
-            realmount, is_ninety_six_channel
+            realmount, expect_multiple_responses
         )
         pipette_state_for_mount: PipetteStateDict = {"tip_detected": bool(res[0])}
         return pipette_state_for_mount

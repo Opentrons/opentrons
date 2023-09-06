@@ -387,13 +387,13 @@ class OT3Simulator:
         self,
         mount: OT3Mount,
         tip_state: TipStateType,
-        is_ninety_six_channel: bool = False,
+        expect_multiple_responses: bool = False,
     ) -> None:
         """Raise an error if the given state doesn't match the physical state."""
         pass
 
     async def get_tip_present_state(
-        self, mount: OT3Mount, is_ninety_six_channel: bool = False
+        self, mount: OT3Mount, expect_multiple_responses: bool = False
     ) -> int:
         """Get the state of the tip ejector flag for a given mount."""
         pass
