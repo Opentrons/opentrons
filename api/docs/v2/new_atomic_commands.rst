@@ -458,7 +458,7 @@ This example moves the pipette 75% of well's total radius and 2 mm below the top
                       radius=0.75,
                       v_offset=-2)
 
-When ``radius=1``, the robot moves the centerline of the pipette’s plunger axis to the exact edge of the well. Sometimes this means a pipette tip may hit the well wall or edge first and bends inwards. Setting the radius to < 1 helps avoid hitting the well wall prematurely. If you need to use it, test the radius argument first before starting a protocol production run.
+The ``touch_tip`` feature allows the pipette to touch the edges of a well gently instead of crashing into them. When ``radius=1`` the robot moves the centerline of the pipette’s plunger axis to the edge of the well. This means a pipette tip may sometimes hit the well wall too early, causing the tip to bend inwards. A smaller radius helps avoid a premature wall collision and a lower speed produces gentler motion. Different liquid droplets behave differently, so test out these parameters in a single well before performing a full protocol run.
 
 .. warning::
     *Do not* set the ``radius`` value greater than ``1.0``. When ``radius`` is > ``1.0``, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
