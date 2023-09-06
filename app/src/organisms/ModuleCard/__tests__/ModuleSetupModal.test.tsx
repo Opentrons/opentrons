@@ -23,7 +23,7 @@ describe('ModuleSetupModal', () => {
   it('should render the correct body', () => {
     const { getByText } = render(props)
     getByText(
-      'To attach the module to your robot, you need to install your module into a caddy, before lowering the caddy into the deck and connecting your module to the robot. Please reference the following support article for in depth instructions.'
+      'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to visit the modules section of the Opentrons Help Center.'
     )
   })
   it('should render a link to the learn more page', () => {
