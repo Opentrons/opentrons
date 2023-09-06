@@ -381,7 +381,7 @@ With utility commands, you can control various robot functions such as pausing a
 Delay and Resume
 ----------------
 
-Call the :py:meth:`.ProtocolContext.delay` method to insert a timed delay (e.g. for an incubation period) into your protocol. This method accepts time increments in seconds, minutes, or combinations of both. Your protocol resumes automatically after the pause expires.
+Call the :py:meth:`.ProtocolContext.delay` method to insert a timed delay into your protocol. This method accepts time increments in seconds, minutes, or combinations of both. Your protocol resumes automatically after the specified time expires.
 
 This example delays a protocol for 10 seconds::
 
@@ -398,7 +398,7 @@ This example delays a protocol for 5 minutes and 10 seconds::
 Pause Until Resumed
 -------------------
 
-Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the App. This method lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
+Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
 
     protocol.pause('Remember to get more pipette tips')
 
@@ -450,7 +450,7 @@ This example turns the rail lights off::
 
 .. versionadded:: 2.5
 
-You can also check whether the rail lights are on or off in the protocol by using :py:obj:`.ProtocolContext.rail_lights_on`. For example, this method returns ``True`` when lights are on and ``False`` when the lights are off.
+You can also check whether the rail lights are on or off in the protocol by using :py:obj:`.ProtocolContext.rail_lights_on`. This method returns ``True`` when lights are on and ``False`` when the lights are off.
 
 .. versionadded:: 2.5
 
