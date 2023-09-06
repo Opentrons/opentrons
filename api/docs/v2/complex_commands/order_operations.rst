@@ -104,7 +104,7 @@ To effect the transfer, the API will aspirate and dispense the maximum volume of
 
 You can change ``volume`` to any value (above the minimum volume of the pipette) and the API will automatically calculate how many times the pipette needs to aspirate and dispense. ``volume=50`` would require just one repetition. ``volume=75`` would require two, split into 50 µL and 25 µL. ``volume=1000`` would repeat 20 times — not very efficient, but perhaps more useful than having to swap to a different pipette!
 
-Remember that ``distribute()`` includes a disposal volume by default, and this can affect the number of times the pipette refills its tip. Say you want to distribute 80 µL to each of the 12 wells in row A of a plate. That's 960 µL total — less than the capacity of the pipette — but the disposal volume will cause the pipette to refill.
+Remember that ``distribute()`` includes a disposal volume by default, and this can affect the number of times the pipette refills its tip. Say you want to distribute 80 µL to each of the 12 wells in row A of a plate. That's 960 µL total — less than the capacity of the pipette — but the 100 µL disposal volume will cause the pipette to refill.
 
 .. code-block:: text
 
@@ -123,8 +123,41 @@ Remember that ``distribute()`` includes a disposal volume by default, and this c
 This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use :ref:`complex_params` to reduce or eliminate the disposal volume, or to blow out in a location other than the trash.
 
 .. _distribute-consolidate-volume-list:
-.. _complex-variable-volumes:
+.. _complex-list-volumes:
 
-Variable Volumes
-================
+List of Volumes
+===============
 
+The ``volume`` parameter of complex commands accepts a lists of volumes instead of a single number. The list must be the same length as the longer of ``source`` or ``dest``, or the API will raise an error. For example, this command transfers a different amount of liquid into each of wells B1, B2, and B3::
+
+    pipette.transfer(
+        volume=[20,40,60],
+        source=[plate["A1"]],
+        dest=[plate["B1"], plate["B2"], plate["B3"]],
+    )
+
+.. versionadded: 2.0
+
+Setting any item in the list to ``0`` will skip that aspirate, dispense, and related actions entirely. This example takes the command from above and skips B2::
+
+    pipette.transfer(
+        volume=[20,0,60],
+        source=[plate["A1"]],
+        dest=[plate["B1"], plate["B2"], plate["B3"]],
+    )
+
+The pipette dispenses and touches the tip in B1 and B3, and does not move to B2 at all.
+
+.. code-block:: text
+
+	Picking up tip from A1 of tip rack on 3
+	Aspirating 20.0 uL from A1 of well plate on 2 at 274.7 uL/sec
+	Dispensing 20.0 uL into B1 of well plate on 2 at 274.7 uL/sec
+	Aspirating 60.0 uL from A1 of well plate on 2 at 274.7 uL/sec
+	Dispensing 60.0 uL into B3 of well plate on 2 at 274.7 uL/sec
+	Dropping tip into A1 of Opentrons Fixed Trash on 12
+	
+.. note::
+    When the optional ``new_tip`` parameter is set to ``"always"``, the pipette will pick up and drop a tip even for skipped wells. If you don't want to waste tips, you may want to pre-process your list of sources or destinations and use the result as the argument of your complex command.
+	
+This is such a simple example that you might prefer to use two ``transfer()`` commands instead. Lists of volumes become more useful when they are longer than a couple elements. For example, you can specify ``volume`` as a list with 96 items and ``source=plate.wells()`` to individually control amounts to dispense (and wells to skip) across an entire plate.

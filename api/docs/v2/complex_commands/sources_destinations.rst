@@ -18,7 +18,7 @@ For example, a simple transfer between two wells on a plate could specify::
 
 .. versionadded:: 2.0
 
-This page covers how :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate` operate on source and destination wells. Each method has its own :ref:`restrictions on sources and destinations <source-dest-args>`. They also aspirate and dispense in different :ref:`patterns <complex-transfer-patterns>` that are optimized for their distinct use cases. Finally, you can control the amount of liquid transferred by specifying a :ref:`list of volumes <complex-variable-volumes>` rather than a single value.
+This page covers how :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate` operate on source and destination wells. Each method has its own :ref:`restrictions on sources and destinations <source-dest-args>`. They also aspirate and dispense in different :ref:`patterns <complex-transfer-patterns>` that are optimized for their distinct use cases. Finally, you can control the amount of liquid transferred by specifying a :ref:`list of volumes <complex-list-volumes>` rather than a single value.
 
 
 .. _source-dest-args:
@@ -53,7 +53,7 @@ These restrictions and behaviors are summarized as follows:
 
 Singleton wells can be passed by themselves or as a list with one item: ``source=plate['A1']`` and ``source=[plate['A1']]`` are equivalent.
     
-The section on :ref:`many-to-many transfers <many-to-many>` below covers how ``transfer()`` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to ``transfer()`` in sequence or by using a :ref:`complex-variable-volumes` to skip certain wells.
+The section on :ref:`many-to-many transfers <many-to-many>` below covers how ``transfer()`` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to ``transfer()`` in sequence or by using a :ref:`complex-list-volumes` to skip certain wells.
 
 For distributing and consolidating, the API will not raise an error if you use a list of wells as the argument that is limited to exactly one well. Instead, the API will ignore everything except the first well in the list. For example, the following command will only aspirate from well A1::
 
