@@ -3,7 +3,7 @@ from time import sleep
 from typing import Optional, Tuple, List, Dict
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
-
+from subprocess import run as run_subprocess
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import Point, OT3Mount, Axis
@@ -56,6 +56,11 @@ _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
 
 _tip_counter: Dict[int, int] = {}
+
+CAM_CMD_OT3 = (
+    "v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
+    "--stream-mmap --stream-to={0} --stream-count=1"
+)
 
 
 def _minimum_z_height(cfg: config.GravimetricConfig) -> int:
@@ -322,6 +327,16 @@ def _run_trial(
         blank=trial.blank,
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    cam_pic_name = f"volume_{trial.volume}_trial_{trial.trial}.jpg"
+    if trial.ctx.is_simulating:
+        cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
+    cam_pic_path = trial.test_report.parent / cam_pic_name
+    process_cmd = CAM_CMD_OT3.format(str(cam_pic_path))
+    if trial.ctx.is_simulating:
+        with open(cam_pic_path, "w") as f:
+            f.write(str(cam_pic_name))  # create a test file
+    else:
+        run_subprocess(process_cmd.split(" "))  # take a picture
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
