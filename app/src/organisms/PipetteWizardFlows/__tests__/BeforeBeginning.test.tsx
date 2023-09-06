@@ -59,6 +59,7 @@ describe('BeforeBeginning', () => {
       isRobotMoving: false,
       isOnDevice: false,
       requiredPipette: undefined,
+      createdMaintenanceRunId: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)

@@ -38,10 +38,10 @@ export function PrivacySettings(): JSX.Element {
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
         >
-          {t('share_analytics')}
+          {t('share_app_analytics')}
         </StyledText>
         <StyledText css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing8}>
-          {t('analytics_description')}
+          {t('share_app_analytics_description')}
         </StyledText>
       </Box>
       <ToggleButton

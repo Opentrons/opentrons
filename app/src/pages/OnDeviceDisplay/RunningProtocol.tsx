@@ -16,6 +16,7 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import {
+  useAllCommandsQuery,
   useProtocolQuery,
   useRunQuery,
   useRunActionMutations,
@@ -44,7 +45,6 @@ import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtoc
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
@@ -122,26 +122,28 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
-  const currentCommand = robotSideAnalysis?.commands.find(
-    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
-  )
+  const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
+    cursor: null,
+    pageLength: 1,
+  })
+  const lastRunCommand = allCommandsQueryData?.data[0] ?? null
 
   React.useEffect(() => {
     if (
-      currentCommand != null &&
+      lastRunCommand != null &&
       interventionModalCommandKey != null &&
-      currentCommand.key !== interventionModalCommandKey
+      lastRunCommand.key !== interventionModalCommandKey
     ) {
       // set intervention modal command key to null if different from current command key
       setInterventionModalCommandKey(null)
     } else if (
-      currentCommand?.key != null &&
-      isInterventionCommand(currentCommand) &&
+      lastRunCommand?.key != null &&
+      isInterventionCommand(lastRunCommand) &&
       interventionModalCommandKey === null
     ) {
-      setInterventionModalCommandKey(currentCommand.key)
+      setInterventionModalCommandKey(lastRunCommand.key)
     }
-  }, [currentCommand, interventionModalCommandKey])
+  }, [lastRunCommand, interventionModalCommandKey])
 
   return (
     <>
@@ -170,10 +172,11 @@ export function RunningProtocol(): JSX.Element {
         ) : null}
         {interventionModalCommandKey != null &&
         runRecord?.data != null &&
-        currentCommand != null ? (
+        lastRunCommand != null &&
+        isInterventionCommand(lastRunCommand) ? (
           <InterventionModal
             robotName={robotName}
-            command={currentCommand}
+            command={lastRunCommand}
             onResume={playRun}
             run={runRecord.data}
             analysis={robotSideAnalysis}

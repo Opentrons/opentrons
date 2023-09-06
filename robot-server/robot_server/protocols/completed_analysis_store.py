@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from logging import getLogger
 from dataclasses import dataclass
 
@@ -11,6 +11,7 @@ import anyio
 
 from robot_server.persistence import analysis_table, sqlite_rowid
 from robot_server.persistence import legacy_pickle
+from robot_server.persistence.pickle_protocol_version import PICKLE_PROTOCOL_VERSION
 
 from .analysis_models import CompletedAnalysis
 from .analysis_memcache import MemoryCache
@@ -42,10 +43,16 @@ class CompletedAnalysisResource:
         Avoid calling this from inside a SQL transaction, since it might be slow.
         """
 
-        def serialize_completed_analysis() -> bytes:
-            return legacy_pickle.dumps(self.completed_analysis.dict())
+        def serialize_completed_analysis() -> Tuple[bytes, str]:
+            serialized_pickle = _serialize_completed_analysis_to_pickle(
+                self.completed_analysis
+            )
+            serialized_json = _serialize_completed_analysis_to_json(
+                self.completed_analysis
+            )
+            return serialized_pickle, serialized_json
 
-        serialized_completed_analysis = await anyio.to_thread.run_sync(
+        serialized_pickle, serialized_json = await anyio.to_thread.run_sync(
             serialize_completed_analysis,
             # Cancellation may orphan the worker thread,
             # but that should be harmless in this case.
@@ -56,7 +63,8 @@ class CompletedAnalysisResource:
             "id": self.id,
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
-            "completed_analysis": serialized_completed_analysis,
+            "completed_analysis": serialized_pickle,
+            "completed_analysis_as_document": serialized_json,
         }
 
     @classmethod
@@ -167,6 +175,29 @@ class CompletedAnalysisStore:
 
             return resource
 
+    async def get_by_id_as_document(self, analysis_id: str) -> Optional[str]:
+        """Return the analysis with the given ID, if it exists.
+
+        This is like `get_by_id()`, except it returns the analysis as a pre-serialized JSON
+        document.
+        """
+        statement = sqlalchemy.select(
+            analysis_table.c.completed_analysis_as_document
+        ).where(analysis_table.c.id == analysis_id)
+
+        with self._sql_engine.begin() as transaction:
+            try:
+                document: Optional[str] = transaction.execute(statement).scalar_one()
+            except sqlalchemy.exc.NoResultFound:
+                # No analysis with this ID.
+                return None
+
+        # Although the completed_analysis_as_document column is nullable,
+        # our migration code is supposed to ensure that it's never NULL in practice.
+        assert document is not None
+
+        return document
+
     async def get_by_protocol(
         self, protocol_id: str
     ) -> List[CompletedAnalysisResource]:
@@ -254,3 +285,21 @@ class CompletedAnalysisStore:
         self._memcache.insert(
             completed_analysis_resource.id, completed_analysis_resource
         )
+
+
+def _serialize_completed_analysis_to_pickle(
+    completed_analysis: CompletedAnalysis,
+) -> bytes:
+    return legacy_pickle.dumps(
+        completed_analysis.dict(), protocol=PICKLE_PROTOCOL_VERSION
+    )
+
+
+def _serialize_completed_analysis_to_json(completed_analysis: CompletedAnalysis) -> str:
+    return completed_analysis.json(
+        # by_alias and exclude_none should match how
+        # FastAPI + Pydantic + our customizations serialize these objects
+        # over the `GET /protocols/:id/analyses/:id` endpoint.
+        by_alias=True,
+        exclude_none=True,
+    )

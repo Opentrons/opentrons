@@ -19,7 +19,7 @@ import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
   title: string
-  onExit?: React.MouseEventHandler | null
+  onExit?: (() => void) | null
   totalSteps?: number
   currentStep?: number | null
   exitDisabled?: boolean

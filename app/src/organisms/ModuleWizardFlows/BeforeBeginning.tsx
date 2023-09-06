@@ -9,9 +9,7 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
-import { COLORS } from '@opentrons/components'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -27,7 +25,7 @@ interface BeforeBeginningProps extends ModuleCalibrationWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
-  errorMessage: string | null
+  createdMaintenanceRunId: string | null
 }
 
 export const BeforeBeginning = (
@@ -39,11 +37,13 @@ export const BeforeBeginning = (
     isCreateLoading,
     attachedModule,
     maintenanceRunId,
-    errorMessage,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
@@ -82,14 +82,7 @@ export const BeforeBeginning = (
     { loadName: adapterLoadname, displayName: t(adapterDisplaynameKey) },
   ]
 
-  return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.errorEnabled}
-      header={t('shared:error_encountered')}
-      subHeader={errorMessage}
-    />
-  ) : (
+  return (
     <GenericWizardTile
       header={t('calibration', { module: moduleDisplayName })}
       rightHandBody={
@@ -103,7 +96,7 @@ export const BeforeBeginning = (
           components={{ block: <StyledText as="p" /> }}
         />
       }
-      proceedButtonText={t('move_gantry_to_front')}
+      proceedButtonText={t('start_setup')}
       proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={proceed}
     />

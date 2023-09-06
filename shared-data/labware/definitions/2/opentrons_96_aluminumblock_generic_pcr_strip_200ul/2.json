@@ -29,6 +29,7 @@
   },
   "parameters": {
     "format": "96Standard",
+    "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_96_aluminumblock_generic_pcr_strip_200ul"
