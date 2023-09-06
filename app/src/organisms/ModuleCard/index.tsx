@@ -45,7 +45,6 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
-import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -69,6 +68,7 @@ import type {
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import { ModuleSetupModal } from './ModuleSetupModal'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -240,9 +240,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         />
       ) : null}
       {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
-        <HeaterShakerWizard
-          onCloseClick={() => setShowHSWizard(false)}
-          attachedModule={module}
+        <ModuleSetupModal
+          close={() => setShowHSWizard(false)}
+          moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
       {showSlideout && (
