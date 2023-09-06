@@ -1,3 +1,5 @@
+import isEqual from 'lodash/isEqual'
+
 import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
@@ -53,7 +55,7 @@ export function createDiscoveryClient(
         const addrs = getAddresses()
         const robots = getRobots()
 
-        if (addrs !== prevAddrs) healthPoller.start({ list: addrs })
+        if (!isEqual(addrs, prevAddrs)) healthPoller.start({ list: addrs })
         if (robots !== prevRobots) onListChange(robots)
 
         prevAddrs = addrs

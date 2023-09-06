@@ -296,6 +296,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             requireModuleCalibration &&
             !isPending ? (
               <UpdateBanner
+                robotName={robotName}
                 updateType="calibration"
                 serialNumber={module.serialNumber}
                 setShowBanner={() => null}
@@ -310,6 +311,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             showFWBanner &&
             !isPending ? (
               <UpdateBanner
+                robotName={robotName}
                 updateType="firmware"
                 serialNumber={module.serialNumber}
                 setShowBanner={setshowFWBanner}

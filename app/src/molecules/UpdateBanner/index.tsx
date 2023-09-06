@@ -11,8 +11,10 @@ import {
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
+import { useIsOT3 } from '../../organisms/Devices/hooks'
 
 interface UpdateBannerProps {
+  robotName: string
   updateType: 'calibration' | 'firmware' | 'firmware_important'
   setShowBanner: (arg0: boolean) => void
   handleUpdateClick: () => void
@@ -22,13 +24,14 @@ interface UpdateBannerProps {
 }
 
 export const UpdateBanner = ({
+  robotName,
   updateType,
   serialNumber,
   setShowBanner,
   handleUpdateClick,
   attachPipetteRequired,
   updatePipetteFWRequired,
-}: UpdateBannerProps): JSX.Element => {
+}: UpdateBannerProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
 
   let bannerType: 'error' | 'warning'
@@ -54,6 +57,9 @@ export const UpdateBanner = ({
     bannerMessage = t('firmware_update_available')
     hyperlinkText = t('update_now')
   }
+
+  const isOT3 = useIsOT3(robotName)
+  if (!isOT3 && updateType === 'calibration') return null
 
   return (
     <Flex
