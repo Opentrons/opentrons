@@ -260,6 +260,9 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.DropTipResult, result)
 
+    def configure_for_volume(self, pipette_id: str, volume: float) -> None:
+        pass
+
     def aspirate(
         self,
         pipette_id: str,
