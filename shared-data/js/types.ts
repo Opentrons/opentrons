@@ -510,3 +510,12 @@ export interface GripperDefinition {
     jawWidth: { min: number; max: number }
   }
 }
+
+export type StatusBarAnimation =
+  | 'idle'
+  | 'confirm'
+  | 'updating'
+  | 'disco'
+  | 'off'
+
+export type StatusBarAnimations = StatusBarAnimation[]
