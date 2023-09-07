@@ -21,7 +21,7 @@ import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../../hooks'
-import { HeaterShakerWizard } from '../../../HeaterShakerWizard'
+import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import { SetupModulesList } from '../SetupModulesList'
 
@@ -29,7 +29,7 @@ import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('../../../hooks')
 jest.mock('../UnMatchedModuleWarning')
-jest.mock('../../../HeaterShakerWizard')
+jest.mock('../../../../ModuleCard/ModuleSetupModal')
 jest.mock('../../../../ModuleWizardFlows')
 jest.mock('../MultipleModulesModal')
 
@@ -40,8 +40,8 @@ const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolByI
 const mockUnMatchedModuleWarning = UnMatchedModuleWarning as jest.MockedFunction<
   typeof UnMatchedModuleWarning
 >
-const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
-  typeof HeaterShakerWizard
+const mockModuleSetupModal = ModuleSetupModal as jest.MockedFunction<
+  typeof ModuleSetupModal
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
@@ -108,9 +108,7 @@ describe('SetupModulesList', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
-    when(mockHeaterShakerWizard).mockReturnValue(
-      <div>mockHeaterShakerWizard</div>
-    )
+    when(mockModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
     when(mockUnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
     )
@@ -418,7 +416,7 @@ describe('SetupModulesList', () => {
     const { getByText } = render(props)
     const moduleSetup = getByText('View module setup instructions')
     fireEvent.click(moduleSetup)
-    getByText('mockHeaterShakerWizard')
+    getByText('mockModuleSetupModal')
   })
   it('shoulde render a magnetic block', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
