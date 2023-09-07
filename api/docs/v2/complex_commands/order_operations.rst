@@ -128,25 +128,25 @@ This command will blow out 200 total µL of liquid in the trash. If you need to 
 List of Volumes
 ===============
 
-The ``volume`` parameter of complex commands accepts a lists of volumes instead of a single number. The list must be the same length as the longer of ``source`` or ``dest``, or the API will raise an error. For example, this command transfers a different amount of liquid into each of wells B1, B2, and B3::
+Complex commands can aspirate or dispense different amounts for different wells, rather than the same amount across all wells. To do this, set the ``volume`` parameter to a list of volumes instead of a single number. The list must be the same length as the longer of ``source`` or ``dest``, or the API will raise an error. For example, this command transfers a different amount of liquid into each of wells B1, B2, and B3::
 
     pipette.transfer(
-        volume=[20,40,60],
-        source=[plate["A1"]],
+        volume=[20, 40, 60],
+        source=plate["A1"],
         dest=[plate["B1"], plate["B2"], plate["B3"]],
     )
 
 .. versionadded: 2.0
 
-Setting any item in the list to ``0`` will skip that aspirate, dispense, and related actions entirely. This example takes the command from above and skips B2::
+Setting any item in the list to ``0`` will skip aspirating and dispensing for the corresponding well. This example takes the command from above and skips B2::
 
     pipette.transfer(
-        volume=[20,0,60],
-        source=[plate["A1"]],
+        volume=[20, 0, 60],
+        source=plate["A1"],
         dest=[plate["B1"], plate["B2"], plate["B3"]],
     )
 
-The pipette dispenses and touches the tip in B1 and B3, and does not move to B2 at all.
+The pipette dispenses in B1 and B3, and does not move to B2 at all.
 
 .. code-block:: text
 
@@ -156,8 +156,9 @@ The pipette dispenses and touches the tip in B1 and B3, and does not move to B2 
 	Aspirating 60.0 uL from A1 of well plate on 2 at 274.7 uL/sec
 	Dispensing 60.0 uL into B3 of well plate on 2 at 274.7 uL/sec
 	Dropping tip into A1 of Opentrons Fixed Trash on 12
+
+This is such a simple example that you might prefer to use two ``transfer()`` commands instead. Lists of volumes become more useful when they are longer than a couple elements. For example, you can specify ``volume`` as a list with 96 items and ``dest=plate.wells()`` to individually control amounts to dispense (and wells to skip) across an entire plate.
 	
 .. note::
-    When the optional ``new_tip`` parameter is set to ``"always"``, the pipette will pick up and drop a tip even for skipped wells. If you don't want to waste tips, you may want to pre-process your list of sources or destinations and use the result as the argument of your complex command.
+    When the optional ``new_tip`` parameter is set to ``"always"``, the pipette will pick up and drop a tip even for skipped wells. If you don't want to waste tips, pre-process your list of sources or destinations and use the result as the argument of your complex command.
 	
-This is such a simple example that you might prefer to use two ``transfer()`` commands instead. Lists of volumes become more useful when they are longer than a couple elements. For example, you can specify ``volume`` as a list with 96 items and ``source=plate.wells()`` to individually control amounts to dispense (and wells to skip) across an entire plate.
