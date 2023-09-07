@@ -81,10 +81,10 @@ export function AvailableRobotOption(
   )
 
   let iconName: IconName | null = null
-  if (wifi?.ipAddress != null) {
-    iconName = 'wifi'
-  } else if (ethernet?.ipAddress != null) {
+  if (ethernet?.ipAddress != null) {
     iconName = 'ethernet'
+  } else if (wifi?.ipAddress != null) {
+    iconName = 'wifi'
   } else if (local != null && local) {
     iconName = 'usb'
   }
