@@ -790,11 +790,15 @@ class OT3API(
         try:
             gripper = self._gripper_handler.get_gripper()
             self._log.info("Homing gripper jaw.")
-            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-                gripper.default_home_force
-            )
-            await self._ungrip(duty_cycle=dc)
-            gripper.state = GripperJawState.HOMED_READY
+            if gripper.state != GripperJawState.GRIPPING:
+                dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+                    gripper.default_home_force
+                )
+                await self._ungrip(duty_cycle=dc)
+                gripper.state = await self._backend.get_jaw_state()
+            else:
+                # TODO: check jaw width to verify it's actually gripping something
+                self._log.warning("Could not home when gripper is actively gripping.")
         except GripperNotAttachedError:
             pass
 
@@ -860,6 +864,14 @@ class OT3API(
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
+            await self._update_jaw_state()
+
+    async def _update_jaw_state(self) -> None:
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            gripper.state = await self._backend.get_jaw_state()
+        except GripperNotAttachedError:
+            pass
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
@@ -1502,7 +1514,7 @@ class OT3API(
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
         await self._hold_jaw_width(jaw_width_mm)
-        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
+        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING)
 
     async def _move_to_plunger_bottom(
         self, mount: OT3Mount, rate: float, acquire_lock: bool = True

@@ -59,6 +59,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     SubSystemState,
     TipStateType,
+    GripperJawState,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -389,6 +390,10 @@ class OT3Simulator:
 
     async def get_tip_present_state(self, mount: OT3Mount) -> int:
         """Get the state of the tip ejector flag for a given mount."""
+        pass
+
+    async def get_jaw_state(self) -> GripperJawState:
+        """Get the state of the gripper jaw."""
         pass
 
     async def tip_action(
