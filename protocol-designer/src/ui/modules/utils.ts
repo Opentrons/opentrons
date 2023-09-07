@@ -52,7 +52,6 @@ export function getModuleUnderLabware(
         : initialDeckSetup.labware[labwareId]?.slot) === moduleOnDeck.id
   )
 }
-
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,
   nicknamesById: Record<string, string>,

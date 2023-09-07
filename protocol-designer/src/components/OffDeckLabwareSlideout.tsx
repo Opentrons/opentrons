@@ -32,7 +32,7 @@ import { getRobotStateAtActiveItem } from '../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../ui/labware/selectors'
 import { EditLabwareOffDeck } from './DeckSetup/LabwareOverlays/EditLabwareOffDeck'
 import { BrowseLabware } from './DeckSetup/LabwareOverlays/BrowseLabware'
-import { Slideout } from './Slideout'
+import { Slideout } from '../atoms/Slideout'
 import { wellFillFromWellContents } from './labware'
 
 interface OffDeckLabwareSlideoutProps {
