@@ -232,6 +232,29 @@ def _next_tip_for_channel(
     return _tip
 
 
+def _take_photos(trial: GravimetricTrial, stage_str: str) -> None:
+    if trial.ctx.is_simulating():
+        cameras = ["/dev/video0"]
+    else:
+        cameras = glob.glob("/dev/video*")
+    for camera in cameras:
+        cam_pic_name = f"camera{camera[-1]}_channel{trial.channel}_volume{trial.volume}_trial{trial.trial}_{stage_str}.jpg"
+        if trial.ctx.is_simulating():
+            cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
+        cam_pic_path = (
+            f"{trial.test_report.parent}/{trial.test_report._run_id}/{cam_pic_name}"
+        )
+        process_cmd = CAM_CMD_OT3.format(str(cam_pic_path), camera)
+        if trial.ctx.is_simulating():
+            with open(cam_pic_path, "w") as f:
+                f.write(str(cam_pic_name))  # create a test file
+        else:
+            try:
+                run_subprocess(process_cmd.split(" "), timeout=2)  # take a picture
+            except subprocess.TimeoutExpired:
+                os.remove(cam_pic_path)
+
+
 def _run_trial(
     trial: GravimetricTrial,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
@@ -329,26 +352,7 @@ def _run_trial(
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
 
-    if trial.ctx.is_simulating():
-        cameras = ["/dev/video0"]
-    else:
-        cameras = glob.glob("/dev/video*")
-    for camera in cameras:
-        cam_pic_name = f"camera{camera[-1]}_channel{trial.channel}_volume_{trial.volume}_trial_{trial.trial}.jpg"
-        if trial.ctx.is_simulating():
-            cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
-        cam_pic_path = (
-            f"{trial.test_report.parent}/{trial.test_report._run_id}/{cam_pic_name}"
-        )
-        process_cmd = CAM_CMD_OT3.format(str(cam_pic_path), camera)
-        if trial.ctx.is_simulating():
-            with open(cam_pic_path, "w") as f:
-                f.write(str(cam_pic_name))  # create a test file
-        else:
-            try:
-                run_subprocess(process_cmd.split(" "), timeout=2)  # take a picture
-            except subprocess.TimeoutExpired:
-                os.remove(cam_pic_path)
+    _take_photos(trial, "aspirate")
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
@@ -367,6 +371,7 @@ def _run_trial(
         blank=trial.blank,
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    _take_photos(trial, "dispense")
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
     # calculate volumes
