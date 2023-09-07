@@ -411,7 +411,6 @@ Homing commands the robot to move the gantry, a pipette, or a pipette plunger to
 
 This example homes the gantry::
 
-    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
     protocol.home()
 
 To home a specific pipette's Z axis and plunger, you can call :py:meth:`~.InstrumentContext.home`::
@@ -429,7 +428,7 @@ To home a specific pipette's plunger only, you can call :py:meth:`~.InstrumentCo
 Comment
 -------
 
-Call the :py:meth:`.ProtocolContext.comment` method to write and display a brief message in the Opentrons App during a protocol run::
+Call the :py:meth:`.ProtocolContext.comment` method if you want to write and display a brief message in the Opentrons App during a protocol run::
 
     protocol.comment('Hello, world!')
 
