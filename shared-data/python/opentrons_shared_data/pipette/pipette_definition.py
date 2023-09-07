@@ -330,6 +330,11 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         regex="opentrons/[a-z0-9._]+/[0-9]",
         alias="defaultTipracks",
     )
+    tip_presence_check_height_mm: Optional[float] = Field(
+        default=0.0,
+        description="The distance the high throughput tip motors will travel to check tip status.",
+        alias="tipPresenceCheckHeightMM",
+    )
 
     @validator("supported_tips", pre=True)
     def convert_aspirate_key_to_channel_type(
