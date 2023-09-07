@@ -1461,15 +1461,15 @@ class OT3API(
         # IMPORTANT: Here is our backlash compensation.
         #            The plunger is pre-loaded in the "aspirate" direction
         # NOTE: plunger position (mm) decreases up towards homing switch
-        #if current_pos < target_pos[pip_ax]:
-        #    # move down below "bottom", before moving back up to "bottom"
-        #    backlash_pos = target_pos.copy()
-        #    backlash_pos[pip_ax] += instrument.backlash_distance
-        #    await self._move(
-        #        backlash_pos,
-        #        speed=(speed * rate),
-        #        acquire_lock=acquire_lock,
-        #    )
+        backlash_pos = target_pos.copy()
+        backlash_pos[pip_ax] += instrument.backlash_distance
+        if current_pos < backlash_pos[pip_ax]:
+            # move down below "bottom", before moving back up to "bottom"
+            await self._move(
+               backlash_pos,
+               speed=(speed * rate),
+               acquire_lock=acquire_lock,
+            )
         await self._move(
             target_pos,
             speed=(speed * rate),

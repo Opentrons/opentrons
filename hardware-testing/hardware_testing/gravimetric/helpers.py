@@ -285,7 +285,7 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.VolumetricConfig) -> List[flo
             )
         else:
             raise RuntimeError("you are not the correct branch")
-    return sorted(test_volumes, reverse=False)  # lowest volumes first
+    return sorted(test_volumes, reverse=True)  # lowest volumes first
 
 
 def _load_pipette(

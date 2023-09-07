@@ -242,7 +242,7 @@ def _pipette_with_liquid_settings(
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
-        pass
+        hw_api.prepare_for_aspirate(hw_mount)
 
     def _aspirate_on_submerge() -> None:
         # TODO: re-implement mixing once we have a real use for it

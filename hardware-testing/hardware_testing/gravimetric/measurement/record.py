@@ -327,7 +327,8 @@ class GravimetricRecorder:
         #   1) Set profile to USER
         #   2) Set screensaver to NONE
         self._scale.connect()
-        self._scale.initialize()
+        for _ in range(5):
+            self._scale.initialize()
         self._scale.tare(0.0)
         self._scale_serial = self._scale.read_serial_number()
 

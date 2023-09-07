@@ -542,12 +542,13 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         cfg, resources, channel, total_tips
                     )
                     next_tip_location = next_tip.top().move(channel_offset)
-                    _pick_up_tip(
-                        resources.ctx,
-                        resources.pipette,
-                        cfg,
-                        location=next_tip_location,
-                    )
+                    if trial_count == 1:
+                        _pick_up_tip(
+                            resources.ctx,
+                            resources.pipette,
+                            cfg,
+                            location=next_tip_location,
+                        )
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -587,8 +588,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         asp_with_evap,
                         disp_with_evap,
                     )
-                    ui.print_info("dropping tip")
-                    _drop_tip(resources.pipette, cfg.return_tip, _minimum_z_height(cfg))
+
+                ui.print_info("dropping tip")
+                _drop_tip(resources.pipette, cfg.return_tip, _minimum_z_height(cfg))
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
                 aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
