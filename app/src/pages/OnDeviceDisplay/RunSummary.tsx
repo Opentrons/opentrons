@@ -270,7 +270,6 @@ export function RunSummary(): JSX.Element {
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: 80px;
   line-height: 94px;
   color: ${COLORS.white};
