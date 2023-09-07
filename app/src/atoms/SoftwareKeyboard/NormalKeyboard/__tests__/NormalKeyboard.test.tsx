@@ -87,7 +87,7 @@ describe('SoftwareKeyboard', () => {
       'J',
       'K',
       'L',
-      'SHIFT',
+      'abc',
       'Z',
       'X',
       'C',

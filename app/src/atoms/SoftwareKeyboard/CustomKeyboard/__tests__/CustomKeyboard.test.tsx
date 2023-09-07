@@ -84,7 +84,7 @@ describe('CustomKeyboard', () => {
       'J',
       'K',
       'L',
-      'SHIFT',
+      'abc',
       'Z',
       'X',
       'C',
