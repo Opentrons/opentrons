@@ -1138,13 +1138,6 @@ class InstrumentContext(publisher.CommandPublisher):
               If `True` (default), any `volume` that exceeds the maximum volume
               of this Pipette will be split into multiple smaller volumes.
 
-            * *gradient* (``lambda``) --
-              Function for calculating the curve used for gradient volumes.
-              When `volume` is a tuple of length 2, its values are used to
-              create a list of gradient volumes. The default curve for this
-              gradient is linear (lambda x: x), however a method can be passed
-              with the `gradient` keyword argument to create a custom curve.
-
         :returns: This instance
         """
         _log.debug("Transfer {} from {} to {}".format(volume, source, dest))
