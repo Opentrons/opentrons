@@ -356,10 +356,13 @@ class PipetteConfigurations(
     ) -> Dict[pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition]:
         return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
 
+
 def liquid_class_for_volume_between_default_and_defaultlowvolume(
-        volume: float,
-        current_liquid_class_name: pip_types.LiquidClasses,
-        available_liquid_classes: Dict[pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition]
+    volume: float,
+    current_liquid_class_name: pip_types.LiquidClasses,
+    available_liquid_classes: Dict[
+        pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition
+    ],
 ) -> pip_types.LiquidClasses:
     """Determine the appropriate liquid class to use for a volume.
 
@@ -377,9 +380,16 @@ def liquid_class_for_volume_between_default_and_defaultlowvolume(
     if not has_lvd:
         return pip_types.LiquidClasses.default
     if current_liquid_class_name == pip_types.LiquidClasses.lowVolumeDefault:
-        if volume > (available_liquid_classes[pip_types.LiquidClasses.lowVolumeDefault].max_volume * 0.75):
+        if volume > (
+            available_liquid_classes[
+                pip_types.LiquidClasses.lowVolumeDefault
+            ].max_volume
+            * 0.75
+        ):
             return pip_types.LiquidClasses.default
     else:  # LiquidClasses.default
-        if volume < (available_liquid_classes[pip_types.LiquidClasses.default].max_volume * 0.5):
+        if volume < (
+            available_liquid_classes[pip_types.LiquidClasses.default].max_volume * 0.5
+        ):
             return pip_types.LiquidClasses.lowVolumeDefault
     return current_liquid_class_name
