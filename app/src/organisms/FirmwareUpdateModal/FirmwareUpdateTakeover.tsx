@@ -6,12 +6,12 @@ import {
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
-
+import { Portal } from '../../App/portal'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
-
 import { UpdateNeededModal } from './UpdateNeededModal'
 import type { Subsystem } from '@opentrons/api-client'
+
 const POLL_INTERVAL_5000_MS = 5000
 
 export function FirmwareUpdateTakeover(): JSX.Element {
@@ -83,11 +83,13 @@ export function FirmwareUpdateTakeover(): JSX.Element {
         />
       ) : null}
       {externalSubsystemUpdate != null ? (
-        <UpdateInProgressModal
-          percentComplete={
-            externalsubsystemUpdateData?.data.updateProgress ?? 0
-          }
-        />
+        <Portal level="top">
+          <UpdateInProgressModal
+            percentComplete={
+              externalsubsystemUpdateData?.data.updateProgress ?? 0
+            }
+          />
+        </Portal>
       ) : null}
     </>
   )

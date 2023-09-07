@@ -297,7 +297,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     <StyledText
                       as="p"
                       css={BANNER_LINK_CSS}
-                      onClick={updatePipette()}
+                      onClick={updatePipette}
                     />
                   ),
                 }}

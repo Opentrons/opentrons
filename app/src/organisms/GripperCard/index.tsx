@@ -143,7 +143,7 @@ export function GripperCard({
                     <StyledText
                       as="p"
                       css={BANNER_LINK_CSS}
-                      onClick={setSubsystemToUpdate('gripper')}
+                      onClick={() => setSubsystemToUpdate('gripper')}
                     />
                   ),
                 }}
