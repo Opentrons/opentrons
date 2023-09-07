@@ -35,7 +35,7 @@ If you omit the ``tip_rack`` argument from the ``pipette`` variable, the API wil
     pipette.drop_tip()
     pipette.pick_up_tip(tiprack_1['B1']) 
 
-If coding the location of each tip seems inefficient or tedious, try using a ``for`` loop to automate a sequential tip pick up process. When using a loop, the API tracks and manages the tip pickup locations automatically. But ``pick_up_tip`` is still a powerful feature. It lets you maintain control over tip use when that’s important in your protocol.
+If coding the location of each tip seems inefficient or tedious, try using a ``for`` loop to automate a sequential tip pick up process. When using a loop, the API keeps track of tips and manages tip pickup for you. But ``pick_up_tip`` is still a powerful feature. It gives you direct control over tip use when that’s important in your protocol.
 
 .. versionadded:: 2.0
 
@@ -49,7 +49,7 @@ When used with Python's :py:class:`range` class, a ``for`` loop brings automatio
         # liquid handling commands
         pipette.drop_tip()
 
-If your protocol requires a lot of tips, add a second tip rack to the protocol. Then associate it with your pipette and increase the number of repetitions in the loop. The robot will loop through both racks. 
+If your protocol requires a lot of tips, add a second tip rack to the protocol. Then, associate it with your pipette and increase the number of repetitions in the loop. The robot will work through both racks. 
 
 First, add another tip rack to the sample protocol::
 
@@ -72,7 +72,7 @@ Finally, sum the tip count in the range::
         pipette.pick_up_tip()
         pipette.drop_tip()
 
-For a more advanced "real-world" example, take a moment to review the :ref:`off-deck location protocol <off-deck-location>` on the :ref:`moving-labware` page. This example also uses a ``for`` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
+For a more advanced "real-world" example, review the :ref:`off-deck location protocol <off-deck-location>` on the :ref:`moving-labware` page. This example also uses a ``for`` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
 
 Dropping a Tip
 --------------
