@@ -836,7 +836,7 @@ class OT3Controller:
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
-    async def get_tip_present(
+    async def check_for_tip_presence(
         self,
         mount: OT3Mount,
         tip_state: TipStateType,

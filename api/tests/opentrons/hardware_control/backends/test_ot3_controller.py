@@ -1086,7 +1086,7 @@ async def test_get_tip_present(
         return_value=mocked_ejector_response,
     ):
         with expectation:
-            await controller.get_tip_present(mount, tip_state_type)
+            await controller.check_for_tip_presence(mount, tip_state_type)
 
 
 @pytest.mark.parametrize(

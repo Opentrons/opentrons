@@ -383,7 +383,7 @@ class OT3Simulator:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
-    async def get_tip_present(
+    async def check_for_tip_presence(
         self,
         mount: OT3Mount,
         tip_state: TipStateType,
