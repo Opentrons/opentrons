@@ -286,17 +286,17 @@ export const migrateFile = (
             : stepForm.dispense_touchTip_mmFromBottom,
         }
       } else if (stepForm.stepType === 'mix') {
-        const misLabware =
+        const mixLabware =
           newLabwareDefinitions[labware[stepForm.labware].definitionId]
-        const touchTipIncompatible = misLabware?.parameters.quirks?.includes(
+        const mixTouchTipIncompatible = mixLabware?.parameters.quirks?.includes(
           'touchTipDisabled'
         )
         return {
           ...stepForm,
-          mix_touchTip_checkbox: touchTipIncompatible
+          mix_touchTip_checkbox: mixTouchTipIncompatible
             ? false
             : stepForm.mix_touchTip_checkbox,
-          mix_touchTip_mmFromBottom: touchTipIncompatible
+          mix_touchTip_mmFromBottom: mixTouchTipIncompatible
             ? null
             : stepForm.mix_touchTip_mmFromBottom,
         }
