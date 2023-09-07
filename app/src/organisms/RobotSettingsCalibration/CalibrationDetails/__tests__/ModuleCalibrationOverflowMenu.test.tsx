@@ -94,15 +94,17 @@ describe('ModuleCalibrationOverflowMenu', () => {
 
   it('should be disabled when not calibrated module and pipette is not attached', () => {
     props.formattedPipetteOffsetCalibrations = [] as any
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('ModuleCalibrationOverflowMenu')).toBeDisabled()
+    const [{ getByText, getByLabelText }] = render(props)
+    getByLabelText('ModuleCalibrationOverflowMenu').click()
+    expect(getByText('Calibrate module')).toBeDisabled()
   })
 
   it('should be disabled when not calibrated module and pipette is not calibrated', () => {
     props.formattedPipetteOffsetCalibrations[0].lastCalibrated = undefined
     props.formattedPipetteOffsetCalibrations[1].lastCalibrated = undefined
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('ModuleCalibrationOverflowMenu')).toBeDisabled()
+    const [{ getByText, getByLabelText }] = render(props)
+    getByLabelText('ModuleCalibrationOverflowMenu').click()
+    expect(getByText('Calibrate module')).toBeDisabled()
   })
 
   it('should be disabled when running', () => {
@@ -112,7 +114,8 @@ describe('ModuleCalibrationOverflowMenu', () => {
       isRunIdle: false,
       isRunTerminal: false,
     })
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('ModuleCalibrationOverflowMenu')).toBeDisabled()
+    const [{ getByText, getByLabelText }] = render(props)
+    getByLabelText('ModuleCalibrationOverflowMenu').click()
+    expect(getByText('Calibrate module')).toBeDisabled()
   })
 })
