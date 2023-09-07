@@ -21,7 +21,7 @@ import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
-import { getSlotLabwareName } from '../utils/getSlotLabwareName'
+import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
@@ -58,7 +58,7 @@ export const LiquidsLabwareDetailsModal = (
     labwareByLiquidId
   )
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
-  const { slotName, labwareName } = getSlotLabwareName(labwareId, commands)
+  const { slotName, labwareName } = getLocationInfoNames(labwareId, commands)
   const loadLabwareCommand = commands
     ?.filter(command => command.commandType === 'loadLabware')
     ?.find(command => command.result?.labwareId === labwareId)

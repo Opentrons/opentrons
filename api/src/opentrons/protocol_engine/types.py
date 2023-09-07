@@ -636,3 +636,30 @@ class LabwareMovementStrategy(str, Enum):
     USING_GRIPPER = "usingGripper"
     MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
+
+
+class PostRunHardwareState(Enum):
+    """State of robot gantry & motors after a stop is performed and the hardware API is reset.
+
+    HOME_AND_STAY_ENGAGED: home the gantry and keep all motors engaged. This allows the
+        robot to continue performing movement actions without re-homing
+    HOME_THEN_DISENGAGE: home the gantry and then disengage motors.
+        Reduces current consumption of the motors and prevents coil heating.
+        Re-homing is required to re-engage the motors and resume robot movement.
+    STAY_ENGAGED_IN_PLACE: do not home after the stop and keep the motors engaged.
+        Keeps gantry in the same position as prior to `stop()` execution
+        and allows the robot to execute movement commands without requiring to re-home first.
+    DISENGAGE_IN_PLACE: disengage motors and do not home the robot
+    Probable states for pipette:
+        - for 1- or 8-channel:
+            - HOME_AND_STAY_ENGAGED after protocol runs
+            - STAY_ENGAGED_IN_PLACE after maintenance runs
+        - for 96-channel:
+            - HOME_THEN_DISENGAGE after protocol runs
+            - DISENGAGE_IN_PLACE after maintenance runs
+    """
+
+    HOME_AND_STAY_ENGAGED = "homeAndStayEngaged"
+    HOME_THEN_DISENGAGE = "homeThenDisengage"
+    STAY_ENGAGED_IN_PLACE = "stayEngagedInPlace"
+    DISENGAGE_IN_PLACE = "disengageInPlace"

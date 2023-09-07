@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux'
 
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
+import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
+
 import { PrimaryButton, IconProps, StyleProps } from '@opentrons/components'
 import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
@@ -38,7 +40,7 @@ export function SendProtocolToOT3Slideout(
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t } = useTranslation(['protocol_details', 'protocol_list'])
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
 
@@ -141,8 +143,8 @@ export function SendProtocolToOT3Slideout(
     <ChooseRobotSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}
-      title={t('choose_robot_to_run', {
-        protocol_name: protocolDisplayName,
+      title={t('protocol_list:send_to_ot3', {
+        robot_display_name: FLEX_DISPLAY_NAME,
       })}
       footer={
         <PrimaryButton
@@ -152,7 +154,7 @@ export function SendProtocolToOT3Slideout(
           onClick={handleSendClick}
           width="100%"
         >
-          {t('shared:proceed_to_setup')}
+          {t('protocol_details:send')}
         </PrimaryButton>
       }
       selectedRobot={selectedRobot}

@@ -219,5 +219,6 @@ class SerialGadget:
         path = self._get_handle_path()
         ser = serial.Serial(port=path)
         # To support select()
+        ser.write_timeout = 0
         ser.nonblocking()
         return ser

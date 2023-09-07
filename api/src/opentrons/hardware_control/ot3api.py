@@ -34,6 +34,7 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs, feature_flags as ff
@@ -606,10 +607,8 @@ class OT3API(
         and set up hardware controller internal state if necessary.
         """
         skip_configure = await self._cache_instruments(require)
-        self._log.info(
-            f"Instrument model cache updated, skip configure: {skip_configure}"
-        )
         if not skip_configure:
+            self._log.info("Instrument model cache updated, reconfiguring")
             await self._configure_instruments()
 
     async def _cache_instruments(  # noqa: C901
@@ -743,19 +742,18 @@ class OT3API(
         """Cancel execution manager and all running (hardware module) tasks."""
         await self._execution_manager.cancel()
 
-    async def halt(self) -> None:
+    async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately disengage all present motors and clear motor and module tasks."""
-        # TODO (spp, 2023-08-22): check if disengaging motors is really required
-        await self.disengage_axes(
-            [ax for ax in Axis if self._backend.axis_is_present(ax)]
-        )
+        if disengage_before_stopping:
+            await self.disengage_axes(
+                [ax for ax in Axis if self._backend.axis_is_present(ax)]
+            )
         await self._stop_motors()
-        await self._cancel_execution_and_running_tasks()
 
     async def stop(self, home_after: bool = True) -> None:
         """Stop motion as soon as possible, reset, and optionally home."""
         await self._stop_motors()
-
+        await self._cancel_execution_and_running_tasks()
         self._log.info("Resetting OT3API")
         await self.reset()
         if home_after:
@@ -1288,11 +1286,17 @@ class OT3API(
             if origin[axis] - target_pos[axis] > axis_home_dist:
                 target_pos[axis] += axis_home_dist
                 moves = self._build_moves(origin, target_pos)
-                await self._backend.move(
-                    origin,
-                    moves[0],
-                    MoveStopCondition.none,
-                )
+                try:
+                    await self._backend.move(
+                        origin,
+                        moves[0],
+                        MoveStopCondition.none,
+                    )
+                except StallOrCollisionDetectedError:
+                    self._log.warning(
+                        f"Stall on {axis} during fast home, encoder may have missed an overflow"
+                    )
+
             await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home

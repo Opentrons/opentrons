@@ -21,8 +21,6 @@ import {
   Icon,
   Btn,
 } from '@opentrons/components'
-import { getOnDeviceDisplaySettings } from '../../redux/config'
-
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
 import {
@@ -38,17 +36,15 @@ import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
+import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
 
-// Note: kj 12/15/2022 the current input field is optimized for the desktop
-// Need to update the InputField for the ODD app
-// That will be done in another PR
 const INPUT_FIELD_ODD_STYLE = css`
-  padding-top: ${SPACING.spacing40};
-  padding-bottom: ${SPACING.spacing40};
+  padding-top: ${SPACING.spacing32};
+  padding-bottom: ${SPACING.spacing32};
   font-size: 2.5rem;
   line-height: 3.25rem;
   text-align: center;
@@ -72,12 +68,8 @@ export function NameRobot(): JSX.Element {
   ] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
   const dispatch = useDispatch<Dispatch>()
-  const { unfinishedUnboxingFlowRoute } = useSelector(
-    getOnDeviceDisplaySettings
-  )
-  const isInitialSetup = unfinishedUnboxingFlowRoute !== null
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
-  // check for robot name
   const connectableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
   )
@@ -126,7 +118,7 @@ export function NameRobot(): JSX.Element {
     onSuccess: (data: UpdatedRobotName) => {
       if (data.name != null) {
         setNewName(data.name)
-        if (!isInitialSetup) {
+        if (!isUnboxingFlowOngoing) {
           history.push('/robot-settings')
         } else {
           setIsShowConfirmRobotName(true)
@@ -143,7 +135,6 @@ export function NameRobot(): JSX.Element {
 
   const handleConfirm = (): void => {
     // check robot name in the same network
-    // ToDo (kj:04/09/2023) need to specify for odd
     trackEvent({
       name: ANALYTICS_RENAME_ROBOT,
       properties: {
@@ -156,30 +147,31 @@ export function NameRobot(): JSX.Element {
 
   return (
     <>
-      {isShowConfirmRobotName && isInitialSetup ? (
+      {isShowConfirmRobotName && isUnboxingFlowOngoing ? (
         <ConfirmRobotName robotName={newName} />
       ) : (
         <>
-          {isInitialSetup ? <StepMeter totalSteps={6} currentStep={5} /> : null}
+          {isUnboxingFlowOngoing ? (
+            <StepMeter totalSteps={6} currentStep={5} />
+          ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacing32}
-            marginX={SPACING.spacing40}
+            paddingY={SPACING.spacing32}
+            paddingX={SPACING.spacing40}
           >
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={
-                isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
+                isUnboxingFlowOngoing ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
               }
               position={POSITION_RELATIVE}
-              marginBottom="3.041875rem"
             >
               <Flex position={POSITION_ABSOLUTE} left="0">
                 <Btn
                   data-testid="name_back_button"
                   onClick={() => {
-                    if (isInitialSetup) {
+                    if (isUnboxingFlowOngoing) {
                       history.push('/emergency-stop')
                     } else {
                       history.push('/robot-settings')
@@ -189,9 +181,11 @@ export function NameRobot(): JSX.Element {
                   <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
                 </Btn>
               </Flex>
-              <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
+              <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
                 <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-                  {isInitialSetup ? t('name_your_robot') : t('rename_robot')}
+                  {isUnboxingFlowOngoing
+                    ? t('name_your_robot')
+                    : t('rename_robot')}
                 </StyledText>
               </Flex>
               <Flex position={POSITION_ABSOLUTE} right="0">
@@ -211,63 +205,64 @@ export function NameRobot(): JSX.Element {
                 )}
               </Flex>
             </Flex>
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            paddingX={SPACING.spacing40}
+            height="15.125rem"
+            paddingTop={isUnboxingFlowOngoing ? undefined : SPACING.spacing80}
+          >
             <Flex
-              width="100%"
               flexDirection={DIRECTION_COLUMN}
-              alignItems={ALIGN_CENTER}
+              marginBottom={SPACING.spacing8}
+              paddingX={SPACING.spacing60}
+              width="100%"
             >
-              {isInitialSetup ? (
+              {isUnboxingFlowOngoing ? (
                 <StyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.darkBlack70}
-                  marginBottom={SPACING.spacing40}
+                  marginBottom={SPACING.spacing24}
                 >
                   {t('name_your_robot_description')}
                 </StyledText>
               ) : null}
-              <Flex
-                flexDirection={DIRECTION_ROW}
-                alignItems={ALIGN_CENTER}
-                marginBottom={SPACING.spacing8}
-                justifyContent={JUSTIFY_CENTER}
-                width="100%"
-              >
-                <InputField
-                  data-testid="name-robot_input"
-                  id="newRobotName"
-                  name="newRobotName"
-                  type="text"
-                  onChange={formik.handleChange}
-                  value={name}
-                  error={formik.errors.newRobotName && ''}
-                  css={INPUT_FIELD_ODD_STYLE}
-                />
-              </Flex>
-              <StyledText
-                as="p"
-                color={COLORS.darkBlack70}
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-              >
-                {t('name_rule_description')}
-              </StyledText>
-              {formik.errors.newRobotName && (
-                <StyledText
-                  as="p"
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.red2}
-                >
-                  {formik.errors.newRobotName}
-                </StyledText>
-              )}
-            </Flex>
-
-            <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-              <CustomKeyboard
-                onChange={e => e != null && setName(e)}
-                keyboardRef={keyboardRef}
+              <InputField
+                data-testid="name-robot_input"
+                id="newRobotName"
+                name="newRobotName"
+                type="text"
+                onChange={formik.handleChange}
+                value={name}
+                error={formik.errors.newRobotName && ''}
+                css={INPUT_FIELD_ODD_STYLE}
               />
             </Flex>
+            <StyledText
+              as="p"
+              color={COLORS.darkBlack70}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+            >
+              {t('name_rule_description')}
+            </StyledText>
+            {formik.errors.newRobotName && (
+              <StyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                color={COLORS.red2}
+              >
+                {formik.errors.newRobotName}
+              </StyledText>
+            )}
+          </Flex>
+
+          <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
+            <CustomKeyboard
+              onChange={e => e != null && setName(e)}
+              keyboardRef={keyboardRef}
+            />
           </Flex>
         </>
       )}

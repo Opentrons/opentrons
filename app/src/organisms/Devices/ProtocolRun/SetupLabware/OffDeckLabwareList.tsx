@@ -35,6 +35,7 @@ export function OffDeckLabwareList(
           {...labwareItem}
           isOt3={isOt3}
           commands={commands}
+          nestedLabwareInfo={null}
         />
       ))}
     </>

@@ -22,7 +22,7 @@ def os_driver() -> mock.Mock:
 @pytest.fixture
 def subject(os_driver: mock.Mock) -> usb_config.SerialGadget:
     return usb_config.SerialGadget(
-        driver=os_driver, config=default_config.default_gadget
+        driver=os_driver, config=default_config.get_gadget_config()
     )
 
 
@@ -200,3 +200,21 @@ def test_get_udc_folder(subject: usb_config.SerialGadget) -> None:
     subject._udc_name = "fake_name"
     expected = usb_config.UDC_HANDLE_FOLDER + "fake_name"
     assert subject.udc_folder() == expected
+
+
+def test_get_gadget_serial_number(tmpdir: Path) -> None:
+    """Test that the gadget serial number is read."""
+    serial = Path(tmpdir) / "serial"
+    TEST_SERIAL = "fake_serial_number_123"
+    serial.write_text(TEST_SERIAL)
+    default_config.SERIAL_NUMBER_FILE = str(serial.absolute())
+
+    assert default_config.get_gadget_config().serial_number == TEST_SERIAL
+
+    # Make sure the default serial number is used if there's no serial file
+    default_config.SERIAL_NUMBER_FILE = "/fake/path/that/does/not/exist.txt"
+
+    assert (
+        default_config.get_gadget_config().serial_number
+        == default_config.DEFAULT_SERIAL
+    )

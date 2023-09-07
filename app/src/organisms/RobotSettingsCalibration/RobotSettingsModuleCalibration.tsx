@@ -12,15 +12,18 @@ import { StyledText } from '../../atoms/text'
 import { ModuleCalibrationItems } from './CalibrationDetails/ModuleCalibrationItems'
 
 import type { AttachedModule } from '@opentrons/api-client'
+import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsModuleCalibrationProps {
   attachedModules: AttachedModule[]
   updateRobotStatus: (isRobotBusy: boolean) => void
+  formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
 }
 
 export function RobotSettingsModuleCalibration({
   attachedModules,
   updateRobotStatus,
+  formattedPipetteOffsetCalibrations,
 }: RobotSettingsModuleCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -38,6 +41,9 @@ export function RobotSettingsModuleCalibration({
         <ModuleCalibrationItems
           attachedModules={attachedModules}
           updateRobotStatus={updateRobotStatus}
+          formattedPipetteOffsetCalibrations={
+            formattedPipetteOffsetCalibrations
+          }
         />
       ) : (
         <StyledText as="label" marginTop={SPACING.spacing8}>

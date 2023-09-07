@@ -466,13 +466,13 @@ class PipetteHandlerProvider:
     def plunger_speed(
         self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        mm_per_s = ul_per_s / instr.ul_per_mm(instr.liquid_class.max_volume, action)
+        mm_per_s = ul_per_s / instr.ul_per_mm(instr.working_volume, action)
         return round(mm_per_s, 6)
 
     def plunger_flowrate(
         self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
     ) -> float:
-        ul_per_s = mm_per_s * instr.ul_per_mm(instr.liquid_class.max_volume, action)
+        ul_per_s = mm_per_s * instr.ul_per_mm(instr.working_volume, action)
         return round(ul_per_s, 6)
 
     def plunger_acceleration(self, instr: Pipette, ul_per_s_per_s: float) -> float:

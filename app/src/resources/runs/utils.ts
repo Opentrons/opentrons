@@ -87,14 +87,14 @@ export const chainMaintenanceCommandsRecursive = (
     })
 }
 
-export const formatTimeWithUtcLabel = (
-  time: string,
-  noFormat?: boolean
-): string => {
-  const UTC_LABEL = 'UTC'
-  const TIME_FORMAT = 'M/d/yy HH:mm'
+const dateIsValid = (date: string): boolean => {
+  return !isNaN(new Date(date).getTime())
+}
 
-  return noFormat
-    ? `${time} ${UTC_LABEL}`
-    : `${format(new Date(time), TIME_FORMAT)} ${UTC_LABEL}`
+export const formatTimeWithUtcLabel = (time: string | null): string => {
+  const UTC_LABEL = 'UTC'
+  if (time == null) return 'unknown'
+  return typeof time === 'string' && dateIsValid(time)
+    ? `${format(new Date(time), 'M/d/yy HH:mm')} ${UTC_LABEL}`
+    : `${time} ${UTC_LABEL}`
 }

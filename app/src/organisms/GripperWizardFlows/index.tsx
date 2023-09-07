@@ -12,7 +12,6 @@ import {
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
@@ -21,7 +20,10 @@ import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import {
+  useChainMaintenanceCommands,
+  useCreateTargetedMaintenanceRunMutation,
+} from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -74,9 +76,9 @@ export function GripperWizardFlows(
   ] = React.useState<boolean>(false)
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({
+  } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
       setCreatedMaintenanceRunId(response.data.id)
     },
@@ -144,9 +146,10 @@ export function GripperWizardFlows(
   return (
     <GripperWizard
       flowType={flowType}
+      createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
       attachedGripper={attachedGripper}
-      createMaintenanceRun={createMaintenanceRun}
+      createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
         isChainCommandMutationLoading || isCommandLoading || isExiting
@@ -164,6 +167,7 @@ export function GripperWizardFlows(
 interface GripperWizardProps {
   flowType: GripperWizardFlowType
   maintenanceRunId?: string
+  createdMaintenanceRunId: string | null
   attachedGripper: InstrumentData | null
   createMaintenanceRun: UseMutateFunction<
     MaintenanceRun,
@@ -201,6 +205,7 @@ export const GripperWizard = (
     setErrorMessage,
     errorMessage,
     isExiting,
+    createdMaintenanceRunId,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
@@ -244,7 +249,10 @@ export const GripperWizard = (
 
   const sharedProps = {
     flowType,
-    maintenanceRunId,
+    maintenanceRunId:
+      maintenanceRunId != null && createdMaintenanceRunId === maintenanceRunId
+        ? maintenanceRunId
+        : undefined,
     isCreateLoading,
     isRobotMoving,
     attachedGripper,
@@ -273,6 +281,7 @@ export const GripperWizard = (
         {...currentStep}
         {...sharedProps}
         createMaintenanceRun={createMaintenanceRun}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {

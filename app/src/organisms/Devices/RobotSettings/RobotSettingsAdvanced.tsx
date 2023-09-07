@@ -166,12 +166,16 @@ export function RobotSettingsAdvanced({
         <RobotServerVersion robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
-        <Divider marginY={SPACING.spacing16} />
-        <UsageSettings
-          settings={findSettings('enableDoorSafetySwitch')}
-          robotName={robotName}
-          isRobotBusy={isRobotBusy}
-        />
+        {isOT3 ? null : (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <UsageSettings
+              settings={findSettings('enableDoorSafetySwitch')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+          </>
+        )}
         <Divider marginY={SPACING.spacing16} />
         <DisableHoming
           settings={findSettings('disableHomeOnBoot')}

@@ -27,7 +27,6 @@ import { CONNECTABLE } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
 import * as Sessions from '../../redux/sessions'
-import { useFeatureFlag } from '../../redux/config'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { CalibrationHealthCheck } from './CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
@@ -123,7 +122,6 @@ export function RobotSettingsCalibration({
   )
 
   // Modules Calibration
-  const enableModuleCalibration = useFeatureFlag('enableModuleCalibration')
   const attachedModules =
     useModulesQuery({
       refetchInterval: CALS_FETCH_MS,
@@ -159,6 +157,9 @@ export function RobotSettingsCalibration({
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
   )
+
+  console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
+  // console.log('attachedInstruments', attachedInstruments)
 
   const createStatus = createRequest?.status
 
@@ -327,15 +328,14 @@ export function RobotSettingsCalibration({
           />
           <Line />
           <RobotSettingsGripperCalibration gripper={attachedGripper} />
-          {enableModuleCalibration ? (
-            <>
-              <Line />
-              <RobotSettingsModuleCalibration
-                attachedModules={attachedModules}
-                updateRobotStatus={updateRobotStatus}
-              />
-            </>
-          ) : null}
+          <Line />
+          <RobotSettingsModuleCalibration
+            attachedModules={attachedModules}
+            updateRobotStatus={updateRobotStatus}
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
+          />
         </>
       ) : (
         <>
