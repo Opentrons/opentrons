@@ -355,160 +355,106 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 .. versionadded:: 2.0
 
 
+
+
 .. _new-utility-commands:
 
-****************
+
 Utility Commands
-****************
+================
 
-Delay for an Amount of Time
-===========================
+With utility commands, you can control various robot functions such as pausing or delaying a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
-Sometimes you need to wait as a step in your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to wait your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol as a whole.
+Delay and Resume
+----------------
 
-The values passed into ``delay()`` specify the number of minutes and seconds that the robot will wait until moving on to the next command.
+Call the :py:meth:`.ProtocolContext.delay` method to insert a timed delay into your protocol. This method accepts time increments in seconds, minutes, or combinations of both. Your protocol resumes automatically after the specified time expires.
 
-.. code-block:: python
+This example delays a protocol for 10 seconds::
 
-    protocol.delay(seconds=2)             # delay for 2 seconds
-    protocol.delay(minutes=5)             # delay for 5 minutes
-    protocol.delay(minutes=5, seconds=2)  # delay for 5 minutes and 2 seconds
+    protocol.delay(seconds=10)
 
+This example delays a protocol for 5 minutes::
+
+    protocol.delay(minutes=5)
+
+This example delays a protocol for 5 minutes and 10 seconds::
+
+    protocol.delay(minutes=5, seconds=10)
 
 Pause Until Resumed
-===================
+-------------------
 
-The method :py:meth:`.ProtocolContext.pause` will pause protocol execution at a specific step.
-You can resume by pressing 'resume' in your Opentrons App. You can optionally specify a message that
-will be displayed in the Opentrons App when protocol execution pauses.
+Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the Opentrons App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
 
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        # The start of your protocol goes here...
-
-        # The protocol stops here until you press resume. The optional message appears in
-        # the Opentrons App. You do not need to specify a message, but it makes things
-        # more clear.
-        protocol.pause('Time to take a break')
+    protocol.pause('Remember to get more pipette tips')
 
 .. versionadded:: 2.0
 
 Homing
-======
+------
 
-You can manually request for the robot to home during protocol execution. This is typically
-not necessary; however, if at any point you will disengage motors or move
-the gantry with your hand, you may want to command a home afterwards.
+Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. With the available homing methods you can home the gantry, home the mounted pipette and plunger, and home the pipette plunger. These functions take no arguments.
 
-To home the all axes, you can call :py:meth:`.ProtocolContext.home`.
+To home the gantry, call :py:meth:`.ProtocolContext.home`::
 
-To home a specific pipette's Z axis and plunger, you can call :py:meth:`.InstrumentContext.home`.
+    protocol.home()
 
-To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentContext.home_plunger`.
+To home a specific pipette's Z axis and plunger, call :py:meth:`.InstrumentContext.home`::
 
-None of these functions take any arguments:
+    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    pipette.home()
 
-.. code-block:: python
-    :substitutions:
+To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentContext.home_plunger`::
 
-    from opentrons import protocol_api, types
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        pipette = protocol.load_instrument('p300_single', 'right')
-        protocol.home() # Homes the gantry, z axes, and plungers
-        pipette.home()  # Homes the right z axis and plunger
-        pipette.home_plunger() # Homes the right plunger
+    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    pipette.home_plunger()
 
 .. versionadded:: 2.0
-
 
 Comment
-=======
+-------
 
-The method :py:meth:`.ProtocolContext.comment` lets you display messages in the Opentrons App during protocol execution:
+Call the :py:meth:`.ProtocolContext.comment` method if you want to write and display a brief message in the Opentrons App during a protocol run::
 
-
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api, types
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        protocol.comment('Hello, world!')
+    protocol.comment('Hello, world!')
 
 .. versionadded:: 2.0
 
-
 Control and Monitor Robot Rail Lights
-=====================================
+-------------------------------------
 
-You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
+Call the :py:meth:`.ProtocolContext.set_rail_lights` method to turn the robot's rail lights on or off during a protocol. This method accepts Boolean ``True`` (lights on) or ``False`` (lights off) arguments. Rail lights are off by default.
 
+This example turns the rail lights on::
 
-.. code-block:: python
-    :substitutions:
+    protocol.set_rail_lights(True)
 
-    from opentrons import protocol_api
+This example turns the rail lights off::
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    protocol.set_rail_lights(False)
 
-    def run(protocol: protocol_api.ProtocolContext):
-        # turn on robot rail lights
-        protocol.set_rail_lights(True)
+.. versionadded:: 2.5
 
-        # turn off robot rail lights
-        protocol.set_rail_lights(False)
+You can also check whether the rail lights are on or off in the protocol by using :py:obj:`.ProtocolContext.rail_lights_on`. This method returns ``True`` when lights are on and ``False`` when the lights are off.
 
 .. versionadded:: 2.5
 
 
-You can also check whether the rail lights are on or off in the protocol using :py:obj:`.ProtocolContext.rail_lights_on`:
+OT-2 Door Safety Switch
+-----------------------
 
+Introduced with :ref:`robot software version <version-table>` 3.19, the safety switch feature prevents the OT-2, and your protocol, from running if the door is open. To operate properly, the front door and top window of your OT-2 must be closed. You can toggle the door safety switch on or off from **Robot Settings > Advanced > Usage Settings**.
 
-.. code-block:: python
-
-    protocol.rail_lights_on  # returns True when the lights are on,
-                             # False when the lights are off
-
-.. versionadded:: 2.5
-
-
-.. TODO clarify that this is specific to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
-
-Monitor Robot Door
-==================
-
-The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
-
-.. image:: ../img/feature_flags/door_safety_switch.png
-
-You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:obj:`.ProtocolContext.door_closed`:
-
+To check if the robot's door is closed at a specific point during a protocol run, call :py:obj:`.ProtocolContext.door_closed`. It returns a Boolean ``True`` (door closed) or ``False`` (door open) response.
 
 .. code-block:: python
 
-    protocol.door_closed  # return True when the door is closed,
-                          # False when the door is open
-
-
-.. note::
-
-    Both the top window and the front door must be closed in order for the robot to report the door is closed.
-
+    protocol.door_closed
 
 .. warning::
 
-    If you chose to enable the door safety switch feature flag, you should only use :py:obj:`.ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:obj:`.ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
+    :py:obj:`~.ProtocolContext.door_closed` is a status check only. It does not control the robot's behavior. If you wish to implement a custom method to pause or resume a protocol using ``door_closed``, disable the door safety feature first (not recommended).
 
 .. versionadded:: 2.5
 
