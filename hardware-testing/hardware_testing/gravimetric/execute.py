@@ -4,6 +4,7 @@ from typing import Optional, Tuple, List, Dict
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
 from subprocess import run as run_subprocess
+import subprocess
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import Point, OT3Mount, Axis
@@ -49,7 +50,7 @@ from .measurement.record import (
 )
 from .measurement.scale import Scale
 from .tips import MULTI_CHANNEL_TEST_ORDER
-
+import glob
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -58,7 +59,7 @@ _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
 _tip_counter: Dict[int, int] = {}
 
 CAM_CMD_OT3 = (
-    "v4l2-ctl --device /dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=MJPG "
+    "v4l2-ctl --device {1} --set-fmt-video=width=1920,height=1080,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
 
@@ -327,18 +328,27 @@ def _run_trial(
         blank=trial.blank,
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
-    cam_pic_name = f"volume_{trial.volume}_trial_{trial.trial}.jpg"
+
     if trial.ctx.is_simulating():
-        cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
-    cam_pic_path = (
-        f"{trial.test_report.parent}/{trial.test_report._run_id}/{cam_pic_name}"
-    )
-    process_cmd = CAM_CMD_OT3.format(str(cam_pic_path))
-    if trial.ctx.is_simulating():
-        with open(cam_pic_path, "w") as f:
-            f.write(str(cam_pic_name))  # create a test file
+        cameras = ["/dev/video0"]
     else:
-        run_subprocess(process_cmd.split(" "))  # take a picture
+        cameras = glob.glob("/dev/video*")
+    for camera in cameras:
+        cam_pic_name = f"camera{camera[-1]}_channel{trial.channel}_volume_{trial.volume}_trial_{trial.trial}.jpg"
+        if trial.ctx.is_simulating():
+            cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
+        cam_pic_path = (
+            f"{trial.test_report.parent}/{trial.test_report._run_id}/{cam_pic_name}"
+        )
+        process_cmd = CAM_CMD_OT3.format(str(cam_pic_path), camera)
+        if trial.ctx.is_simulating():
+            with open(cam_pic_path, "w") as f:
+                f.write(str(cam_pic_name))  # create a test file
+        else:
+            try:
+                run_subprocess(process_cmd.split(" "), timeout=2)  # take a picture
+            except subprocess.TimeoutExpired:
+                os.remove(cam_pic_path)
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
@@ -564,7 +574,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     if resources.ctx.is_simulating():
         start_sim_mass = {50: 15, 200: 200, 1000: 200}
         resources.recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
-    os.makedirs(f"{resources.test_report.parent}/{resources.test_report._run_id}", exist_ok=True)
+    os.makedirs(
+        f"{resources.test_report.parent}/{resources.test_report._run_id}", exist_ok=True
+    )
     recorder._recording = GravimetricRecording()
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
