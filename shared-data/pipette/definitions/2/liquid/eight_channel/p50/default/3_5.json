@@ -3,7 +3,7 @@
   "supportedTips": {
     "t50": {
       "defaultAspirateFlowRate": {
-        "default": 35,
+        "default": 15,
         "valuesByApiLevel": { "2.14": 35 }
       },
       "defaultDispenseFlowRate": {
