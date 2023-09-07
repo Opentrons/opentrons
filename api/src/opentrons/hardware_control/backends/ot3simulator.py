@@ -394,7 +394,7 @@ class OT3Simulator:
 
     async def get_tip_present_state(
         self, mount: OT3Mount, expect_multiple_responses: bool = False
-    ) -> int:
+    ) -> bool:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 

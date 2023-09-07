@@ -2066,7 +2066,7 @@ class OT3API(
         # this function with additional state (such as critical points)
         realmount = OT3Mount.from_mount(mount)
         res = await self._backend.get_tip_present_state(realmount)
-        pipette_state_for_mount: PipetteStateDict = {"tip_detected": bool(res[0])}
+        pipette_state_for_mount: PipetteStateDict = {"tip_detected": res}
         return pipette_state_for_mount
 
     def reset_instrument(

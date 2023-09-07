@@ -125,6 +125,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     TipStateType,
     FailedTipStateCheck,
+    UnmatchedTipStates,
     EstopState,
 )
 from opentrons.hardware_control.errors import (
@@ -843,18 +844,21 @@ class OT3Controller:
     ) -> None:
         """Raise an error if the expected tip state does not match the current state."""
         res = await self.get_tip_present_state(mount, expect_multiple_responses)
-        if res[0] != tip_state.value or res[0] != res[1]:
-            raise FailedTipStateCheck(tip_state, res[0])
+        if res != tip_state.value:
+            raise FailedTipStateCheck(tip_state, res)
 
     async def get_tip_present_state(
         self, mount: OT3Mount, expect_multiple_responses: bool = False
-    ) -> List[int]:
+    ) -> bool:
         """Get the state of the tip ejector flag for a given mount."""
         expected_responses = 2 if expect_multiple_responses else 1
         res = await get_tip_ejector_state(
             self._messenger, sensor_node_for_mount(OT3Mount(mount.value)), expected_responses  # type: ignore
         )
-        return res
+        if res[0] != res[1]:
+            raise UnmatchedTipStates()
+        tip_present_state = bool(res[0]) and bool(res[1])
+        return tip_present_state
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[Axis]) -> List[NodeId]:

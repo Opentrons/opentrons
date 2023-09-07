@@ -642,3 +642,13 @@ class FailedTipStateCheck(RuntimeError):
             f"Failed to correctly determine tip state for tip {str(tip_state_type)} "
             f"received {bool(actual_state)} but expected {bool(tip_state_type.value)}"
         )
+
+
+class UnmatchedTipStates(RuntimeError):
+    """Error raised if a 96 channel pipette receives two differing tip presence statuses."""
+
+    def __init__(self) -> None:
+        """Iniitialize FailedTipStateCheck error."""
+        super().__init__(
+            f"Received two differing tip presence statuses. Pickup motor may need to be homed."
+        )
