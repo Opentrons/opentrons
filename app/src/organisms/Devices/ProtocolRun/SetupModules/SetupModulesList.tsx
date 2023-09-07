@@ -40,7 +40,7 @@ import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../hooks'
-import { HeaterShakerWizard } from '../../HeaterShakerWizard'
+import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModuleImage } from './utils'
 
@@ -209,14 +209,9 @@ export function ModulesListItem({
       ? t('module_connected')
       : t('module_not_connected')
   const [
-    showHeaterShakerFlow,
-    setShowHeaterShakerFlow,
+    showModuleSetupModal,
+    setShowModuleSetupModal,
   ] = React.useState<Boolean>(false)
-  const heaterShakerAttachedModule =
-    attachedModuleMatch != null &&
-    attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
-      ? attachedModuleMatch
-      : null
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -235,7 +230,7 @@ export function ModulesListItem({
           }
         `}
         marginTop={SPACING.spacing4}
-        onClick={() => setShowHeaterShakerFlow(true)}
+        onClick={() => setShowModuleSetupModal(true)}
       >
         <Flex flexDirection={DIRECTION_ROW}>
           <Icon
@@ -321,11 +316,12 @@ export function ModulesListItem({
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
       >
-        {showHeaterShakerFlow && heaterShakerModuleFromProtocol != null ? (
-          <HeaterShakerWizard
-            onCloseClick={() => setShowHeaterShakerFlow(false)}
-            moduleFromProtocol={heaterShakerModuleFromProtocol}
-            attachedModule={heaterShakerAttachedModule}
+        {showModuleSetupModal && heaterShakerModuleFromProtocol != null ? (
+          <ModuleSetupModal
+            close={() => setShowModuleSetupModal(false)}
+            moduleDisplayName={
+              heaterShakerModuleFromProtocol.moduleDef.displayName
+            }
           />
         ) : null}
         <Flex
