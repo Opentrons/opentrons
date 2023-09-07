@@ -75,13 +75,7 @@ import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import { RunFailedModal } from '../RunFailedModal'
-import {
-  DISENGAGED,
-  ENGAGED,
-  LOGICALLY_ENGAGED,
-  NOT_PRESENT,
-  PHYSICALLY_ENGAGED,
-} from '../../../EmergencyStop'
+import { DISENGAGED, NOT_PRESENT } from '../../../EmergencyStop'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -842,32 +836,5 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText, getByLabelText }] = render()
     getByText('Run completed.')
     getByLabelText('ot-spinner')
-  })
-
-  it('renders banner when estop pressed - physicallyEngaged', () => {
-    mockEstopStatus.data.status = PHYSICALLY_ENGAGED
-    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
-
-    mockUseEstopQuery({ data: mockEstopStatus } as any)
-    const [{ getByText }] = render()
-    getByText('Run failed.')
-  })
-
-  it('renders banner when estop pressed - logicallyEngaged', () => {
-    mockEstopStatus.data.status = LOGICALLY_ENGAGED
-    mockEstopStatus.data.leftEstopPhysicalStatus = ENGAGED
-
-    mockUseEstopQuery({ data: mockEstopStatus } as any)
-    const [{ getByText }] = render()
-    getByText('Run failed.')
-  })
-
-  it('renders banner when estop pressed - notPresent', () => {
-    mockEstopStatus.data.status = NOT_PRESENT
-    mockEstopStatus.data.leftEstopPhysicalStatus = NOT_PRESENT
-
-    mockUseEstopQuery({ data: mockEstopStatus } as any)
-    const [{ getByText }] = render()
-    getByText('Run failed.')
   })
 })

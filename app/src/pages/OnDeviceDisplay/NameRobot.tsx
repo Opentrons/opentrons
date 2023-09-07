@@ -207,29 +207,28 @@ export function NameRobot(): JSX.Element {
             </Flex>
           </Flex>
           <Flex
-            width="100%"
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
             paddingX={SPACING.spacing40}
-            height="15.125rem "
+            height="15.125rem"
+            paddingTop={isUnboxingFlowOngoing ? undefined : SPACING.spacing80}
           >
-            {isUnboxingFlowOngoing ? (
-              <StyledText
-                as="h4"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.darkBlack70}
-                marginBottom={SPACING.spacing24}
-              >
-                {t('name_your_robot_description')}
-              </StyledText>
-            ) : null}
             <Flex
-              alignItems={ALIGN_CENTER}
+              flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing8}
-              justifyContent={JUSTIFY_CENTER}
-              width="100%"
               paddingX={SPACING.spacing60}
+              width="100%"
             >
+              {isUnboxingFlowOngoing ? (
+                <StyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  color={COLORS.darkBlack70}
+                  marginBottom={SPACING.spacing24}
+                >
+                  {t('name_your_robot_description')}
+                </StyledText>
+              ) : null}
               <InputField
                 data-testid="name-robot_input"
                 id="newRobotName"

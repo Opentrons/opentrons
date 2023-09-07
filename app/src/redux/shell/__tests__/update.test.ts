@@ -23,7 +23,10 @@ describe('shell/update', () => {
         name: 'shell:DOWNLOAD_UPDATE',
         creator: ShellUpdate.downloadShellUpdate,
         args: [],
-        expected: { type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } },
+        expected: {
+          type: 'shell:DOWNLOAD_UPDATE',
+          meta: { shell: true },
+        },
       },
       {
         name: 'shell:APPLY_UPDATE',

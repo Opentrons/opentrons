@@ -10,6 +10,7 @@ const INITIAL_STATE: ShellUpdateState = {
   downloading: false,
   available: false,
   downloaded: false,
+  downloadPercentage: 0,
   info: null,
   error: null,
 }
@@ -37,7 +38,13 @@ export function shellUpdateReducer(
         ...state,
         downloading: false,
         error: action.payload.error || null,
-        downloaded: !action.payload.error,
+        downloaded: action.payload.error == null,
+      }
+    }
+    case 'shell:DOWNLOAD_PERCENTAGE': {
+      return {
+        ...state,
+        downloadPercentage: action.payload.percent,
       }
     }
   }

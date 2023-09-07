@@ -11,6 +11,7 @@ import anyio
 
 from robot_server.persistence import analysis_table, sqlite_rowid
 from robot_server.persistence import legacy_pickle
+from robot_server.persistence.pickle_protocol_version import PICKLE_PROTOCOL_VERSION
 
 from .analysis_models import CompletedAnalysis
 from .analysis_memcache import MemoryCache
@@ -289,7 +290,9 @@ class CompletedAnalysisStore:
 def _serialize_completed_analysis_to_pickle(
     completed_analysis: CompletedAnalysis,
 ) -> bytes:
-    return legacy_pickle.dumps(completed_analysis.dict())
+    return legacy_pickle.dumps(
+        completed_analysis.dict(), protocol=PICKLE_PROTOCOL_VERSION
+    )
 
 
 def _serialize_completed_analysis_to_json(completed_analysis: CompletedAnalysis) -> str:

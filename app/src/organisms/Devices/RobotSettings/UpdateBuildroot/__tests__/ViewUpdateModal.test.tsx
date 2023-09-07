@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { mountWithStore } from '@opentrons/components'
+import { useIsRobotBusy } from '../../../hooks'
 import * as RobotUpdate from '../../../../../redux/robot-update'
 
 import { RobotUpdateProgressModal } from '../RobotUpdateProgressModal'
@@ -12,6 +13,7 @@ import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/robot-update')
 jest.mock('../../../../../redux/shell')
+jest.mock('../../../hooks')
 
 const getRobotUpdateInfo = RobotUpdate.getRobotUpdateInfo as jest.MockedFunction<
   typeof RobotUpdate.getRobotUpdateInfo
@@ -24,6 +26,10 @@ const getRobotUpdateDownloadError = RobotUpdate.getRobotUpdateDownloadError as j
 >
 const getRobotUpdateDisplayInfo = RobotUpdate.getRobotUpdateDisplayInfo as jest.MockedFunction<
   typeof RobotUpdate.getRobotUpdateDisplayInfo
+>
+
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const MOCK_STATE: State = { mockState: true } as any
@@ -62,6 +68,7 @@ describe('ViewUpdateModal', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {

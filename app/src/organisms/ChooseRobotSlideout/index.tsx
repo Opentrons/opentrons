@@ -200,7 +200,12 @@ export function ChooseRobotSlideout(
         </Flex>
         {!isScanning && healthyReachableRobots.length === 0 ? (
           <Flex
-            css={BORDERS.cardOutlineBorder}
+            css={css`
+              ${BORDERS.cardOutlineBorder}
+              &:hover {
+                border-color: ${COLORS.medGreyEnabled};
+              }
+            `}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}

@@ -9,7 +9,7 @@ import winston from 'winston'
 import { getConfig } from './config'
 
 import type Transport from 'winston-transport'
-import type { Config } from './config'
+import type { ConfigV0 } from '@opentrons/app/src/redux/config/schema-types'
 
 export const LOG_DIR = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
@@ -25,7 +25,7 @@ const FILE_OPTIONS = {
   tailable: true,
 }
 
-let config: Config['log']
+let config: ConfigV0['log']
 let transports: Transport[]
 let log: winston.Logger
 
