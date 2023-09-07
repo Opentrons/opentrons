@@ -231,6 +231,7 @@
   "robot_busy_protocol": "This robot cannot be updated while a protocol is running on it",
   "robot_calibration_data": "Robot Calibration Data",
   "robot_name": "Robot Name",
+  "robot_operating_update_available": "Robot Operating System Update Available",
   "robot_serial_number": "Robot Serial Number",
   "robot_server_version": "Robot Server Version",
   "robot_server_version_ot3_description": "The Opentrons Flex software includes the robot server and the touchscreen display interface.",

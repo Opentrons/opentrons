@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 import { AlertModal } from '@opentrons/components'
 import { UPGRADE } from '../../../../redux/robot-update'
@@ -14,8 +15,6 @@ export interface MigrationWarningModalProps {
 }
 
 type MaybeButtonProps = ButtonProps | null | undefined
-
-const HEADING = 'Robot Operating System Update Available'
 
 const VIEW_UPDATE_BUTTON_STYLE = css`
   width: auto;
@@ -35,6 +34,7 @@ const SYSTEM_UPDATE_WARNING_STYLE = css`
 export function MigrationWarningModal(
   props: MigrationWarningModalProps
 ): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const { notNowButton, updateType, proceed } = props
 
   const buttons: MaybeButtonProps[] = [
@@ -48,7 +48,7 @@ export function MigrationWarningModal(
 
   return (
     <AlertModal
-      heading={HEADING}
+      heading={t('robot_operating_update_available')}
       buttons={buttons}
       restrictOuterScroll={false}
       alertOverlay

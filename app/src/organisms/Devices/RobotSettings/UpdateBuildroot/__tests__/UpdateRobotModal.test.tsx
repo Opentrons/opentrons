@@ -1,11 +1,14 @@
 import * as React from 'react'
 import { createStore } from 'redux'
-import { i18n } from '../../../../../i18n'
 import { fireEvent } from '@testing-library/react'
-import * as RobotUpdate from '../../../../../redux/robot-update'
+
 import { renderWithProviders } from '@opentrons/components'
+
+import { i18n } from '../../../../../i18n'
+import * as RobotUpdate from '../../../../../redux/robot-update'
 import { UpdateRobotModal } from '../UpdateRobotModal'
 import type { Store } from 'redux'
+
 import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/robot-update')

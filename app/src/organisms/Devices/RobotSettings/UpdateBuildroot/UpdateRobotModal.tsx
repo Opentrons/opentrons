@@ -2,17 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
-import {
-  getRobotUpdateDisplayInfo,
-  robotUpdateChangelogSeen,
-  startRobotUpdate,
-  OT2_BALENA,
-} from '../../../../redux/robot-update'
-import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
-import { useIsRobotBusy } from '../../hooks'
-import { Tooltip } from '../../../../atoms/Tooltip'
-import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { Banner } from '../../../../atoms/Banner'
+
 import {
   useHoverTooltip,
   ALIGN_CENTER,
@@ -24,6 +14,19 @@ import {
   NewSecondaryBtn,
   BORDERS,
 } from '@opentrons/components'
+
+import {
+  getRobotUpdateDisplayInfo,
+  robotUpdateChangelogSeen,
+  startRobotUpdate,
+  OT2_BALENA,
+} from '../../../../redux/robot-update'
+import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
+import { useIsRobotBusy } from '../../hooks'
+import { Tooltip } from '../../../../atoms/Tooltip'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
+import { Banner } from '../../../../atoms/Banner'
+
 import type { State, Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/robot-update/types'
 

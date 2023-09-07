@@ -2,10 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { css } from 'styled-components'
-import {
-  clearRobotUpdateSession,
-  startRobotUpdate,
-} from '../../../../redux/robot-update'
+
 import {
   Flex,
   Icon,
@@ -18,10 +15,15 @@ import {
   SPACING,
   BORDERS,
 } from '@opentrons/components'
+
 import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { ProgressBar } from '../../../../atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
+import {
+  clearRobotUpdateSession,
+  startRobotUpdate,
+} from '../../../../redux/robot-update'
 import successIcon from '../../../../assets/images/icon_success.png'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -156,8 +158,8 @@ export function RobotUpdateProgressModal({
   const completedUpdating = error || updateStep === 'finished'
 
   const UPDATE_PROGRESS_BAR_STYLE = css`
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-top: ${SPACING.spacing24};
+    margin-bottom: ${SPACING.spacing24};
     border-radius: ${BORDERS.borderRadiusSize3};
     background: ${COLORS.medGreyEnabled};
   `
