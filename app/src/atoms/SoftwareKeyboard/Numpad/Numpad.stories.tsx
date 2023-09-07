@@ -5,17 +5,18 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
-import { InputField } from '../InputField'
-import { CustomKeyboard } from './'
+import { InputField } from '../../InputField'
+import { Numpad } from './'
+import '../../../styles.global.css'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Odd/Atoms/SoftwareKeyboard/CustomKeyboard',
-  component: CustomKeyboard,
+  title: 'ODD/Atoms/SoftwareKeyboard/Numpad',
+  component: Numpad,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
+const Template: Story<React.ComponentProps<typeof Numpad>> = args => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -25,13 +26,13 @@ const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
         <InputField
           value={value}
           type="text"
-          placeholder="When focusing, the keyboard shows up"
+          placeholder="When focusing, the numpad shows up"
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
-      <Flex position={POSITION_ABSOLUTE} top="20%" width="55rem">
+      <Flex position={POSITION_ABSOLUTE} top="20%" width="15rem">
         {showKeyboard && (
-          <CustomKeyboard
+          <Numpad
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
@@ -41,4 +42,4 @@ const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
   )
 }
 
-export const CustomSoftwareKeyboard = Template.bind({})
+export const NormalSoftwareKeyboard = Template.bind({})
