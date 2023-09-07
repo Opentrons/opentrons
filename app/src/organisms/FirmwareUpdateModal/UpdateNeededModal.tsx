@@ -91,7 +91,12 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     </Modal>
   )
   if (status === 'updating' || status === 'queued') {
-    modalContent = <UpdateInProgressModal percentComplete={percentComplete} />
+    modalContent = (
+      <UpdateInProgressModal
+        percentComplete={percentComplete}
+        subsystem={subsystem}
+      />
+    )
   } else if (status === 'done' || instrument?.ok) {
     modalContent = (
       <UpdateResultsModal

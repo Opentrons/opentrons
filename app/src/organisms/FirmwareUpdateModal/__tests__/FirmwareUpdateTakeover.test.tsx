@@ -121,6 +121,15 @@ describe('FirmwareUpdateTakeover', () => {
         ],
       },
     } as any)
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: {
+          subsystem: 'pipette_right',
+          updateStatus: 20,
+        } as any,
+      },
+    } as any)
+
     const { queryByText, getByText } = render()
     expect(queryByText('Mock Update Needed Modal')).not.toBeInTheDocument()
     getByText('Mock Update In Progress Modal')
