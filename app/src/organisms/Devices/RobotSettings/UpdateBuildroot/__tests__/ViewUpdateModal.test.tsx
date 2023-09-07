@@ -4,14 +4,15 @@ import { mountWithStore } from '@opentrons/components'
 import { useIsRobotBusy } from '../../../hooks'
 import * as RobotUpdate from '../../../../../redux/robot-update'
 
-import { DownloadUpdateModal } from '../DownloadUpdateModal'
-import { ReleaseNotesModal } from '../ReleaseNotesModal'
+import { RobotUpdateProgressModal } from '../RobotUpdateProgressModal'
+import { UpdateRobotModal } from '../UpdateRobotModal'
 import { MigrationWarningModal } from '../MigrationWarningModal'
 import { ViewUpdateModal } from '../ViewUpdateModal'
 
 import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/robot-update')
+jest.mock('../../../../../redux/shell')
 jest.mock('../../../hooks')
 
 const getRobotUpdateInfo = RobotUpdate.getRobotUpdateInfo as jest.MockedFunction<
@@ -22,6 +23,9 @@ const getRobotUpdateDownloadProgress = RobotUpdate.getRobotUpdateDownloadProgres
 >
 const getRobotUpdateDownloadError = RobotUpdate.getRobotUpdateDownloadError as jest.MockedFunction<
   typeof RobotUpdate.getRobotUpdateDownloadError
+>
+const getRobotUpdateDisplayInfo = RobotUpdate.getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof RobotUpdate.getRobotUpdateDisplayInfo
 >
 
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
@@ -34,7 +38,6 @@ const queryClient = new QueryClient()
 
 describe('ViewUpdateModal', () => {
   const handleClose = jest.fn()
-  const handleProceed = jest.fn()
 
   const render = (
     robotUpdateType: React.ComponentProps<
@@ -50,8 +53,7 @@ describe('ViewUpdateModal', () => {
           robotName={MOCK_ROBOT_NAME}
           robotUpdateType={robotUpdateType}
           robotSystemType={robotSystemType}
-          close={handleClose}
-          proceed={handleProceed}
+          closeModal={handleClose}
         />
       </QueryClientProvider>,
       { initialState: MOCK_STATE }
@@ -61,6 +63,11 @@ describe('ViewUpdateModal', () => {
     getRobotUpdateInfo.mockReturnValue(null)
     getRobotUpdateDownloadProgress.mockReturnValue(50)
     getRobotUpdateDownloadError.mockReturnValue(null)
+    getRobotUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     mockUseIsRobotBusy.mockReturnValue(false)
   })
 
@@ -68,46 +75,32 @@ describe('ViewUpdateModal', () => {
     jest.resetAllMocks()
   })
 
-  it('should show a DownloadUpdateModal if the update has not been downloaded yet', () => {
+  it('renders a RobotUpdateProgressModal if the update has not completed downloading', () => {
     const { wrapper } = render()
-    const downloadUpdateModal = wrapper.find(DownloadUpdateModal)
+    const robotUpdateProgressModal = wrapper.find(RobotUpdateProgressModal)
 
-    expect(downloadUpdateModal.prop('error')).toEqual(null)
-    expect(downloadUpdateModal.prop('progress')).toEqual(50)
+    expect(robotUpdateProgressModal.prop('error')).toEqual(null)
+    expect(robotUpdateProgressModal.prop('stepProgress')).toEqual(50)
     expect(getRobotUpdateDownloadProgress).toHaveBeenCalledWith(
       MOCK_STATE,
       'robot-name'
     )
-
-    const closeButtonProps = downloadUpdateModal.prop('notNowButton')
-
-    expect(closeButtonProps.children).toMatch(/not now/i)
-    expect(handleClose).not.toHaveBeenCalled()
-    closeButtonProps.onClick?.({} as React.MouseEvent)
-    expect(handleClose).toHaveBeenCalled()
   })
 
-  it('should show a DownloadUpdateModal if the update download errored out', () => {
+  it('should show a RobotUpdateProgressModal if the update download errored out', () => {
     getRobotUpdateDownloadError.mockReturnValue('oh no!')
 
     const { wrapper } = render()
-    const downloadUpdateModal = wrapper.find(DownloadUpdateModal)
+    const robotUpdateProgressModal = wrapper.find(RobotUpdateProgressModal)
 
-    expect(downloadUpdateModal.prop('error')).toEqual('oh no!')
+    expect(robotUpdateProgressModal.prop('error')).toEqual('oh no!')
     expect(getRobotUpdateDownloadError).toHaveBeenCalledWith(
       MOCK_STATE,
       'robot-name'
     )
-
-    const closeButtonProps = downloadUpdateModal.prop('notNowButton')
-
-    expect(closeButtonProps.children).toMatch(/close/i)
-    expect(handleClose).not.toHaveBeenCalled()
-    closeButtonProps.onClick?.({} as React.MouseEvent)
-    expect(handleClose).toHaveBeenCalled()
   })
 
-  it('should show a ReleaseNotesModal if the update is an upgrade', () => {
+  it('should show a UpdateRobotModal if the update is an upgrade', () => {
     getRobotUpdateInfo.mockReturnValue({
       version: '1.0.0',
       target: 'ot2',
@@ -115,23 +108,12 @@ describe('ViewUpdateModal', () => {
     })
 
     const { wrapper } = render()
-    const releaseNotesModal = wrapper.find(ReleaseNotesModal)
+    const updateRobotModal = wrapper.find(UpdateRobotModal)
 
-    expect(releaseNotesModal.prop('robotName')).toBe(MOCK_ROBOT_NAME)
-    expect(releaseNotesModal.prop('releaseNotes')).toBe('hey look a release')
-    expect(releaseNotesModal.prop('systemType')).toBe(RobotUpdate.OT2_BUILDROOT)
+    expect(updateRobotModal.prop('robotName')).toBe(MOCK_ROBOT_NAME)
+    expect(updateRobotModal.prop('releaseNotes')).toBe('hey look a release')
+    expect(updateRobotModal.prop('systemType')).toBe(RobotUpdate.OT2_BUILDROOT)
     expect(getRobotUpdateInfo).toHaveBeenCalledWith(MOCK_STATE, 'robot-name')
-
-    const closeButtonProps = releaseNotesModal.prop('notNowButton')
-
-    expect(closeButtonProps.children).toMatch(/not now/i)
-    expect(handleClose).not.toHaveBeenCalled()
-    closeButtonProps.onClick?.({} as React.MouseEvent)
-    expect(handleClose).toHaveBeenCalled()
-
-    expect(handleProceed).not.toHaveBeenCalled()
-    releaseNotesModal.invoke('proceed')?.()
-    expect(handleProceed).toHaveBeenCalled()
   })
 
   it('should show a MigrationWarningModal if the robot is on Balena', () => {
@@ -160,16 +142,16 @@ describe('ViewUpdateModal', () => {
 
     migrationWarning.invoke('proceed')?.()
 
-    expect(wrapper.find(ReleaseNotesModal).prop('systemType')).toBe(
+    expect(wrapper.find(UpdateRobotModal).prop('systemType')).toBe(
       RobotUpdate.OT2_BALENA
     )
   })
 
-  it('should proceed from MigrationWarningModal to DownloadUpdateModal if still downloading', () => {
+  it('should proceed from MigrationWarningModal to RobotUpdateProgressModal if still downloading', () => {
     const { wrapper } = render(RobotUpdate.UPGRADE, RobotUpdate.OT2_BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)
 
     migrationWarning.invoke('proceed')?.()
-    expect(wrapper.exists(DownloadUpdateModal)).toBe(true)
+    expect(wrapper.exists(RobotUpdateProgressModal)).toBe(true)
   })
 })
