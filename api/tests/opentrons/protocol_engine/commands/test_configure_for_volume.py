@@ -1,9 +1,6 @@
 """Test load pipette commands."""
 from decoy import Decoy
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-
-from opentrons.types import MountType
 from opentrons.protocol_engine.execution import (
     LoadedConfigureForVolumeData,
     EquipmentHandler,
@@ -24,16 +21,12 @@ async def test_configure_for_volume_implementation(
     subject = ConfigureForVolumeImplementation(equipment=equipment)
 
     data = ConfigureForVolumeParams(
-        pipetteName="p50_single_flex",
-        mount=MountType.LEFT,
         pipetteId="some id",
         volume=1,
     )
 
     decoy.when(
         await equipment.configure_for_volume(
-            pipette_name="p50_single_flex",
-            mount=MountType.LEFT,
             pipette_id="some id",
             volume=1,
         )

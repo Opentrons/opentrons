@@ -69,11 +69,27 @@ def _make_config(use_virtual_modules: bool) -> Config:
 
 @pytest.fixture(autouse=True)
 def patch_mock_pipette_data_provider(
-    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+    virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> None:
     """Mock out move_types.py functions."""
     for name, func in inspect.getmembers(pipette_data_provider, inspect.isfunction):
         monkeypatch.setattr(pipette_data_provider, name, decoy.mock(func=func))
+    monkeypatch.setattr(
+        virtual_pipette_data_provider,
+        "get_virtual_pipette_static_config",
+        decoy.mock(
+            func=virtual_pipette_data_provider.get_virtual_pipette_static_config
+        ),
+    )
+    monkeypatch.setattr(
+        virtual_pipette_data_provider,
+        "get_virtual_pipette_static_config_by_model_string",
+        decoy.mock(
+            func=virtual_pipette_data_provider.get_virtual_pipette_static_config_by_model_string
+        ),
+    )
 
 
 @pytest.fixture
@@ -150,6 +166,12 @@ def loaded_static_pipette_data(
 
 
 @pytest.fixture
+def virtual_pipette_data_provider() -> pipette_data_provider.VirtualPipetteDataProvider:
+    """Virtual pipette data provider."""
+    return pipette_data_provider.VirtualPipetteDataProvider()
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -157,6 +179,7 @@ def subject(
     labware_data_provider: LabwareDataProvider,
     module_data_provider: ModuleDataProvider,
     model_utils: ModelUtils,
+    virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> EquipmentHandler:
     """Get an EquipmentHandler test subject with its dependencies mocked out."""
     return EquipmentHandler(
@@ -166,6 +189,7 @@ def subject(
         labware_data_provider=labware_data_provider,
         module_data_provider=module_data_provider,
         model_utils=model_utils,
+        virtual_pipette_data_provider=virtual_pipette_data_provider,
     )
 
 
@@ -738,6 +762,7 @@ async def test_load_pipette_use_virtual(
     action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
+    virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
     decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
@@ -748,8 +773,8 @@ async def test_load_pipette_use_virtual(
     )
 
     decoy.when(
-        pipette_data_provider.get_virtual_pipette_static_config(
-            PipetteNameType.P300_SINGLE.value
+        virtual_pipette_data_provider.get_virtual_pipette_static_config(
+            PipetteNameType.P300_SINGLE.value, "unique-id"
         )
     ).then_return(loaded_static_pipette_data)
 

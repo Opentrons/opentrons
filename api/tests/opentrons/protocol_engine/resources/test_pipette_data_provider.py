@@ -1,4 +1,5 @@
 """Test pipette data provider."""
+import pytest
 from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 
@@ -6,15 +7,24 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
+    VirtualPipetteDataProvider,
 )
 
 from opentrons.protocol_engine.resources import pipette_data_provider as subject
 
 
-def test_get_virtual_pipette_static_config() -> None:
+@pytest.fixture
+def subject_instance() -> VirtualPipetteDataProvider:
+    """Instance of a VirtualPipetteDataProvider for test."""
+    return VirtualPipetteDataProvider()
+
+
+def test_get_virtual_pipette_static_config(
+    subject_instance: VirtualPipetteDataProvider,
+) -> None:
     """It should return config data given a pipette name."""
-    result = subject.get_virtual_pipette_static_config(
-        PipetteNameType.P20_SINGLE_GEN2.value
+    result = subject_instance.get_virtual_pipette_static_config(
+        PipetteNameType.P20_SINGLE_GEN2.value, "some-id"
     )
 
     assert result == LoadedStaticPipetteData(

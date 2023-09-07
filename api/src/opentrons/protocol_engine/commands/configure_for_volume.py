@@ -1,12 +1,9 @@
 """Configure for volume command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type, Union
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons.types import MountType
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from .pipetting_common import (
     PipetteIdMixin,
     VolumeMixin,
@@ -23,16 +20,7 @@ ConfigureForVolumeCommandType = Literal["configureForVolume"]
 class ConfigureForVolumeParams(PipetteIdMixin, VolumeMixin):
     """Parameters required to configure volume for a specific pipette."""
 
-    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
-    # https://opentrons.atlassian.net/browse/RLIQ-255
-    pipetteName: Union[PipetteNameType, Literal["p1000_96"]] = Field(
-        ...,
-        description="The load name of the pipette to be required.",
-    )
-    mount: MountType = Field(
-        ...,
-        description="The mount the pipette should be present on.",
-    )
+    pass
 
 
 class ConfigureForVolumeResult(BaseModel):
@@ -57,8 +45,6 @@ class ConfigureForVolumeImplementation(
     ) -> ConfigureForVolumeResult:
         """Check that requested pipette can be configured for the given volume."""
         configured_pipette = await self._equipment.configure_for_volume(
-            pipette_name=params.pipetteName,
-            mount=params.mount,
             pipette_id=params.pipetteId,
             volume=params.volume,
         )
