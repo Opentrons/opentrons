@@ -145,7 +145,7 @@ Setting any item in the list to ``0`` will skip aspirating and dispensing for th
         source=plate["A1"],
         dest=[plate["B1"], plate["B2"], plate["B3"]],
     )
-
+    
 The pipette dispenses in B1 and B3, and does not move to B2 at all.
 
 .. code-block:: text
@@ -161,4 +161,8 @@ This is such a simple example that you might prefer to use two ``transfer()`` co
 	
 .. note::
     When the optional ``new_tip`` parameter is set to ``"always"``, the pipette will pick up and drop a tip even for skipped wells. If you don't want to waste tips, pre-process your list of sources or destinations and use the result as the argument of your complex command.
-	
+
+.. versionadded:: 2.0
+    Skip wells for ``transfer()`` and ``distribute()``.
+.. versionadded:: 2.8
+    Skip wells for ``consolidate()``.
