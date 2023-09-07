@@ -3,7 +3,6 @@ import subprocess
 import asyncio 
 from numpy import float64
 from typing import Dict, Tuple
-import time
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus import CanMessenger
@@ -12,10 +11,7 @@ from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.current_settings import set_currents
 from opentrons_hardware.hardware_control.motion import (
-    MoveGroupSingleAxisStep,
     MoveStopCondition,
-    create_home_step,
-    create_backoff_step,
     create_tip_action_backoff_step,
     MoveGroupTipActionStep,
 )
