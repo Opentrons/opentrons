@@ -29,7 +29,7 @@ This simple statement works because the variable ``tiprack_1`` in the sample pro
     pipette.pick_up_tip()  # picks up tip from rack location B1
     pipette.drop_tip()     # drops tip in trash bin 
 
-If you omit the ``tip_rack`` argument from the ``pipette`` variable, the API will throw an error. You must pass in the tip rack's location to ``pick_up_tip`` like this::
+If you omit the ``tip_rack`` argument from the ``pipette`` variable, the API will raise an error. You must pass in the tip rack's location to ``pick_up_tip`` like this::
     
     pipette.pick_up_tip(tiprack_1['A1'])
     pipette.drop_tip()
