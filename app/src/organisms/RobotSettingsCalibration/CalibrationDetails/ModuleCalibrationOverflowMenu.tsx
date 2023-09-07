@@ -77,7 +77,6 @@ export function ModuleCalibrationOverflowMenu({
         alignSelf={ALIGN_FLEX_END}
         aria-label="ModuleCalibrationOverflowMenu"
         onClick={handleOverflowClick}
-        disabled={isRunning || requiredAttachOrCalibratePipette}
       />
       {showModuleWizard ? (
         <ModuleWizardFlows
@@ -100,7 +99,10 @@ export function ModuleCalibrationOverflowMenu({
           right="0"
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={handleCalibration}>
+          <MenuItem
+            onClick={handleCalibration}
+            disabled={isRunning || requiredAttachOrCalibratePipette}
+          >
             {isCalibrated ? t('recalibrate_module') : t('calibrate_module')}
           </MenuItem>
           {isCalibrated ? (
