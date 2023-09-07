@@ -16,9 +16,13 @@ from typing import (
 from typing_extensions import Final
 import numpy
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+)
+from opentrons_shared_data.pipette.pipette_definition import (
+    liquid_class_for_volume_between_default_and_defaultlowvolume,
 )
 
 from opentrons import types as top_types
@@ -905,5 +909,9 @@ class OT3PipetteHandler:
         if pip.current_volume > 0:
             # Switching liquid classes can't happen when there's already liquid
             return
-        new_class = pip.get_liquid_class_for_volume(volume + pip.current_volume)
-        pip.set_liquid_class_by_name(new_class)
+        new_class_name = liquid_class_for_volume_between_default_and_defaultlowvolume(
+            volume,
+            pip.liquid_class_name,
+            pip.config.liquid_properties,
+        )
+        pip.set_liquid_class_by_name(new_class_name.name)
