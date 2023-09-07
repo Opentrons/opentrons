@@ -1,23 +1,29 @@
 import * as React from 'react'
 import { createStore } from 'redux'
+import { when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import * as RobotUpdate from '../../../../../redux/robot-update'
+import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
+import { getDiscoverableRobotByName } from '../../../../../redux/discovery'
 import { UpdateRobotModal } from '../UpdateRobotModal'
 import type { Store } from 'redux'
 
 import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/robot-update')
+jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
-const getRobotUpdateDisplayInfo = RobotUpdate.getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof RobotUpdate.getRobotUpdateDisplayInfo
+const mockGetRobotUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
+>
+const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
+  typeof getDiscoverableRobotByName
 >
 
 const render = (props: React.ComponentProps<typeof UpdateRobotModal>) => {
@@ -38,11 +44,12 @@ describe('UpdateRobotModal', () => {
       systemType: 'flex',
       closeModal: jest.fn(),
     }
-    getRobotUpdateDisplayInfo.mockReturnValue({
+    when(mockGetRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: 'test',
     })
+    when(mockGetDiscoverableRobotByName).mockReturnValue(null)
   })
 
   afterEach(() => {
