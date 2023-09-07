@@ -398,7 +398,7 @@ This example delays a protocol for 5 minutes and 10 seconds::
 Pause Until Resumed
 -------------------
 
-Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
+Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the Opentrons App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
 
     protocol.pause('Remember to get more pipette tips')
 
@@ -437,7 +437,7 @@ Call the :py:meth:`.ProtocolContext.comment` method if you want to write and dis
 Control and Monitor Robot Rail Lights
 -------------------------------------
 
-Call the :py:meth:`.ProtocolContext.set_rail_lights` method to turn the robot's rail lights on or off during a protocol. This method accepts boolean true (lights on) or false (lights off) arguments. Rail lights are off by default.
+Call the :py:meth:`.ProtocolContext.set_rail_lights` method to turn the robot's rail lights on or off during a protocol. This method accepts Boolean ``True`` (lights on) or ``False`` (lights off) arguments. Rail lights are off by default.
 
 This example turns the rail lights on::
 
@@ -458,11 +458,9 @@ You can also check whether the rail lights are on or off in the protocol by usin
 OT-2 Door Safety Switch
 -----------------------
 
-Introduced with :ref:`robot software version <version-table>` 3.19, the safety switch feature prevents the OT-2, and your protocol, from running if the door is open. To operate properly, the front door and top window of your OT-2 must be closed.
+Introduced with :ref:`robot software version <version-table>` 3.19, the safety switch feature prevents the OT-2, and your protocol, from running if the door is open. To operate properly, the front door and top window of your OT-2 must be closed. You can toggle the door safety switch on or off from **Robot Settings > Advanced > Usage Settings**.
 
-.. image:: ../img/feature_flags/door_safety_switch.png
-
-To check if the robot's door is closed at a specific point during a protocol run, call :py:obj:`.ProtocolContext.door_closed`. It returns a boolean true (door closed) or false (door open) response.
+To check if the robot's door is closed at a specific point during a protocol run, call :py:obj:`.ProtocolContext.door_closed`. It returns a Boolean ``True`` (door closed) or ``False`` (door open) response.
 
 .. code-block:: python
 
