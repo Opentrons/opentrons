@@ -1575,6 +1575,12 @@ class OT3API(
             acquire_lock=acquire_lock,
         )
 
+    async def set_liquid_class(
+        self, mount: Union[top_types.Mount, OT3Mount], liquid_class: str
+    ) -> None:
+        checked_mount = OT3Mount.from_mount(mount)
+        await self._pipette_handler.set_liquid_class(checked_mount, liquid_class)
+
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0

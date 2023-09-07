@@ -902,3 +902,7 @@ class OT3PipetteHandler:
                 f"No pipette attached to {mount.name} mount"
             )
         return pip
+
+    async def set_liquid_class(self, mount: OT3Mount, liquid_class: str) -> None:
+        pip = self.get_pipette(mount)
+        pip.set_liquid_class_by_name(liquid_class)
