@@ -72,12 +72,16 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     isUnboxingFlowOngoing,
     externalSubsystemUpdateExists,
   ])
+  const memoizedSubsystem = React.useMemo(
+    () => subsystemUpdateInstrument?.subsystem,
+    []
+  )
 
   return (
     <>
-      {subsystemUpdateInstrument != null && showUpdateNeededModal ? (
+      {memoizedSubsystem != null && showUpdateNeededModal ? (
         <UpdateNeededModal
-          subsystem={subsystemUpdateInstrument.subsystem}
+          subsystem={memoizedSubsystem}
           setShowUpdateModal={setShowUpdateNeededModal}
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
