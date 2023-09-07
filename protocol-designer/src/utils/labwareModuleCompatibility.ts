@@ -87,9 +87,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   string,
   string[]
 > = {
-  [DEEP_WELL_ADAPTER_LOADNAME]: [
-    'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
-  ],
+  [DEEP_WELL_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_2ml_deep/2'],
   [FLAT_BOTTOM_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_200ul_flat/2'],
   [PCR_ADAPTER_LOADNAME]: [
     'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
