@@ -121,7 +121,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
-        self._push_out_volume = self._active_tip_settings.default_push_out_volume
 
         self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
@@ -184,6 +183,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def active_tip_settings(self) -> SupportedTipsDefinition:
         return self._active_tip_settings
 
+    @property
+    def push_out_volume(self) -> float:
+        return self._active_tip_settings.default_push_out_volume
+
     def act_as(self, name: PipetteName) -> None:
         """Reconfigure to act as ``name``. ``name`` must be either the
         actual name of the pipette, or a name in its back-compatibility
@@ -231,7 +234,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
-        self._push_out_volume = self._active_tip_settings.default_push_out_volume
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
 
@@ -443,6 +445,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
 
     @property
+    def minimum_volume(self) -> float:
+        """The smallest controllable volume the pipette can handle in this liquid class."""
+        return self.liquid_class.min_volume
+
+    @property
     def available_volume(self) -> float:
         """The amount of liquid possible to aspirate"""
         return self.working_volume - self.current_volume
@@ -462,6 +469,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def ok_to_add_volume(self, volume_incr: float) -> bool:
         return self.current_volume + volume_incr <= self.working_volume
+
+    def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
+        return push_out_dist_mm <= (
+            self.plunger_positions.blow_out - self.plunger_positions.bottom
+        )
 
     def add_tip(self, tip_length: float) -> None:
         """

@@ -181,6 +181,14 @@
     "4003": {
       "detail": "Not supported on this robot type",
       "category": "generalError"
+    },
+    "4004": {
+      "detail": "Command Precondition Violated",
+      "category": "generalError"
+    },
+    "4005": {
+      "detail": "Command Parameter Limit Violated",
+      "category": "generalError"
     }
   }
 }

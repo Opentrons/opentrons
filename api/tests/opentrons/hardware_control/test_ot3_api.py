@@ -74,6 +74,7 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
 )
+from opentrons_shared_data.errors.exceptions import CommandParameterLimitViolated
 from opentrons.hardware_control.modules import (
     Thermocycler,
     TempDeck,
@@ -549,7 +550,7 @@ async def test_blow_out_error(
         assume(blowout_volume > max_input_vol)
 
         # check that blowout does not allow input values that would blow out too far
-        with pytest.raises(ValueError):
+        with pytest.raises(CommandParameterLimitViolated):
             await ot3_hardware.blow_out(mount, blowout_volume)
 
 
