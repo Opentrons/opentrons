@@ -189,15 +189,6 @@ class AddPipetteConfigAction:
     config: pipette_data_provider.LoadedStaticPipetteData
 
 
-@dataclass(frozen=True)
-class UpdateLiquidClassAction:
-    """Update a pipette's current static config class based on a new liquid class."""
-
-    pipette_id: str
-    serial_number: str
-    config: pipette_data_provider.LoadedStaticPipetteData
-
-
 Action = Union[
     PlayAction,
     PauseAction,
@@ -215,5 +206,4 @@ Action = Union[
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     AddPipetteConfigAction,
-    UpdateLiquidClassAction,
 ]

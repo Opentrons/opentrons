@@ -42,7 +42,6 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
-    UpdateLiquidClassAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -120,21 +119,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
         elif isinstance(action, AddPipetteConfigAction):
-            config = action.config
-            self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
-                serial_number=action.serial_number,
-                model=config.model,
-                display_name=config.display_name,
-                min_volume=config.min_volume,
-                max_volume=config.max_volume,
-                channels=config.channels,
-                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
-                nominal_tip_overlap=config.nominal_tip_overlap,
-                home_position=config.home_position,
-                nozzle_offset_z=config.nozzle_offset_z,
-            )
-            self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
-        elif isinstance(action, UpdateLiquidClassAction):
             config = action.config
             self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
                 serial_number=action.serial_number,
