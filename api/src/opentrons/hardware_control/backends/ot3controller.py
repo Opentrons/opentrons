@@ -855,9 +855,9 @@ class OT3Controller:
         res = await get_tip_ejector_state(
             self._messenger, sensor_node_for_mount(OT3Mount(mount.value)), expected_responses  # type: ignore
         )
-        if res[0] != res[1]:
+        if res[0] != res[-1]:
             raise UnmatchedTipStates()
-        tip_present_state = bool(res[0]) and bool(res[1])
+        tip_present_state = bool(res[0]) and bool(res[-1])
         return tip_present_state
 
     @staticmethod
