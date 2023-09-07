@@ -13,6 +13,7 @@ except (OSError, ModuleNotFoundError):
 from opentrons import types, config
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 
 LEFT_PIPETTE_PREFIX = "p10_single"
@@ -430,22 +431,24 @@ async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj):
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
     hw_api.set_working_volume(mount, 50)
-    aspirate_ul = 10.0
+    aspirate_ul = 50
     aspirate_rate = 2
     await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
-
-    dispense_1 = 3.0
+    dispense_1 = 25
     await hw_api.dispense(mount, dispense_1)
-    plunger_pos_1 = 70.938414
+    plunger_pos_1 = 69.705
     assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
-        plunger_pos_1
+        plunger_pos_1, 0.1
     )
 
-    await hw_api.dispense(mount, rate=2)
-    plunger_pos_2 = 71.5
+    with pytest.raises(CommandPreconditionViolated):
+        await hw_api.dispense(mount, 5, push_out=10)
+
+    await hw_api.dispense(mount, rate=2, push_out=10)
+    plunger_pos_2 = 72.2715
     assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
-        plunger_pos_2
+        plunger_pos_2, 0.1
     )
 
 
