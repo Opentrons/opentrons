@@ -136,6 +136,28 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         else:
             self._pipetting_function_version = PIPETTING_FUNCTION_LATEST_VERSION
 
+    def get_liquid_class_for_volume(self, volume: float) -> str:
+        """Get the liquid class required for the specified volume.
+        Some pipettes have different liquid classes for different volumes. If applicable,
+        and if the volume is in the different range, this will return that liquid class.
+        Otherwise, it will return the current liquid class.
+        This function takes into account the current liquid class to provide hysteresis.
+        """
+        # For now, until we add more liquid classes, we're going to hardcode the default
+        # and lowVolumeDefault liquid classes as the ones to switch between.
+        has_lvd = (
+            pip_types.LiquidClasses.lowVolumeDefault in self._config.liquid_properties
+        )
+        if not has_lvd:
+            return self._liquid_class_name.name
+        if self._liquid_class_name == pip_types.LiquidClasses.lowVolumeDefault:
+            if volume > (self.liquid_class.max_volume * 0.75):
+                return pip_types.LiquidClasses.default.name
+        if self._liquid_class_name == pip_types.LiquidClasses.default:
+            if volume < (self.liquid_class.max_volume * 0.5):
+                return pip_types.LiquidClasses.lowVolumeDefault.name
+        return self._liquid_class_name.name
+
     @property
     def config(self) -> PipetteConfigurations:
         return self._config
