@@ -16,25 +16,23 @@ import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
-import {
-  useRunStatuses,
-  useAttachedPipetteCalibrations,
-  useAttachedPipettes,
-} from '../../Devices/hooks'
+import { useRunStatuses } from '../../Devices/hooks'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-
+import type { FormattedPipetteOffsetCalibration } from '../'
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean
   attachedModule: AttachedModule
   updateRobotStatus: (isRobotBusy: boolean) => void
+  formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
 }
 
 export function ModuleCalibrationOverflowMenu({
   isCalibrated,
   attachedModule,
   updateRobotStatus,
+  formattedPipetteOffsetCalibrations,
 }: ModuleCalibrationOverflowMenuProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'robot_calibration'])
 
@@ -52,15 +50,10 @@ export function ModuleCalibrationOverflowMenu({
     onClickOutside: () => setShowOverflowMenu(false),
   })
 
-  const attachedPipettes = useAttachedPipettes()
-  const missingPipettes =
-    attachedPipettes.left == null && attachedPipettes.right == null
-  const attachedPipetteCalibrations = useAttachedPipetteCalibrations()
-  const missingPipetteCalibrations =
-    attachedPipetteCalibrations?.left?.offset?.lastModified == null ||
-    attachedPipetteCalibrations?.right?.offset?.lastModified == null
   const requiredAttachOrCalibratePipette =
-    missingPipettes || missingPipetteCalibrations
+    formattedPipetteOffsetCalibrations.length === 0 ||
+    (formattedPipetteOffsetCalibrations[0].lastCalibrated == null &&
+      formattedPipetteOffsetCalibrations[1].lastCalibrated == null)
 
   const handleCalibration = (): void => {
     setShowOverflowMenu(false)
@@ -84,7 +77,6 @@ export function ModuleCalibrationOverflowMenu({
         alignSelf={ALIGN_FLEX_END}
         aria-label="ModuleCalibrationOverflowMenu"
         onClick={handleOverflowClick}
-        disabled={isRunning || requiredAttachOrCalibratePipette}
       />
       {showModuleWizard ? (
         <ModuleWizardFlows
@@ -107,7 +99,10 @@ export function ModuleCalibrationOverflowMenu({
           right="0"
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={handleCalibration}>
+          <MenuItem
+            onClick={handleCalibration}
+            disabled={isRunning || requiredAttachOrCalibratePipette}
+          >
             {isCalibrated ? t('recalibrate_module') : t('calibrate_module')}
           </MenuItem>
           {isCalibrated ? (
