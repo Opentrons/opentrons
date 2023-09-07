@@ -19,7 +19,6 @@ const initialFlags: Flags = {
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
-  OT_PD_ENABLE_OT_3: process.env.OT_PD_ENABLE_OT_3 === '1' || false,
   OT_PD_ALLOW_ALL_TIPRACKS:
     process.env.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
 }
