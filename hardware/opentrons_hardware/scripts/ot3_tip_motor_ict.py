@@ -67,7 +67,8 @@ async def move_tip_motor(messenger: CanMessenger, node, distance, velocity):
                                                         velocity)),
                         velocity_mm_sec=float64(velocity),
                         action=PipetteTipActionType.clamp,
-                        acceleration_mm_sec_sq=float64(0)
+                        acceleration_mm_sec_sq=float64(0),
+                        stop_condition=MoveStopCondition.none,
                     )
                 }
             ]
