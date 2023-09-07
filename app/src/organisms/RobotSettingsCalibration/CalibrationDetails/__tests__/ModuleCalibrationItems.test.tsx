@@ -70,6 +70,7 @@ describe('ModuleCalibrationItems', () => {
     props = {
       attachedModules: mockFetchModulesSuccessActionPayloadModules,
       updateRobotStatus: jest.fn(),
+      formattedPipetteOffsetCalibrations: [],
     }
     mockModuleCalibrationOverflowMenu.mockReturnValue(
       <div>mock ModuleCalibrationOverflowMenu</div>

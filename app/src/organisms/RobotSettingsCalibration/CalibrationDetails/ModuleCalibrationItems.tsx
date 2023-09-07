@@ -10,15 +10,18 @@ import { formatLastCalibrated } from './utils'
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
 
 import type { AttachedModule } from '@opentrons/api-client'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 interface ModuleCalibrationItemsProps {
   attachedModules: AttachedModule[]
   updateRobotStatus: (isRobotBusy: boolean) => void
+  formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
 }
 
 export function ModuleCalibrationItems({
   attachedModules,
   updateRobotStatus,
+  formattedPipetteOffsetCalibrations,
 }: ModuleCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -58,6 +61,9 @@ export function ModuleCalibrationItems({
                 }
                 attachedModule={attachedModule}
                 updateRobotStatus={updateRobotStatus}
+                formattedPipetteOffsetCalibrations={
+                  formattedPipetteOffsetCalibrations
+                }
               />
             </StyledTableCell>
           </StyledTableRow>
