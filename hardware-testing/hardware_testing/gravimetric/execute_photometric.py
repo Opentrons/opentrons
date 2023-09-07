@@ -69,11 +69,11 @@ def _next_tip(
     return resources.tips[0][0]
 
 
-def get_res_well_name(cfg: config.PhotometricConfig) -> str:
+def _get_res_well_name(cfg: config.PhotometricConfig) -> str:
     return f"A{cfg.dye_well_column_offset}"
 
 
-def get_photo_plate_dest(cfg: config.PhotometricConfig, trial: int) -> str:
+def _get_photo_plate_dest(cfg: config.PhotometricConfig, trial: int) -> str:
     if cfg.pipette_channels == 96:
         return "A1"
     else:
@@ -196,10 +196,10 @@ def _run_trial(trial: PhotometricTrial) -> None:
         for w in trial.dest.wells():
             trial.liquid_tracker.set_start_volume(w, photoplate_preped_vol)
         trial.pipette.move_to(
-            trial.dest[get_photo_plate_dest(trial.cfg, trial.trial)].top()
+            trial.dest[_get_photo_plate_dest(trial.cfg, trial.trial)].top()
         )
         ui.print_info(
-            f"dispensing to {trial.dest[get_photo_plate_dest(trial.cfg, trial.trial)]}"
+            f"dispensing to {trial.dest[_get_photo_plate_dest(trial.cfg, trial.trial)]}"
         )
         # RUN DISPENSE
         dispense_with_liquid_class(
@@ -207,7 +207,7 @@ def _run_trial(trial: PhotometricTrial) -> None:
             trial.pipette,
             trial.tip_volume,
             volume_to_dispense,
-            trial.dest[get_photo_plate_dest(trial.cfg, trial.trial)],
+            trial.dest[_get_photo_plate_dest(trial.cfg, trial.trial)],
             Point(),
             channel_count,
             trial.liquid_tracker,
@@ -269,7 +269,8 @@ def _display_dye_information(
                 if not resources.ctx.is_simulating():
                     dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
-                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg} in well A{cfg.dye_well_column_offset}"'
+                        f"add {_ul_to_ml(reservoir_ul)} mL of DYE type {dye_msg} "
+                        "in well A{cfg.dye_well_column_offset}"
                     )
 
 
@@ -436,14 +437,14 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
 
     _display_dye_information(cfg, resources)
     _find_liquid_height(
-        cfg, resources, liquid_tracker, reservoir[get_res_well_name(cfg)]
+        cfg, resources, liquid_tracker, reservoir[_get_res_well_name(cfg)]
     )
 
     trials = build_photometric_trials(
         resources.ctx,
         resources.test_report,
         resources.pipette,
-        reservoir[get_res_well_name(cfg)],
+        reservoir[_get_res_well_name(cfg)],
         photoplate,
         resources.test_volumes,
         liquid_tracker,

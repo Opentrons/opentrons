@@ -238,7 +238,8 @@ def _take_photos(trial: GravimetricTrial, stage_str: str) -> None:
     else:
         cameras = glob.glob("/dev/video*")
     for camera in cameras:
-        cam_pic_name = f"camera{camera[-1]}_channel{trial.channel}_volume{trial.volume}_trial{trial.trial}_{stage_str}.jpg"
+        cam_pic_name = f"camera{camera[-1]}_channel{trial.channel}_volume{trial.volume}"
+        cam_pic_name += f"_trial{trial.trial}_{stage_str}.jpg"
         if trial.ctx.is_simulating():
             cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
         cam_pic_path = (
