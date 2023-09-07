@@ -407,18 +407,18 @@ Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specif
 Homing
 ------
 
-Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. Homing methods include :py:meth:`.ProtocolContext.home`, :py:meth:`.InstrumentContext.home` and :py:meth:`.InstrumentContext.home_plunger`. These methods home the gantry, home the mounted pipette and plunger, and home the pipette plunger, respectively. These functions take no arguments.
+Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. With the available homing methods you can home the gantry, home the mounted pipette and plunger, and home the pipette plunger. These functions take no arguments.
 
-This example homes the gantry::
+To home the gantry, call :py:meth:`.ProtocolContext.home`::
 
     protocol.home()
 
-To home a specific pipette's Z axis and plunger, you can call :py:meth:`~.InstrumentContext.home`::
+To home a specific pipette's Z axis and plunger, call :py:meth:`.InstrumentContext.home`::
 
     pipette = protocol.load_instrument('flex_1channel_1000', 'right')
     pipette.home()
 
-To home a specific pipette's plunger only, you can call :py:meth:`~.InstrumentContext.home_plunger`::
+To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentContext.home_plunger`::
 
     pipette = protocol.load_instrument('flex_1channel_1000', 'right')
     pipette.home_plunger()
@@ -453,7 +453,6 @@ You can also check whether the rail lights are on or off in the protocol by usin
 
 .. versionadded:: 2.5
 
-.. TODO clarify that this is specific to OT-2 (Flex always pauses when door open) or remove this section if OT-2 will also always pause in the future
 
 OT-2 Door Safety Switch
 -----------------------
