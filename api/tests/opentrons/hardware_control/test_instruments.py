@@ -374,7 +374,7 @@ async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instru
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
-async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
+async def test_aspirate_ot3_50(dummy_instruments_ot3, ot3_api_obj):
     hw_api = await ot3_api_obj(
         attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
     )
@@ -391,6 +391,61 @@ async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
     new_plunger_pos = 71.1968
     pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
+
+
+async def test_aspirate_ot3_1000(dummy_instruments_ot3, ot3_api_obj):
+    hw_api = await ot3_api_obj(
+        attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
+    )
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+
+    hw_api.set_working_volume(mount, 1000)
+    aspirate_ul = 3.0
+    aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
+    new_plunger_pos = 71.2122
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(new_plunger_pos)
+
+
+async def test_configure_ot3(ot3_api_obj):
+    instrs = {
+        types.Mount.LEFT: {
+            "model": "p50_multi_v3.3",
+            "id": "testy",
+            "name": "p50_multi_gen3",
+        },
+        types.Mount.RIGHT: {"model": None, "id": None, "name": None},
+        OT3Mount.GRIPPER: None,
+    }
+    hw_api = await ot3_api_obj(attached_instruments=instrs)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, 50)
+    await hw_api.set_liquid_class(mount, "default")
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(71.5)
+    assert hw_api._pipette_handler.get_pipette(OT3Mount.LEFT).push_out_volume == 2
+
+    await hw_api.set_liquid_class(mount, "lowVolumeDefault")
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(57.0)
+    assert hw_api._pipette_handler.get_pipette(OT3Mount.LEFT).push_out_volume == 7
+
+    await hw_api.set_liquid_class(mount, "default")
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(71.5)
 
 
 async def test_dispense_ot2(dummy_instruments):

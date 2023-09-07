@@ -21,6 +21,11 @@ from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
     types as pip_types,
 )
+from opentrons_shared_data.errors.exceptions import (
+    InvalidLiquidClassName,
+    CommandPreconditionViolated,
+)
+
 
 from opentrons.types import Point, Mount
 from opentrons.config import robot_configs, feature_flags as ff
@@ -562,6 +567,17 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             }
         )
         return self._config_as_dict
+
+    def set_liquid_class_by_name(self, class_name: str) -> None:
+        """Change the currently active liquid class."""
+        if self.current_volume > 0:
+            raise CommandPreconditionViolated(
+                "Cannot switch liquid classes when liquid is in the tip"
+            )
+        if class_name != "default":
+            raise InvalidLiquidClassName(
+                message=f"Liquid class {class_name} is not valid for {self._config.display_name}"
+            )
 
 
 def _reload_and_check_skip(

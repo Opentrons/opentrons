@@ -716,6 +716,21 @@ class InvalidInstrumentData(RoboticsInteractionError):
         super().__init__(ErrorCodes.INVALID_INSTRUMENT_DATA, message, detail, wrapping)
 
 
+class InvalidLiquidClassName(RoboticsInteractionError):
+    """An error indicating that a liquid class name does not exist on a pipette."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidLiquidClassName."""
+        super().__init__(
+            ErrorCodes.INVALID_LIQUID_CLASS_NAME, message, detail, wrapping
+        )
+
+
 class APIRemoved(GeneralError):
     """An error indicating that a specific API is no longer available."""
 

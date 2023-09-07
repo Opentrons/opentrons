@@ -166,6 +166,10 @@
       "detail": "Invalid Instrument Data",
       "category": "roboticsInteractionError"
     },
+    "3017": {
+      "detail": "Invalid Liquid Class Name",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
