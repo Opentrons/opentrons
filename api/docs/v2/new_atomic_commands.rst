@@ -99,7 +99,7 @@ To return a tip to its original location, call the :py:meth:`~.InstrumentContext
 
     pipette.return_tip()
 
-
+Working With Used Tips
 ----------------------
 
 Currently, the API considers tips as "used" after being picked up. For example, if the robot picked up a tip from rack location A1 and then returned it to the same location, it will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example::
