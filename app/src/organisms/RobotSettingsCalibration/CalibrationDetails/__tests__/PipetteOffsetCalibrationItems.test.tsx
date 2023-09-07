@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { renderWithProviders, Mount } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import {
@@ -17,6 +17,7 @@ import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 import { formatLastCalibrated } from '../utils'
 
+import type { Mount } from '@opentrons/components'
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 const render = (
