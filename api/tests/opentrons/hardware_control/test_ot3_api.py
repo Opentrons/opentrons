@@ -1696,7 +1696,7 @@ async def test_tip_presence_disabled_ninety_six_channel(
     with patch.object(
         ot3_hardware.managed_obj._backend,
         "check_for_tip_presence",
-        AsyncMock(spec=ot3_hardware.managed_obj._backend.check_for_tip_presence()),
+        AsyncMock(spec=ot3_hardware.managed_obj._backend.check_for_tip_presence),
     ) as tip_present:
         pipette_config = load_pipette_data.load_definition(
             PipetteModelType("p1000"),

@@ -650,5 +650,5 @@ class UnmatchedTipStates(RuntimeError):
     def __init__(self) -> None:
         """Iniitialize FailedTipStateCheck error."""
         super().__init__(
-            f"Received two differing tip presence statuses. Pickup motor may need to be homed."
+            "Received two differing tip presence statuses. Pickup motor may need to be homed."
         )
