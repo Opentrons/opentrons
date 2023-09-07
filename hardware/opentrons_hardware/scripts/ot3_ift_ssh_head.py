@@ -138,11 +138,12 @@ async def move_for_tip_motor(messenger: CanMessenger, node, position,xy,args) ->
     speed = 10
     res = {node: (0,0,0)}
     current = args.current
-    await set_pipette_current(messenger,current,node)
+    #await set_pipette_current(messenger,current,node)
     try:
         await move_tip_motor(messenger, node, step, speed)
         print("MOVETIPMOTOR=Pass")
-    except:
+    except Exception as errval:
+        print("errvalmovemotor:",errval)
         print("MOVETIPMOTOR=Fail")
 async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> None:
     step_size = [0.1, 0.5, 1,5,10, 20, 50]
@@ -321,11 +322,12 @@ async def home_tip_motor(messenger, node, args):
 
     current = args.current
     try:
-        await set_pipette_current(messenger,current,node)
+        #await set_pipette_current(messenger,current,node)
         await home_runner.run(can_messenger = messenger)
-        print("MOVEHOME=Pass")
-    except:
-        print("MOVEHOME=Failed")
+        print("MOVETIPMOTORHOME=Pass")
+    except Exception as ree:
+        print("err:",ree)
+        print("MOVETIPMOTORHOME=Failed")
 
 
 async def move_tip_motor(messenger: CanMessenger, node, distance, velocity):
@@ -450,9 +452,9 @@ async def read_epprom_head(
         while True:
             with WaitableCallback(can_messenger) as wc:
                 message, arb = await asyncio.wait_for(wc.read(), 1.0)
-                # aaaaa = message.payload.data.value
-                # print(aaaaa)
-                #str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
+                aaaaa = message.payload.data.value
+                print(aaaaa)
+                str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
                 eppdata = str(message.payload.data.value.decode('ascii').rstrip('\x00'))
                 return eppdata
     except Exception as errval:
