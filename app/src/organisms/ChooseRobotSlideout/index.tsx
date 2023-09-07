@@ -222,32 +222,34 @@ export function ChooseRobotSlideout(
             const isSelected =
               selectedRobot != null && selectedRobot.ip === robot.ip
             return (
-              <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
-                <AvailableRobotOption
-                  key={robot.ip}
-                  robot={robot}
-                  // TODO: generalize to a disabled/reset prop
-                  onClick={() => {
-                    if (!isCreatingRun) {
-                      resetCreateRun?.()
-                      setSelectedRobot(robot)
+              <>
+                <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
+                  <AvailableRobotOption
+                    key={robot.ip}
+                    robot={robot}
+                    // TODO: generalize to a disabled/reset prop
+                    onClick={() => {
+                      if (!isCreatingRun) {
+                        resetCreateRun?.()
+                        setSelectedRobot(robot)
+                      }
+                    }}
+                    isError={runCreationError != null}
+                    isSelected={isSelected}
+                    isOnDifferentSoftwareVersion={
+                      isSelectedRobotOnWrongVersionOfSoftware
                     }
-                  }}
-                  isError={runCreationError != null}
-                  isSelected={isSelected}
-                  isOnDifferentSoftwareVersion={
-                    isSelectedRobotOnWrongVersionOfSoftware
-                  }
-                  showIdleOnly={showIdleOnly}
-                  registerRobotBusyStatus={registerRobotBusyStatus}
-                />
+                    showIdleOnly={showIdleOnly}
+                    registerRobotBusyStatus={registerRobotBusyStatus}
+                  />
+                </Flex>
                 {runCreationError != null && isSelected && (
                   <StyledText
                     as="label"
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
-                    marginTop={`-${SPACING.spacing4}`}
+                    marginTop={`-${SPACING.spacing8}`}
                     marginBottom={SPACING.spacing8}
                   >
                     {runCreationErrorCode === 409 ? (
@@ -271,7 +273,7 @@ export function ChooseRobotSlideout(
                     )}
                   </StyledText>
                 )}
-              </Flex>
+              </>
             )
           })
         )}
