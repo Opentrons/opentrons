@@ -71,6 +71,7 @@ class ErrorCodes(Enum):
     INVALID_ACTUATOR = _code_from_dict_entry("3014")
     MODULE_NOT_PRESENT = _code_from_dict_entry("3015")
     INVALID_INSTRUMENT_DATA = _code_from_dict_entry("3016")
+    INVALID_LIQUID_CLASS_NAME = _code_from_dict_entry("3017")
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")

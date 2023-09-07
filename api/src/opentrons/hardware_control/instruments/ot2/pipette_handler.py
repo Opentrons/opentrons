@@ -975,6 +975,10 @@ class PipetteHandlerProvider(Generic[MountType]):
             )
         return pip
 
+    async def set_liquid_class(self, mount: MountType, liquid_class: str) -> None:
+        pip = self.get_pipette(mount)
+        pip.set_liquid_class_by_name(liquid_class)
+
 
 class OT3PipetteHandler(PipetteHandlerProvider[OT3Mount]):
     """Override for correct plunger_position."""
