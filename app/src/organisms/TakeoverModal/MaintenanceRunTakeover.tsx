@@ -37,11 +37,7 @@ export function MaintenanceRunTakeoverModal(
   const desktopMaintenanceRunInProgress =
     isMaintenanceRunCurrent && oddRunId !== currentRunId
 
-  const {
-    deleteMaintenanceRun,
-    status,
-    reset,
-  } = useDeleteMaintenanceRunMutation()
+  const { deleteMaintenanceRun, reset } = useDeleteMaintenanceRunMutation()
 
   const handleCloseAndTerminate = (): void => {
     if (currentRunId != null) {
@@ -51,12 +47,12 @@ export function MaintenanceRunTakeoverModal(
   }
 
   React.useEffect(() => {
-    if (currentRunId == null && status === 'success') {
+    if (currentRunId == null) {
       setIsLoading(false)
       setShowConfirmTerminateModal(false)
       reset()
     }
-  }, [currentRunId, status])
+  }, [currentRunId])
 
   return (
     <>
