@@ -4,6 +4,7 @@ from typing import Optional, overload, Union
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import LiquidClasses
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -70,6 +71,15 @@ class LoadedModuleData:
     module_id: str
     serial_number: Optional[str]
     definition: ModuleDefinition
+
+
+@dataclass(frozen=True)
+class LoadedConfigureForVolumeData:
+    """The result of a load liquid class procedure."""
+
+    pipette_id: str
+    serial_number: Optional[str]
+    volume: float
 
 
 class EquipmentHandler:
@@ -328,6 +338,106 @@ class EquipmentHandler:
             module_id=self._model_utils.ensure_id(module_id),
             serial_number=attached_module.serial_number,
             definition=attached_module.definition,
+        )
+
+    async def configure_for_volume(
+        self,
+        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
+        mount: MountType,
+        volume: float,
+        pipette_id: Optional[str],
+    ) -> LoadedConfigureForVolumeData:
+        """Ensure the requested volume can be configured for the given pipette.
+
+        Args:
+            pipette_name: The pipette name.
+            mount: The mount on which pipette must be attached.
+            pipette_id: An optional identifier to assign the pipette. If None, an
+                identifier will be generated.
+            volume: The volume to configure the pipette for
+
+        Returns:
+            A LoadedConfiguredVolumeData object.
+        """
+        # TODO (spp, 2023-05-10): either raise error if using MountType.EXTENSION in
+        #  load pipettes command, or change the mount type used to be a restricted
+        #  PipetteMountType which has only pipette mounts and not the extension mount.
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
+
+        pipette_name_value = (
+            pipette_name.value
+            if isinstance(pipette_name, PipetteNameType)
+            else pipette_name
+        )
+
+        pipette_id = pipette_id or self._model_utils.generate_id()
+
+        if not use_virtual_pipettes:
+            cache_request = {mount.to_hw_mount(): pipette_name_value}
+
+            # TODO(mc, 2022-12-09): putting the other pipette in the cache request
+            # is only to support protocol analysis, since the hardware simulator
+            # does not cache requested virtual instruments. Remove per
+            # https://opentrons.atlassian.net/browse/RLIQ-258
+            other_mount = mount.other_mount()
+            other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
+            if other_pipette is not None:
+                cache_request[other_mount.to_hw_mount()] = (
+                    other_pipette.pipetteName.value
+                    if isinstance(other_pipette.pipetteName, PipetteNameType)
+                    else other_pipette.pipetteName
+                )
+
+            # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
+            # behavior of protocol_context.load_instrument, and is used here as a
+            # pipette existence check
+            try:
+                await self._hardware_api.cache_instruments(cache_request)
+            except RuntimeError as e:
+                raise FailedToLoadPipetteError(str(e)) from e
+
+            pipette_dict = self._hardware_api.get_attached_instrument(
+                mount.to_hw_mount()
+            )
+
+            self._hardware_api.configure_for_volume(mount.to_hw_mount(), volume)
+
+            serial_number = pipette_dict["pipette_id"]
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_dict
+            )
+
+        else:
+            is_p50_flex_pipette = (
+                "p50" in pipette_name_value and "flex" in pipette_name_value
+            )
+            if volume < 5 and is_p50_flex_pipette:
+                liquid_class = LiquidClasses.lowVolumeDefault
+            else:
+                liquid_class = LiquidClasses.default
+            serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
+            static_pipette_config = (
+                pipette_data_provider.get_virtual_pipette_static_config(
+                    pipette_name_value, liquid_class=liquid_class
+                )
+            )
+
+        # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
+        # see if additional config data like this can be returned from the command impl
+        # alongside, but outside of, the command result.
+        # this pattern could potentially improve `loadLabware` and `loadModule`, too
+        self._action_dispatcher.dispatch(
+            AddPipetteConfigAction(
+                pipette_id=pipette_id,
+                serial_number=serial_number,
+                config=static_pipette_config,
+            )
+        )
+
+        return LoadedConfigureForVolumeData(
+            pipette_id=pipette_id,
+            serial_number=serial_number,
+            volume=volume,
         )
 
     @overload

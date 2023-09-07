@@ -256,6 +256,14 @@ from .retract_axis import (
     RetractAxisCommandType,
 )
 
+from .configure_for_volume import (
+    ConfigureForVolume,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeResult,
+    ConfigureForVolumeCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -444,4 +452,10 @@ __all__ = [
     "thermocycler",
     # calibration command bundle
     "calibration",
+    # configure pipette volume command bundle
+    "ConfigureForVolume",
+    "ConfigureForVolumeCreate",
+    "ConfigureForVolumeParams",
+    "ConfigureForVolumeResult",
+    "ConfigureForVolumeCommandType",
 ]
