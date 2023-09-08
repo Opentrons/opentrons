@@ -1,5 +1,5 @@
 {
-  "adapter_in_mod_in_slot": "{{adapter}} in {{module}} in {{slot}}",
+  "adapter_in_mod_in_slot": "{{adapter}} on {{module}} in {{slot}}",
   "adapter_in_slot": "{{adapter}} in {{slot}}",
   "aspirate": "Aspirating {{volume}} µL from well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
   "blowout": "Blowing out at well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
@@ -36,7 +36,7 @@
   "pause_on": "Pause on {{robot_name}}",
   "pause": "Pause",
   "pickup_tip": "Picking up tip from {{well_name}} of {{labware}} in {{labware_location}}",
-  "return_tip": "Returning tip in {{well_name}} of {{labware}} in {{labware_location}}",
+  "return_tip": "Returning tip to {{well_name}} of {{labware}} in {{labware_location}}",
   "save_position": "Saving position",
   "set_and_await_hs_shake": "Setting Heater-Shaker to shake at {{rpm}} rpm and waiting until reached",
   "setting_hs_temp": "Setting Target Temperature of Heater-Shaker to {{temp}}",

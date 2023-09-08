@@ -130,7 +130,7 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )[0]
     getByText(
-      'Returning tip in A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1'
+      'Returning tip to A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1'
     )
   })
   it('renders correct text for pickUpTip', () => {
