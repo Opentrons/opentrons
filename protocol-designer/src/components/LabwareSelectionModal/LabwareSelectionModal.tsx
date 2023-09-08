@@ -238,10 +238,13 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       defs,
       (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
-        // filter out non-permitted tipracks
+        // filter out non-permitted tipracks +
+        //  temporarily filtering out 96-channel adapter until we support
+        //  96-channel
         if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
+          (category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))) ||
+          def.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
         ) {
           return acc
         }
