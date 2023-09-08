@@ -104,6 +104,7 @@ class PickUpTipSpec:
     shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
     retract_target: float
     pick_up_motor_actions: Optional[TipMotorPickUpTipSpec]
+    check_tip_presence_height: Optional[float] = 0
 
 
 @dataclass(frozen=True)
@@ -125,6 +126,7 @@ class DropTipSpec:
     drop_moves: List[DropTipMove]
     shake_moves: List[Tuple[top_types.Point, Optional[float]]]
     ending_current: Dict[Axis, float]
+    check_tip_presence_height: Optional[float] = 0
 
 
 class OT3PipetteHandler:
@@ -816,6 +818,7 @@ class OT3PipetteHandler:
                 + check_incr * checked_presses
                 + 2,
                 pick_up_motor_actions=None,
+                check_tip_presence_height=instrument.liquid_class.tip_presence_check_height_mm,
             ),
             add_tip_to_instr,
         )
@@ -922,6 +925,7 @@ class OT3PipetteHandler:
                         mount
                     ): instrument.plunger_motor_current.run
                 },
+                check_tip_presence_height=instrument.liquid_class.tip_presence_check_height_mm,
             ),
             _remove_tips,
         )

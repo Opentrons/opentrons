@@ -80,6 +80,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pipette_version = self._config.version
         self._max_channels = self._config.channels
         self._backlash_distance = config.backlash_distance
+        self._tip_presence_check_height = config.tip_presence_check_height_mm
 
         self._liquid_class_name = pip_types.LiquidClasses.default
         self._liquid_class = self._config.liquid_properties[self._liquid_class_name]
