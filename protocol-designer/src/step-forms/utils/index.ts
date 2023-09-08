@@ -113,6 +113,10 @@ export const getSlotIsEmpty = (
   } else if (getSlotIdsBlockedBySpanning(initialDeckSetup).includes(slot)) {
     // if a slot is being blocked by a spanning labware/module (eg thermocycler), it's not empty
     return false
+    //  don't allow duplicating into the trash slot.
+    //  TODO(jr, 8/31/23): delete this when we support moveable trash
+  } else if (slot === '12' || slot === 'A3') {
+    return false
   }
 
   // NOTE: should work for both deck slots and module slots
