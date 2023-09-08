@@ -2,7 +2,6 @@ import * as React from 'react'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
-import { FixedSizeList } from 'react-window'
 
 import {
   RobotWorkSpace,
@@ -55,9 +54,9 @@ export const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-export const VIEWBOX_MIN_X = -64
+export const VIEWBOX_MIN_X = -84
 export const VIEWBOX_MIN_Y = -10
-export const VIEWBOX_WIDTH = 520
+export const VIEWBOX_WIDTH = 600
 export const VIEWBOX_HEIGHT = 460
 
 export function ProtocolTimelineScrubber(
@@ -104,9 +103,7 @@ export function ProtocolTimelineScrubber(
             {({ deckSlotsById }) => (
               <>
                 {map(robotState.modules, (module, moduleId) => {
-                  console.log(robotState.modules)
                   const slot = deckSlotsById[module.slot]
-                  console.log(slot)
                   const labwareInModuleId =
                     Object.entries(robotState.labware).find(
                       ([labwareId, labware]) => labware.slot === moduleId
@@ -215,7 +212,10 @@ export function ProtocolTimelineScrubber(
           invariantContext={invariantContext}
         />
       </Flex>
-      <Flex alignSelf={ALIGN_STRETCH}>
+      <Flex
+      alignSelf={ALIGN_STRETCH}
+      overflowY="scroll"
+      width="100%">
         <ViewportList
           viewportRef={wrapperRef}
           ref={commandListRef}
@@ -244,7 +244,7 @@ export function ProtocolTimelineScrubber(
           const nextIndex = Number(e.target.value) - 1
           setCurrentCommandIndex(nextIndex)
           // const progressOffset = window.innerWidth / 2
-          // commandListRef.current?.scrollToItem(nextIndex, 'center')
+          commandListRef.current?.scrollToIndex(nextIndex)
         }}
       />
       <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -260,10 +260,10 @@ export function ProtocolTimelineScrubber(
         <Text
           as="p"
           fontSize="0.5rem"
-          marginLeft={
-            (currentCommandIndex / (commands.length - 1)) *
-            (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
-          }
+          // marginLeft={
+          //   // (currentCommandIndex / (commands.length - 1)) *
+          //   // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
+          // }
         >
           {currentCommandIndex + 1}
         </Text>

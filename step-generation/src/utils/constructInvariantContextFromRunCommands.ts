@@ -56,6 +56,7 @@ export function constructInvariantContextFromRunCommands(
               )?.result.definition ?? null
             : null
 
+        console.log('load pipette command', command)
         return {
           ...acc,
           pipetteEntities: {

@@ -247,6 +247,7 @@ export function createEmptyLiquidState(
       pipetteEntities,
       (acc, pipette: PipetteEntity, id: string) => {
         const pipetteSpec = pipette.spec
+        console.log('pipetteEntities', pipetteEntities)
         return { ...acc, [id]: createTipLiquidState(pipetteSpec.channels, {}) }
       },
       {}
