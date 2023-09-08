@@ -4,8 +4,14 @@ import uniq from 'lodash/uniq'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
 import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
-import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
+import type {
+  DeckDefinition,
+  LabwareDefinition2,
+  LoadedLabware,
+  ModuleModel,
+  RobotType,
+  ThermalAdapterName,
+} from '../types'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
@@ -19,6 +25,7 @@ export * from './getVectorDifference'
 export * from './getVectorSum'
 export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getOccludedSlotCountForModule'
+export * from './labwareInference'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -51,6 +58,9 @@ const RETIRED_LABWARE = [
   'tipone_96_tiprack_200ul',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
+  // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
+  // https://opentrons.atlassian.net/browse/RLAB-230
+  'armadillo_96_wellplate_200ul_pcr_full_skirt',
 ]
 
 export const getLabwareDisplayName = (
@@ -304,6 +314,24 @@ export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   }
 
   return adapterName
+}
+
+export const getCalibrationAdapterLoadName = (
+  moduleModel: ModuleModel
+): string | null => {
+  switch (moduleModel) {
+    case 'heaterShakerModuleV1':
+      return 'opentrons_calibration_adapter_heatershaker_module'
+    case 'temperatureModuleV2':
+      return 'opentrons_calibration_adapter_temperature_module'
+    case 'thermocyclerModuleV2':
+      return 'opentrons_calibration_adapter_thermocycler_module'
+    default:
+      console.error(
+        `${moduleModel} does not have an associated calibration adapter`
+      )
+      return null
+  }
 }
 
 export const getRobotTypeFromLoadedLabware = (

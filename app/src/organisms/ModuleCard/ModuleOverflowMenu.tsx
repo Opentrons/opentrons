@@ -1,5 +1,8 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
 import { Flex, POSITION_RELATIVE } from '@opentrons/components'
+
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
@@ -17,8 +20,10 @@ interface ModuleOverflowMenuProps {
   handleSlideoutClick: () => void
   handleAboutClick: () => void
   handleTestShakeClick: () => void
-  handleWizardClick: () => void
+  handleInstructionsClick: () => void
+  handleCalibrateClick: () => void
   isLoadedInRun: boolean
+  isPipetteReady: boolean
   robotName: string
   runId?: string
 }
@@ -33,9 +38,13 @@ export const ModuleOverflowMenu = (
     handleSlideoutClick,
     handleAboutClick,
     handleTestShakeClick,
-    handleWizardClick,
+    handleInstructionsClick,
+    handleCalibrateClick,
     isLoadedInRun,
+    isPipetteReady,
   } = props
+
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunStill } = useRunStatuses()
@@ -59,7 +68,7 @@ export const ModuleOverflowMenu = (
     module,
     handleAboutClick,
     handleTestShakeClick,
-    handleWizardClick,
+    handleInstructionsClick,
     handleSlideoutClick,
     isDisabled,
     isIncompatibleWithOT3
@@ -68,14 +77,20 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
+        <MenuItem onClick={handleCalibrateClick} disabled={!isPipetteReady}>
+          {i18n.format(
+            module.moduleOffset?.last_modified != null
+              ? t('recalibrate')
+              : t('calibrate'),
+            'capitalize'
+          )}
+        </MenuItem>
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
               <React.Fragment key={`${index}_${String(module.moduleType)}`}>
                 <MenuItem
-                  key={`${index}_${String(module.moduleModel)}`}
                   onClick={() => item.onClick(item.isSecondary)}
-                  data-testid={`module_setting_${String(module.moduleModel)}`}
                   disabled={item.disabledReason || isDisabled}
                   whiteSpace="nowrap"
                 >

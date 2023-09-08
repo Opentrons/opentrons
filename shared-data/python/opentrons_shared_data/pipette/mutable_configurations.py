@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import Optional, List, Dict, Any, cast
 
-from .pipette_definition import PipetteConfigurations
+from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
 from .model_constants import (
     MUTABLE_CONFIGS_V1,
     VALID_QUIRKS,
@@ -13,9 +13,15 @@ from .model_constants import (
     _TYPE_LOOKUP,
     _UNITS_LOOKUP,
 )
-from .pipette_load_name_conversions import PipetteModelVersionType
 from .load_data import load_definition, load_serial_lookup_table
-from .types import MutableConfig, Quirks, QuirkConfig, TypeOverrides, OverrideType
+from .types import (
+    MutableConfig,
+    Quirks,
+    QuirkConfig,
+    TypeOverrides,
+    OverrideType,
+    LiquidClasses,
+)
 from .pipette_load_name_conversions import (
     convert_pipette_model,
     convert_to_pipette_name_type,
@@ -31,6 +37,7 @@ log = logging.getLogger(__name__)
 
 PIPETTE_SERIAL_MODEL_LOOKUP = load_serial_lookup_table()
 SERIAL_STUB_REGEX = re.compile(r"P[0-9]{1,3}[KSMHV]{1,2}V[0-9]{2}")
+LIQUID_CLASS = LiquidClasses.default
 
 
 def _migrate_to_v2_configurations(
@@ -43,7 +50,6 @@ def _migrate_to_v2_configurations(
     value of that configuration."""
     quirks_list = []
     dict_of_base_model = base_configurations.dict(by_alias=True)
-
     for c, v in v1_mutable_configs.items():
         if isinstance(v, str):
             # ignore the saved model
@@ -61,17 +67,36 @@ def _migrate_to_v2_configurations(
                 # This is only a concern for OT-2 configs and I think we can
                 # be less smart about handling multiple tip types by updating
                 # all tips.
-                for k in dict_of_base_model[new_names["top_level_name"]].keys():
-                    dict_of_base_model[top_name][k][nested_name] = v.value
+                for k in dict_of_base_model["liquid_properties"][LIQUID_CLASS][
+                    new_names["top_level_name"]
+                ].keys():
+                    dict_of_base_model["liquid_properties"][LIQUID_CLASS][top_name][k][
+                        nested_name
+                    ] = v
+            elif new_names.get("liquid_class") and isinstance(v, MutableConfig):
+                _class = LiquidClasses[new_names["liquid_class"]]
+                dict_of_base_model[top_name][_class][nested_name] = v.value
             elif isinstance(v, MutableConfig):
                 # isinstances are needed for type checking.
                 dict_of_base_model[top_name][nested_name] = v.value
-    dict_of_base_model["quirks"] = quirks_list
+    dict_of_base_model["quirks"] = list(
+        set(dict_of_base_model["quirks"]).union(set(quirks_list))
+    )
 
     # re-serialization is not great for this nested enum so we need
     # to perform this workaround.
-    dict_of_base_model["supportedTips"] = {
-        k.name: v for k, v in dict_of_base_model["supportedTips"].items()
+    dict_of_base_model["liquid_properties"][LIQUID_CLASS]["supportedTips"] = {
+        k.name: v
+        for k, v in dict_of_base_model["liquid_properties"][LIQUID_CLASS][
+            "supportedTips"
+        ].items()
+    }
+    dict_of_base_model["liquid_properties"] = {
+        k.name: v for k, v in dict_of_base_model["liquid_properties"].items()
+    }
+    dict_of_base_model["plungerPositionsConfigurations"] = {
+        k.name: v
+        for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
     }
     return PipetteConfigurations.parse_obj(dict_of_base_model)
 
@@ -130,11 +155,18 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
         # This is only a concern for OT-2 configs and I think we can
         # be less smart about handling multiple tip types. Instead, just
         # get the max tip type.
-        tip_list = list(configs[lookup_dict["top_level_name"]].keys())
+        tip_list = list(
+            configs["liquid_properties"][LIQUID_CLASS][
+                lookup_dict["top_level_name"]
+            ].keys()
+        )
         tip_list.sort(key=lambda o: o.value)
-        default_value = configs[lookup_dict["top_level_name"]][tip_list[-1]][
-            nested_name
-        ]
+        default_value = configs["liquid_properties"][LIQUID_CLASS][
+            lookup_dict["top_level_name"]
+        ][tip_list[-1]][nested_name]
+    elif lookup_dict.get("liquid_class"):
+        _class = LiquidClasses[lookup_dict["liquid_class"]]
+        default_value = configs[lookup_dict["top_level_name"]][_class][nested_name]
     else:
         default_value = configs[lookup_dict["top_level_name"]][nested_name]
     return MutableConfig(
@@ -250,7 +282,6 @@ def load_with_mutable_configurations(
             base_configurations = _migrate_to_v2_configurations(
                 base_configurations, override
             )
-
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
     # are always the last element and, as of right now, the older ones are

@@ -14,6 +14,7 @@ from typing import (
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
@@ -41,7 +42,6 @@ from .core.module import (
     AbstractMagneticBlockCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
-from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
@@ -365,7 +365,9 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_labware(
             load_name=load_name,
@@ -471,7 +473,9 @@ class ProtocolContext(CommandPublisher):
         if isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_adapter(
             load_name=load_name,
@@ -529,18 +533,13 @@ class ProtocolContext(CommandPublisher):
         labware: Labware,
         new_location: Union[DeckLocation, Labware, ModuleTypes, OffDeckType],
         use_gripper: bool = False,
-        use_pick_up_location_lpc_offset: bool = False,
-        use_drop_location_lpc_offset: bool = False,
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
-        """Move a loaded labware to a new location.
+        """Move a loaded labware to a new location. See :ref:`moving-labware` for more details.
 
-        *** This API method is currently being developed. ***
-        *** Expect changes without API level bump.        ***
-
-        :param labware: Labware to move. Should be a labware already loaded
-                        using :py:meth:`load_labware`
+        :param labware: The labware to move. It should be a labware already loaded
+                        using :py:meth:`load_labware`.
 
         :param new_location: Where to move the labware to. This is either:
 
@@ -551,27 +550,23 @@ class ProtocolContext(CommandPublisher):
                   with :py:meth:`load_labware` or :py:meth:`load_adapter`.
                 * The special constant :py:obj:`OFF_DECK`.
 
-        :param use_gripper: Whether to use gripper to perform this move.
-                            If True, will use the gripper to perform the move (OT3 only).
-                            If False, will pause protocol execution to allow the user
-                            to perform a manual move and click resume to continue
-                            protocol execution.
+        :param use_gripper: Whether to use the Flex Gripper for this movement.
 
-        Other experimental params:
+                * If ``True``, will use the gripper to perform an automatic
+                  movement. This will raise an error on an OT-2 protocol.
+                * If ``False``, will pause protocol execution until the user
+                  performs the movement. Protocol execution remains paused until
+                  the user presses **Confirm and resume**.
 
-        :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
-                                                associated with its pick up location.
-        :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
-                                             associated with its drop off location.
-        :param pick_up_offset: Offset to use when picking up labware.
-        :param drop_offset: Offset to use when dropping off labware.
+        Gripper-only parameters:
 
-        Before moving a labware from or to a hardware module, make sure that the labware
-        and its new location is reachable by the gripper. So, thermocycler lid should be
-        open and heater-shaker's labware latch should be open.
+        :param pick_up_offset: Optional x, y, z vector offset to use when picking up labware.
+        :param drop_offset: Optional x, y, z vector offset to use when dropping off labware.
+
+        Before moving a labware to or from a hardware module, make sure that the labware's
+        current and new locations are accessible, i.e., open the Thermocycler lid or
+        open the Heater-Shaker's labware latch.
         """
-        # TODO (spp, 2022-10-31): re-evaluate whether to allow specifying `use_gripper`
-        #  in the args or whether to have it specified in protocol requirements.
 
         if not isinstance(labware, Labware):
             raise ValueError(
@@ -584,7 +579,9 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(new_location, OffDeckType):
             location = new_location
         else:
-            location = validation.ensure_deck_slot(new_location, self._api_version)
+            location = validation.ensure_and_convert_deck_slot(
+                new_location, self._api_version, self._core.robot_type
+            )
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
@@ -600,8 +597,7 @@ class ProtocolContext(CommandPublisher):
             labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
-            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
-            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pause_for_manual_move=True,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
@@ -648,14 +644,18 @@ class ProtocolContext(CommandPublisher):
 
         :type location: str or int or None
         :returns: The loaded and initialized module---a
-                  :py:class:`TemperatureModuleContext`,
-                  :py:class:`MagneticModuleContext`,
-                  :py:class:`ThermocyclerContext`, or
                   :py:class:`HeaterShakerContext`,
+                  :py:class:`MagneticBlockContext`,
+                  :py:class:`MagneticModuleContext`,
+                  :py:class:`TemperatureModuleContext`, or
+                  :py:class:`ThermocyclerContext`,
                   depending on what you requested with ``module_name``.
 
+                  .. versionchanged:: 2.13
+                    Added ``HeaterShakerContext`` return value.
+
                   .. versionchanged:: 2.15
-                    Added :py:class:`MagneticBlockContext` return value.
+                    Added ``MagneticBlockContext`` return value.
         """
         if configuration:
             if self._api_version < APIVersion(2, 4):
@@ -679,7 +679,9 @@ class ProtocolContext(CommandPublisher):
         deck_slot = (
             None
             if location is None
-            else validation.ensure_deck_slot(location, self._api_version)
+            else validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
         )
 
         module_core = self._core.load_module(
@@ -754,14 +756,12 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
+        # TODO (spp: 2023-08-30): disallow loading Flex pipettes on OT-2 by checking robotType
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        is_96_channel = instrument_name == "p1000_96"
-        if is_96_channel and isinstance(self._core, ProtocolEngineCore):
-            checked_instrument_name = instrument_name
-            checked_mount = Mount.LEFT
-        else:
-            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-            checked_mount = validation.ensure_mount(mount)
+        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
+
+        checked_mount = Mount.LEFT if is_96_channel else validation.ensure_mount(mount)
 
         tip_racks = tip_racks or []
 
@@ -780,7 +780,7 @@ class ProtocolContext(CommandPublisher):
         # TODO (tz, 11-22-22): was added to support 96 channel pipette.
         #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._core.load_instrument(
-            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
+            instrument_name=checked_instrument_name,
             mount=checked_mount,
         )
 

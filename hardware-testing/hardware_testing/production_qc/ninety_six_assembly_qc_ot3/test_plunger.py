@@ -11,7 +11,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
+from hardware_testing.opentrons_api.types import Axis, OT3Mount
 
 PLUNGER_MAX_SKIP_MM = 0.1
 SPEEDS_TO_TEST: List[float] = [5, 8, 12, 16, 20]
@@ -45,15 +45,15 @@ async def _is_plunger_still_aligned_with_encoder(
 ) -> Tuple[float, float, bool]:
     enc_pos = await api.encoder_current_position_ot3(OT3Mount.LEFT)
     motor_pos = await api.current_position_ot3(OT3Mount.LEFT)
-    p_enc = enc_pos[OT3Axis.P_L]
-    p_est = motor_pos[OT3Axis.P_L]
+    p_enc = enc_pos[Axis.P_L]
+    p_est = motor_pos[Axis.P_L]
     is_aligned = abs(p_est - p_enc) < PLUNGER_MAX_SKIP_MM
     return p_enc, p_est, is_aligned
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    ax = OT3Axis.P_L
+    ax = Axis.P_L
     mount = OT3Mount.LEFT
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
     default_current = settings.run_current
@@ -115,7 +115,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api, ax, default_max_speed=default_speed
             )
-            await api._backend.set_active_current({OT3Axis.P_L: default_current})
+            await api._backend.set_active_current({Axis.P_L: default_current})
             await api.home([ax])
             if not down_passed or not up_passed and not api.is_simulator:
                 print(f"current {current} failed")

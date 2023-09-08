@@ -12,7 +12,8 @@ _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _RESET_MARKER_FILE_NAME: Final = "_TO_BE_DELETED_ON_REBOOT"
 _RESET_MARKER_FILE_CONTENTS: Final = """\
 This file was placed here by robot-server.
-It tells robot-server to clear this directory on the next boot.
+It tells robot-server to clear this directory on the next boot,
+after which it will delete this file.
 """
 
 

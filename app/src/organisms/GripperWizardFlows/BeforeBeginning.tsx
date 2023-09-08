@@ -2,7 +2,7 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -55,6 +55,7 @@ interface BeforeBeginningProps extends GripperWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
 }
 
 export const BeforeBeginning = (
@@ -68,31 +69,34 @@ export const BeforeBeginning = (
     isRobotMoving,
     chainRunCommands,
     errorMessage,
-    setShowErrorMessage,
+    maintenanceRunId,
+    setErrorMessage,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
 
   const commandsOnProceed: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT,
+        mount: EXTENSION,
       },
     },
   ]
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, false)
+    chainRunCommands?.(commandsOnProceed, false)
       .then(() => {
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setErrorMessage(error.message)
       })
   }
 
@@ -142,7 +146,7 @@ export const BeforeBeginning = (
         />
       }
       proceedButtonText={t('move_gantry_to_front')}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={handleOnClick}
     />
   )

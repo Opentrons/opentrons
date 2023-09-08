@@ -8,6 +8,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
+  Icon,
+  SIZE_1,
+  DIRECTION_ROW,
+  TYPOGRAPHY,
+  Link,
 } from '@opentrons/components'
 
 import { Line } from '../../../atoms/structure'
@@ -20,6 +25,7 @@ import {
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
+  ProtocolCalibrationStatus,
 } from '../hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { SetupLabware } from './SetupLabware'
@@ -28,6 +34,9 @@ import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupModules } from './SetupModules'
 import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
+import { EmptySetupStep } from './EmptySetupStep'
+import { HowLPCWorksModal } from './SetupLabwarePositionCheck/HowLPCWorksModal'
+
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
 const LPC_KEY = 'labware_position_check_step' as const
@@ -52,7 +61,7 @@ export function ProtocolRunSetup({
   robotName,
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -73,28 +82,11 @@ export function ProtocolRunSetup({
 
   React.useEffect(() => {
     let nextStepKeysInOrder = stepsKeysInOrder
-    const showModuleSetup = protocolData != null && modules.length > 0
-    const showLiquidSetup =
-      protocolData != null && protocolData.liquids?.length > 0
 
-    if (showModuleSetup && showLiquidSetup) {
+    if (protocolData != null) {
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
         MODULE_SETUP_KEY,
-        LPC_KEY,
-        LABWARE_SETUP_KEY,
-        LIQUID_SETUP_KEY,
-      ]
-    } else if (showModuleSetup) {
-      nextStepKeysInOrder = [
-        ROBOT_CALIBRATION_STEP_KEY,
-        MODULE_SETUP_KEY,
-        LPC_KEY,
-        LABWARE_SETUP_KEY,
-      ]
-    } else if (showLiquidSetup) {
-      nextStepKeysInOrder = [
-        ROBOT_CALIBRATION_STEP_KEY,
         LPC_KEY,
         LABWARE_SETUP_KEY,
         LIQUID_SETUP_KEY,
@@ -104,6 +96,8 @@ export function ProtocolRunSetup({
   }, [Boolean(protocolData), protocolData?.commands])
 
   if (robot == null) return null
+  const hasLiquids = protocolData != null && protocolData.liquids?.length > 0
+  const hasModules = protocolData != null && modules.length > 0
 
   const StepDetailMap: Record<
     StepKey,
@@ -138,9 +132,11 @@ export function ProtocolRunSetup({
           runId={runId}
         />
       ),
-      description: t(`${MODULE_SETUP_KEY}_description`, {
-        count: modules.length,
-      }),
+      description: !hasModules
+        ? i18n.format(t('no_modules_specified'), 'capitalize')
+        : t(`${MODULE_SETUP_KEY}_description`, {
+            count: modules.length,
+          }),
     },
     [LPC_KEY]: {
       stepInternals: (
@@ -176,7 +172,9 @@ export function ProtocolRunSetup({
           runId={runId}
         />
       ),
-      description: t(`${LIQUID_SETUP_KEY}_description`),
+      description: hasLiquids
+        ? t(`${LIQUID_SETUP_KEY}_description`)
+        : i18n.format(t('liquids_not_in_the_protocol'), 'capitalize'),
     },
   }
 
@@ -198,24 +196,33 @@ export function ProtocolRunSetup({
           ) : (
             stepsKeysInOrder.map((stepKey, index) => (
               <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
-                <SetupStep
-                  expanded={stepKey === expandedStepKey}
-                  label={t('step', { index: index + 1 })}
-                  title={t(`${stepKey}_title`)}
-                  description={StepDetailMap[stepKey].description}
-                  toggleExpanded={() =>
-                    stepKey === expandedStepKey
-                      ? setExpandedStepKey(null)
-                      : setExpandedStepKey(stepKey)
-                  }
-                  calibrationStatusComplete={
-                    stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted
-                      ? calibrationStatus.complete
-                      : null
-                  }
-                >
-                  {StepDetailMap[stepKey].stepInternals}
-                </SetupStep>
+                {(stepKey === 'liquid_setup_step' && !hasLiquids) ||
+                (stepKey === 'module_setup_step' && !hasModules) ? (
+                  <EmptySetupStep
+                    title={t(`${stepKey}_title`)}
+                    description={StepDetailMap[stepKey].description}
+                    label={t('step', { index: index + 1 })}
+                  />
+                ) : (
+                  <SetupStep
+                    expanded={stepKey === expandedStepKey}
+                    label={t('step', { index: index + 1 })}
+                    title={t(`${stepKey}_title`)}
+                    description={StepDetailMap[stepKey].description}
+                    toggleExpanded={() =>
+                      stepKey === expandedStepKey
+                        ? setExpandedStepKey(null)
+                        : setExpandedStepKey(stepKey)
+                    }
+                    rightElement={
+                      <StepRightElement
+                        {...{ stepKey, runHasStarted, calibrationStatus }}
+                      />
+                    }
+                  >
+                    {StepDetailMap[stepKey].stepInternals}
+                  </SetupStep>
+                )}
                 {index !== stepsKeysInOrder.length - 1 ? (
                   <Line marginTop={SPACING.spacing24} />
                 ) : null}
@@ -229,5 +236,72 @@ export function ProtocolRunSetup({
         </StyledText>
       )}
     </Flex>
+  )
+}
+
+interface StepRightElementProps {
+  stepKey: StepKey
+  calibrationStatus: ProtocolCalibrationStatus
+  runHasStarted: boolean
+}
+function StepRightElement(props: StepRightElementProps): JSX.Element | null {
+  const { stepKey, calibrationStatus, runHasStarted } = props
+  const { t } = useTranslation('protocol_setup')
+
+  if (stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted) {
+    return (
+      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Icon
+          size={SIZE_1}
+          color={
+            calibrationStatus.complete
+              ? COLORS.successEnabled
+              : COLORS.warningEnabled
+          }
+          marginRight={SPACING.spacing8}
+          name={calibrationStatus.complete ? 'ot-check' : 'alert-circle'}
+          id="RunSetupCard_calibrationIcon"
+        />
+        <StyledText
+          color={COLORS.black}
+          css={TYPOGRAPHY.pSemiBold}
+          marginRight={SPACING.spacing16}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          id="RunSetupCard_calibrationText"
+        >
+          {calibrationStatus.complete
+            ? t('calibration_ready')
+            : t('calibration_needed')}
+        </StyledText>
+      </Flex>
+    )
+  } else if (stepKey === LPC_KEY) {
+    return <LearnAboutLPC />
+  } else {
+    return null
+  }
+}
+
+function LearnAboutLPC(): JSX.Element {
+  const { t } = useTranslation('protocol_setup')
+  const [showLPCHelpModal, setShowLPCHelpModal] = React.useState(false)
+  return (
+    <>
+      <Link
+        css={TYPOGRAPHY.linkPSemiBold}
+        marginRight={SPACING.spacing16}
+        onClick={e => {
+          // clicking link shouldn't toggle step expanded state
+          e.preventDefault()
+          e.stopPropagation()
+          setShowLPCHelpModal(true)
+        }}
+      >
+        {t('learn_how_it_works')}
+      </Link>
+      {showLPCHelpModal ? (
+        <HowLPCWorksModal onCloseClick={() => setShowLPCHelpModal(false)} />
+      ) : null}
+    </>
   )
 }

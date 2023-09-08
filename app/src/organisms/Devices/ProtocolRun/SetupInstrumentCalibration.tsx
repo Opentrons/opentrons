@@ -11,8 +11,13 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
-import { useRunPipetteInfoByMount, useStoredProtocolAnalysis } from '../hooks'
+import {
+  useRunPipetteInfoByMount,
+  useStoredProtocolAnalysis,
+  useIsOT3,
+} from '../hooks'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
+import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -21,6 +26,7 @@ import { isGripperInCommands } from '../../../resources/protocols/utils'
 import type { GripperData } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
+const EQUIPMENT_POLL_MS = 5000
 interface SetupInstrumentCalibrationProps {
   robotName: string
   runId: string
@@ -32,8 +38,12 @@ export function SetupInstrumentCalibration({
 }: SetupInstrumentCalibrationProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
+  const isOT3 = useIsOT3(robotName)
 
-  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery()
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    enabled: isOT3,
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const usesGripper = isGripperInCommands(
@@ -55,16 +65,29 @@ export function SetupInstrumentCalibration({
       </StyledText>
       {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
         const pipetteInfo = runPipetteInfoByMount[mount]
-        return pipetteInfo != null ? (
-          <SetupPipetteCalibrationItem
-            key={index}
-            pipetteInfo={pipetteInfo}
-            mount={mount}
-            robotName={robotName}
-            runId={runId}
-            instrumentsRefetch={refetch}
-          />
-        ) : null
+        if (pipetteInfo != null && !isOT3) {
+          return (
+            <SetupPipetteCalibrationItem
+              key={index}
+              pipetteInfo={pipetteInfo}
+              mount={mount}
+              robotName={robotName}
+              runId={runId}
+              instrumentsRefetch={refetch}
+            />
+          )
+        } else if (isOT3) {
+          return (
+            <SetupFlexPipetteCalibrationItem
+              key={index}
+              mount={mount}
+              runId={runId}
+              instrumentsRefetch={refetch}
+            />
+          )
+        } else {
+          return null
+        }
       })}
       {usesGripper ? (
         <SetupGripperCalibrationItem

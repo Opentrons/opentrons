@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { StyleProps, Svg } from '../../primitives'
-import { DeckFromData } from './DeckFromData'
+import { StyledDeck } from './StyledDeck'
 
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
+import type { TrashSlotName } from './FlexTrash'
 
 export interface RobotWorkSpaceRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }
@@ -16,7 +17,10 @@ export interface RobotWorkSpaceProps extends StyleProps {
   deckDef?: DeckDefinition
   viewBox?: string | null
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
+  deckFill?: string
   deckLayerBlocklist?: string[]
+  trashSlotName?: TrashSlotName
+  trashColor?: string
   id?: string
 }
 
@@ -26,8 +30,11 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
   const {
     children,
     deckDef,
+    deckFill = '#CCCCCC',
     deckLayerBlocklist = [],
+    trashSlotName,
     viewBox,
+    trashColor,
     id,
     ...styleProps
   } = props
@@ -73,7 +80,13 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       {...styleProps}
     >
       {deckDef != null && (
-        <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
+        <StyledDeck
+          deckFill={deckFill}
+          def={deckDef}
+          layerBlocklist={deckLayerBlocklist}
+          trashSlotName={trashSlotName}
+          trashColor={trashColor}
+        />
       )}
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
     </Svg>

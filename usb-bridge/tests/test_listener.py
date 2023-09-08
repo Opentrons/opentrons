@@ -5,8 +5,10 @@ import mock
 
 import select
 import serial  # type: ignore[import]
+from queue import Queue
 
 from ot3usb import usb_config, tcp_conn, usb_monitor, listener
+from ot3usb.serial_thread import QUEUE_TYPE
 
 FAKE_HANDLE = "Handle Placeholder"
 
@@ -25,6 +27,11 @@ def monitor_mock() -> mock.MagicMock:
 
 def serial_mock() -> mock.MagicMock:
     return mock.MagicMock(serial.Serial)
+
+
+@pytest.fixture
+def worker_queue() -> QUEUE_TYPE:
+    return Queue(0)
 
 
 def test_update_ser_handle() -> None:
@@ -75,13 +82,14 @@ SER_DATA = b"abcd"
 TCP_DATA = b"efgh"
 
 
-def test_listen(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_listen(monkeypatch: pytest.MonkeyPatch, worker_queue: QUEUE_TYPE) -> None:
     monitor = monitor_mock()
     config = config_mock()
     tcp = tcp_mock()
     ser = serial_mock()
 
     ser.read_all.return_value = SER_DATA
+    ser.write.return_value = len(TCP_DATA)
     tcp.read.return_value = TCP_DATA
 
     tcp.connected.return_value = False
@@ -94,7 +102,7 @@ def test_listen(monkeypatch: pytest.MonkeyPatch) -> None:
 
     # No message ready, monitor disconnected
     monitor.host_connected.return_value = False
-    assert listener.listen(monitor, config, None, tcp) is None
+    assert listener.listen(monitor, config, None, tcp, worker_queue) is None
     monitor.update_state.assert_called_once()
     select_mock.assert_called_with([monitor], [], [], TIMEOUT)
     select_mock.reset_mock()
@@ -103,7 +111,7 @@ def test_listen(monkeypatch: pytest.MonkeyPatch) -> None:
     # Monitor has a message and is connected
     monitor.host_connected.return_value = True
     select_mock.return_value = ([monitor], None, None)
-    assert listener.listen(monitor, config, None, tcp) is not None
+    assert listener.listen(monitor, config, None, tcp, worker_queue) is not None
     # Monitor should be manually updated
     monitor.update_state.assert_not_called()
     select_mock.assert_called_with([monitor], [], [], TIMEOUT)
@@ -116,7 +124,7 @@ def test_listen(monkeypatch: pytest.MonkeyPatch) -> None:
     select_mock.return_value = ([], None, None)
     tcp.connected.return_value = True
     monitor.host_connected.return_value = True
-    assert listener.listen(monitor, config, ser, tcp) == ser
+    assert listener.listen(monitor, config, ser, tcp, worker_queue) == ser
     select_mock.assert_called_with([monitor, ser, tcp], [], [], TIMEOUT)
     select_mock.reset_mock()
     monitor.reset_mock()
@@ -125,12 +133,13 @@ def test_listen(monkeypatch: pytest.MonkeyPatch) -> None:
     select_mock.return_value = ([ser, tcp], None, None)
     tcp.connected.return_value = True
     monitor.host_connected.return_value = True
-    assert listener.listen(monitor, config, ser, tcp) == ser
+    assert listener.listen(monitor, config, ser, tcp, worker_queue) == ser
     select_mock.assert_called_with([monitor, ser, tcp], [], [], TIMEOUT)
     ser.read_all.assert_called_once()
     tcp.send.assert_called_with(SER_DATA)
     tcp.read.assert_called_once()
-    ser.write.assert_called_with(TCP_DATA)
+    assert not worker_queue.empty()
+    assert worker_queue.get() == (ser, TCP_DATA)
 
     ser.reset_mock()
     select_mock.reset_mock()

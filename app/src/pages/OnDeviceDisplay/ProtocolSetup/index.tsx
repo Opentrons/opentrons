@@ -28,19 +28,19 @@ import {
 import {
   useProtocolQuery,
   useRunQuery,
-  useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
-import { Skeleton } from '../../../atoms/Skeleton'
+import {
+  ProtocolSetupTitleSkeleton,
+  ProtocolSetupStepSkeleton,
+} from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { useMaintenanceRunTakeover } from '../../../organisms/TakeoverModal'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -74,7 +74,7 @@ import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -90,7 +90,7 @@ interface ProtocolSetupStepProps {
   disabledReason?: string | null
 }
 
-function ProtocolSetupStep({
+export function ProtocolSetupStep({
   onClickSetupStep,
   status,
   title,
@@ -112,6 +112,26 @@ function ProtocolSetupStep({
     }
   }
 
+  let backgroundColor: string
+  if (!disabled) {
+    switch (status) {
+      case 'general':
+        backgroundColor = COLORS.darkBlack40
+        break
+      case 'ready':
+        backgroundColor = COLORS.green3Pressed
+        break
+      default:
+        backgroundColor = COLORS.yellow3Pressed
+    }
+  } else backgroundColor = ''
+
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${backgroundColor};
+    }
+  `
+
   return (
     <Btn
       onClick={() =>
@@ -127,6 +147,7 @@ function ProtocolSetupStep({
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
+        css={PUSHED_STATE_STYLE}
       >
         {status !== 'general' && !disabled ? (
           <Icon
@@ -153,9 +174,13 @@ function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled ? null : (
-          <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
-        )}
+        <Icon
+          marginLeft={SPACING.spacing8}
+          name="more"
+          size="3rem"
+          // Required to prevent inconsistent component height.
+          style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
+        />
       </Flex>
     </Btn>
   )
@@ -212,36 +237,9 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   )
 }
 
-const PLAY_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.blueEnabled};
-  }
-
-  &:active {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
 interface PlayButtonProps {
   ready: boolean
-  onPlay: () => void
+  onPlay?: () => void
   disabled?: boolean
 }
 
@@ -250,6 +248,33 @@ function PlayButton({
   onPlay,
   ready,
 }: PlayButtonProps): JSX.Element {
+  const playButtonStyle = css`
+    -webkit-tap-highlight-color: transparent;
+    &:focus {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:hover {
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+      color: ${COLORS.white};
+    }
+
+    &:focus-visible {
+      box-shadow: ${ODD_FOCUS_VISIBLE};
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+    }
+
+    &:active {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack60};
+    }
+  `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
@@ -264,7 +289,7 @@ function PlayButton({
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
-      css={PLAY_BUTTON_STYLE}
+      css={playButtonStyle}
     >
       <Icon
         color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
@@ -298,7 +323,7 @@ function PrepareToRun({
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
-  if (scrollRef.current) {
+  if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
 
@@ -309,15 +334,12 @@ function PrepareToRun({
   })
 
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const {
-    data: allPipettesCalibrationData,
-  } = useAllPipetteOffsetCalibrationsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
-    protocolRecord?.data.files[0].name
+    protocolRecord?.data.files[0].name ??
+    ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -331,12 +353,6 @@ function PrepareToRun({
 
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
-  const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
-    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
@@ -349,49 +365,52 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
+  const areInstrumentsReady =
+    mostRecentAnalysis != null && attachedInstruments != null
+      ? getAreInstrumentsReady(mostRecentAnalysis, attachedInstruments)
+      : false
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingPipCalForOdd: allPipettesCalibrationData == null,
+    hasMissingCalForOdd: !areInstrumentsReady,
   })
+  const requiredCalibration = attachedModules.some(
+    module => module.moduleOffset?.last_modified == null
+  )
 
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  if (
+  // True if any server request is still pending.
+  const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules == null) ||
-    allPipettesCalibrationData == null
-  ) {
-    return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
-  }
+    (protocolHasModules && attachedModules == null)
 
-  const areInstrumentsReady = getAreInstrumentsReady(
-    mostRecentAnalysis,
-    attachedInstruments,
-    allPipettesCalibrationData
-  )
   const speccedInstrumentCount =
-    mostRecentAnalysis.pipettes.length +
-    (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+    mostRecentAnalysis !== null
+      ? mostRecentAnalysis.pipettes.length +
+        (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+      : 0
+
   const instrumentsDetail = t('instruments_connected', {
     count: speccedInstrumentCount,
   })
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
-  const modulesStatus = isMissingModules ? 'not ready' : 'ready'
+  const modulesStatus =
+    isMissingModules || requiredCalibration ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
 
   const onPlay = (): void => {
     if (
       isHeaterShakerInProtocol &&
-      !isHeaterShakerShaking &&
+      isReadyToRun &&
       (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
     ) {
       confirmAttachment()
@@ -428,9 +447,15 @@ function PrepareToRun({
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
       : t('multiple_modules_missing')
 
-  const modulesDetail = isMissingModules
-    ? missingModulesText
-    : connectedModulesText
+  const modulesDetail = (): string => {
+    if (isMissingModules) {
+      return missingModulesText
+    } else if (requiredCalibration) {
+      return t('calibration_required')
+    } else {
+      return connectedModulesText
+    }
+  }
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -447,6 +472,10 @@ function PrepareToRun({
     additionalLabwareCount > 0
       ? t('additional_labware', { count: additionalLabwareCount })
       : null
+
+  const latestCurrentOffsets = getLatestCurrentOffsets(
+    runRecord?.data?.labwareOffsets ?? []
+  )
 
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
@@ -473,29 +502,36 @@ function PrepareToRun({
             gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
-              {t('prepare_to_run')}
-            </StyledText>
-            <StyledText
-              as="h4"
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              overflowWrap="anywhere"
-            >
-              {truncateString(protocolName as string, 100)}
-            </StyledText>
+            {!isLoading ? (
+              <>
+                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                  {t('prepare_to_run')}
+                </StyledText>
+                <StyledText
+                  as="h4"
+                  color={COLORS.darkGreyEnabled}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  overflowWrap="anywhere"
+                >
+                  {truncateString(protocolName, 100)}
+                </StyledText>
+              </>
+            ) : (
+              <ProtocolSetupTitleSkeleton />
+            )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
-            <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton
-              disabled={
-                mostRecentAnalysis == null ||
-                attachedInstruments == null ||
-                (protocolHasModules && attachedModules == null) ||
-                allPipettesCalibrationData == null
+            <CloseButton
+              onClose={
+                !isLoading
+                  ? () => setShowConfirmCancelModal(true)
+                  : onConfirmCancelClose
               }
-              onPlay={onPlay}
-              ready={isReadyToRun}
+            />
+            <PlayButton
+              disabled={isLoading}
+              onPlay={!isLoading ? onPlay : undefined}
+              ready={!isLoading ? isReadyToRun : false}
             />
           </Flex>
         </Flex>
@@ -506,54 +542,66 @@ function PrepareToRun({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing8}
       >
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('instruments')}
-          title={t('instruments')}
-          detail={instrumentsDetail}
-          status={instrumentsStatus}
-          disabled={speccedInstrumentCount === 0}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('modules')}
-          title={t('modules')}
-          detail={modulesDetail}
-          status={modulesStatus}
-          disabled={protocolModulesInfo.length === 0}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => {
-            setODDMaintenanceFlowInProgress()
-            launchLPC()
-          }}
-          title={t('labware_position_check')}
-          detail={t(
-            lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
-          )}
-          status="general"
-          disabled={lpcDisabledReason != null}
-          disabledReason={lpcDisabledReason}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('labware')}
-          title={t('labware')}
-          detail={labwareDetail}
-          subDetail={labwareSubDetail}
-          status="general"
-          disabled={labwareDetail === null}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('liquids')}
-          title={t('liquids')}
-          status="general"
-          detail={
-            liquidsInProtocol.length > 0
-              ? t('initial_liquids_num', {
-                  count: liquidsInProtocol.length,
-                })
-              : t('liquids_not_in_setup')
-          }
-          disabled={liquidsInProtocol.length === 0}
-        />
+        {!isLoading ? (
+          <>
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('instruments')}
+              title={t('instruments')}
+              detail={instrumentsDetail}
+              status={instrumentsStatus}
+              disabled={speccedInstrumentCount === 0}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('modules')}
+              title={t('modules')}
+              detail={modulesDetail()}
+              status={modulesStatus}
+              disabled={protocolModulesInfo.length === 0}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => {
+                launchLPC()
+              }}
+              title={t('labware_position_check')}
+              detail={t(
+                lpcDisabledReason != null
+                  ? 'currently_unavailable'
+                  : 'recommended'
+              )}
+              subDetail={
+                latestCurrentOffsets.length > 0
+                  ? t('offsets_applied', { count: latestCurrentOffsets.length })
+                  : null
+              }
+              status="general"
+              disabled={lpcDisabledReason != null}
+              disabledReason={lpcDisabledReason}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('labware')}
+              title={t('labware')}
+              detail={labwareDetail}
+              subDetail={labwareSubDetail}
+              status="general"
+              disabled={labwareDetail == null}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('liquids')}
+              title={t('liquids')}
+              status="general"
+              detail={
+                liquidsInProtocol.length > 0
+                  ? t('initial_liquids_num', {
+                      count: liquidsInProtocol.length,
+                    })
+                  : t('liquids_not_in_setup')
+              }
+              disabled={liquidsInProtocol.length === 0}
+            />
+          </>
+        ) : (
+          <ProtocolSetupStepSkeleton />
+        )}
       </Flex>
       {LPCWizard}
       {showConfirmCancelModal ? (
@@ -642,35 +690,5 @@ export function ProtocolSetup(): JSX.Element {
         {setupComponentByScreen[setupScreen]}
       </Flex>
     </>
-  )
-}
-
-interface ProtocolSetupSkeletonProps {
-  cancelAndClose: () => void
-}
-function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing40}
-      marginTop={SPACING.spacing40}
-    >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-          <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
-          <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
-        </Flex>
-        <Flex gridGap={SPACING.spacing24}>
-          <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton onPlay={() => {}} ready={false} />
-        </Flex>
-      </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-      </Flex>
-    </Flex>
   )
 }

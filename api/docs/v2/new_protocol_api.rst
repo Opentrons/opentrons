@@ -11,13 +11,9 @@ Protocols and Instruments
 -------------------------
 .. module:: opentrons.protocol_api
 
-..
-   TODO(mm, 2023-06-06): When we want to publish move_labware(), un-exclude it here and
-   and also uncomment the inclusion of OFF_DECK, below in this file.
-   https://opentrons.atlassian.net/browse/RTC-288
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands, commands, move_labware
+   :exclude-members: location_cache, cleanup, clear_commands, commands
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
@@ -42,9 +38,14 @@ Labware and Wells
 Modules
 -------
 
-.. autoclass:: opentrons.protocol_api.TemperatureModuleContext
+.. autoclass:: opentrons.protocol_api.HeaterShakerContext
    :members:
-   :exclude-members: start_set_temperature, await_temperature, broker, geometry, load_labware_object
+   :exclude-members: broker, geometry, load_labware_object
+   :inherited-members:
+
+.. autoclass:: opentrons.protocol_api.MagneticBlockContext
+   :members:
+   :exclude-members: broker, geometry, load_labware_object
    :inherited-members:
 
 .. autoclass:: opentrons.protocol_api.MagneticModuleContext
@@ -52,16 +53,16 @@ Modules
    :exclude-members: calibrate, broker, geometry, load_labware_object
    :inherited-members:
 
+.. autoclass:: opentrons.protocol_api.TemperatureModuleContext
+   :members:
+   :exclude-members: start_set_temperature, await_temperature, broker, geometry, load_labware_object
+   :inherited-members:
+
 .. autoclass:: opentrons.protocol_api.ThermocyclerContext
    :members:
    :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, broker, geometry, load_labware_object
    :inherited-members:
    
-.. autoclass:: opentrons.protocol_api.HeaterShakerContext
-   :members:
-   :exclude-members: broker, geometry, load_labware_object
-   :inherited-members:
-
 
 .. _protocol-api-types:
 
@@ -75,11 +76,8 @@ Useful Types and Definitions
 .. automodule:: opentrons.types
    :members: PipetteNotAttachedError, Point, Location, Mount
 
-..
-   TODO(mm, 2023-06-06): This should be uncommented when move_labware() is published. See above.
-   https://opentrons.atlassian.net/browse/RTC-288
-   .. autodata:: opentrons.protocol_api.OFF_DECK
-      :no-value:
+.. autodata:: opentrons.protocol_api.OFF_DECK
+   :no-value:
 
 Executing and Simulating Protocols
 ----------------------------------

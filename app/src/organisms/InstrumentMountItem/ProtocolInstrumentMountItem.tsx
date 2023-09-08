@@ -23,9 +23,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
+import { GripperWizardFlows } from '../GripperWizardFlows'
 
 import type {
   InstrumentData,
@@ -44,9 +44,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green3 : COLORS.yellow3};
-  &:hover,
-  &:active,
-  &:focus {
+  &:active {
     background-color: ${({ isReady }) =>
       isReady ? COLORS.green3Pressed : COLORS.yellow3Pressed};
   }
@@ -67,24 +65,40 @@ export function ProtocolInstrumentMountItem(
 ): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const [
     showPipetteWizardFlow,
     setShowPipetteWizardFlow,
   ] = React.useState<boolean>(false)
+  const [
+    showGripperWizardFlow,
+    setShowGripperWizardFlow,
+  ] = React.useState<boolean>(false)
+  const memoizedAttachedGripper = React.useMemo(
+    () =>
+      attachedInstrument?.instrumentType === 'gripper' && attachedInstrument.ok
+        ? attachedInstrument
+        : null,
+    []
+  )
   const [flowType, setFlowType] = React.useState<string>(FLOWS.ATTACH)
   const selectedPipette =
     speccedName === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES
 
   const handleCalibrate: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     setFlowType(FLOWS.CALIBRATE)
-    setShowPipetteWizardFlow(true)
+    if (mount === 'extension') {
+      setShowGripperWizardFlow(true)
+    } else {
+      setShowPipetteWizardFlow(true)
+    }
   }
   const handleAttach: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     setFlowType(FLOWS.ATTACH)
-    setShowPipetteWizardFlow(true)
+    if (mount === 'extension') {
+      setShowGripperWizardFlow(true)
+    } else {
+      setShowPipetteWizardFlow(true)
+    }
   }
   const is96ChannelPipette = speccedName === 'p1000_96'
   const isAttachedWithCal =
@@ -160,6 +174,14 @@ export function ProtocolInstrumentMountItem(
           selectedPipette={selectedPipette}
           mount={mount as Mount}
           pipetteInfo={mostRecentAnalysis?.pipettes}
+          onComplete={props.instrumentsRefetch}
+        />
+      ) : null}
+      {showGripperWizardFlow ? (
+        <GripperWizardFlows
+          attachedGripper={memoizedAttachedGripper}
+          flowType={memoizedAttachedGripper != null ? 'RECALIBRATE' : 'ATTACH'}
+          closeFlow={() => setShowGripperWizardFlow(false)}
           onComplete={props.instrumentsRefetch}
         />
       ) : null}

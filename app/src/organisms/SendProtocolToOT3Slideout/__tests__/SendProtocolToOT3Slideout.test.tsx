@@ -24,7 +24,7 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -36,16 +36,18 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { SendProtocolToOT3Slideout } from '..'
 
 import type { State } from '../../../redux/types'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ToasterOven')
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
+jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/protocol-storage/selectors')
 
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -72,6 +74,9 @@ const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as j
 >
 const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
   typeof getNetworkInterfaces
+>
+const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
+  typeof getValidCustomLabwareFiles
 >
 
 const render = (
@@ -110,6 +115,7 @@ const mockMakeSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 const mockMutateAsync = jest.fn()
+const mockCustomLabwareFile: File = { path: 'fake_custom_labware_path' } as any
 
 describe('SendProtocolToOT3Slideout', () => {
   beforeEach(() => {
@@ -144,6 +150,9 @@ describe('SendProtocolToOT3Slideout', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, expect.any(String))
       .mockReturnValue({ wifi: null, ethernet: null })
+    when(mockGetValidCustomLabwareFiles)
+      .calledWith({} as State)
+      .mockReturnValue([mockCustomLabwareFile])
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -237,15 +246,41 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const sendButton = getByRole('button', { name: 'Send' })
-    expect(sendButton).not.toBeDisabled()
+    const proceedButton = getByRole('button', { name: 'Send' })
+    expect(proceedButton).not.toBeDisabled()
     const otherRobot = getByText('otherRobot')
     otherRobot.click() // unselect default robot
-    expect(sendButton).not.toBeDisabled()
+    expect(proceedButton).not.toBeDisabled()
     const mockRobot = getByText('opentrons-robot-name')
     mockRobot.click()
-    expect(sendButton).not.toBeDisabled()
-    sendButton.click()
-    expect(mockMutateAsync).toBeCalled()
+    expect(proceedButton).not.toBeDisabled()
+    proceedButton.click()
+    expect(mockMutateAsync).toBeCalledWith({
+      files: [expect.any(Object), mockCustomLabwareFile],
+      protocolKey: 'protocolKeyStub',
+    })
+  })
+  it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
+    when(mockGetBuildrootUpdateDisplayInfo)
+      .calledWith(({} as any) as State, 'opentrons-robot-name')
+      .mockReturnValue({
+        autoUpdateAction: 'upgrade',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Send' })
+    expect(proceedButton).toBeDisabled()
+    expect(
+      getByText(
+        'A robot software update is required to run protocols with this version of the Opentrons App.'
+      )
+    ).toBeInTheDocument()
+    const linkToRobotDetails = getByText('Go to Robot')
+    linkToRobotDetails.click()
   })
 })

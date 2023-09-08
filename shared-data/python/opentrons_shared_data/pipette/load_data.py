@@ -1,7 +1,7 @@
 import json
 import os
 
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, Optional
 from typing_extensions import Literal
 from functools import lru_cache
 
@@ -9,14 +9,18 @@ from .. import load_shared_data, get_shared_data_root
 
 from .pipette_definition import (
     PipetteConfigurations,
+    PipetteLiquidPropertiesDefinition,
+)
+from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE, _MAP_KEY_TO_V2
+from .types import (
     PipetteChannelType,
-    PipetteVersionType,
     PipetteModelType,
     PipetteGenerationType,
+    PipetteVersionType,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
+    LiquidClasses,
 )
-from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE
 
 
 LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
@@ -25,53 +29,76 @@ LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
 def _get_configuration_dictionary(
     config_type: Literal["general", "geometry", "liquid"],
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
+    liquid_class: Optional[LiquidClasses] = None,
 ) -> LoadedConfiguration:
-    config_path = (
-        get_shared_data_root()
-        / "pipette"
-        / "definitions"
-        / "2"
-        / config_type
-        / channels.name.lower()
-        / max_volume.value
-        / f"{version.major}_{version.minor}.json"
-    )
+    if liquid_class:
+        config_path = (
+            get_shared_data_root()
+            / "pipette"
+            / "definitions"
+            / "2"
+            / config_type
+            / channels.name.lower()
+            / model.value
+            / liquid_class.name
+            / f"{version.major}_{version.minor}.json"
+        )
+    else:
+        config_path = (
+            get_shared_data_root()
+            / "pipette"
+            / "definitions"
+            / "2"
+            / config_type
+            / channels.name.lower()
+            / model.value
+            / f"{version.major}_{version.minor}.json"
+        )
     return json.loads(load_shared_data(config_path))
 
 
 @lru_cache(maxsize=None)
 def _geometry(
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
 ) -> LoadedConfiguration:
-    return _get_configuration_dictionary("geometry", channels, max_volume, version)
+    return _get_configuration_dictionary("geometry", channels, model, version)
 
 
 @lru_cache(maxsize=None)
 def _liquid(
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
-) -> LoadedConfiguration:
-    return _get_configuration_dictionary("liquid", channels, max_volume, version)
+) -> Dict[str, LoadedConfiguration]:
+    liquid_dict = {}
+    for liquid_class in LiquidClasses:
+        try:
+            liquid_dict[liquid_class.name] = _get_configuration_dictionary(
+                "liquid", channels, model, version, liquid_class
+            )
+        except FileNotFoundError:
+            continue
+
+    return liquid_dict
 
 
 @lru_cache(maxsize=None)
 def _physical(
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
 ) -> LoadedConfiguration:
-    return _get_configuration_dictionary("general", channels, max_volume, version)
+    return _get_configuration_dictionary("general", channels, model, version)
 
 
 @lru_cache(maxsize=None)
 def load_serial_lookup_table() -> Dict[str, str]:
     """Load a serial abbreviation lookup table mapped to model name."""
-    config_path = get_shared_data_root() / "pipette" / "definitions" / "2" / "liquid"
+    config_path = get_shared_data_root() / "pipette" / "definitions" / "2" / "general"
     _lookup_table = {}
     _channel_shorthand = {
         "eight_channel": "M",
@@ -105,8 +132,103 @@ def load_serial_lookup_table() -> Dict[str, str]:
     return _lookup_table
 
 
+def load_liquid_model(
+    model: PipetteModelType,
+    channels: PipetteChannelType,
+    version: PipetteVersionType,
+) -> Dict[str, PipetteLiquidPropertiesDefinition]:
+    liquid_dict = _liquid(channels, model, version)
+    return {
+        k: PipetteLiquidPropertiesDefinition.parse_obj(v)
+        for k, v in liquid_dict.items()
+    }
+
+
+def _change_to_camel_case(c: str) -> str:
+    # Tiny helper function to convert to camelCase.
+    config_name = c.split("_")
+    if len(config_name) == 1:
+        return config_name[0]
+    return f"{config_name[0]}" + "".join(s.capitalize() for s in config_name[1::])
+
+
+def update_pipette_configuration(  # noqa: C901
+    base_configurations: PipetteConfigurations,
+    v1_configuration_changes: Dict[str, Any],
+    liquid_class: Optional[LiquidClasses] = None,
+) -> PipetteConfigurations:
+    """Helper function to update 'V1' format configurations (left over from PipetteDict).
+
+    #TODO (lc 7-14-2023) Remove once the pipette config dict is eliminated.
+    Given an input of v1 mutable configs, look up the equivalent keyed
+    value of that configuration."""
+    quirks_list = []
+    dict_of_base_model = base_configurations.dict(by_alias=True)
+
+    for c, v in v1_configuration_changes.items():
+        lookup_key = _change_to_camel_case(c)
+        if c == "quirks" and isinstance(v, dict):
+            quirks_list.extend([b.name for b in v.values() if b.value])
+        elif liquid_class:
+            if lookup_key == "tipLength":
+                new_names = _MAP_KEY_TO_V2[lookup_key]
+                top_name = new_names["top_level_name"]
+                nested_name = new_names["nested_name"]
+                # This is only a concern for OT-2 configs and I think we can
+                # be less smart about handling multiple tip types by updating
+                # all tips.
+                for k in dict_of_base_model["liquid_properties"][liquid_class][
+                    new_names["top_level_name"]
+                ].keys():
+                    dict_of_base_model["liquid_properties"][liquid_class][top_name][k][
+                        nested_name
+                    ] = v
+            else:
+                dict_of_base_model["liquid_properties"][liquid_class].pop(lookup_key)
+                dict_of_base_model["liquid_properties"][liquid_class][lookup_key] = v
+        else:
+            try:
+                dict_of_base_model.pop(lookup_key)
+                dict_of_base_model[lookup_key] = v
+            except KeyError:
+                # The name is not the same format as previous so
+                # we need to look it up from the V2 key map
+                new_names = _MAP_KEY_TO_V2[lookup_key]
+                top_name = new_names["top_level_name"]
+                nested_name = new_names["nested_name"]
+                if new_names.get("liquid_class"):
+                    # isinstances are needed for type checking.
+                    liquid_class = LiquidClasses[new_names["liquid_class"]]
+                    dict_of_base_model[top_name][liquid_class][nested_name] = v
+                else:
+                    # isinstances are needed for type checking.
+                    dict_of_base_model[top_name][nested_name] = v
+    dict_of_base_model["quirks"] = list(
+        set(dict_of_base_model["quirks"]) - set(quirks_list)
+    )
+
+    # re-serialization is not great for this nested enum so we need
+    # to perform this workaround.
+    if not liquid_class:
+        liquid_class = LiquidClasses.default
+    dict_of_base_model["liquid_properties"][liquid_class]["supportedTips"] = {
+        k.name: v
+        for k, v in dict_of_base_model["liquid_properties"][liquid_class][
+            "supportedTips"
+        ].items()
+    }
+    dict_of_base_model["liquid_properties"] = {
+        k.name: v for k, v in dict_of_base_model["liquid_properties"].items()
+    }
+    dict_of_base_model["plungerPositionsConfigurations"] = {
+        k.name: v
+        for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
+    }
+    return PipetteConfigurations.parse_obj(dict_of_base_model)
+
+
 def load_definition(
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     channels: PipetteChannelType,
     version: PipetteVersionType,
 ) -> PipetteConfigurations:
@@ -116,18 +238,18 @@ def load_definition(
     ):
         raise KeyError("Pipette version not found.")
 
-    geometry_dict = _geometry(channels, max_volume, version)
-    physical_dict = _physical(channels, max_volume, version)
-    liquid_dict = _liquid(channels, max_volume, version)
+    geometry_dict = _geometry(channels, model, version)
+    physical_dict = _physical(channels, model, version)
+    liquid_dict = _liquid(channels, model, version)
 
     generation = PipetteGenerationType(physical_dict["displayCategory"])
-    mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation.value]
+    mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation][channels]
 
     return PipetteConfigurations.parse_obj(
         {
             **geometry_dict,
             **physical_dict,
-            **liquid_dict,
+            "liquid_properties": liquid_dict,
             "version": version,
             "mount_configurations": mount_configs,
         }

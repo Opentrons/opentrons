@@ -1,12 +1,8 @@
 """Pipette motions."""
-from math import pi
 from dataclasses import dataclass
 from typing import Optional, Callable, Tuple
 
-from opentrons.config.defaults_ot3 import (
-    DEFAULT_ACCELERATIONS,
-    DEFAULT_MAX_SPEED_DISCONTINUITY,
-)
+from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
 
@@ -119,7 +115,6 @@ def _submerge(
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
-        force_direct=True,
         speed=speed,
     )
 
@@ -129,6 +124,7 @@ def _retract(
     pipette: InstrumentContext,
     well: Well,
     channel_offset: Point,
+    mm_above_well_bottom: float,
     speed: float,
     z_discontinuity: float,
 ) -> None:
@@ -144,12 +140,8 @@ def _retract(
         ] = z_discontinuity
     # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
     hw_api.set_gantry_load(hw_api.gantry_load)
-    # retract out of well
-    pipette.move_to(
-        well.top().move(channel_offset),
-        force_direct=True,
-        speed=speed,
-    )
+    # retract out of the liquid (not out of the well)
+    pipette.move_to(well.top(mm_above_well_bottom).move(channel_offset), speed=speed)
     # reset discontinuity back to default
     if pipette.channels == 96:
         hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
@@ -159,49 +151,6 @@ def _retract(
         hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
             OT3AxisKind.Z
         ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
-
-
-def _change_plunger_acceleration(
-    ctx: ProtocolContext, pipette: InstrumentContext, ul_per_sec_per_sec: float
-) -> None:
-    hw_api = ctx._core.get_hardware()
-    # NOTE: set plunger accelerations by converting ul/sec/sec to mm/sec/sec,
-    #       making sure to use the nominal ul/mm to convert so that the
-    #       mm/sec/sec we move is constant regardless of changes to the function
-    if "p50" in pipette.name:
-        shaft_diameter_mm = 1.0
-    else:
-        shaft_diameter_mm = 4.5
-    nominal_ul_per_mm = pi * pow(shaft_diameter_mm * 0.5, 2)
-    p_accel = ul_per_sec_per_sec / nominal_ul_per_mm
-    if pipette.channels == 96:
-        hw_api.config.motion_settings.acceleration.high_throughput[
-            OT3AxisKind.P
-        ] = p_accel
-    else:
-        hw_api.config.motion_settings.acceleration.low_throughput[
-            OT3AxisKind.P
-        ] = p_accel
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
-
-
-def _reset_plunger_acceleration(
-    ctx: ProtocolContext, pipette: InstrumentContext
-) -> None:
-    hw_api = ctx._core.get_hardware()
-    if pipette.channels == 96:
-        p_accel = DEFAULT_ACCELERATIONS.high_throughput[OT3AxisKind.P]
-        hw_api.config.motion_settings.acceleration.high_throughput[
-            OT3AxisKind.P
-        ] = p_accel
-    else:
-        p_accel = DEFAULT_ACCELERATIONS.low_throughput[OT3AxisKind.P]
-        hw_api.config.motion_settings.acceleration.low_throughput[
-            OT3AxisKind.P
-        ] = p_accel
     # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
     hw_api.set_gantry_load(hw_api.gantry_load)
 
@@ -224,6 +173,9 @@ def _pipette_with_liquid_settings(
     touch_tip: bool = False,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
+    # FIXME: stop using hwapi, and get those functions into core software
+    hw_api = ctx._core.get_hardware()
+    hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     _check_aspirate_dispense_args(aspirate, dispense)
 
     def _dispense_with_added_blow_out() -> None:
@@ -231,7 +183,7 @@ def _pipette_with_liquid_settings(
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.dispense.leading_air_gap)
+        hw_api.blow_out(hw_mount, liquid_class.dispense.blow_out_submerged)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -259,21 +211,14 @@ def _pipette_with_liquid_settings(
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
-        pass
+        if liquid_class.aspirate.leading_air_gap > 0:
+            pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_submerge() -> None:
-        # mix 5x times
-        callbacks.on_mixing()
+        # TODO: re-implement mixing once we have a real use for it
+        #       and once the rest of the script settles down
         if mix:
-            for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
-                pipette.aspirate(aspirate)
-                pipette.dispense(aspirate)
-                _z_disc = liquid_class.aspirate.z_retract_discontinuity
-                _retract(
-                    ctx, pipette, well, channel_offset, retract_speed, _z_disc
-                )  # retract to the approach height
-                pipette.blow_out().aspirate(pipette.min_volume).dispense()
-                _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
+            raise NotImplementedError("mixing is not currently implemented")
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
@@ -311,11 +256,10 @@ def _pipette_with_liquid_settings(
             callbacks.on_blowing_out()
             # FIXME: using the HW-API to specify that we want to blow-out the full
             #        available blow-out volume
-            hw_api = ctx._core.get_hardware()
-            hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
             # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
             max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
             hw_api.blow_out(hw_mount, max_blow_out_volume)
+            hw_api.prepare_for_aspirate(hw_mount)
         if touch_tip:
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
@@ -326,9 +270,6 @@ def _pipette_with_liquid_settings(
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
     pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
     pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
-    _change_plunger_acceleration(
-        ctx, pipette, liquid_class.dispense.plunger_acceleration
-    )
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate else _dispense_on_approach()
 
@@ -343,13 +284,12 @@ def _pipette_with_liquid_settings(
         _z_disc = liquid_class.aspirate.z_retract_discontinuity
     else:
         _z_disc = liquid_class.dispense.z_retract_discontinuity
-    _retract(ctx, pipette, well, channel_offset, retract_speed, _z_disc)
+    _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
     callbacks.on_exiting()
-    pipette.move_to(well.top().move(channel_offset), force_direct=True)
-    _reset_plunger_acceleration(ctx, pipette)
+    hw_api.retract(hw_mount)
 
 
 def aspirate_with_liquid_class(

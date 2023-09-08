@@ -69,7 +69,7 @@ export function shouldLevel(specs: PipetteNameSpecs): boolean {
 export function isOT3Pipette(pipetteName: PipetteName): boolean {
   return (
     OT3_PIPETTES.includes(pipetteName) ||
-    getPipetteNameSpecs(pipetteName)?.displayCategory === 'GEN3'
+    getPipetteNameSpecs(pipetteName)?.displayCategory === 'FLEX'
   )
 }
 

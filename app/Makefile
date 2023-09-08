@@ -9,6 +9,8 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # dev server port
 PORT ?= 8090
 
+OPENTRONS_PROJECT ?= robot-stack
+
 # dependency directories for dev
 shell_dir := ../app-shell
 shell_odd_dir := ../app-shell-odd
@@ -44,25 +46,27 @@ dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
 dev:
 	concurrently --no-color --kill-others --names "server,shell" \
-		"$(MAKE) dev-server" \
-		"$(MAKE) dev-shell"
+		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \
+		"$(MAKE) dev-shell OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)"
 
 .PHONY: dev-odd
 dev-odd: export NODE_ENV := development
 dev-odd: export PORT := $(PORT)
+dev-odd: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-odd:
 	concurrently --no-color --kill-others --names "server,shell" \
-		"$(MAKE) dev-server" \
-		"$(MAKE) dev-shell-odd"
+		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \
+		"$(MAKE) dev-shell-odd OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)"
 
 .PHONY: dev-server
+dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
 	webpack-dev-server --hot
 
 .PHONY: dev-shell
 dev-shell:
 	wait-on http-get://localhost:$(PORT)
-	$(MAKE) -C $(shell_dir) dev
+	$(MAKE) -C $(shell_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
 
 
 .PHONY: dev-shell-odd
@@ -72,4 +76,4 @@ dev-shell-odd: export OT_APP_UI__WIDTH := 1024
 dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd:
 	wait-on http-get://localhost:$(PORT)
-	$(MAKE) -C $(shell_odd_dir) dev
+	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)

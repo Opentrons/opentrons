@@ -1,5 +1,5 @@
 """ProtocolEngine clients."""
 from .sync_client import SyncClient
-from .transports import AbstractSyncTransport, ChildThreadTransport
+from .transports import ChildThreadTransport
 
-__all__ = ["SyncClient", "AbstractSyncTransport", "ChildThreadTransport"]
+__all__ = ["SyncClient", "ChildThreadTransport"]

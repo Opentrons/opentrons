@@ -1,17 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
-import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
+import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
-import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-
-jest.mock('../../../redux/config')
-
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 const mockRequiredModuleDetails = [
   {
@@ -72,15 +64,10 @@ const render = (
 describe('RobotConfigurationDetails', () => {
   let props: React.ComponentProps<typeof RobotConfigurationDetails>
 
-  beforeEach(() => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(false)
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
   it('renders a robot section showing the intended robot model for an OT-2 protocol', () => {
     props = {
       leftMountPipetteName: 'p10_single',
@@ -102,7 +89,7 @@ describe('RobotConfigurationDetails', () => {
       requiredModuleDetails: null,
       extensionInstrumentName: null,
       isLoading: false,
-      robotType: OT3_STANDARD_MODEL,
+      robotType: FLEX_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('robot')
@@ -142,12 +129,29 @@ describe('RobotConfigurationDetails', () => {
   })
 
   it('renders extension mount section when extended hardware feature flag is on', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(true)
-
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: FLEX_STANDARD_MODEL,
+    }
     const { getByText } = render(props)
     getByText('extension mount')
+  })
+
+  it('should not render extension mount section when robotType is OT-2', () => {
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
+    }
+    const { queryByText } = render(props)
+    expect(queryByText('extension mount')).not.toBeInTheDocument()
   })
 
   it('renders the magnetic module when the protocol contains a magnetic module', () => {

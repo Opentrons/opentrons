@@ -2,48 +2,68 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  BALENA,
+  OT2_BALENA,
   UPGRADE,
-  getBuildrootUpdateInfo,
-  getBuildrootDownloadProgress,
-  getBuildrootDownloadError,
-} from '../../../../redux/buildroot'
-
+  getRobotUpdateInfo,
+  getRobotUpdateDownloadProgress,
+  getRobotUpdateDownloadError,
+} from '../../../../redux/robot-update'
+import { getAvailableShellUpdate } from '../../../../redux/shell'
+import { Portal } from '../../../../App/portal'
+import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
-import { DownloadUpdateModal } from './DownloadUpdateModal'
-import { ReleaseNotesModal } from './ReleaseNotesModal'
+import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
+import { UpdateRobotModal } from './UpdateRobotModal'
 
 import type {
-  BuildrootUpdateType,
+  RobotUpdateType,
   RobotSystemType,
-} from '../../../../redux/buildroot/types'
+} from '../../../../redux/robot-update/types'
+import type { State } from '../../../../redux/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
-  robotUpdateType: BuildrootUpdateType | null
+  robotUpdateType: RobotUpdateType | null
   robotSystemType: RobotSystemType | null
-  close: () => unknown
-  proceed: () => unknown
+  closeModal: () => void
 }
 
 export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
-  const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
-  const updateInfo = useSelector(getBuildrootUpdateInfo)
-  const downloadProgress = useSelector(getBuildrootDownloadProgress)
-  const downloadError = useSelector(getBuildrootDownloadError)
+  const { robotName, robotUpdateType, robotSystemType, closeModal } = props
+
+  const updateInfo = useSelector((state: State) =>
+    getRobotUpdateInfo(state, robotName)
+  )
+  const downloadProgress = useSelector((state: State) =>
+    getRobotUpdateDownloadProgress(state, robotName)
+  )
+  const downloadError = useSelector((state: State) =>
+    getRobotUpdateDownloadError(state, robotName)
+  )
+  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate)
 
   const [
     showMigrationWarning,
     setShowMigrationWarning,
-  ] = React.useState<boolean>(robotSystemType === BALENA)
+  ] = React.useState<boolean>(robotSystemType === OT2_BALENA)
 
   const notNowButton = {
-    onClick: close,
+    onClick: closeModal,
     children: downloadError !== null ? 'close' : 'not now',
   }
+
   const showReleaseNotes = robotUpdateType === UPGRADE
+  let releaseNotes = ''
+  if (updateInfo?.releaseNotes) releaseNotes = updateInfo.releaseNotes
+
+  if (availableAppUpdateVersion)
+    return (
+      <Portal>
+        <UpdateAppModal closeModal={close} />
+      </Portal>
+    )
 
   if (showMigrationWarning) {
     return (
@@ -55,27 +75,25 @@ export function ViewUpdateModal(
     )
   }
 
-  if (updateInfo === null) {
+  if (updateInfo === null)
     return (
-      <DownloadUpdateModal
-        notNowButton={notNowButton}
-        error={downloadError}
-        progress={downloadProgress}
-      />
-    )
-  }
-
-  if (showReleaseNotes) {
-    return (
-      <ReleaseNotesModal
+      <RobotUpdateProgressModal
         robotName={robotName}
-        notNowButton={notNowButton}
-        releaseNotes={updateInfo.releaseNotes}
-        systemType={robotSystemType}
-        proceed={proceed}
+        updateStep="download"
+        stepProgress={downloadProgress}
+        error={downloadError}
       />
     )
-  }
+
+  if (showReleaseNotes)
+    return (
+      <UpdateRobotModal
+        robotName={robotName}
+        releaseNotes={releaseNotes}
+        systemType={robotSystemType}
+        closeModal={closeModal}
+      />
+    )
 
   return null
 }

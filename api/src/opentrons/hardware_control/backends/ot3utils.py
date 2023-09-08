@@ -1,10 +1,11 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence, cast
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
 from typing_extensions import Literal
+from logging import getLogger
 from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
-    OT3Axis,
+    Axis,
     OT3AxisKind,
     OT3AxisMap,
     CurrentConfig,
@@ -46,12 +47,14 @@ from opentrons_hardware.hardware_control.motion import (
     NodeIdMotionValues,
     create_home_step,
     create_backoff_step,
+    create_tip_action_backoff_step,
     MoveGroup,
     MoveType,
     MoveStopCondition,
     create_gripper_jaw_step,
     create_tip_action_step,
 )
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
@@ -83,6 +86,8 @@ SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {SubSystem.rear_panel: USBTarget.rea
 
 USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
 
+LOG = getLogger(__name__)
+
 
 def axis_nodes() -> List["NodeId"]:
     return [
@@ -97,57 +102,57 @@ def axis_nodes() -> List["NodeId"]:
     ]
 
 
-def node_axes() -> List[OT3Axis]:
+def node_axes() -> List[Axis]:
     return [
-        OT3Axis.X,
-        OT3Axis.Y,
-        OT3Axis.Z_L,
-        OT3Axis.Z_R,
-        OT3Axis.P_L,
-        OT3Axis.P_R,
-        OT3Axis.Z_G,
-        OT3Axis.G,
+        Axis.X,
+        Axis.Y,
+        Axis.Z_L,
+        Axis.Z_R,
+        Axis.P_L,
+        Axis.P_R,
+        Axis.Z_G,
+        Axis.G,
     ]
 
 
-def home_axes() -> List[OT3Axis]:
+def home_axes() -> List[Axis]:
     return [
-        OT3Axis.P_L,
-        OT3Axis.P_R,
-        OT3Axis.G,
-        OT3Axis.Z_L,
-        OT3Axis.Z_R,
-        OT3Axis.Z_G,
-        OT3Axis.X,
-        OT3Axis.Y,
+        Axis.P_L,
+        Axis.P_R,
+        Axis.G,
+        Axis.Z_L,
+        Axis.Z_R,
+        Axis.Z_G,
+        Axis.X,
+        Axis.Y,
     ]
 
 
-def axis_to_node(axis: OT3Axis) -> "NodeId":
+def axis_to_node(axis: Axis) -> "NodeId":
     anm = {
-        OT3Axis.X: NodeId.gantry_x,
-        OT3Axis.Y: NodeId.gantry_y,
-        OT3Axis.Z_L: NodeId.head_l,
-        OT3Axis.Z_R: NodeId.head_r,
-        OT3Axis.P_L: NodeId.pipette_left,
-        OT3Axis.P_R: NodeId.pipette_right,
-        OT3Axis.Z_G: NodeId.gripper_z,
-        OT3Axis.G: NodeId.gripper_g,
-        OT3Axis.Q: NodeId.pipette_left,
+        Axis.X: NodeId.gantry_x,
+        Axis.Y: NodeId.gantry_y,
+        Axis.Z_L: NodeId.head_l,
+        Axis.Z_R: NodeId.head_r,
+        Axis.P_L: NodeId.pipette_left,
+        Axis.P_R: NodeId.pipette_right,
+        Axis.Z_G: NodeId.gripper_z,
+        Axis.G: NodeId.gripper_g,
+        Axis.Q: NodeId.pipette_left,
     }
     return anm[axis]
 
 
-def node_to_axis(node: "NodeId") -> OT3Axis:
+def node_to_axis(node: "NodeId") -> Axis:
     nam = {
-        NodeId.gantry_x: OT3Axis.X,
-        NodeId.gantry_y: OT3Axis.Y,
-        NodeId.head_l: OT3Axis.Z_L,
-        NodeId.head_r: OT3Axis.Z_R,
-        NodeId.pipette_left: OT3Axis.P_L,
-        NodeId.pipette_right: OT3Axis.P_R,
-        NodeId.gripper_z: OT3Axis.Z_G,
-        NodeId.gripper_g: OT3Axis.G,
+        NodeId.gantry_x: Axis.X,
+        NodeId.gantry_y: Axis.Y,
+        NodeId.head_l: Axis.Z_L,
+        NodeId.head_r: Axis.Z_R,
+        NodeId.pipette_left: Axis.P_L,
+        NodeId.pipette_right: Axis.P_R,
+        NodeId.gripper_z: Axis.Z_G,
+        NodeId.gripper_g: Axis.G,
     }
     return nam[node]
 
@@ -160,7 +165,7 @@ def node_is_axis(node: "NodeId") -> bool:
         return False
 
 
-def axis_is_node(axis: OT3Axis) -> bool:
+def axis_is_node(axis: Axis) -> bool:
     try:
         axis_to_node(axis)
         return True
@@ -209,28 +214,42 @@ def get_current_settings(
     conf_by_pip = config.by_gantry_load(gantry_load)
     currents = {}
     for axis_kind in conf_by_pip["hold_current"].keys():
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
-                conf_by_pip["hold_current"][axis_kind],
-                conf_by_pip["run_current"][axis_kind],
+                hold_current=conf_by_pip["hold_current"][axis_kind],
+                run_current=conf_by_pip["run_current"][axis_kind],
             )
+    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        # In high-throughput configuration, the right mount doesn't do anything: the
+        # lead screw nut is disconnected from the carriage, and it just hangs out
+        # up at the top of the axis. We should therefore not give it a lot of current.
+        # TODO: think of a better way to do this
+        lt_config = config.by_gantry_load(GantryLoad.LOW_THROUGHPUT)
+        currents[Axis.Z_R] = CurrentConfig(
+            hold_current=lt_config["hold_current"][OT3AxisKind.Z],
+            # not a typo: keep that current low
+            run_current=lt_config["hold_current"][OT3AxisKind.Z],
+        )
     return currents
 
 
 def get_system_constraints(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
-) -> "SystemConstraints[OT3Axis]":
+) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
-    for axis_kind in [
+    axis_kind_list = [
         OT3AxisKind.P,
         OT3AxisKind.X,
         OT3AxisKind.Y,
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
-    ]:
-        for axis in OT3Axis.of_kind(axis_kind):
+    ]
+    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        axis_kind_list.append(OT3AxisKind.Q)
+    for axis_kind in axis_kind_list:
+        for axis in Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
@@ -243,7 +262,7 @@ def get_system_constraints(
 def get_system_constraints_for_calibration(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
-) -> "SystemConstraints[OT3Axis]":
+) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     for axis_kind in [
@@ -253,7 +272,7 @@ def get_system_constraints_for_calibration(
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
     ]:
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
@@ -263,8 +282,32 @@ def get_system_constraints_for_calibration(
     return constraints
 
 
+def get_system_constraints_for_plunger_acceleration(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+    mount: OT3Mount,
+    acceleration: float,
+) -> "SystemConstraints[Axis]":
+    old_constraints = config.by_gantry_load(gantry_load)
+    new_constraints = {}
+    axis_kinds = set([k for _, v in old_constraints.items() for k in v.keys()])
+    for axis_kind in axis_kinds:
+        for axis in Axis.of_kind(axis_kind):
+            if axis == Axis.of_main_tool_actuator(mount):
+                _accel = acceleration
+            else:
+                _accel = old_constraints["acceleration"][axis_kind]
+            new_constraints[axis] = AxisConstraints.build(
+                _accel,
+                old_constraints["max_speed_discontinuity"][axis_kind],
+                old_constraints["direction_change_speed_discontinuity"][axis_kind],
+                old_constraints["default_max_speed"][axis_kind],
+            )
+    return new_constraints
+
+
 def _convert_to_node_id_dict(
-    axis_pos: Coordinates[OT3Axis, CoordinateValue],
+    axis_pos: Coordinates[Axis, CoordinateValue],
 ) -> NodeIdMotionValues:
     target: NodeIdMotionValues = {}
     for axis, pos in axis_pos.items():
@@ -321,8 +364,8 @@ def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
 
 
 def create_move_group(
-    origin: Coordinates[OT3Axis, CoordinateValue],
-    moves: List[Move[OT3Axis]],
+    origin: Coordinates[Axis, CoordinateValue],
+    moves: List[Move[Axis]],
     present_nodes: Iterable[NodeId],
     stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> Tuple[MoveGroup, Dict[NodeId, float]]:
@@ -331,6 +374,11 @@ def create_move_group(
     for move in moves:
         unit_vector = move.unit_vector
         for block in move.blocks:
+            if block.time < (3.0 / interrupts_per_sec):
+                LOG.info(
+                    f"Skipping move block with time {block.time} (<{3.0/interrupts_per_sec})"
+                )
+                continue
             distances = unit_vector_multiplication(unit_vector, block.distance)
             node_id_distances = _convert_to_node_id_dict(distances)
             velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
@@ -349,45 +397,80 @@ def create_move_group(
     return move_group, {k: float(v) for k, v in pos.items()}
 
 
-def create_home_group(
-    distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
-) -> MoveGroup:
+def create_home_groups(
+    distance: Dict[Axis, float], velocity: Dict[Axis, float]
+) -> List[MoveGroup]:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
-    home = create_home_step(
-        distance=node_id_distances,
-        velocity=node_id_velocities,
-    )
+    home_group = [
+        create_home_step(distance=node_id_distances, velocity=node_id_velocities)
+    ]
     # halve the homing speed for backoff
     backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
-    backoff = create_backoff_step(backoff_velocities)
-
-    move_group: MoveGroup = [home, backoff]
-    return move_group
+    backoff_group = [create_backoff_step(backoff_velocities)]
+    return [home_group, backoff_group]
 
 
 def create_tip_action_group(
-    axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction
+    moves: Sequence[Move[Axis]],
+    present_nodes: Iterable[NodeId],
+    action: str,
 ) -> MoveGroup:
-    current_nodes = [axis_to_node(ax) for ax in axes]
-    step = create_tip_action_step(
-        velocity={node_id: np.float64(velocity) for node_id in current_nodes},
-        distance={node_id: np.float64(distance) for node_id in current_nodes},
-        present_nodes=current_nodes,
-        action=PipetteTipActionType[action],
+    move_group: MoveGroup = []
+    for move in moves:
+        unit_vector = move.unit_vector
+        for block in move.blocks:
+            if block.time < (3.0 / interrupts_per_sec):
+                continue
+            velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
+            accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
+            step = create_tip_action_step(
+                velocity=_convert_to_node_id_dict(velocities),
+                acceleration=_convert_to_node_id_dict(accelerations),
+                duration=block.time,
+                present_nodes=present_nodes,
+                action=PipetteTipActionType[action],
+            )
+            move_group.append(step)
+    return move_group
+
+
+def create_gear_motor_home_group(
+    distance: float,
+    velocity: float,
+    backoff: Optional[bool] = False,
+) -> MoveGroup:
+    move_group: MoveGroup = []
+    home_step = create_tip_action_step(
+        velocity={NodeId.pipette_left: np.float64(-1 * velocity)},
+        acceleration={NodeId.pipette_left: np.float64(0)},
+        duration=np.float64(distance / velocity),
+        present_nodes=[NodeId.pipette_left],
+        action=PipetteTipActionType.home,
     )
-    return [step]
+    move_group.append(home_step)
+
+    if backoff:
+        backoff_group = create_tip_action_backoff_step(
+            velocity={
+                node_id: np.float64(velocity / 2) for node_id in [NodeId.pipette_left]
+            }
+        )
+        move_group.append(backoff_group)
+    return move_group
 
 
 def create_gripper_jaw_grip_group(
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
+    stay_engaged: bool = True,
 ) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
         duty_cycle=np.float32(round(duty_cycle)),
         stop_condition=stop_condition,
         move_type=MoveType.grip,
+        stay_engaged=stay_engaged,
     )
     move_group: MoveGroup = [step]
     return move_group
@@ -414,6 +497,16 @@ def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
     )
     move_group: MoveGroup = [step]
     return move_group
+
+
+def moving_axes_in_move_group(group: MoveGroup) -> Set[NodeId]:
+    """Utility function to get only the moving nodes in a move group."""
+    ret: Set[NodeId] = set()
+    for step in group:
+        for node, node_step in step.items():
+            if node_step.is_moving_step():
+                ret.add(node)
+    return ret
 
 
 AxisMapPayload = TypeVar("AxisMapPayload")

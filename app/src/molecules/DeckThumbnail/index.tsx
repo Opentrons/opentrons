@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 
 import {
@@ -6,6 +7,7 @@ import {
   Module,
   LabwareRender,
   SlotLabels,
+  COLORS,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -20,8 +22,10 @@ import {
   parseInitialLoadedModulesBySlot,
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
+  parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
+import { getIsOnDevice } from '../../redux/config'
 import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
 import { getStandardDeckViewBox } from './utils/getStandardViewBox'
 
@@ -51,6 +55,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const robotType = getRobotTypeFromLoadedLabware(labware)
   const deckDef = getDeckDefFromRobotType(robotType)
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
+  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
+    commands
+  )
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
     commands
@@ -60,6 +67,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     commands
   )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
+  const isOnDevice = useSelector(getIsOnDevice)
+  // TODO(bh, 2023-7-12): replace with color constant when added to design system
+  const deckFill = isOnDevice ? COLORS.light1 : '#e6e6e6'
 
   return (
     // PR #10488 changed size
@@ -68,6 +78,8 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     <RobotWorkSpace
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       deckDef={deckDef}
+      deckFill={deckFill}
+      trashSlotName="A3"
       viewBox={getStandardDeckViewBox(robotType)}
       {...styleProps}
     >
@@ -89,12 +101,27 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
                 ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
                 : null
+
             let labwareId =
               labwareInSlot != null ? labwareInSlot.result?.labwareId : null
-            labwareId =
-              labwareInModule != null
-                ? labwareInModule.result?.labwareId
-                : labwareId
+            let labwareInAdapter = null
+
+            if (labwareInModule != null) {
+              if (
+                labwareInModule?.result != null &&
+                'labwareId' in labwareInModule.result &&
+                labwareInModule.result.labwareId in
+                  initialLoadedLabwareByAdapter
+              ) {
+                labwareInAdapter =
+                  initialLoadedLabwareByAdapter[
+                    labwareInModule?.result.labwareId
+                  ]
+                labwareId = labwareInAdapter.result?.labwareId
+              } else {
+                labwareId = labwareInModule.params.labwareId
+              }
+            }
             const wellFill =
               labwareId != null && liquids != null
                 ? getWellFillFromLabwareId(
@@ -121,7 +148,11 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   >
                     {labwareInModule?.result?.definition != null ? (
                       <LabwareRender
-                        definition={labwareInModule.result.definition}
+                        definition={
+                          labwareInAdapter?.result != null
+                            ? labwareInAdapter?.result?.definition
+                            : labwareInModule?.result?.definition
+                        }
                         wellFill={wellFill ?? undefined}
                       />
                     ) : null}
@@ -129,9 +160,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                 ) : null}
                 {labwareInSlot?.result?.definition != null ? (
                   <g
-                    transform={`translate(${String(slot.position[0])},${String(
-                      slot.position[1]
-                    )})`}
+                    transform={`translate(${slot.position[0]},${slot.position[1]})`}
                   >
                     <LabwareRender
                       definition={labwareInSlot.result.definition}

@@ -8,6 +8,7 @@ import pytest
 from opentrons_shared_data.pipette import (
     mutable_configurations,
     types,
+    pipette_definition,
     pipette_load_name_conversions as pip_conversions,
     load_data,
     dev_types,
@@ -223,7 +224,7 @@ def test_save_invalid_overrides(
 )
 def test_load_with_overrides(
     overrides_fixture: types.MutableConfig,
-    pipette_model: pip_conversions.PipetteModelVersionType,
+    pipette_model: pipette_definition.PipetteModelVersionType,
     serial_number: str,
     override_configuration_path: Path,
 ) -> None:
@@ -248,3 +249,18 @@ def test_load_with_overrides(
         assert updated_configurations_dict == dict_loaded_configs
     else:
         assert updated_configurations == loaded_base_configurations
+
+
+def test_build_mutable_config_using_old_units() -> None:
+    """Test that MutableConfigs can build with old units."""
+    old_units_config = {
+        "value": 5,
+        "default": 5.0,
+        "units": "mm/s",
+        "type": "float",
+        "min": 0.01,
+        "max": 30,
+    }
+    assert (
+        types.MutableConfig.build(**old_units_config, name="dropTipSpeed") is not None  # type: ignore
+    )

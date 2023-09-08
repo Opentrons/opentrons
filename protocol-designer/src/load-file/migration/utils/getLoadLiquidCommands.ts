@@ -17,6 +17,7 @@ export interface DesignerApplicationData {
     }
   }
   savedStepForms: Record<string, any>
+  orderedStepIds: string[]
 }
 
 export const getLoadLiquidCommands = (

@@ -4,7 +4,7 @@ import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
 import type { IconProps, StyleProps } from '@opentrons/components'
 
-type ModalType = 'info' | 'warning' | 'error' | 'outlinedError'
+type ModalType = 'info' | 'warning' | 'error'
 export * from './LegacyModalShell'
 export * from './LegacyModalHeader'
 
@@ -16,6 +16,7 @@ export interface LegacyModalProps extends StyleProps {
   fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
+  footer?: React.ReactNode
 }
 
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
@@ -26,6 +27,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     title,
     childrenPadding = `${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24}`,
     children,
+    footer,
     ...styleProps
   } = props
 
@@ -37,9 +39,6 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
         break
       case 'error':
         iconColor = COLORS.errorEnabled
-        break
-      case 'outlinedError':
-        iconColor = COLORS.white
         break
     }
     return iconColor
@@ -56,15 +55,9 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     <LegacyModalHeader
       onClose={onClose}
       title={title}
-      icon={
-        ['error', 'warning', 'outlinedError'].includes(type)
-          ? modalIcon
-          : undefined
-      }
-      color={type === 'outlinedError' ? COLORS.white : COLORS.darkBlackEnabled}
-      backgroundColor={
-        type === 'outlinedError' ? COLORS.errorEnabled : COLORS.white
-      }
+      icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
+      color={COLORS.darkBlackEnabled}
+      backgroundColor={COLORS.white}
     />
   )
 
@@ -75,12 +68,8 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
       // center within viewport aside from nav
       marginLeft="7.125rem"
-      border={
-        type === 'outlinedError'
-          ? `0.375rem solid ${COLORS.errorEnabled}`
-          : 'none'
-      }
       {...props}
+      footer={footer}
     >
       <Box padding={childrenPadding}>{children}</Box>
     </LegacyModalShell>

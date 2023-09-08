@@ -1,29 +1,29 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  COLORS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_HIDDEN,
-  ALIGN_FLEX_END,
-  POSITION_ABSOLUTE,
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_STRETCH,
   ALIGN_FLEX_START,
+  ALIGN_STRETCH,
   BORDERS,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
-  SIZE_2,
-  Btn,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_HIDDEN,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  WRAP,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
@@ -32,7 +32,7 @@ import {
 } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
-import { LargeButton, TertiaryButton } from '../../atoms/buttons'
+import { LargeButton } from '../../atoms/buttons'
 import {
   useRunTimestamps,
   useRunControls,
@@ -52,11 +52,12 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
+import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
-import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -134,154 +135,141 @@ export function RunSummary(): JSX.Element {
   }
 
   return (
-    <>
-      <Btn
-        display={DISPLAY_FLEX}
-        width="100%"
-        height="100vh"
-        flexDirection={DIRECTION_COLUMN}
-        position={POSITION_RELATIVE}
-        overflow={OVERFLOW_HIDDEN}
-        disabled={isClosingCurrentRun}
-        onClick={handleClickSplash}
-      >
-        {showSplash ? (
+    <Btn
+      display={DISPLAY_FLEX}
+      width="100%"
+      height="100vh"
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      overflow={OVERFLOW_HIDDEN}
+      disabled={isClosingCurrentRun}
+      onClick={handleClickSplash}
+    >
+      {showSplash ? (
+        <Flex
+          height="100vh"
+          width="100%"
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          position={POSITION_ABSOLUTE}
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing40}
+          padding={SPACING.spacing40}
+          backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
+        >
+          <SplashFrame>
+            <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
+              <Icon
+                name={didRunSucceed ? 'ot-check' : 'ot-alert'}
+                size="4.5rem"
+                color={COLORS.white}
+              />
+              <SplashHeader>
+                {didRunSucceed
+                  ? t('run_complete_splash')
+                  : t('run_failed_splash')}
+              </SplashHeader>
+            </Flex>
+            <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
+              <SplashBody>{protocolName}</SplashBody>
+            </Flex>
+          </SplashFrame>
+        </Flex>
+      ) : (
+        <Flex
+          height="100vh"
+          width="100%"
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          padding={SPACING.spacing40}
+        >
+          {showRunFailedModal ? (
+            <RunFailedModal
+              runId={runId}
+              setShowRunFailedModal={setShowRunFailedModal}
+              errors={runRecord?.data.errors}
+            />
+          ) : null}
           <Flex
-            height="100vh"
-            width="100%"
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-            position={POSITION_ABSOLUTE}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing40}
-            padding={SPACING.spacing40}
-            backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
+            alignItems={ALIGN_FLEX_START}
+            gridGap={SPACING.spacing16}
           >
-            <SplashFrame>
-              <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
-                <Icon
-                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
-                  size="4.5rem"
-                  color={COLORS.white}
+            <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+              <Icon
+                name={didRunSucceed ? 'ot-check' : 'ot-alert'}
+                size="2rem"
+                color={
+                  didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
+                }
+              />
+              <SummaryHeader>{headerText}</SummaryHeader>
+            </Flex>
+            <ProtocolName>{protocolName}</ProtocolName>
+            <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
+              <SummaryDatum>
+                {`${t('run')}: ${formatTimeWithUtcLabel(createdAtTimestamp)}`}
+              </SummaryDatum>
+              <SummaryDatum>
+                {`${t('duration')}: `}
+                <RunTimer
+                  {...{
+                    runStatus,
+                    startedAt,
+                    stoppedAt,
+                    completedAt,
+                  }}
+                  style={DURATION_TEXT_STYLE}
                 />
-                <SplashHeader>
-                  {didRunSucceed
-                    ? t('run_complete_splash')
-                    : t('run_failed_splash')}
-                </SplashHeader>
-              </Flex>
-              <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
-                <SplashBody>{protocolName}</SplashBody>
-              </Flex>
-            </SplashFrame>
+              </SummaryDatum>
+              <SummaryDatum>
+                {`${t('start')}: ${formatTimeWithUtcLabel(startedAtTimestamp)}`}
+              </SummaryDatum>
+              <SummaryDatum>
+                {`${t('end')}: ${formatTimeWithUtcLabel(completedAtTimestamp)}`}
+              </SummaryDatum>
+            </Flex>
           </Flex>
-        ) : (
-          <Flex
-            height="100vh"
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            padding={SPACING.spacing40}
-          >
-            {showRunFailedModal ? (
-              <RunFailedModal
-                runId={runId}
-                setShowRunFailedModal={setShowRunFailedModal}
-                errors={runRecord?.data.errors}
+          <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
+            <LargeButton
+              flex="1"
+              iconName="arrow-left"
+              buttonType="secondary"
+              onClick={handleReturnToDash}
+              buttonText={t('return_to_dashboard')}
+              height="17rem"
+            />
+            <LargeButton
+              flex="1"
+              iconName="play-round-corners"
+              onClick={handleRunAgain}
+              buttonText={t('run_again')}
+              height="17rem"
+            />
+            {!didRunSucceed ? (
+              <LargeButton
+                flex="1"
+                iconName="info"
+                buttonType="alert"
+                onClick={handleViewErrorDetails}
+                buttonText={t('view_error_details')}
+                height="17rem"
+                disabled={
+                  runRecord?.data.errors == null ||
+                  runRecord?.data.errors.length === 0
+                }
               />
             ) : null}
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              alignItems={ALIGN_FLEX_START}
-              gridGap={SPACING.spacing16}
-            >
-              <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-                <Icon
-                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
-                  size={SIZE_2}
-                  color={
-                    didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
-                  }
-                />
-                <SummaryHeader>{headerText}</SummaryHeader>
-              </Flex>
-              <ProtocolName>{protocolName}</ProtocolName>
-              <Flex gridGap={SPACING.spacing8}>
-                <SummaryDatum>{`${t(
-                  'run'
-                )}: ${createdAtTimestamp}`}</SummaryDatum>
-                <SummaryDatum>
-                  {`${t('duration')}: `}
-                  <RunTimer
-                    {...{
-                      runStatus,
-                      startedAt,
-                      stoppedAt,
-                      completedAt,
-                    }}
-                    style={DURATION_TEXT_STYLE}
-                  />
-                </SummaryDatum>
-                <SummaryDatum>{`${t(
-                  'start'
-                )}: ${startedAtTimestamp}`}</SummaryDatum>
-                <SummaryDatum>{`${t(
-                  'end'
-                )}: ${completedAtTimestamp}`}</SummaryDatum>
-              </Flex>
-            </Flex>
-            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
-              <LargeButton
-                flex="1"
-                iconName="arrow-left"
-                buttonType="secondary"
-                onClick={handleReturnToDash}
-                buttonText={t('return_to_dashboard')}
-                height="17rem"
-              />
-              <LargeButton
-                flex="1"
-                iconName="play-round-corners"
-                onClick={handleRunAgain}
-                buttonText={t('run_again')}
-                height="17rem"
-              />
-              {!didRunSucceed ? (
-                <LargeButton
-                  flex="1"
-                  iconName="info"
-                  buttonType="alert"
-                  onClick={handleViewErrorDetails}
-                  buttonText={t('view_error_details')}
-                  height="17rem"
-                  disabled={
-                    runRecord?.data.errors == null ||
-                    runRecord?.data.errors.length === 0
-                  }
-                />
-              ) : null}
-            </Flex>
           </Flex>
-        )}
-      </Btn>
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing24}
-        width="fit-content"
-        paddingRight={SPACING.spacing32}
-      >
-        <Link to="/dashboard">
-          <TertiaryButton>back to RobotDashboard</TertiaryButton>
-        </Link>
-      </Flex>
-    </>
+        </Flex>
+      )}
+    </Btn>
   )
 }
 
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: 80px;
   line-height: 94px;
   color: ${COLORS.white};
@@ -330,7 +318,7 @@ const ProtocolName = styled.h4`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   height: max-content;
 `
 

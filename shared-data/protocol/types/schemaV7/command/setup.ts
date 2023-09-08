@@ -65,6 +65,7 @@ export type SetupRunTimeCommand =
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
+
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
@@ -72,12 +73,22 @@ export type SetupCreateCommand =
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
 
-export type LabwareLocation = { slotName: string } | { moduleId: string }
+export type LabwareLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
+  | { labwareId: string }
+
+export type NonStackedLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
 
 export interface ModuleLocation {
   slotName: string
 }
-interface LoadPipetteParams {
+export interface LoadPipetteParams {
+  pipetteName: string
   pipetteId: string
   mount: 'left' | 'right'
 }
@@ -85,25 +96,36 @@ interface LoadPipetteResult {
   pipetteId: string
 }
 interface LoadLabwareParams {
-  labwareId: string
   location: LabwareLocation
+  version: number
+  namespace: string
+  loadName: string
   displayName?: string
+  labwareId?: string
 }
 interface LoadLabwareResult {
   labwareId: string
   definition: LabwareDefinition2
   offset: LabwareOffset
 }
-interface MoveLabwareParams {
+
+export type LabwareMovementStrategy =
+  | 'usingGripper'
+  | 'manualMoveWithPause'
+  | 'manualMoveWithoutPause'
+
+export interface MoveLabwareParams {
   labwareId: string
   newLocation: LabwareLocation
+  strategy: LabwareMovementStrategy
 }
 interface MoveLabwareResult {
   offsetId: string
 }
 interface LoadModuleParams {
-  moduleId: string
+  moduleId?: string
   location: ModuleLocation
+  model: ModuleModel
 }
 interface LoadModuleResult {
   moduleId: string

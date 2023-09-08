@@ -140,7 +140,10 @@ class PythonConfig(BaseModel):
 
 
 class AnalyzeResults(BaseModel):
-    """Results of a protocol analysis."""
+    """Results of a protocol analysis.
+
+    See robot-server's analysis models for field documentation.
+    """
 
     createdAt: datetime
     files: List[ProtocolFile]

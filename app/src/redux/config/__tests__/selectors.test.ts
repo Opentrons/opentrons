@@ -43,6 +43,20 @@ describe('shell selectors', () => {
     })
   })
 
+  describe('getHasJustUpdated', () => {
+    it('should return false if config is unknown', () => {
+      const state: State = { config: null } as any
+      expect(Selectors.getHasJustUpdated(state)).toEqual(false)
+    })
+
+    it('should return config.update.hasJustUpdated if config is known', () => {
+      const state: State = {
+        config: { update: { hasJustUpdated: false } },
+      } as any
+      expect(Selectors.getHasJustUpdated(state)).toEqual(false)
+    })
+  })
+
   describe('getUpdateChannelOptions', () => {
     it('should return "latest" and "beta" options if config is unknown', () => {
       const state: State = { config: null } as any
@@ -220,6 +234,30 @@ describe('shell selectors', () => {
         textSize: 1,
         unfinishedUnboxingFlowRoute: '/welcome',
       })
+    })
+  })
+
+  describe('applyHistoricOffsets', () => {
+    it('should return false if applyHistoricOffsets is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            applyHistoricOffsets: false,
+          },
+        },
+      } as any
+      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(false)
+    })
+
+    it('should return true if applyHistoricOffsets is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            applyHistoricOffsets: true,
+          },
+        },
+      } as any
+      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(true)
     })
   })
 })

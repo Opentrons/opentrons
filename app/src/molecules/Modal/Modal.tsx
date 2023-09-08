@@ -11,9 +11,10 @@ import {
 import { BackgroundOverlay } from '../BackgroundOverlay'
 import { ModalHeader } from './ModalHeader'
 
+import type { StyleProps } from '@opentrons/components'
 import type { ModalHeaderBaseProps, ModalSize } from '../Modal/types'
 
-interface ModalProps {
+interface ModalProps extends StyleProps {
   /** clicking anywhere outside of the modal closes it  */
   onOutsideClick?: React.MouseEventHandler
   /** modal content */
@@ -22,8 +23,6 @@ interface ModalProps {
   modalSize?: ModalSize
   /** see ModalHeader component for more details */
   header?: ModalHeaderBaseProps
-  /** an option for adding additional styles for an error modal */
-  isError?: boolean
 }
 export function Modal(props: ModalProps): JSX.Element {
   const {
@@ -31,7 +30,7 @@ export function Modal(props: ModalProps): JSX.Element {
     onOutsideClick,
     children,
     header,
-    isError,
+    ...styleProps
   } = props
 
   let modalWidth: string = '45.625rem'
@@ -55,11 +54,10 @@ export function Modal(props: ModalProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
     >
       <Flex
-        backgroundColor={isError ? COLORS.red2 : COLORS.white}
-        border={isError ? `0.375rem solid ${COLORS.red2}` : 'none'}
+        backgroundColor={COLORS.white}
         width={modalWidth}
         height="max-content"
-        maxHeight="33.5rem"
+        maxHeight="36.875rem"
         borderRadius={BORDERS.borderRadiusSize3}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing32}
@@ -70,14 +68,7 @@ export function Modal(props: ModalProps): JSX.Element {
         }}
       >
         {header != null ? (
-          <ModalHeader
-            title={header.title}
-            iconName={header.iconName}
-            iconColor={header.iconColor}
-            hasExitIcon={header.hasExitIcon}
-            onClick={onOutsideClick}
-            isError={isError}
-          />
+          <ModalHeader {...header} onClick={onOutsideClick} />
         ) : null}
         <Flex
           backgroundColor={COLORS.white}
@@ -89,6 +80,8 @@ export function Modal(props: ModalProps): JSX.Element {
               ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
               : BORDERS.borderRadiusSize3
           }
+          maxHeight="30.625rem"
+          {...styleProps}
         >
           {children}
         </Flex>

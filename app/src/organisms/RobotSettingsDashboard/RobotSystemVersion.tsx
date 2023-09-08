@@ -21,7 +21,7 @@ import { getShellUpdateState } from '../../redux/shell'
 
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
-const GITHUB_URL = 'https://github.com/Opentrons/opentrons'
+const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 
 interface RobotSystemVersionProps {
   currentVersion: string
@@ -74,11 +74,12 @@ export function RobotSystemVersion({
           gridGap="16rem"
           flexDirection={DIRECTION_COLUMN}
           paddingX={SPACING.spacing40}
+          marginTop="7.75rem"
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <StyledText as="p">{`${t(
-              'view_latest_release_notes_at'
-            )} ${GITHUB_URL}`}</StyledText>
+            <StyledText as="p">
+              {t('view_latest_release_notes_at', { url: GITHUB_URL })}
+            </StyledText>
             <Flex
               backgroundColor={COLORS.light1}
               flexDirection={DIRECTION_ROW}

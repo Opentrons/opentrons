@@ -10,7 +10,7 @@ import type {
   LabwareLocation,
   LoadModuleRunTimeCommand,
   ModuleLocation,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 export interface LabwareSetupItem {
   definition: LabwareDefinition2
@@ -18,6 +18,7 @@ export interface LabwareSetupItem {
   initialLocation: LabwareLocation
   moduleModel: ModuleModel | null
   moduleLocation: ModuleLocation | null
+  labwareId?: string
 }
 
 export interface GroupedLabwareSetupItems {
@@ -88,6 +89,7 @@ export function getLabwareSetupItemGroups(
             moduleModel,
             moduleLocation,
             nickName,
+            labwareId: c.result?.labwareId,
           },
         ]
       } else if (

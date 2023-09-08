@@ -20,9 +20,8 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
-import { useMaintenanceRunTakeover } from '../TakeoverModal'
-import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -35,7 +34,6 @@ interface InstrumentInfoProps {
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t, i18n } = useTranslation('instruments_dashboard')
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
@@ -57,11 +55,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     instrument != null &&
     instrument.ok &&
     instrument.mount !== 'extension' &&
-    // @ts-expect-error the mount acts as a type narrower here
     instrument.data?.channels === 96
 
   const handleDetach: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -89,7 +85,6 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -118,46 +113,56 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       height="100%"
     >
       {instrument != null && instrument.ok ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          marginTop={SPACING.spacing24}
-        >
-          <InfoItem
-            label={t('last_calibrated')}
-            value={
-              instrument.data.calibratedOffset?.last_modified != null
-                ? formatTimestamp(
-                    instrument.data.calibratedOffset?.last_modified
-                  )
-                : i18n.format(t('no_cal_data'), 'capitalize')
-            }
-          />
-          <InfoItem label={t('firmware_version')} value="TODO" />
-          <InfoItem
-            label={t('serial_number')}
-            value={instrument.serialNumber}
-          />
-        </Flex>
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            marginTop={SPACING.spacing24}
+          >
+            <InfoItem
+              label={t('last_calibrated')}
+              value={
+                instrument.data.calibratedOffset?.last_modified != null
+                  ? formatTimeWithUtcLabel(
+                      instrument.data.calibratedOffset?.last_modified
+                    )
+                  : i18n.format(t('no_cal_data'), 'capitalize')
+              }
+            />
+            {instrument.firmwareVersion != null && (
+              <InfoItem
+                label={t('firmware_version')}
+                value={instrument.firmwareVersion}
+              />
+            )}
+            <InfoItem
+              label={t('serial_number')}
+              value={instrument.serialNumber}
+            />
+          </Flex>
+          <Flex gridGap={SPACING.spacing8}>
+            <MediumButton
+              buttonType="secondary"
+              flex="1"
+              onClick={handleDetach}
+              buttonText={t('detach')}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+            <MediumButton
+              flex="1"
+              onClick={handleRecalibrate}
+              buttonText={
+                instrument.data.calibratedOffset?.last_modified == null
+                  ? t('calibrate')
+                  : t('recalibrate')
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+          </Flex>
+        </>
       ) : null}
-      <Flex gridGap={SPACING.spacing8}>
-        <MediumButton
-          buttonType="secondary"
-          flex="1"
-          onClick={handleDetach}
-          buttonText={t('detach')}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          justifyContent={JUSTIFY_CENTER}
-        />
-        <MediumButton
-          buttonType="primary"
-          flex="1"
-          onClick={handleRecalibrate}
-          buttonText={t('recalibrate')}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          justifyContent={JUSTIFY_CENTER}
-        />
-      </Flex>
       {wizardProps != null && 'mount' in wizardProps ? (
         <PipetteWizardFlows {...wizardProps} />
       ) : null}

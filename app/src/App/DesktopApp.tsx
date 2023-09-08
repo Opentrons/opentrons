@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 
 import {
   Box,
-  POSITION_RELATIVE,
   COLORS,
-  OVERFLOW_SCROLL,
+  OVERFLOW_AUTO,
+  POSITION_RELATIVE,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
@@ -22,13 +23,21 @@ import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
+import { EstopTakeover, EmergencyStopContext } from '../organisms/EmergencyStop'
+import { OPENTRONS_USB } from '../redux/discovery'
+import { appShellRequestor } from '../redux/shell/remote'
+import { useRobot, useIsOT3 } from '../organisms/Devices/hooks'
+import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
-import type { RouteProps } from './types'
-import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
+import type { RouteProps, DesktopRouteParams  } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
+  const [
+    isEmergencyStopModalDismissed,
+    setIsEmergencyStopModalDismissed,
+  ] = React.useState<boolean>(false)
 
   const desktopRoutes: RouteProps[] = [
     {
@@ -98,30 +107,62 @@ export const DesktopApp = (): JSX.Element => {
     <>
       <Navbar routes={desktopRoutes} />
       <ToasterOven>
-        <Box width="100%">
-          <Switch>
-            {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect exact from="/" to="/protocols" />
-          </Switch>
-          <Alerts />
-        </Box>
+        <EmergencyStopContext.Provider
+          value={{
+            isEmergencyStopModalDismissed,
+            setIsEmergencyStopModalDismissed,
+          }}
+        >
+          <Box width="100%">
+            <Switch>
+              {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
+                return (
+                  <Route key={path} exact={exact} path={path}>
+                    <Breadcrumbs />
+                    <Box
+                      position={POSITION_RELATIVE}
+                      width="100%"
+                      height="100%"
+                      backgroundColor={COLORS.fundamentalsBackground}
+                      overflow={OVERFLOW_AUTO}
+                    >
+                      <ModalPortalRoot />
+                      <Component />
+                    </Box>
+                  </Route>
+                )
+              })}
+              <Redirect exact from="/" to="/protocols" />
+            </Switch>
+            <RobotControlTakeover />
+            <Alerts />
+          </Box>
+        </EmergencyStopContext.Provider>
       </ToasterOven>
     </>
+  )
+}
+
+function RobotControlTakeover(): JSX.Element | null {
+  const deviceRouteMatch = useRouteMatch({ path: '/devices/:robotName' })
+  const params = deviceRouteMatch?.params as DesktopRouteParams
+  const robotName = params?.robotName
+  const robot = useRobot(robotName)
+  const isOT3 = useIsOT3(robotName)
+
+  // E-stop is not supported on OT2
+  if (!isOT3) return null
+
+  if (deviceRouteMatch == null || robot == null || robotName == null)
+    return null
+
+  return (
+    <ApiHostProvider
+      key={robot.name}
+      hostname={robot.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+    >
+      <EstopTakeover robotName={robotName} />
+    </ApiHostProvider>
   )
 }

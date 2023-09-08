@@ -34,7 +34,19 @@ class EnumeratedError(Exception):
 
     def __str__(self) -> str:
         """Get a human-readable string."""
-        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}'
+        _node = self.detail.get("node")
+        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}{f" ({_node})" if _node else ""}'
+
+    def __eq__(self, other: object) -> bool:
+        """Compare if two enumerated errors match."""
+        if not isinstance(other, EnumeratedError):
+            return NotImplemented
+        return (
+            self.code == other.code
+            and self.message == other.message
+            and self.detail == other.detail
+            and self.wrapping == other.wrapping
+        )
 
 
 class CommunicationError(EnumeratedError):
@@ -196,7 +208,7 @@ class PythonException(GeneralError):
         base_details["class"] = type(exc).__name__
 
         super().__init__(
-            message="\n".join(format_exception_only(type(exc), exc)),
+            message="\n".join(format_exception_only(type(exc), exc)).strip(),
             detail=base_details,
             wrapping=_descend_exc_ctx(exc),
         )
@@ -411,6 +423,106 @@ class MoveConditionNotMetError(RoboticsControlError):
         super().__init__(
             ErrorCodes.MOVE_CONDITION_NOT_MET,
             message or "Move completed without its complete condition being met",
+            detail,
+            wrapping,
+        )
+
+
+class CalibrationStructureNotFoundError(RoboticsControlError):
+    """An error indicating that a calibration square was not able to be found."""
+
+    def __init__(
+        self,
+        structure_height: float,
+        lower_limit: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CalibrationStructureNotFoundError."""
+        super().__init__(
+            ErrorCodes.CALIBRATION_STRUCTURE_NOT_FOUND,
+            f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}.",
+            detail,
+            wrapping,
+        )
+
+
+class EdgeNotFoundError(RoboticsControlError):
+    """An error indicating that a calibration square edge was not able to be found."""
+
+    def __init__(
+        self,
+        edge_name: str,
+        stride: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a EdgeNotFoundError."""
+        super().__init__(
+            ErrorCodes.EDGE_NOT_FOUND,
+            f"Edge {edge_name} could not be verified at {stride} mm resolution.",
+            detail,
+            wrapping,
+        )
+
+
+class EarlyCapacitiveSenseTrigger(RoboticsControlError):
+    """An error indicating that a capacitive probe triggered too early."""
+
+    def __init__(
+        self,
+        found: float,
+        nominal: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a EarlyCapacitiveSenseTrigger."""
+        super().__init__(
+            ErrorCodes.EARLY_CAPACITIVE_SENSE_TRIGGER,
+            f"Calibration triggered early at z={found}mm, expected {nominal}",
+            detail,
+            wrapping,
+        )
+
+
+class InaccurateNonContactSweepError(RoboticsControlError):
+    """An error indicating that a capacitive sweep was inaccurate."""
+
+    def __init__(
+        self,
+        found: float,
+        nominal: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InaccurateNonContactSweepError."""
+        msg = (
+            f"Calibration detected a slot width of {found:.3f}mm, "
+            f"which is too far from the design width of {nominal:.3f}mm"
+        )
+        super().__init__(
+            ErrorCodes.INACCURATE_NON_CONTACT_SWEEP,
+            msg,
+            detail,
+            wrapping,
+        )
+
+
+class MisalignedGantryError(RoboticsControlError):
+    """An error indicating that the robot's gantry and deck are misaligned."""
+
+    def __init__(
+        self,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MisalignedGantryError."""
+        msg = "This machine is misaligned and requires maintenance."
+        if detail:
+            msg += str(detail)
+        super().__init__(
+            ErrorCodes.MISALIGNED_GANTRY,
+            msg,
             detail,
             wrapping,
         )

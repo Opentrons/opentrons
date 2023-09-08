@@ -102,6 +102,6 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
   it('renders Not calibrated yet when no pipette offset calibrations data', () => {
     mockUsePipetteOffsetCalibrations.mockReturnValue(null)
     const [{ getByText }] = render()
-    getByText('Not calibrated yet')
+    getByText('No pipette attached')
   })
 })

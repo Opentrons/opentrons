@@ -9,6 +9,7 @@ import {
   SPACING,
   PrimaryButton,
   SecondaryButton,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
   getPipetteNameSpecs,
@@ -140,14 +141,13 @@ export const Results = (props: ResultsProps): JSX.Element => {
     ) {
       const axes: MotorAxes =
         mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
-      chainRunCommands(
+      chainRunCommands?.(
         [
           {
             commandType: 'loadPipette' as const,
             params: {
-              // @ts-expect-error pipetteName is required but missing in schema v6 type
-              pipetteName: attachedPipettes[mount]?.instrumentName,
-              pipetteId: attachedPipettes[mount]?.serialNumber,
+              pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+              pipetteId: attachedPipettes[mount]?.serialNumber ?? '',
               mount: mount,
             },
           },
@@ -155,29 +155,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
             commandType: 'home' as const,
             params: {
               axes: axes,
-            },
-          },
-        ],
-        false
-      )
-        .then(() => {
-          proceed()
-        })
-        .catch(error => {
-          setShowErrorMessage(error.message)
-        })
-    } else if (
-      isSuccess &&
-      flowType === FLOWS.DETACH &&
-      currentStepIndex !== totalStepCount
-    ) {
-      chainRunCommands(
-        [
-          {
-            // @ts-expect-error calibration type not yet supported
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
             },
           },
         ],
@@ -208,6 +185,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       {buttonText}
     </PrimaryButton>
   )
+
   if (
     flowType === FLOWS.ATTACH &&
     requiredPipette != null &&
@@ -289,6 +267,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
       subHeader={subHeader}
       isPending={isFetching}
       width="100%"
+      justifyContentForOddButton={
+        isOnDevice && isSuccess ? ALIGN_FLEX_END : undefined
+      }
     >
       {button}
     </SimpleWizardBody>

@@ -86,8 +86,7 @@ class AbstractProtocol(
         labware_core: LabwareCoreType,
         new_location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
         use_gripper: bool,
-        use_pick_up_location_lpc_offset: bool,
-        use_drop_location_lpc_offset: bool,
+        pause_for_manual_move: bool,
         pick_up_offset: Optional[Tuple[float, float, float]],
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:

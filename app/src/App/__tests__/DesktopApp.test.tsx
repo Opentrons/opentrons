@@ -14,11 +14,13 @@ import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
+import { useIsOT3 } from '../../organisms/Devices/hooks'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
 jest.mock('../../organisms/Alerts')
 jest.mock('../../organisms/Breadcrumbs')
+jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/AppSettings/GeneralSettings')
 jest.mock('../../pages/Devices/CalibrationDashboard')
 jest.mock('../../pages/Devices/DeviceDetails')
@@ -54,6 +56,7 @@ const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 const mockUseSoftwareUpdatePoll = useSoftwareUpdatePoll as jest.MockedFunction<
   typeof useSoftwareUpdatePoll
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -77,6 +80,7 @@ describe('DesktopApp', () => {
     mockAlerts.mockReturnValue(<div>Mock Alerts</div>)
     mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
     mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
+    mockUseIsOT3.mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()

@@ -35,7 +35,12 @@ export const mockApiTemperatureModule: ApiTypes.ApiTemperatureModule = {
     targetTemperature: null,
     status: 'idle',
   },
-  usbPort: { hub: null, port: 1, path: '/dev/ot_module_tempdeck0' },
+  usbPort: {
+    hub: false,
+    portGroup: 'unknown',
+    port: 1,
+    path: '/dev/ot_module_tempdeck0',
+  },
 }
 
 export const mockApiTemperatureModuleGen2: ApiTypes.ApiTemperatureModule = {
@@ -52,7 +57,12 @@ export const mockApiTemperatureModuleGen2: ApiTypes.ApiTemperatureModule = {
     targetTemperature: null,
     status: 'idle',
   },
-  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_tempdeck0' },
+  usbPort: {
+    hub: true,
+    portGroup: 'unknown',
+    port: 1,
+    path: '/dev/ot_module_tempdeck0',
+  },
 }
 
 export const mockTemperatureModule: Types.TemperatureModule = {
@@ -68,7 +78,12 @@ export const mockTemperatureModule: Types.TemperatureModule = {
     targetTemperature: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_tempdeck0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_tempdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockTemperatureModuleGen2: Types.TemperatureModule = {
@@ -84,7 +99,12 @@ export const mockTemperatureModuleGen2: Types.TemperatureModule = {
     targetTemperature: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_tempdeck0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_tempdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockApiMagneticModuleLegacy: ApiTypes.ApiMagneticModuleLegacy = {
@@ -115,7 +135,12 @@ export const mockApiMagneticModule: ApiTypes.ApiMagneticModule = {
     height: 42,
     status: 'disengaged',
   },
-  usbPort: { hub: null, port: 1, path: '/dev/ot_module_magdeck0' },
+  usbPort: {
+    hub: false,
+    portGroup: 'unknown',
+    port: 1,
+    path: '/dev/ot_module_magdeck0',
+  },
 }
 
 export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
@@ -132,7 +157,12 @@ export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
     height: 42,
     status: 'disengaged',
   },
-  usbPort: { hub: null, port: 1, path: '/dev/ot_module_magdeck0' },
+  usbPort: {
+    hub: false,
+    portGroup: 'unknown',
+    port: 1,
+    path: '/dev/ot_module_magdeck0',
+  },
 }
 
 export const mockMagneticModule: Types.MagneticModule = {
@@ -148,7 +178,12 @@ export const mockMagneticModule: Types.MagneticModule = {
     height: 42,
     status: 'disengaged',
   },
-  usbPort: { path: '/dev/ot_module_magdeck0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_magdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockMagneticModuleGen2: Types.MagneticModule = {
@@ -164,7 +199,12 @@ export const mockMagneticModuleGen2: Types.MagneticModule = {
     height: 42,
     status: 'disengaged',
   },
-  usbPort: { path: '/dev/ot_module_magdeck0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_magdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockApiThermocyclerLegacy: ApiTypes.ApiThermocyclerModuleLegacy = {
@@ -216,7 +256,12 @@ export const mockApiThermocycler: ApiTypes.ApiThermocyclerModule = {
     totalStepCount: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_thermocycler0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockThermocycler: Types.ThermocyclerModule = {
@@ -242,7 +287,12 @@ export const mockThermocycler: Types.ThermocyclerModule = {
     totalStepCount: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_thermocycler0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockThermocyclerGen2: Types.ThermocyclerModule = {
@@ -268,7 +318,12 @@ export const mockThermocyclerGen2: Types.ThermocyclerModule = {
     totalStepCount: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_thermocycler2', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler2',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockApiHeaterShaker: ApiTypes.ApiHeaterShakerModule = {
@@ -290,7 +345,12 @@ export const mockApiHeaterShaker: ApiTypes.ApiHeaterShakerModule = {
     errorDetails: null,
     status: 'idle',
   },
-  usbPort: { hub: 1, port: 1, path: '/dev/ot_module_heatershaker0' },
+  usbPort: {
+    hub: true,
+    portGroup: 'unknown',
+    port: 1,
+    path: '/dev/ot_module_heatershaker0',
+  },
 }
 
 export const mockHeaterShaker: Types.HeaterShakerModule = {
@@ -312,7 +372,12 @@ export const mockHeaterShaker: Types.HeaterShakerModule = {
     errorDetails: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_heatershaker0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 export const mockMagneticBlock = {

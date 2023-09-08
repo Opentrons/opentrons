@@ -1,5 +1,6 @@
 """Production QC User Interface."""
-
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.types import StatusBarState
 
 PRINT_HEADER_NUM_SPACES = 4
 PRINT_HEADER_DASHES = "-" * PRINT_HEADER_NUM_SPACES
@@ -23,6 +24,13 @@ def get_user_answer(question: str) -> bool:
 def get_user_ready(message: str) -> None:
     """Get user ready."""
     input(f"WAIT: {message}, press ENTER when ready: ")
+
+
+def alert_user_ready(message: str, hw: SyncHardwareAPI) -> None:
+    """Flash the ui lights on the ot3 and then use the get_user_ready."""
+    hw.set_status_bar_state(StatusBarState.PAUSED)
+    get_user_ready(message)
+    hw.set_status_bar_state(StatusBarState.CONFIRMATION)
 
 
 def print_title(title: str) -> None:
@@ -54,3 +62,8 @@ def print_header(header: str) -> None:
 def print_error(message: str) -> None:
     """Print error."""
     print(f"ERROR: {message}")
+
+
+def print_info(message: str) -> None:
+    """Print information."""
+    print(message)

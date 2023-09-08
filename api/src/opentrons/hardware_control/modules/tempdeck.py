@@ -171,9 +171,10 @@ class TempDeck(mod_abc.AbstractModule):
         self.make_cancellable(t)
         await t
 
-    async def deactivate(self) -> None:
+    async def deactivate(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling and turn off the fan"""
-        await self.wait_for_is_running()
+        if must_be_running:
+            await self.wait_for_is_running()
         await self._driver.deactivate()
         await self._reader.read()
 

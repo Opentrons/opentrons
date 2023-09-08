@@ -9,7 +9,7 @@ import {
   getConnectableRobots,
   getReachableRobots,
 } from '../../../redux/discovery'
-import { getOnDeviceDisplaySettings } from '../../../redux/config'
+import { useIsUnboxingFlowOngoing } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -17,18 +17,20 @@ import {
 
 import { NameRobot } from '../NameRobot'
 
-import type { OnDeviceDisplaySettings } from '../../../redux/config/types'
-
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/analytics')
+jest.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
 
-const mockSettings = {
-  sleepMs: 0,
-  brightness: 1,
-  textSize: 1,
-  unfinishedUnboxingFlowRoute: '/robot-settings/rename-robot',
-} as OnDeviceDisplaySettings
+const mockPush = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -39,8 +41,8 @@ const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
-  typeof getOnDeviceDisplaySettings
+const mockuseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
+  typeof useIsUnboxingFlowOngoing
 >
 let mockTrackEvent: jest.Mock
 
@@ -61,7 +63,7 @@ describe('NameRobot', () => {
     mockReachableRobot.name = 'reachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
+    mockuseIsUnboxingFlowOngoing.mockReturnValue(true)
   })
 
   it('should render text, button and keyboard', () => {
@@ -78,16 +80,15 @@ describe('NameRobot', () => {
   it('should display a letter when typing a letter', () => {
     const [{ getByRole }] = render()
     const input = getByRole('textbox')
-    fireEvent.click(getByRole('button', { name: 'a' }))
-    fireEvent.click(getByRole('button', { name: 'b' }))
-    fireEvent.click(getByRole('button', { name: 'c' }))
+    getByRole('button', { name: 'a' }).click()
+    getByRole('button', { name: 'b' }).click()
+    getByRole('button', { name: 'c' }).click()
     expect(input).toHaveValue('abc')
   })
 
   it('should show an error message when tapping confirm without typing anything', async () => {
     const [{ findByText, getByLabelText }] = render()
-    const button = getByLabelText('SmallButton_primary')
-    fireEvent.click(button)
+    getByLabelText('SmallButton_primary').click()
     const error = await findByText(
       'Oops! Robot name must follow the character count and limitations'
     )
@@ -102,8 +103,7 @@ describe('NameRobot', () => {
     fireEvent.change(input, {
       target: { value: 'connectableOtie' },
     })
-    const nameButton = getByLabelText('SmallButton_primary')
-    fireEvent.click(nameButton)
+    getByLabelText('SmallButton_primary').click()
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -118,8 +118,7 @@ describe('NameRobot', () => {
     fireEvent.change(input, {
       target: { value: 'reachableOtie' },
     })
-    const nameButton = getByLabelText('SmallButton_primary')
-    fireEvent.click(nameButton)
+    getByLabelText('SmallButton_primary').click()
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -130,17 +129,15 @@ describe('NameRobot', () => {
 
   it('should call a mock function when tapping the confirm button', () => {
     const [{ getByRole, getByLabelText }] = render()
-    fireEvent.click(getByRole('button', { name: 'a' }))
-    fireEvent.click(getByRole('button', { name: 'b' }))
-    fireEvent.click(getByRole('button', { name: 'c' }))
-    const button = getByLabelText('SmallButton_primary')
-    fireEvent.click(button)
+    getByRole('button', { name: 'a' }).click()
+    getByRole('button', { name: 'b' }).click()
+    getByRole('button', { name: 'c' }).click()
+    getByLabelText('SmallButton_primary').click()
     expect(mockTrackEvent).toHaveBeenCalled()
   })
 
   it('should render text and button when coming from robot settings', () => {
-    mockSettings.unfinishedUnboxingFlowRoute = null
-    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
+    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
     const [{ getByText, queryByText }] = render()
     getByText('Rename robot')
     expect(
@@ -148,5 +145,12 @@ describe('NameRobot', () => {
     ).not.toBeInTheDocument()
     getByText('Enter up to 17 characters (letters and numbers only)')
     getByText('Confirm')
+  })
+
+  it('should call a mock function when tapping back button', () => {
+    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
+    const [{ getByTestId }] = render()
+    getByTestId('name_back_button').click()
+    expect(mockPush).toHaveBeenCalledWith('/robot-settings')
   })
 })

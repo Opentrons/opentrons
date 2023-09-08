@@ -60,9 +60,7 @@ class HardwareTipHandler(TipHandler):
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
         nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
+            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
         )
 
         actual_tip_length = await self._labware_data_provider.get_calibrated_tip_length(
@@ -98,10 +96,14 @@ class HardwareTipHandler(TipHandler):
         """Drop a tip at the current location using the Hardware API."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        await self._hardware_api.drop_tip(
-            mount=hw_mount,
-            home_after=True if home_after is None else home_after,
-        )
+        # Let the hardware controller handle defaulting home_after since its behavior
+        # differs between machines
+        if home_after is not None:
+            kwargs = {"home_after": home_after}
+        else:
+            kwargs = {}
+
+        await self._hardware_api.drop_tip(mount=hw_mount, **kwargs)
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""

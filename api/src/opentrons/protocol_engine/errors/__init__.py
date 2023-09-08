@@ -14,8 +14,6 @@ from .exceptions import (
     LabwareNotOnDeckError,
     LiquidDoesNotExistError,
     LabwareDefinitionDoesNotExistError,
-    LabwareDefinitionIsNotLabwareError,
-    LabwareDefinitionIsNotAdapterError,
     LabwareCannotBeStackedError,
     LabwareIsInStackError,
     LabwareOffsetDoesNotExistError,
@@ -49,15 +47,15 @@ from .exceptions import (
     InvalidHoldTimeError,
     CannotPerformModuleAction,
     PauseNotAllowedError,
-    ProtocolCommandFailedError,
     GripperNotAttachedError,
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
     InvalidAxisForRobotType,
+    NotSupportedOnRobotType,
 )
 
-from .error_occurrence import ErrorOccurrence
+from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
 
 __all__ = [
     # exceptions
@@ -74,8 +72,6 @@ __all__ = [
     "LabwareNotOnDeckError",
     "LiquidDoesNotExistError",
     "LabwareDefinitionDoesNotExistError",
-    "LabwareDefinitionIsNotLabwareError",
-    "LabwareDefinitionIsNotAdapterError",
     "LabwareCannotBeStackedError",
     "LabwareIsInStackError",
     "LabwareOffsetDoesNotExistError",
@@ -115,6 +111,7 @@ __all__ = [
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
     "InvalidAxisForRobotType",
+    "NotSupportedOnRobotType",
     # error occurrence models
     "ErrorOccurrence",
 ]

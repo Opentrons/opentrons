@@ -1,6 +1,12 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
-import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SIZE_1,
+  SPACING,
+} from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -42,6 +48,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
   requiredPipette?: LoadedPipette
 }
 export const BeforeBeginning = (
@@ -61,10 +68,14 @@ export const BeforeBeginning = (
     selectedPipette,
     isOnDevice,
     requiredPipette,
+    maintenanceRunId,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
@@ -152,15 +163,13 @@ export const BeforeBeginning = (
       {
         commandType: 'loadPipette' as const,
         params: {
-          // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipettes[mount]?.instrumentName,
-          pipetteId: pipetteId,
+          pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+          pipetteId: pipetteId ?? '',
           mount: mount,
         },
       },
       { commandType: 'home' as const, params: {} },
       {
-        // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
           mount: mount,
@@ -168,7 +177,7 @@ export const BeforeBeginning = (
       },
     ]
     if (pipetteId == null) moveToFrontCommands = moveToFrontCommands.slice(1)
-    chainRunCommands(moveToFrontCommands, false)
+    chainRunCommands?.(moveToFrontCommands, false)
       .then(() => {
         proceed()
       })
@@ -180,7 +189,6 @@ export const BeforeBeginning = (
   const SingleMountAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: mount,
@@ -191,7 +199,6 @@ export const BeforeBeginning = (
   const NinetySixChannelAttachCommand: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,
@@ -201,7 +208,7 @@ export const BeforeBeginning = (
   ]
 
   const handleOnClickAttach = (): void => {
-    chainRunCommands(
+    chainRunCommands?.(
       selectedPipette === SINGLE_MOUNT_PIPETTES
         ? SingleMountAttachCommand
         : NinetySixChannelAttachCommand,
@@ -242,17 +249,19 @@ export const BeforeBeginning = (
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
             </Banner>
           ) : null}
-          <Trans
-            t={t}
-            i18nKey={bodyTranslationKey}
-            components={{
-              block: <StyledText css={BODY_STYLE} />,
-            }}
-          />
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
+            <Trans
+              t={t}
+              i18nKey={bodyTranslationKey}
+              components={{
+                block: <StyledText css={BODY_STYLE} />,
+              }}
+            />
+          </Flex>
         </>
       }
       proceedButtonText={proceedButtonText}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={
         isGantryEmptyFor96ChannelAttachment ||
         (flowType === FLOWS.ATTACH && selectedPipette === SINGLE_MOUNT_PIPETTES)

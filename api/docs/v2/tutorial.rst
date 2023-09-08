@@ -100,6 +100,8 @@ You can include any other information you like in the metadata dictionary. The f
 
 Note, if you have a Flex, or are using an OT-2 with API v2.15 (or higher), we recommend adding a ``requirements`` section to your code. See the Requirements section below.
 
+.. _tutorial-requirements:
+
 Requirements
 ^^^^^^^^^^^^
 
@@ -309,8 +311,10 @@ There are two ways to try out your protocol: simulation on your computer, or a l
 
 If you get any errors in simulation, or you don't get the outcome you expected when running your protocol, you can check your code against these reference protocols on GitHub:
 
-- `Single-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial.py>`_
-- `8-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_multi.py>`_
+- `Flex: Single-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_flex.py>`_
+- `Flex: 8-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_multi_flex.py>`_
+- `OT-2: Single-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial.py>`_
+- `OT-2: 8-channel serial dilution <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_multi.py>`_
 
 .. _tutorial-simulate:
 

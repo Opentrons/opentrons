@@ -1,13 +1,17 @@
 import pytest
 
-from opentrons_shared_data.pipette.pipette_definition import (
+from typing import Union
+from opentrons_shared_data.pipette.types import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
     PipetteGenerationType,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
-from opentrons_shared_data.pipette import pipette_load_name_conversions as pc
+from opentrons_shared_data.pipette import (
+    pipette_definition as pc,
+    pipette_load_name_conversions as ps,
+)
 
 
 @pytest.mark.parametrize(
@@ -42,7 +46,7 @@ from opentrons_shared_data.pipette import pipette_load_name_conversions as pc
 def test_convert_pipette_model(
     model: PipetteModel, output: pc.PipetteModelVersionType
 ) -> None:
-    assert output == pc.convert_pipette_model(model)
+    assert output == ps.convert_pipette_model(model)
 
 
 @pytest.mark.parametrize(
@@ -80,7 +84,7 @@ def test_convert_pipette_model(
 def test_convert_pipette_model_provided_version(
     model: PipetteModel, version: str, output: pc.PipetteModelVersionType
 ) -> None:
-    assert output == pc.convert_pipette_model(model, version)
+    assert output == ps.convert_pipette_model(model, version)
 
 
 @pytest.mark.parametrize(
@@ -115,7 +119,7 @@ def test_convert_pipette_model_provided_version(
 def test_convert_pipette_name(
     name: PipetteName, output: pc.PipetteModelVersionType
 ) -> None:
-    assert output == pc.convert_pipette_name(name)
+    assert output == ps.convert_pipette_name(name)
 
 
 @pytest.mark.parametrize(
@@ -163,7 +167,7 @@ def test_model_version_type_string_version(
             PipetteModelType.p50,
             PipetteChannelType.SINGLE_CHANNEL,
             PipetteVersionType(1, 0),
-            "p50_single_v1.0",
+            "p50_single_v1",
         ],
         [
             PipetteModelType.p1000,
@@ -189,3 +193,30 @@ def test_name_type_string_generation(
         pipette_type=model_type, pipette_channels=channels, pipette_version=version
     )
     assert output == str(data)
+
+
+@pytest.mark.parametrize(
+    argnames=["model_or_name", "valid"],
+    argvalues=[
+        [
+            "p50_single",
+            True,
+        ],
+        [
+            "p50_sing",
+            False,
+        ],
+        [
+            "p100_multi",
+            False,
+        ],
+        [
+            "p1000_multi_v3.3",
+            True,
+        ],
+    ],
+)
+def test_supported_pipette(
+    model_or_name: Union[PipetteName, PipetteModel, None], valid: bool
+) -> None:
+    assert ps.supported_pipette(model_or_name) == valid

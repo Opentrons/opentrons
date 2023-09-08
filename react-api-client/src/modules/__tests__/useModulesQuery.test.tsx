@@ -12,14 +12,17 @@ import { useModulesQuery } from '..'
 
 import type { HostConfig, Response, Modules } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
+jest.mock('@opentrons/api-client/src/modules/getModules')
 jest.mock('../../api/useHost')
 
 const mockGetModules = getModules as jest.MockedFunction<typeof getModules>
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const MODULES_RESPONSE = { data: mockModulesResponse } as Modules
+const MODULES_RESPONSE = {
+  data: mockModulesResponse,
+  meta: { totalLength: 4, cursor: 0 },
+}
 const V2_MODULES_RESPONSE = { data: v2MockModulesResponse }
 
 describe('useModulesQuery hook', () => {
@@ -53,7 +56,7 @@ describe('useModulesQuery hook', () => {
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should return all current protocols', async () => {
+  it('should return attached modules', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetModules)
       .calledWith(HOST_CONFIG)
@@ -78,6 +81,9 @@ describe('useModulesQuery hook', () => {
     const { result, waitFor } = renderHook(useModulesQuery, { wrapper })
 
     await waitFor(() => result.current.data != null)
-    expect(result.current.data).toEqual({ data: [] })
+    expect(result.current.data).toEqual({
+      data: [],
+      meta: { totalLength: 0, cursor: 0 },
+    })
   })
 })

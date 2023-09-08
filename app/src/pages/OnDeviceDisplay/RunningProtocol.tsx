@@ -1,31 +1,33 @@
 import * as React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  OVERFLOW_HIDDEN,
+  POSITION_RELATIVE,
   SPACING,
   useSwipe,
-  COLORS,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_HIDDEN,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
+  useAllCommandsQuery,
   useProtocolQuery,
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
-import { TertiaryButton } from '../../atoms/buttons'
+
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
+import { InterventionModal } from '../../organisms/InterventionModal'
+import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -73,6 +75,10 @@ export function RunningProtocol(): JSX.Element {
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
+  const [
+    interventionModalCommandKey,
+    setInterventionModalCommandKey,
+  ] = React.useState<string | null>(null)
   const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -116,10 +122,32 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
+  const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
+    cursor: null,
+    pageLength: 1,
+  })
+  const lastRunCommand = allCommandsQueryData?.data[0] ?? null
+
+  React.useEffect(() => {
+    if (
+      lastRunCommand != null &&
+      interventionModalCommandKey != null &&
+      lastRunCommand.key !== interventionModalCommandKey
+    ) {
+      // set intervention modal command key to null if different from current command key
+      setInterventionModalCommandKey(null)
+    } else if (
+      lastRunCommand?.key != null &&
+      isInterventionCommand(lastRunCommand) &&
+      interventionModalCommandKey === null
+    ) {
+      setInterventionModalCommandKey(lastRunCommand.key)
+    }
+  }, [lastRunCommand, interventionModalCommandKey])
+
   return (
     <>
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
-
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
@@ -140,6 +168,18 @@ export function RunningProtocol(): JSX.Element {
             runId={runId}
             setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
             isActiveRun={true}
+          />
+        ) : null}
+        {interventionModalCommandKey != null &&
+        runRecord?.data != null &&
+        lastRunCommand != null &&
+        isInterventionCommand(lastRunCommand) ? (
+          <InterventionModal
+            robotName={robotName}
+            command={lastRunCommand}
+            onResume={playRun}
+            run={runRecord.data}
+            analysis={robotSideAnalysis}
           />
         ) : null}
         <Flex
@@ -194,17 +234,6 @@ export function RunningProtocol(): JSX.Element {
             <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
           </Flex>
         </Flex>
-      </Flex>
-      {/* temporary */}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing24}
-        width="fit-content"
-        paddingRight={SPACING.spacing32}
-      >
-        <Link to="/dashboard">
-          <TertiaryButton>back to RobotDashboard</TertiaryButton>
-        </Link>
       </Flex>
     </>
   )

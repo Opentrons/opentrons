@@ -9,6 +9,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, API
+from opentrons.hardware_control.types import EstopStateNotification, EstopState
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import (
     RunResult,
@@ -18,7 +19,11 @@ from opentrons.protocol_runner import (
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 from robot_server.protocols import ProtocolResource
-from robot_server.runs.engine_store import EngineStore, EngineConflictError
+from robot_server.runs.engine_store import (
+    EngineStore,
+    EngineConflictError,
+    get_estop_listener,
+)
 
 
 @pytest.fixture
@@ -226,3 +231,30 @@ async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
 
     result = await subject.get_default_engine()
     assert isinstance(result, ProtocolEngine)
+
+
+async def test_estop_callback(
+    decoy: Decoy,
+) -> None:
+    """The callback should stop an active engine."""
+    engine_store = decoy.mock(cls=EngineStore)
+
+    subject = get_estop_listener(engine_store=engine_store)
+
+    decoy.when(engine_store.current_run_id).then_return(None, "fake_run_id")
+
+    disengage_event = EstopStateNotification(
+        old_state=EstopState.PHYSICALLY_ENGAGED, new_state=EstopState.LOGICALLY_ENGAGED
+    )
+
+    subject(disengage_event)
+
+    engage_event = EstopStateNotification(
+        old_state=EstopState.LOGICALLY_ENGAGED, new_state=EstopState.PHYSICALLY_ENGAGED
+    )
+
+    subject(engage_event)
+
+    subject(engage_event)
+
+    decoy.verify(engine_store.engine.estop(maintenance_run=False), times=1)

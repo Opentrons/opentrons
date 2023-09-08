@@ -74,13 +74,18 @@ def _on_unstable_measurement(
     data = RadwagResponse.build(command, response_list)
     # SI ? -  0.00020 g
     # TODO: we could accept more unit types if we wanted...
-    assert response_list[-1] == "g", (
-        f'Expected units to be grams ("g"), ' f'instead got "{response_list[-1]}"'
-    )
-    data.stable = "?" not in response_list
-    data.measurement = float(response_list[-2])
-    if "-" in response_list:
-        data.measurement *= -1
+    if RadwagResponseCodes.MAX_THRESHOLD_EXCEEDED in response_list:
+        print("Warning: Scale maximum exceeded returning infinity")
+        data.stable = False
+        data.measurement = float("inf")
+    else:
+        assert response_list[-1] == "g", (
+            f'Expected units to be grams ("g"), ' f'instead got "{response_list[-1]}"'
+        )
+        data.stable = "?" not in response_list
+        data.measurement = float(response_list[-2])
+        if "-" in response_list:
+            data.measurement *= -1
     return data
 
 

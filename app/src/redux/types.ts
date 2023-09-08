@@ -10,14 +10,13 @@ import type {
   RobotControlsState,
   RobotControlsAction,
 } from './robot-controls/types'
-import type { BuildrootState, BuildrootAction } from './buildroot/types'
+import type { RobotUpdateState, RobotUpdateAction } from './robot-update/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
 import type { ModulesAction } from './modules/types'
 import type { ShellState, ShellAction } from './shell/types'
 import type { ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
 import type { NetworkingState, NetworkingAction } from './networking/types'
-import type { ProtocolState, ProtocolAction } from './protocol/types'
 import type {
   ProtocolStorageState,
   ProtocolStorageAction,
@@ -48,13 +47,12 @@ export interface State {
   readonly robotAdmin: RobotAdminState
   readonly robotControls: RobotControlsState
   readonly robotSettings: RobotSettingsState
-  readonly buildroot: BuildrootState
+  readonly robotUpdate: RobotUpdateState
   readonly pipettes: PipettesState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
   readonly networking: NetworkingState
   readonly labware: CustomLabwareState
-  readonly protocol: ProtocolState
   readonly shell: ShellState
   readonly systemInfo: SystemInfoState
   readonly alerts: AlertsState
@@ -69,14 +67,13 @@ export type Action =
   | RobotAdminAction
   | RobotControlsAction
   | RobotSettingsAction
-  | BuildrootAction
+  | RobotUpdateAction
   | PipettesAction
   | ModulesAction
   | ShellAction
   | ConfigAction
   | RouterAction
   | DiscoveryAction
-  | ProtocolAction
   | ProtocolAnalysisAction
   | ProtocolStorageAction
   | CustomLabwareAction

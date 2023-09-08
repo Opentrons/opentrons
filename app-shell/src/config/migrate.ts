@@ -1,11 +1,7 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import {
-  CONFIG_VERSION_LATEST,
-  OT2_MANIFEST_URL,
-  OT3_MANIFEST_URL,
-} from '@opentrons/app/src/redux/config'
+import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -26,6 +22,9 @@ import type {
   ConfigV14,
   ConfigV15,
   ConfigV16,
+  ConfigV17,
+  ConfigV18,
+  ConfigV19,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
@@ -43,7 +42,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   },
 
   buildroot: {
-    manifestUrl: OT2_MANIFEST_URL,
+    manifestUrl: 'not-used',
   },
 
   // logging config
@@ -253,15 +252,14 @@ const toVersion11 = (prevConfig: ConfigV10): ConfigV11 => {
 
 // config version 12 migration and defaults
 const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
-  // @ts-expect-error deleting a key from the config removes a required param from the prev config
-  delete prevConfig.buildroot
+  const { buildroot, version, ...prevConfigFields } = prevConfig
   const nextConfig = {
-    ...prevConfig,
+    ...prevConfigFields,
     version: 12 as const,
     robotSystemUpdate: {
       manifestUrls: {
-        OT2: OT2_MANIFEST_URL,
-        OT3: OT3_MANIFEST_URL,
+        OT2: 'not-used',
+        OT3: 'not-used',
       },
     },
   }
@@ -318,7 +316,39 @@ const toVersion16 = (prevConfig: ConfigV15): ConfigV16 => {
     version: 16 as const,
     onDeviceDisplaySettings: {
       ...prevConfig.onDeviceDisplaySettings,
-      unfinishedUnboxingFlowRoute: '/welcome',
+      unfinishedUnboxingFlowRoute: null,
+    },
+  }
+  return nextConfig
+}
+
+// config version 17 migration and defaults
+const toVersion17 = (prevConfig: ConfigV16): ConfigV17 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 17 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      applyHistoricOffsets: true,
+    },
+  }
+  return nextConfig
+}
+
+// config version 18 migration and defaults
+const toVersion18 = (prevConfig: ConfigV17): ConfigV18 => {
+  const { robotSystemUpdate, version, ...prevConfigFields } = prevConfig
+  return { ...prevConfigFields, version: 18 as const }
+}
+
+// config version 19 migration and defaults
+const toVersion19 = (prevConfig: ConfigV18): ConfigV19 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 19 as const,
+    update: {
+      ...prevConfig.update,
+      hasJustUpdated: false,
     },
   }
   return nextConfig
@@ -340,7 +370,10 @@ const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
   (prevConfig: ConfigV13) => ConfigV14,
   (prevConfig: ConfigV14) => ConfigV15,
-  (prevConfig: ConfigV15) => ConfigV16
+  (prevConfig: ConfigV15) => ConfigV16,
+  (prevConfig: ConfigV16) => ConfigV17,
+  (prevConfig: ConfigV17) => ConfigV18,
+  (prevConfig: ConfigV18) => ConfigV19
 ] = [
   toVersion1,
   toVersion2,
@@ -358,6 +391,9 @@ const MIGRATIONS: [
   toVersion14,
   toVersion15,
   toVersion16,
+  toVersion17,
+  toVersion18,
+  toVersion19,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -381,6 +417,9 @@ export function migrate(
     | ConfigV14
     | ConfigV15
     | ConfigV16
+    | ConfigV17
+    | ConfigV18
+    | ConfigV19
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

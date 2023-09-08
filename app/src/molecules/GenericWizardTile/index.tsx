@@ -16,12 +16,22 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   RESPONSIVENESS,
+  DISPLAY_INLINE_BLOCK,
+  ALIGN_CENTER,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'
+
+const ALIGN_BUTTONS = css`
+  align-items: ${ALIGN_FLEX_END};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    align-items: ${ALIGN_CENTER};
+  }
+`
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -39,9 +49,11 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-
     &:hover {
       opacity: 100%;
+    }
+    &:active {
+      opacity: 70%;
     }
   }
 `
@@ -51,10 +63,10 @@ const GO_BACK_BUTTON_DISABLED_STYLE = css`
 `
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
-
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     height: ${SPACING.spacing40};
+    display: ${DISPLAY_INLINE_BLOCK};
   }
 `
 
@@ -120,14 +132,16 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           flex="1"
           gridGap={SPACING.spacing24}
         >
-          {typeof header === 'string' ? <Title>{header}</Title> : header}
-          <StyledText as="p">{bodyText}</StyledText>
+          <Flex display={DISPLAY_INLINE_BLOCK}>
+            {typeof header === 'string' ? <Title>{header}</Title> : header}
+          </Flex>
+          {bodyText}
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
           {rightHandBody}
         </Flex>
       </Flex>
-      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
+      <Flex justifyContent={buttonPositioning} css={ALIGN_BUTTONS}>
         {back != null ? (
           <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
             <StyledText
@@ -144,7 +158,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
-            <SmallButton buttonText={proceedButtonText} onClick={proceed} />
+            <SmallButton
+              disabled={proceedIsDisabled}
+              buttonText={proceedButtonText}
+              onClick={proceed}
+            />
           ) : (
             <PrimaryButton
               disabled={proceedIsDisabled}

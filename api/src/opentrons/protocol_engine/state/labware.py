@@ -17,6 +17,7 @@ from typing import (
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
@@ -30,7 +31,6 @@ from ..resources import DeckFixedLabware, labware_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
-    LoadAdapterResult,
     MoveLabwareResult,
 )
 from ..types import (
@@ -46,6 +46,7 @@ from ..types import (
     ModuleLocation,
     ModuleModel,
     OverlapOffset,
+    LabwareMovementOffsetData,
 )
 from ..actions import (
     Action,
@@ -172,7 +173,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
-        if isinstance(command.result, (LoadLabwareResult, LoadAdapterResult)):
+        if isinstance(command.result, LoadLabwareResult):
             # If the labware load refers to an offset, that offset must actually exist.
             if command.result.offsetId is not None:
                 assert command.result.offsetId in self._state.labware_offsets_by_id
@@ -185,20 +186,15 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             self._state.definitions_by_uri[definition_uri] = command.result.definition
 
-            if isinstance(command.result, LoadLabwareResult):
-                deck_item_id = command.result.labwareId
-                display_name = command.params.displayName
-            else:
-                deck_item_id = command.result.adapterId
-                display_name = None
-
-            self._state.labware_by_id[deck_item_id] = LoadedLabware.construct(
-                id=deck_item_id,
+            self._state.labware_by_id[
+                command.result.labwareId
+            ] = LoadedLabware.construct(
+                id=command.result.labwareId,
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
-                displayName=display_name,
+                displayName=command.params.displayName,
             )
 
         elif isinstance(command.result, MoveLabwareResult):
@@ -688,6 +684,11 @@ class LabwareView(HasState[LabwareState]):
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
         """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
+        if labware_validation.validate_definition_is_adapter(top_labware_definition):
+            raise errors.LabwareCannotBeStackedError(
+                f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"
+                " on other labware."
+            )
         below_labware = self.get(bottom_labware_id)
         if not labware_validation.validate_labware_can_be_stacked(
             top_labware_definition=top_labware_definition,
@@ -719,3 +720,62 @@ class LabwareView(HasState[LabwareState]):
         """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_uri_from_definition(self.get_definition(labware_id))
         return uri in _MAGDECK_HALF_MM_LABWARE
+
+    def get_deck_default_gripper_offsets(self) -> Optional[LabwareMovementOffsetData]:
+        """Get the deck's default gripper offsets."""
+        parsed_offsets = (
+            self.get_deck_definition().get("gripperOffsets", {}).get("default")
+        )
+        return (
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(
+                    x=parsed_offsets["pickUpOffset"]["x"],
+                    y=parsed_offsets["pickUpOffset"]["y"],
+                    z=parsed_offsets["pickUpOffset"]["z"],
+                ),
+                dropOffset=LabwareOffsetVector(
+                    x=parsed_offsets["dropOffset"]["x"],
+                    y=parsed_offsets["dropOffset"]["y"],
+                    z=parsed_offsets["dropOffset"]["z"],
+                ),
+            )
+            if parsed_offsets
+            else None
+        )
+
+    def get_labware_gripper_offsets(
+        self,
+        labware_id: str,
+        slot_name: Optional[DeckSlotName],
+    ) -> Optional[LabwareMovementOffsetData]:
+        """Get the labware's gripper offsets of the specified type."""
+        parsed_offsets = self.get_definition(labware_id).gripperOffsets
+        offset_key = slot_name.name if slot_name else "default"
+
+        if parsed_offsets is None or offset_key not in parsed_offsets:
+            return None
+        else:
+            return LabwareMovementOffsetData(
+                pickUpOffset=cast(
+                    LabwareOffsetVector, parsed_offsets[offset_key].pickUpOffset
+                ),
+                dropOffset=cast(
+                    LabwareOffsetVector, parsed_offsets[offset_key].dropOffset
+                ),
+            )
+
+    def get_grip_force(self, labware_id: str) -> float:
+        """Get the recommended grip force for gripping labware using gripper."""
+        recommended_force = self.get_definition(labware_id).gripForce
+        return (
+            recommended_force if recommended_force is not None else LABWARE_GRIP_FORCE
+        )
+
+    def get_grip_height_from_labware_bottom(self, labware_id: str) -> float:
+        """Get the recommended grip height from labware bottom, if present."""
+        recommended_height = self.get_definition(labware_id).gripHeightFromLabwareBottom
+        return (
+            recommended_height
+            if recommended_height is not None
+            else self.get_dimensions(labware_id).z / 2
+        )

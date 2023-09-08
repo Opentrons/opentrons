@@ -341,20 +341,22 @@ class HeaterShaker(mod_abc.AbstractModule):
         while self.speed_status != SpeedStatus.IDLE:
             await self._poller.wait_next_poll()
 
-    async def deactivate(self) -> None:
+    async def deactivate(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
-        await self.deactivate_heater()
-        await self.deactivate_shaker()
+        await self.deactivate_heater(must_be_running=must_be_running)
+        await self.deactivate_shaker(must_be_running=must_be_running)
 
-    async def deactivate_heater(self) -> None:
+    async def deactivate_heater(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling"""
-        await self.wait_for_is_running()
+        if must_be_running:
+            await self.wait_for_is_running()
         await self._driver.deactivate_heater()
         await self._reader.read_temperature()
 
-    async def deactivate_shaker(self) -> None:
+    async def deactivate_shaker(self, must_be_running: bool = True) -> None:
         """Stop shaking and home the plate"""
-        await self.wait_for_is_running()
+        if must_be_running:
+            await self.wait_for_is_running()
         await self._driver.home()
         await self._wait_for_shake_deactivation()
 

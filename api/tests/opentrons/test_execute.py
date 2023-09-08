@@ -1,17 +1,26 @@
+"""Tests for `opentrons.execute`."""
+
 from __future__ import annotations
 import io
-import os
+import json
+import textwrap
 import mock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, TextIO, cast
+from typing import TYPE_CHECKING, Any, Callable, Generator, TextIO, cast
 
 import pytest
 
+from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
+)
+
 from opentrons import execute, types
 from opentrons.hardware_control import Controller, api
-from opentrons.protocols.execution.errors import ExceptionInProtocolError
-from opentrons.config.pipette_config import load
+from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from tests.opentrons.conftest import Bundle, Protocol
@@ -20,8 +29,18 @@ if TYPE_CHECKING:
 HERE = Path(__file__).parent
 
 
+@pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
+def api_version(request: pytest.FixtureRequest) -> APIVersion:
+    """Return an API version to test with.
+
+    Newer API versions execute through Protocol Engine, and older API versions don't.
+    The two codepaths are very different, so we need to test them both.
+    """
+    return request.param  # type: ignore[attr-defined,no-any-return]
+
+
 @pytest.fixture
-def mock_get_attached_instr(
+def mock_get_attached_instr(  # noqa: D103
     monkeypatch: pytest.MonkeyPatch,
     virtual_smoothie_env: None,
 ) -> mock.AsyncMock:
@@ -39,21 +58,49 @@ def mock_get_attached_instr(
     return gai_mock
 
 
-@pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
+@pytest.mark.parametrize(
+    ("protocol_file", "expect_run_log"),
+    [
+        ("testosaur_v2.py", True),
+        ("testosaur_v2_14.py", False),
+        # FIXME(mm, 2023-07-20): Support printing the run log when executing new protocols.
+        # Then, remove this expect_run_log parametrization (it should always be True).
+        pytest.param(
+            "testosaur_v2_14.py",
+            True,
+            marks=pytest.mark.xfail(strict=True, raises=NotImplementedError),
+        ),
+    ],
+)
 def test_execute_function_apiv2(
     protocol: Protocol,
     protocol_file: str,
-    monkeypatch: pytest.MonkeyPatch,
+    expect_run_log: bool,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a Python file."""
+    converted_model_v15 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p10_single_v1.5")
+    )
+    converted_model_v1 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p1000_single_v1")
+    )
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load(PipetteModel("p10_single_v1.5")),
+        "config": load_pipette_data.load_definition(
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load(PipetteModel("p1000_single_v1")),
+        "config": load_pipette_data.load_definition(
+            converted_model_v1.pipette_type,
+            converted_model_v1.pipette_channels,
+            converted_model_v1.pipette_version,
+        ),
         "id": "testid2",
     }
     entries = []
@@ -62,20 +109,29 @@ def test_execute_function_apiv2(
         nonlocal entries
         entries.append(entry)
 
-    execute.execute(protocol.filelike, "testosaur_v2.py", emit_runlog=emit_runlog)
-    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
-        "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
-        "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
-        "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
-    ]
+    execute.execute(
+        protocol.filelike,
+        protocol.filename,
+        emit_runlog=(emit_runlog if expect_run_log else None),
+    )
+
+    if expect_run_log:
+        assert [
+            item["payload"]["text"] for item in entries if item["$"] == "before"
+        ] == [
+            "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
+            "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
+            "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
+            "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
+        ]
 
 
-def test_execute_function_json_v3_apiv2(
+def test_execute_function_json_v3(
     get_json_protocol_fixture: Callable[[str, str, bool], str],
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a JSONv3 file."""
     jp = get_json_protocol_fixture("3", "simple", False)
     filelike = io.StringIO(jp)
     entries = []
@@ -84,8 +140,15 @@ def test_execute_function_json_v3_apiv2(
         nonlocal entries
         entries.append(entry)
 
+    converted_model_v15 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p10_single_v1.5")
+    )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load(PipetteModel("p10_single_v1.5")),
+        "config": load_pipette_data.load_definition(
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -101,11 +164,12 @@ def test_execute_function_json_v3_apiv2(
     ]
 
 
-def test_execute_function_json_v4_apiv2(
+def test_execute_function_json_v4(
     get_json_protocol_fixture: Callable[[str, str, bool], str],
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a JSONv4 file."""
     jp = get_json_protocol_fixture("4", "simpleV4", False)
     filelike = io.StringIO(jp)
     entries = []
@@ -114,8 +178,15 @@ def test_execute_function_json_v4_apiv2(
         nonlocal entries
         entries.append(entry)
 
+    converted_model_v15 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p10_single_v1.5")
+    )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load(PipetteModel("p10_single_v1.5")),
+        "config": load_pipette_data.load_definition(
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -131,11 +202,12 @@ def test_execute_function_json_v4_apiv2(
     ]
 
 
-def test_execute_function_json_v5_apiv2(
+def test_execute_function_json_v5(
     get_json_protocol_fixture: Callable[[str, str, bool], str],
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a JSONv5 file."""
     jp = get_json_protocol_fixture("5", "simpleV5", False)
     filelike = io.StringIO(jp)
     entries = []
@@ -144,8 +216,15 @@ def test_execute_function_json_v5_apiv2(
         nonlocal entries
         entries.append(entry)
 
+    converted_model_v15 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p10_single_v1.5")
+    )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load(PipetteModel("p10_single_v1.5")),
+        "config": load_pipette_data.load_definition(
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -168,6 +247,7 @@ def test_execute_function_bundle_apiv2(
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a .zip bundle."""
     bundle = get_bundle_fixture("simple_bundle")
     entries = []
 
@@ -175,8 +255,15 @@ def test_execute_function_bundle_apiv2(
         nonlocal entries
         entries.append(entry)
 
+    converted_model_v15 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p10_single_v1.5")
+    )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load(PipetteModel("p10_single_v1.5")),
+        "config": load_pipette_data.load_definition(
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(
@@ -203,68 +290,191 @@ def test_execute_function_bundle_apiv2(
     ]
 
 
-@pytest.mark.parametrize("protocol_file", ["python_v2_custom_lw.py"])
-def test_execute_extra_labware(
-    protocol: Protocol,
-    protocol_file: str,
-    monkeypatch: pytest.MonkeyPatch,
-    virtual_smoothie_env: None,
-    mock_get_attached_instr: mock.AsyncMock,
-) -> None:
-    fixturedir = (
-        HERE / ".." / ".." / ".." / "shared-data" / "labware" / "fixtures" / "2"
-    )
-    entries = []
+class TestExecutePythonLabware:
+    """Tests for making sure execute() handles custom labware correctly for Python files."""
 
-    def emit_runlog(entry: Any) -> None:
-        nonlocal entries
-        entries.append(entry)
+    LW_DIR = get_shared_data_root() / "labware" / "fixtures" / "2"
+    LW_LOAD_NAME = "fixture_12_trough"
+    LW_NAMESPACE = "fixture"
 
-    mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load(PipetteModel("p300_single_v2.0")),
-        "id": "testid",
-    }
-    # make sure we can load labware explicitly
-    # make sure we don't have an exception from not finding the labware
-    execute.execute(
-        protocol.filelike,
-        "custom_labware.py",
-        emit_runlog=emit_runlog,
-        custom_labware_paths=[str(fixturedir)],
-    )
-    # instead of 4 in simulate because we get before and after
-    assert len(entries) == 8
+    @pytest.fixture(autouse=True)
+    def use_virtual_smoothie_env(self, virtual_smoothie_env: None) -> None:
+        """Automatically enable the virtual_smoothie_env fixture for every test."""
+        pass
 
-    protocol.filelike.seek(0)
-    # make sure we don't get autoload behavior when not on a robot
-    with pytest.raises(ExceptionInProtocolError, match=".*FileNotFoundError.*"):
-        execute.execute(protocol.filelike, "custom_labware.py")
-    no_lw = execute.get_protocol_api("2.0")
+    @pytest.fixture
+    def protocol_path(self, tmp_path: Path, api_version: APIVersion) -> Path:
+        """Return a path to a Python protocol file that loads a custom labware."""
+        path = tmp_path / "protocol.py"
+        protocol_source = textwrap.dedent(
+            f"""\
+            metadata = {{"apiLevel": "{api_version}"}}
+            def run(protocol):
+                protocol.load_labware(
+                    load_name="{self.LW_LOAD_NAME}",
+                    location=1,
+                    namespace="{self.LW_NAMESPACE}",
+                )
+            """
+        )
+        path.write_text(protocol_source)
+        return path
 
-    # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
-    assert not no_lw._core._extra_labware  # type: ignore[attr-defined]
-    protocol.filelike.seek(0)
-    monkeypatch.setattr(execute, "IS_ROBOT", True)
-    monkeypatch.setattr(execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", fixturedir)
-    # make sure we don't have an exception from not finding the labware
-    entries = []
-    execute.execute(protocol.filelike, "custom_labware.py", emit_runlog=emit_runlog)
-    # instead of 4 in simulate because we get before and after
-    assert len(entries) == 8
+    @pytest.fixture
+    def protocol_name(self, protocol_path: Path) -> str:
+        """Return the file name of the Python protocol file."""
+        return protocol_path.name
 
-    # make sure the extra labware loaded by default is right
-    ctx = execute.get_protocol_api("2.0")
-    # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
-    assert len(ctx._core._extra_labware.keys()) == len(  # type: ignore[attr-defined]
-        os.listdir(fixturedir)
-    )
+    @pytest.fixture
+    def protocol_filelike(self, protocol_path: Path) -> Generator[TextIO, None, None]:
+        """Return the Python protocol file opened as a stream."""
+        with open(protocol_path) as file:
+            yield file
 
-    assert ctx.load_labware("fixture_12_trough", 1, namespace="fixture")
+    @staticmethod
+    def test_default_no_custom_labware(
+        protocol_filelike: TextIO, protocol_name: str
+    ) -> None:
+        """By default, no custom labware should be available."""
+        with pytest.raises(Exception, match="Labware .+ not found"):
+            execute.execute(
+                protocol_file=protocol_filelike, protocol_name=protocol_name
+            )
 
-    # if there is no labware dir, make sure everything still works
-    monkeypatch.setattr(
-        execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
-    )
-    ctx = execute.get_protocol_api("2.0")
-    with pytest.raises(FileNotFoundError):
-        ctx.load_labware("fixture_12_trough", 1, namespace="fixture")
+    def test_custom_labware_paths(
+        self, protocol_filelike: TextIO, protocol_name: str
+    ) -> None:
+        """Providing custom_labware_paths should make those labware available."""
+        execute.execute(
+            protocol_file=protocol_filelike,
+            protocol_name=protocol_name,
+            custom_labware_paths=[str(self.LW_DIR)],
+        )
+
+    def test_jupyter(
+        self,
+        protocol_filelike: TextIO,
+        protocol_name: str,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Putting labware in the Jupyter directory should make it available."""
+        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        monkeypatch.setattr(execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR)
+        execute.execute(protocol_file=protocol_filelike, protocol_name=protocol_name)
+
+    @pytest.mark.xfail(
+        strict=True, raises=pytest.fail.Exception
+    )  # TODO(mm, 2023-07-14): Fix this bug.
+    def test_jupyter_override(
+        self,
+        protocol_filelike: TextIO,
+        protocol_name: str,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Passing any custom_labware_paths should prevent searching the Jupyter directory."""
+        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        monkeypatch.setattr(execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR)
+        with pytest.raises(Exception, match="Labware .+ not found"):
+            execute.execute(
+                protocol_file=protocol_filelike,
+                protocol_name=protocol_name,
+                custom_labware_paths=[],
+            )
+
+    @staticmethod
+    def test_jupyter_not_on_filesystem(
+        protocol_filelike: TextIO,
+        protocol_name: str,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """It should tolerate the Jupyter labware directory not existing on the filesystem."""
+        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        monkeypatch.setattr(
+            execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
+        )
+        with pytest.raises(Exception, match="Labware .+ not found"):
+            execute.execute(
+                protocol_file=protocol_filelike, protocol_name=protocol_name
+            )
+
+
+class TestGetProtocolAPILabware:
+    """Tests for making sure get_protocol_api() handles extra labware correctly."""
+
+    LW_FIXTURE_DIR = Path("labware/fixtures/2")
+    LW_LOAD_NAME = "fixture_12_trough"
+    LW_NAMESPACE = "fixture"
+
+    @pytest.fixture(autouse=True)
+    def use_virtual_smoothie_env(self, virtual_smoothie_env: None) -> None:
+        """Automatically enable the virtual_smoothie_env fixture for every test."""
+        pass
+
+    def test_default_no_extra_labware(
+        self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """By default, no extra labware should be available."""
+        context = execute.get_protocol_api(api_version)
+        with pytest.raises(Exception, match="Labware .+ not found"):
+            context.load_labware(
+                load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
+            )
+
+    def test_extra_labware(self, api_version: APIVersion) -> None:
+        """Providing extra_labware should make that labware available."""
+        explicit_extra_lw = {
+            self.LW_LOAD_NAME: json.loads(
+                load_shared_data(self.LW_FIXTURE_DIR / f"{self.LW_LOAD_NAME}.json")
+            )
+        }
+        context = execute.get_protocol_api(api_version, extra_labware=explicit_extra_lw)
+        assert context.load_labware(
+            load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
+        )
+
+    def test_jupyter(
+        self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Putting labware in the Jupyter directory should make it available."""
+        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        monkeypatch.setattr(
+            execute,
+            "JUPYTER_NOTEBOOK_LABWARE_DIR",
+            get_shared_data_root() / self.LW_FIXTURE_DIR,
+        )
+        context = execute.get_protocol_api(api_version)
+        assert context.load_labware(
+            load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
+        )
+
+    @pytest.mark.xfail(
+        strict=True, raises=pytest.fail.Exception
+    )  # TODO(mm, 2023-07-14): Fix this bug.
+    def test_jupyter_override(
+        self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Passing any extra_labware should prevent searching the Jupyter directory."""
+        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        monkeypatch.setattr(
+            execute,
+            "JUPYTER_NOTEBOOK_LABWARE_DIR",
+            get_shared_data_root() / self.LW_FIXTURE_DIR,
+        )
+        context = execute.get_protocol_api(api_version)
+        with pytest.raises(Exception, match="Labware .+ not found"):
+            context.load_labware(
+                load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
+            )
+
+    def test_jupyter_not_on_filesystem(
+        self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """It should tolerate the Jupyter labware directory not existing on the filesystem."""
+        monkeypatch.setattr(
+            execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
+        )
+        with_nonexistent_jupyter_extra_labware = execute.get_protocol_api(api_version)
+        with pytest.raises(Exception, match="Labware .+ not found"):
+            with_nonexistent_jupyter_extra_labware.load_labware(
+                load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
+            )

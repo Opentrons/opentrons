@@ -1,4 +1,5 @@
-"""Synchronous ProtocolEngine client module."""
+"""Control a `ProtocolEngine` without async/await."""
+
 from typing import cast, List, Optional, Union, Dict
 from typing_extensions import Literal
 
@@ -16,7 +17,6 @@ from ..types import (
     DeckPoint,
     DeckSlotLocation,
     LabwareLocation,
-    NonStackedLocation,
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
@@ -25,14 +25,37 @@ from ..types import (
     MotorAxis,
     Liquid,
 )
-from .transports import AbstractSyncTransport
+from .transports import ChildThreadTransport
 
 
 class SyncClient:
-    """Synchronous Protocol Engine client."""
+    """Control a `ProtocolEngine` without async/await.
 
-    def __init__(self, transport: AbstractSyncTransport) -> None:
-        """Initialize the client with a transport."""
+    Normally, `ProtocolEngine` provides an async/await interface, like this:
+
+    ```
+    aspirate_result = await protocol_engine.add_and_execute_command(aspirate_command)
+    dispense_result = await protocol_engine.add_and_execute_command(dispense_command)
+    ```
+
+    But we sometimes want to control it with plain old non-async blocking method calls.
+    To accomplish that, this class adapts `ProtocolEngine`'s interface into this:
+
+    ```
+    aspirate_result = sync_client.aspirate(...)
+    dispense_result = sync_client.dispense(...)
+    ```
+
+    This is intended to help implement the Python Protocol API, which is all non-async.
+    """
+
+    def __init__(self, transport: ChildThreadTransport) -> None:
+        """Initialize the `SyncClient`.
+
+        Params:
+            transport: The interface for the new `SyncClient` to use to
+                communicate with the `ProtocolEngine`.
+        """
         self._transport = transport
 
     @property
@@ -95,34 +118,12 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
-    def load_adapter(
-        self,
-        location: NonStackedLocation,
-        load_name: str,
-        namespace: str,
-        version: int,
-    ) -> commands.LoadAdapterResult:
-        """Execute a LoadLabware command and return the result."""
-        request = commands.LoadAdapterCreate(
-            params=commands.LoadAdapterParams(
-                location=location,
-                loadName=load_name,
-                namespace=namespace,
-                version=version,
-            )
-        )
-        result = self._transport.execute_command(request=request)
-
-        return cast(commands.LoadAdapterResult, result)
-
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_id: str,
         new_location: LabwareLocation,
         strategy: LabwareMovementStrategy,
-        use_pick_up_location_lpc_offset: bool,
-        use_drop_location_lpc_offset: bool,
         pick_up_offset: Optional[LabwareOffsetVector],
         drop_offset: Optional[LabwareOffsetVector],
     ) -> commands.MoveLabwareResult:
@@ -132,8 +133,6 @@ class SyncClient:
                 labwareId=labware_id,
                 newLocation=new_location,
                 strategy=strategy,
-                usePickUpLocationLpcOffset=use_pick_up_location_lpc_offset,
-                useDropLocationLpcOffset=use_drop_location_lpc_offset,
                 pickUpOffset=pick_up_offset,
                 dropOffset=drop_offset,
             )
@@ -311,6 +310,7 @@ class SyncClient:
         well_location: WellLocation,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> commands.DispenseResult:
         """Execute a ``Dispense`` command and return the result."""
         request = commands.DispenseCreate(
@@ -321,6 +321,7 @@ class SyncClient:
                 wellLocation=well_location,
                 volume=volume,
                 flowRate=flow_rate,
+                pushOut=push_out,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -331,6 +332,7 @@ class SyncClient:
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> commands.DispenseInPlaceResult:
         """Execute a ``DispenseInPlace`` command and return the result."""
         request = commands.DispenseInPlaceCreate(
@@ -338,6 +340,7 @@ class SyncClient:
                 pipetteId=pipette_id,
                 volume=volume,
                 flowRate=flow_rate,
+                pushOut=push_out,
             )
         )
         result = self._transport.execute_command(request=request)

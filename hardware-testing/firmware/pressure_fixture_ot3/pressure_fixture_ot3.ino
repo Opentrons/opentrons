@@ -3,7 +3,7 @@
 #include"MMR920C04.h"
 #include "TCA9548A.h"
 
-#define VERSION ("0.0.0")
+#define VERSION ("1.0.0")
 
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
