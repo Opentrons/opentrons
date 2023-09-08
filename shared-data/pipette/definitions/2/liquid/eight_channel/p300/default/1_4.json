@@ -23,12 +23,7 @@
           ]
         }
       },
-      "dispense": {
-        "default": {
-          "1": [[309.2612689, 0.0, 19.29389273]]
-        }
-      },
-      "defaultBlowoutVolume": 39.27,
+      "dispense": { "default": { "1": [[309.2612689, 0.0, 19.29389273]] } },
       "defaultPushOutVolume": 0
     },
     "t300": {
@@ -53,12 +48,7 @@
           ]
         }
       },
-      "dispense": {
-        "default": {
-          "1": [[309.2612689, 0.0, 19.29389273]]
-        }
-      },
-      "defaultBlowoutVolume": 39.27,
+      "dispense": { "default": { "1": [[309.2612689, 0.0, 19.29389273]] } },
       "defaultPushOutVolume": 0
     }
   },

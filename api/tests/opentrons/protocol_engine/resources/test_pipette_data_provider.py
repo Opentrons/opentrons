@@ -80,7 +80,6 @@ def test_get_pipette_static_config(
         "default_blow_out_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_dispense_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
-        "default_blow_out_volume": 10,
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
     }
