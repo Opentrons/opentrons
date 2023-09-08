@@ -41,16 +41,10 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   } = useCurrentAllSubsystemUpdatesQuery({
     refetchInterval: POLL_INTERVAL_5000_MS,
   })
-  const externalSubsystemUpdateExists =
-    currentSubsystemsUpdatesData?.data.some(
-      update =>
-        (update.updateStatus === 'queued' ||
-          update.updateStatus === 'updating') &&
-        update.subsystem !== initiatedSubsystemUpdate
-    ) ?? false
   const externalSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
     update =>
-      update.updateStatus === 'updating' &&
+      (update.updateStatus === 'queued' ||
+        update.updateStatus === 'updating') &&
       update.subsystem !== initiatedSubsystemUpdate
   )
   const { data: externalsubsystemUpdateData } = useSubsystemUpdateQuery(
@@ -62,7 +56,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
       subsystemUpdateInstrument != null &&
       maintenanceRunData == null &&
       !isUnboxingFlowOngoing &&
-      !externalSubsystemUpdateExists
+      externalSubsystemUpdate == null
     ) {
       setShowUpdateNeededModal(true)
     }
@@ -70,7 +64,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     subsystemUpdateInstrument,
     maintenanceRunData,
     isUnboxingFlowOngoing,
-    externalSubsystemUpdateExists,
+    externalSubsystemUpdate,
   ])
   const memoizedSubsystem = React.useMemo(
     () => subsystemUpdateInstrument?.subsystem,
