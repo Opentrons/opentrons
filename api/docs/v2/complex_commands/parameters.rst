@@ -113,11 +113,129 @@ Mixing occurs before every aspiration, including when :ref:`complex-tip-refillin
 Touch Tip
 =========
 
+The ``touch_tip`` parameter accepts a Boolean value. When ``True``, a touch tip step occurs after every aspirate and dispense.
+
+For example, this transfer command aspirates, touches the tip at the source, dispenses, and touches the tip at the destination::
+
+    pipette.transfer(
+        volume=100,
+        dest=plate["A1"],
+        source=plate["B1"],
+        touch_tip=True,
+    )
+
+.. versionadded:: 2.0
+
+Touch tip occurs after every aspiration, including when :ref:`complex-tip-refilling` is required.
+
+This parameter always uses default motion behavior for touch tip. Use the :ref:`touch tip building block command <touch-tip>` if you need to:
+
+    * Only touch the tip after aspirating or dispensing, but not both.
+    * Control the speed, radius, or height of the touch tip motion.
+
 Air Gap
 =======
 
+The ``air_gap`` parameter controls how much air to aspirate and hold in the bottom of the tip when it also contains liquid. The parameter's value is the amount of air to aspirate in µL.
+
+Air-gapping behavior is different for each complex command. The different behaviors all serve the same purpose, which is to never leave the pipette holding liquid at the very bottom of the tip. This helps keep liquids from seeping out of the pipette.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Command
+     - Air-gapping behavior
+   * - ``transfer()``
+     - 
+       - Air gap after each aspiration.
+       - Pipette is empty after dispensing.
+   * - ``distribute()``
+     - 
+       - Air gap after each aspiration.
+       - Air gap after dispensing if the pipette isn't empty.
+   * - ``consolidate()``
+     - 
+       - Air gap after each aspiration. This may create multiple air gaps within the tip.
+       - Pipette is empty after dispensing.
+
+For example, this transfer command will create a 20 µL air gap after each of its aspirations. When dispensing, it will clear the air gap and dispense the full 100 µL of liquid::
+
+    pipette.transfer(
+        volume=100,
+        source=plate["A1"],
+        dest=plate["B1"],
+        air_gap=20,
+    )
+    
+.. versionadded:: 2.0
+
+When consolidating, air gaps still occur after every aspiration. In this example, the tip will use 210 µL of its capacity (50 µL of liquid followed by 20 µL of air, repeated three times)::
+
+    pipette.consolidate(
+        volume=50,
+        source=[plate["A1"], plate["A2"], plate["A3"]],
+        dest=plate["B1"],
+        air_gap=20,
+    )
+
+.. code-block:: text
+
+    Picking up tip from A1 of tip rack on 3
+    Aspirating 50.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+    Air gap
+        Aspirating 20.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+    Aspirating 50.0 uL from A2 of well plate on 2 at 92.86 uL/sec
+    Air gap
+        Aspirating 20.0 uL from A2 of well plate on 2 at 92.86 uL/sec
+    Aspirating 50.0 uL from A3 of well plate on 2 at 92.86 uL/sec
+    Air gap
+        Aspirating 20.0 uL from A3 of well plate on 2 at 92.86 uL/sec
+    Dispensing 210.0 uL into B1 of well plate on 2 at 92.86 uL/sec
+    Dropping tip into A1 of Opentrons Fixed Trash on 12
+    
+If adding an air gap would exceed the pipette's maximum volume, the complex command will use a :ref:`complex-tip-refilling` strategy. For example, this command uses a 300 µL pipette to transfer 300 µL of liquid plus an air gap::
+
+    pipette.transfer(
+        volume=300,
+        source=plate["A1"],
+        dest=plate["B1"],
+        air_gap=20,
+    )
+
+As a result, the transfer is split into two aspirates of 150 µL, each with their own 20 µL air gap:
+
+.. code-block:: text
+
+	Picking up tip from A1 of tip rack on 3
+	Aspirating 150.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+	Air gap
+		Aspirating 20.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+	Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
+	Aspirating 150.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+	Air gap
+		Aspirating 20.0 uL from A1 of well plate on 2 at 92.86 uL/sec
+	Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
+	Dropping tip into A1 of Opentrons Fixed Trash on 12
+
 Mix After
 =========
+
+The ``mix_after`` parameter controls mixing in source wells after each dispense. Its value must be a :py:class:`tuple` with two numeric values. The first value is the number of repetitions, and the second value is the amount of liquid to mix in µL.
+
+For example, this transfer command will mix 50 µL of liquid 3 times after each of its dispenses::
+
+    pipette.transfer(
+        volume=100,
+        source=plate["A1"],
+        dest=[plate["B1"], plate["B2"]],
+        mix_after=(3, 50),
+    )
+    
+.. versionadded:: 2.0
+
+.. note::
+    :py:meth:`~.InstrumentContext.distribute` ignores any value of ``mix_after``. Mixing after dispensing would combine (and potentially contaminate) the remaining source liquid with liquid present at the destination.
+
 
 Disposal Volume
 ===============
