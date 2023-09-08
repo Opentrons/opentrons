@@ -174,7 +174,7 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        {!disabled && (
+        {disabled ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
