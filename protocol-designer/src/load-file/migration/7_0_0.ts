@@ -34,9 +34,8 @@ interface LabwareLocationUpdate {
 export const migrateFile = (
   appData: ProtocolFileV6<DesignerApplicationData>
 ): ProtocolFile => {
-  const { commands, labwareDefinitions, designerApplication } = appData
+  const { commands, labwareDefinitions } = appData
   const { pipettes, labware, modules, ...rest } = appData
-  const savedStepForms = designerApplication?.data?.savedStepForms
   const labwareLocationUpdate: LabwareLocationUpdate =
     appData.designerApplication?.data?.savedStepForms[
       INITIAL_DECK_SETUP_STEP_ID
@@ -305,14 +304,12 @@ export const migrateFile = (
       return stepForm
     })
   }
-  const savedStepFormsWithoutInitialDeckState = Object.fromEntries(
-    Object.entries(savedStepForms ?? {}).filter(
-      ([key, value]) => key !== INITIAL_DECK_SETUP_STEP_ID
-    )
+  const filteredavedStepForms = Object.fromEntries(
+    Object.entries(
+      appData.designerApplication?.data?.savedStepForms ?? {}
+    ).filter(([key, value]) => key !== INITIAL_DECK_SETUP_STEP_ID)
   )
-  const newSavedStepFormsWithoutInitialDeckState = migrateSavedStepForms(
-    savedStepFormsWithoutInitialDeckState
-  )
+  const newFilteredavedStepForms = migrateSavedStepForms(filteredavedStepForms)
 
   return {
     ...rest,
@@ -325,7 +322,6 @@ export const migrateFile = (
           ...newLabwareIngreds,
         },
         savedStepForms: {
-          ...newSavedStepFormsWithoutInitialDeckState,
           [INITIAL_DECK_SETUP_STEP_ID]: {
             ...appData.designerApplication?.data?.savedStepForms[
               INITIAL_DECK_SETUP_STEP_ID
@@ -334,6 +330,7 @@ export const migrateFile = (
               ...newLabwareLocationUpdate,
             },
           },
+          ...newFilteredavedStepForms,
         },
       },
     },
