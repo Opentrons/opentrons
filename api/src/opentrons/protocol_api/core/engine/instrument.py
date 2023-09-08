@@ -528,6 +528,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._blow_out_flow_rate = blow_out
 
     def configure_for_volume(self, volume: float) -> None:
-        return self._engine_client.configure_for_volume(
+        self._engine_client.configure_for_volume(
             pipette_id=self._pipette_id, volume=volume
         )

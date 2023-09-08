@@ -260,8 +260,17 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.DropTipResult, result)
 
-    def configure_for_volume(self, pipette_id: str, volume: float) -> None:
-        pass
+    def configure_for_volume(
+        self, pipette_id: str, volume: float
+    ) -> commands.ConfigureForVolumeResult:
+        """Execute a ConfigureForVolume command."""
+        request = commands.ConfigureForVolumeCreate(
+            params=commands.ConfigureForVolumeParams(
+                pipetteId=pipette_id, volume=volume
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ConfigureForVolumeResult, result)
 
     def aspirate(
         self,
