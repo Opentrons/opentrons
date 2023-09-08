@@ -52,8 +52,7 @@ export const genericDidMigrateMessage: ModalContents = {
       </p>
       <p>
         Updating the file may make changes to liquid handling actions. Please
-        review your file in the Protocol Designer as well as with a water run on
-        the robot.
+        review your file in the Protocol Designer.
       </p>
       <p>As always, please contact us with any questions or feedback.</p>
     </>
@@ -126,7 +125,7 @@ export function getMigrationMessage(migrationsRan: string[]): ModalContents {
   if (migrationsRan.includes('3.0.0')) {
     return toV3MigrationMessage
   }
-  if (migrationsRan.every(migration => semver.gt(migration, '4.0.0'))) {
+  if (migrationsRan.includes('4.0.0')) {
     return noBehaviorChangeMessage
   }
   return genericDidMigrateMessage
