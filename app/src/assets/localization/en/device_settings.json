@@ -114,7 +114,7 @@
   "estop_missing": "E-stop missing",
   "estop_missing_description": "Your E-stop could be damaged or detached. {{robotName}} lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.",
   "estop_pressed": "E-stop pressed",
-  "estop_pressed_description": "First, safely clear the deck of any labware or spills. Then, twist the E-stop button counterclockwise. Finally, have Flex move the gantry to its home position.",
+  "estop_pressed_description": "First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have Flex move the gantry to its home position.",
   "ethernet": "Ethernet",
   "ethernet_connection_description": "Connect an Ethernet cable to the back of the robot and a network switch or hub.",
   "exit": "exit",
