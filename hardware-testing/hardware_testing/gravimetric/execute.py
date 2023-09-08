@@ -568,6 +568,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         f"{volume} uL channel {channel + 1} ({run_trial.trial + 1}/{cfg.trials})"
                     )
                     ui.print_info(f"trial total {trial_count}/{trial_total}")
+                    resources.ctx.home()
                     # NOTE: always pick-up new tip for each trial
                     #       b/c it seems tips heatup
                     next_tip: Well = _next_tip_for_channel(
