@@ -125,7 +125,16 @@ export function getMigrationMessage(migrationsRan: string[]): ModalContents {
   if (migrationsRan.includes('3.0.0')) {
     return toV3MigrationMessage
   }
-  if (migrationsRan.includes('4.0.0')) {
+  const noBehaviorMigrations = [
+    ['5.0.0'],
+    ['5.0.0', '5.1.0'],
+    ['5.0.0', '5.1.0', '5.2.0'],
+  ]
+  if (
+    noBehaviorMigrations.some(migrationList =>
+      migrationsRan.every(migration => migrationList.includes(migration))
+    )
+  ) {
     return noBehaviorChangeMessage
   }
   return genericDidMigrateMessage
