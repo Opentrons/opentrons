@@ -98,7 +98,7 @@ function importProtocol() {
     cy.get('[data-test="ComputingSpinner"]').should('exist')
     cy.get('div')
       .contains(
-        'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior'
+        'Your protocol will be automatically updated to the latest version.'
       )
       .should('exist')
     cy.get('button').contains('ok', { matchCase: false }).click()
