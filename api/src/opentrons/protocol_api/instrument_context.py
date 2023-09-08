@@ -1585,77 +1585,30 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
-        """Configure the pipette to handle a specific volume of liquid.
+        """Configure a pipette to handle a specific volume of liquid, specified in µL. Depending on the
+        volume, the pipette will enter a certain pipetting mode. Changing pipette modes alters properties
+        of the instance of :py:class:`.InstrumentContext`, such as default flow rate, minimum volume, and
+        maximum volume. The pipette will remain in the mode set by this function until it is called again.
 
-        Some pipettes have multiples of operation to handle certain volumes of liquid accurately.
-        For instance, the 50 µL GEN3 Single and Eight Channel pipettes must be placed in a low
-        volume mode to accurately dispense 1 µL of liquid. This function sets the mode of a pipette
-        - if applicable - appropriately for the specified volume.
+        The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode
+        to accurately dispense 1 µL of liquid. Low-volume mode can only be set by calling this function.
 
-        The function can only be called when no liquid is aspirated into the pipette. It can be called
-        whether or not a tip is present, though when the pipette is in a certain mode some tips may be
-        unavailable.
-
-        The function must be called to put the pipette in the proper mode for a later aspiration. The
-        mode then persists until the next time the function is called.
-
-        Pipette modes also determine other properties of the pipette such as default flow rates and
-        maximum or minimum handlable volumes. The properties of this object may change when you change
-        modes.
+        For more information on available modes for certain pipettes, see :ref:`pipette-volume-modes`.
 
         .. note ::
 
-            Changing a pipette's mode will reset its flowrates.
+            Changing a pipette's mode will reset its :ref:`flow rates <new-plunger-flow-rates>`.
 
-        If you are executing a protocol with many different volumes, it's a good practice to call this
-        function immediately before every distinct transfer or aspirate, using the volumes that you are
-        about to transfer or aspirate. This style also means the mode will always be correct when
-        executing from a volume list:
+        This function will raise an error if called when the pipette's tip contains liquid. It won't
+        raise an error if no tip is attached, but changing modes may affect which tips the pipette can
+        subsequently pick up without raising an error.
 
-        .. code-block:: python
+        This function will also raise an error if ``volume`` is outside the :ref:`overall minimum and
+        maximum capacities <new-pipette-models>` of the pipette (e.g., setting ``volume=1`` for a Flex
+        1000 µL pipette).
 
-            tiprack = protocol.load_labware('opentrons_flex_96_tiprack_50ul', 'D1')
-            sample_plate = protocol.load_labware('nest_1_reservoir_195ml', 'D2')
-            instr = protocol.load_instrument('p50_single_gen3', 'left', tip_racks=[tiprack])
-            # this list might have been loaded from a CSV
-            for volume in [1, 2, 3, 4, 1, 5, 2, 8]:
-                instr.pick_up_tip()
-                # configuring for each volume before aspiration ensures the pipette is always in the
-                # right mode
-                instr.configure_for_volume(volume)
-                instr.aspirate(volume=volume, location=sample_plate['A1'])
-                instr.dispense(location=sample_plate['A1'])
-                instr.drop_tip()
-
-        However, if you know that all your liquid handling will take place in a specific mode, then you
-        can call the function just once with a nominal volume ahead of time, or - if the mode is the default
-        one - not call the function at all:
-
-        .. code-block:: python
-
-            # A p300_multi_gen2 has only a default mode; you do not need to call this function
-            tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-            sample_plate = protocol.load_labware('nest_1_reservoir_195ml', '2')
-            instr = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tiprack])
-            for volume in [50, 10, 25, 300, 8]:
-                instr.pick_up_tip()
-                instr.aspirate(volume=volume, location=sample_plate['A1'])
-                instr.drop_tip()
-
-        For more information on what pipettes have what modes, see the Pipettes page.
-
-        .. note::
-
-            Changing the mode of a pipette may require a plunger movement. The pipette may move to ensure it
-            is not immersed in liquid.
-
-        :param volume:  - The volume to configure the pipette to handle
+        :param volume: The volume, in µL, that the pipette will prepare to handle.
         :type volume: float
-
-        :raises CommandPreconditionViolated: If called when liquid is held in the pipette
-        :raises CommandParameterLimitViolated: If called with a negative volume or a volume that the pipette
-                                               cannot handle in any mode.
-
         """
         if self._core.get_current_volume():
             raise CommandPreconditionViolated(
