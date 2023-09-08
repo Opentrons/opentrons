@@ -27,7 +27,12 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt32Field,
     Int32Field,
 )
-from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId, ErrorCode, GripperJawState
+from opentrons_hardware.firmware_bindings.constants import (
+    MessageId,
+    NodeId,
+    ErrorCode,
+    GripperJawState,
+)
 from .constants import brushed_motor_interrupts_per_sec
 
 log = logging.getLogger(__name__)
@@ -213,11 +218,8 @@ async def get_gripper_jaw_state(
             jaw_state = GripperJawState(message.payload.state.value)
 
     def _filter(arb_id: ArbitrationId) -> bool:
-        return (
-            NodeId(arb_id.parts.originating_node_id) == NodeId.gripper_g
-        ) and (
-            MessageId(arb_id.parts.message_id)
-            == MessageId.gripper_jaw_state_response
+        return (NodeId(arb_id.parts.originating_node_id) == NodeId.gripper_g) and (
+            MessageId(arb_id.parts.message_id) == MessageId.gripper_jaw_state_response
         )
 
     can_messenger.add_listener(_listener, _filter)
