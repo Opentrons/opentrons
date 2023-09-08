@@ -379,15 +379,15 @@ class GeometryView:
                 offset=well_location.offset,
             )
 
-        # return to top if labware is fixed trash
-        if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
-            z_offset = well_location.offset.z
-        else:
+        if self._labware.get_definition(labware_id).parameters.isTiprack:
             z_offset = self._labware.get_tip_drop_z_offset(
                 labware_id=labware_id,
                 length_scale=self._pipettes.get_return_tip_scale(pipette_id),
                 additional_offset=well_location.offset.z,
             )
+        else:
+            # return to top if labware is not tip rack
+            z_offset = well_location.offset.z
 
         return WellLocation(
             origin=WellOrigin.TOP,
