@@ -5,6 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { ConfirmRobotName } from '../ConfirmRobotName'
+
 const mockPush = jest.fn()
 
 jest.mock('react-router-dom', () => {
