@@ -210,7 +210,7 @@ async def get_gripper_jaw_state(
         nonlocal jaw_state
         if isinstance(message, GripperJawStateResponse):
             event.set()
-            jaw_state = GripperJawState[message.payload.state.value]
+            jaw_state = GripperJawState(message.payload.state.value)
 
     def _filter(arb_id: ArbitrationId) -> bool:
         return (
