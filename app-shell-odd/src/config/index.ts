@@ -34,6 +34,7 @@ const PARSE_ARGS_OPTS = {
   envPrefix: 'OT_APP',
   configuration: {
     'negation-prefix': 'disable_',
+    'parse-numbers': false,
   },
 }
 
