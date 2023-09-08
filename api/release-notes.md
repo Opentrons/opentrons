@@ -32,7 +32,6 @@ This update may take longer than usual. Allow **approximately 15 minutes** for y
 
 - The API relaxes placement restrictions for the Heater-Shaker Module on Flex.
 - Pipettes drop tips in multiple locations above the trash bin to prevent tips from stacking up.
-- Load times for various parts of the Opentrons App have been reduced.
 
 ### Known Issues
 
