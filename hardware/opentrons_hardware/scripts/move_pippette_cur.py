@@ -76,7 +76,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
-    speed = 10
+    speed = args.speed
     current = args.cur
     print('Speed = {}, current = {}'.format(speed,current))
     res = {node: (0,0,0)}
@@ -315,6 +315,9 @@ def main() -> None:
     parser.add_argument(
         "--cur", type=str, help="set current.", default=0.3
     )
+    # parser.add_argument(
+    #     "--speed", type=str, help="set speed.", default=10
+    # )
     args = parser.parse_args()
 
     asyncio.run(run(args))
