@@ -273,16 +273,16 @@ export const migrateFile = (
           ...stepForm,
           aspirate_touchTip_checkbox: aspirateTouchTipIncompatible
             ? false
-            : stepForm.aspirate_touchTip_checkbox,
+            : stepForm.aspirate_touchTip_checkbox ?? false,
           aspirate_touchTip_mmFromBottom: aspirateTouchTipIncompatible
             ? null
-            : stepForm.aspirate_touchTip_mmFromBottom,
+            : stepForm.aspirate_touchTip_mmFromBottom ?? null,
           dispense_touchTip_checkbox: dispenseTouchTipIncompatible
             ? false
-            : stepForm.dispense_touchTip_checkbox,
+            : stepForm.dispense_touchTip_checkbox ?? false,
           dispense_touchTip_mmFromBottom: dispenseTouchTipIncompatible
             ? null
-            : stepForm.dispense_touchTip_mmFromBottom,
+            : stepForm.dispense_touchTip_mmFromBottom ?? null,
         }
       } else if (stepForm.stepType === 'mix') {
         const mixLabware =
@@ -294,10 +294,10 @@ export const migrateFile = (
           ...stepForm,
           mix_touchTip_checkbox: mixTouchTipIncompatible
             ? false
-            : stepForm.mix_touchTip_checkbox,
+            : stepForm.mix_touchTip_checkbox ?? false,
           mix_touchTip_mmFromBottom: mixTouchTipIncompatible
             ? null
-            : stepForm.mix_touchTip_mmFromBottom,
+            : stepForm.mix_touchTip_mmFromBottom ?? null,
         }
       }
 
