@@ -1,6 +1,5 @@
 import * as React from 'react'
 import assert from 'assert'
-import semver from 'semver'
 import styles from './modalContents.css'
 import { ModalContents } from './types'
 import { FileUploadMessage } from '../../../load-file'
