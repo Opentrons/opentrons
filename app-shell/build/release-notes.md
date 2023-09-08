@@ -10,11 +10,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v7.0.0 release of the Opentrons App! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
 
-### Upgrade Note: Allow Extra Time for Restart
-
-When you first upgrade a robot to this version, it will take longer to restart, because it needs to convert some internal storage to a more efficient format.
-
-How much longer depends on how many different protocols you've recently run and how big they are. A lightly-loaded robot should only take an additional minute, but a heavily-loaded robot can take 10 minutes.
+This update may take longer than usual. Allow **approximately 15 minutes** for your robot to restart. This delay will only happen once.
 
 ### New Features
 
