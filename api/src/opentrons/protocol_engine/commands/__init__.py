@@ -36,6 +36,7 @@ from .command_unions import (
     CommandCreate,
     CommandResult,
     CommandType,
+    CommandPrivateResult,
 )
 
 from .aspirate import (
@@ -141,6 +142,7 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+    LoadPipettePrivateResult,
 )
 
 from .move_labware import (
@@ -271,8 +273,10 @@ __all__ = [
     "CommandCreate",
     "CommandResult",
     "CommandType",
+    "CommandPrivateResult",
     # base interfaces
     "AbstractCommandImpl",
+    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
@@ -359,6 +363,7 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    "LoadPipettePrivateResult",
     # move labware command models
     "MoveLabware",
     "MoveLabwareCreate",

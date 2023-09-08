@@ -22,7 +22,7 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleId,
 )
-from ..actions import ActionDispatcher, AddPipetteConfigAction
+from ..actions import ActionDispatcher
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
@@ -61,6 +61,8 @@ class LoadedPipetteData:
     """The result of a load pipette procedure."""
 
     pipette_id: str
+    serial_number: str
+    static_config: pipette_data_provider.LoadedStaticPipetteData
 
 
 @dataclass(frozen=True)
@@ -77,8 +79,9 @@ class LoadedConfigureForVolumeData:
     """The result of a load liquid class procedure."""
 
     pipette_id: str
-    serial_number: Optional[str]
+    serial_number: str
     volume: float
+    static_config: pipette_data_provider.LoadedStaticPipetteData
 
 
 class EquipmentHandler:
@@ -241,19 +244,11 @@ class EquipmentHandler:
                 )
             )
 
-        # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
-        # see if additional config data like this can be returned from the command impl
-        # alongside, but outside of, the command result.
-        # this pattern could potentially improve `loadLabware` and `loadModule`, too
-        self._action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id=pipette_id,
-                serial_number=serial_number,
-                config=static_pipette_config,
-            )
+        return LoadedPipetteData(
+            pipette_id=pipette_id,
+            serial_number=serial_number,
+            static_config=static_pipette_config,
         )
-
-        return LoadedPipetteData(pipette_id=pipette_id)
 
     async def load_magnetic_block(
         self,
@@ -386,22 +381,11 @@ class EquipmentHandler:
                 model, pipette_id
             )
 
-        # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
-        # see if additional config data like this can be returned from the command impl
-        # alongside, but outside of, the command result.
-        # this pattern could potentially improve `loadLabware` and `loadModule`, too
-        self._action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id=pipette_id,
-                serial_number=serial_number,
-                config=static_pipette_config,
-            )
-        )
-
         return LoadedConfigureForVolumeData(
             pipette_id=pipette_id,
             serial_number=serial_number,
             volume=volume,
+            static_config=static_pipette_config,
         )
 
     @overload

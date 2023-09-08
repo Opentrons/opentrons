@@ -145,14 +145,16 @@ async def test_command_broker_messages(
 
     decoy.when(
         mock_legacy_command_mapper.map_command(command=legacy_command)
-    ).then_return([pe_actions.UpdateCommandAction(engine_command)])
+    ).then_return([pe_actions.UpdateCommandAction(engine_command, private_result=None)])
 
     await to_thread.run_sync(handler, legacy_command)
 
     await subject.teardown()
 
     decoy.verify(
-        mock_action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
+        mock_action_dispatcher.dispatch(
+            pe_actions.UpdateCommandAction(engine_command, private_result=None)
+        )
     )
 
 
@@ -200,21 +202,16 @@ async def test_equipment_broker_messages(
         params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
     )
 
-    pipette_config_action = pe_actions.AddPipetteConfigAction(
-        pipette_id="pipette-id",
-        serial_number="serial-number",
-        config=cast(LoadedStaticPipetteData, {"config": True}),
-    )
-
     decoy.when(
         mock_legacy_command_mapper.map_equipment_load(load_info=load_info)
-    ).then_return((engine_command, pipette_config_action))
+    ).then_return((engine_command, None))
 
     await to_thread.run_sync(handler, load_info)
 
     await subject.teardown()
 
     decoy.verify(
-        mock_action_dispatcher.dispatch(pipette_config_action),
-        mock_action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command)),
+        mock_action_dispatcher.dispatch(
+            pe_actions.UpdateCommandAction(command=engine_command, private_result=None)
+        ),
     )

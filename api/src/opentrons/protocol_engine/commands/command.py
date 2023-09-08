@@ -6,7 +6,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Generic, Optional, TypeVar, Tuple
 
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
+
+CommandPrivateResultT = TypeVar("CommandPrivateResultT", bound=BaseModel)
 
 
 class CommandStatus(str, Enum):
@@ -176,5 +178,43 @@ class AbstractCommandImpl(
 
     @abstractmethod
     async def execute(self, params: CommandParamsT) -> CommandResultT:
+        """Execute the command, mapping data from execution into a response model."""
+        ...
+
+
+class AbstractCommandWithPrivateResultImpl(
+    ABC,
+    Generic[CommandParamsT, CommandResultT, CommandPrivateResultT],
+):
+    """Abstract command creation and execution implementation.
+
+    A given command request should map to a specific command implementation,
+    which defines how to:
+
+    - Create a command resource from the request model
+    - Execute the command, mapping data from execution into the result model
+    """
+
+    def __init__(
+        self,
+        state_view: StateView,
+        hardware_api: HardwareControlAPI,
+        equipment: execution.EquipmentHandler,
+        movement: execution.MovementHandler,
+        gantry_mover: execution.GantryMover,
+        labware_movement: execution.LabwareMovementHandler,
+        pipetting: execution.PipettingHandler,
+        tip_handler: execution.TipHandler,
+        run_control: execution.RunControlHandler,
+        rail_lights: execution.RailLightsHandler,
+        status_bar: execution.StatusBarHandler,
+    ) -> None:
+        """Initialize the command implementation with execution handlers."""
+        pass
+
+    @abstractmethod
+    async def execute(
+        self, params: CommandParamsT
+    ) -> Tuple[CommandResultT, CommandPrivateResultT]:
         """Execute the command, mapping data from execution into a response model."""
         ...

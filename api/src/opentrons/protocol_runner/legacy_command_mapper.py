@@ -149,7 +149,9 @@ class LegacyCommandMapper:
             self._command_count[command_type] = count + 1
             self._commands_by_broker_id[broker_id] = engine_command
 
-            results.append(pe_actions.UpdateCommandAction(engine_command))
+            results.append(
+                pe_actions.UpdateCommandAction(engine_command, private_result=None)
+            )
 
         elif stage == "after":
             running_command = self._commands_by_broker_id[broker_id]
@@ -228,7 +230,11 @@ class LegacyCommandMapper:
                             "completedAt": now,
                         }
                     )
-                results.append(pe_actions.UpdateCommandAction(completed_command))
+                results.append(
+                    pe_actions.UpdateCommandAction(
+                        completed_command, private_result=None
+                    )
+                )
 
                 if isinstance(completed_command, pe_commands.WaitForResume):
                     results.append(
@@ -249,7 +255,7 @@ class LegacyCommandMapper:
 
     def map_equipment_load(
         self, load_info: LegacyLoadInfo
-    ) -> Tuple[pe_commands.Command, Optional[pe_actions.AddPipetteConfigAction]]:
+    ) -> Tuple[pe_commands.Command, pe_commands.CommandPrivateResult]:
         """Map a labware, instrument (pipette), or module load to a PE command."""
         if isinstance(load_info, LegacyLabwareLoadInfo):
             return (self._map_labware_load(load_info), None)
@@ -562,7 +568,7 @@ class LegacyCommandMapper:
     def _map_instrument_load(
         self,
         instrument_load_info: LegacyInstrumentLoadInfo,
-    ) -> Tuple[pe_commands.Command, pe_actions.AddPipetteConfigAction]:
+    ) -> Tuple[pe_commands.Command, pe_commands.CommandPrivateResult]:
         """Map a legacy instrument (pipette) load to a ProtocolEngine command.
 
         Also creates a `AddPipetteConfigAction`, which is not necessary for the run,
@@ -587,7 +593,7 @@ class LegacyCommandMapper:
             ),
             result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
         )
-        pipette_config_action = pe_actions.AddPipetteConfigAction(
+        pipette_config_result = pe_commands.LoadPipettePrivateResult.construct(
             pipette_id=pipette_id,
             serial_number=instrument_load_info.pipette_dict["pipette_id"],
             config=pipette_data_provider.get_pipette_static_config(
@@ -598,7 +604,7 @@ class LegacyCommandMapper:
         self._command_count["LOAD_PIPETTE"] = count + 1
         self._pipette_id_by_mount[mount] = pipette_id
 
-        return (load_pipette_command, pipette_config_action)
+        return (load_pipette_command, pipette_config_result)
 
     def _map_module_load(
         self, module_load_info: LegacyModuleLoadInfo
