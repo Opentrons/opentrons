@@ -8,7 +8,9 @@ import { useDispatch } from 'react-redux'
 import { useInterval } from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
+  useAllRunsQuery,
   useHost,
+  useRunQuery,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import {
@@ -21,13 +23,13 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
-import { useCurrentRun } from '../organisms/ProtocolUpload/hooks'
-import { useToaster } from '../organisms/ToasterOven'
 import { checkShellUpdate } from '../redux/shell'
+import { useToaster } from '../organisms/ToasterOven'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 import type { Dispatch } from '../redux/types'
 
+const CURRENT_RUN_POLL = 5000
 const UPDATE_RECHECK_INTERVAL_MS = 60000
 const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
 
@@ -124,7 +126,24 @@ export function useProtocolReceiptToast(): void {
 }
 
 export function useCurrentRunRoute(): string | null {
-  const runRecord = useCurrentRun()
+  const { data: allRuns } = useAllRunsQuery(
+    { pageLength: 1 },
+    { refetchInterval: CURRENT_RUN_POLL }
+  )
+  const currentRunLink = allRuns?.links?.current ?? null
+  const currentRun =
+    currentRunLink != null &&
+    typeof currentRunLink !== 'string' &&
+    'href' in currentRunLink
+      ? allRuns?.data.find(
+          run => run.id === currentRunLink.href.replace('/runs/', '')
+        ) // trim link path down to only runId
+      : null
+  const currentRunId = currentRun?.id ?? null
+  const { data: runRecord } = useRunQuery(currentRunId, {
+    staleTime: Infinity,
+    enabled: currentRunId != null,
+  })
 
   const isRunSetupRoute = useRouteMatch('/runs/:runId/setup')
   if (isRunSetupRoute != null && runRecord == null) return '/protocols'
@@ -132,24 +151,23 @@ export function useCurrentRunRoute(): string | null {
   const runStatus = runRecord?.data.status
   const runActions = runRecord?.data.actions
   if (runRecord == null || runStatus == null || runActions == null) return null
-
   // grabbing run id off of the run query to have all routing info come from one source of truth
   const runId = runRecord.data.id
-  const hasRunBeenStarted = runActions?.some(
+  const hasRunStarted = runActions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
   if (
     runStatus === RUN_STATUS_SUCCEEDED ||
-    (runStatus === RUN_STATUS_STOPPED && hasRunBeenStarted) ||
+    (runStatus === RUN_STATUS_STOPPED && hasRunStarted) ||
     runStatus === RUN_STATUS_FAILED
   ) {
     return `/runs/${runId}/summary`
   } else if (
     runStatus === RUN_STATUS_IDLE ||
-    (!hasRunBeenStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    (!hasRunStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
   ) {
     return `/runs/${runId}/setup`
-  } else if (hasRunBeenStarted) {
+  } else if (hasRunStarted) {
     return `/runs/${runId}/run`
   } else {
     // includes runs cancelled before starting and runs not yet started
