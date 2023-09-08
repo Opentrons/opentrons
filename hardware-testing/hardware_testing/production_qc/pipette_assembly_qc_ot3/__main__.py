@@ -70,6 +70,7 @@ PROBING_DECK_PRECISION_MM = 1.0
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 ASPIRATE_SUBMERGE_MM: Final = 3
+TRAILING_AIR_GAP_DROPLETS_UL: Final = 0.5
 
 # FIXME: reduce this spec after dial indicator is implemented
 LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM = 0.4
@@ -460,8 +461,9 @@ async def _aspirate_and_look_for_droplets(
     pipette_volume = pip.working_volume
     print(f"aspirating {pipette_volume} microliters")
     await api.move_rel(mount, Point(z=-ASPIRATE_SUBMERGE_MM))
-    await api.aspirate(mount, pipette_volume)
+    await api.aspirate(mount, pipette_volume - TRAILING_AIR_GAP_DROPLETS_UL)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
+    await api.aspirate(mount, TRAILING_AIR_GAP_DROPLETS_UL)
     for t in range(wait_time):
         print(f"waiting for leaking tips ({t + 1}/{wait_time})")
         if not api.is_simulator:
