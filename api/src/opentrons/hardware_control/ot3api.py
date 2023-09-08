@@ -1339,6 +1339,17 @@ class OT3API(
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(Axis.Q)
+            # NOTE: Z_R current is dropped very low when 96CH attached,
+            #       so trying to home it would cause timeout error
+            if axes and Axis.Z_R in axes:
+                # TODO: make it a specific exception so we can catch
+                self._log.warning(
+                    f"unable to home {Axis.Z_R.name} axis"
+                    f"with {self.gantry_load.name} gantry load"
+                )
+            if Axis.Z_R in checked_axes:
+                checked_axes.remove(Axis.Z_R)
+
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1387,6 +1398,12 @@ class OT3API(
         the behaviors between the two robots similar, retract_axis on the FLEX
         will call home if the stepper position is inaccurate.
         """
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R:
+            self._log.warning(
+                f"unable to retract {Axis.Z_R.name} axis"
+                f"with {self.gantry_load.name} gantry load"
+            )
+
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
 
