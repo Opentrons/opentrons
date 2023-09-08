@@ -84,8 +84,22 @@ class VirtualPipetteDataProvider:
             pipette_model.pipette_channels,
             pipette_model.pipette_version,
         )
+        try:
+            tip_type = pip_types.PipetteTipType(
+                config.liquid_properties[liquid_class].max_volume
+            )
+        except ValueError:
+            tip_type = sorted(
+                [
+                    tip
+                    for tip in config.liquid_properties[
+                        liquid_class
+                    ].supported_tips.keys()
+                ],
+                key=lambda tt: tt.value,
+            )[0]
         tip_configuration = config.liquid_properties[liquid_class].supported_tips[
-            pip_types.PipetteTipType(config.liquid_properties[liquid_class].max_volume)
+            tip_type
         ]
         return LoadedStaticPipetteData(
             model=str(pipette_model),

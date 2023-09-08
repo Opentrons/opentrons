@@ -53,6 +53,78 @@ def test_get_virtual_pipette_static_config(
     )
 
 
+def test_configure_virtual_pipette_for_volume(
+    subject_instance: VirtualPipetteDataProvider,
+) -> None:
+    """It should return an updated config if the liquid class changes."""
+    result1 = subject_instance.get_virtual_pipette_static_config(
+        PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette"
+    )
+    assert result1 == LoadedStaticPipetteData(
+        model="p50_single_v3.0",
+        display_name="Flex 1-Channel 50 μL",
+        min_volume=5,
+        max_volume=50.0,
+        channels=1,
+        nozzle_offset_z=-259.15,
+        home_position=230.15,
+        flow_rates=FlowRates(
+            default_blow_out={"2.14": 4.0},
+            default_aspirate={"2.14": 8.0},
+            default_dispense={"2.14": 8.0},
+        ),
+        tip_configuration_lookup_table=result1.tip_configuration_lookup_table,
+        nominal_tip_overlap=result1.nominal_tip_overlap,
+    )
+    subject_instance.configure_virtual_pipette_for_volume(
+        "my-pipette", 1, result1.model
+    )
+    result2 = subject_instance.get_virtual_pipette_static_config(
+        PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette"
+    )
+    assert result2 == LoadedStaticPipetteData(
+        model="p50_single_v3.0",
+        display_name="Flex 1-Channel 50 μL",
+        min_volume=0.5,
+        max_volume=5.0,
+        channels=1,
+        nozzle_offset_z=-259.15,
+        home_position=230.15,
+        flow_rates=FlowRates(
+            default_blow_out={"2.14": 4.0},
+            default_aspirate={"2.14": 8.0},
+            default_dispense={"2.14": 8.0},
+        ),
+        tip_configuration_lookup_table=result2.tip_configuration_lookup_table,
+        nominal_tip_overlap=result2.nominal_tip_overlap,
+    )
+
+
+def test_load_virtual_pipette_by_model_string(
+    subject_instance: VirtualPipetteDataProvider,
+) -> None:
+    """It should return config data given a pipette model."""
+    result = subject_instance.get_virtual_pipette_static_config_by_model_string(
+        "p300_multi_v2.1", "my-pipette"
+    )
+    assert result == LoadedStaticPipetteData(
+        model="p300_multi_v2.1",
+        display_name="P300 8-Channel GEN2",
+        min_volume=20.0,
+        max_volume=300,
+        channels=8,
+        nozzle_offset_z=35.52,
+        home_position=155.75,
+        flow_rates=FlowRates(
+            default_blow_out={"2.0": 94.0},
+            default_aspirate={"2.0": 94.0},
+            default_dispense={"2.0": 94.0},
+        ),
+        tip_configuration_lookup_table=result.tip_configuration_lookup_table,
+        nominal_tip_overlap=result.nominal_tip_overlap,
+    )
+
+
 def test_get_pipette_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
