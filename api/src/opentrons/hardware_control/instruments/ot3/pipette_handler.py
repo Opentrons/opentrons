@@ -273,9 +273,6 @@ class OT3PipetteHandler:
                 for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
             result[
-                "default_blow_out_volume"
-            ] = instr.active_tip_settings.default_blowout_volume
-            result[
                 "default_push_out_volume"
             ] = instr.active_tip_settings.default_push_out_volume
         return cast(PipetteDict, result)
@@ -645,11 +642,7 @@ class OT3PipetteHandler:
             instrument.plunger_positions.blow_out - instrument.plunger_positions.bottom
         )
         if volume is None:
-            ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
-            distance_mm = max(
-                ul / instrument.ul_per_mm(ul, "blowout"),
-                max_distance,
-            )
+            distance_mm = max_distance
         else:
             ul = volume
             distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
