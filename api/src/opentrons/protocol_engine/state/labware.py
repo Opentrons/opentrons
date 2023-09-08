@@ -750,7 +750,7 @@ class LabwareView(HasState[LabwareState]):
     ) -> Optional[LabwareMovementOffsetData]:
         """Get the labware's gripper offsets of the specified type."""
         parsed_offsets = self.get_definition(labware_id).gripperOffsets
-        offset_key = slot_name.name if slot_name else "default"
+        offset_key = slot_name.id if slot_name else "default"
 
         if parsed_offsets is None or offset_key not in parsed_offsets:
             return None
