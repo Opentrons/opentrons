@@ -119,7 +119,7 @@ describe('CommandText', () => {
           {
             commandType: 'dropTip',
             params: {
-              labwareId: 'c8f42311-f83f-4722-9821-9d2225e4b0b5',
+              labwareId: 'b2a40c9d-31b0-4f27-ad4a-c92ced91204d',
               wellName: 'A1',
               wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 0 } },
               pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
@@ -129,9 +129,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )[0]
-    getByText(
-      'Returning tip to A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1'
-    )
+    getByText('Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9')
   })
   it('renders correct text for pickUpTip', () => {
     const command = mockRobotSideAnalysis.commands.find(

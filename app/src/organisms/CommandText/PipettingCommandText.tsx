@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { getLoadedLabware } from './utils/accessors'
-import { getLabwareName, getLabwareDisplayLocation } from './utils'
-import type {
+import {
   CompletedProtocolAnalysis,
   AspirateRunTimeCommand,
   DispenseRunTimeCommand,
@@ -9,7 +7,11 @@ import type {
   MoveToWellRunTimeCommand,
   DropTipRunTimeCommand,
   PickUpTipRunTimeCommand,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
+import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
+import { getLoadedLabware } from './utils/accessors'
+import { getLabwareName, getLabwareDisplayLocation } from './utils'
 
 type PipettingRunTimeCommmand =
   | AspirateRunTimeCommand
@@ -75,17 +77,22 @@ export const PipettingCommandText = ({
       })
     }
     case 'dropTip': {
-      const labwareDisplayName = getLabwareName(robotSideAnalysis, labwareId)
-
-      return labwareDisplayName === 'Fixed Trash'
-        ? t('drop_tip', {
-            well_name: wellName,
-            labware: getLabwareName(robotSideAnalysis, labwareId),
-          })
-        : t('return_tip', {
+      const loadedLabware = getLoadedLabware(robotSideAnalysis, labwareId)
+      const labwareDefinitions = getLabwareDefinitionsFromCommands(
+        robotSideAnalysis.commands
+      )
+      const labwareDef = labwareDefinitions.find(
+        lw => getLabwareDefURI(lw) === loadedLabware?.definitionUri
+      )
+      return labwareDef?.parameters.isTiprack
+        ? t('return_tip', {
             well_name: wellName,
             labware: getLabwareName(robotSideAnalysis, labwareId),
             labware_location: displayLocation,
+          })
+        : t('drop_tip', {
+            well_name: wellName,
+            labware: getLabwareName(robotSideAnalysis, labwareId),
           })
     }
     case 'pickUpTip': {
