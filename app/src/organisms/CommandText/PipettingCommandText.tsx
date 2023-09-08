@@ -32,6 +32,7 @@ export const PipettingCommandText = ({
   const { labwareId, wellName } = command.params
   const labwareLocation = getLoadedLabware(robotSideAnalysis, labwareId)
     ?.location
+
   const displayLocation =
     labwareLocation != null
       ? getLabwareDisplayLocation(robotSideAnalysis, labwareLocation, t)
@@ -74,11 +75,18 @@ export const PipettingCommandText = ({
       })
     }
     case 'dropTip': {
-      return t('drop_tip', {
-        well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: displayLocation,
-      })
+      const labwareDisplayName = getLabwareName(robotSideAnalysis, labwareId)
+
+      return labwareDisplayName === 'Fixed Trash'
+        ? t('drop_tip', {
+            well_name: wellName,
+            labware: getLabwareName(robotSideAnalysis, labwareId),
+          })
+        : t('return_tip', {
+            well_name: wellName,
+            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware_location: displayLocation,
+          })
     }
     case 'pickUpTip': {
       return t('pickup_tip', {
