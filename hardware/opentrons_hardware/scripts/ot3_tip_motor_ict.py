@@ -15,7 +15,7 @@ from opentrons_hardware.hardware_control.motion import (
     create_tip_action_backoff_step,
     MoveGroupTipActionStep,
 )
-
+import time
 
 def calc_time(distance, speed):
     time = abs(distance/speed)
@@ -47,9 +47,9 @@ async def home_tip_motor(messenger, node, args):
     try:
         await set_pipette_current(messenger,current,node)
         await home_runner.run(can_messenger = messenger)
-        print("MOVEHOME=Pass")
+        print("MOVETIPMOTORHOME=Pass")
     except:
-        print("MOVEHOME=Failed")
+        print("MOVETIPMOTORHOME=Fail")
 
 
 async def move_tip_motor(messenger: CanMessenger, node, distance, velocity):
@@ -88,9 +88,36 @@ async def run(args: argparse.Namespace) -> None:
     if args.home:
         await home_tip_motor(messenger, node, args)
     if args.downward:
-        await move_tip_motor(messenger, node, 10, 5)
+        
+        try:
+            move1 = await move_tip_motor(messenger, node, 5, 5)
+            print(move1[node])
+            time.sleep(0.2)
+            move2 = await move_tip_motor(messenger, node, 5, 5)
+            
+
+            diff = float(move2[node][0]) - float(move1[node][0])
+            print("diff",diff)
+            if abs(diff) > 0:
+                print("MOVEDOWNTIPMOTOR=Pass")
+            else:
+                print("MOVEDOWNTIPMOTOR=Fail")
+        except:
+                print("MOVEDOWNTIPMOTOR=Fail")
+        
     if args.up:
-        await move_tip_motor(messenger, node, 10, -5)
+        try:
+            move1 = await move_tip_motor(messenger, node, 5, -5)
+            time.sleep(0.2)
+            move2 = await move_tip_motor(messenger, node, 5, -5)
+            diff = float(move2[node][0]) - float(move1[node][0])
+            print("diff",diff)
+            if abs(diff) > 0:
+                print("MOVEUPTIPMOTOR=Pass")
+            else:
+                print("MOVEUPTIPMOTOR=Fail")
+        except:
+                print("MOVEUPTIPMOTOR=Fail")
 
 def main() -> None:
     """Entry point."""
