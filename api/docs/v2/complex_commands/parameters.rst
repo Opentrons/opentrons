@@ -83,13 +83,32 @@ But it *does not* pick up a new tip after dispensing into B1:
 If this poses a contamination risk, you can work around it in a few ways:
 
     * Use ``transfer()`` with ``new_tip="always"`` instead.
-    * Set :py:obj:`.well_bottom_clearance` before your complex command.
+    * Set :py:obj:`.well_bottom_clearance` high enough that the tip doesn't contact liquid in the destination well.
     * Use :ref:`v2-atomic-commands` instead of complex commands.
 
 
 
 Mix Before
 ==========
+
+The ``mix_before`` parameter controls mixing in source wells before each aspiration. Its value must be a :py:class:`tuple` with two numeric values. The first value is the number of repetitions, and the second value is the amount of liquid to mix in µL.
+
+For example, this transfer command will mix 50 µL of liquid 3 times before each of its aspirations::
+
+    pipette.transfer(
+        volume=100,
+        source=plate["A1"],
+        dest=[plate["B1"], plate["B2"]],
+        mix_before=(3, 50),
+    )
+    
+.. versionadded:: 2.0
+
+Mixing occurs before every aspiration, including when :ref:`complex-tip-refilling` is required.
+
+.. note::
+    :py:meth:`~.InstrumentContext.consolidate` ignores any value of ``mix_before``. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
+    
 
 Touch Tip
 =========
