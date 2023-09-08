@@ -11,6 +11,8 @@ import {
   ALIGN_FLEX_END,
   useOnClickOutside,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -19,6 +21,7 @@ import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useRunStatuses } from '../../Devices/hooks'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '../'
 interface ModuleCalibrationOverflowMenuProps {
@@ -49,6 +52,7 @@ export function ModuleCalibrationOverflowMenu({
   const OverflowMenuRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
+  const { createLiveCommand } = useCreateLiveCommandMutation()
 
   const requiredAttachOrCalibratePipette =
     formattedPipetteOffsetCalibrations.length === 0 ||
@@ -56,6 +60,21 @@ export function ModuleCalibrationOverflowMenu({
       formattedPipetteOffsetCalibrations[1].lastCalibrated == null)
 
   const handleCalibration = (): void => {
+    if (attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE) {
+      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: {
+          moduleId: module.id,
+        },
+      }
+      createLiveCommand({
+        command: stopShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
+        )
+      })
+    }
     setShowOverflowMenu(false)
     setShowModuleWizard(true)
   }

@@ -2,6 +2,8 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
+import { useHistory } from 'react-router-dom'
+
 import {
   Box,
   Flex,
@@ -26,7 +28,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { useHistory } from 'react-router-dom'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { updateModule } from '../../redux/modules'
 import {
@@ -62,6 +65,7 @@ import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
 
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type {
   AttachedModule,
   HeaterShakerModule,
@@ -126,6 +130,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
   )
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+
   const handleCloseErrorModal = (): void => {
     if (latestRequestId != null) {
       dispatch(dismissRequest(latestRequestId))
@@ -225,6 +231,22 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleCalibrateClick = (): void => {
+    if (module.moduleType === HEATERSHAKER_MODULE_TYPE) {
+      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: {
+          moduleId: module.id,
+        },
+      }
+      createLiveCommand({
+        command: stopShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
+        )
+      })
+    }
+
     setshowCalModal(true)
   }
 
