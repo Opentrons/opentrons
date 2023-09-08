@@ -137,12 +137,13 @@ class GripperHandler:
         gripper = self.get_gripper()
         if gripper.state == GripperJawState.UNHOMED:
             raise GripError("Gripper jaw must be homed before moving")
-    
+
     def check_ready_for_jaw_home(self) -> None:
         """Raise an exception if it is not currently valid to home the jaw."""
         gripper = self.get_gripper()
-        if gripper.state == GripperJawState.GRIPPING and \
-            not math.isclose(gripper.jaw_width, gripper.geometry.jaw_width["min"], abs_tol=5.0):
+        if gripper.state == GripperJawState.GRIPPING and not math.isclose(
+            gripper.jaw_width, gripper.geometry.jaw_width["min"], abs_tol=5.0
+        ):
             raise GripError("Gripper cannot home while it is gripping a labware")
 
     def set_jaw_state(self, state: GripperJawState) -> None:

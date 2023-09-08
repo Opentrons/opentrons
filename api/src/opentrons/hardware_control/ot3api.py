@@ -802,7 +802,6 @@ class OT3API(
             self._log.error("Could not home when gripper is actively gripping.")
             raise e
 
-
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
