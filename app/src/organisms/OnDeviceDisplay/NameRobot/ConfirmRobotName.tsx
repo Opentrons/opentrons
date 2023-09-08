@@ -11,13 +11,11 @@ import {
   TYPOGRAPHY,
   COLORS,
 } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { StepMeter } from '../../../atoms/StepMeter'
 import { MediumButton } from '../../../atoms/buttons'
 import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
@@ -29,20 +27,9 @@ export function ConfirmRobotName({
   robotName,
 }: ConfirmRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { createLiveCommand } = useCreateLiveCommandMutation()
-  const animationCommand: SetStatusBarCreateCommand = {
-    commandType: 'setStatusBar',
-    params: { animation: 'disco' },
-  }
   const history = useHistory()
 
   const handleClick = (): void => {
-    createLiveCommand({
-      command: animationCommand,
-      waitUntilComplete: false,
-    }).catch((e: Error) =>
-      console.warn(`cannot run status bar animation: ${e.message}`)
-    )
     history.push('/dashboard')
   }
   return (
