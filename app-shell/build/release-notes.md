@@ -23,7 +23,7 @@ Welcome to the v7.0.0 release of the Opentrons App! This release adds support fo
 
 ### Improved Features
 
-- Load times for various pages have been reduced.
+- The app loads various pages faster.
 
 ---
 
