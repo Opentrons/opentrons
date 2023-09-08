@@ -92,9 +92,9 @@ export function ProtocolTimelineScrubber(
       : null
 
   return (
-    <Flex ref={wrapperRef} width="100%" flexDirection={DIRECTION_COLUMN}>
+    <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex>
-        <Flex size="25rem" marginRight={SPACING.spacing3}>
+        <Flex size="25rem" marginRight={SPACING.spacing16}>
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
@@ -213,9 +213,10 @@ export function ProtocolTimelineScrubber(
         />
       </Flex>
       <Flex
-      alignSelf={ALIGN_STRETCH}
-      overflowY="scroll"
-      width="100%">
+        ref={wrapperRef}
+        alignSelf={ALIGN_STRETCH}
+        overflowY="scroll"
+        width="100%">
         <ViewportList
           viewportRef={wrapperRef}
           ref={commandListRef}
@@ -243,7 +244,6 @@ export function ProtocolTimelineScrubber(
         onChange={e => {
           const nextIndex = Number(e.target.value) - 1
           setCurrentCommandIndex(nextIndex)
-          // const progressOffset = window.innerWidth / 2
           commandListRef.current?.scrollToIndex(nextIndex)
         }}
       />
@@ -260,10 +260,11 @@ export function ProtocolTimelineScrubber(
         <Text
           as="p"
           fontSize="0.5rem"
-          // marginLeft={
-          //   // (currentCommandIndex / (commands.length - 1)) *
-          //   // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
-          // }
+          marginLeft={
+            (currentCommandIndex / (commands.length - 1)) *
+            886
+            // (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
+          }
         >
           {currentCommandIndex + 1}
         </Text>
