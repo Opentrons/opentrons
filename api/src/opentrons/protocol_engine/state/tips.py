@@ -167,14 +167,11 @@ class TipView(HasState[TipState]):
                 return next(iter(wells))
 
         else:
-            for well_name, tip_state in wells.items():
-                seen_start = (
-                    starting_tip_name is None
-                    or well_name == starting_tip_name
-                    or wells[starting_tip_name] == TipRackWellState.USED
-                )
+            if starting_tip_name is not None:
+                wells = _drop_wells_before_starting_tip(wells, starting_tip_name)
 
-                if seen_start and tip_state == TipRackWellState.CLEAN:
+            for well_name, tip_state in wells.items():
+                if tip_state == TipRackWellState.CLEAN:
                     return well_name
 
         return None
@@ -202,3 +199,17 @@ class TipView(HasState[TipState]):
     def get_tip_length(self, pipette_id: str) -> float:
         """Return the given pipette's tip length."""
         return self._state.length_by_pipette_id.get(pipette_id, 0)
+
+
+def _drop_wells_before_starting_tip(
+    wells: TipRackStateByWellName, starting_tip_name: str
+) -> TipRackStateByWellName:
+    """Drop any wells that come before the starting tip and return the remaining ones after."""
+    seen_starting_well = False
+    remaining_wells = {}
+    for well_name, tip_state in wells.items():
+        if well_name == starting_tip_name:
+            seen_starting_well = True
+        if seen_starting_well:
+            remaining_wells[well_name] = tip_state
+    return remaining_wells

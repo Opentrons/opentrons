@@ -116,6 +116,7 @@ async def test_run_update(
         node_id=target.bootloader_node,
         hex_processor=mock_hex_record_processor,
         ack_wait_seconds=11,
+        retries=12,
     )
     mock_can_messenger.send.assert_called_once_with(
         node_id=target.bootloader_node, message=FirmwareUpdateStartApp()
@@ -148,17 +149,18 @@ async def test_run_updates(
             can_messenger=mock_can_messenger,
             usb_messenger=mock_usb_messenger,
             update_details=update_details,
-            retry_count=12,
-            timeout_seconds=11,
+            retry_count=3,
+            timeout_seconds=5,
             erase=should_erase,
+            erase_timeout_seconds=60,
         )
         async for progress in updater.run_updates():
             pass
 
     mock_initiator_run.assert_has_calls(
         [
-            mock.call(target=target_1, retry_count=12, ready_wait_time_sec=11),
-            mock.call(target=target_2, retry_count=12, ready_wait_time_sec=11),
+            mock.call(target=target_1, retry_count=3, ready_wait_time_sec=5),
+            mock.call(target=target_2, retry_count=3, ready_wait_time_sec=5),
         ]
     )
 
@@ -177,13 +179,15 @@ async def test_run_updates(
             mock.call(
                 node_id=target_1.bootloader_node,
                 hex_processor=mock_hex_record_processor,
-                ack_wait_seconds=11,
+                ack_wait_seconds=5,
+                retries=3,
             ),
             mock.call().__aiter__(),
             mock.call(
                 node_id=target_2.bootloader_node,
                 hex_processor=mock_hex_record_processor,
-                ack_wait_seconds=11,
+                ack_wait_seconds=5,
+                retries=3,
             ),
             mock.call().__aiter__(),
         ]

@@ -131,7 +131,7 @@ def test_load_instrument(
     mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
-    """It should create a instrument using its execution core."""
+    """It should create an instrument using its execution core."""
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
     mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
 
@@ -204,6 +204,33 @@ def test_load_instrument_replace(
 
     with pytest.raises(RuntimeError, match="Instrument already present"):
         subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
+
+
+def test_96_channel_pipette_always_loads_on_the_left_mount(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should always load a 96-channel pipette on left mount, regardless of the mount arg specified."""
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("A 96 Channel Name")).then_return(
+        "a 96 channel name"
+    )
+    decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
+        PipetteNameType.P1000_96
+    )
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P1000_96,
+            mount=Mount.LEFT,
+        )
+    ).then_return(mock_instrument_core)
+
+    result = subject.load_instrument(
+        instrument_name="A 96 Channel Name", mount="shadowfax"
+    )
+    assert result == subject.loaded_instruments["left"]
 
 
 def test_load_labware(
@@ -517,6 +544,7 @@ def test_move_labware_to_slot(
             labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=(1, 2, 3),
         )
@@ -556,6 +584,7 @@ def test_move_labware_to_module(
             labware_core=mock_labware_core,
             new_location=mock_module_core,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,
         )
@@ -586,6 +615,7 @@ def test_move_labware_off_deck(
             labware_core=mock_labware_core,
             new_location=OFF_DECK,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,
         )

@@ -48,6 +48,9 @@ export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
 export const GRIPPER_V1_2: 'gripperV1.2' = 'gripperV1.2'
 export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2]
 
+// robot display name
+export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
+
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
 export const GEN2: 'GEN2' = 'GEN2'

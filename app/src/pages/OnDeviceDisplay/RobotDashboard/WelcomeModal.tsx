@@ -24,7 +24,7 @@ interface WelcomeModalProps {
   setShowWelcomeModal: (showWelcomeModal: boolean) => void
 }
 
-export function WelcomedModal({
+export function WelcomeModal({
   setShowWelcomeModal,
 }: WelcomeModalProps): JSX.Element {
   const { t } = useTranslation('device_details')

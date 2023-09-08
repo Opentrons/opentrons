@@ -372,6 +372,7 @@ class RunUpdate:
                 node_id=target.bootloader_node,
                 hex_processor=hex_processor,
                 ack_wait_seconds=timeout_seconds,
+                retries=retry_count,
             ):
                 await self._status_queue.put(
                     (

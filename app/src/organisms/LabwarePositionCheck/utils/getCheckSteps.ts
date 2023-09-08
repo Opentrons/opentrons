@@ -45,6 +45,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
+    adapterId: lastTiprackCheckStep.adapterId,
   }
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
@@ -53,6 +54,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
+    adapterId: lastTiprackCheckStep.adapterId,
   }
 
   return [
@@ -130,11 +132,12 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 
     return [
       ...acc,
-      ...labwareLocations.map(({ location }) => ({
+      ...labwareLocations.map(({ location, adapterId }) => ({
         section: SECTIONS.CHECK_TIP_RACKS,
         labwareId: params.labwareId,
         pipetteId: params.pipetteId,
         location,
+        adapterId,
       })),
     ]
   }, [])

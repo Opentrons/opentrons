@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { format } from 'date-fns'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CreateMaintenanceCommand, CreateRunCommand } from './hooks'
@@ -84,4 +85,16 @@ export const chainMaintenanceCommandsRecursive = (
       setIsLoading(false)
       return Promise.reject(error)
     })
+}
+
+const dateIsValid = (date: string): boolean => {
+  return !isNaN(new Date(date).getTime())
+}
+
+export const formatTimeWithUtcLabel = (time: string | null): string => {
+  const UTC_LABEL = 'UTC'
+  if (time == null) return 'unknown'
+  return typeof time === 'string' && dateIsValid(time)
+    ? `${format(new Date(time), 'M/d/yy HH:mm')} ${UTC_LABEL}`
+    : `${time} ${UTC_LABEL}`
 }

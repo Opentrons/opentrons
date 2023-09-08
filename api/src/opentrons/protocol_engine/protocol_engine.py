@@ -7,7 +7,6 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-
 from opentrons_shared_data.errors import (
     ErrorCodes,
     EnumeratedError,
@@ -24,6 +23,7 @@ from .types import (
     ModuleModel,
     Liquid,
     HexColor,
+    PostRunHardwareState,
 )
 from .execution import (
     QueueWorker,
@@ -292,7 +292,6 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
-        await self._hardware_stopper.do_halt()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -307,8 +306,9 @@ class ProtocolEngine:
     async def finish(
         self,
         error: Optional[Exception] = None,
-        drop_tips_and_home: bool = True,
+        drop_tips_after_run: bool = True,
         set_run_status: bool = True,
+        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
@@ -322,19 +322,23 @@ class ProtocolEngine:
 
         Arguments:
             error: An error that caused the stop, if applicable.
-            drop_tips_and_home: Whether to home and drop tips as part of cleanup.
+            drop_tips_after_run: Whether to drop tips as part of cleanup.
             set_run_status: Whether to calculate a `success` or `failure` run status.
                 If `False`, will set status to `stopped`.
+            post_run_hardware_state: The state in which to leave the gantry and motors in
+                after the run is over.
         """
         if self._state_store.commands.state.stopped_by_estop:
-            drop_tips_and_home = False
+            drop_tips_after_run = False
+            post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
             if error is None:
                 error = EStopActivatedError(message="Estop was activated during a run")
         if error:
             if isinstance(error, EnumeratedError) and self._code_in_exception_stack(
                 error=error, code=ErrorCodes.E_STOP_ACTIVATED
             ):
-                drop_tips_and_home = False
+                drop_tips_after_run = False
+                post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
 
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
@@ -354,11 +358,25 @@ class ProtocolEngine:
         # order will be backwards because the stack is first-in-last-out.
         exit_stack = AsyncExitStack()
         exit_stack.push_async_callback(self._plugin_starter.stop)  # Last step.
+
         exit_stack.push_async_callback(
+            # Cleanup after hardware halt and reset the hardware controller
             self._hardware_stopper.do_stop_and_recover,
-            drop_tips_and_home=drop_tips_and_home,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
         )
         exit_stack.callback(self._door_watcher.stop)
+
+        disengage_before_stopping = (
+            False
+            if post_run_hardware_state == PostRunHardwareState.STAY_ENGAGED_IN_PLACE
+            else True
+        )
+        # Halt any movements immediately
+        exit_stack.push_async_callback(
+            self._hardware_stopper.do_halt,
+            disengage_before_stopping=disengage_before_stopping,
+        )
         exit_stack.push_async_callback(self._queue_worker.join)  # First step.
 
         try:

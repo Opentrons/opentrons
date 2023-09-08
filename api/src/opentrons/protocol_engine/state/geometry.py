@@ -136,7 +136,19 @@ class GeometryView:
     def _get_labware_position_offset(
         self, labware_id: str, labware_location: LabwareLocation
     ) -> LabwareOffsetVector:
-        """Gets the offset vector of a labware on the given location."""
+        """Gets the offset vector of a labware on the given location.
+
+        NOTE: Not to be confused with LPC offset.
+        - For labware on Deck Slot: returns an offset of (0, 0, 0)
+        - For labware on a Module: returns the nominal offset for the labware's position
+          when placed on the specified module (using slot-transformed labwareOffset
+          from the module's definition with any stacking overlap).
+          Does not include module calibration offset or LPC offset.
+        - For labware on another labware: returns the nominal offset for the labware
+          as placed on the specified labware, taking into account any offsets for labware
+          on modules as well as stacking overlaps.
+          Does not include module calibration offset or LPC offset.
+        """
         if isinstance(labware_location, DeckSlotLocation):
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
@@ -434,17 +446,16 @@ class GeometryView:
         grip_height_from_labware_bottom = (
             self._labware.get_grip_height_from_labware_bottom(labware_id)
         )
-        offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
 
-        if isinstance(location, ModuleLocation):
-            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            offset = self._modules.get_module_offset(
-                module_id=location.moduleId, deck_type=deck_type
-            )
-            location_slot = self._modules.get_location(location.moduleId).slotName
-        elif isinstance(location, OnLabwareLocation):
-            location_slot = self.get_ancestor_slot_name(location.labwareId)
+        if isinstance(location, DeckSlotLocation):
+            location_slot = location.slotName
+            offset = LabwareOffsetVector(x=0, y=0, z=0)
+        else:
+            if isinstance(location, ModuleLocation):
+                location_slot = self._modules.get_location(location.moduleId).slotName
+            else:  # OnLabwareLocation
+                location_slot = self.get_ancestor_slot_name(location.labwareId)
             labware_offset = self._get_labware_position_offset(labware_id, location)
             # Get the calibrated offset if the on labware location is on top of a module, otherwise return empty one
             cal_offset = self._get_calibrated_module_offset(location)
@@ -453,8 +464,7 @@ class GeometryView:
                 y=labware_offset.y + cal_offset.y,
                 z=labware_offset.z + cal_offset.z,
             )
-        else:
-            location_slot = location.slotName
+
         slot_center = self._labware.get_slot_center_position(location_slot)
         return Point(
             slot_center.x + offset.x,

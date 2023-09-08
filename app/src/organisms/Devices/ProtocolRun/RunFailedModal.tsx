@@ -40,7 +40,7 @@ interface RunFailedModalProps {
   robotName: string
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
-  highestPriorityError?: RunError
+  highestPriorityError?: RunError | null
 }
 
 export function RunFailedModal({

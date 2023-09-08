@@ -5,14 +5,14 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
-import { HeaterShakerWizard } from '../../Devices/HeaterShakerWizard'
 import { useLatchControls } from '../hooks'
 import { TestShakeSlideout } from '../TestShakeSlideout'
+import { ModuleSetupModal } from '../ModuleSetupModal'
 
 jest.mock('../../../redux/config')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
-jest.mock('../../Devices/HeaterShakerWizard')
+jest.mock('../ModuleSetupModal')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -23,8 +23,8 @@ const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFu
 const mockUseLatchControls = useLatchControls as jest.MockedFunction<
   typeof useLatchControls
 >
-const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
-  typeof HeaterShakerWizard
+const mockModuleSetupModal = ModuleSetupModal as jest.MockedFunction<
+  typeof ModuleSetupModal
 >
 
 const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
@@ -151,12 +151,12 @@ describe('TestShakeSlideout', () => {
   })
 
   it('renders show attachment instructions link', () => {
-    mockHeaterShakerWizard.mockReturnValue(<div>mock HeaterShakerWizard</div>)
+    mockModuleSetupModal.mockReturnValue(<div>mockModuleSetupModal</div>)
     const { getByText } = render(props)
 
     const button = getByText('Show attachment instructions')
     fireEvent.click(button)
-    getByText('mock HeaterShakerWizard')
+    getByText('mockModuleSetupModal')
   })
 
   it('start shake button should be disabled if the labware latch is open', () => {

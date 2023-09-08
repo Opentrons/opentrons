@@ -44,7 +44,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
   'opentrons_calibration_adapter_heatershaker_module',
-  'opentrons_calibration_adapter_magnetic_module',
   'opentrons_calibration_adapter_temperature_module',
   'opentrons_calibration_adapter_thermocycler_module',
   // TODO(lc 8-24-2022) We are temporarily filtering

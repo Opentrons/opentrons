@@ -23,7 +23,7 @@ describe('CompleteUpdateSoftware', () => {
   it('should render text, progress bar and button', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('Update complete!')
-    getByText('Restarting robot...')
+    getByText('Install complete, robot restarting...')
     const bar = getByTestId('ProgressBar_Bar')
     expect(bar).toHaveStyle('width: 100%')
   })
