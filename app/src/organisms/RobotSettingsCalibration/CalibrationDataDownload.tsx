@@ -12,7 +12,10 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
@@ -55,20 +58,14 @@ export function CalibrationDataDownload({
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const tipLengthCalibrations = useTipLengthCalibrations()
   const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
+  const { data: attachedModules } = useModulesQuery({ enabled: isOT3 })
 
-  const downloadIsPossible =
+  const ot2DownloadIsPossible =
     deckCalibrationData.isDeckCalibrated &&
     pipetteOffsetCalibrations != null &&
     pipetteOffsetCalibrations.length > 0 &&
     tipLengthCalibrations != null &&
     tipLengthCalibrations.length > 0
-
-  const ot3DownloadIsPossible =
-    isOT3 &&
-    attachedInstruments?.data.some(
-      instrument =>
-        instrument.ok && instrument.data.calibratedOffset?.last_modified != null
-    )
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -81,6 +78,7 @@ export function CalibrationDataDownload({
         isOT3
           ? JSON.stringify({
               instrumentData: attachedInstruments,
+              moduleData: attachedModules,
             })
           : JSON.stringify({
               deck: deckCalibrationData,
@@ -124,7 +122,7 @@ export function CalibrationDataDownload({
         ) : (
           <StyledText as="p">
             {t(
-              downloadIsPossible
+              ot2DownloadIsPossible
                 ? 'robot_calibration:download_calibration_data_available'
                 : 'robot_calibration:download_calibration_data_unavailable'
             )}
@@ -133,7 +131,7 @@ export function CalibrationDataDownload({
       </Flex>
       <TertiaryButton
         onClick={onClickSaveAs}
-        disabled={isOT3 ? !ot3DownloadIsPossible : !downloadIsPossible}
+        disabled={isOT3 ? false : !ot2DownloadIsPossible} // always enable download on Flex
       >
         <Flex alignItems={ALIGN_CENTER}>
           <Icon name="download" size="0.75rem" marginRight={SPACING.spacing8} />
