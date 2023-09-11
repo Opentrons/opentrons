@@ -13,6 +13,7 @@ import {
   useConditionalConfirm,
   DIRECTION_ROW,
 } from '@opentrons/components'
+import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton, SmallButton } from '../../atoms/buttons'
@@ -24,7 +25,13 @@ import {
   resetConfig,
 } from '../../redux/robot-admin'
 import { useDispatchApiRequest } from '../../redux/robot-api'
+import {
+  getRobotSerialNumber,
+  removeRobot,
+  getLocalRobot,
+} from '../../redux/discovery'
 
+import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
@@ -79,19 +86,39 @@ export function DeviceReset({
       (a, b) =>
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
     )
+  const [tempRobotName, setTempRobotName] = React.useState<string>(robotName)
   const dispatch = useDispatch<Dispatch>()
+  const localRobot = useSelector(getLocalRobot)
+  const serialNumber =
+    localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
+
+  const { updateRobotName } = useUpdateRobotNameMutation({
+    onSuccess: (data: UpdatedRobotName) => {
+      if (serialNumber != null) {
+        setTempRobotName(serialNumber)
+      }
+      dispatch(removeRobot(robotName))
+    },
+    onError: (error: Error) => {
+      console.error('error', error.message)
+    },
+  })
 
   const handleClick = (): void => {
     if (resetOptions != null) {
       // remove clearAllStoredData since its not a setting on the backend
       const { clearAllStoredData, ...serverResetOptions } = resetOptions
       if (Boolean(clearAllStoredData)) {
+        if (serialNumber != null) {
+          updateRobotName(serialNumber)
+        }
         dispatchRequest(
-          resetConfig(robotName, {
+          resetConfig(tempRobotName, {
             ...serverResetOptions,
             onDeviceDisplay: true,
           })
         )
+        dispatchRequest(resetConfig(tempRobotName, serverResetOptions))
       } else {
         dispatchRequest(resetConfig(robotName, serverResetOptions))
       }

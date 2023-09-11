@@ -158,9 +158,6 @@ export function RobotSettingsCalibration({
       : null
   )
 
-  console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
-  // console.log('attachedInstruments', attachedInstruments)
-
   const createStatus = createRequest?.status
 
   const isJogging =

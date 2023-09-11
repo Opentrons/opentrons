@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 import { useHistory } from 'react-router-dom'
@@ -15,6 +15,8 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
 } from '@opentrons/components'
+import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
+
 import { StyledText } from '../../../../../atoms/text'
 import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
@@ -27,9 +29,14 @@ import {
   getResetConfigOptions,
   resetConfig,
 } from '../../../../../redux/robot-admin'
-import { useIsOT3 } from '../../../hooks'
+import {
+  getRobotSerialNumber,
+  removeRobot,
+} from '../../../../../redux/discovery'
+import { useIsOT3, useRobot } from '../../../hooks'
 
-import type { State } from '../../../../../redux/types'
+import type { UpdatedRobotName } from '@opentrons/api-client'
+import type { Dispatch, State } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface DeviceResetModalProps {
@@ -54,9 +61,28 @@ export function DeviceResetModal({
     return lastId != null ? getRequestById(state, lastId) : null
   })?.status
 
+  const [tempRobotName, setTempRobotName] = React.useState<string>(robotName)
+
   const serverResetOptions = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
+  const dispatch = useDispatch<Dispatch>()
+  const robot = useRobot(robotName)
+  const serialNumber =
+    robot?.status != null ? getRobotSerialNumber(robot) : null
+
+  const { updateRobotName } = useUpdateRobotNameMutation({
+    onSuccess: (data: UpdatedRobotName) => {
+      if (serialNumber != null) {
+        setTempRobotName(serialNumber)
+      }
+      data.name != null && history.push(`/devices`)
+      dispatch(removeRobot(robotName))
+    },
+    onError: (error: Error) => {
+      console.error('error', error.message)
+    },
+  })
 
   const triggerReset = (): void => {
     if (resetOptions != null) {
@@ -72,10 +98,14 @@ export function DeviceResetModal({
             serverResetOptions.filter(o => o.id !== 'onDeviceDisplay').length
 
         if (isEveryOptionSelected) {
+          if (serialNumber != null) {
+            updateRobotName(serialNumber)
+          }
           resetOptions = {
             ...resetOptions,
             onDeviceDisplay: true,
           }
+          dispatchRequest(resetConfig(tempRobotName, resetOptions))
         }
       }
       dispatchRequest(resetConfig(robotName, resetOptions))

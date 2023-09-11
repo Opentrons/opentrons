@@ -1,26 +1,102 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import { renderWithProviders } from '@opentrons/components'
+import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../../i18n'
-import { resetConfig } from '../../../../../../redux/robot-admin'
+import {
+  resetConfig,
+  getResetConfigOptions,
+} from '../../../../../../redux/robot-admin'
 import { useDispatchApiRequest } from '../../../../../../redux/robot-api'
+import { getRobotSerialNumber } from '../../../../../../redux/discovery'
+import { useIsOT3, useRobot } from '../../../../hooks'
+import { mockConnectableRobot } from '../../../../../../redux/discovery/__fixtures__'
 import { DeviceResetModal } from '../DeviceResetModal'
 
+import type { State } from '../../../../../../redux/types'
 import type { DispatchApiRequestType } from '../../../../../../redux/robot-api'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../hooks')
 jest.mock('../../../../../../redux/robot-admin')
 jest.mock('../../../../../../redux/robot-api')
+jest.mock('../../../../../../redux/discovery')
+jest.mock('../../../../hooks')
 
 const mockResetConfig = resetConfig as jest.MockedFunction<typeof resetConfig>
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseUpdateRobotNameMutation = useUpdateRobotNameMutation as jest.MockedFunction<
+  typeof useUpdateRobotNameMutation
+>
+const mockGetRobotSerialNumber = getRobotSerialNumber as jest.MockedFunction<
+  typeof getRobotSerialNumber
+>
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
+  typeof getResetConfigOptions
+>
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const mockResetOptions = {}
 const mockCloseModal = jest.fn()
+const mockUpdateName = jest.fn()
 const ROBOT_NAME = 'otie'
+const SERIAL_NUMBER = 'mockSerialNumber'
+const mockOT2ResetOptions = [
+  {
+    id: 'bootScripts',
+    name: 'BootScript Foo',
+    description: 'BootScript foo description',
+  },
+  {
+    id: 'deckCalibration',
+    name: 'deck Calibration Bar',
+    description: 'deck Calibration bar description',
+  },
+  {
+    id: 'pipetteOffsetCalibrations',
+    name: 'pipette calibration FooBar',
+    description: 'pipette calibration fooBar description',
+  },
+  {
+    id: 'runsHistory',
+    name: 'RunsHistory FooBar',
+    description: 'runsHistory fooBar description',
+  },
+  {
+    id: 'tipLengthCalibrations',
+    name: 'tip length FooBar',
+    description: 'tip length fooBar description',
+  },
+]
+const mockFlexResetOptions = [
+  {
+    id: 'bootScripts',
+    name: 'BootScript Foo',
+    description: 'BootScript foo description',
+  },
+  {
+    id: 'pipetteOffsetCalibrations',
+    name: 'pipette calibration FooBar',
+    description: 'pipette calibration fooBar description',
+  },
+  {
+    id: 'gripperOffsetCalibrations',
+    name: 'gripper calibration FooBar',
+    description: 'gripper calibration fooBar description',
+  },
+  {
+    id: 'runsHistory',
+    name: 'RunsHistory FooBar',
+    description: 'runsHistory fooBar description',
+  },
+]
+
 const render = (props: React.ComponentProps<typeof DeviceResetModal>) => {
   return renderWithProviders(
     <MemoryRouter>
@@ -35,10 +111,22 @@ describe('RobotSettings DeviceResetModal', () => {
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    mockUseUpdateRobotNameMutation.mockReturnValue({
+      updateRobotName: mockUpdateName,
+    } as any)
+
+    when(mockGetRobotSerialNumber)
+      .calledWith(mockConnectableRobot)
+      .mockReturnValue(SERIAL_NUMBER)
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockGetResetConfigOptions)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue(mockOT2ResetOptions)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render title, description, and buttons', () => {
@@ -54,7 +142,7 @@ describe('RobotSettings DeviceResetModal', () => {
     getByRole('button', { name: 'Yes, clear data and restart robot' })
   })
 
-  it('should close the modal when the user clicks the Yes button', () => {
+  it('should close the modal when the user clicks the Yes button - OT-2', () => {
     const clearMockResetOptions = {
       bootScript: true,
       deckCalibration: true,
@@ -68,9 +156,38 @@ describe('RobotSettings DeviceResetModal', () => {
     const clearDataAndRestartRobotButton = getByRole('button', {
       name: 'Yes, clear data and restart robot',
     })
-    fireEvent.click(clearDataAndRestartRobotButton)
+    clearDataAndRestartRobotButton.click()
     expect(dispatchApiRequest).toBeCalledWith(
       mockResetConfig(ROBOT_NAME, clearMockResetOptions)
+    )
+  })
+
+  it('should close the modal when the user clicks the Yes button - Flex', () => {
+    when(mockUseIsOT3).calledWith('flex').mockReturnValue(true)
+    when(mockGetResetConfigOptions)
+      .calledWith({} as State, 'flex')
+      .mockReturnValue(mockFlexResetOptions)
+    const clearMockResetOptions = {
+      bootScripts: true,
+      gripperOffsetCalibrations: true,
+      pipetteOffsetCalibrations: true,
+      runsHistory: true,
+    }
+    mockUseRobot.mockReturnValue(mockConnectableRobot)
+    mockGetRobotSerialNumber.mockReturnValue(SERIAL_NUMBER)
+    const [{ getByRole }] = render({
+      closeModal: mockCloseModal,
+      isRobotReachable: true,
+      robotName: 'flex',
+      resetOptions: clearMockResetOptions,
+    })
+    const clearDataAndRestartRobotButton = getByRole('button', {
+      name: 'Yes, clear data and restart robot',
+    })
+    clearDataAndRestartRobotButton.click()
+    expect(mockUpdateName).toHaveBeenCalledWith(SERIAL_NUMBER)
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig(SERIAL_NUMBER, clearMockResetOptions)
     )
   })
 
@@ -82,7 +199,7 @@ describe('RobotSettings DeviceResetModal', () => {
       resetOptions: mockResetOptions,
     })
     const cancelButton = getByRole('button', { name: 'cancel' })
-    fireEvent.click(cancelButton)
+    cancelButton.click()
     expect(mockCloseModal).toHaveBeenCalled()
   })
 
@@ -96,7 +213,7 @@ describe('RobotSettings DeviceResetModal', () => {
     const closeIconButton = getByTestId(
       'ModalHeader_icon_close_Reset to factory settings?'
     )
-    fireEvent.click(closeIconButton)
+    closeIconButton.click()
     expect(mockCloseModal).toHaveBeenCalled()
   })
 
@@ -124,7 +241,7 @@ describe('RobotSettings DeviceResetModal', () => {
     })
 
     const closeButton = getByRole('button', { name: 'close' })
-    fireEvent.click(closeButton)
+    closeButton.click()
     expect(mockCloseModal).toHaveBeenCalled()
   })
 
@@ -138,7 +255,7 @@ describe('RobotSettings DeviceResetModal', () => {
     const closeIconButton = getByTestId(
       'ModalHeader_icon_close_Connection to robot lost'
     )
-    fireEvent.click(closeIconButton)
+    closeIconButton.click()
     expect(mockCloseModal).toHaveBeenCalled()
   })
 })
