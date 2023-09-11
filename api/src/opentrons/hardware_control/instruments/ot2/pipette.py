@@ -193,6 +193,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._liquid_class
 
     @property
+    def liquid_class_name(self) -> pip_types.LiquidClasses:
+        return self._liquid_class_name
+
+    @property
     def nozzle_offset(self) -> List[float]:
         return self._nozzle_offset
 

@@ -16,6 +16,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteNameType,
     PipetteModelVersionType,
     PipetteLiquidPropertiesDefinition,
+    default_tip_for_liquid_class,
 )
 from opentrons_shared_data.errors.exceptions import (
     InvalidLiquidClassName,
@@ -110,9 +111,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self.ready_to_aspirate = False
 
-        self._active_tip_setting_name = pip_types.PipetteTipType(
-            self._liquid_class.max_volume
-        )
+        self._active_tip_setting_name = default_tip_for_liquid_class(self._liquid_class)
         self._active_tip_settings = self._liquid_class.supported_tips[
             self._active_tip_setting_name
         ]
@@ -143,6 +142,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def liquid_class(self) -> PipetteLiquidPropertiesDefinition:
         return self._liquid_class
+
+    @property
+    def liquid_class_name(self) -> pip_types.LiquidClasses:
+        return self._liquid_class_name
 
     @property
     def channels(self) -> pip_types.PipetteChannelType:
@@ -227,7 +230,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self.set_liquid_class_by_name("default")
-        self.set_tip_type_by_volume(self.liquid_class.max_volume)
+        self.set_tip_type(default_tip_for_liquid_class(self._liquid_class))
 
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
