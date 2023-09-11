@@ -129,6 +129,19 @@ def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
+def mock_get_jaw_state(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "get_jaw_state",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._backend.get_jaw_state,
+            wraps=ot3_hardware.managed_obj._backend.get_jaw_state,
+        ),
+    ) as mock_get_jaw_state:
+        yield mock_get_jaw_state
+
+
+@pytest.fixture
 def mock_home(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
         ot3_hardware.managed_obj,
@@ -272,6 +285,16 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
         ),
     ) as mock_refresh:
         yield mock_refresh
+
+
+@pytest.fixture
+async def mock_reset(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "reset",
+        AsyncMock(),
+    ) as mock_reset:
+        yield mock_reset
 
 
 @pytest.fixture
@@ -829,12 +852,14 @@ async def test_gripper_capacitive_sweep(
     distance: float,
     ot3_hardware: ThreadManager[OT3API],
     mock_move_to: AsyncMock,
+    mock_get_jaw_state: AsyncMock,
     mock_backend_capacitive_pass: AsyncMock,
     gripper_present: None,
 ) -> None:
     await ot3_hardware.home()
     await ot3_hardware.grip(5)
     ot3_hardware._gripper_handler.get_gripper().current_jaw_displacement = 5
+    mock_get_jaw_state.return_value = GripperJawState.GRIPPING
     ot3_hardware.add_gripper_probe(probe)
     data = await ot3_hardware.capacitive_sweep(OT3Mount.GRIPPER, axis, begin, end, 3)
     assert data == [1, 2, 3, 4, 5, 6, 8]
@@ -1744,3 +1769,30 @@ async def test_estop_event_deactivate_module(
         )
     else:
         assert len(futures) == 0
+
+
+@pytest.mark.parametrize(
+    "jaw_state",
+    [
+        GripperJawState.UNHOMED,
+        GripperJawState.HOMED_READY,
+        GripperJawState.GRIPPING,
+        GripperJawState.HOLDING,
+    ],
+)
+async def test_stop_only_home_necessary_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_home: AsyncMock,
+    # mock_get_jaw_state: AsyncMock,
+    mock_reset: AsyncMock,
+    jaw_state: GripperJawState,
+):
+    gripper_config = gc.load(GripperModel.v1)
+    instr_data = AttachedGripper(config=gripper_config, id="test")
+    await ot3_hardware.cache_gripper(instr_data)
+    ot3_hardware._gripper_handler.get_gripper().current_jaw_displacement = 0
+    ot3_hardware._gripper_handler.get_gripper().state = jaw_state
+
+    await ot3_hardware.stop(home_after=True)
+    if jaw_state == GripperJawState.GRIPPING:
+        mock_home.assert_called_once_with(skip=[Axis.G])
