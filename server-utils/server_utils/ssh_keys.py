@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Dict, Optional
 
 
-AUTHORIZED_KEYS = os.path.expanduser("~/.ssh/authorized_keys")
+SSH_DIR = Path(os.path.expanduser("~/.ssh"))
+AUTHORIZED_KEYS = SSH_DIR / "authorized_keys"
 
 
 def add_ssh_keys_from_usb(path: Optional[Path] = None) -> None:
@@ -24,6 +25,8 @@ def add_ssh_keys_from_usb(path: Optional[Path] = None) -> None:
 
     # Load the current keys and hash them if we have any
     current_keys = dict()
+    if not os.path.exists(SSH_DIR):
+        os.mkdir(SSH_DIR, mode=0o700)
     if os.path.exists(AUTHORIZED_KEYS):
         with open(AUTHORIZED_KEYS, "r") as fh:
             current_keys = {
