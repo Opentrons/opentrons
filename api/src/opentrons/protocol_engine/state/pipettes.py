@@ -187,6 +187,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         attached_tip.volume
                     ]
                 except KeyError:
+                    # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
+                    # we used to look up a default tip config via the pipette max volume, but if that isn't
+                    # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
+                    # the first entry in the table is ok I guess but we really need to generally rethink how
+                    # we identify tip classes - looking things up by volume is not enough.
                     tip_configuration = list(
                         static_config.tip_configuration_lookup_table.values()
                     )[0]
@@ -203,6 +208,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             static_config = self._state.static_config_by_id.get(pipette_id)
             if static_config:
+                # TODO(seth,9/11/2023): bad way to do defaulting, see above.
                 tip_configuration = list(
                     static_config.tip_configuration_lookup_table.values()
                 )[0]

@@ -593,7 +593,7 @@ class LegacyCommandMapper:
             ),
             result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
         )
-        serial = instrument_load_info.pipette_dict.get('pipette_id', None) or ''
+        serial = instrument_load_info.pipette_dict.get("pipette_id", None) or ""
         pipette_config_result = pe_commands.LoadPipettePrivateResult(
             pipette_id=pipette_id,
             serial_number=serial,
