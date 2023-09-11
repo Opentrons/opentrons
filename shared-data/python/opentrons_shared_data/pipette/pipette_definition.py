@@ -394,8 +394,9 @@ def liquid_class_for_volume_between_default_and_defaultlowvolume(
             return pip_types.LiquidClasses.lowVolumeDefault
     return current_liquid_class_name
 
+
 def default_tip_for_liquid_class(
-        liquid_class_config: PipetteLiquidPropertiesDefinition
+    liquid_class_config: PipetteLiquidPropertiesDefinition,
 ) -> pip_types.PipetteTipType:
     """Provide a "default tip", the one with the largest volume."""
     tip_names = liquid_class_config.supported_tips.keys()
