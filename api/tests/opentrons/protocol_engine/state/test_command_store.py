@@ -282,9 +282,11 @@ def test_command_queue_and_unqueue() -> None:
         command_id="command-id-2",
     )
     update_1 = UpdateCommandAction(
+        private_result=None,
         command=create_running_command(command_id="command-id-1"),
     )
     update_2 = UpdateCommandAction(
+        private_result=None,
         command=create_running_command(command_id="command-id-2"),
     )
 
@@ -326,9 +328,11 @@ def test_setup_command_queue_and_unqueue() -> None:
         command_id="command-id-2",
     )
     update_1 = UpdateCommandAction(
+        private_result=None,
         command=create_running_command(command_id="command-id-1"),
     )
     update_2 = UpdateCommandAction(
+        private_result=None,
         command=create_running_command(command_id="command-id-2"),
     )
 
@@ -388,9 +392,11 @@ def test_running_command_id() -> None:
         command_id="command-id-1",
     )
     running_update = UpdateCommandAction(
+        private_result=None,
         command=create_running_command(command_id="command-id-1"),
     )
     completed_update = UpdateCommandAction(
+        private_result=None,
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
@@ -409,9 +415,11 @@ def test_running_command_id() -> None:
 def test_running_command_no_queue() -> None:
     """It should add a running command to state, even if there was no queue action."""
     running_update = UpdateCommandAction(
+        private_result=None,
         command=create_running_command(command_id="command-id-1"),
     )
     completed_update = UpdateCommandAction(
+        private_result=None,
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
@@ -445,6 +453,7 @@ def test_command_failure_clears_queues() -> None:
         command_id="command-id-2",
     )
     running_1 = UpdateCommandAction(
+        private_result=None,
         command=commands.WaitForResume(
             id="command-id-1",
             key="command-key-1",
@@ -452,7 +461,7 @@ def test_command_failure_clears_queues() -> None:
             startedAt=datetime(year=2022, month=2, day=2),
             params=commands.WaitForResumeParams(),
             status=commands.CommandStatus.RUNNING,
-        )
+        ),
     )
     fail_1 = FailCommandAction(
         command_id="command-id-1",
@@ -546,6 +555,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     )
 
     running_cmd_2 = UpdateCommandAction(
+        private_result=None,
         command=commands.WaitForResume(
             id="command-id-2",
             key="command-key-2",
@@ -554,7 +564,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             params=commands.WaitForResumeParams(),
             status=commands.CommandStatus.RUNNING,
             intent=commands.CommandIntent.SETUP,
-        )
+        ),
     )
     failed_action_cmd_2 = FailCommandAction(
         command_id="command-id-2",
@@ -622,20 +632,20 @@ def test_command_store_preserves_handle_order() -> None:
 
     subject = CommandStore(is_door_open=False, config=_make_config())
 
-    subject.handle_action(UpdateCommandAction(command=command_a))
+    subject.handle_action(UpdateCommandAction(private_result=None, command=command_a))
     assert subject.state.all_command_ids == ["command-id-1"]
     assert subject.state.commands_by_id == {
         "command-id-1": CommandEntry(index=0, command=command_a),
     }
 
-    subject.handle_action(UpdateCommandAction(command=command_b))
+    subject.handle_action(UpdateCommandAction(private_result=None, command=command_b))
     assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
     assert subject.state.commands_by_id == {
         "command-id-1": CommandEntry(index=0, command=command_a),
         "command-id-2": CommandEntry(index=1, command=command_b),
     }
 
-    subject.handle_action(UpdateCommandAction(command=command_c))
+    subject.handle_action(UpdateCommandAction(private_result=None, command=command_c))
     assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
     assert subject.state.commands_by_id == {
         "command-id-1": CommandEntry(index=0, command=command_c),
@@ -1036,7 +1046,7 @@ def test_command_store_handles_command_failed() -> None:
     )
 
     subject = CommandStore(is_door_open=False, config=_make_config())
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(UpdateCommandAction(private_result=None, command=command))
     subject.handle_action(
         FailCommandAction(
             command_id="command-id",

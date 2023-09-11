@@ -124,14 +124,13 @@ class LegacyContextPlugin(AbstractPlugin):
     def _handle_equipment_loaded(self, load_info: LegacyLoadInfo) -> None:
         (
             pe_command,
-            pipette_config_action,
+            pe_private_result,
         ) = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
 
-        if pipette_config_action:
-            self._actions_to_dispatch.put(pipette_config_action)
-
         self._actions_to_dispatch.put(
-            pe_actions.UpdateCommandAction(command=pe_command)
+            pe_actions.UpdateCommandAction(
+                command=pe_command, private_result=pe_private_result
+            )
         )
 
     async def _dispatch_all_actions(self) -> None:
