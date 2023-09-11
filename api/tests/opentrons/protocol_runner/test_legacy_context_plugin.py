@@ -3,7 +3,7 @@ import pytest
 from anyio import to_thread
 from decoy import Decoy, matchers
 from datetime import datetime
-from typing import Callable, cast
+from typing import Callable
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
@@ -12,9 +12,6 @@ from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,
     commands as pe_commands,
-)
-from opentrons.protocol_engine.resources.pipette_data_provider import (
-    LoadedStaticPipetteData,
 )
 
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper

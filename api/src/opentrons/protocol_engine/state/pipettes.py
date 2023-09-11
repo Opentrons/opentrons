@@ -541,8 +541,9 @@ class PipetteView(HasState[PipetteState]):
         """Return the given pipette's return tip height scale."""
         max_volume = self.get_maximum_volume(pipette_id)
         working_volume = max_volume
-        if self.get_attached_tip(pipette_id):
-            working_volume = self.get_working_volume(pipette_id)
+        tip = self.get_attached_tip(pipette_id)
+        if tip:
+            working_volume = tip.volume
 
         if working_volume in self.get_config(pipette_id).tip_configuration_lookup_table:
             tip_lookup = self.get_config(pipette_id).tip_configuration_lookup_table[
