@@ -351,8 +351,7 @@ class EquipmentHandler:
         """Ensure the requested volume can be configured for the given pipette.
 
         Args:
-            pipette_id: An optional identifier to assign the pipette. If None, an
-                identifier will be generated.
+            pipette_id: The identifier for the pipette.
             volume: The volume to configure the pipette for
 
         Returns:
