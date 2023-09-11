@@ -19,6 +19,7 @@ import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useRunStatuses } from '../../Devices/hooks'
+import { useLatchControls } from '../../ModuleCard/hooks'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
@@ -59,8 +60,17 @@ export function ModuleCalibrationOverflowMenu({
     (formattedPipetteOffsetCalibrations[0].lastCalibrated == null &&
       formattedPipetteOffsetCalibrations[1].lastCalibrated == null)
 
+  const { toggleLatch, isLatchClosed } = useLatchControls(attachedModule)
+
   const handleCalibration = (): void => {
-    if (attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE) {
+    if (!isLatchClosed) {
+      toggleLatch()
+    }
+    if (
+      attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      attachedModule.data.currentSpeed != null &&
+      attachedModule.data.currentSpeed > 0
+    ) {
       const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
         commandType: 'heaterShaker/deactivateShaker',
         params: {

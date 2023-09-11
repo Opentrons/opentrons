@@ -54,7 +54,10 @@ import {
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+import type {
+  HeaterShakerDeactivateShakerCreateCommand,
+  HeaterShakerCloseLatchCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -87,7 +90,30 @@ function RenderModuleStatus({
   const { createLiveCommand } = useCreateLiveCommandMutation()
 
   const handleCalibrate = (): void => {
-    if (module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE) {
+    if (
+      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.attachedModuleMatch.data.labwareLatchStatus !== 'idle_closed' &&
+      module.attachedModuleMatch.data.labwareLatchStatus !== 'closing'
+    ) {
+      const latchCommand: HeaterShakerCloseLatchCreateCommand = {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: module.attachedModuleMatch.id,
+        },
+      }
+      createLiveCommand({
+        command: latchCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+        )
+      })
+    }
+    if (
+      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.attachedModuleMatch.data.currentSpeed != null &&
+      module.attachedModuleMatch.data.currentSpeed > 0
+    ) {
       const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
         commandType: 'heaterShaker/deactivateShaker',
         params: {

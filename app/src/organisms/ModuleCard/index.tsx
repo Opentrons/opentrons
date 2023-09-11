@@ -63,6 +63,7 @@ import { TestShakeSlideout } from './TestShakeSlideout'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
+import { useLatchControls } from './hooks'
 import { ErrorInfo } from './ErrorInfo'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
@@ -110,8 +111,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showHSWizard, setShowHSWizard] = React.useState<boolean>(false)
-  const [showFWBanner, setshowFWBanner] = React.useState<boolean>(true)
-  const [showCalModal, setshowCalModal] = React.useState<boolean>(false)
+  const [showFWBanner, setShowFWBanner] = React.useState<boolean>(true)
+  const [showCalModal, setShowCalModal] = React.useState<boolean>(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
@@ -169,6 +170,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         module.data.lidTemperature > TOO_HOT_TEMP))
 
   const isTooHot = heaterShakerTooHot || ThermoTooHot
+
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -231,7 +234,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleCalibrateClick = (): void => {
-    if (module.moduleType === HEATERSHAKER_MODULE_TYPE) {
+    if (!isLatchClosed) {
+      toggleLatch()
+    }
+    if (
+      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.data.currentSpeed != null &&
+      module?.data?.currentSpeed > 0
+    ) {
       const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
         commandType: 'heaterShaker/deactivateShaker',
         params: {
@@ -247,7 +257,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       })
     }
 
-    setshowCalModal(true)
+    setShowCalModal(true)
   }
 
   return (
@@ -260,7 +270,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       {showCalModal ? (
         <ModuleWizardFlows
           attachedModule={module}
-          closeFlow={() => setshowCalModal(false)}
+          closeFlow={() => setShowCalModal(false)}
         />
       ) : null}
       {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
@@ -324,7 +334,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 updateType="calibration"
                 serialNumber={module.serialNumber}
                 setShowBanner={() => null}
-                handleUpdateClick={() => setshowCalModal(true)}
+                handleUpdateClick={() => setShowCalModal(true)}
                 attachPipetteRequired={attachPipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
               />
@@ -338,7 +348,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 robotName={robotName}
                 updateType="firmware"
                 serialNumber={module.serialNumber}
-                setShowBanner={setshowFWBanner}
+                setShowBanner={setShowFWBanner}
                 handleUpdateClick={handleFirmwareUpdateClick}
               />
             ) : null}
