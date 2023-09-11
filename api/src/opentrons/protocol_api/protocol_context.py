@@ -785,8 +785,6 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
-        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._core.load_instrument(
             instrument_name=checked_instrument_name,
             mount=checked_mount,
