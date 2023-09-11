@@ -773,6 +773,14 @@ class ProtocolContext(CommandPublisher):
 
         tip_racks = tip_racks or []
 
+        if is_96_channel and self._instruments[Mount.RIGHT] is not None:
+            loaded_instrument = self._instruments[Mount.RIGHT]
+            assert loaded_instrument is not None
+            raise RuntimeError(
+                f"Instrument already present on right:"
+                f" {loaded_instrument.name}. In order to load a 96 channel pipette both mounts need to be available."
+            )
+
         existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
             # TODO(mc, 2022-08-25): create specific exception type
