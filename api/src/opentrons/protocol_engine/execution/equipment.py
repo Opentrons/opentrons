@@ -243,10 +243,11 @@ class EquipmentHandler:
                     pipette_name_value, pipette_id
                 )
             )
+        serial = serial_number or ''
 
         return LoadedPipetteData(
             pipette_id=pipette_id,
-            serial_number=serial_number,
+            serial_number=serial,
             static_config=static_pipette_config,
         )
 
