@@ -206,7 +206,6 @@ async def get_gripper_jaw_state(
     can_messenger: CanMessenger,
 ) -> GripperJawState:
     """Get gripper jaw state."""
-
     jaw_state = GripperJawState.unhomed
 
     event = asyncio.Event()
