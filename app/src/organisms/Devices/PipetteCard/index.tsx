@@ -199,7 +199,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           >
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
               <Flex alignItems={ALIGN_START}>
-                {pipetteModelSpecs === null ? null : (
+                {pipetteModelSpecs !== null ? (
                   <InstrumentDiagram
                     pipetteSpecs={pipetteModelSpecs}
                     mount={mount}
@@ -208,7 +208,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     size="3.125rem"
                     transformOrigin={isOt3 ? '-50% -10%' : '20% -10%'}
                   />
-                )}
+                ) : null}
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}

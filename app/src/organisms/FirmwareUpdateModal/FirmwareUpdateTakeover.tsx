@@ -12,7 +12,7 @@ import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
 import type { Subsystem } from '@opentrons/api-client'
 
-const POLL_INTERVAL_5000_MS = 5000
+const POLL_INTERVAL_MS = 5000
 
 export function FirmwareUpdateTakeover(): JSX.Element {
   const [
@@ -25,21 +25,21 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   ] = React.useState<Subsystem | null>(null)
 
   const instrumentsData = useInstrumentsQuery({
-    refetchInterval: POLL_INTERVAL_5000_MS,
+    refetchInterval: POLL_INTERVAL_MS,
   }).data?.data
   const subsystemUpdateInstrument = instrumentsData?.find(
     instrument => instrument.ok === false
   )
 
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
-    refetchInterval: POLL_INTERVAL_5000_MS,
+    refetchInterval: POLL_INTERVAL_MS,
   })
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   const {
     data: currentSubsystemsUpdatesData,
   } = useCurrentAllSubsystemUpdatesQuery({
-    refetchInterval: POLL_INTERVAL_5000_MS,
+    refetchInterval: POLL_INTERVAL_MS,
   })
   const externalSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
     update =>
