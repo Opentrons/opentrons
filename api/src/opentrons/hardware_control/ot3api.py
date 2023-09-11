@@ -125,7 +125,7 @@ from .instruments.ot3.pipette_handler import (
     TipMotorPickUpTipSpec,
 )
 from .instruments.ot3.instrument_calibration import load_pipette_offset
-from .instruments.ot3.gripper_handler import GripperHandler, GripError
+from .instruments.ot3.gripper_handler import GripperHandler
 from .instruments.ot3.instrument_calibration import (
     load_gripper_calibration_offset,
 )
@@ -757,7 +757,13 @@ class OT3API(
         self._log.info("Resetting OT3API")
         await self.reset()
         if home_after:
-            await self.home()
+            skip = []
+            if (
+                self._gripper_handler.has_gripper()
+                and not self._gripper_handler.is_ready_for_jaw_home()
+            ):
+                skip.append(Axis.G)
+            await self.home(skip=skip)
 
     async def reset(self) -> None:
         """Reset the stored state of the system."""
@@ -790,7 +796,6 @@ class OT3API(
         try:
             gripper = self._gripper_handler.get_gripper()
             self._log.info("Homing gripper jaw.")
-            self._gripper_handler.check_ready_for_jaw_home()
 
             dc = self._gripper_handler.get_duty_cycle_by_grip_force(
                 gripper.default_home_force
@@ -798,9 +803,6 @@ class OT3API(
             await self._ungrip(duty_cycle=dc)
         except GripperNotAttachedError:
             pass
-        except GripError as e:
-            self._log.error("Could not home when gripper is actively gripping.")
-            raise e
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
@@ -1337,7 +1339,11 @@ class OT3API(
                     await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(self, axes: Optional[List[Axis]] = None) -> None:
+    async def home(
+        self,
+        axes: Optional[List[Axis]] = None,
+        skip: Optional[List[Axis]] = None,
+    ) -> None:
         """
         Worker function to home the robot by axis or list of
         desired axes.
@@ -1351,6 +1357,9 @@ class OT3API(
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(Axis.Q)
+
+        if skip:
+            checked_axes = [ax for ax in checked_axes if ax not in skip]
         self._log.info(f"Homing {axes}")
 
         home_seq = [

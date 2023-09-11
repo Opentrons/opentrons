@@ -394,7 +394,7 @@ class OT3Simulator:
 
     async def get_jaw_state(self) -> GripperJawState:
         """Get the state of the gripper jaw."""
-        pass
+        return GripperJawState.HOMED_READY
 
     async def tip_action(
         self,
