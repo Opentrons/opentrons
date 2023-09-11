@@ -8,7 +8,6 @@ from ..actions import (
     Action,
     UpdateCommandAction,
     ResetTipsAction,
-    AddPipetteConfigAction,
 )
 from ..commands import (
     Command,
@@ -17,6 +16,7 @@ from ..commands import (
     DropTipResult,
     DropTipInPlaceResult,
 )
+from ..commands.configuring_common import PipetteConfigUpdateResultMixin
 
 
 class TipRackWellState(Enum):
@@ -56,6 +56,11 @@ class TipStore(HasState[TipState], HandlesActions):
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
+            if isinstance(action.private_result, PipetteConfigUpdateResultMixin):
+                config = action.private_result.config
+                self._state.channels_by_pipette_id[
+                    action.private_result.pipette_id
+                ] = config.channels
             self._handle_command(action.command)
 
         elif isinstance(action, ResetTipsAction):
@@ -65,10 +70,6 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.tips_by_labware_id[labware_id][
                     well_name
                 ] = TipRackWellState.CLEAN
-
-        elif isinstance(action, AddPipetteConfigAction):
-            config = action.config
-            self._state.channels_by_pipette_id[action.pipette_id] = config.channels
 
     def _handle_command(self, command: Command) -> None:
         if (
