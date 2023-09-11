@@ -174,13 +174,15 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon
-          marginLeft={SPACING.spacing8}
-          name="more"
-          size="3rem"
-          // Required to prevent inconsistent component height.
-          style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
-        />
+        {disabled ? null : (
+          <Icon
+            marginLeft={SPACING.spacing8}
+            name="more"
+            size="3rem"
+            // Required to prevent inconsistent component height.
+            style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
+          />
+        )}
       </Flex>
     </Btn>
   )
