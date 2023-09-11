@@ -13,6 +13,7 @@
   .hg-row:not(:last-child)
   .hg-button:not(:last-child) {
   margin-right: 8px;
+  margin-bottom: 3px;
 }
 
 .simple-keyboard.simple-keyboard.oddTheme1 .hg-button {
