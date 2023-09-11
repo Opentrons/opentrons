@@ -362,7 +362,7 @@ class EquipmentHandler:
         if not use_virtual_pipettes:
             mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
 
-            self._hardware_api.configure_for_volume(mount, volume)
+            await self._hardware_api.configure_for_volume(mount, volume)
             pipette_dict = self._hardware_api.get_attached_instrument(mount)
 
             serial_number = pipette_dict["pipette_id"]
