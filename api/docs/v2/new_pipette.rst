@@ -331,7 +331,7 @@ In a protocol that handles many different volumes, it's a good practice to call 
     for i in range(8):
         pipette50.pick_up_tip()
         pipette50.configure_for_volume(volumes[i])
-        pipette50.aspirate(volume=volume, location=sources[i])
+        pipette50.aspirate(volume=volumes[i], location=sources[i])
         pipette50.dispense(location=destinations[i])
         pipette50.drop_tip()
 
