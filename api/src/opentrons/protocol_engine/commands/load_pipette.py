@@ -76,9 +76,9 @@ class LoadPipetteImplementation(
             pipette_id=params.pipetteId,
         )
 
-        return LoadPipetteResult.construct(
+        return LoadPipetteResult(
             pipetteId=loaded_pipette.pipette_id
-        ), LoadPipettePrivateResult.construct(
+        ), LoadPipettePrivateResult(
             pipette_id=loaded_pipette.pipette_id,
             serial_number=loaded_pipette.serial_number,
             config=loaded_pipette.static_config,

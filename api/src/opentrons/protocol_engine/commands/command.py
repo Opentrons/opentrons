@@ -25,7 +25,7 @@ CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
 
-CommandPrivateResultT = TypeVar("CommandPrivateResultT", bound=BaseModel)
+CommandPrivateResultT = TypeVar("CommandPrivateResultT")
 
 
 class CommandStatus(str, Enum):

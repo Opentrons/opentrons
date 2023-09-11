@@ -324,7 +324,7 @@ def test_map_instrument_load(decoy: Decoy) -> None:
         ),
         result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id_captor),
     )
-    assert result[1] == pe_commands.LoadPipettePrivateResult.construct(
+    assert result[1] == pe_commands.LoadPipettePrivateResult(
         pipette_id="pipette-0",
         serial_number="fizzbuzz",
         config=pipette_config,
