@@ -23,8 +23,8 @@ from .handler_type import Handler
 LOG = logging.getLogger(__name__)
 
 
-def require_local(handler: Handler) -> Handler:
-    """Ensure the decorated is only called if the request is linklocal or local.
+def require_linklocal(handler: Handler) -> Handler:
+    """Ensure the decorated is only called if the request is linklocal.
 
     The host ip address should be in the X-Host-IP header (provided by nginx)
     """
@@ -36,9 +36,9 @@ def require_local(handler: Handler) -> Handler:
             "error": "bad-interface",
             "message": (
                 f"The endpoint {request.rel_url}"
-                f" can only be used from local or link-local connections."
+                f" can only be used from link-local connections."
                 f" Make sure you're connected to this robot directly by cable"
-                f" and using this robot's wired IP address or usb-bridge"
+                f" and using this robot's wired IP address"
                 f" (not its wireless IP address)."
             ),
         }
@@ -52,7 +52,7 @@ def require_local(handler: Handler) -> Handler:
             LOG.exception(f"Couldn't parse host ip address {ipaddr_str}")
             raise
 
-        if not addr.is_link_local or not addr.is_loopback:
+        if not addr.is_link_local:
             return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
                 data=invalid_req_data, status=403
             )
@@ -109,7 +109,7 @@ def key_present(hashval: str) -> bool:
     return hashval in [keyhash for keyhash, _ in get_keys()]
 
 
-@require_local
+@require_linklocal
 async def list_keys(request: web.Request) -> web.Response:
     """List keys in the authorized_keys file.
 
@@ -128,7 +128,7 @@ async def list_keys(request: web.Request) -> web.Response:
     )
 
 
-@require_local
+@require_linklocal
 async def add(request: web.Request) -> web.Response:
     """Add a public key to the authorized_keys file.
 
@@ -181,7 +181,7 @@ async def add(request: web.Request) -> web.Response:
     )
 
 
-@require_local
+@require_linklocal
 async def clear(request: web.Request) -> web.Response:
     """Clear all public keys from authorized_keys
 
@@ -202,7 +202,7 @@ async def clear(request: web.Request) -> web.Response:
     )
 
 
-@require_local
+@require_linklocal
 async def remove(request: web.Request) -> web.Response:
     """Remove a public key from authorized_keys
 
