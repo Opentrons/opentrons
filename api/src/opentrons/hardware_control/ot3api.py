@@ -32,7 +32,6 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
@@ -1176,7 +1175,7 @@ class OT3API(
                 )
             else:
                 # allows for safer gantry movement at minimum force
-                await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+                await self.grip(force_newtons=self._gripper_handler.gripper.default_grip_force)
 
     def _build_moves(
         self,
