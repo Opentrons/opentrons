@@ -234,9 +234,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleCalibrateClick = (): void => {
-    if (!isLatchClosed) {
-      toggleLatch()
-    }
     if (
       module.moduleType === HEATERSHAKER_MODULE_TYPE &&
       module.data.currentSpeed != null &&
@@ -256,7 +253,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         )
       })
     }
-
+    if (!isLatchClosed) {
+      toggleLatch()
+    }
     setShowCalModal(true)
   }
 

@@ -92,25 +92,6 @@ function RenderModuleStatus({
   const handleCalibrate = (): void => {
     if (
       module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      module.attachedModuleMatch.data.labwareLatchStatus !== 'idle_closed' &&
-      module.attachedModuleMatch.data.labwareLatchStatus !== 'closing'
-    ) {
-      const latchCommand: HeaterShakerCloseLatchCreateCommand = {
-        commandType: 'heaterShaker/closeLabwareLatch',
-        params: {
-          moduleId: module.attachedModuleMatch.id,
-        },
-      }
-      createLiveCommand({
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-    if (
-      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
       module.attachedModuleMatch.data.currentSpeed != null &&
       module.attachedModuleMatch.data.currentSpeed > 0
     ) {
@@ -125,6 +106,25 @@ function RenderModuleStatus({
       }).catch((e: Error) => {
         console.error(
           `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
+        )
+      })
+    }
+    if (
+      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.attachedModuleMatch.data.labwareLatchStatus !== 'idle_closed' &&
+      module.attachedModuleMatch.data.labwareLatchStatus !== 'closing'
+    ) {
+      const latchCommand: HeaterShakerCloseLatchCreateCommand = {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: module.attachedModuleMatch.id,
+        },
+      }
+      createLiveCommand({
+        command: latchCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
         )
       })
     }

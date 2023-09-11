@@ -63,9 +63,6 @@ export function ModuleCalibrationOverflowMenu({
   const { toggleLatch, isLatchClosed } = useLatchControls(attachedModule)
 
   const handleCalibration = (): void => {
-    if (!isLatchClosed) {
-      toggleLatch()
-    }
     if (
       attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE &&
       attachedModule.data.currentSpeed != null &&
@@ -84,6 +81,9 @@ export function ModuleCalibrationOverflowMenu({
           `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
         )
       })
+    }
+    if (!isLatchClosed) {
+      toggleLatch()
     }
     setShowOverflowMenu(false)
     setShowModuleWizard(true)
