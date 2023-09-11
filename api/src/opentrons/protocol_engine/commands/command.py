@@ -157,6 +157,10 @@ class AbstractCommandImpl(
 
     - Create a command resource from the request model
     - Execute the command, mapping data from execution into the result model
+
+    This class should be used as the base class for new commands by default. You should only
+    use AbstractCommandWithPrivateResultImpl if you actually need private results to send to
+    the rest of the engine wihtout being published outside of it.
     """
 
     def __init__(
@@ -186,13 +190,18 @@ class AbstractCommandWithPrivateResultImpl(
     ABC,
     Generic[CommandParamsT, CommandResultT, CommandPrivateResultT],
 ):
-    """Abstract command creation and execution implementation.
+    """Abstract command creation and execution implementation if the command has private results.
 
     A given command request should map to a specific command implementation,
     which defines how to:
 
     - Create a command resource from the request model
     - Execute the command, mapping data from execution into the result model
+
+    This class should be used instead of AbstractCommandImpl as a base class if your command needs
+    to send data to result handlers that should not be published outside of the engine.
+
+    Note that this class needs an extra type-parameter for the private result.
     """
 
     def __init__(

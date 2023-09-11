@@ -1,6 +1,6 @@
 """Configure for volume command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type, Tuple
 from typing_extensions import Literal
 
@@ -37,10 +37,7 @@ class ConfigureForVolumePrivateResult(PipetteConfigUpdateResultMixin):
 class ConfigureForVolumeResult(BaseModel):
     """Result data from execution of an ConfigureForVolume command."""
 
-    pipetteId: str = Field(
-        ...,
-        description="An ID to reference this pipette in subsequent commands.",
-    )
+    pass
 
 
 class ConfigureForVolumeImplementation(
@@ -64,9 +61,7 @@ class ConfigureForVolumeImplementation(
             volume=params.volume,
         )
 
-        return ConfigureForVolumeResult(
-            pipetteId=pipette_result.pipette_id
-        ), ConfigureForVolumePrivateResult(
+        return ConfigureForVolumeResult(), ConfigureForVolumePrivateResult(
             pipette_id=pipette_result.pipette_id,
             serial_number=pipette_result.serial_number,
             config=pipette_result.static_config,

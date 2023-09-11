@@ -232,6 +232,7 @@ from .configure_for_volume import (
     ConfigureForVolumeCreate,
     ConfigureForVolumeResult,
     ConfigureForVolumeCommandType,
+    ConfigureForVolumePrivateResult,
 )
 
 Command = Union[
@@ -515,4 +516,6 @@ CommandResult = Union[
     calibration.MoveToMaintenancePositionResult,
 ]
 
-CommandPrivateResult = Union[None, LoadPipettePrivateResult]
+CommandPrivateResult = Union[
+    None, LoadPipettePrivateResult, ConfigureForVolumePrivateResult
+]

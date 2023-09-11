@@ -61,7 +61,7 @@ async def test_configure_for_volume_implementation(
 
     result, private_result = await subject.execute(data)
 
-    assert result == ConfigureForVolumeResult(pipetteId="pipette-id")
+    assert result == ConfigureForVolumeResult()
     assert private_result == ConfigureForVolumePrivateResult(
         pipette_id="pipette-id", serial_number="some number", config=config
     )
