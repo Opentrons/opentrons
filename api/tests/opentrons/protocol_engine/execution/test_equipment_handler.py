@@ -71,25 +71,10 @@ def _make_config(use_virtual_modules: bool) -> Config:
 def patch_mock_pipette_data_provider(
     decoy: Decoy,
     monkeypatch: pytest.MonkeyPatch,
-    virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> None:
-    """Mock out move_types.py functions."""
+    """Mock out pipette_data_provider top level functions."""
     for name, func in inspect.getmembers(pipette_data_provider, inspect.isfunction):
         monkeypatch.setattr(pipette_data_provider, name, decoy.mock(func=func))
-    monkeypatch.setattr(
-        virtual_pipette_data_provider,
-        "get_virtual_pipette_static_config",
-        decoy.mock(
-            func=virtual_pipette_data_provider.get_virtual_pipette_static_config
-        ),
-    )
-    monkeypatch.setattr(
-        virtual_pipette_data_provider,
-        "get_virtual_pipette_static_config_by_model_string",
-        decoy.mock(
-            func=virtual_pipette_data_provider.get_virtual_pipette_static_config_by_model_string
-        ),
-    )
 
 
 @pytest.fixture
@@ -166,9 +151,11 @@ def loaded_static_pipette_data(
 
 
 @pytest.fixture
-def virtual_pipette_data_provider() -> pipette_data_provider.VirtualPipetteDataProvider:
+def virtual_pipette_data_provider(
+    decoy: Decoy,
+) -> pipette_data_provider.VirtualPipetteDataProvider:
     """Virtual pipette data provider."""
-    return pipette_data_provider.VirtualPipetteDataProvider()
+    return decoy.mock(cls=pipette_data_provider.VirtualPipetteDataProvider)
 
 
 @pytest.fixture
