@@ -6,7 +6,7 @@
       "model": "p1000_single_3.4",
       "id": "321",
       "max_volume": 1000,
-      "name": "p1000_single_gen3",
+      "name": "flex_1channel_1000",
       "tip_length": 0,
       "channels": 1
     },
@@ -14,7 +14,7 @@
       "model": "p50_single_3.4",
       "id": "123",
       "max_volume": 50,
-      "name": "p50_single_gen3",
+      "name": "flex_1channel_50",
       "tip_length": 0,
       "channels": 1
     }

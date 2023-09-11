@@ -45,7 +45,7 @@ def dummy_instruments_attached_ot3():
         types.Mount.LEFT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "p1000_single_gen3",
+            "name": "flex_1channel_1000",
         },
         types.Mount.RIGHT: {"model": None, "id": None, "name": None},
         OT3Mount.GRIPPER: None,
@@ -680,12 +680,12 @@ async def test_reset_instruments(monkeypatch, sim_and_instr):
         types.Mount.LEFT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "p1000_single_gen3",
+            "name": "flex_1channel_1000",
         },
         types.Mount.RIGHT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "p1000_single_gen3",
+            "name": "flex_1channel_1000",
         },
     }
     sim_builder, _ = sim_and_instr
