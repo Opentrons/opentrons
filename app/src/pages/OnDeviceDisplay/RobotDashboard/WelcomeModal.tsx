@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
@@ -18,6 +19,7 @@ import { updateConfigValue } from '../../../redux/config'
 
 import welcomeModalImage from '../../../assets/images/on-device-display/welcome_dashboard_modal.png'
 
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 import type { Dispatch } from '../../../redux/types'
 
 interface WelcomeModalProps {
@@ -30,6 +32,21 @@ export function WelcomeModal({
   const { t } = useTranslation('device_details')
   const dispatch = useDispatch<Dispatch>()
 
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const animationCommand: SetStatusBarCreateCommand = {
+    commandType: 'setStatusBar',
+    params: { animation: 'disco' },
+  }
+
+  const startDiscoAnimation = (): void => {
+    createLiveCommand({
+      command: animationCommand,
+      waitUntilComplete: false,
+    }).catch((e: Error) =>
+      console.warn(`cannot run status bar animation: ${e.message}`)
+    )
+  }
+
   const handleCloseModal = (): void => {
     dispatch(
       updateConfigValue(
@@ -39,6 +56,8 @@ export function WelcomeModal({
     )
     setShowWelcomeModal(false)
   }
+
+  React.useEffect(startDiscoAnimation, [])
 
   return (
     <Modal modalSize="small" onOutsideClick={handleCloseModal}>
