@@ -858,11 +858,12 @@ class OT3Controller:
         node = sensor_node_for_mount(OT3Mount(mount.value))
         assert node != NodeId.gripper
         res = await get_tip_ejector_state(
-            self._messenger, node, Literal[expected_responses]
+            self._messenger, node, expected_responses
         )
-        if not all([r == res[0] for r in res]):
+        vals = list(res.values())
+        if not all([r == vals[0] for r in vals]):
             raise UnmatchedTipPresenceStates()
-        tip_present_state = bool(res[0]) and bool(res[-1])
+        tip_present_state = bool(vals[0]) and bool(vals[-1])
         return tip_present_state
 
     @staticmethod

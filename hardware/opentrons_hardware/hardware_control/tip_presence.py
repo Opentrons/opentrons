@@ -3,7 +3,7 @@ import asyncio
 import logging
 
 from typing_extensions import Literal
-from typing import List, overload, Tuple, Union
+from typing import Union, Dict
 
 from opentrons_shared_data.errors.exceptions import CommandTimedOutError
 
@@ -12,36 +12,15 @@ from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     MultipleMessagesWaitableCallback,
-    WaitableCallback,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipStatusQueryRequest,
     PushTipPresenceNotification,
 )
 
-from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId, SensorId
 
 log = logging.getLogger(__name__)
-
-
-@overload
-async def get_tip_ejector_state(
-    can_messenger: CanMessenger,
-    node: Literal[NodeId.pipette_left, NodeId.pipette_right],
-    expected_responses: Literal[1],
-    timeout: float = 1.0,
-) -> Tuple[int]:
-    ...
-
-
-@overload
-async def get_tip_ejector_state(
-    can_messenger: CanMessenger,
-    node: Literal[NodeId.pipette_left, NodeId.pipette_right],
-    expected_responses: Literal[2],
-    timeout: float = 1.0,
-) -> Tuple[int, int]:
-    ...
 
 
 async def get_tip_ejector_state(
@@ -49,7 +28,7 @@ async def get_tip_ejector_state(
     node: Literal[NodeId.pipette_left, NodeId.pipette_right],
     expected_responses: Union[Literal[1], Literal[2]],
     timeout: float = 1.0,
-) -> Tuple[int, ...]:
+) -> Dict[SensorId, int]:
     """Get the state of the tip presence interrupter.
 
     When the tip ejector flag is occuluded, then we
@@ -62,12 +41,12 @@ async def get_tip_ejector_state(
             == MessageId.tip_presence_notification
         )
 
-    async def gather_responses(reader: WaitableCallback) -> List[int]:
-        data: List[int] = []
+    async def gather_responses(reader: MultipleMessagesWaitableCallback ) -> Dict[SensorId, int]:
+        data: Dict[SensorId, int] = {}
         async for response, _ in reader:
             assert isinstance(response, PushTipPresenceNotification)
             tip_ejector_state = response.payload.ejector_flag_status.value
-            data.append(tip_ejector_state)
+            data[SensorId(response.payload.sensor_id.value)] = tip_ejector_state
         return data
 
     with MultipleMessagesWaitableCallback(
@@ -75,11 +54,10 @@ async def get_tip_ejector_state(
         _filter,
         number_of_messages=expected_responses,
     ) as _reader:
-        data_list: List[int] = []
         await can_messenger.send(node_id=node, message=TipStatusQueryRequest())
         try:
 
-            data_list = await asyncio.wait_for(
+            data_dict = await asyncio.wait_for(
                 gather_responses(_reader),
                 timeout,
             )
@@ -87,5 +65,4 @@ async def get_tip_ejector_state(
             msg = f"Tip presence poll of {node} timed out"
             log.warning(msg)
             raise CommandTimedOutError(message=msg) from te
-        finally:
-            return tuple(data_list)
+        return data_dict
