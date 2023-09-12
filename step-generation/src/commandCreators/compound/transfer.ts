@@ -164,7 +164,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           } else if (args.changeTip === 'perDest') {
             changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
           }
-          
+
           //  todo(jr, 9/12/23): figure out a way to only emit this command if the the previous pipetting volume
           //  with the same pipette is the same 1uL volume
           const configureForVolumeCommand: CurriedCommandCreator[] =
