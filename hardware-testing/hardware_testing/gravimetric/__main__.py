@@ -213,6 +213,7 @@ class RunArgs:
                 kind,
                 False,  # set extra to false so we always do the normal tests first
                 args.channels,
+                mode=args.mode  # NOTE: only needed for increment test
             )
             if len(vls) > 0:
                 volumes.append(
@@ -233,7 +234,7 @@ class RunArgs:
                     args.user_volumes,
                     kind,
                     True,
-                    args.channels,
+                    args.channels
                 )
                 if len(vls) > 0:
                     volumes.append(
@@ -513,6 +514,7 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-fail", action="store_true")
     parser.add_argument("--photoplate-col-offset", type=int, default=1)
     parser.add_argument("--dye-well-col-offset", type=int, default=1)
+    parser.add_argument("--mode", type=str, choices=["default", "lowVolumeDefault"], default="default")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():

@@ -296,14 +296,13 @@ def _get_volumes(
     kind: config.ConfigType,
     extra: bool,
     channels: int,
+    mode: str = "default"
 ) -> List[float]:
     if increment:
-        print("if")
         test_volumes = get_volume_increments(
-            pipette_channels, pipette_volume, tip_volume
+            pipette_channels, pipette_volume, tip_volume, mode=mode
         )
     elif user_volumes and not ctx.is_simulating():
-        print("elif")
         _inp = input(
             f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
         )
@@ -311,7 +310,6 @@ def _get_volumes(
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        print("else")
         test_volumes = get_test_volumes(
             kind, channels, pipette_volume, tip_volume, extra
         )

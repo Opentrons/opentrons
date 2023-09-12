@@ -179,22 +179,25 @@ def _pipette_with_liquid_settings(  # noqa: C901
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(mix, aspirate, dispense)
 
+    def _get_max_blow_out_ul() -> float:
+        # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
+        blow_out_ul_per_mm = hw_pipette.config.shaft_ul_per_mm
+        bottom = hw_pipette.plunger_positions.bottom
+        blow_out = hw_pipette.plunger_positions.blow_out
+        return (blow_out - bottom) * blow_out_ul_per_mm
+
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.dispense.blow_out_submerged)
+        vol = min(liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul())
+        hw_api.blow_out(hw_mount, vol)
 
     def _blow_out_remaining_air() -> None:
         # FIXME: using the HW-API to specify that we want to blow-out the full
         #        available blow-out volume
-        # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
-        blow_out_ul_per_mm = hw_pipette.config.shaft_ul_per_mm
-        bottom = hw_pipette.plunger_positions.bottom
-        blow_out = hw_pipette.plunger_positions.blow_out
-        max_blow_out_ul = (blow_out - bottom) * blow_out_ul_per_mm
-        hw_api.blow_out(hw_mount, max_blow_out_ul)
+        hw_api.blow_out(hw_mount, _get_max_blow_out_ul())
 
     def _set_plunger_bottom() -> None:
         # FIXME: this should be deleted immediately once low-volume mode is working
