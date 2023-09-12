@@ -200,6 +200,33 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
             ),
             "RuntimeError [line 5]: >:(",
         ),
+        (
+            textwrap.dedent(
+                # Raises an exception from inside a Protocol Engine command.
+                # https://opentrons.atlassian.net/browse/RSS-317
+                """\
+                requirements = {"apiLevel": "2.14"}      # line 1
+                                                         # line 2
+                def run(protocol):                       # line 3
+                    tip_rack = protocol.load_labware(    # line 4
+                        "opentrons_96_tiprack_300ul", 1  # line 5
+                    )                                    # line 6
+                    pipette = protocol.load_instrument(  # line 7
+                        "p300_single", "left"            # line 8
+                    )                                    # line 9
+                    pipette.pick_up_tip(tip_rack["A1"])  # line 10
+                    pipette.pick_up_tip(tip_rack["A2"])  # line 11
+                """
+            ),
+            (
+                # TODO(mm, 2023-09-12): This is an overly verbose concatenative Frankenstein
+                # message. We should simplify our error propagation to trim out the noise.
+                "ProtocolCommandFailedError [line 11]:"
+                " Error 4000 GENERAL_ERROR (ProtocolCommandFailedError):"
+                " TipAttachedError: Pipette should not have a tip attached, but does."
+            ),
+        ),
+        # TODO: PAPIv<2.15?
     ],
 )
 def test_error_context(
