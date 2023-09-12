@@ -24,6 +24,7 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
+import { configureForVolume } from '../atomic/configureForVolume'
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
   invariantContext,
@@ -84,7 +85,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const destLabwareDef = invariantContext.labwareEntities[args.destLabware].def
   const airGapOffsetDestWell =
     getWellDepth(destLabwareDef, args.destWell) + AIR_GAP_OFFSET_FROM_TOP
+
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
+  const numOfWells = sourceWellChunks.flatMap(chunk => chunk).length
+  const totalVolumeAspirated = args.volume * numOfWells
+
   const commandCreators = flatMap(
     sourceWellChunks,
     (
@@ -308,10 +313,24 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
       })
+
+      const configureForVolumeCommand: CurriedCommandCreator[] =
+        invariantContext.pipetteEntities[args.pipette].name ===
+          'p50_single_flex' ||
+        invariantContext.pipetteEntities[args.pipette].name === 'p50_multi_flex'
+          ? [
+              curryCommandCreator(configureForVolume, {
+                pipetteId: args.pipette,
+                volume: totalVolumeAspirated,
+              }),
+            ]
+          : []
+
       return [
         ...tipCommands,
         ...mixBeforeCommands,
         ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
+        ...configureForVolumeCommand,
         ...aspirateCommands,
         curryCommandCreator(dispense, {
           pipette: args.pipette,

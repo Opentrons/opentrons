@@ -139,9 +139,8 @@ export const mix: CommandCreator<MixArgs> = (
   }
 
   const configureForVolumeCommand: CurriedCommandCreator[] =
-    volume <= 1 &&
-    (invariantContext.pipetteEntities[pipette].name === 'p50_single_flex' ||
-      invariantContext.pipetteEntities[pipette].name === 'p50_multi_flex')
+    invariantContext.pipetteEntities[pipette].name === 'p50_single_flex' ||
+    invariantContext.pipetteEntities[pipette].name === 'p50_multi_flex'
       ? [
           curryCommandCreator(configureForVolume, {
             pipetteId: pipette,

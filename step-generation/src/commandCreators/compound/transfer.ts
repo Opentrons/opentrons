@@ -165,11 +165,10 @@ export const transfer: CommandCreator<TransferArgs> = (
           }
 
           const configureForVolumeCommand: CurriedCommandCreator[] =
-            args.volume <= 1 &&
-            (invariantContext.pipetteEntities[args.pipette].name ===
+            invariantContext.pipetteEntities[args.pipette].name ===
               'p50_single_flex' ||
-              invariantContext.pipetteEntities[args.pipette].name ===
-                'p50_multi_flex')
+            invariantContext.pipetteEntities[args.pipette].name ===
+              'p50_multi_flex'
               ? [
                   curryCommandCreator(configureForVolume, {
                     pipetteId: args.pipette,
