@@ -12,6 +12,7 @@ import type {
   CurriedCommandCreator,
 } from '../../types'
 import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
+import { configureForVolume } from '../atomic/configureForVolume'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {
@@ -137,6 +138,18 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
+  const configureForVolumeCommand: CurriedCommandCreator[] =
+    volume <= 1 &&
+    (invariantContext.pipetteEntities[pipette].name === 'p50_single_flex' ||
+      invariantContext.pipetteEntities[pipette].name === 'p50_multi_flex')
+      ? [
+          curryCommandCreator(configureForVolume, {
+            pipetteId: pipette,
+            volume: volume,
+          }),
+        ]
+      : []
+
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -187,6 +200,7 @@ export const mix: CommandCreator<MixArgs> = (
       })
       return [
         ...tipCommands,
+        ...configureForVolumeCommand,
         ...mixCommands,
         ...blowoutCommand,
         ...touchTipCommands,
