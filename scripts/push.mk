@@ -1,7 +1,7 @@
 # utilities for pushing things to robots in a reusable fashion
 
 find_robot=$(shell yarn run -s discovery find -i 169.254)
-default_ssh_key := ~/.ssh/robot_key
+default_ssh_key :=
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 version_dict=$(shell ssh $(call id-file-arg,$(2)) $(3) root@$(1) cat /etc/VERSION.json)
 is-ot3=$(findstring OT-3, $(version_dict))
