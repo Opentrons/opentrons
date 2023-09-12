@@ -773,12 +773,12 @@ class ProtocolContext(CommandPublisher):
 
         tip_racks = tip_racks or []
 
-        if is_96_channel and self._instruments[Mount.RIGHT] is not None:
-            loaded_instrument = self._instruments[Mount.RIGHT]
-            assert loaded_instrument is not None
+        # TODO (tz, 9-12-23): move validation into PE
+        on_right_mount = self._instruments[Mount.RIGHT]
+        if is_96_channel and on_right_mount is not None:
             raise RuntimeError(
                 f"Instrument already present on right:"
-                f" {loaded_instrument.name}. In order to load a 96 channel pipette both mounts need to be available."
+                f" {on_right_mount.name}. In order to load a 96 channel pipette both mounts need to be available."
             )
 
         existing_instrument = self._instruments[checked_mount]
