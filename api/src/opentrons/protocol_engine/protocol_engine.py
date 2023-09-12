@@ -334,8 +334,8 @@ class ProtocolEngine:
             if error is None:
                 error = EStopActivatedError(message="Estop was activated during a run")
         if error:
-            if isinstance(error, EnumeratedError) and self._code_in_exception_stack(
-                error=error, code=ErrorCodes.E_STOP_ACTIVATED
+            if isinstance(error, EnumeratedError) and self._code_in_error_tree(
+                root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
             ):
                 drop_tips_after_run = False
                 post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
@@ -494,34 +494,34 @@ class ProtocolEngine:
 
     # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
     @staticmethod
-    def _code_in_exception_stack(
-        error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
+    def _code_in_error_tree(
+        root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
     ) -> bool:
-        if isinstance(error, ErrorOccurrence):
+        if isinstance(root_error, ErrorOccurrence):
             # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
             # code by a string value.
-            if error.errorCode == code.value.code:
+            if root_error.errorCode == code.value.code:
                 return True
             return any(
-                ProtocolEngine._code_in_exception_stack(wrapped, code)
-                for wrapped in error.wrappedErrors
+                ProtocolEngine._code_in_error_tree(wrapped, code)
+                for wrapped in root_error.wrappedErrors
             )
 
         # From here we have an exception, can just check the code + recurse to wrapped errors.
-        if error.code == code:
+        if root_error.code == code:
             return True
 
         if (
-            isinstance(error, ProtocolCommandFailedError)
-            and error.original_error is not None
+            isinstance(root_error, ProtocolCommandFailedError)
+            and root_error.original_error is not None
         ):
             # For this specific EnumeratedError child, we recurse on the original_error field
             # in favor of the general error.wrapping field.
-            return ProtocolEngine._code_in_exception_stack(error.original_error, code)
+            return ProtocolEngine._code_in_error_tree(root_error.original_error, code)
 
-        if len(error.wrapping) == 0:
+        if len(root_error.wrapping) == 0:
             return False
         return any(
-            ProtocolEngine._code_in_exception_stack(wrapped_error, code)
-            for wrapped_error in error.wrapping
+            ProtocolEngine._code_in_error_tree(wrapped_error, code)
+            for wrapped_error in root_error.wrapping
         )
