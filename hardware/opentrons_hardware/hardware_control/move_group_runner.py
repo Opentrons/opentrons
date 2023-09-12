@@ -10,6 +10,7 @@ from opentrons_shared_data.errors.exceptions import (
     GeneralError,
     MoveConditionNotMetError,
     EnumeratedError,
+    EStopActivatedError,
     MotionFailedError,
     PythonException,
 )
@@ -551,6 +552,18 @@ class MoveScheduler:
                 nodes.append(NodeId(node_id))
         return nodes
 
+    def _filtered_errors(self) -> List[EnumeratedError]:
+        """If multiple errors occurred, filter which ones we raise.
+
+        This function primarily handles the case when an Estop is pressed during a run.
+        Multiple kinds of error messages may arise, but the only one that is important
+        to raise is the message about the Estop.
+        """
+        estop_errors = list(
+            filter(lambda err: isinstance(err, EStopActivatedError), self._errors)
+        )
+        return estop_errors if len(estop_errors) > 0 else self._errors
+
     async def _send_stop_if_necessary(
         self, can_messenger: CanMessenger, group_id: int
     ) -> None:
@@ -563,12 +576,13 @@ class MoveScheduler:
             if err != ErrorCode.stop_requested:
                 log.warning("Stop request failed")
             if self._errors:
-                if len(self._errors) > 1:
+                errors_to_show = self._filtered_errors()
+                if len(errors_to_show) > 1:
                     raise MotionFailedError(
-                        "Motion failed with multiple errors", wrapping=self._errors
+                        "Motion failed with multiple errors", wrapping=errors_to_show
                     )
                 else:
-                    raise self._errors[0]
+                    raise errors_to_show[0]
             else:
                 # This happens when the move completed without stop condition
                 raise MoveConditionNotMetError(detail={"group-id": str(group_id)})
