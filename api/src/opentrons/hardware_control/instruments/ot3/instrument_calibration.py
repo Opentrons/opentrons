@@ -10,10 +10,12 @@ from opentrons.config.robot_configs import (
 from opentrons.types import Point, Mount
 
 # TODO change this when imports are fixed
-from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
+from opentrons.calibration_storage.ot3.pipette_offset import (
+    save_pipette_calibration,
+    get_pipette_offset,
+)
 from opentrons.calibration_storage import (
     types as cal_top_types,
-    get_pipette_offset,
     ot3_gripper_offset,
 )
 from opentrons.hardware_control.types import OT3Mount
