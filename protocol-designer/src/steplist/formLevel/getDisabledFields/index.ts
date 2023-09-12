@@ -3,15 +3,11 @@ import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidFo
 import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
 import { getDisabledFieldsHeaterShaker } from './getDisabledFieldsHeaterShaker'
 import { FormData } from '../../../form-types'
-import { PipetteEntities } from '@opentrons/step-generation'
 
-function _getDisabledFields(
-  rawForm: FormData,
-  pipetteEntities: PipetteEntities
-): Set<string> {
+function _getDisabledFields(rawForm: FormData): Set<string> {
   switch (rawForm.stepType) {
     case 'moveLiquid':
-      return getDisabledFieldsMoveLiquidForm(rawForm, pipetteEntities)
+      return getDisabledFieldsMoveLiquidForm(rawForm)
 
     case 'mix':
       return getDisabledFieldsMixForm(rawForm)
@@ -38,6 +34,5 @@ function _getDisabledFields(
 // shallow-memoized because every disable-able field in the form calls this function once
 // WARNING: do not mutate the same rawForm obj or this memoization will break
 export const getDisabledFields: (
-  rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  rawForm: FormData
 ) => Set<string> = defaultMemoize(_getDisabledFields)

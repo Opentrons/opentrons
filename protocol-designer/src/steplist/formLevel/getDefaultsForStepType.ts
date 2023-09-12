@@ -66,7 +66,6 @@ export function getDefaultsForStepType(
         dispense_mmFromBottom: null,
         dispense_touchTip_checkbox: false,
         dispense_touchTip_mmFromBottom: null,
-        dispense_pushOut: false,
         disposalVolume_checkbox: false,
         disposalVolume_volume: null,
         blowout_checkbox: false,

@@ -65,8 +65,7 @@
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
-        "blowout_checkbox": "Redundant with disposal volume",
-        "dispense_pushOut": "Not available unless dispensing 1µL or less"
+        "blowout_checkbox": "Redundant with disposal volume"
       }
     },
     "moveLabware": {

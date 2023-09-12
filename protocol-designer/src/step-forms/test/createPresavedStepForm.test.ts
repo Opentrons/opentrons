@@ -167,7 +167,6 @@ describe('createPresavedStepForm', () => {
       dispense_wells: [],
       disposalVolume_checkbox: true,
       disposalVolume_volume: '1',
-      dispense_pushOut: false,
       path: 'single',
       preWetTip: false,
       stepDetails: '',

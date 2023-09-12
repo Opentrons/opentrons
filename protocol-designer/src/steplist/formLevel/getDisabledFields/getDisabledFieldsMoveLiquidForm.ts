@@ -1,21 +1,11 @@
-import { PipetteEntities } from '@opentrons/step-generation'
 import { FormData } from '../../../form-types'
 // NOTE: expects that '_checkbox' fields are implemented so that
 // when checkbox is disabled, its dependent fields are hidden
 export function getDisabledFieldsMoveLiquidForm(
-  rawForm: FormData, // TODO IMMEDIATELY use raw form type instead of FormData
-  pipetteEntities: PipetteEntities
+  rawForm: FormData // TODO IMMEDIATELY use raw form type instead of FormData
 ): Set<string> {
   const disabled: Set<string> = new Set()
   const prefixes = ['aspirate', 'dispense']
-  const pipetteSelected =
-    rawForm.pipette != null
-      ? pipetteEntities[String(rawForm.pipette)].name
-      : null
-  const pushOutAllowed =
-    Number(rawForm.volume) <= 1 &&
-    (pipetteSelected === 'p50_single_flex' ||
-      pipetteSelected === 'p50_multi_flex')
 
   if (rawForm.path === 'multiAspirate') {
     disabled.add('aspirate_mix_checkbox')
@@ -35,9 +25,5 @@ export function getDisabledFieldsMoveLiquidForm(
       disabled.add(prefix + '_wells')
     }
   })
-
-  if (!pushOutAllowed) {
-    disabled.add('dispense_pushOut')
-  }
   return disabled
 }

@@ -98,7 +98,6 @@ export const transfer: CommandCreator<TransferArgs> = (
     blowoutOffsetFromTopMm,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
-    dispensePushOut,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -441,7 +440,6 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: destWell,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
-              pushOut: dispensePushOut ? subTransferVol : undefined,
             }),
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,

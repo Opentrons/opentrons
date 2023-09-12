@@ -1,6 +1,6 @@
 import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
@@ -19,7 +19,6 @@ import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
 import { BaseState, ThunkDispatch } from '../../types'
 import { FormData, StepFieldName, StepIdType } from '../../form-types'
-import { getPipetteEntities } from '../../step-forms/selectors'
 
 interface SP {
   canSave: boolean
@@ -65,7 +64,6 @@ const StepEditFormManager = (
   const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
-  const pipetteEntities = useSelector(getPipetteEntities)
 
   const toggleMoreOptionsModal = (): void => {
     resetScrollElements()
@@ -137,7 +135,6 @@ const StepEditFormManager = (
   const propsForFields = makeSingleEditFieldProps(
     focusHandlers,
     formData,
-    pipetteEntities,
     handleChangeFormInput
   )
   let handleSave = saveStepForm

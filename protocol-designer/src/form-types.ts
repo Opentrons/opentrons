@@ -211,7 +211,6 @@ export interface HydratedMoveLiquidFormData {
     dispense_mix_checkbox: boolean
     dispense_mix_volume: number | null | undefined
     dispense_mix_times: number | null | undefined
-    dispense_pushOut: boolean
     disposalVolume_checkbox: boolean
     disposalVolume_volume: number | null | undefined
     blowout_checkbox: boolean

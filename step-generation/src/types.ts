@@ -196,8 +196,6 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm: number
-  /** Push out param only in dispense */
-  dispensePushOut: boolean
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {

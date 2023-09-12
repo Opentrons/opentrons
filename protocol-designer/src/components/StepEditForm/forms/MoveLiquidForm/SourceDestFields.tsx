@@ -1,9 +1,6 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { i18n } from '../../../../localization'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { getRobotType } from '../../../../file-data/selectors'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -40,7 +37,6 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields, allLabware } = props
-  const robotType = useSelector(getRobotType)
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const getDelayFields = (): JSX.Element => (
@@ -160,31 +156,22 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           />
         </CheckboxRowField>
 
-        {prefix === 'dispense' ? (
-          <>
-            <CheckboxRowField
-              {...propsForFields.blowout_checkbox}
-              label={i18n.t('form.step_edit_form.field.blowout.label')}
-              className={styles.small_field}
-            >
-              <BlowoutLocationField
-                {...propsForFields.blowout_location}
-                className={styles.full_width}
-                options={getBlowoutLocationOptionsForForm({
-                  path: formData.path,
-                  stepType: formData.stepType,
-                })}
-              />
-            </CheckboxRowField>
-            {robotType === FLEX_ROBOT_TYPE ? (
-              <CheckboxRowField
-                {...propsForFields.dispense_pushOut}
-                label={i18n.t('form.step_edit_form.field.pushOut.label')}
-                className={styles.small_field}
-              />
-            ) : null}
-          </>
-        ) : null}
+        {prefix === 'dispense' && (
+          <CheckboxRowField
+            {...propsForFields.blowout_checkbox}
+            label={i18n.t('form.step_edit_form.field.blowout.label')}
+            className={styles.small_field}
+          >
+            <BlowoutLocationField
+              {...propsForFields.blowout_location}
+              className={styles.full_width}
+              options={getBlowoutLocationOptionsForForm({
+                path: formData.path,
+                stepType: formData.stepType,
+              })}
+            />
+          </CheckboxRowField>
+        )}
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
           label={i18n.t('form.step_edit_form.field.airGap.label')}

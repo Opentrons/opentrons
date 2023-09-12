@@ -63,7 +63,6 @@ describe('getDefaultsForStepType', () => {
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_mmFromBottom: null,
-        dispense_pushOut: false,
       })
     })
   })
