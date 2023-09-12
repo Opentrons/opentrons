@@ -4,7 +4,6 @@ ssh_key_management: Endpoints for managing SSH keys on the robot
 import contextlib
 import functools
 import hashlib
-import subprocess
 import ipaddress
 import logging
 import os
@@ -248,12 +247,12 @@ async def add_from_local(request: web.Request) -> web.Response:
     """
 
     LOG.info("Searching for public keys in /media")
-    pub_keys = (
-        subprocess.check_output(["find", "/media", "-type", "f", "-name", "*.pub"])
-        .decode()
-        .strip()
-        .split()
-    )
+    pub_keys = [
+        Path(root, file)
+        for root, _, files in os.walk("/media")
+        for file in files
+        if file.endswith(".pub")
+    ]
     if not pub_keys:
         LOG.warning("No keys found")
         return key_error("no-key", "No valid keys found", 404)
