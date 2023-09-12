@@ -240,6 +240,33 @@ For example, this transfer command will mix 50 µL of liquid 3 times after each 
 Disposal Volume
 ===============
 
+The ``disposal_volume`` parameter controls how much extra liquid is aspirated as part of a :py:meth:`~.InstrumentContext.distribute` command. Including a disposal volume can improve the accuracy of each dispense. The pipette blows out the disposal volume of liquid after dispensing. To skip aspirating and blowing out extra liquid, set ``disposal_volume=0``.
+
+By default, ``disposal_volume`` is the :ref:`minimum volume <new-pipette-models>` of the pipette, but you can set it to any amount::
+
+    pipette.distribute(
+        volume=100,
+        source=plate["A1"],
+        dest=[plate["B1"], plate["B2"]],
+        disposal_volume=50,  # reduce from default 100 µL to 50 µL
+    )
+    
+If the amount to aspirate plus the disposal volume exceeds the tip's capacity, ``distribute()`` will use a :ref:`complex-tip-refilling` strategy. In such cases, the pipette will aspirate and blow out the disposal volume *with each aspiration*. For example, this command will require tip refilling with a 1000 µL pipette::
+    
+    pipette.distribute(
+        volume=100,
+        source=reservoir["A1"],
+        dest=[plate.columns()[0]],
+        disposal_volume=250,
+    )
+    
+The amount to dispense in the destination is 800 µL (100 µL for each of 8 wells in the column). Adding the 250 µL disposal volume exceeds the 1000 µL capacity of the tip. The command will be split across two aspirations, each with the full disposal volume of 250 µL. The pipette will dispose *a total of 500 µL* during the command.
+
+.. note::
+    :py:meth:`~.InstrumentContext.transfer` will not aspirate additional liquid if you set ``disposal_volume``. However, it will perform a very small blow out after each dispense.
+    
+    :py:meth:`~.InstrumentContext.consolidate` ignores ``disposal_volume`` completely.
+
 Blow Out
 ========
 
