@@ -1,3 +1,6 @@
+from types import TracebackType
+from typing import Optional
+
 from opentrons_shared_data.errors.exceptions import GeneralError
 
 
@@ -7,7 +10,13 @@ class ExceptionInProtocolError(GeneralError):
     we can properly figure out formatting
     """
 
-    def __init__(self, original_exc, original_tb, message, line):
+    def __init__(
+        self,
+        original_exc: Exception,
+        original_tb: Optional[TracebackType],
+        message: str,
+        line: Optional[int],
+    ) -> None:
         self.original_exc = original_exc
         self.original_tb = original_tb
         self.message = message
@@ -21,5 +30,5 @@ class ExceptionInProtocolError(GeneralError):
             ),
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
