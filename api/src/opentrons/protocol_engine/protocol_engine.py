@@ -329,11 +329,26 @@ class ProtocolEngine:
                 after the run is over.
         """
         if self._state_store.commands.state.stopped_by_estop:
+            # This handles the case where the E-stop was pressed while we were *not* in the middle
+            # of some hardware interaction that would raise it as an exception. For example, imagine
+            # we were paused between two commands, or imagine we were executing a very long run of
+            # comment commands.
             drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
             if error is None:
                 error = EStopActivatedError(message="Estop was activated during a run")
+
         if error:
+            # If the run had an error, check if that error indicates an E-stop.
+            # This handles the case where the run was in the middle of some hardware control
+            # method and the hardware controller raised an E-stop error from it.
+            #
+            # To do this, we need to scan all the way through the error tree.
+            # By the time E-stop error has gotten to us, it may have been wrapped in other errors,
+            # so we need to unwrap them to uncover the E-stop error's inner beauty.
+            #
+            # TODO(mm, 2023-09-12): Do we need to scan the exception tree like this? Instead, can we
+            # directly inspect the E-stop state through self._hardware_api.get_estop_state()?
             if isinstance(error, EnumeratedError) and self._code_in_error_tree(
                 root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
             ):
