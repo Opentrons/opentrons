@@ -546,6 +546,8 @@ class GripperErrorTolerancePayload(EmptyPayload):
 
 @dataclass(eq=False)
 class PushTipPresenceNotificationPayload(EmptyPayload):
+    """A notification that the ejector flag status has changed."""
+
     ejector_flag_status: utils.UInt8Field
     sensor_id: SensorIdField
 
