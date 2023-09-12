@@ -525,6 +525,7 @@ describe('ModuleOverflowMenu', () => {
   })
 
   it('a mock function should be called when clicking Calibrate if pipette is ready', () => {
+    mockUseIsOT3.mockReturnValue(true)
     props = {
       ...props,
       isPipetteReady: true,
