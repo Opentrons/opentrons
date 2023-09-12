@@ -38,6 +38,7 @@ describe('WelcomeModal', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
+      setShowAnalyticsOptInModal: jest.fn(),
       setShowWelcomeModal: mockFunc,
     }
     mockUseCreateLiveCommandMutation.mockReturnValue({
@@ -58,7 +59,7 @@ describe('WelcomeModal', () => {
     getByText(
       'A place to run protocols, manage your instruments, and view robot status.'
     )
-    getByText('Got it')
+    getByText('Next')
     expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: animationCommand,
@@ -66,10 +67,12 @@ describe('WelcomeModal', () => {
     })
   })
 
-  it('should call a mock function when tapping got it button', () => {
+  it('should call a mock function when tapping next button', () => {
     const [{ getByText }] = render(props)
-    getByText('Got it').click()
-    expect(mockUpdateConfigValue).toHaveBeenCalled()
+    getByText('Next').click()
+    // move to analytics modal test
+    // expect(mockUpdateConfigValue).toHaveBeenCalled()
     expect(props.setShowWelcomeModal).toHaveBeenCalled()
+    expect(props.setShowAnalyticsOptInModal).toHaveBeenCalled()
   })
 })
