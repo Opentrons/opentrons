@@ -188,12 +188,12 @@ PRESSURE_ASPIRATE_VOL = {
     }
 }
 PRESSURE_THRESH_OPEN_AIR = {
-    1: [-15, 15],
-    8: [-15, 15]
+    1: [-150, 150],
+    8: [-150, 150]
 }
 PRESSURE_THRESH_SEALED = {
-    1: [-50, 50],
-    8: [0, 200]
+    1: [-500, 500],
+    8: [-200, 400]
 }
 PRESSURE_THRESH_COMPRESS = {
     1: [-2600, 1600],
