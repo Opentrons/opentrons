@@ -66,7 +66,10 @@ import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { useLatchControls } from './hooks'
 import { ErrorInfo } from './ErrorInfo'
 
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+import type {
+  HeaterShakerDeactivateShakerCreateCommand,
+  TCOpenLidCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type {
   AttachedModule,
   HeaterShakerModule,
@@ -255,6 +258,24 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
     if (!isLatchClosed) {
       toggleLatch()
+    }
+    if (
+      module.moduleType === THERMOCYCLER_MODULE_TYPE &&
+      module.data.lidStatus !== 'open'
+    ) {
+      const lidCommand: TCOpenLidCreateCommand = {
+        commandType: 'thermocycler/openLid',
+        params: {
+          moduleId: module.id,
+        },
+      }
+      createLiveCommand({
+        command: lidCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
+        )
+      })
     }
     setShowCalModal(true)
   }
