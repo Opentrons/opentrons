@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
 
-import { DisableHoming } from '../DisableHoming'
+import { GantryHoming } from '../GantryHoming'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../hooks')
@@ -27,7 +27,7 @@ const mockSettings = {
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <DisableHoming settings={mockSettings} robotName="otie" isRobotBusy />
+      <GantryHoming settings={mockSettings} robotName="otie" isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -44,10 +44,10 @@ describe('RobotSettings DisableHoming', () => {
 
   it('should render title, description and toggle button', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Disable homing the gantry when restarting robot')
-    getByText('Prevent robot from homing motors when the robot restarts.')
-    const toggleButton = getByRole('switch', { name: 'disable_homing' })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+    getByText('Home Gantry on Restart')
+    getByText('Homes the gantry along the z-axis.')
+    const toggleButton = getByRole('switch', { name: 'gantry_homing' })
+    expect(toggleButton.getAttribute('aria-checked')).toBe('false')
   })
 
   it('should change the value when a user clicks a toggle button', () => {
@@ -58,16 +58,16 @@ describe('RobotSettings DisableHoming', () => {
     mockGetRobotSettings.mockReturnValue([tempMockSettings])
     const [{ getByRole }] = render()
     const toggleButton = getByRole('switch', {
-      name: 'disable_homing',
+      name: 'gantry_homing',
     })
     fireEvent.click(toggleButton)
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+    expect(toggleButton.getAttribute('aria-checked')).toBe('false')
   })
 
   it('should call update robot status if a robot is busy', () => {
     const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
-      name: 'disable_homing',
+      name: 'gantry_homing',
     })
     expect(toggleButton).toBeDisabled()
   })

@@ -18,17 +18,17 @@ import { updateSetting } from '../../../../redux/robot-settings'
 import type { Dispatch } from '../../../../redux/types'
 import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
 
-interface DisableHomingProps {
+interface GantryHomingProps {
   settings: RobotSettingsField | undefined
   robotName: string
   isRobotBusy: boolean
 }
 
-export function DisableHoming({
+export function GantryHoming({
   settings,
   robotName,
   isRobotBusy,
-}: DisableHomingProps): JSX.Element {
+}: GantryHomingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
@@ -46,17 +46,17 @@ export function DisableHoming({
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_disableHoming"
+          id="AdvancedSettings_homing"
         >
-          {t('disable_homing')}
+          {t('gantry_homing')}
         </StyledText>
-        <StyledText as="p">{t('disable_homing_description')}</StyledText>
+        <StyledText as="p">{t('gantry_homing_description')}</StyledText>
       </Box>
       <ToggleButton
-        label="disable_homing"
-        toggledOn={value}
+        label="gantry_homing"
+        toggledOn={!value}
         onClick={handleClick}
-        id="RobotSettings_disableHomingToggleButton"
+        id="RobotSettings_gantryHomingToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>
