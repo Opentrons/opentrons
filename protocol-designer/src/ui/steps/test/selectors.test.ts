@@ -531,6 +531,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 1,
           isIndeterminate: false,
         },
+        dispense_pushOut: {
+          value: undefined,
+          isIndeterminate: false,
+        },
         blowout_checkbox: {
           value: true,
           isIndeterminate: false,
@@ -727,6 +731,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_touchTip_mmFromBottom: {
           isIndeterminate: false,
           value: 1,
+        },
+        dispense_pushOut: {
+          value: undefined,
+          isIndeterminate: false,
         },
         blowout_checkbox: {
           isIndeterminate: true,

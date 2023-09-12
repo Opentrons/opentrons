@@ -4,16 +4,25 @@ import { mount } from 'enzyme'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { getRobotType } from '../../../../file-data/selectors'
 import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
 import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  LabwareDefinition2,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import type { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')
+jest.mock('../../../../file-data/selectors')
 
 const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
   typeof stepFormSelectors.getUnsavedForm
+>
+const mockGetRobotType = getRobotType as jest.MockedFunction<
+  typeof getRobotType
 >
 
 jest.mock('../../fields/', () => {
@@ -201,6 +210,7 @@ describe('SourceDestFields', () => {
     getUnsavedFormMock.mockReturnValue({
       stepType: 'moveLiquid',
     } as FormData)
+    mockGetRobotType.mockReturnValue(OT2_ROBOT_TYPE)
   })
 
   const render = (props: React.ComponentProps<typeof SourceDestFields>) =>
@@ -247,7 +257,7 @@ describe('SourceDestFields', () => {
     beforeEach(() => {
       props = { ...props, prefix: 'dispense' }
     })
-    it('should render the correct checkboxes', () => {
+    it('should render the correct checkboxes for an OT-2', () => {
       const wrapper = render(props)
       const checkboxes = wrapper.find(CheckboxRowField)
 
@@ -261,6 +271,23 @@ describe('SourceDestFields', () => {
       expect(checkboxes.at(1).prop('name')).toBe('dispense_touchTip_checkbox')
       expect(checkboxes.at(2).prop('name')).toBe('blowout_checkbox')
       expect(checkboxes.at(3).prop('name')).toBe('dispense_airGap_checkbox')
+    })
+    it('should render the correct checkboxes for a flex', () => {
+      mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
+      const wrapper = render(props)
+      const checkboxes = wrapper.find(CheckboxRowField)
+
+      const delayFields = wrapper.find(DelayFields)
+      expect(delayFields.props()).toMatchObject({
+        checkboxFieldName: 'dispense_delay_checkbox',
+        secondsFieldName: 'dispense_delay_seconds',
+        tipPositionFieldName: 'dispense_delay_mmFromBottom',
+      })
+      expect(checkboxes.at(0).prop('name')).toBe('dispense_mix_checkbox')
+      expect(checkboxes.at(1).prop('name')).toBe('dispense_touchTip_checkbox')
+      expect(checkboxes.at(2).prop('name')).toBe('blowout_checkbox')
+      expect(checkboxes.at(3).prop('name')).toBe('dispense_pushOut')
+      expect(checkboxes.at(4).prop('name')).toBe('dispense_airGap_checkbox')
     })
     it('should render a well order field', () => {
       const wrapper = render(props)

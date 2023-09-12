@@ -6,6 +6,8 @@ export type PipettingRunTimeCommand =
   | TouchTipRunTimeCommand
   | PickUpTipRunTimeCommand
   | DropTipRunTimeCommand
+  | ConfigureForVolumeRunTimeCommand
+
 export type PipettingCreateCommand =
   | AspirateCreateCommand
   | DispenseCreateCommand
@@ -13,7 +15,18 @@ export type PipettingCreateCommand =
   | TouchTipCreateCommand
   | PickUpTipCreateCommand
   | DropTipCreateCommand
+  | ConfigureForVolumeCreateCommand
 
+export interface ConfigureForVolumeCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'configureForVolume'
+  params: ConfigureForVolumeParams
+}
+export interface ConfigureForVolumeRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    ConfigureForVolumeCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
 export interface AspirateCreateCommand extends CommonCommandCreateInfo {
   commandType: 'aspirate'
   params: AspDispAirgapParams
@@ -23,9 +36,11 @@ export interface AspirateRunTimeCommand
     AspirateCreateCommand {
   result?: BasicLiquidHandlingResult
 }
+
+export type DispenseParams = AspDispAirgapParams & { pushOut?: number }
 export interface DispenseCreateCommand extends CommonCommandCreateInfo {
   commandType: 'dispense'
-  params: AspDispAirgapParams
+  params: DispenseParams
 }
 export interface DispenseRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -67,6 +82,11 @@ export interface DropTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
     DropTipCreateCommand {
   result?: any
+}
+
+export type ConfigureForVolumeParams = {
+  pipetteId: string
+  volume: number
 }
 
 export type AspDispAirgapParams = FlowRateParams &

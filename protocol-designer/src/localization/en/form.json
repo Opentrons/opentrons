@@ -49,6 +49,7 @@
     },
     "field": {
       "airGap": { "label": "air gap" },
+      "pushOut": { "label": "push out" },
       "blowout": { "label": "blowout" },
       "change_tip": {
         "label": "change tip",
