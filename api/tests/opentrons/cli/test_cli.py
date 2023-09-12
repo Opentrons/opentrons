@@ -180,3 +180,37 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
         "You may only put apiLevel in the metadata dict or the requirements dict"
     )
     assert expected_message in result.stdout_stderr
+
+
+@pytest.mark.parametrize(
+    ("python_protocol_source", "expected_detail"),
+    [
+        (
+            textwrap.dedent(
+                # Raises an exception from outside of Opentrons code,
+                # in between two PAPI functions.
+                """\
+                requirements = {"apiLevel": "2.14"}  # line 1
+                                                     # line 2
+                def run(protocol):                   # line 3
+                    protocol.comment(":^)")          # line 4
+                    raise RuntimeError(">:(")        # line 5
+                    protocol.comment(":D")           # line 6
+                """
+            ),
+            "RuntimeError [line 5]: >:(",
+        ),
+    ],
+)
+def test_error_context(
+    tmp_path: Path, python_protocol_source: str, expected_detail: str
+) -> None:
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+
+    result = _get_analysis_result([protocol_source_file])
+
+    assert result.exit_code == 0
+    assert result.json_output is not None
+    [error] = result.json_output["errors"]
+    assert error["detail"] == expected_detail
