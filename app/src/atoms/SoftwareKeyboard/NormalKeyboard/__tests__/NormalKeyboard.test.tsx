@@ -2,14 +2,14 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
 import { renderWithProviders } from '@opentrons/components'
-import { CustomKeyboard } from '..'
+import { NormalKeyboard } from '..'
 
-const render = (props: React.ComponentProps<typeof CustomKeyboard>) => {
-  return renderWithProviders(<CustomKeyboard {...props} />)[0]
+const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {
+  return renderWithProviders(<NormalKeyboard {...props} />)[0]
 }
 
-describe('CustomKeyboard', () => {
-  let props: React.ComponentProps<typeof CustomKeyboard>
+describe('SoftwareKeyboard', () => {
+  let props: React.ComponentProps<typeof NormalKeyboard>
 
   beforeEach(() => {
     const { result } = renderHook(() => React.useRef(null))
@@ -18,10 +18,10 @@ describe('CustomKeyboard', () => {
       keyboardRef: result.current,
     }
   })
-
-  it('should render the custom keyboards lower case', () => {
+  it('should render the software keyboards', () => {
     const { getAllByRole } = render(props)
     const buttons = getAllByRole('button')
+
     const expectedButtonNames = [
       'q',
       'w',
@@ -33,6 +33,7 @@ describe('CustomKeyboard', () => {
       'i',
       'o',
       'p',
+      '123',
       'a',
       's',
       'd',
@@ -51,18 +52,19 @@ describe('CustomKeyboard', () => {
       'n',
       'm',
       'del',
-      '123',
+      'space',
     ]
+
     buttons.forEach((button, index) => {
       const expectedName = expectedButtonNames[index]
       expect(button).toHaveTextContent(expectedName)
     })
   })
-  it('should render the custom keyboards upper case, when clicking shift key', () => {
-    const { getByRole, getAllByRole } = render(props)
+
+  it('should render the software keyboards when hitting shift key', () => {
+    const { getAllByRole, getByRole } = render(props)
     const shiftKey = getByRole('button', { name: 'SHIFT' })
     fireEvent.click(shiftKey)
-
     const buttons = getAllByRole('button')
     const expectedButtonNames = [
       'Q',
@@ -75,6 +77,7 @@ describe('CustomKeyboard', () => {
       'I',
       'O',
       'P',
+      '123',
       'A',
       'S',
       'D',
@@ -84,7 +87,7 @@ describe('CustomKeyboard', () => {
       'J',
       'K',
       'L',
-      'SHIFT',
+      'abc',
       'Z',
       'X',
       'C',
@@ -93,16 +96,17 @@ describe('CustomKeyboard', () => {
       'N',
       'M',
       'del',
-      '123',
+      'space',
     ]
+
     buttons.forEach((button, index) => {
       const expectedName = expectedButtonNames[index]
       expect(button).toHaveTextContent(expectedName)
     })
   })
 
-  it('should render the custom keyboards numbers, when clicking number key', () => {
-    const { getByRole, getAllByRole } = render(props)
+  it('should render the software keyboards when hitting 123 key', () => {
+    const { getAllByRole, getByRole } = render(props)
     const numberKey = getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
     const buttons = getAllByRole('button')
@@ -116,24 +120,83 @@ describe('CustomKeyboard', () => {
       '7',
       '8',
       '9',
-      'abc',
       '0',
+      '-',
+      '/',
+      ':',
+      ';',
+      '(',
+      ')',
+      '$',
+      '&',
+      '@',
+      '"',
+      'abc',
+      '#+=',
+      '.',
+      ',',
+      '?',
+      '!',
+      "'",
       'del',
+      'space',
     ]
+
     buttons.forEach((button, index) => {
       const expectedName = expectedButtonNames[index]
       expect(button).toHaveTextContent(expectedName)
     })
   })
 
-  it('should render the custom keyboards lower case, when clicking number key then abc key', () => {
-    const { getByRole } = render(props)
+  it('should render the software keyboards when hitting #+= key', () => {
+    const { getAllByRole, getByRole } = render(props)
     const numberKey = getByRole('button', { name: '123' })
-    getByRole('button', { name: 'a' })
     fireEvent.click(numberKey)
-    getByRole('button', { name: '1' })
-    const abcKey = getByRole('button', { name: 'abc' })
-    fireEvent.click(abcKey)
-    getByRole('button', { name: 'a' })
+    const symbolKey = getByRole('button', { name: '#+=' })
+    fireEvent.click(symbolKey)
+    const buttons = getAllByRole('button')
+    const expectedButtonNames = [
+      '[',
+      ']',
+      '{',
+      '}',
+      '#',
+      '%',
+      '^',
+      '*',
+      '+',
+      '=',
+      '_',
+      '\\',
+      '|',
+      '~',
+      '<',
+      '>',
+      '€',
+      '£',
+      '¥',
+      '·',
+      'abc',
+      '123',
+      '.',
+      ',',
+      '?',
+      '!',
+      "'",
+      'del',
+      'space',
+    ]
+
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
+  })
+
+  it('should call mock function when clicking a key', () => {
+    const { getByRole } = render(props)
+    const aKey = getByRole('button', { name: 'a' })
+    fireEvent.click(aKey)
+    expect(props.onChange).toHaveBeenCalled()
   })
 })

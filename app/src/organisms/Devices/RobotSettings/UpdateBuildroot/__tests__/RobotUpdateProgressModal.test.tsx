@@ -2,8 +2,18 @@ import * as React from 'react'
 import { i18n } from '../../../../../i18n'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 
 import { RobotUpdateProgressModal } from '../RobotUpdateProgressModal'
+
+jest.mock('@opentrons/react-api-client')
+jest.mock('@opentrons/shared-data/protocol/types/schemaV7/command/incidental')
+
+const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
+>
 
 const render = (
   props: React.ComponentProps<typeof RobotUpdateProgressModal>
@@ -15,8 +25,11 @@ const render = (
 
 describe('DownloadUpdateModal', () => {
   let props: React.ComponentProps<typeof RobotUpdateProgressModal>
+  let mockCreateLiveCommand = jest.fn()
 
   beforeEach(() => {
+    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       robotName: 'testRobot',
       updateStep: 'download',
@@ -24,6 +37,9 @@ describe('DownloadUpdateModal', () => {
       stepProgress: 50,
       closeUpdateBuildroot: jest.fn(),
     }
+    mockUseCreateLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
   })
 
   afterEach(() => {
@@ -34,6 +50,20 @@ describe('DownloadUpdateModal', () => {
     const [{ getByText }] = render(props)
 
     expect(getByText('Updating testRobot')).toBeInTheDocument()
+  })
+
+  it('activates the Update animation when first rendered', () => {
+    render(props)
+    const updatingCommand: SetStatusBarCreateCommand = {
+      commandType: 'setStatusBar',
+      params: { animation: 'updating' },
+    }
+
+    expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
+    expect(mockCreateLiveCommand).toBeCalledWith({
+      command: updatingCommand,
+      waitUntilComplete: false,
+    })
   })
 
   it('renders the correct text when downloading the robot update with no close button', () => {
@@ -89,11 +119,16 @@ describe('DownloadUpdateModal', () => {
 
     expect(getByText('Robot software successfully updated')).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
+    expect(mockCreateLiveCommand).toBeCalledTimes(1)
     fireEvent.click(exitButton)
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('renders an error modal and exit button if an error occurs', () => {
+    const idleCommand: SetStatusBarCreateCommand = {
+      commandType: 'setStatusBar',
+      params: { animation: 'idle' },
+    }
     props = {
       ...props,
       error: 'test error',
@@ -106,5 +141,12 @@ describe('DownloadUpdateModal', () => {
     fireEvent.click(exitButton)
     expect(getByText('Try again')).toBeInTheDocument()
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
+
+    expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
+    expect(mockCreateLiveCommand).toBeCalledTimes(2)
+    expect(mockCreateLiveCommand).toBeCalledWith({
+      command: idleCommand,
+      waitUntilComplete: false,
+    })
   })
 })

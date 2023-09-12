@@ -746,7 +746,7 @@ class OT3API(
         """Immediately disengage all present motors and clear motor and module tasks."""
         if disengage_before_stopping:
             await self.disengage_axes(
-                [ax for ax in Axis if self._backend.axis_is_present(ax)]
+                [ax for ax in Axis if self._backend.axis_is_present(ax) if ax != Axis.G]
             )
         await self._stop_motors()
 
@@ -757,7 +757,13 @@ class OT3API(
         self._log.info("Resetting OT3API")
         await self.reset()
         if home_after:
-            await self.home()
+            skip = []
+            if (
+                self._gripper_handler.has_gripper()
+                and not self._gripper_handler.is_ready_for_jaw_home()
+            ):
+                skip.append(Axis.G)
+            await self.home(skip=skip)
 
     async def reset(self) -> None:
         """Reset the stored state of the system."""
@@ -790,11 +796,11 @@ class OT3API(
         try:
             gripper = self._gripper_handler.get_gripper()
             self._log.info("Homing gripper jaw.")
+
             dc = self._gripper_handler.get_duty_cycle_by_grip_force(
                 gripper.default_home_force
             )
             await self._ungrip(duty_cycle=dc)
-            gripper.state = GripperJawState.HOMED_READY
         except GripperNotAttachedError:
             pass
 
@@ -860,6 +866,14 @@ class OT3API(
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
+            await self._refresh_jaw_state()
+
+    async def _refresh_jaw_state(self) -> None:
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            gripper.state = await self._backend.get_jaw_state()
+        except GripperNotAttachedError:
+            pass
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
@@ -1325,7 +1339,11 @@ class OT3API(
                     await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(self, axes: Optional[List[Axis]] = None) -> None:
+    async def home(
+        self,
+        axes: Optional[List[Axis]] = None,
+        skip: Optional[List[Axis]] = None,
+    ) -> None:
         """
         Worker function to home the robot by axis or list of
         desired axes.
@@ -1339,6 +1357,9 @@ class OT3API(
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(Axis.Q)
+
+        if skip:
+            checked_axes = [ax for ax in checked_axes if ax not in skip]
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1449,6 +1470,7 @@ class OT3API(
                 duty_cycle=duty_cycle, stay_engaged=stay_engaged
             )
             await self._cache_encoder_position()
+            self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
         except Exception:
             self._log.exception(
                 f"Gripper grip failed, encoder pos: {self._encoder_position[Axis.G]}"
@@ -1461,6 +1483,7 @@ class OT3API(
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
             await self._cache_encoder_position()
+            self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1476,6 +1499,7 @@ class OT3API(
             jaw_displacement_mm = (width_max - jaw_width_mm) / 2.0
             await self._backend.gripper_hold_jaw(int(1000 * jaw_displacement_mm))
             await self._cache_encoder_position()
+            self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
@@ -1488,21 +1512,24 @@ class OT3API(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
         )
         await self._grip(duty_cycle=dc, stay_engaged=stay_engaged)
-        self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
+        """
+        Release gripped object.
+
+        To simply open the jaw, use `home_gripper_jaw` instead.
+        """
         # get default grip force for release if not provided
         self._gripper_handler.check_ready_for_jaw_move()
+        # TODO: check jaw width to make sure it is actually gripping something
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_home_force
         )
         await self._ungrip(duty_cycle=dc)
-        self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
         await self._hold_jaw_width(jaw_width_mm)
-        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
     async def _move_to_plunger_bottom(
         self, mount: OT3Mount, rate: float, acquire_lock: bool = True
