@@ -141,7 +141,7 @@ class LabwareMovementHandler:
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )
 
-            # this makes sure gripper jaw is closed between two labware movement calls
+            # this makes sure gripper jaw is closed between two move labware calls
             await ot3api.idle_gripper()
 
     async def ensure_movement_not_obstructed_by_module(

@@ -1162,7 +1162,7 @@ class OT3API(
             if self._gripper_handler.is_ready_for_idle():
                 await self.grip(
                     force_newtons=self._gripper_handler.gripper.default_idle_force,
-                    stay_engaged=False
+                    stay_engaged=False,
                 )
         except GripperNotAttachedError:
             pass
