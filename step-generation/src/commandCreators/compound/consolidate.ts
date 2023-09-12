@@ -87,8 +87,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getWellDepth(destLabwareDef, args.destWell) + AIR_GAP_OFFSET_FROM_TOP
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
-  const numOfWells = sourceWellChunks.flatMap(chunk => chunk).length
-  const totalVolumeAspirated = args.volume * numOfWells
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -321,7 +319,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? [
               curryCommandCreator(configureForVolume, {
                 pipetteId: args.pipette,
-                volume: totalVolumeAspirated,
+                volume:
+                  args.volume * sourceWellChunk.length +
+                  aspirateAirGapVolume * sourceWellChunk.length,
               }),
             ]
           : []
