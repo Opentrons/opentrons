@@ -273,6 +273,21 @@ describe('SourceDestFields', () => {
       expect(checkboxes.at(3).prop('name')).toBe('dispense_airGap_checkbox')
     })
     it('should render the correct checkboxes for a flex', () => {
+      props = {
+        ...props,
+        propsForFields: {
+          ...props.propsForFields,
+          dispense_pushOut: {
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
+            errorToShow: null,
+            disabled: false,
+            name: 'dispense_pushOut',
+            updateValue: jest.fn() as any,
+            value: true,
+          } as any,
+        },
+      }
       mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
       const wrapper = render(props)
       const checkboxes = wrapper.find(CheckboxRowField)
@@ -283,6 +298,7 @@ describe('SourceDestFields', () => {
         secondsFieldName: 'dispense_delay_seconds',
         tipPositionFieldName: 'dispense_delay_mmFromBottom',
       })
+
       expect(checkboxes.at(0).prop('name')).toBe('dispense_mix_checkbox')
       expect(checkboxes.at(1).prop('name')).toBe('dispense_touchTip_checkbox')
       expect(checkboxes.at(2).prop('name')).toBe('blowout_checkbox')
