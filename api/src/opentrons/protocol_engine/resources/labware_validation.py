@@ -30,3 +30,11 @@ def validate_gripper_compatible(definition: LabwareDefinition) -> bool:
         definition.parameters.quirks is None
         or "gripperIncompatible" not in definition.parameters.quirks
     )
+
+
+def validate_if_labware_is_fixed_trash(definition: LabwareDefinition) -> bool:
+    """Validate that the labware definition is a fixed trash."""
+    return (
+        definition.parameters.quirks is not None
+        and "fixedTrash" in definition.parameters.quirks
+    )
