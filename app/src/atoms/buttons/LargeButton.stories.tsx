@@ -1,10 +1,12 @@
 import * as React from 'react'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { LargeButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Buttons/LargeButton',
   argTypes: { onClick: { action: 'clicked' } },
+  parameters: touchScreenViewport,
 } as Meta
 
 const LargeButtonTemplate: Story<
@@ -14,7 +16,6 @@ const LargeButtonTemplate: Story<
 export const PrimaryLargeButton = LargeButtonTemplate.bind({})
 PrimaryLargeButton.args = {
   buttonText: 'Button text',
-  buttonType: 'primary',
   disabled: false,
   iconName: 'play-round-corners',
 }

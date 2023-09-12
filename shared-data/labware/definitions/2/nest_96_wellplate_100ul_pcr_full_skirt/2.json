@@ -16,9 +16,7 @@
   "brand": {
     "brand": "NEST",
     "brandId": ["402501"],
-    "links": [
-      "http://www.cell-nest.com/page94?_l=en&product_id=97&product_category=96"
-    ]
+    "links": ["https://www.nest-biotech.com/pcr-plates/58773587.html"]
   },
   "metadata": {
     "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -31,6 +29,8 @@
     "yDimension": 85.48,
     "zDimension": 15.7
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 10.65,
   "wells": {
     "A1": {
       "depth": 14.78,
@@ -1022,6 +1022,11 @@
       "x": 0,
       "y": 0,
       "z": 10.2
+    },
+    "opentrons_96_well_aluminum_block": {
+      "x": 0,
+      "y": 0,
+      "z": 12.66
     }
   }
 }

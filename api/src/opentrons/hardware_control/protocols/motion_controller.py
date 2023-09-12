@@ -1,17 +1,14 @@
-from typing import Dict, List, Optional, Mapping, TypeVar
+from typing import Dict, List, Optional, Mapping
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
-from ..types import Axis, CriticalPoint, MotionChecks, OT3Axis
+from ..types import Axis, CriticalPoint, MotionChecks
 
 
-AxisType = TypeVar("AxisType", Axis, OT3Axis)
-
-
-class MotionController(Protocol[AxisType]):
+class MotionController(Protocol):
     """Protocol specifying fundamental motion controls."""
 
-    async def halt(self) -> None:
+    async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately stop motion.
 
         Calls to stop through the synch adapter while other calls
@@ -20,8 +17,9 @@ class MotionController(Protocol[AxisType]):
         smoothie. To provide actual immediate halting, call this method which
         does not require use of the loop.
 
-        After this call, the hardware will be in a bad state until a call to
-        stop
+        If disengage_before_stopping is True, the motors will disengage first and then
+        stop in place. Disengaging creates a smoother halt but requires homing after
+        in order to resume movement.
         """
         ...
 
@@ -163,9 +161,9 @@ class MotionController(Protocol[AxisType]):
 
     async def move_axes(
         self,
-        position: Mapping[AxisType, float],
+        position: Mapping[Axis, float],
         speed: Optional[float] = None,
-        max_speeds: Optional[Dict[AxisType, float]] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.
@@ -210,4 +208,8 @@ class MotionController(Protocol[AxisType]):
 
         Works regardless of critical point or home status.
         """
+        ...
+
+    async def retract_axis(self, axis: Axis) -> None:
+        """Retract the specified axis to its home position."""
         ...

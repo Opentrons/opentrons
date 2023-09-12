@@ -7,7 +7,7 @@ import asyncio
 from logging.config import dictConfig
 from typing import List
 
-from opentrons_hardware.drivers.can_bus.errors import CanError
+from opentrons_shared_data.errors.exceptions import CANBusBusError
 from opentrons_hardware.drivers.can_bus.socket_driver import SocketDriver
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class ConnectionHandler:
         while not reader.at_eof():
             try:
                 data = await driver.read()
-            except CanError as e:
+            except CANBusBusError as e:
                 log.error(f"Read error: {e}.")
                 break
 

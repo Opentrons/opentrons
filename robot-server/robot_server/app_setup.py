@@ -16,6 +16,10 @@ from .service.task_runner import (
     clean_up_task_runner,
 )
 from .settings import get_settings
+from .runs.dependencies import (
+    start_light_control_task,
+    mark_light_control_startup_finished,
+)
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +56,14 @@ async def on_startup() -> None:
     settings = get_settings()
 
     initialize_logging()
-    start_initializing_hardware(app_state=app.state)
+    initialize_task_runner(app_state=app.state)
+    start_initializing_hardware(
+        app_state=app.state,
+        callbacks=[
+            (start_light_control_task, True),
+            (mark_light_control_startup_finished, False),
+        ],
+    )
     start_initializing_persistence(
         app_state=app.state,
         persistence_directory=(
@@ -61,7 +72,6 @@ async def on_startup() -> None:
             else settings.persistence_directory
         ),
     )
-    initialize_task_runner(app_state=app.state)
 
 
 @app.on_event("shutdown")

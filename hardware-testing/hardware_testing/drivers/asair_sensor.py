@@ -7,14 +7,14 @@ relative humidity that is recorded onto the pipette results.
 import abc
 import codecs
 import logging
-import random
 import time
 from typing import Tuple
 from abc import ABC
 from dataclasses import dataclass
-
+from . import list_ports_and_select
 import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
+from hardware_testing.data import ui
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ addrs = {
     "08": "C492",
     "09": "C543",
     "10": "C74A",
+    "0A": "48d9",
 }
 
 
@@ -64,6 +65,25 @@ class AsairSensorBase(ABC):
     def get_reading(self) -> Reading:
         """Get a temp and humidity reading."""
         ...
+
+    @abc.abstractmethod
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        ...
+
+
+def BuildAsairSensor(simulate: bool) -> AsairSensorBase:
+    """Try to find and return an Asair sensor, if not found return a simulator."""
+    ui.print_title("Connecting to Environmental sensor")
+    if not simulate:
+        port = list_ports_and_select(device_name="Asair environmental sensor")
+        try:
+            sensor = AsairSensor.connect(port)
+            ui.print_info(f"Found sensor on port {port}")
+            return sensor
+        except SerialException:
+            pass
+    return SimAsairSensor()
 
 
 class AsairSensor(AsairSensorBase):
@@ -130,8 +150,8 @@ class AsairSensor(AsairSensorBase):
             log.debug(f"received {res}")
 
             res = codecs.encode(res, "hex")
-            temp = res[6:10]
-            relative_hum = res[10:14]
+            relative_hum = res[6:10]
+            temp = res[10:14]
             log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
 
             temp = float(int(temp, 16)) / 10
@@ -146,12 +166,42 @@ class AsairSensor(AsairSensorBase):
             error_msg = "Asair Sensor not connected. Check if port number is correct."
             raise AsairSensorError(error_msg)
 
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        serial_addr = "0A"
+        data_packet = "{}0300000002{}".format(serial_addr, addrs[serial_addr])
+        log.debug(f"sending {data_packet}")
+        command_bytes = codecs.decode(data_packet.encode(), "hex")
+        try:
+            self._th_sensor.flushInput()
+            self._th_sensor.flushOutput()
+            self._th_sensor.write(command_bytes)
+            time.sleep(0.1)
+
+            length = self._th_sensor.inWaiting()
+            res = self._th_sensor.read(length)
+            log.debug(f"received {res}")
+            dev_id = res[6:14]
+            return dev_id.decode()
+
+        except (IndexError, ValueError) as e:
+            log.exception("Bad value read")
+            raise AsairSensorError(str(e))
+        except SerialException:
+            log.exception("Communication error")
+            error_msg = "Asair Sensor not connected. Check if port number is correct."
+            raise AsairSensorError(error_msg)
+
 
 class SimAsairSensor(AsairSensorBase):
     """Simulating Asair sensor driver."""
 
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        return "0102030405060708"
+
     def get_reading(self) -> Reading:
         """Get a reading."""
-        temp = random.uniform(24.5, 25)
-        relative_hum = random.uniform(45, 40)
+        temp = 25.0
+        relative_hum = 50.0
         return Reading(temperature=temp, relative_humidity=relative_hum)

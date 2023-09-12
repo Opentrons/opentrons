@@ -51,6 +51,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        push_out: Optional[float],
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -60,6 +61,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             rate: The rate for how quickly to dispense.
             flow_rate: The flow rate in µL/s to dispense at.
             in_place: Whether this is in-place.
+            push_out: The amount to push the plunger below bottom position.
         """
         ...
 
@@ -116,7 +118,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         location: Optional[types.Location],
         well_core: WellCoreType,
         home_after: Optional[bool],
-        randomize_drop_location: Optional[bool] = False,
+        alternate_drop_location: Optional[bool] = False,
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -125,7 +127,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
                 If unspecified, the default drop location of the well will be used.
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
-            randomize_drop_location: Whether to randomize the exact location to drop tip
+            alternate_drop_location: Whether to randomize the exact location to drop tip
                 within the specified well.
         """
         ...

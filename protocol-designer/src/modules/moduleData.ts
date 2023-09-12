@@ -167,10 +167,6 @@ const HS_AND_TEMP_SLOTS_FLEX: DropdownOption[] = [
     name: 'Slot A1',
     value: 'A1',
   },
-  {
-    name: 'Slot A3',
-    value: 'A3',
-  },
 ]
 
 const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
@@ -217,10 +213,6 @@ const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
   {
     name: 'Slot A2',
     value: 'A2',
-  },
-  {
-    name: 'Slot A3',
-    value: 'A3',
   },
 ]
 export function getAllModuleSlotsByType(

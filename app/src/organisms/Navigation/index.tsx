@@ -18,9 +18,10 @@ import {
   POSITION_STICKY,
   POSITION_STATIC,
   BORDERS,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+
 import { useNetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
 import { getLocalRobot } from '../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
@@ -130,6 +131,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
         <NavigationMenu
           onClick={() => handleMenu(false)}
           robotName={robotName}
+          setShowNavMenu={setShowNavMenu}
         />
       )}
     </>
@@ -157,6 +159,10 @@ const TouchNavLink = styled(NavLink)`
   &.active > div {
     background-color: ${COLORS.highlightPurple1};
   }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
+  }
 `
 
 const IconButton = styled('button')`
@@ -164,11 +170,7 @@ const IconButton = styled('button')`
   max-height: 100%;
   background-color: ${COLORS.white};
 
-  &:hover {
-    background-color: ${COLORS.darkBlack20};
-  }
-  &:active,
-  &:focus {
+  &:active {
     background-color: ${COLORS.darkBlack20};
   }
   &:focus-visible {
@@ -177,5 +179,8 @@ const IconButton = styled('button')`
   }
   &:disabled {
     background-color: transparent;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    cursor: default;
   }
 `

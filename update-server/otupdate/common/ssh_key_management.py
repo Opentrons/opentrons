@@ -68,7 +68,7 @@ def authorized_keys(mode: str = "r") -> Generator[IO[Any], None, None]:
 
     :param mode: As :py:meth:`open`
     """
-    path = "/var/home/.ssh/authorized_keys"
+    path = os.path.expanduser("~/.ssh/authorized_keys")
     if not os.path.exists(path):
         os.makedirs(os.path.dirname(path))
         open(path, "w").close()

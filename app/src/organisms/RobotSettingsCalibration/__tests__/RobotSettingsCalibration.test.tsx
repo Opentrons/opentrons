@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
-
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
 import { useFeatureFlag } from '../../../redux/config'
@@ -32,10 +32,12 @@ import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
+import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 import { RobotSettingsCalibration } from '..'
 
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
+jest.mock('@opentrons/react-api-client/src/instruments/useInstrumentsQuery')
 jest.mock('../../../organisms/CalibrationStatusCard')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/sessions/selectors')
@@ -47,6 +49,7 @@ jest.mock('../RobotSettingsDeckCalibration')
 jest.mock('../RobotSettingsGripperCalibration')
 jest.mock('../RobotSettingsPipetteOffsetCalibration')
 jest.mock('../RobotSettingsTipLengthCalibration')
+jest.mock('../RobotSettingsModuleCalibration')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -54,6 +57,9 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
 } as any
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
+>
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
@@ -93,6 +99,9 @@ const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstr
   typeof useAttachedPipettesFromInstrumentsQuery
 >
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockRobotSettingsModuleCalibration = RobotSettingsModuleCalibration as jest.MockedFunction<
+  typeof RobotSettingsModuleCalibration
+>
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -121,6 +130,16 @@ describe('RobotSettingsCalibration', () => {
       left: null,
       right: null,
     })
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            ok: true,
+            instrumentType: 'gripper',
+          } as any,
+        ],
+      },
+    } as any)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
@@ -152,6 +171,9 @@ describe('RobotSettingsCalibration', () => {
     )
     mockRobotSettingsTipLengthCalibration.mockReturnValue(
       <div>Mock RobotSettingsTipLengthCalibration</div>
+    )
+    mockRobotSettingsModuleCalibration.mockReturnValue(
+      <div>Mock RobotSettingsModuleCalibration</div>
     )
   })
 
@@ -246,5 +268,12 @@ describe('RobotSettingsCalibration', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock RobotSettingsPipetteOffsetCalibration')
+  })
+
+  it('render a Module Calibration component for an OT-3 and module calibration feature flag is on', () => {
+    mockUseFeatureFlag.mockReturnValue(true)
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock RobotSettingsModuleCalibration')
   })
 })

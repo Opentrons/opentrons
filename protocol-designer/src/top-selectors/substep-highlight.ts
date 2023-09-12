@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
-import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 import mapValues from 'lodash/mapValues'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'

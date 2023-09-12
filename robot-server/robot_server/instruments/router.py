@@ -1,5 +1,5 @@
 """Instruments routes."""
-from typing import Optional, Dict, Iterator, TYPE_CHECKING, cast
+from typing import Optional, Dict, List, TYPE_CHECKING, cast
 
 from fastapi import APIRouter, status, Depends
 
@@ -25,7 +25,11 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     SubSystem as HWSubSystem,
 )
-from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
+from opentrons.hardware_control.dev_types import (
+    PipetteDict,
+    PipetteStateDict,
+    GripperDict,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
 from .instrument_models import (
@@ -37,6 +41,7 @@ from .instrument_models import (
     AttachedItem,
     BadGripper,
     BadPipette,
+    PipetteState,
 )
 
 from robot_server.subsystems.models import SubSystem
@@ -52,11 +57,14 @@ def _pipette_dict_to_pipette_res(
     pipette_dict: PipetteDict,
     pipette_offset: Optional[PipetteOffsetByPipetteMount],
     mount: Mount,
+    fw_version: Optional[int],
+    pipette_state: Optional[PipetteStateDict],
 ) -> Pipette:
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
         calibration_data = pipette_offset
         return Pipette.construct(
+            firmwareVersion=str(fw_version) if fw_version else None,
             ok=True,
             mount=MountType.from_hw_mount(mount).value,
             instrumentName=pipette_dict["name"],
@@ -79,13 +87,17 @@ def _pipette_dict_to_pipette_res(
                 if calibration_data
                 else None,
             ),
+            state=PipetteState.parse_obj(pipette_state) if pipette_state else None,
         )
 
 
-def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
+def _gripper_dict_to_gripper_res(
+    gripper_dict: GripperDict, fw_version: Optional[int]
+) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     calibration_data = gripper_dict["calibration_offset"]
     return Gripper.construct(
+        firmwareVersion=str(fw_version) if fw_version else None,
         ok=True,
         mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
@@ -126,7 +138,7 @@ def _bad_pipette_response(subsystem: SubSystem) -> BadPipette:
     )
 
 
-def _get_gripper_instrument_data(
+async def _get_gripper_instrument_data(
     hardware: "OT3API",
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
@@ -135,11 +147,14 @@ def _get_gripper_instrument_data(
     if status and (status.fw_update_needed or not status.ok):
         return _bad_gripper_response()
     if attached_gripper:
-        return _gripper_dict_to_gripper_res(gripper_dict=attached_gripper)
+        return _gripper_dict_to_gripper_res(
+            gripper_dict=attached_gripper,
+            fw_version=status.current_fw_version if status else None,
+        )
     return None
 
 
-def _get_pipette_instrument_data(
+async def _get_pipette_instrument_data(
     hardware: "OT3API",
     attached_pipettes: Dict[Mount, PipetteDict],
     mount: Mount,
@@ -154,24 +169,36 @@ def _get_pipette_instrument_data(
             Optional[PipetteOffsetByPipetteMount],
             hardware.get_instrument_offset(OT3Mount.from_mount(mount)),
         )
+        pipette_state = await hardware.get_instrument_state(mount)
         return _pipette_dict_to_pipette_res(
-            pipette_dict=pipette_dict, mount=mount, pipette_offset=offset
+            pipette_dict=pipette_dict,
+            mount=mount,
+            pipette_offset=offset,
+            fw_version=status.current_fw_version if status else None,
+            pipette_state=pipette_state,
         )
     return None
 
 
-def _get_instrument_data(
+async def _get_instrument_data(
     hardware: "OT3API",
-) -> Iterator[AttachedItem]:
+) -> List[AttachedItem]:
     attached_pipettes = hardware.attached_pipettes
     attached_gripper = hardware.attached_gripper
-    for info in (
-        _get_pipette_instrument_data(hardware, attached_pipettes, Mount.LEFT),
-        _get_pipette_instrument_data(hardware, attached_pipettes, Mount.RIGHT),
-        _get_gripper_instrument_data(hardware, attached_gripper),
-    ):
+
+    pipette_left = await _get_pipette_instrument_data(
+        hardware, attached_pipettes, Mount.LEFT
+    )
+    pipette_right = await _get_pipette_instrument_data(
+        hardware, attached_pipettes, Mount.RIGHT
+    )
+    gripper = await _get_gripper_instrument_data(hardware, attached_gripper)
+
+    info_list = []
+    for info in (pipette_left, pipette_right, gripper):
         if info:
-            yield info
+            info_list.append(info)
+    return info_list
 
 
 async def _get_attached_instruments_ot3(
@@ -179,7 +206,7 @@ async def _get_attached_instruments_ot3(
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
     await hardware.cache_instruments()
-    response_data = list(_get_instrument_data(hardware))
+    response_data = await _get_instrument_data(hardware)
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
             data=response_data,
@@ -198,6 +225,8 @@ async def _get_attached_instruments_ot2(
             pipette_dict=pipette_dict,
             mount=mount,
             pipette_offset=None,
+            fw_version=None,
+            pipette_state=None,
         )
         for mount, pipette_dict in pipettes.items()
         if pipette_dict

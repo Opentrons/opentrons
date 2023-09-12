@@ -11,7 +11,7 @@
     },
     "displayCategory": {
       "type": "string",
-      "enum": ["GEN1", "GEN2", "GEN3"]
+      "enum": ["GEN1", "GEN2", "FLEX"]
     },
     "valuesByApiLevel": {
       "type": "object",

@@ -19,23 +19,24 @@ import {
   RecentRunProtocolCarousel,
 } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
-import { WelcomedModal } from './WelcomeModal'
+import { WelcomeModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
+import { ServerInitializing } from '../../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
-  const allRuns = useAllRunsQuery().data?.data ?? []
+  const { data: allRunsQueryData, error: allRunsQueryError } = useAllRunsQuery()
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
-    unfinishedUnboxingFlowRoute === '/robot-settings/rename-robot'
+    unfinishedUnboxingFlowRoute !== null
   )
 
-  const recentRunsOfUniqueProtocols = allRuns
+  const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
     .reverse() // newest runs first
     .reduce<RunData[]>((acc, run) => {
       if (
@@ -48,29 +49,41 @@ export function RobotDashboard(): JSX.Element {
     }, [])
     .slice(0, MAXIMUM_RECENT_RUN_PROTOCOLS)
 
+  let contents: JSX.Element = <EmptyRecentRun />
+  // GET runs query will error with 503 if database is initializing
+  // this should be momentary, and the type of error to come from this endpoint
+  // so, all errors will be mapped to an initializing spinner
+  if (allRunsQueryError != null) {
+    contents = <ServerInitializing />
+  } else if (recentRunsOfUniqueProtocols.length > 0) {
+    contents = (
+      <>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={COLORS.darkBlack70}
+        >
+          {t('run_again')}
+        </StyledText>
+        <RecentRunProtocolCarousel
+          recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
+        />
+      </>
+    )
+  }
+
   return (
-    <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <Flex
+        paddingX={SPACING.spacing40}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing16}
+      >
         {showWelcomeModal ? (
-          <WelcomedModal setShowWelcomeModal={setShowWelcomeModal} />
+          <WelcomeModal setShowWelcomeModal={setShowWelcomeModal} />
         ) : null}
-        {recentRunsOfUniqueProtocols.length === 0 ? (
-          <EmptyRecentRun />
-        ) : (
-          <>
-            <StyledText
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack70}
-            >
-              {t('run_again')}
-            </StyledText>
-            <RecentRunProtocolCarousel
-              recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
-            />
-          </>
-        )}
+        {contents}
       </Flex>
     </Flex>
   )

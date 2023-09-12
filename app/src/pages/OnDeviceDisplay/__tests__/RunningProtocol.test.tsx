@@ -4,9 +4,13 @@ import { UseQueryResult } from 'react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  useAllCommandsQuery,
   useProtocolAnalysesQuery,
   useProtocolQuery,
   useRunQuery,
@@ -19,10 +23,12 @@ import {
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { mockUseAllCommandsResponseNonDeterministic } from '../../../organisms/RunProgressMeter/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
+import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { RunningProtocol } from '../RunningProtocol'
@@ -39,6 +45,9 @@ jest.mock(
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../redux/discovery')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
+)
 
 const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
   typeof useProtocolAnalysesQuery
@@ -70,6 +79,12 @@ const mockRunningProtocolCommandList = RunningProtocolCommandList as jest.Mocked
 >
 const mockRunningProtocolSkeleton = RunningProtocolSkeleton as jest.MockedFunction<
   typeof RunningProtocolSkeleton
+>
+const mockCancelingRunModal = CancelingRunModal as jest.MockedFunction<
+  typeof CancelingRunModal
+>
+const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
+  typeof useAllCommandsQuery
 >
 
 const RUN_ID = 'run_id'
@@ -154,6 +169,10 @@ describe('RunningProtocol', () => {
     mockRunningProtocolSkeleton.mockReturnValue(
       <div>mock RunningProtocolSkeleton</div>
     )
+    mockCancelingRunModal.mockReturnValue(<div>mock CancelingRunModal</div>)
+    when(mockUseAllCommandsQuery)
+      .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
+      .mockReturnValue(mockUseAllCommandsResponseNonDeterministic)
   })
 
   afterEach(() => {
@@ -168,7 +187,13 @@ describe('RunningProtocol', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock RunningProtocolSkeleton')
   })
-
+  it('should render the canceling run modal when run status is stop requested', () => {
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
+    getByText('mock CancelingRunModal')
+  })
   it('should render CurrentRunningProtocolCommand when loaded the data', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock CurrentRunningProtocolCommand')

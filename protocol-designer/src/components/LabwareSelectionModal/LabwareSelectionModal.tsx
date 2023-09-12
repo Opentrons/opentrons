@@ -22,7 +22,10 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
-import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  getLabwareIsCompatible as _getLabwareIsCompatible,
+  getLabwareCompatibleWithAdapter,
+} from '../../utils/labwareModuleCompatibility'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
@@ -48,10 +51,12 @@ export interface Props {
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
   isNextToHeaterShaker: boolean
+  adapterLoadName?: string
 }
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
 const CUSTOM_CATEGORY = 'custom'
+const adapterCompatibleLabware = 'adapterCompatibleLabware'
 
 const orderedCategories: string[] = [
   'tipRack',
@@ -59,32 +64,37 @@ const orderedCategories: string[] = [
   'wellPlate',
   'reservoir',
   'aluminumBlock',
+  'adapter',
   // 'trash', // NOTE: trash intentionally hidden
 ]
 
 const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
-    'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+    'opentrons_96_well_aluminum_block',
     'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
     'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
     'opentrons_24_aluminumblock_nest_1.5ml_snapcap',
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
-    'opentrons_96_aluminumblock_nest_wellplate_100ul',
   ],
-  [MAGNETIC_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [MAGNETIC_MODULE_TYPE]: [
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+  ],
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   [HEATERSHAKER_MODULE_TYPE]: [
-    'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
-    'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
-    'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
-    'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+    'opentrons_96_deep_well_adapter',
+    'opentrons_96_flat_bottom_adapter',
+    'opentrons_96_pcr_adapter',
+    'opentrons_universal_flat_adapter',
   ],
   [MAGNETIC_BLOCK_TYPE]: [
-    'armadillo_96_wellplate_200ul_pcr_full_skirt',
     'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
 }
 
@@ -109,8 +119,9 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     moduleType,
     selectLabware,
     isNextToHeaterShaker,
+    adapterLoadName,
   } = props
-
+  const defs = getOnlyLatestDefs()
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
@@ -173,22 +184,38 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   )
 
   const getIsLabwareFiltered = React.useCallback(
-    (labwareDef: LabwareDefinition2) =>
-      (filterRecommended && !getLabwareIsRecommended(labwareDef, moduleType)) ||
-      (filterHeight &&
-        getIsLabwareAboveHeight(
-          labwareDef,
-          MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
-        )) ||
-      !getLabwareCompatible(labwareDef),
-    [filterRecommended, filterHeight, getLabwareCompatible, moduleType]
-  )
+    (labwareDef: LabwareDefinition2) => {
+      const smallXDimension = labwareDef.dimensions.xDimension < 127.75
+      const smallYDimension = labwareDef.dimensions.yDimension < 85.48
+      const irregularSize = smallXDimension && smallYDimension
+      const adapter = labwareDef.metadata.displayCategory === 'adapter'
 
+      return (
+        (filterRecommended &&
+          !getLabwareIsRecommended(labwareDef, moduleType)) ||
+        (filterHeight &&
+          getIsLabwareAboveHeight(
+            labwareDef,
+            MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+          )) ||
+        !getLabwareCompatible(labwareDef) ||
+        (adapter && irregularSize && !slot?.includes(HEATERSHAKER_MODULE_TYPE))
+      )
+    },
+    [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
+  )
   const getTitleText = (): string => {
     if (isNextToHeaterShaker) {
       return `Slot ${slot}, Labware to the side of ${i18n.t(
         `modules.module_long_names.heaterShakerModuleType`
       )}`
+    }
+    if (adapterLoadName != null) {
+      const adapterDisplayName =
+        Object.values(defs).find(
+          def => def.parameters.loadName === adapterLoadName
+        )?.metadata.displayName ?? ''
+      return `Labware on top of the ${adapterDisplayName}`
     }
     if (parentSlot != null && moduleType != null) {
       return `Slot ${
@@ -204,7 +231,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   )
 
   const labwareByCategory = React.useMemo(() => {
-    const defs = getOnlyLatestDefs()
     return reduce<
       LabwareDefByDefURI,
       { [category: string]: LabwareDefinition2[] }
@@ -212,10 +238,13 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       defs,
       (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
-        // filter out non-permitted tipracks
+        //  filter out non-permitted tipracks +
+        //  temporarily filtering out 96-channel adapter until we support
+        //  96-channel
         if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
+          (category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))) ||
+          def.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
         ) {
           return acc
         }
@@ -288,11 +317,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               )}{' '}
               <KnowledgeBaseLink
                 className={styles.link}
-                to={
-                  isNextToHeaterShaker
-                    ? 'heaterShakerLabware'
-                    : 'recommendedLabware'
-                }
+                to={'recommendedLabware'}
               >
                 here
               </KnowledgeBaseLink>
@@ -317,7 +342,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       moduleCompatibility = 'notCompatible'
     }
   }
-
   return (
     <>
       <Portal>
@@ -352,42 +376,78 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               ))}
             </PDTitledList>
           ) : null}
-          {orderedCategories.map(category => {
-            const isPopulated = populatedCategories[category]
-            if (isPopulated) {
-              return (
-                <PDTitledList
-                  key={category}
-                  title={startCase(category)}
-                  collapsed={selectedCategory !== category}
-                  onCollapseToggle={makeToggleCategory(category)}
-                  onClick={makeToggleCategory(category)}
-                  inert={!isPopulated}
-                >
-                  {labwareByCategory[category]?.map((labwareDef, index) => {
-                    const isFiltered = getIsLabwareFiltered(labwareDef)
-                    if (!isFiltered) {
-                      return (
-                        <LabwareItem
-                          key={index}
-                          icon={
-                            getLabwareIsRecommended(labwareDef, moduleType)
-                              ? 'check-decagram'
-                              : null
-                          }
-                          labwareDef={labwareDef}
-                          selectLabware={selectLabware}
-                          onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                          // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-                          onMouseLeave={() => setPreviewedLabware()}
-                        />
-                      )
-                    }
-                  })}
-                </PDTitledList>
-              )
-            }
-          })}
+          {adapterLoadName == null ? (
+            orderedCategories.map(category => {
+              const isPopulated = populatedCategories[category]
+              if (isPopulated) {
+                return (
+                  <PDTitledList
+                    key={category}
+                    title={startCase(category)}
+                    collapsed={selectedCategory !== category}
+                    onCollapseToggle={makeToggleCategory(category)}
+                    onClick={makeToggleCategory(category)}
+                    inert={!isPopulated}
+                  >
+                    {labwareByCategory[category]?.map((labwareDef, index) => {
+                      const isFiltered = getIsLabwareFiltered(labwareDef)
+                      if (!isFiltered) {
+                        return (
+                          <LabwareItem
+                            key={index}
+                            icon={
+                              getLabwareIsRecommended(labwareDef, moduleType)
+                                ? 'check-decagram'
+                                : null
+                            }
+                            labwareDef={labwareDef}
+                            selectLabware={selectLabware}
+                            onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                            // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+                            onMouseLeave={() => setPreviewedLabware()}
+                          />
+                        )
+                      }
+                    })}
+                  </PDTitledList>
+                )
+              }
+            })
+          ) : (
+            <PDTitledList
+              key={adapterCompatibleLabware}
+              title="adapter compatible labware"
+              collapsed={selectedCategory !== adapterCompatibleLabware}
+              onCollapseToggle={makeToggleCategory(adapterCompatibleLabware)}
+              onClick={makeToggleCategory(adapterCompatibleLabware)}
+              inert={false}
+            >
+              {getLabwareCompatibleWithAdapter(adapterLoadName).map(
+                (adapterDefUri, index) => {
+                  const latestDefs = getOnlyLatestDefs()
+                  const Uris = Object.keys(latestDefs)
+                  const labwareDefUri = Uris.find(
+                    defUri => defUri === adapterDefUri
+                  )
+                  const labwareDef = labwareDefUri
+                    ? latestDefs[labwareDefUri]
+                    : null
+
+                  return labwareDef != null ? (
+                    <LabwareItem
+                      key={index}
+                      icon="check-decagram"
+                      labwareDef={labwareDef}
+                      selectLabware={selectLabware}
+                      onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                      // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+                      onMouseLeave={() => setPreviewedLabware()}
+                    />
+                  ) : null
+                }
+              )}
+            </PDTitledList>
+          )}
         </ul>
 
         <OutlineButton Component="label" className={styles.upload_button}>

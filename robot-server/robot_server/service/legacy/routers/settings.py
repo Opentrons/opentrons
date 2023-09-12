@@ -1,6 +1,6 @@
 from dataclasses import asdict
 import logging
-from typing import Dict
+from typing import Dict, cast, Union, Any
 
 from starlette import status
 from fastapi import APIRouter, Depends
@@ -8,16 +8,18 @@ from fastapi import APIRouter, Depends
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.system import log_control
+from opentrons_shared_data.pipette import mutable_configurations, types as pip_types
 from opentrons.config import (
-    pipette_config,
     reset as reset_util,
     robot_configs,
     advanced_settings,
     feature_flags as ff,
+    get_opentrons_path,
 )
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware, get_robot_type
+from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
     AdvancedSettingsResponse,
@@ -36,6 +38,7 @@ from robot_server.service.legacy.models.settings import (
     AdvancedSetting,
 )
 from robot_server.persistence import PersistenceResetter, get_persistence_resetter
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +56,9 @@ router = APIRouter()
     },
 )
 async def post_settings(
-    update: AdvancedSettingRequest, hardware: HardwareControlAPI = Depends(get_hardware)
+    update: AdvancedSettingRequest,
+    hardware: HardwareControlAPI = Depends(get_hardware),
+    robot_type: str = Depends(get_robot_type),
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
@@ -66,7 +71,7 @@ async def post_settings(
         raise LegacyErrorResponse.from_exc(e).as_error(
             status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-    return _create_settings_response()
+    return _create_settings_response(robot_type)
 
 
 @router.get(
@@ -76,14 +81,22 @@ async def post_settings(
     response_model=AdvancedSettingsResponse,
     response_model_exclude_unset=True,
 )
-async def get_settings() -> AdvancedSettingsResponse:
+async def get_settings(
+    robot_type: str = Depends(get_robot_type),
+) -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
-    return _create_settings_response()
+    return _create_settings_response(robot_type)
 
 
-def _create_settings_response() -> AdvancedSettingsResponse:
+def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
     """Create the feature flag settings response object"""
-    data = advanced_settings.get_all_adv_settings()
+    # TODO lc(8-10-2023) We should convert the robot type function to return
+    # the enum value directly.
+    if robot_type == "OT-2 Standard":
+        robot_type_enum = RobotTypeEnum.OT2
+    else:
+        robot_type_enum = RobotTypeEnum.FLEX
+    data = advanced_settings.get_all_adv_settings(robot_type_enum)
 
     if advanced_settings.is_restart_required():
         links = Links(restart="/server/restart")
@@ -102,6 +115,7 @@ def _create_settings_response() -> AdvancedSettingsResponse:
                 value=s.value,
             )
             for s in data.values()
+            if s.definition.should_show()
         ],
     )
 
@@ -231,6 +245,9 @@ async def post_settings_reset_options(
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
         await persistence_resetter.mark_directory_reset()
 
+    if factory_reset_commands.get(reset_util.ResetOptionId.on_device_display, False):
+        await reset_odd.mark_odd_for_reset_next_boot()
+
     # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
     # The message returned to the client will be printed in the wrong order.
     message = (
@@ -261,10 +278,11 @@ async def get_robot_settings(
 )
 async def get_pipette_settings() -> MultiPipetteSettings:
     res = {}
-    for pipette_id in pipette_config.known_pipettes():
+    for pipette_id in mutable_configurations.known_pipettes(
+        get_opentrons_path("pipette_config_overrides_dir")
+    ):
         # Have to convert to dict using by_alias due to bug in fastapi
         res[pipette_id] = _pipette_settings_from_config(
-            pipette_config,
             pipette_id,
         )
     return res
@@ -281,12 +299,14 @@ async def get_pipette_settings() -> MultiPipetteSettings:
     },
 )
 async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
-    if pipette_id not in pipette_config.known_pipettes():
+    if pipette_id not in mutable_configurations.known_pipettes(
+        get_opentrons_path("pipette_config_overrides_dir")
+    ):
         raise LegacyErrorResponse(
             message=f"{pipette_id} is not a valid pipette id",
             errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
         ).as_error(status.HTTP_404_NOT_FOUND)
-    r = _pipette_settings_from_config(pipette_config, pipette_id)
+    r = _pipette_settings_from_config(pipette_id)
     return r
 
 
@@ -303,22 +323,27 @@ async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
 async def patch_pipette_setting(
     pipette_id: str, settings_update: PipetteSettingsUpdate
 ) -> PipetteSettings:
-
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}
     field_values = {k: None if v is None else v.value for k, v in fields.items()}
     if field_values:
         try:
-            pipette_config.override(fields=field_values, pipette_id=pipette_id)
+            mutable_configurations.save_overrides(
+                overrides=field_values,
+                pipette_serial_number=pipette_id,
+                pipette_override_path=get_opentrons_path(
+                    "pipette_config_overrides_dir"
+                ),
+            )
         except ValueError as e:
             raise LegacyErrorResponse(
                 message=str(e), errorCode=ErrorCodes.GENERAL_ERROR.value.code
             ).as_error(status.HTTP_412_PRECONDITION_FAILED)
-    r = _pipette_settings_from_config(pipette_config, pipette_id)
+    r = _pipette_settings_from_config(pipette_id)
     return r
 
 
-def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
+def _pipette_settings_from_config(pipette_id: str) -> PipetteSettings:
     """
     Create a PipetteSettings object from pipette config for single pipette
 
@@ -326,11 +351,28 @@ def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
     :param pipette_id: pipette id
     :return: PipetteSettings object
     """
-    mutuble_configs = pc.list_mutable_configs(pipette_id=pipette_id)
-    fields = PipetteSettingsFields(**{k: v for k, v in mutuble_configs.items()})
-    c, m = pc.load_config_dict(pipette_id)
+    mutable_configs = mutable_configurations.list_mutable_configs(
+        pipette_serial_number=pipette_id,
+        pipette_override_path=get_opentrons_path("pipette_config_overrides_dir"),
+    )
+    converted_dict: Dict[str, Union[str, Dict[str, Any]]] = {}
+    # TODO rather than doing this gross thing, we should
+    # mess around with pydantic dataclasses.
+    for k, v in mutable_configs.items():
+        if isinstance(v, str):
+            converted_dict[k] = v
+        elif isinstance(v, pip_types.MutableConfig):
+            converted_dict[k] = v.dict_for_encode()
+        elif k == "quirks":
+            converted_dict[k] = {q: b.dict_for_encode() for q, b in v.items()}
+    fields = PipetteSettingsFields(**converted_dict)  # type: ignore
 
     # TODO(mc, 2020-09-17): s/fields/setting_fields (?)
+    # need model and name?
     return PipetteSettings(  # type: ignore[call-arg]
-        info=PipetteSettingsInfo(name=c.get("name"), model=m), fields=fields
+        info=PipetteSettingsInfo(
+            name=cast(str, mutable_configs.get("name", "")),
+            model=cast(str, mutable_configs.get("model", "")),
+        ),
+        fields=fields,
     )

@@ -4,6 +4,11 @@ from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons.protocols.models import LabwareDefinition
 
 
+def is_flex_trash(load_name: str) -> bool:
+    """Check if a labware is a large trash."""
+    return load_name == "opentrons_1_trash_3200ml_fixed"
+
+
 def validate_definition_is_labware(definition: LabwareDefinition) -> bool:
     """Validate that one of the definition's allowed roles is `labware`.
 
@@ -22,3 +27,11 @@ def validate_labware_can_be_stacked(
 ) -> bool:
     """Validate that the labware being loaded onto is in the above labware's stackingOffsetWithLabware definition."""
     return below_labware_load_name in top_labware_definition.stackingOffsetWithLabware
+
+
+def validate_gripper_compatible(definition: LabwareDefinition) -> bool:
+    """Validate that the labware definition does not have a quirk disallowing movement with gripper."""
+    return (
+        definition.parameters.quirks is None
+        or "gripperIncompatible" not in definition.parameters.quirks
+    )

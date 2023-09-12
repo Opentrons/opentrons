@@ -28,6 +28,7 @@ export function SmallModalChildren(
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
         width="100%"
+        whiteSpace="break-spaces"
       >
         <StyledText
           color={COLORS.darkBlackEnabled}
@@ -52,7 +53,6 @@ export function SmallModalChildren(
           <SmallButton
             flex="1"
             buttonText={buttonText}
-            buttonType="primary"
             onClick={handleCloseMaxPinsAlert}
           />
         </Flex>

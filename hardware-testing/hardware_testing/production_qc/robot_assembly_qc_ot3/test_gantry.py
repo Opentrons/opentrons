@@ -11,15 +11,15 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import types, helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis
+from hardware_testing.opentrons_api.types import Axis
 from hardware_testing.data import ui
 
 
-GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axis.Z_R]
+GANTRY_AXES = [types.Axis.X, types.Axis.Y, types.Axis.Z_L, types.Axis.Z_R]
 
 # NOTE: max travel distances are from EVT robot extents document
-MAX_TRAVEL = {OT3Axis.X: 537.49, OT3Axis.Y: 405.815, OT3Axis.Z_L: 215, OT3Axis.Z_R: 215}
-COLLISION_AVOID_MARGIN = {OT3Axis.X: 0, OT3Axis.Y: 0, OT3Axis.Z_L: 0, OT3Axis.Z_R: 0}
+MAX_TRAVEL = {Axis.X: 537.49, Axis.Y: 405.815, Axis.Z_L: 215, Axis.Z_R: 215}
+COLLISION_AVOID_MARGIN = {Axis.X: 0, Axis.Y: 0, Axis.Z_L: 0, Axis.Z_R: 0}
 ALIGNMENT_THRESHOLD_MM = 0.2
 CURRENT_PERCENTAGE = 0.66
 
@@ -43,8 +43,8 @@ GANTRY_TESTS = [
 class AxisStatus:
     """Axis Status."""
 
-    estimate: Dict[OT3Axis, float]
-    encoder: Dict[OT3Axis, float]
+    estimate: Dict[Axis, float]
+    encoder: Dict[Axis, float]
     aligned: bool
 
     def as_lists(self) -> Tuple[List[float], List[float]]:
@@ -60,7 +60,7 @@ class AxisStatus:
 
 
 async def _read_gantry_position_and_check_alignment(
-    api: OT3API, aligned_axis: Optional[OT3Axis]
+    api: OT3API, aligned_axis: Optional[Axis]
 ) -> AxisStatus:
     await api.refresh_positions()
     if not api.is_simulator:
@@ -69,11 +69,6 @@ async def _read_gantry_position_and_check_alignment(
     else:
         estimate = {ax: 200.0 for ax in GANTRY_AXES}
         encoder = {ax: 200.0 for ax in GANTRY_AXES}
-    # NOTE: DVT2.0 firmware's Z encoders are backwards,
-    #       so the absolute encoder position moves in the opposite direction.
-    #       For reference, we can know a DVT2.0 firmware Z-Stages passes
-    #       if it's "max" encoder value is read close to 468.475
-    # FIXME: switch to expected behavior once FW bug is resolved
     all_aligned_axes = [
         ax
         for ax in GANTRY_AXES
@@ -104,13 +99,11 @@ async def _record_test_status(
     api: OT3API,
     report: CSVReport,
     section: str,
-    axis: Optional[OT3Axis] = None,
+    axis: Optional[Axis] = None,
 ) -> None:
     if test not in GANTRY_TESTS:
         raise ValueError(f"unexpected gantry test: {test}")
     status = await _read_gantry_position_and_check_alignment(api, axis)
-    if "min" in test and "z" in test:
-        status.aligned = True  # TODO: remove once DVT@2.0 FW bug is fixed
     estimate, encoder = status.as_lists()
     print(f"estimate: {estimate}, encoder: {encoder}")
     report(section, f"{test}-estimate", estimate)
@@ -118,21 +111,21 @@ async def _record_test_status(
     report(section, f"{test}-aligned", [status.result])
 
 
-def _move_rel_point_for_axis(axis: OT3Axis, distance: float) -> types.Point:
-    if axis == OT3Axis.X:
+def _move_rel_point_for_axis(axis: Axis, distance: float) -> types.Point:
+    if axis == Axis.X:
         return types.Point(x=distance)
-    elif axis == OT3Axis.Y:
+    elif axis == Axis.Y:
         return types.Point(y=distance)
-    elif axis == OT3Axis.Z_L or axis == OT3Axis.Z_R:
+    elif axis == Axis.Z_L or axis == Axis.Z_R:
         return types.Point(z=distance)
     else:
         raise ValueError(f"unexpected axis: {axis}")
 
 
 async def _move_along_axis_and_record_test_results(
-    axis: OT3Axis, api: OT3API, report: CSVReport, section: str
+    axis: Axis, api: OT3API, report: CSVReport, section: str
 ) -> None:
-    mount = types.OT3Mount.RIGHT if axis == OT3Axis.Z_R else types.OT3Mount.LEFT
+    mount = types.OT3Mount.RIGHT if axis == Axis.Z_R else types.OT3Mount.LEFT
     ax_str = str(axis.name).lower().replace("_", "")
     safety_mm = COLLISION_AVOID_MARGIN[axis]
     rel_distance = MAX_TRAVEL[axis] - (safety_mm * 2)
@@ -151,7 +144,7 @@ async def _move_along_axis_and_record_test_results(
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     print(f"lowering gantry currents to {int(CURRENT_PERCENTAGE * 100)}% of defaults")
-    settings: Dict[OT3Axis, helpers_ot3.GantryLoadSettings] = {
+    settings: Dict[Axis, helpers_ot3.GantryLoadSettings] = {
         ax: helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
         for ax in GANTRY_AXES
     }

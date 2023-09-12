@@ -5,10 +5,10 @@ import { Flex, SPACING } from '@opentrons/components'
 
 import { getLocalRobot } from '../../redux/discovery'
 import {
-  getBuildrootUpdateAvailable,
-  getBuildrootSession,
-  startBuildrootUpdate,
-} from '../../redux/buildroot'
+  getRobotUpdateAvailable,
+  getRobotUpdateSession,
+  startRobotUpdate,
+} from '../../redux/robot-update'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import {
   getOnDeviceDisplaySettings,
@@ -34,11 +34,11 @@ export function UpdateRobot(): JSX.Element {
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
-      ? getBuildrootUpdateAvailable(state, localRobot)
+      ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
 
-  const session = useSelector(getBuildrootSession)
+  const session = useSelector(getRobotUpdateSession)
   const { step, stage, progress, error: sessionError } = session ?? {
     step: null,
     error: null,
@@ -80,7 +80,7 @@ export function UpdateRobot(): JSX.Element {
             dispatch(
               updateConfigValue(
                 'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
-                '/robot-settings/rename-robot'
+                '/emergency-stop'
               )
             )
           }
@@ -108,14 +108,12 @@ export function UpdateRobot(): JSX.Element {
     // check isDownloading to avoid dispatching again
     if (robotUpdateType === 'upgrade' && !isDownloading) {
       setIsDownloading(true)
-      dispatch(startBuildrootUpdate(robotName))
+      dispatch(startRobotUpdate(robotName))
     }
   }, [robotUpdateType, dispatch, robotName, isDownloading])
 
   return (
-    <Flex
-      padding={`${SPACING.spacing24} ${SPACING.spacing40} ${SPACING.spacing40}`}
-    >
+    <Flex padding={SPACING.spacing40}>
       {isShowCheckingUpdates ? (
         <CheckUpdates />
       ) : robotUpdateType !== 'upgrade' ? (

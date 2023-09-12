@@ -59,6 +59,7 @@ describe('BeforeBeginning', () => {
       isRobotMoving: false,
       isOnDevice: false,
       requiredPipette: undefined,
+      createdMaintenanceRunId: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -89,7 +90,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -179,7 +180,7 @@ describe('BeforeBeginning', () => {
         requiredPipette: {
           mount: LEFT,
           id: 'abc',
-          pipetteName: 'p1000_single_gen3',
+          pipetteName: 'p1000_single_flex',
         },
       }
       const { getByText, getByAltText, getByRole } = render(props)
@@ -206,7 +207,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -247,7 +248,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -346,7 +347,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: RIGHT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -398,7 +399,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -455,7 +456,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -515,7 +516,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },

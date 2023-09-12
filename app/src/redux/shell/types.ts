@@ -1,5 +1,4 @@
 import type { Error } from '../types'
-import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 import type { RobotSystemAction } from './is-ready/types'
 
 export interface Remote {
@@ -26,6 +25,7 @@ export interface ShellUpdateState {
   downloading: boolean
   available: boolean
   downloaded: boolean
+  downloadPercentage: number
   error: Error | null | undefined
   info: UpdateInfo | null | undefined
 }
@@ -39,10 +39,10 @@ export type ShellUpdateAction =
   | { type: 'shell:DOWNLOAD_UPDATE'; meta: { shell: true } }
   | { type: 'shell:DOWNLOAD_UPDATE_RESULT'; payload: { error?: Error } }
   | { type: 'shell:APPLY_UPDATE'; meta: { shell: true } }
+  | { type: 'shell:DOWNLOAD_PERCENTAGE'; payload: { percent: number } }
 
 export interface ShellState {
   update: ShellUpdateState
-  robotLogs: RobotLogsState
   isReady: boolean
 }
 
@@ -71,11 +71,19 @@ export interface SendLogAction {
   meta: { shell: true }
 }
 
+export interface UpdateBrightnessAction {
+  type: 'shell:UPDATE_BRIGHTNESS'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
-  | RobotLogsAction
   | RobotSystemAction
   | UsbRequestsAction
   | AppRestartAction
   | SendLogAction
+  | UpdateBrightnessAction

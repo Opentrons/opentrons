@@ -5,7 +5,8 @@ from dataclasses import dataclass
 import logging
 from json import JSONDecodeError
 import pathlib
-from typing import Dict, Sequence, Union, TYPE_CHECKING
+import shutil
+from typing import BinaryIO, Dict, Sequence, TextIO, Union, TYPE_CHECKING
 
 from jsonschema import ValidationError  # type: ignore
 
@@ -83,3 +84,37 @@ def datafiles_from_paths(paths: Sequence[Union[str, pathlib.Path]]) -> Dict[str,
                 else:
                     log.info(f"ignoring {child} in data path")
     return datafiles
+
+
+# HACK(mm, 2023-06-29): This function is attempting to do something fundamentally wrong.
+# Remove it when we fix https://opentrons.atlassian.net/browse/RSS-281.
+def copy_file_like(source: Union[BinaryIO, TextIO], destination: pathlib.Path) -> None:
+    """Copy a file-like object to a path.
+
+    Limitations:
+        If `source` is text, the new file's encoding may not correctly match its original encoding.
+        This can matter if it's a Python file and it has an encoding declaration
+        (https://docs.python.org/3.7/reference/lexical_analysis.html#encoding-declarations).
+        Also, its newlines may get translated.
+    """
+    # When we read from the source stream, will it give us bytes, or text?
+    try:
+        # Experimentally, this is present (but possibly None) on text-mode streams,
+        # and not present on binary-mode streams.
+        getattr(source, "encoding")
+    except AttributeError:
+        source_is_text = False
+    else:
+        source_is_text = True
+
+    if source_is_text:
+        destination_mode = "wt"
+    else:
+        destination_mode = "wb"
+
+    with open(
+        destination,
+        mode=destination_mode,
+    ) as destination_file:
+        # Use copyfileobj() to limit memory usage.
+        shutil.copyfileobj(fsrc=source, fdst=destination_file)

@@ -1,4 +1,4 @@
-import type { MoveLabwareParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { MoveLabwareParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forMoveLabware(
@@ -16,6 +16,8 @@ export function forMoveLabware(
     newLocationString = newLocation.moduleId
   } else if ('slotName' in newLocation) {
     newLocationString = newLocation.slotName
+  } else if ('labwareId' in newLocation) {
+    newLocationString = newLocation.labwareId
   }
 
   robotState.labware[labwareId].slot = newLocationString

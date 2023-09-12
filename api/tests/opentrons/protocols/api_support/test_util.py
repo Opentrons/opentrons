@@ -16,7 +16,7 @@ from opentrons.hardware_control.types import Axis
 
 
 def test_max_speeds_userdict():
-    defaults = AxisMaxSpeeds()
+    defaults = AxisMaxSpeeds(robot_type="OT-2 Standard")
     assert defaults.data == {}
     assert dict(defaults) == {}
 

@@ -13,6 +13,13 @@ import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
 export const getConfig = (state: State): Config | null => state.config
 
+export const getApplyHistoricOffsets: (
+  state: State
+) => boolean = createSelector(
+  getConfig,
+  config => config?.protocols.applyHistoricOffsets ?? true
+)
+
 export const getDevtoolsEnabled = (state: State): boolean => {
   return state.config?.devtools ?? false
 }
@@ -23,6 +30,10 @@ export const getFeatureFlags = (state: State): FeatureFlags => {
 
 export const getUpdateChannel = (state: State): UpdateChannel => {
   return state.config?.update.channel ?? 'latest'
+}
+
+export const getHasJustUpdated = (state: State): boolean => {
+  return state.config?.update.hasJustUpdated ?? false
 }
 
 export const getUseTrashSurfaceForTipCal = (state: State): boolean | null => {

@@ -3,13 +3,13 @@ import {
   Flex,
   Btn,
   TYPOGRAPHY,
-  COLOR_ERROR,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
   RESPONSIVENESS,
   PrimaryButton,
   ALIGN_FLEX_END,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
@@ -29,6 +29,7 @@ import type { BadGripper, GripperData } from '@opentrons/api-client'
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   color: ${COLORS.darkGreyEnabled};
+  padding-left: ${SPACING.spacing32};
 
   &:hover {
     opacity: 70%;
@@ -37,10 +38,19 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-
+    padding-left: 0rem;
     &:hover {
       opacity: 100%;
     }
+  }
+`
+const QUICK_GRIPPER_POLL_MS = 3000
+
+const ALIGN_BUTTONS = css`
+  align-items: ${ALIGN_FLEX_END};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    align-items: ${ALIGN_CENTER};
   }
 `
 
@@ -51,21 +61,23 @@ export const MountGripper = (
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
-
-  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
+  const [isPending, setIsPending] = React.useState(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
-    refetchInterval: 3000,
+    refetchInterval: QUICK_GRIPPER_POLL_MS,
   })
   const isGripperAttached = (instrumentsQueryData?.data ?? []).some(
     (i): i is GripperData | BadGripper => i.instrumentType === 'gripper'
   )
   const handleOnClick = (): void => {
+    setIsPending(true)
     refetch()
       .then(() => {
         isGripperAttached ? proceed() : setShowUnableToDetect(true)
+        setIsPending(false)
       })
       .catch(() => {
         setShowUnableToDetect(true)
+        setIsPending(false)
       })
   }
 
@@ -78,16 +90,16 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={COLOR_ERROR}
+      iconColor={COLORS.errorEnabled}
       isSuccess={false}
     >
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_FLEX_END}
+        css={ALIGN_BUTTONS}
         gridGap={SPACING.spacing8}
       >
-        <Btn onClick={goBack}>
+        <Btn onClick={() => setShowUnableToDetect(false)}>
           <StyledText css={GO_BACK_BUTTON_STYLE}>
             {t('shared:go_back')}
           </StyledText>
@@ -95,11 +107,11 @@ export const MountGripper = (
         {isOnDevice ? (
           <SmallButton
             buttonText={t('try_again')}
-            buttonType="primary"
-            onClick={proceed}
+            disabled={isPending}
+            onClick={handleOnClick}
           />
         ) : (
-          <PrimaryButton onClick={() => setShowUnableToDetect(false)}>
+          <PrimaryButton disabled={isPending} onClick={handleOnClick}>
             {t('try_again')}
           </PrimaryButton>
         )}
@@ -126,6 +138,7 @@ export const MountGripper = (
         <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
       }
       proceedButtonText={t('continue')}
+      proceedIsDisabled={isPending}
       proceed={handleOnClick}
       back={goBack}
     />

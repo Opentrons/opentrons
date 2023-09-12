@@ -8,7 +8,7 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
-  OT3_STANDARD_MODEL,
+  FLEX_STANDARD_MODEL,
   getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
@@ -198,7 +198,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             <Flex gridGap={SPACING.spacing16}>
               <Flex
                 flex={`0 0 ${
-                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                  robotType === FLEX_STANDARD_MODEL ? '6.2rem' : SIZE_2
                 }`}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}

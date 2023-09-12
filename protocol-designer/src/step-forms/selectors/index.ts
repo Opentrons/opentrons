@@ -29,6 +29,7 @@ import {
   ProfileFormError,
   getProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
+import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
@@ -524,6 +525,12 @@ const _dynamicFieldFormErrors = (
   return getProfileFormErrors(hydratedForm)
 }
 
+const _dynamicMoveLabwareFieldFormErrors = (
+  hydratedForm: FormData,
+  invariantContext: InvariantContext
+): ProfileFormError[] => {
+  return getMoveLabwareFormErrors(hydratedForm, invariantContext)
+}
 // TODO type with hydrated form type
 export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
   for (const fieldName in hydratedForm) {
@@ -549,7 +556,10 @@ export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
   return false
 }
 // TODO type with hydrated form type
-export const _hasFormLevelErrors = (hydratedForm: FormData): boolean => {
+export const _hasFormLevelErrors = (
+  hydratedForm: FormData,
+  invariantContext: InvariantContext
+): boolean => {
   if (_formLevelErrors(hydratedForm).length > 0) return true
 
   if (
@@ -559,11 +569,24 @@ export const _hasFormLevelErrors = (hydratedForm: FormData): boolean => {
     return true
   }
 
+  if (
+    hydratedForm.stepType === 'moveLabware' &&
+    _dynamicMoveLabwareFieldFormErrors(hydratedForm, invariantContext).length >
+      0
+  ) {
+    return true
+  }
   return false
 }
 // TODO type with hydrated form type
-export const _formHasErrors = (hydratedForm: FormData): boolean => {
-  return _hasFieldLevelErrors(hydratedForm) || _hasFormLevelErrors(hydratedForm)
+export const _formHasErrors = (
+  hydratedForm: FormData,
+  invariantContext: InvariantContext
+): boolean => {
+  return (
+    _hasFieldLevelErrors(hydratedForm) ||
+    _hasFormLevelErrors(hydratedForm, invariantContext)
+  )
 }
 export const getInvariantContext: Selector<
   BaseState,
@@ -628,10 +651,14 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
 export const getCurrentFormCanBeSaved: Selector<
   BaseState,
   boolean
-> = createSelector(getHydratedUnsavedForm, hydratedForm => {
-  if (!hydratedForm) return false
-  return !_formHasErrors(hydratedForm)
-})
+> = createSelector(
+  getHydratedUnsavedForm,
+  getInvariantContext,
+  (hydratedForm, invariantContext) => {
+    if (!hydratedForm) return false
+    return !_formHasErrors(hydratedForm, invariantContext)
+  }
+)
 export const getArgsAndErrorsByStepId: Selector<
   BaseState,
   StepArgsAndErrorsById
@@ -644,8 +671,7 @@ export const getArgsAndErrorsByStepId: Selector<
       (acc, stepForm) => {
         const hydratedForm = _getHydratedForm(stepForm, contextualState)
 
-        const errors = _formHasErrors(hydratedForm)
-
+        const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
               stepArgs: stepFormToArgs(hydratedForm),

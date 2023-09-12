@@ -24,6 +24,11 @@ import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
+import {
+  getRobotAddressesByName,
+  HEALTH_STATUS_OK,
+  OPENTRONS_USB,
+} from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 
 import type { IconName, StyleProps } from '@opentrons/components'
@@ -84,15 +89,33 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     getNetworkInterfaces(state, name)
   )
 
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, name)
+  )
+
+  const wifiAddress = addresses.find(addr => addr.ip === wifi?.ipAddress)
+  const isOT3ConnectedViaWifi =
+    wifiAddress != null && wifiAddress.healthStatus === HEALTH_STATUS_OK
+
+  const ethernetAddress = addresses.find(
+    addr => addr.ip === ethernet?.ipAddress
+  )
+  const isOT3ConnectedViaEthernet =
+    ethernetAddress != null && ethernetAddress.healthStatus === HEALTH_STATUS_OK
+
+  const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
+  const isOT3ConnectedViaUSB =
+    usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
+
   let iconName: IconName | null = null
   let tooltipTranslationKey = null
-  if (wifi?.ipAddress != null) {
-    iconName = 'wifi'
-    tooltipTranslationKey = 'device_settings:wifi'
-  } else if (ethernet?.ipAddress != null) {
+  if (isOT3ConnectedViaEthernet) {
     iconName = 'ethernet'
     tooltipTranslationKey = 'device_settings:ethernet'
-  } else if (local != null && local) {
+  } else if (isOT3ConnectedViaWifi) {
+    iconName = 'wifi'
+    tooltipTranslationKey = 'device_settings:wifi'
+  } else if ((local != null && local) || isOT3ConnectedViaUSB) {
     iconName = 'usb'
     tooltipTranslationKey = 'device_settings:wired_usb'
   }

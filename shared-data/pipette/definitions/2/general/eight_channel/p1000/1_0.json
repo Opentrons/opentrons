@@ -1,8 +1,8 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "P1000 Eight Channel GEN3",
+  "displayName": "Flex 8-Channel 1000 μL",
   "model": "p1000",
-  "displayCategory": "GEN3",
+  "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
     "current": 0.5,
     "presses": 1,
@@ -10,19 +10,33 @@
     "increment": 0.0,
     "distance": 13.0
   },
-  "dropTipConfigurations": { "current": 1.0, "speed": 10 },
-  "plungerMotorConfigurations": { "idle": 0.3, "run": 1.0 },
+  "dropTipConfigurations": {
+    "current": 1.0,
+    "speed": 10
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 1.0
+  },
   "plungerPositionsConfigurations": {
-    "top": 0.5,
-    "bottom": 71.5,
-    "blowout": 76.5,
-    "drop": 92.5
+    "default": {
+      "top": 0.5,
+      "bottom": 71.5,
+      "blowout": 76.5,
+      "drop": 92.5
+    }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": { "count": 2 },
-    "capacitive": { "count": 2 },
-    "environment": { "count": 1 }
+    "pressure": {
+      "count": 2
+    },
+    "capacitive": {
+      "count": 2
+    },
+    "environment": {
+      "count": 1
+    }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -32,5 +46,10 @@
   "channels": 8,
   "shaftDiameter": 9.0,
   "shaftULperMM": 63.617,
-  "backlashDistance": 0.0
+  "backlashDistance": 0.0,
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 1.0,
+    "speed": 30
+  }
 }

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -11,8 +12,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LocationIcon,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -30,24 +33,29 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { LocationIcon } from '../../molecules/LocationIcon'
-import { useAttachedModules } from '../../organisms/Devices/hooks'
+import {
+  useAttachedModules,
+  useRunCalibrationStatus,
+} from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
+import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
+import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -57,16 +65,93 @@ const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'CALIBRATION_CUTOUTS',
 ]
 
+interface RenderModuleStatusProps {
+  isModuleReady: boolean
+  isDuplicateModuleModel: boolean
+  module: AttachedProtocolModuleMatch
+  calibrationStatus: ProtocolCalibrationStatus
+  setShowModuleWizard: (showModuleWizard: boolean) => void
+}
+
+function RenderModuleStatus({
+  isModuleReady,
+  isDuplicateModuleModel,
+  module,
+  calibrationStatus,
+  setShowModuleWizard,
+}: RenderModuleStatusProps): JSX.Element {
+  const { i18n, t } = useTranslation('protocol_setup')
+
+  const handleCalibrate = (): void => {
+    setShowModuleWizard(true)
+  }
+
+  let moduleStatus: JSX.Element = (
+    <>
+      <Chip
+        text={t('module_disconnected')}
+        type="warning"
+        background={false}
+        iconName="connection-status"
+      />
+      {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
+    </>
+  )
+
+  if (
+    isModuleReady &&
+    calibrationStatus.complete &&
+    module.attachedModuleMatch?.moduleOffset?.last_modified != null
+  ) {
+    moduleStatus = (
+      <>
+        <Chip
+          text={t('module_connected')}
+          type="success"
+          background={false}
+          iconName="connection-status"
+        />
+        {isDuplicateModuleModel ? (
+          <Icon name="information" size="2rem" />
+        ) : null}
+      </>
+    )
+  } else if (
+    isModuleReady &&
+    calibrationStatus.complete &&
+    module.attachedModuleMatch?.moduleOffset?.last_modified == null
+  ) {
+    moduleStatus = (
+      <SmallButton
+        buttonCategory="rounded"
+        buttonText={i18n.format(t('calibrate'), 'capitalize')}
+        onClick={handleCalibrate}
+      />
+    )
+  } else if (!calibrationStatus?.complete) {
+    moduleStatus = (
+      <StyledText as="p">
+        {calibrationStatus?.reason === 'attach_pipette_failure_reason'
+          ? t('calibration_required_attach_pipette_first')
+          : t('calibration_required_calibrate_pipette_first')}
+      </StyledText>
+    )
+  }
+  return moduleStatus
+}
+
 interface RowModuleProps {
   isDuplicateModuleModel: boolean
   module: AttachedProtocolModuleMatch
   setShowMultipleModulesModal: (showMultipleModulesModal: boolean) => void
+  calibrationStatus: ProtocolCalibrationStatus
 }
 
 function RowModule({
   isDuplicateModuleModel,
   module,
   setShowMultipleModulesModal,
+  calibrationStatus,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
@@ -74,62 +159,75 @@ function RowModule({
   )
   const isModuleReady =
     isNonConnectingModule || module.attachedModuleMatch != null
+
+  const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
-      borderRadius={BORDERS.borderRadiusSize3}
-      cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
-      gridGap={SPACING.spacing24}
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      onClick={() =>
-        isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
-      }
-    >
-      <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {getModuleDisplayName(module.moduleDef.model)}
-        </StyledText>
-      </Flex>
-      <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-        <LocationIcon
-          slotName={
-            getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-              ? TC_MODULE_LOCATION_OT3
-              : module.slotName
-          }
+    <>
+      {showModuleWizard && module.attachedModuleMatch != null ? (
+        <ModuleWizardFlows
+          attachedModule={module.attachedModuleMatch}
+          closeFlow={() => setShowModuleWizard(false)}
+          initialSlotName={module.slotName}
         />
-      </Flex>
-      {isNonConnectingModule ? (
-        <Flex
-          flex="3 0 0"
-          alignItems={ALIGN_CENTER}
-          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-        >
+      ) : null}
+      <Flex
+        alignItems={ALIGN_CENTER}
+        backgroundColor={
+          isModuleReady &&
+          module.attachedModuleMatch?.moduleOffset?.last_modified != null
+            ? COLORS.green3
+            : COLORS.yellow3
+        }
+        borderRadius={BORDERS.borderRadiusSize3}
+        cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
+        gridGap={SPACING.spacing24}
+        padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+        onClick={() =>
+          isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
+        }
+      >
+        <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('n_a')}
+            {getModuleDisplayName(module.moduleDef.model)}
           </StyledText>
         </Flex>
-      ) : (
-        <Flex
-          flex="3 0 0"
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          <Chip
-            text={
-              isModuleReady ? t('module_connected') : t('module_disconnected')
+        <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
+          <LocationIcon
+            slotName={
+              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
+                ? TC_MODULE_LOCATION_OT3
+                : module.slotName
             }
-            type={isModuleReady ? 'success' : 'warning'}
-            background={false}
-            iconName="connection-status"
           />
-          {isDuplicateModuleModel ? (
-            <Icon name="information" size="2rem" />
-          ) : null}
         </Flex>
-      )}
-    </Flex>
+        {isNonConnectingModule ? (
+          <Flex
+            flex="3 0 0"
+            alignItems={ALIGN_CENTER}
+            padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+          >
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {t('n_a')}
+            </StyledText>
+          </Flex>
+        ) : (
+          <Flex
+            flex="3 0 0"
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <RenderModuleStatus
+              isModuleReady={isModuleReady}
+              isDuplicateModuleModel={isDuplicateModuleModel}
+              module={module}
+              calibrationStatus={calibrationStatus}
+              setShowModuleWizard={setShowModuleWizard}
+            />
+          </Flex>
+        )}
+      </Flex>
+    </>
   )
 }
 
@@ -166,6 +264,10 @@ export function ProtocolSetupModules({
 
   const attachedModules = useAttachedModules()
 
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : ''
+  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
+
   const protocolModulesInfo =
     mostRecentAnalysis != null
       ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
@@ -184,6 +286,11 @@ export function ProtocolSetupModules({
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
 
+  const modalHeader: ModalHeaderBaseProps = {
+    title: t('map_view'),
+    hasExitIcon: true,
+  }
+
   return (
     <>
       <Portal level="top">
@@ -198,39 +305,46 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showDeckMapModal ? (
-          <LegacyModal
-            title={t('map_view')}
-            onClose={() => setShowDeckMapModal(false)}
-            fullPage
+          <Modal
+            header={modalHeader}
+            modalSize="large"
+            onOutsideClick={() => setShowDeckMapModal(false)}
           >
             <RobotWorkSpace
               deckDef={deckDef}
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+              deckFill={COLORS.light1}
+              trashSlotName="A3"
               id="ModuleSetup_deckMap"
+              trashColor={COLORS.darkGreyEnabled}
             >
-              {() =>
-                attachedProtocolModuleMatches.map(module => (
-                  <Module
-                    key={module.moduleId}
-                    x={module.x}
-                    y={module.y}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      module.x
-                    )}
-                    def={module.moduleDef}
-                  >
-                    <ModuleInfo
-                      moduleModel={module.moduleDef.model}
-                      isAttached={module.attachedModuleMatch != null}
-                      usbPort={module.attachedModuleMatch?.usbPort.port ?? null}
-                      hubPort={module.attachedModuleMatch?.usbPort.hub ?? null}
-                      runId={runId}
-                    />
-                  </Module>
-                ))
-              }
+              {() => (
+                <>
+                  {attachedProtocolModuleMatches.map(module => (
+                    <Module
+                      key={module.moduleId}
+                      x={module.x}
+                      y={module.y}
+                      orientation={inferModuleOrientationFromXCoordinate(
+                        module.x
+                      )}
+                      def={module.moduleDef}
+                    >
+                      <ModuleInfo
+                        moduleModel={module.moduleDef.model}
+                        isAttached={module.attachedModuleMatch != null}
+                        physicalPort={
+                          module.attachedModuleMatch?.usbPort ?? null
+                        }
+                        runId={runId}
+                      />
+                    </Module>
+                  ))}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
+                </>
+              )}
             </RobotWorkSpace>
-          </LegacyModal>
+          </Modal>
         ) : null}
       </Portal>
       <Flex
@@ -296,6 +410,7 @@ export function ProtocolSetupModules({
                 module={module}
                 isDuplicateModuleModel={isDuplicateModuleModel}
                 setShowMultipleModulesModal={setShowMultipleModulesModal}
+                calibrationStatus={calibrationStatus}
               />
             )
           })}

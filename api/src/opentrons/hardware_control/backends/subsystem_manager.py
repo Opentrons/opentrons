@@ -265,8 +265,8 @@ class SubsystemManager:
                 can_messenger=self._can_messenger,
                 usb_messenger=self._usb_messenger,
                 update_details=update_details,
-                retry_count=60,
-                timeout_seconds=1,
+                retry_count=3,
+                timeout_seconds=5,
                 erase=True,
             )
 

@@ -9,12 +9,13 @@ import {
   SPACING,
   PrimaryButton,
   SecondaryButton,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
   getPipetteNameSpecs,
   LEFT,
   LoadedPipette,
-  MotorAxis,
+  MotorAxes,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -138,19 +139,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
-      let axes: MotorAxis = mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
-      // TODO: (sb)5/25/23 Stop homing leftZ for 96 once motor is disabled
-      if (attachedPipettes[mount]?.instrumentName === 'p1000_96') {
-        axes = ['leftPlunger', 'leftZ']
-      }
-      chainRunCommands(
+      const axes: MotorAxes =
+        mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
+      chainRunCommands?.(
         [
           {
             commandType: 'loadPipette' as const,
             params: {
-              // @ts-expect-error pipetteName is required but missing in schema v6 type
-              pipetteName: attachedPipettes[mount]?.instrumentName,
-              pipetteId: attachedPipettes[mount]?.serialNumber,
+              pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+              pipetteId: attachedPipettes[mount]?.serialNumber ?? '',
               mount: mount,
             },
           },
@@ -158,36 +155,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
             commandType: 'home' as const,
             params: {
               axes: axes,
-            },
-          },
-          {
-            // @ts-expect-error calibration type not yet supported
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
-            },
-          },
-        ],
-        false
-      )
-        .then(() => {
-          proceed()
-        })
-        .catch(error => {
-          setShowErrorMessage(error.message)
-        })
-    } else if (
-      isSuccess &&
-      flowType === FLOWS.DETACH &&
-      currentStepIndex !== totalStepCount
-    ) {
-      chainRunCommands(
-        [
-          {
-            // @ts-expect-error calibration type not yet supported
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
             },
           },
         ],
@@ -208,7 +175,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
       textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
       buttonText={buttonText}
-      buttonType="primary"
     />
   ) : (
     <PrimaryButton
@@ -219,6 +185,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       {buttonText}
     </PrimaryButton>
   )
+
   if (
     flowType === FLOWS.ATTACH &&
     requiredPipette != null &&
@@ -299,6 +266,10 @@ export const Results = (props: ResultsProps): JSX.Element => {
       isSuccess={isSuccess}
       subHeader={subHeader}
       isPending={isFetching}
+      width="100%"
+      justifyContentForOddButton={
+        isOnDevice && isSuccess ? ALIGN_FLEX_END : undefined
+      }
     >
       {button}
     </SimpleWizardBody>

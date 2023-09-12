@@ -34,12 +34,13 @@ class DropTipParams(PipetteIdMixin):
             " a safe default depending on its hardware."
         ),
     )
-    randomizeDropLocation: Optional[bool] = Field(
+    alternateDropLocation: Optional[bool] = Field(
         False,
         description=(
-            "Whether to randomize the location where tip is dropped within the labware."
-            " If True, this command will ignore the wellLocation provided and"
-            " drop tip at a random location within a set area of the specified labware well."
+            "Whether to alternate location where tip is dropped within the labware."
+            " If True, this command will ignore the wellLocation provided and alternate"
+            " between dropping tips at two predetermined locations inside the specified"
+            " labware well."
             " If False, the tip will be dropped at the top center of the well."
         ),
     )
@@ -72,30 +73,24 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
         well_name = params.wellName
         home_after = params.homeAfter
 
-        if params.randomizeDropLocation:
-            # TODO (spp, 2023-05-30): we might make this cycle through pre-defined
-            #  locations to drop tip instead of a completely random location.
-            #  That would make sw as well as hw testing more robust.
-            drop_tip_well_location = (
-                self._state_view.labware.get_random_drop_tip_location(
-                    labware_id=labware_id,
-                    well_name=well_name,
-                )
+        if params.alternateDropLocation:
+            well_location = self._state_view.geometry.get_next_tip_drop_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                pipette_id=pipette_id,
             )
         else:
-            drop_tip_well_location = params.wellLocation
+            well_location = params.wellLocation
 
-        well_location = self._state_view.geometry.get_tip_drop_location(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_location=drop_tip_well_location,
+        tip_drop_location = self._state_view.geometry.get_checked_tip_drop_location(
+            pipette_id=pipette_id, labware_id=labware_id, well_location=well_location
         )
 
         position = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=well_location,
+            well_location=tip_drop_location,
         )
 
         await self._tip_handler.drop_tip(pipette_id=pipette_id, home_after=home_after)

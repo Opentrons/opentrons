@@ -15,6 +15,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
+import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: 2.125rem;
@@ -47,6 +48,7 @@ export function SetWifiSsid({
 }: SetWifiSsidProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = React.useRef(null)
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   return (
     <>
@@ -54,6 +56,7 @@ export function SetWifiSsid({
         flexDirection={DIRECTION_COLUMN}
         paddingX="6.34375rem"
         gridGap={SPACING.spacing8}
+        marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
         <StyledText
           as="p"

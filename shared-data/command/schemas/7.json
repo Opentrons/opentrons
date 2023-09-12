@@ -36,10 +36,10 @@
       "$ref": "#/definitions/HomeCreate"
     },
     {
-      "$ref": "#/definitions/LoadLabwareCreate"
+      "$ref": "#/definitions/RetractAxisCreate"
     },
     {
-      "$ref": "#/definitions/LoadAdapterCreate"
+      "$ref": "#/definitions/LoadLabwareCreate"
     },
     {
       "$ref": "#/definitions/LoadLiquidCreate"
@@ -460,6 +460,11 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "pushOut": {
+          "title": "Pushout",
+          "description": "push the plunger a small amount farther than necessary for accurate low-volume dispensing",
+          "type": "number"
         }
       },
       "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"]
@@ -515,6 +520,11 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "pushOut": {
+          "title": "Pushout",
+          "description": "push the plunger a small amount farther than necessary for accurate low-volume dispensing",
+          "type": "number"
         }
       },
       "required": ["flowRate", "volume", "pipetteId"]
@@ -724,9 +734,9 @@
           "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
           "type": "boolean"
         },
-        "randomizeDropLocation": {
-          "title": "Randomizedroplocation",
-          "description": "Whether to randomize the location where tip is dropped within the labware. If True, this command will ignore the wellLocation provided and drop tip at a random location within a set area of the specified labware well. If False, the tip will be dropped at the top center of the well.",
+        "alternateDropLocation": {
+          "title": "Alternatedroplocation",
+          "description": "Whether to alternate location where tip is dropped within the labware. If True, this command will ignore the wellLocation provided and alternate between dropping tips at two predetermined locations inside the specified labware well. If False, the tip will be dropped at the top center of the well.",
           "default": false,
           "type": "boolean"
         }
@@ -853,6 +863,52 @@
         },
         "params": {
           "$ref": "#/definitions/HomeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "RetractAxisParams": {
+      "title": "RetractAxisParams",
+      "description": "Payload required for a Retract Axis command.",
+      "type": "object",
+      "properties": {
+        "axis": {
+          "description": "Axis to retract to its home position as quickly as safely possible. The difference between retracting an axis and homing an axis using the home command is that a home will always probe the limit switch and will work as the first motion command a robot will need to execute; On the other hand, retraction will rely on this previously determined  home position to move to it as fast as safely possible. So on the Flex, it will move (fast) the axis to the previously recorded home position and on the OT2, it will move (fast) the axis a safe distance from the previously recorded home position, and then slowly approach the limit switch.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MotorAxis"
+            }
+          ]
+        }
+      },
+      "required": ["axis"]
+    },
+    "RetractAxisCreate": {
+      "title": "RetractAxisCreate",
+      "description": "Data to create a Retract Axis command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "retractAxis",
+          "enum": ["retractAxis"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/RetractAxisParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -1024,80 +1080,6 @@
       },
       "required": ["params"]
     },
-    "LoadAdapterParams": {
-      "title": "LoadAdapterParams",
-      "description": "Payload required to load an adapter into a slot.",
-      "type": "object",
-      "properties": {
-        "location": {
-          "title": "Location",
-          "description": "Location the adapter should be loaded into.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/DeckSlotLocation"
-            },
-            {
-              "$ref": "#/definitions/ModuleLocation"
-            },
-            {
-              "enum": ["offDeck"],
-              "type": "string"
-            }
-          ]
-        },
-        "loadName": {
-          "title": "Loadname",
-          "description": "Name used to reference a labware definition.",
-          "type": "string"
-        },
-        "namespace": {
-          "title": "Namespace",
-          "description": "The namespace the labware definition belongs to.",
-          "type": "string"
-        },
-        "version": {
-          "title": "Version",
-          "description": "The labware definition version.",
-          "type": "integer"
-        },
-        "adapterId": {
-          "title": "Adapterid",
-          "description": "An optional ID to assign to this adapter. If None, an ID will be generated.",
-          "type": "string"
-        }
-      },
-      "required": ["location", "loadName", "namespace", "version"]
-    },
-    "LoadAdapterCreate": {
-      "title": "LoadAdapterCreate",
-      "description": "Load adapter command creation request.",
-      "type": "object",
-      "properties": {
-        "commandType": {
-          "title": "Commandtype",
-          "default": "loadAdapter",
-          "enum": ["loadAdapter"],
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/definitions/LoadAdapterParams"
-        },
-        "intent": {
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/CommandIntent"
-            }
-          ]
-        },
-        "key": {
-          "title": "Key",
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "type": "string"
-        }
-      },
-      "required": ["params"]
-    },
     "LoadLiquidParams": {
       "title": "LoadLiquidParams",
       "description": "Payload required to load a liquid into a well.",
@@ -1239,16 +1221,16 @@
         "p20_multi_gen2",
         "p50_single",
         "p50_multi",
-        "p50_single_gen3",
-        "p50_multi_gen3",
+        "p50_single_flex",
+        "p50_multi_flex",
         "p300_single",
         "p300_multi",
         "p300_single_gen2",
         "p300_multi_gen2",
         "p1000_single",
         "p1000_single_gen2",
-        "p1000_single_gen3",
-        "p1000_multi_gen3",
+        "p1000_single_flex",
+        "p1000_multi_flex",
         "p1000_96"
       ],
       "type": "string"
@@ -1385,18 +1367,6 @@
               "$ref": "#/definitions/LabwareMovementStrategy"
             }
           ]
-        },
-        "usePickUpLocationLpcOffset": {
-          "title": "Usepickuplocationlpcoffset",
-          "description": "Whether to use LPC offset of the labware associated with its pick up location. Experimental param, subject to change.",
-          "default": false,
-          "type": "boolean"
-        },
-        "useDropLocationLpcOffset": {
-          "title": "Usedroplocationlpcoffset",
-          "description": "Whether to use LPC offset of the labware associated with its drop off location. Experimental param, subject to change.",
-          "default": false,
-          "type": "boolean"
         },
         "pickUpOffset": {
           "title": "Pickupoffset",

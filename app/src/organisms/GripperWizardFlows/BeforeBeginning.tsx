@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
+import { COLORS } from '@opentrons/components'
+import { EXTENSION } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import {
@@ -15,10 +18,9 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
-import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { EXTENSION } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -53,6 +55,7 @@ interface BeforeBeginningProps extends GripperWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
 }
 
 export const BeforeBeginning = (
@@ -65,16 +68,21 @@ export const BeforeBeginning = (
     isCreateLoading,
     isRobotMoving,
     chainRunCommands,
+    errorMessage,
+    maintenanceRunId,
+    setErrorMessage,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
 
   const commandsOnProceed: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: EXTENSION,
@@ -83,11 +91,13 @@ export const BeforeBeginning = (
   ]
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, true)
+    chainRunCommands?.(commandsOnProceed, false)
       .then(() => {
         proceed()
       })
-      .catch(() => {})
+      .catch(error => {
+        setErrorMessage(error.message)
+      })
   }
 
   const equipmentInfoByLoadName: {
@@ -113,7 +123,14 @@ export const BeforeBeginning = (
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
       //  TODO(BC, 11/8/22): wire up this URL and unhide the link!
@@ -129,7 +146,7 @@ export const BeforeBeginning = (
         />
       }
       proceedButtonText={t('move_gantry_to_front')}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={handleOnClick}
     />
   )

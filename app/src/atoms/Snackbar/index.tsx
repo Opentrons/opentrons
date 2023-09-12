@@ -37,16 +37,37 @@ const OPEN_STYLE = css`
   }
 `
 
+const CLOSE_STYLE = css`
+  animation-duration: ${SNACKBAR_ANIMATION_DURATION}ms;
+  animation-name: fadeout;
+  overflow: hidden;
+
+  @keyframes fadeout {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+`
+
 export function Snackbar(props: SnackbarProps): JSX.Element {
   const { message, onClose, duration = 4000, ...styleProps } = props
+  const [isClosed, setIsClosed] = React.useState<boolean>(false)
+
+  const animationStyle = isClosed ? CLOSE_STYLE : OPEN_STYLE
 
   setTimeout(() => {
-    onClose?.()
+    setIsClosed(true)
+    setTimeout(() => {
+      onClose?.()
+    }, SNACKBAR_ANIMATION_DURATION - 50)
   }, duration)
 
   return (
     <Flex
-      css={OPEN_STYLE}
+      css={animationStyle}
       alignItems={ALIGN_CENTER}
       borderRadius={BORDERS.borderRadiusSize3}
       boxShadow={BORDERS.shadowSmall}

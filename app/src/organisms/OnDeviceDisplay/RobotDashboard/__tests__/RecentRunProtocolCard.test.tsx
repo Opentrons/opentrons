@@ -4,9 +4,9 @@ import { formatDistance } from 'date-fns'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
@@ -33,7 +33,7 @@ const RUN_ID = 'mockRunId'
 const mockMissingPipette = [
   {
     hardwareType: 'pipette',
-    pipetteName: 'p1000_single_gen3',
+    pipetteName: 'p1000_single_flex',
     mount: 'left',
     connected: false,
   },
@@ -51,7 +51,7 @@ const mockMissingModule = [
 const missingBoth = [
   {
     hardwareType: 'pipette',
-    pipetteName: 'p1000_single_gen3',
+    pipetteName: 'p1000_single_flex',
     mount: 'left',
     connected: false,
   },
@@ -123,7 +123,10 @@ describe('RecentRunProtocolCard', () => {
     mockSkeleton.mockReturnValue(<div>mock Skeleton</div>)
     mockUseMissingHardwareText.mockReturnValue('Ready to run')
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockUseMissingProtocolHardware.mockReturnValue([])
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: [],
+      isLoading: false,
+    })
     mockUseAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
@@ -159,44 +162,48 @@ describe('RecentRunProtocolCard', () => {
   })
 
   it('should render missing chip when missing a pipette', () => {
-    mockUseMissingProtocolHardware.mockReturnValue(mockMissingPipette)
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: mockMissingPipette,
+      isLoading: false,
+    })
     mockUseMissingHardwareText.mockReturnValue('Missing 1 pipette')
     const [{ getByText }] = render(props)
     getByText('Missing 1 pipette')
   })
 
   it('should render missing chip when missing a module', () => {
-    mockUseMissingProtocolHardware.mockReturnValue(mockMissingModule)
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: mockMissingModule,
+      isLoading: false,
+    })
     mockUseMissingHardwareText.mockReturnValue('Missing 1 module')
     const [{ getByText }] = render(props)
     getByText('Missing 1 module')
   })
 
   it('should render missing chip (module and pipette) when missing a pipette and a module', () => {
-    mockUseMissingProtocolHardware.mockReturnValue(missingBoth)
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: missingBoth,
+      isLoading: false,
+    })
     mockUseMissingHardwareText.mockReturnValue('Missing hardware')
     const [{ getByText }] = render(props)
     getByText('Missing hardware')
   })
 
-  it('when tapping a card, mock functions is called', () => {
+  it('when tapping a card, mock functions is called and loading state is activated', () => {
     const [{ getByLabelText }] = render(props)
     const button = getByLabelText('RecentRunProtocolCard')
+    expect(button).toHaveStyle(`background-color: ${COLORS.green3}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
-  })
-
-  it('should render the skeleton when react query is fetching', () => {
-    mockUseProtocolQuery.mockReturnValue({
-      isFetching: true,
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
-    } as any)
-    const [{ getByText }] = render(props)
-    getByText('mock Skeleton')
+    // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
+    // expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    getByLabelText('icon_ot-spinner')
+    expect(button).toHaveStyle(`background-color: ${COLORS.green3Pressed}`)
   })
 
   it('should render the skeleton when react query is loading', () => {

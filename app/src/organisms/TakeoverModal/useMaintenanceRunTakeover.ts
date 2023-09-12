@@ -1,15 +1,7 @@
 import * as React from 'react'
-import {
-  TakeoverModalContextType,
-  TakeoverModalContext,
-} from './TakeoverModalContext'
+import { MaintenanceRunContext } from './MaintenanceRunStatusProvider'
+import type { MaintenanceRunStatus } from './MaintenanceRunStatusProvider'
 
-export function useMaintenanceRunTakeover(): TakeoverModalContextType {
-  const { setODDMaintenanceFlowInProgress } = React.useContext(
-    TakeoverModalContext
-  )
-
-  return {
-    setODDMaintenanceFlowInProgress,
-  }
+export function useMaintenanceRunTakeover(): MaintenanceRunStatus {
+  return React.useContext(MaintenanceRunContext)
 }

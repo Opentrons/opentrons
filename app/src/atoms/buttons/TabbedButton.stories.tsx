@@ -1,10 +1,12 @@
 import * as React from 'react'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { TabbedButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Buttons/TabbedButton',
   argTypes: { onClick: { action: 'clicked' } },
+  parameters: touchScreenViewport,
 } as Meta
 
 const TabbedButtonTemplate: Story<

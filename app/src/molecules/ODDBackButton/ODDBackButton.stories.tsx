@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { ODDBackButton } from '.'
 import type { Story, Meta } from '@storybook/react'
 
@@ -7,6 +8,7 @@ export default {
   argTypes: {
     onClick: { action: 'clicked' },
   },
+  parameters: touchScreenViewport,
 } as Meta
 
 const ODDBackButtonTemplate: Story<

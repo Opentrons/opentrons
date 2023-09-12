@@ -5,7 +5,9 @@ exports[`App component renders with definition 1`] = `
   className="app is_detail_page"
 >
   <Nav />
-  <Breadcrumbs />
+  <Breadcrumbs
+    show={true}
+  />
   <Page
     content={
       <LabwareDetails
@@ -21,7 +23,7 @@ exports[`App component renders with definition 1`] = `
         }
       />
     }
-    detailPage={true}
+    isDetailPage={true}
     scrollRef={
       Object {
         "current": null,
@@ -46,6 +48,9 @@ exports[`App component renders without definition 1`] = `
   className="app"
 >
   <Nav />
+  <Breadcrumbs
+    show={false}
+  />
   <Page
     content={
       <LabwareList
@@ -57,7 +62,7 @@ exports[`App component renders without definition 1`] = `
         }
       />
     }
-    detailPage={false}
+    isDetailPage={false}
     scrollRef={
       Object {
         "current": null,

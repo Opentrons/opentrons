@@ -14,7 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import flexGripper from '../../assets/images/flex_gripper.svg'
+import flexGripper from '../../assets/images/flex_gripper.png'
 
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -27,7 +27,7 @@ import type { MenuOverlayItemProps } from './MenuOverlay'
 interface InstrumentCardProps extends StyleProps {
   description: string
   label: string
-  menuOverlayItems: MenuOverlayItemProps[]
+  menuOverlayItems?: MenuOverlayItemProps[]
   hasDivider?: boolean
   instrumentDiagramProps?: InstrumentDiagramProps
   // special casing the gripper at least for now
@@ -69,13 +69,8 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       {...styleProps}
     >
       {isGripperAttached ? (
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          backgroundColor={COLORS.lightGreyHover}
-          width="3.75rem"
-          height="3.75rem"
-        >
-          <img src={flexGripper} />
+        <Flex justifyContent={JUSTIFY_CENTER} size="3.75rem">
+          <img src={flexGripper} alt="flex gripper" />
         </Flex>
       ) : null}
       {instrumentDiagramProps?.pipetteSpecs != null ? (
@@ -92,6 +87,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing2}
         paddingRight={SPACING.spacing24}
+        width="100%"
       >
         {banner}
         <StyledText
@@ -106,21 +102,26 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           {description}
         </StyledText>
       </Flex>
-      <Box
-        position={POSITION_ABSOLUTE}
-        top={SPACING.spacing4}
-        right={SPACING.spacing4}
-      >
-        <OverflowBtn onClick={handleOverflowClick} />
-        {menuOverlay}
-        {showOverflowMenu ? (
-          <MenuOverlay
-            hasDivider={hasDivider}
-            menuOverlayItems={menuOverlayItems}
-            setShowMenuOverlay={setShowOverflowMenu}
+      {menuOverlayItems != null && (
+        <Box
+          position={POSITION_ABSOLUTE}
+          top={SPACING.spacing4}
+          right={SPACING.spacing4}
+        >
+          <OverflowBtn
+            onClick={handleOverflowClick}
+            aria-label="InstrumentCard_overflowMenu"
           />
-        ) : null}
-      </Box>
+          {menuOverlay}
+          {showOverflowMenu ? (
+            <MenuOverlay
+              hasDivider={hasDivider}
+              menuOverlayItems={menuOverlayItems}
+              setShowMenuOverlay={setShowOverflowMenu}
+            />
+          ) : null}
+        </Box>
+      )}
     </Flex>
   )
 }

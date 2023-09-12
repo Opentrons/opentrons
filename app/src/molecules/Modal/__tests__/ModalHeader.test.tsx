@@ -32,16 +32,4 @@ describe('ModalHeader', () => {
     getByLabelText('closeIcon').click()
     expect(props.onClick).toHaveBeenCalled()
   })
-  it('should render the header with red when isError is true', () => {
-    props = {
-      ...props,
-      isError: true,
-      iconName: 'information',
-      iconColor: COLORS.black,
-    }
-    const { getByLabelText } = render(props)
-    expect(getByLabelText('icon_information')).toHaveStyle(
-      `color: ${COLORS.white}`
-    )
-  })
 })

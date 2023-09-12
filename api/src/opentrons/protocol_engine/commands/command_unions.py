@@ -97,14 +97,6 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
-from .load_adapter import (
-    LoadAdapter,
-    LoadAdapterParams,
-    LoadAdapterCreate,
-    LoadAdapterResult,
-    LoadAdapterCommandType,
-)
-
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -225,6 +217,14 @@ from .set_status_bar import (
     SetStatusBarCommandType,
 )
 
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -237,8 +237,8 @@ Command = Union[
     DropTip,
     DropTipInPlace,
     Home,
+    RetractAxis,
     LoadLabware,
-    LoadAdapter,
     LoadLiquid,
     LoadModule,
     LoadPipette,
@@ -292,8 +292,8 @@ CommandParams = Union[
     DropTipParams,
     DropTipInPlaceParams,
     HomeParams,
+    RetractAxisParams,
     LoadLabwareParams,
-    LoadAdapterParams,
     LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
@@ -348,8 +348,8 @@ CommandType = Union[
     DropTipCommandType,
     DropTipInPlaceCommandType,
     HomeCommandType,
+    RetractAxisCommandType,
     LoadLabwareCommandType,
-    LoadAdapterCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
@@ -403,8 +403,8 @@ CommandCreate = Union[
     DropTipCreate,
     DropTipInPlaceCreate,
     HomeCreate,
+    RetractAxisCreate,
     LoadLabwareCreate,
-    LoadAdapterCreate,
     LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
@@ -458,8 +458,8 @@ CommandResult = Union[
     DropTipResult,
     DropTipInPlaceResult,
     HomeResult,
+    RetractAxisResult,
     LoadLabwareResult,
-    LoadAdapterResult,
     LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,

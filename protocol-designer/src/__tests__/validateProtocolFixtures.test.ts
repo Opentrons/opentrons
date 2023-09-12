@@ -7,7 +7,9 @@ import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
 import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import protocolV6Schema from '@opentrons/shared-data/protocol/schemas/6.json'
+import protocolV7Schema from '@opentrons/shared-data/protocol/schemas/7.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
+import commandV7Schema from '@opentrons/shared-data/command/schemas/7.json'
 
 // TODO: copied from createFile.test.js
 const getAjvValidator = (_protocolSchema: object) => {
@@ -17,6 +19,8 @@ const getAjvValidator = (_protocolSchema: object) => {
   })
   // v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
   ajv.addSchema(labwareV2Schema)
+  ajv.addSchema(commandV7Schema)
+
   const validateProtocol = ajv.compile(_protocolSchema)
   return validateProtocol
 }
@@ -40,8 +44,8 @@ const expectResultToMatchSchema = (
 
 const getSchemaDefForProtocol = (protocol: any): any => {
   // For reference, possibilities are, from newest to oldest:
-  // "$otSharedSchema": "#/protocol/schemas/5"
-  // "schemaVersion": 3
+  // "$otSharedSchema": "#/protocol/schemas/7"
+  // "schemaVersion": 7
   // "protocol-schema": "1.0.0"
   let n
   if (typeof protocol.$otSharedSchema === 'string') {
@@ -63,6 +67,8 @@ const getSchemaDefForProtocol = (protocol: any): any => {
       return protocolV5Schema
     case '6':
       return protocolV6Schema
+    case '7':
+      return protocolV7Schema
   }
 
   const errorMessage = `bad schema for protocol!: ${
@@ -107,7 +113,6 @@ describe('Protocol fixtures should validate under their JSON schemas', () => {
         '1'
 
       const pdMajorVersion = pdVersion && pdVersion.split('.')[0]
-
       expect(pdMajorVersion).toEqual(expectedVersion)
     })
   })

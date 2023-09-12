@@ -6,7 +6,7 @@ import { discoveryEpic } from './discovery/epic'
 import { robotAdminEpic } from './robot-admin/epic'
 import { robotControlsEpic } from './robot-controls/epic'
 import { robotSettingsEpic } from './robot-settings/epic'
-import { buildrootEpic } from './buildroot/epic'
+import { robotUpdateEpic } from './robot-update/epic'
 import { pipettesEpic } from './pipettes/epic'
 import { modulesEpic } from './modules/epic'
 import { networkingEpic } from './networking/epic'
@@ -24,7 +24,7 @@ export const rootEpic = combineEpics<Epic>(
   robotAdminEpic,
   robotControlsEpic,
   robotSettingsEpic,
-  buildrootEpic,
+  robotUpdateEpic,
   pipettesEpic,
   modulesEpic,
   networkingEpic,

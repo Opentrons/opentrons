@@ -88,10 +88,15 @@ export interface TemperatureModuleDeactivateRunTimeCommand
     TemperatureModuleDeactivateCreateCommand {
   result?: any
 }
+export interface TemperatureModuleAwaitTemperatureParams {
+  // same params as TemperatureParams except celsius is optional
+  moduleId: string
+  celsius?: number
+}
 export interface TemperatureModuleAwaitTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'temperatureModule/waitForTemperature'
-  params: TemperatureParams
+  params: TemperatureModuleAwaitTemperatureParams
 }
 export interface TemperatureModuleAwaitTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -298,4 +303,5 @@ export interface ThermocyclerSetTargetBlockTemperatureParams {
   moduleId: string
   celsius: number
   volume?: number
+  holdTimeSeconds?: number
 }

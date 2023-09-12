@@ -125,6 +125,16 @@ stages:
                 location:
                   slotName: '1'
             commands:
+              # Initial home
+              - id: !anystr
+                createdAt: !anystr
+                commandType: home
+                key: !anystr
+                status: succeeded
+                params: { }
+                result: { }
+                startedAt: !anystr
+                completedAt: !anystr
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadPipette
@@ -443,7 +453,7 @@ stages:
                       x: 0
                       y: 0
                       z: 0
-                  randomizeDropLocation: false
+                  alternateDropLocation: false
                 result:
                   position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
                 startedAt: !anystr

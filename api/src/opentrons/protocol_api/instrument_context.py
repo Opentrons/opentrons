@@ -45,8 +45,8 @@ _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
 _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
-_DROP_TIP_LOCATION_RANDOMIZED_IN = APIVersion(2, 15)
-"""The version after which a drop-tip-into-trash procedure drops tips in a random location within the trash well."""
+_DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
+"""The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -101,7 +101,18 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def starting_tip(self) -> Union[labware.Well, None]:
-        """The starting tip from which the pipette pick up"""
+        """
+        Which well of a tip rack the pipette should start at when automatically choosing tips to pick up.
+
+        See :py:meth:`.pick_up_tip()`.
+
+        .. note::
+
+            In robot software versions 6.3.0 and 6.3.1, protocols specifying API level 2.14 would
+            not respect ``starting_tip`` on the second and subsequent calls to
+            :py:meth:`.InstrumentContext.pick_up_tip` with no argument. This is fixed for all API
+            levels as of robot software version 7.0.0.
+        """
         return self._starting_tip
 
     @starting_tip.setter
@@ -205,6 +216,7 @@ class InstrumentContext(publisher.CommandPublisher):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
         c_vol = self._core.get_available_volume() if not volume else volume
@@ -237,6 +249,7 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
@@ -266,6 +279,9 @@ class InstrumentContext(publisher.CommandPublisher):
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
                      If not specified, defaults to 1.0.
         :type rate: float
+        :param push_out: Continue past the plunger bottom to guarantee all liquid
+                        leaves the tip. Specified in microliters. By default, this value is None.
+        :type push_out: float
 
         :returns: This instance.
 
@@ -278,6 +294,10 @@ class InstrumentContext(publisher.CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
+        if self.api_version < APIVersion(2, 15) and push_out:
+            raise APIVersionError(
+                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+            )
         _log.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -315,6 +335,7 @@ class InstrumentContext(publisher.CommandPublisher):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
         c_vol = self._core.get_current_volume() if not volume else volume
@@ -338,6 +359,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
+                push_out=push_out,
             )
 
         return self
@@ -658,6 +680,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will pick up the next available
         tip in its :py:attr:`InstrumentContext.tip_racks` list.
+        Within each tip rack, tips will be picked up in the order specified by
+        the labware definition and :py:meth:`.Labware.wells`.
+        To adjust where the sequence starts, see :py:obj:`.starting_tip`.
 
         The tip to pick up can be manually specified with the `location`
         argument. The `location` argument can be specified in several ways:
@@ -837,8 +862,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.  From API version 2.15 on, the exact position
-        where the pipette drops the tip(s) within the trash will be randomized
+        the fixed trash in slot 12.  From API version 2.15 on, the API will default to
+        alternating between two different drop tip locations within the trash container
         in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
@@ -902,11 +927,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
-        randomize_drop_location: bool = False
+        alternate_drop_location: bool = False
         if location is None:
             well = self.trash_container.wells()[0]
-            if self.api_version >= _DROP_TIP_LOCATION_RANDOMIZED_IN:
-                randomize_drop_location = True
+            if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
+                alternate_drop_location = True
 
         elif isinstance(location, labware.Well):
             well = location
@@ -942,7 +967,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=location,
                 well_core=well._core,
                 home_after=home_after,
-                randomize_drop_location=randomize_drop_location,
+                alternate_drop_location=alternate_drop_location,
             )
 
         self._last_tip_picked_up_from = None

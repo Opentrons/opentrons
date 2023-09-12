@@ -5,11 +5,18 @@ from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
 
+from opentrons_shared_data.errors.exceptions import (
+    EStopActivatedError,
+    EnumeratedError,
+    PythonException,
+)
+
 from ..state import StateStore
 from ..resources import ModelUtils
 from ..commands import CommandStatus
 from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
-from ..errors import ProtocolEngineError, RunStoppedError, UnexpectedProtocolError
+from ..errors import RunStoppedError
+from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .gantry_mover import GantryMover
@@ -102,13 +109,14 @@ class CommandExecutor:
 
         except (Exception, asyncio.CancelledError) as error:
             log.warning(f"Execution of {command.id} failed", exc_info=error)
-
             # TODO(mc, 2022-11-14): mark command as stopped rather than failed
             # https://opentrons.atlassian.net/browse/RCORE-390
             if isinstance(error, asyncio.CancelledError):
                 error = RunStoppedError("Run was cancelled")
-            elif not isinstance(error, ProtocolEngineError):
-                error = UnexpectedProtocolError(message=str(error), wrapping=[error])
+            elif isinstance(error, EStopActivatedError):
+                error = PE_EStopActivatedError(message=str(error), wrapping=[error])
+            elif not isinstance(error, EnumeratedError):
+                error = PythonException(error)
 
             self._action_dispatcher.dispatch(
                 FailCommandAction(

@@ -16,18 +16,19 @@ import {
   MAGNETIC_BLOCK_TYPE,
   GEN1,
   GEN2,
-  GEN3,
+  FLEX,
   LEFT,
   RIGHT,
   GRIPPER_V1,
   GRIPPER_V1_1,
+  GRIPPER_V1_2,
+  EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
-import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
-import { EXTENSION } from '.'
+import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -81,6 +82,7 @@ export type LabwareDisplayCategory =
   | 'aluminumBlock'
   | 'trash'
   | 'other'
+  | 'adapter'
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
@@ -166,6 +168,8 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
+
 // NOTE: must be synced with shared-data/labware/schemas/2.json
 export interface LabwareDefinition2 {
   version: number
@@ -179,6 +183,7 @@ export interface LabwareDefinition2 {
   ordering: string[][]
   wells: LabwareWellMap
   groups: LabwareWellGroup[]
+  allowedRoles?: LabwareRoles[]
 }
 
 export type ModuleType =
@@ -212,7 +217,10 @@ export type ModuleModel =
   | HeaterShakerModuleModel
   | MagneticBlockModel
 
-export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
+export type GripperModel =
+  | typeof GRIPPER_V1
+  | typeof GRIPPER_V1_1
+  | typeof GRIPPER_V1_2
 
 export type ModuleModelWithLegacy =
   | ModuleModel
@@ -233,7 +241,7 @@ export interface Dimensions {
 }
 
 export interface DeckRobot {
-  model: string
+  model: RobotType
 }
 
 export interface DeckFixture {
@@ -339,7 +347,7 @@ export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8 | 96
 
-export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof GEN3
+export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 
 export type PipetteMount = typeof LEFT | typeof RIGHT
 export type GantryMount = typeof LEFT | typeof RIGHT | typeof EXTENSION
@@ -461,10 +469,17 @@ export interface ProtocolResource {
 export interface ProtocolAnalysesResource {
   analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
 }
+export type MotorAxis =
+  | 'x'
+  | 'y'
+  | 'leftZ'
+  | 'rightZ'
+  | 'leftPlunger'
+  | 'rightPlunger'
+  | 'extensionZ'
+  | 'extensionJaw'
 
-export type MotorAxis = Array<
-  'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
->
+export type MotorAxes = MotorAxis[]
 
 export type ThermalAdapterName =
   | 'PCR Adapter'
@@ -495,3 +510,12 @@ export interface GripperDefinition {
     jawWidth: { min: number; max: number }
   }
 }
+
+export type StatusBarAnimation =
+  | 'idle'
+  | 'confirm'
+  | 'updating'
+  | 'disco'
+  | 'off'
+
+export type StatusBarAnimations = StatusBarAnimation[]

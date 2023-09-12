@@ -1,3 +1,5 @@
-export { updateSubsystem } from './updateSubsystem'
+export { getCurrentAllSubsystemUpdates } from './getCurrentAllSubsystemUpdates'
+export { getCurrentSubsystemUpdate } from './getCurrentSubsystemUpdate'
 export { getSubsystemUpdate } from './getSubsystemUpdate'
+export { updateSubsystem } from './updateSubsystem'
 export * from './types'

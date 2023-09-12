@@ -1,5 +1,11 @@
 """Tests for motion planning module."""
 import pytest
+
+from opentrons.motion_planning.types import GripperMovementWaypointsWithJawStatus
+from opentrons.protocol_engine.types import (
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
+)
 from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint as CP
 
@@ -9,6 +15,7 @@ from opentrons.motion_planning import (
     MoveType,
     DestinationOutOfBoundsError,
     ArcOutOfBoundsError,
+    get_gripper_labware_movement_waypoints,
 )
 
 
@@ -256,3 +263,30 @@ def test_get_waypoints_direct_moves_ignore_clearance_requirements() -> None:
     )
 
     assert result == [Waypoint(Point(1, 1, 5.5))]
+
+
+def test_get_gripper_labware_movement_waypoints() -> None:
+    """It should get the correct waypoints for gripper movement."""
+    result = get_gripper_labware_movement_waypoints(
+        from_labware_center=Point(101, 102, 119.5),
+        to_labware_center=Point(201, 202, 219.5),
+        gripper_home_z=999,
+        offset_data=LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+            dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
+        ),
+    )
+    assert result == [
+        # move to above "from" slot
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False),
+        # with jaw open, move to labware on "from" slot
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 116.5), True),
+        # grip labware and retract in place
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False),
+        # with labware gripped, move to above "to" slot
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), False),
+        # with labware gripped, move down to labware drop height on "to" slot
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 222.5), False),
+        # ungrip labware and retract in place
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True),
+    ]

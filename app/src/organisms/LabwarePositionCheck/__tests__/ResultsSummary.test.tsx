@@ -61,8 +61,8 @@ describe('ResultsSummary', () => {
         name: mockTipRackDefinition.metadata.displayName,
       })
     ).toHaveLength(2)
-    getByRole('cell', { name: 'slot 1' })
-    getByRole('cell', { name: 'slot 3' })
+    getByRole('cell', { name: 'Slot 1' })
+    getByRole('cell', { name: 'Slot 3' })
     getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })
     getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0' })
   })

@@ -42,6 +42,18 @@
       "detail": "Firmware Update Failed",
       "category": "hardwareCommunicationError"
     },
+    "1006": {
+      "detail": "Internal Message Format Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1007": {
+      "detail": "CANBus Configuration Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1008": {
+      "detail": "CANBus Bus Error",
+      "category": "hardwareCommunicationError"
+    },
     "2000": {
       "detail": "Robotics Control Error",
       "category": "roboticsControlError"
@@ -60,6 +72,34 @@
     },
     "2004": {
       "detail": "Motion Planning Failure",
+      "category": "roboticsControlError"
+    },
+    "2005": {
+      "detail": "Position Estimation Invalid",
+      "category": "roboticsControlError"
+    },
+    "2006": {
+      "detail": "Move Condition Not Met",
+      "category": "roboticsControlError"
+    },
+    "2007": {
+      "detail": "Calibration Structure Not Found",
+      "category": "roboticsControlError"
+    },
+    "2008": {
+      "detail": "Calibration Edge Not Found",
+      "category": "roboticsControlError"
+    },
+    "2009": {
+      "detail": "Early Capacitance Sense Trigger",
+      "category": "roboticsControlError"
+    },
+    "2010": {
+      "detail": "Inaccurate Non-Contact Sweep",
+      "category": "roboticsControlError"
+    },
+    "2011": {
+      "detail": "Misaligned Gantry",
       "category": "roboticsControlError"
     },
     "3000": {
@@ -122,6 +162,10 @@
       "detail": "Module Not Present",
       "category": "roboticsInteractionError"
     },
+    "3016": {
+      "detail": "Invalid Instrument Data",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -132,6 +176,10 @@
     },
     "4002": {
       "detail": "API Removed",
+      "category": "generalError"
+    },
+    "4003": {
+      "detail": "Not supported on this robot type",
       "category": "generalError"
     }
   }
