@@ -176,14 +176,16 @@ def _pipette_with_liquid_settings(
     # FIXME: stop using hwapi, and get those functions into core software
     hw_api = ctx._core.get_hardware()
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+    hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(aspirate, dispense)
 
     def _dispense_with_added_blow_out() -> None:
-        # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
-        # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
+        # dispense all liquid, plus some air
+        # FIXME: push-out is not supported in Legacy core, so here
+        #        we again use the hardware controller
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.dispense.blow_out_submerged)
+        hw_api.dispense(hw_mount, push_out=liquid_class.dispense.blow_out_submerged)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -211,14 +213,18 @@ def _pipette_with_liquid_settings(
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
+        if hw_pipette.current_volume > 0:
+            print(
+                "WARNING: removing trailing air-gap from pipette, "
+                "this should only happen during blank trials"
+            )
+            hw_api.dispense(hw_mount)
+        hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
+        hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_submerge() -> None:
-        # TODO: re-implement mixing once we have a real use for it
-        #       and once the rest of the script settles down
-        if mix:
-            raise NotImplementedError("mixing is not currently implemented")
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
@@ -308,8 +314,9 @@ def aspirate_with_liquid_class(
     touch_tip: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
+    pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), pipette.channels, tip_volume, int(aspirate_volume)
+        pip_size, pipette.channels, tip_volume, int(aspirate_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -345,8 +352,9 @@ def dispense_with_liquid_class(
     touch_tip: bool = False,
 ) -> None:
     """Dispense with liquid class."""
+    pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), pipette.channels, tip_volume, int(dispense_volume)
+        pip_size, pipette.channels, tip_volume, int(dispense_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
