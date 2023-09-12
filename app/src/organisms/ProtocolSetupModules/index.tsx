@@ -57,6 +57,7 @@ import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import type {
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
+  TCOpenLidCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
@@ -125,6 +126,24 @@ function RenderModuleStatus({
       }).catch((e: Error) => {
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+        )
+      })
+    }
+    if (
+      module.attachedModuleMatch?.moduleType === THERMOCYCLER_MODULE_TYPE &&
+      module.attachedModuleMatch.data.lidStatus !== 'open'
+    ) {
+      const lidCommand: TCOpenLidCreateCommand = {
+        commandType: 'thermocycler/openLid',
+        params: {
+          moduleId: module.attachedModuleMatch.id,
+        },
+      }
+      createLiveCommand({
+        command: lidCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
         )
       })
     }
