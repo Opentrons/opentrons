@@ -224,7 +224,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByTestId }] = render()
     expect(
       getByTestId('RobotSettingButton_home_gantry_on_restart')
-    ).toHaveTextContent('Off')
+    ).toHaveTextContent('On')
   })
 
   it('should call a mock function when tapping enable historic offset', () => {
