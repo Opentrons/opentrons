@@ -860,7 +860,7 @@ class OT3Controller:
         res = await get_tip_ejector_state(
             self._messenger, node, Literal[expected_responses]
         )
-        if res[0] != res[-1]:
+        if not all([r == res[0] for r in res]):
             raise UnmatchedTipPresenceStates()
         tip_present_state = bool(res[0]) and bool(res[-1])
         return tip_present_state
