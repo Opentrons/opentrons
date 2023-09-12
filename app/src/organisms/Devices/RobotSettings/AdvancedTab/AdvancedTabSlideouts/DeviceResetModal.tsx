@@ -73,11 +73,13 @@ export function DeviceResetModal({
 
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
-      if (serialNumber != null) {
-        setTempRobotName(serialNumber)
-      }
       data.name != null && history.push(`/devices`)
       dispatch(removeRobot(robotName))
+      resetOptions = {
+        ...resetOptions,
+        onDeviceDisplay: true,
+      }
+      dispatchRequest(resetConfig(data.name, resetOptions))
     },
     onError: (error: Error) => {
       console.error('error', error.message)
@@ -97,15 +99,13 @@ export function DeviceResetModal({
             // filtering out ODD setting because this gets implicitly cleared if all settings are selected
             serverResetOptions.filter(o => o.id !== 'onDeviceDisplay').length
 
-        if (isEveryOptionSelected) {
-          if (serialNumber != null) {
-            updateRobotName(serialNumber)
-          }
-          resetOptions = {
-            ...resetOptions,
-            onDeviceDisplay: true,
-          }
-          dispatchRequest(resetConfig(tempRobotName, resetOptions))
+        if (isEveryOptionSelected && serialNumber != null) {
+          updateRobotName(serialNumber)
+          // resetOptions = {
+          //   ...resetOptions,
+          //   onDeviceDisplay: true,
+          // }
+          // dispatchRequest(resetConfig(tempRobotName, resetOptions))
         }
       }
       dispatchRequest(resetConfig(robotName, resetOptions))

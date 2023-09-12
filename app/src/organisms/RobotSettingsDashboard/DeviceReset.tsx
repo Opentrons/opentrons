@@ -86,7 +86,6 @@ export function DeviceReset({
       (a, b) =>
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
     )
-  const [tempRobotName, setTempRobotName] = React.useState<string>(robotName)
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const serialNumber =
@@ -94,10 +93,14 @@ export function DeviceReset({
 
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
-      if (serialNumber != null) {
-        setTempRobotName(serialNumber)
-      }
       dispatch(removeRobot(robotName))
+      const { clearAllStoredData, ...serverResetOptions } = resetOptions
+      dispatchRequest(
+        resetConfig(data.name, {
+          ...serverResetOptions,
+          onDeviceDisplay: true,
+        })
+      )
     },
     onError: (error: Error) => {
       console.error('error', error.message)
@@ -108,17 +111,8 @@ export function DeviceReset({
     if (resetOptions != null) {
       // remove clearAllStoredData since its not a setting on the backend
       const { clearAllStoredData, ...serverResetOptions } = resetOptions
-      if (Boolean(clearAllStoredData)) {
-        if (serialNumber != null) {
-          updateRobotName(serialNumber)
-        }
-        dispatchRequest(
-          resetConfig(tempRobotName, {
-            ...serverResetOptions,
-            onDeviceDisplay: true,
-          })
-        )
-        dispatchRequest(resetConfig(tempRobotName, serverResetOptions))
+      if (Boolean(clearAllStoredData) && serialNumber != null) {
+        updateRobotName(serialNumber)
       } else {
         dispatchRequest(resetConfig(robotName, serverResetOptions))
       }
