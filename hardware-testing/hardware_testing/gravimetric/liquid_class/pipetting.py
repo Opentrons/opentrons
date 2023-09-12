@@ -214,8 +214,10 @@ def _pipette_with_liquid_settings(
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
         if hw_pipette.current_volume > 0:
-            print("WARNING: removing trailing air-gap from pipette, "
-                  "this should only happen during blank trials")
+            print(
+                "WARNING: removing trailing air-gap from pipette, "
+                "this should only happen during blank trials"
+            )
             hw_api.dispense(hw_mount)
         hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
         hw_api.prepare_for_aspirate(hw_mount)
@@ -223,10 +225,6 @@ def _pipette_with_liquid_settings(
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
     def _aspirate_on_submerge() -> None:
-        # TODO: re-implement mixing once we have a real use for it
-        #       and once the rest of the script settles down
-        if mix:
-            raise NotImplementedError("mixing is not currently implemented")
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
