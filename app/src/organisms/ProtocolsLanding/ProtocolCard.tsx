@@ -83,7 +83,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (
-    <StyledText>{UNKNOWN_ATTACHMENT_ERROR}</StyledText>
+    <StyledText color={COLORS.errorEnabled}>
+      {UNKNOWN_ATTACHMENT_ERROR}
+    </StyledText>
   )
 
   return (

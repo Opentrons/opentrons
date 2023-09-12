@@ -45,48 +45,53 @@ export const getProtocolSrcFilePaths = (
 // TODO(jh, 2023-09-11): remove migrateProtocolsToNewDirectory after
 // OT-2 parity work is completed.
 const migrateProtocols = migrateProtocolsToNewDirectory()
-function migrateProtocolsToNewDirectory(): () => void {
+function migrateProtocolsToNewDirectory(): () => Promise<void> {
   let hasCheckedForMigration = false
-  return function (): void {
-    if (!hasCheckedForMigration) {
+  return function (): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (hasCheckedForMigration) resolve()
+      hasCheckedForMigration = true
       console.log(
-        `Performing one time protocol migration to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}...`
+        `Performing protocol migration to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}...`
       )
-      try {
-        migrateProtocols(
-          FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH,
-          FileSystem.PROTOCOLS_DIRECTORY_PATH
-        )
-        console.log('Protocol migration complete.')
-        hasCheckedForMigration = true
-      } catch (e) {
-        console.log(
-          `Error migrating protocols to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}: ${e}`
-        )
-      }
-    }
+      copyProtocols(
+        FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH,
+        FileSystem.PROTOCOLS_DIRECTORY_PATH
+      )
+        .then(() => {
+          console.log('Protocol migration complete.')
+          resolve()
+        })
+        .catch(e => {
+          console.log(
+            `Error migrating protocols to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}: ${e}`
+          )
+          reject(e)
+        })
+    })
   }
-  function migrateProtocols(src: string, dest: string): void {
-    if (fse.existsSync(src)) {
-      fse.readdirSync(src).forEach(item => {
-        const srcItem = path.join(src, item)
-        const destItem = path.join(dest, item)
-        fse.copySync(srcItem, destItem, { overwrite: false })
-        deleteIfVersion7Protocol(srcItem)
+
+  function copyProtocols(src: string, dest: string): Promise<void> {
+    return fse
+      .stat(src)
+      .then(doesSrcExist => {
+        if (!doesSrcExist.isDirectory()) return Promise.resolve()
+
+        return fse.readdir(src).then(items => {
+          const protocols: Array<Promise<void>> = items.map(item => {
+            const srcItem = path.join(src, item)
+            const destItem = path.join(dest, item)
+
+            return fse.copy(srcItem, destItem, {
+              overwrite: false,
+            })
+          })
+          return Promise.all(protocols).then(() => Promise.resolve())
+        })
       })
-    }
-  }
-
-  // TODO(jh, 2023-09-11): Remove  deleteIfVersion7Protocol() after
-  // the release of whatever app version follows 7.0.0-alpha.8
-  function deleteIfVersion7Protocol(srcDir: string): void {
-    const stats = fse.statSync(srcDir)
-    const modifiedDate = stats.mtime
-    const version631ReleaseDate = new Date('2023-06-06')
-
-    if (modifiedDate > version631ReleaseDate) {
-      fse.rmSync(srcDir, { recursive: true })
-    }
+      .catch(e => {
+        return Promise.reject(e)
+      })
   }
 }
 
