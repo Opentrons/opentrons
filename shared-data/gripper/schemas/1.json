@@ -6,9 +6,7 @@
     "schemaVersion": {
       "title": "Schemaversion",
       "description": "Which schema version a gripper is using",
-      "enum": [
-        1
-      ],
+      "enum": [1],
       "type": "integer"
     },
     "displayName": {
@@ -37,11 +35,7 @@
     "GripperModel": {
       "title": "GripperModel",
       "description": "Gripper models.",
-      "enum": [
-        "gripperV1",
-        "gripperV1.1",
-        "gripperV1.2"
-      ],
+      "enum": ["gripperV1", "gripperV1.1", "gripperV1.2"],
       "type": "string"
     },
     "Geometry": {
