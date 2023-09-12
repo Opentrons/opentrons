@@ -559,10 +559,10 @@ class MoveScheduler:
         Multiple kinds of error messages may arise, but the only one that is important
         to raise is the message about the Estop.
         """
-        estop_errors = list(
-            filter(lambda err: isinstance(err, EStopActivatedError), self._errors)
-        )
-        return estop_errors if len(estop_errors) > 0 else self._errors
+        for err in self._errors:
+            if isinstance(err, EStopActivatedError):
+                return [err]
+        return self._errors
 
     async def _send_stop_if_necessary(
         self, can_messenger: CanMessenger, group_id: int

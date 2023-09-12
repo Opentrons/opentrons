@@ -7,6 +7,7 @@ from opentrons_shared_data.errors.exceptions import (
     MoveConditionNotMetError,
     EnumeratedError,
     MotionFailedError,
+    EStopActivatedError,
 )
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
@@ -1231,11 +1232,13 @@ class MockSendMoveErrorCompleter:
         move_groups: MoveGroups,
         listener: MessageListenerCallback,
         start_at_index: int = 0,
+        estop_errors_to_send: int = 0,
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
         self._start_at_index = start_at_index
+        self._estop_errors_to_send = estop_errors_to_send
         self.call_count = 0
 
     @property
@@ -1263,9 +1266,13 @@ class MockSendMoveErrorCompleter:
             ):
                 for node, move in moves.items():
                     assert isinstance(move, MoveGroupSingleAxisStep)
+                    code = ErrorCode.collision_detected
+                    if self._estop_errors_to_send > 0:
+                        self._estop_errors_to_send -= 1
+                        code = ErrorCode.estop_detected
                     payload = ErrorMessagePayload(
                         severity=ErrorSeverityField(ErrorSeverity.unrecoverable),
-                        error_code=ErrorCodeField(ErrorCode.collision_detected),
+                        error_code=ErrorCodeField(code),
                     )
                     payload.message_index = message.payload.message_index
                     arbitration_id = ArbitrationId(
@@ -1334,6 +1341,21 @@ async def test_multiple_move_error(
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     with pytest.raises(EnumeratedError):
+        await subject.run(can_messenger=mock_can_messenger)
+    assert mock_sender.call_count == 2
+
+
+async def test_multiple_move_error_estop_filtering(
+    mock_can_messenger: AsyncMock, move_group_multiple_axes: MoveGroups
+) -> None:
+    """It should receive all of the errors but only report the Estop one."""
+    subject = MoveScheduler(move_groups=move_group_multiple_axes)
+    mock_sender = MockSendMoveErrorCompleter(
+        move_group_multiple_axes, subject, estop_errors_to_send=1
+    )
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(EStopActivatedError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 2
 
