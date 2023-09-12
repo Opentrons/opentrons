@@ -35,10 +35,6 @@ import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
-// import {
-//   getAnalyticsOptedIn,
-//   toggleAnalyticsOptedIn,
-// } from '../../../redux/analytics'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
@@ -48,7 +44,6 @@ import { RobotSettingButton } from './RobotSettingButton'
 import type { Dispatch, State } from '../../../redux/types'
 import type { SetSettingOption } from './'
 
-// const ROBOT_ANALYTICS_SETTING_ID = 'disableLogAggregation'
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
@@ -69,15 +64,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     getRobotSettings(state, robotName)
   )
 
-  // const appAnalyticsOptedIn = useSelector(getAnalyticsOptedIn)
-
-  // const isRobotAnalyticsOn =
-  //   allRobotSettings.find(({ id }) => id === ROBOT_ANALYTICS_SETTING_ID)
-  //     ?.value ?? false
-
-  const isHomeGantryIsOn =
+  const isHomeGantryOn =
     allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??
-    true
+    false
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
@@ -175,18 +164,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="reset"
         />
         <RobotSettingButton
-          settingName={t('home_gantry_on_restart')}
+          settingName={t('gantry_homing')}
           dataTestId="RobotSettingButton_home_gantry_on_restart"
-          settingInfo={t('home_gantry_subtext')}
+          settingInfo={t('gantry_homing_description')}
           iconName="gantry-homing"
-          rightElement={<OnOffToggle isOn={isHomeGantryIsOn} />}
+          rightElement={<OnOffToggle isOn={!isHomeGantryOn} />}
           onClick={() =>
             dispatch(
-              updateSetting(
-                robotName,
-                HOME_GANTRY_SETTING_ID,
-                !isHomeGantryIsOn
-              )
+              updateSetting(robotName, HOME_GANTRY_SETTING_ID, !isHomeGantryOn)
             )
           }
         />

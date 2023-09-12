@@ -33,7 +33,7 @@ const render = (isRobotBusy = false) => {
   )
 }
 
-describe('RobotSettings DisableHoming', () => {
+describe('RobotSettings GantryHoming', () => {
   beforeEach(() => {
     mockGetRobotSettings.mockReturnValue([mockSettings])
   })
