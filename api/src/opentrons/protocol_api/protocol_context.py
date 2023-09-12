@@ -773,6 +773,14 @@ class ProtocolContext(CommandPublisher):
 
         tip_racks = tip_racks or []
 
+        # TODO (tz, 9-12-23): move validation into PE
+        on_right_mount = self._instruments[Mount.RIGHT]
+        if is_96_channel and on_right_mount is not None:
+            raise RuntimeError(
+                f"Instrument already present on right:"
+                f" {on_right_mount.name}. In order to load a 96 channel pipette both mounts need to be available."
+            )
+
         existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
             # TODO(mc, 2022-08-25): create specific exception type
@@ -785,8 +793,6 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
-        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._core.load_instrument(
             instrument_name=checked_instrument_name,
             mount=checked_mount,
