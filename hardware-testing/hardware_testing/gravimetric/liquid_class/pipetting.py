@@ -185,7 +185,7 @@ def _pipette_with_liquid_settings(
         #        we again use the hardware controller
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.dispense(hw_mount)
+        hw_api.dispense(hw_mount, push_out=liquid_class.dispense.blow_out_submerged)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
