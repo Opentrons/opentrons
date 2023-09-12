@@ -77,14 +77,16 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        <MenuItem onClick={handleCalibrateClick} disabled={!isPipetteReady}>
-          {i18n.format(
-            module.moduleOffset?.last_modified != null
-              ? t('recalibrate')
-              : t('calibrate'),
-            'capitalize'
-          )}
-        </MenuItem>
+        {isOT3 ? (
+          <MenuItem onClick={handleCalibrateClick} disabled={!isPipetteReady}>
+            {i18n.format(
+              module.moduleOffset?.last_modified != null
+                ? t('recalibrate')
+                : t('calibrate'),
+              'capitalize'
+            )}
+          </MenuItem>
+        ) : null}
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
