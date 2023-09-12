@@ -128,6 +128,7 @@ stages:
 ---
 test_name: Pipette calibrations inaccessible on flex
 marks:
+  - ot3_only
   - usefixtures:
     - ot3_server_base_url
     - set_up_pipette_offset_temp_directory
