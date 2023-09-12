@@ -196,6 +196,15 @@ def _pipette_with_liquid_settings(  # noqa: C901
         max_blow_out_ul = (blow_out - bottom) * blow_out_ul_per_mm
         hw_api.blow_out(hw_mount, max_blow_out_ul)
 
+    def _set_plunger_bottom() -> None:
+        # FIXME: this should be deleted immediately once low-volume mode is working
+        old_positions = hw_pipette.plunger_positions
+        if (aspirate and aspirate < 5) or (dispense and dispense < 5):
+            old_positions.bottom = 61.5
+        else:
+            old_positions.bottom = 71.5
+        hw_pipette._set_plunger_positions(old_positions)
+
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
     #  2. SUBMERGE
@@ -225,6 +234,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
+        _set_plunger_bottom()
         hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)

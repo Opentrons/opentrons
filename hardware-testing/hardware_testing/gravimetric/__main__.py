@@ -183,17 +183,6 @@ class RunArgs:
         pipette_tag = helpers._get_tag_from_pipette(
             pipette, args.increment, args.user_volumes
         )
-        if args.plunger_bottom != 0.0:
-            hw_api = _ctx._core.get_hardware()
-            hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-            hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
-            old_positions = hw_pipette.plunger_positions
-            assert (
-                args.plunger_bottom < old_positions.blow_out
-                and args.plunger_bottom > 0.0
-            )
-            old_positions.bottom = args.plunger_bottom
-            hw_pipette._set_plunger_positions(old_positions)
 
         recorder: Optional[GravimetricRecorder] = None
         kind = ConfigType.photometric if args.photometric else ConfigType.gravimetric
@@ -524,7 +513,6 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-fail", action="store_true")
     parser.add_argument("--photoplate-col-offset", type=int, default=1)
     parser.add_argument("--dye-well-col-offset", type=int, default=1)
-    parser.add_argument("--plunger-bottom", type=float, default=0.0)
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():
