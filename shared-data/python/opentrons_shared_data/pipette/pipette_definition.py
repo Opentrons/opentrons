@@ -369,9 +369,6 @@ def liquid_class_for_volume_between_default_and_defaultlowvolume(
     This function has such a weird name because it is hardcoded to only use the liquid
     classes default and defaultLowVolume. It should no longer be used when those liquid
     classes change.
-
-    This function applies hysteresis to avoid frequently switching back and forth between
-    liquid classes unnecessarily.
     """
     # For now, until we add more liquid classes, we're going to hardcode the default
     # and lowVolumeDefault liquid classes as the ones to switch between.
@@ -379,20 +376,9 @@ def liquid_class_for_volume_between_default_and_defaultlowvolume(
 
     if not has_lvd:
         return pip_types.LiquidClasses.default
-    if current_liquid_class_name == pip_types.LiquidClasses.lowVolumeDefault:
-        if volume > (
-            available_liquid_classes[
-                pip_types.LiquidClasses.lowVolumeDefault
-            ].max_volume
-            * 0.75
-        ):
-            return pip_types.LiquidClasses.default
-    else:  # LiquidClasses.default
-        if volume < (
-            available_liquid_classes[pip_types.LiquidClasses.default].max_volume * 0.5
-        ):
-            return pip_types.LiquidClasses.lowVolumeDefault
-    return current_liquid_class_name
+    if volume >= available_liquid_classes[pip_types.LiquidClasses.default].min_volume:
+        return pip_types.LiquidClasses.default
+    return pip_types.LiquidClasses.lowVolumeDefault
 
 
 def default_tip_for_liquid_class(

@@ -80,7 +80,7 @@ def get_liquid_definition_for(
                 },
                 "defaultTipOverlapDictionary": {},
                 "maxVolume": 100,
-                "minVolume": 30,
+                "minVolume": 5,
                 "defaultTipracks": [],
             }
         )
@@ -139,6 +139,24 @@ def test_version_enum(major: int, minor: int) -> None:
             1,
             LiquidClasses.lowVolumeDefault,
             LiquidClasses.lowVolumeDefault,
+        ],
+        [
+            [LiquidClasses.lowVolumeDefault, LiquidClasses.default],
+            1,
+            LiquidClasses.default,
+            LiquidClasses.lowVolumeDefault,
+        ],
+        [
+            [LiquidClasses.lowVolumeDefault, LiquidClasses.default],
+            5,
+            LiquidClasses.default,
+            LiquidClasses.default,
+        ],
+        [
+            [LiquidClasses.lowVolumeDefault, LiquidClasses.default],
+            5,
+            LiquidClasses.lowVolumeDefault,
+            LiquidClasses.default,
         ],
         [
             [LiquidClasses.lowVolumeDefault, LiquidClasses.default],

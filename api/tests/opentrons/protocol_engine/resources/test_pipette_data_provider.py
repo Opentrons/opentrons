@@ -85,8 +85,8 @@ def test_configure_virtual_pipette_for_volume(
     assert result2 == LoadedStaticPipetteData(
         model="p50_single_v3.0",
         display_name="Flex 1-Channel 50 μL",
-        min_volume=0.5,
-        max_volume=5.0,
+        min_volume=1,
+        max_volume=30,
         channels=1,
         nozzle_offset_z=-259.15,
         home_position=230.15,
