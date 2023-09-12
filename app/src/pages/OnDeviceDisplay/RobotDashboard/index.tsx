@@ -19,6 +19,7 @@ import {
   RecentRunProtocolCarousel,
 } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
+import { AnalyticsOptInModal } from './AnalyticsOptInModal'
 import { WelcomeModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
 import { ServerInitializing } from '../../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
@@ -35,6 +36,10 @@ export function RobotDashboard(): JSX.Element {
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
     unfinishedUnboxingFlowRoute !== null
   )
+  const [
+    showAnalyticsOptInModal,
+    setShowAnalyticsOptInModal,
+  ] = React.useState<boolean>(false)
 
   const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
     .reverse() // newest runs first
@@ -81,7 +86,15 @@ export function RobotDashboard(): JSX.Element {
         gridGap={SPACING.spacing16}
       >
         {showWelcomeModal ? (
-          <WelcomeModal setShowWelcomeModal={setShowWelcomeModal} />
+          <WelcomeModal
+            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
+            setShowWelcomeModal={setShowWelcomeModal}
+          />
+        ) : null}
+        {showAnalyticsOptInModal ? (
+          <AnalyticsOptInModal
+            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
+          />
         ) : null}
         {contents}
       </Flex>

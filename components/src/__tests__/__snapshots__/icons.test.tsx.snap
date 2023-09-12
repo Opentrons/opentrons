@@ -2925,6 +2925,30 @@ exports[`icons plus renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons privacy renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 32 41"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M14.5 30.8002H17.5V17.9502H14.5V30.8002ZM16 14.6502C16.4817 14.6502 16.8854 14.4873 17.2113 14.1614C17.5371 13.8356 17.7 13.4319 17.7 12.9502C17.7 12.4685 17.5371 12.0648 17.2113 11.7389C16.8854 11.4131 16.4817 11.2502 16 11.2502C15.5183 11.2502 15.1146 11.4131 14.7887 11.7389C14.4629 12.0648 14.3 12.4685 14.3 12.9502C14.3 13.4319 14.4629 13.8356 14.7887 14.1614C15.1146 14.4873 15.5183 14.6502 16 14.6502ZM16 40.9502C11.3333 39.7835 7.5 37.0752 4.5 32.8252C1.5 28.5752 0 23.9169 0 18.8502V6.9502L16 0.950195L32 6.9502V18.8502C32 23.9169 30.5 28.5752 27.5 32.8252C24.5 37.0752 20.6667 39.7835 16 40.9502ZM16 37.8502C19.8333 36.5835 22.9583 34.1919 25.375 30.6752C27.7917 27.1585 29 23.2169 29 18.8502V9.0502L16 4.1502L3 9.0502V18.8502C3 23.2169 4.20833 27.1585 6.625 30.6752C9.04167 34.1919 12.1667 36.5835 16 37.8502Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons question-mark-circle renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

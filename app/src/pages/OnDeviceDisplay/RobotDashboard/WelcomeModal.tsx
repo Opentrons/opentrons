@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -15,22 +14,21 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
-import { updateConfigValue } from '../../../redux/config'
 
 import welcomeModalImage from '../../../assets/images/on-device-display/welcome_dashboard_modal.png'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
-import type { Dispatch } from '../../../redux/types'
 
 interface WelcomeModalProps {
+  setShowAnalyticsOptInModal: (showAnalyticsOptInModal: boolean) => void
   setShowWelcomeModal: (showWelcomeModal: boolean) => void
 }
 
 export function WelcomeModal({
+  setShowAnalyticsOptInModal,
   setShowWelcomeModal,
 }: WelcomeModalProps): JSX.Element {
-  const { t } = useTranslation('device_details')
-  const dispatch = useDispatch<Dispatch>()
+  const { t } = useTranslation(['device_details', 'shared'])
 
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const animationCommand: SetStatusBarCreateCommand = {
@@ -48,13 +46,8 @@ export function WelcomeModal({
   }
 
   const handleCloseModal = (): void => {
-    dispatch(
-      updateConfigValue(
-        'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
-        null
-      )
-    )
     setShowWelcomeModal(false)
+    setShowAnalyticsOptInModal(true)
   }
 
   React.useEffect(startDiscoAnimation, [])
@@ -90,7 +83,7 @@ export function WelcomeModal({
             {t('welcome_modal_description')}
           </StyledText>
         </Flex>
-        <SmallButton buttonText={t('got_it')} onClick={handleCloseModal} />
+        <SmallButton buttonText={t('shared:next')} onClick={handleCloseModal} />
       </Flex>
     </Modal>
   )

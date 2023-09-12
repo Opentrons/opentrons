@@ -3,7 +3,6 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { updateConfigValue } from '../../../../redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
@@ -20,10 +19,6 @@ const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.Mo
 const mockFunc = jest.fn()
 const WELCOME_MODAL_IMAGE_NAME = 'welcome_dashboard_modal.png'
 
-const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
-  typeof updateConfigValue
->
-
 const render = (props: React.ComponentProps<typeof WelcomeModal>) => {
   return renderWithProviders(<WelcomeModal {...props} />, {
     i18nInstance: i18n,
@@ -38,6 +33,7 @@ describe('WelcomeModal', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
+      setShowAnalyticsOptInModal: jest.fn(),
       setShowWelcomeModal: mockFunc,
     }
     mockUseCreateLiveCommandMutation.mockReturnValue({
@@ -58,7 +54,7 @@ describe('WelcomeModal', () => {
     getByText(
       'A place to run protocols, manage your instruments, and view robot status.'
     )
-    getByText('Got it')
+    getByText('Next')
     expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: animationCommand,
@@ -66,10 +62,10 @@ describe('WelcomeModal', () => {
     })
   })
 
-  it('should call a mock function when tapping got it button', () => {
+  it('should call a mock function when tapping next button', () => {
     const [{ getByText }] = render(props)
-    getByText('Got it').click()
-    expect(mockUpdateConfigValue).toHaveBeenCalled()
+    getByText('Next').click()
     expect(props.setShowWelcomeModal).toHaveBeenCalled()
+    expect(props.setShowAnalyticsOptInModal).toHaveBeenCalled()
   })
 })

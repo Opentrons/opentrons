@@ -35,10 +35,6 @@ import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
-import {
-  getAnalyticsOptedIn,
-  toggleAnalyticsOptedIn,
-} from '../../../redux/analytics'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
@@ -48,7 +44,6 @@ import { RobotSettingButton } from './RobotSettingButton'
 import type { Dispatch, State } from '../../../redux/types'
 import type { SetSettingOption } from './'
 
-const ROBOT_ANALYTICS_SETTING_ID = 'disableLogAggregation'
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
@@ -69,11 +64,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     getRobotSettings(state, robotName)
   )
 
-  const appAnalyticsOptedIn = useSelector(getAnalyticsOptedIn)
-
-  const isRobotAnalyticsOn =
-    allRobotSettings.find(({ id }) => id === ROBOT_ANALYTICS_SETTING_ID)
-      ?.value ?? false
   const isHomeGantryOn =
     allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??
     false
@@ -153,6 +143,13 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="brightness"
         />
         <RobotSettingButton
+          settingName={t('app_settings:privacy')}
+          dataTestId="RobotSettingButton_privacy"
+          settingInfo={t('app_settings:choose_what_data_to_share')}
+          onClick={() => setCurrentOption('Privacy')}
+          iconName="privacy"
+        />
+        <RobotSettingButton
           settingName={t('apply_historic_offsets')}
           dataTestId="RobotSettingButton_apply_historic_offsets"
           settingInfo={t('historic_offsets_description')}
@@ -165,36 +162,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           dataTestId="RobotSettingButton_device_reset"
           onClick={() => setCurrentOption('DeviceReset')}
           iconName="reset"
-        />
-        <RobotSettingButton
-          settingName={i18n.format(
-            t('app_settings:share_app_analytics_short'),
-            'titleCase'
-          )}
-          settingInfo={t('app_settings:share_app_analytics_description_short')}
-          dataTestId="RobotSettingButton_share_app_analytics"
-          rightElement={<OnOffToggle isOn={appAnalyticsOptedIn} />}
-          onClick={() => dispatch(toggleAnalyticsOptedIn())}
-          iconName="gear"
-        />
-        <RobotSettingButton
-          settingName={i18n.format(
-            t('share_logs_with_opentrons_short'),
-            'titleCase'
-          )}
-          settingInfo={t('share_logs_with_opentrons_description_short')}
-          dataTestId="RobotSettingButton_share_analytics"
-          rightElement={<OnOffToggle isOn={isRobotAnalyticsOn} />}
-          onClick={() =>
-            dispatch(
-              updateSetting(
-                robotName,
-                ROBOT_ANALYTICS_SETTING_ID,
-                !isRobotAnalyticsOn
-              )
-            )
-          }
-          iconName="ot-file"
         />
         <RobotSettingButton
           settingName={t('gantry_homing')}
@@ -276,7 +243,7 @@ function FeatureFlags(): JSX.Element {
   )
 }
 
-function OnOffToggle(props: { isOn: boolean }): JSX.Element {
+export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
   const { t } = useTranslation('shared')
   return (
     <Flex
