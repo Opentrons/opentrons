@@ -41,7 +41,7 @@ export function Privacy({
 
   const appAnalyticsOptedIn = useSelector(getAnalyticsOptedIn)
 
-  const isRobotAnalyticsOn =
+  const isRobotAnalyticsDisabled =
     allRobotSettings.find(({ id }) => id === ROBOT_ANALYTICS_SETTING_ID)
       ?.value ?? false
 
@@ -69,13 +69,13 @@ export function Privacy({
             settingName={t('share_robot_logs')}
             settingInfo={t('share_robot_logs_description')}
             dataTestId="RobotSettingButton_share_analytics"
-            rightElement={<OnOffToggle isOn={isRobotAnalyticsOn} />}
+            rightElement={<OnOffToggle isOn={!isRobotAnalyticsDisabled} />}
             onClick={() =>
               dispatch(
                 updateSetting(
                   robotName,
                   ROBOT_ANALYTICS_SETTING_ID,
-                  !isRobotAnalyticsOn
+                  !isRobotAnalyticsDisabled
                 )
               )
             }
