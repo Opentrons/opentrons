@@ -74,7 +74,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )[0]
       getByText(
-        'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec with push out volume 10 µL'
+        'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec and pushing out 10 µL'
       )
     }
   })
@@ -136,7 +136,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )[0]
-    getByText('Configure 1 µL for aspirating with P300 Single-Channel GEN1')
+    getByText('Configure P300 Single-Channel GEN1 to aspirate 1 µL')
   })
   it('renders correct text for dropTip', () => {
     const command = mockRobotSideAnalysis.commands.find(
