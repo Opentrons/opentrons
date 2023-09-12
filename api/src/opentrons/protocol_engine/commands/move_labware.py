@@ -92,9 +92,7 @@ class MoveLabwareImplementation(
         )
         definition_uri = current_labware.definitionUri
 
-        if labware_validation.validate_if_labware_is_fixed_trash(
-            current_labware_definition
-        ):
+        if self._state_view.labware.is_fixed_trash(params.labwareId):
             raise LabwareMovementNotAllowedError(
                 f"Cannot move fixed trash labware '{current_labware_definition.parameters.loadName}'."
             )

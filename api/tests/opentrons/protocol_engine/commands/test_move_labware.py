@@ -571,9 +571,9 @@ async def test_move_labware_raises_when_moving_fixed_trash_labware(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(definition)
 
-    decoy.when(
-        labware_validation.validate_if_labware_is_fixed_trash(definition)
-    ).then_return(True)
+    decoy.when(state_view.labware.is_fixed_trash("my-cool-labware-id")).then_return(
+        True
+    )
 
     with pytest.raises(
         errors.LabwareMovementNotAllowedError,

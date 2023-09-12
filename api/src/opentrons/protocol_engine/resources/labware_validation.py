@@ -25,16 +25,8 @@ def validate_labware_can_be_stacked(
 
 
 def validate_gripper_compatible(definition: LabwareDefinition) -> bool:
-    """Validate that the labware definition does not have a quirk disallowing movement with gripper."""
+    """Validate that the    labware definition does not have a quirk disallowing movement with gripper."""
     return (
         definition.parameters.quirks is None
         or "gripperIncompatible" not in definition.parameters.quirks
-    )
-
-
-def validate_if_labware_is_fixed_trash(definition: LabwareDefinition) -> bool:
-    """Validate that the labware definition is a fixed trash."""
-    return (
-        definition.parameters.quirks is not None
-        and "fixedTrash" in definition.parameters.quirks
     )
