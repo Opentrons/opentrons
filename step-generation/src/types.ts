@@ -197,7 +197,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm: number
   /** Push out param only in dispense */
-  dispense_pushOut: boolean
+  dispensePushOut: boolean
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {

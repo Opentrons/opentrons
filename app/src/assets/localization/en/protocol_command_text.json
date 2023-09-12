@@ -1,7 +1,7 @@
 {
   "aspirate": "Aspirating {{volume}} µL from well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
   "blowout": "Blowing out at well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
-  "configure_for_volume": "Configure {{volume}} µL for aspirate",
+  "configure_for_volume": "Configure {{volume}} µL for aspirating with {{pipette}}",
   "closing_tc_lid": "Closing Thermocycler lid",
   "comment": "Comment",
   "confirm_and_resume": "Confirm and resume",
@@ -13,6 +13,7 @@
   "degrees_c": "{{temp}}°C",
   "disengaging_magnetic_module": "Disengaging Magnetic Module",
   "dispense": "Dispensing {{volume}} µL into well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
+  "dispense_push_out": "Dispensing {{volume}} µL into well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec with push out volume {{push_out_volume}} µL",
   "drop_tip": "Dropping tip in {{well_name}} of {{labware}}",
   "engaging_magnetic_module": "Engaging Magnetic Module",
   "fixed_trash": "Fixed Trash",

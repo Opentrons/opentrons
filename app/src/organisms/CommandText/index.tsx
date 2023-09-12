@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import { getPipetteNameSpecs, RunTimeCommand } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { LoadCommandText } from './LoadCommandText'
 import { PipettingCommandText } from './PipettingCommandText'
 import { TemperatureCommandText } from './TemperatureCommandText'
 import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
 import type { StyleProps } from '@opentrons/components'
 
@@ -140,10 +140,20 @@ export function CommandText(props: Props): JSX.Element | null {
       )
     }
     case 'configureForVolume': {
-      const { volume } = command.params
+      const { volume, pipetteId } = command.params
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
       return (
         <StyledText as="p" {...styleProps}>
-          {t('configure_for_volume', { volume })}
+          {t('configure_for_volume', {
+            volume,
+            pipette:
+              pipetteName != null
+                ? getPipetteNameSpecs(pipetteName)?.displayName
+                : '',
+          })}
         </StyledText>
       )
     }

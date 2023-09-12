@@ -48,14 +48,23 @@ export const PipettingCommandText = ({
       })
     }
     case 'dispense': {
-      const { volume, flowRate } = command.params
-      return t('dispense', {
-        well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: displayLocation,
-        volume: volume,
-        flow_rate: flowRate,
-      })
+      const { volume, flowRate, pushOut } = command.params
+      return pushOut
+        ? t('dispense_push_out', {
+            well_name: wellName,
+            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware_location: displayLocation,
+            volume: volume,
+            flow_rate: flowRate,
+            push_out_volume: pushOut,
+          })
+        : t('dispense', {
+            well_name: wellName,
+            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware_location: displayLocation,
+            volume: volume,
+            flow_rate: flowRate,
+          })
     }
     case 'blowout': {
       const { flowRate } = command.params
