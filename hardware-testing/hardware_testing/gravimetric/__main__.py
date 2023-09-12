@@ -43,7 +43,6 @@ from .trial import TestResources, _change_pipettes
 from .tips import get_tips
 from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
-from opentrons.hardware_control.types import OT3Mount
 
 # FIXME: bump to v2.15 to utilize protocol engine
 API_LEVEL = "2.13"
