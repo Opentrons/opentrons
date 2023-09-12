@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from functools import wraps
 import logging
 from copy import deepcopy
+from typing_extensions import Literal
 from typing import (
     Any,
     Awaitable,
@@ -125,7 +126,6 @@ from opentrons.hardware_control.types import (
     SubSystem,
     TipStateType,
     FailedTipStateCheck,
-    UnmatchedTipStates,
     EstopState,
 )
 from opentrons.hardware_control.errors import (
@@ -164,6 +164,7 @@ from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
+    UnmatchedTipPresenceStates,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -848,15 +849,19 @@ class OT3Controller:
             raise FailedTipStateCheck(tip_state, res)
 
     async def get_tip_present_state(
-        self, mount: OT3Mount, expect_multiple_responses: bool = False
+        self,
+        mount: OT3Mount,
+        expect_multiple_responses: bool = False,
     ) -> bool:
         """Get the state of the tip ejector flag for a given mount."""
         expected_responses = 2 if expect_multiple_responses else 1
+        node = sensor_node_for_mount(OT3Mount(mount.value))
+        assert node != NodeId.gripper
         res = await get_tip_ejector_state(
-            self._messenger, sensor_node_for_mount(OT3Mount(mount.value)), expected_responses  # type: ignore
+            self._messenger, node, Literal[expected_responses]
         )
         if res[0] != res[-1]:
-            raise UnmatchedTipStates()
+            raise UnmatchedTipPresenceStates()
         tip_present_state = bool(res[0]) and bool(res[-1])
         return tip_present_state
 

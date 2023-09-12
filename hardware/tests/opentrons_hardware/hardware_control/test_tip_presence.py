@@ -46,7 +46,9 @@ async def test_get_tip_ejector_state(
     message_send_loopback.add_responder(responder)
 
     res = await get_tip_ejector_state(
-        mock_messenger, cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node)
+        mock_messenger,
+        cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node),
+        1,
     )
 
     # We should have sent a request
@@ -62,6 +64,8 @@ async def test_tip_ejector_state_times_out(mock_messenger: AsyncMock) -> None:
     node = NodeId.pipette_left
 
     res = await get_tip_ejector_state(
-        mock_messenger, cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node)
+        mock_messenger,
+        cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node),
+        1,
     )
     assert not res

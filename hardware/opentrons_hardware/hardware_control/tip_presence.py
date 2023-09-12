@@ -3,7 +3,7 @@ import asyncio
 import logging
 
 from typing_extensions import Literal
-from typing import List
+from typing import List, overload, Tuple, Union
 
 from opentrons_shared_data.errors.exceptions import CommandTimedOutError
 
@@ -24,12 +24,32 @@ from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 log = logging.getLogger(__name__)
 
 
+@overload
 async def get_tip_ejector_state(
     can_messenger: CanMessenger,
     node: Literal[NodeId.pipette_left, NodeId.pipette_right],
-    expected_responses: int = 1,
+    expected_responses: Literal[1],
     timeout: float = 1.0,
-) -> List[int]:
+) -> Tuple[int]:
+    ...
+
+
+@overload
+async def get_tip_ejector_state(
+    can_messenger: CanMessenger,
+    node: Literal[NodeId.pipette_left, NodeId.pipette_right],
+    expected_responses: Literal[2],
+    timeout: float = 1.0,
+) -> Tuple[int, int]:
+    ...
+
+
+async def get_tip_ejector_state(
+    can_messenger: CanMessenger,
+    node: Literal[NodeId.pipette_left, NodeId.pipette_right],
+    expected_responses: Union[Literal[1], Literal[2]],
+    timeout: float = 1.0,
+) -> Tuple[int, ...]:
     """Get the state of the tip presence interrupter.
 
     When the tip ejector flag is occuluded, then we
@@ -68,4 +88,4 @@ async def get_tip_ejector_state(
             log.warning(msg)
             raise CommandTimedOutError(message=msg) from te
         finally:
-            return data_list
+            return tuple(data_list)

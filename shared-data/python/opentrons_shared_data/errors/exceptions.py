@@ -528,6 +528,26 @@ class MisalignedGantryError(RoboticsControlError):
         )
 
 
+class UnmatchedTipPresenceStates(RoboticsControlError):
+    """An error indicating that a tip presence check resulted in two different response outcomes."""
+
+    def __init__(
+        self,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MisalignedGantryError."""
+        msg = "Received two differing tip presence statuses. Pickup motor may need to be homed."
+        if detail:
+            msg += str(detail)
+        super().__init__(
+            ErrorCodes.UNMATCHED_TIP_PRESENCE_STATES,
+            msg,
+            detail,
+            wrapping,
+        )
+
+
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 
