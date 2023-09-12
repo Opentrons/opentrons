@@ -552,6 +552,8 @@ class GeometryView:
             # In order to avoid the complexity of finding tip drop locations for
             # variety of labware with different well configs, we will allow
             # location cycling only for fixed trash labware right now.
+            # TODO (spp, 2023-09-12): update this to possibly a labware-width based check,
+            #  or a 'trash' quirk check, once movable trash is implemented.
             return DropTipWellLocation(
                 origin=DropTipWellOrigin.DEFAULT,
                 offset=WellOffset(x=0, y=0, z=0),
