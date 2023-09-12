@@ -507,3 +507,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     to_loc=location,
                     is_multichannel=self.get_channels() > 1,
                 )
+
+    def configure_for_volume(self, volume: float) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass
