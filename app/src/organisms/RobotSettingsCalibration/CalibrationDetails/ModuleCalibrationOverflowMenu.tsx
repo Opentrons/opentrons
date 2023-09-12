@@ -88,7 +88,10 @@ export function ModuleCalibrationOverflowMenu({
         )
       })
     }
-    if (!isLatchClosed) {
+    if (
+      attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      !isLatchClosed
+    ) {
       toggleLatch()
     }
 

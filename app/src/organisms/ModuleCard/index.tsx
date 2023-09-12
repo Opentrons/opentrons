@@ -256,7 +256,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         )
       })
     }
-    if (!isLatchClosed) {
+    if (module.moduleType === HEATERSHAKER_MODULE_TYPE && !isLatchClosed) {
       toggleLatch()
     }
     if (
