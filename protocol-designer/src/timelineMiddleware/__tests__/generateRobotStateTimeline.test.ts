@@ -43,6 +43,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12', 'A12'],
           mixBeforeAspirate: null,
           description: null,
+          dispensePushOut: false,
         },
       },
       b: {
@@ -76,6 +77,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12'],
           mixBeforeAspirate: null,
           description: null,
+          dispensePushOut: false,
         },
       },
       c: {

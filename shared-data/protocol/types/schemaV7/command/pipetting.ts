@@ -22,6 +22,11 @@ export interface ConfigureForVolumeCreateCommand
   commandType: 'configureForVolume'
   params: ConfigureForVolumeParams
 }
+
+export interface ConfigureForVolumeParams {
+  pipetteId: string
+  volume: number
+}
 export interface ConfigureForVolumeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     ConfigureForVolumeCreateCommand {
@@ -82,11 +87,6 @@ export interface DropTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
     DropTipCreateCommand {
   result?: any
-}
-
-export type ConfigureForVolumeParams = {
-  pipetteId: string
-  volume: number
 }
 
 export type AspDispAirgapParams = FlowRateParams &
