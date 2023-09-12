@@ -9,6 +9,7 @@ import {
 } from '../utils'
 import { StepFieldName, FormData } from '../../../form-types'
 import { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
+import { PipetteEntities } from '@opentrons/step-generation'
 interface ShowFieldErrorParams {
   name: StepFieldName
   focusedField: StepFieldName | null
@@ -23,6 +24,7 @@ export const showFieldErrors = ({
 export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
   formData: FormData,
+  pipetteEntities: PipetteEntities,
   handleChangeFormInput: (name: string, value: unknown) => void
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
@@ -30,7 +32,9 @@ export const makeSingleEditFieldProps = (
     getDefaultsForStepType(formData.stepType)
   )
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
-    const disabled = formData ? getDisabledFields(formData).has(name) : false
+    const disabled = formData
+      ? getDisabledFields(formData, pipetteEntities).has(name)
+      : false
     const value = formData ? formData[name] : null
     const showErrors = showFieldErrors({
       name,

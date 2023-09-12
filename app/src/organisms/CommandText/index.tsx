@@ -139,6 +139,14 @@ export function CommandText(props: Props): JSX.Element | null {
         </StyledText>
       )
     }
+    case 'configureForVolume': {
+      const { volume } = command.params
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('configure_for_volume', { volume })}
+        </StyledText>
+      )
+    }
     case 'touchTip':
     case 'home':
     case 'savePosition':

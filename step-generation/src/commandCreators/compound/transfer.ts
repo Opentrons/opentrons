@@ -26,6 +26,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
+import { configureForVolume } from '../atomic/configureForVolume'
 export const transfer: CommandCreator<TransferArgs> = (
   args,
   invariantContext,
@@ -97,6 +98,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     blowoutOffsetFromTopMm,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
+    dispense_pushOut,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -162,6 +164,20 @@ export const transfer: CommandCreator<TransferArgs> = (
           } else if (args.changeTip === 'perDest') {
             changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
           }
+
+          const configureForVolumeCommand: CurriedCommandCreator[] =
+            args.volume <= 1 &&
+            (invariantContext.pipetteEntities[args.pipette].name ===
+              'p50_single_flex' ||
+              invariantContext.pipetteEntities[args.pipette].name ===
+                'p50_multi_flex')
+              ? [
+                  curryCommandCreator(configureForVolume, {
+                    pipetteId: args.pipette,
+                    volume: args.volume,
+                  }),
+                ]
+              : []
 
           const tipCommands: CurriedCommandCreator[] = changeTipNow
             ? [
@@ -406,6 +422,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...tipCommands,
             ...preWetTipCommands,
             ...mixBeforeAspirateCommands,
+            ...configureForVolumeCommand,
             curryCommandCreator(aspirate, {
               pipette: args.pipette,
               volume: subTransferVol,
@@ -424,6 +441,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: destWell,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
+              pushOut: dispense_pushOut ? subTransferVol : undefined,
             }),
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,

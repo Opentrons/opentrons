@@ -1,3 +1,4 @@
+import mapValues from 'lodash/mapValues'
 import { uuid } from '../../utils'
 import { getOnlyLatestDefs } from '../../labware-defs'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
@@ -252,6 +253,26 @@ export const migrateFile = (
   }
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
 
+  const migrateSavedStepForms = (
+    savedStepForms: Record<string, any>
+  ): Record<string, any> => {
+    return mapValues(savedStepForms, stepForm => {
+      if (stepForm.stepType === 'moveLiquid') {
+        return {
+          ...stepForm,
+          dispense_pushOut: false,
+        }
+      }
+      return stepForm
+    })
+  }
+  const filteredavedStepForms = Object.fromEntries(
+    Object.entries(
+      appData.designerApplication?.data?.savedStepForms ?? {}
+    ).filter(([key, value]) => key !== INITIAL_DECK_SETUP_STEP_ID)
+  )
+  const newFilteredavedStepForms = migrateSavedStepForms(filteredavedStepForms)
+
   return {
     ...rest,
     designerApplication: {
@@ -263,7 +284,6 @@ export const migrateFile = (
           ...newLabwareIngreds,
         },
         savedStepForms: {
-          ...appData.designerApplication?.data?.savedStepForms,
           [INITIAL_DECK_SETUP_STEP_ID]: {
             ...appData.designerApplication?.data?.savedStepForms[
               INITIAL_DECK_SETUP_STEP_ID
@@ -272,6 +292,7 @@ export const migrateFile = (
               ...newLabwareLocationUpdate,
             },
           },
+          ...newFilteredavedStepForms,
         },
       },
     },

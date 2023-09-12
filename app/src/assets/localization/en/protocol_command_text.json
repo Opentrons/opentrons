@@ -1,6 +1,7 @@
 {
   "aspirate": "Aspirating {{volume}} µL from well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
   "blowout": "Blowing out at well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
+  "configure_for_volume": "Configure {{volume}} µL for aspirate",
   "closing_tc_lid": "Closing Thermocycler lid",
   "comment": "Comment",
   "confirm_and_resume": "Confirm and resume",

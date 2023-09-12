@@ -12,9 +12,12 @@ import {
   uuid,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { DispenseParams as DispenseParamsV3 } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
+interface DispenseParams extends DispenseParamsV3 {
+  pushOut?: number
+}
 /** Dispense with given args. Requires tip. */
 export const dispense: CommandCreator<DispenseParams> = (
   args,
@@ -29,6 +32,7 @@ export const dispense: CommandCreator<DispenseParams> = (
     offsetFromBottomMm,
     flowRate,
     isAirGap,
+    pushOut,
   } = args
   const actionName = 'dispense'
   const errors: CommandCreatorError[] = []
@@ -170,6 +174,7 @@ export const dispense: CommandCreator<DispenseParams> = (
           },
         },
         flowRate,
+        pushOut,
       },
       ...(isAirGap && { meta: { isAirGap } }),
     },
