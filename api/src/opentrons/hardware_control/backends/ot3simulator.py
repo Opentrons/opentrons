@@ -188,6 +188,7 @@ class OT3Simulator:
             nodes.add(NodeId.gripper)
         self._present_nodes = nodes
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+        self._sim_jaw_state = GripperJawState.HOMED_READY
 
     @property
     def initialized(self) -> bool:
@@ -369,12 +370,14 @@ class OT3Simulator:
     ) -> None:
         """Move gripper inward."""
         _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition, stay_engaged)
+        self._sim_jaw_state = GripperJawState.GRIPPING
 
     @ensure_yield
     async def gripper_home_jaw(self, duty_cycle: float) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group(duty_cycle)
         self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
+        self._sim_jaw_state = GripperJawState.HOMED_READY
 
     @ensure_yield
     async def gripper_hold_jaw(
@@ -383,6 +386,7 @@ class OT3Simulator:
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
+        self._sim_jaw_state = GripperJawState.HOLDING
 
     async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
         """Raise an error if the given state doesn't match the physical state."""
@@ -394,7 +398,7 @@ class OT3Simulator:
 
     async def get_jaw_state(self) -> GripperJawState:
         """Get the state of the gripper jaw."""
-        return GripperJawState.HOMED_READY
+        return self._sim_jaw_state
 
     async def tip_action(
         self,
