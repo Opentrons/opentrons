@@ -78,7 +78,7 @@ function migrateProtocolsToNewDirectory(): () => Promise<void> {
         if (!doesSrcExist.isDirectory()) return Promise.resolve()
 
         return fse.readdir(src).then(items => {
-          const protocols: Array<Promise<void>> = items.map(item => {
+          const protocols = items.map(item => {
             const srcItem = path.join(src, item)
             const destItem = path.join(dest, item)
 
