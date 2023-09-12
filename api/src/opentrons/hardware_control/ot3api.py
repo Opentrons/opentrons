@@ -1034,7 +1034,6 @@ class OT3API(
             checked_max = None
 
         await self._cache_and_maybe_retract_mount(realmount)
-        await self._move_gripper_to_idle_position(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1135,7 +1134,6 @@ class OT3API(
         else:
             checked_max = None
         await self._cache_and_maybe_retract_mount(realmount)
-        await self._move_gripper_to_idle_position(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1154,28 +1152,20 @@ class OT3API(
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
+        if mount != OT3Mount.GRIPPER:
+            await self.idle_gripper()
         self._last_moved_mount = mount
 
-    async def _move_gripper_to_idle_position(self, mount_in_use: OT3Mount) -> None:
-        """Move gripper to its idle, gripped position.
-
-        If the gripper is not currently in use, puts its jaws in a low-current,
-        gripped position. Experimental behavior in order to prevent gripper jaws
-        from colliding into thermocycler lid & lid latch clips.
-        """
-        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
-        if (
-            self._gripper_handler.gripper
-            and mount_in_use != OT3Mount.GRIPPER
-            and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
-        ):
-            if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
-                self._log.warning(
-                    "Gripper jaw is not homed. Can't be moved to idle position"
+    async def idle_gripper(self) -> None:
+        """Move gripper to its idle, gripped position."""
+        try:
+            if self._gripper_handler.is_ready_for_idle():
+                await self.grip(
+                    force_newtons=self._gripper_handler.gripper.default_idle_force,
+                    stay_engaged=False
                 )
-            else:
-                # allows for safer gantry movement at minimum force
-                await self.grip(force_newtons=self._gripper_handler.gripper.default_grip_force)
+        except GripperNotAttachedError:
+            pass
 
     def _build_moves(
         self,
