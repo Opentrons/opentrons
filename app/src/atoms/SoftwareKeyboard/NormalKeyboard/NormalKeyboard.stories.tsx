@@ -5,14 +5,14 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
-import { InputField } from '../InputField'
-import { NormalKeyboard } from './'
-import '../../styles.global.css'
+import { InputField } from '../../InputField'
+import { NormalKeyboard } from '.'
+import '../../../styles.global.css'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Odd/Atoms/SoftwareKeyboard/NormalKeyboard',
+  title: 'ODD/Atoms/SoftwareKeyboard/NormalKeyboard',
   component: NormalKeyboard,
 } as Meta
 

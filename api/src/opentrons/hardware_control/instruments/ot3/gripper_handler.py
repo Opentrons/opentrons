@@ -1,5 +1,6 @@
 from typing import Optional
 import logging
+import math
 
 from opentrons.types import Point
 from .instrument_calibration import (
@@ -136,6 +137,15 @@ class GripperHandler:
         gripper = self.get_gripper()
         if gripper.state == GripperJawState.UNHOMED:
             raise GripError("Gripper jaw must be homed before moving")
+
+    def is_ready_for_jaw_home(self) -> bool:
+        """Raise an exception if it is not currently valid to home the jaw."""
+        gripper = self.get_gripper()
+        if gripper.state == GripperJawState.GRIPPING and not math.isclose(
+            gripper.jaw_width, gripper.geometry.jaw_width["min"], abs_tol=5.0
+        ):
+            return False
+        return True
 
     def set_jaw_state(self, state: GripperJawState) -> None:
         self.get_gripper().state = state

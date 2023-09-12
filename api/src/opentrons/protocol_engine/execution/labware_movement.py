@@ -20,6 +20,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
+    CannotPerformGripperAction,
 )
 
 from ..types import (
@@ -96,6 +97,10 @@ class LabwareMovementHandler:
         if not ot3api.has_gripper():
             raise GripperNotAttachedError(
                 "No gripper found for performing labware movements."
+            )
+        if not ot3api._gripper_handler.is_ready_for_jaw_home():
+            raise CannotPerformGripperAction(
+                "Cannot pick up labware when gripper is already gripping."
             )
 
         gripper_mount = OT3Mount.GRIPPER

@@ -862,8 +862,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.  From API version 2.15 on, the API will default to
-        alternating between two different drop tip locations within the trash container
+        the fixed trash in slot 12.  From API version 2.15 on, if the trash container is
+        the default fixed trash in A3 (slot 12), the API will default to
+        dropping tips in different points within the trash container
         in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
