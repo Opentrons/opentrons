@@ -66,7 +66,7 @@ function migrateProtocolsToNewDirectory(): () => Promise<void> {
           console.log(
             `Error migrating protocols to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}: ${e}`
           )
-          reject(e)
+          resolve()
         })
     })
   }
