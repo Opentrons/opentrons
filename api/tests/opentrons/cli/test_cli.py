@@ -229,9 +229,10 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
         # TODO: PAPIv<2.15?
     ],
 )
-def test_error_context(
+def test_python_error_line_numbers(
     tmp_path: Path, python_protocol_source: str, expected_detail: str
 ) -> None:
+    """Test that error messages from Python protocols have line numbers."""
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
 
