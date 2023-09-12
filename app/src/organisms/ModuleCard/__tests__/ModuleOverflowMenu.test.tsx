@@ -511,4 +511,15 @@ describe('ModuleOverflowMenu', () => {
     const calibrate = getByRole('button', { name: 'Calibrate' })
     expect(calibrate).toBeDisabled()
   })
+
+  it('a mock function should be called when clicking Calibrate if pipette is ready', () => {
+    props = {
+      ...props,
+      isPipetteReady: true,
+    }
+    const { getByRole } = render(props)
+
+    getByRole('button', { name: 'Calibrate' }).click()
+    expect(props.handleCalibrateClick).toHaveBeenCalled()
+  })
 })

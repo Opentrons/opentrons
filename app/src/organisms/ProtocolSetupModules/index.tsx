@@ -24,10 +24,12 @@ import {
   getModuleDisplayName,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
+  HEATERSHAKER_MODULE_TYPE,
   NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
@@ -52,6 +54,10 @@ import {
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
 
+import type {
+  HeaterShakerDeactivateShakerCreateCommand,
+  HeaterShakerCloseLatchCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -81,8 +87,47 @@ function RenderModuleStatus({
   setShowModuleWizard,
 }: RenderModuleStatusProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
+  const { createLiveCommand } = useCreateLiveCommandMutation()
 
   const handleCalibrate = (): void => {
+    if (
+      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.attachedModuleMatch.data.currentSpeed != null &&
+      module.attachedModuleMatch.data.currentSpeed > 0
+    ) {
+      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: {
+          moduleId: module.attachedModuleMatch.id,
+        },
+      }
+      createLiveCommand({
+        command: stopShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
+        )
+      })
+    }
+    if (
+      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.attachedModuleMatch.data.labwareLatchStatus !== 'idle_closed' &&
+      module.attachedModuleMatch.data.labwareLatchStatus !== 'closing'
+    ) {
+      const latchCommand: HeaterShakerCloseLatchCreateCommand = {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: module.attachedModuleMatch.id,
+        },
+      }
+      createLiveCommand({
+        command: latchCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+        )
+      })
+    }
     setShowModuleWizard(true)
   }
 

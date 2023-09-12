@@ -9,6 +9,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 
 from opentrons_hardware.firmware_bindings.messages import payloads
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetBrushedMotorVrefRequest,
     SetBrushedMotorPwmRequest,
@@ -18,13 +19,20 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddBrushedLinearMoveRequest,
     BrushedMotorConfRequest,
     BrushedMotorConfResponse,
+    GripperJawStateRequest,
+    GripperJawStateResponse,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt32Field,
     Int32Field,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId, ErrorCode
+from opentrons_hardware.firmware_bindings.constants import (
+    MessageId,
+    NodeId,
+    ErrorCode,
+    GripperJawState,
+)
 from .constants import brushed_motor_interrupts_per_sec
 
 log = logging.getLogger(__name__)
@@ -192,3 +200,33 @@ async def move(
             )
         ),
     )
+
+
+async def get_gripper_jaw_state(
+    can_messenger: CanMessenger,
+) -> GripperJawState:
+    """Get gripper jaw state."""
+    jaw_state = GripperJawState.unhomed
+
+    event = asyncio.Event()
+
+    def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
+        nonlocal jaw_state
+        if isinstance(message, GripperJawStateResponse):
+            event.set()
+            jaw_state = GripperJawState(message.payload.state.value)
+
+    def _filter(arb_id: ArbitrationId) -> bool:
+        return (NodeId(arb_id.parts.originating_node_id) == NodeId.gripper_g) and (
+            MessageId(arb_id.parts.message_id) == MessageId.gripper_jaw_state_response
+        )
+
+    can_messenger.add_listener(_listener, _filter)
+    await can_messenger.send(node_id=NodeId.gripper_g, message=GripperJawStateRequest())
+    try:
+        await asyncio.wait_for(event.wait(), 1.0)
+    except asyncio.TimeoutError:
+        log.warning("gripper jaw state request timed out")
+    finally:
+        can_messenger.remove_listener(_listener)
+        return jaw_state

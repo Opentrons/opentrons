@@ -13,7 +13,7 @@
   .hg-row:not(:last-child)
   .hg-button:not(:last-child) {
   margin-right: 8px;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .simple-keyboard.simple-keyboard.oddTheme1 .hg-button {
@@ -21,6 +21,13 @@
 }
 
 .simple-keyboard .hg-button:active {
-  color: white;
+  color: #16212d;
   background-color: #e3e3e3;
+}
+
+/* Numeric keyboard in custom keyboard */
+.hg-layout-numbers button.hg-button.hg-button-backspace,
+.hg-layout-numbers button.hg-button.hg-button-abc,
+.hg-layout-numbers button.hg-button.hg-standardBtn {
+  flex: 1;
 }
