@@ -2,11 +2,9 @@
 
 find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key :=
-#default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
-#version_dict=$(shell ssh $(call id-file-arg,$(2)) $(3) root@$(1) cat /etc/VERSION.json)
-#is-ot3=$(findstring OT-3, $(version_dict))
-is-ot3=$(findstring OT-3, "OT-3")
+version_dict=$(shell ssh $(call id-file-arg,$(2)) $(3) root@$(1) cat /etc/VERSION.json)
+is-ot3=$(findstring OT-3, $(version_dict))
 # make version less than 4.4 do not use intcmp
 allowed-ssh-versions="1 2 3 4 5 6 7 8"
 # in order to use comma in a string we have to set it to a var
