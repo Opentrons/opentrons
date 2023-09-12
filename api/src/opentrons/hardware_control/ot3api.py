@@ -91,7 +91,6 @@ from .types import (
     OT3AxisKind,
     OT3Mount,
     OT3AxisMap,
-    GripperJawState,
     InstrumentProbeType,
     GripperProbe,
     UpdateStatus,
@@ -1159,9 +1158,10 @@ class OT3API(
     async def idle_gripper(self) -> None:
         """Move gripper to its idle, gripped position."""
         try:
+            gripper = self._gripper_handler.get_gripper()
             if self._gripper_handler.is_ready_for_idle():
                 await self.grip(
-                    force_newtons=self._gripper_handler.gripper.default_idle_force,
+                    force_newtons=gripper.default_idle_force,
                     stay_engaged=False,
                 )
         except GripperNotAttachedError:
