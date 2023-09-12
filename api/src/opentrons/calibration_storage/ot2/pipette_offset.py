@@ -91,7 +91,7 @@ def get_pipette_offset(
         log.debug(f"Calibrations for {pipette_id} on {mount} does not exist.")
         return None
     except (json.JSONDecodeError, ValidationError):
-        log.debug(
+        log.warning(
             f"Malformed calibrations for {pipette_id} on {mount}. Please factory reset your calibrations."
         )
         # TODO: Delete the bad calibration here maybe?
