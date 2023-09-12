@@ -526,3 +526,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if blow_out is not None:
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
+
+    def configure_for_volume(self, volume: float) -> None:
+        self._engine_client.configure_for_volume(
+            pipette_id=self._pipette_id, volume=volume
+        )
