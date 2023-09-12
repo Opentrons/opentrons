@@ -178,7 +178,6 @@ def _pipette_with_liquid_settings(
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(aspirate, dispense)
-    _is_low_volume = (aspirate and aspirate < 5) or (dispense and dispense < 5)
 
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air
@@ -186,7 +185,7 @@ def _pipette_with_liquid_settings(
         #        we again use the hardware controller
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.dispense(hw_mount, push_out=liquid_class.dispense.blow_out_submerged)
+        hw_api.dispense(hw_mount)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -218,10 +217,7 @@ def _pipette_with_liquid_settings(
             print("WARNING: removing trailing air-gap from pipette, "
                   "this should only happen during blank trials")
             hw_api.dispense(hw_mount)
-        if _is_low_volume:
-            hw_api.set_liquid_class(hw_mount, "lowVolumeDefault")
-        else:
-            hw_api.set_liquid_class(hw_mount, "default")
+        hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
         hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
