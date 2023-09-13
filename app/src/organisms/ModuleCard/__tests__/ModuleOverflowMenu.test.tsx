@@ -501,7 +501,19 @@ describe('ModuleOverflowMenu', () => {
     expect(about).not.toBeDisabled()
   })
 
+  it('not render calibrate button when a robot is OT-2', () => {
+    props = {
+      ...props,
+      isPipetteReady: false,
+    }
+    const { queryByRole } = render(props)
+
+    const calibrate = queryByRole('button', { name: 'Calibrate' })
+    expect(calibrate).not.toBeInTheDocument()
+  })
+
   it('renders a disabled calibrate button if the pipettes are not attached or need a firmware update', () => {
+    mockUseIsOT3.mockReturnValue(true)
     props = {
       ...props,
       isPipetteReady: false,
@@ -513,6 +525,7 @@ describe('ModuleOverflowMenu', () => {
   })
 
   it('a mock function should be called when clicking Calibrate if pipette is ready', () => {
+    mockUseIsOT3.mockReturnValue(true)
     props = {
       ...props,
       isPipetteReady: true,

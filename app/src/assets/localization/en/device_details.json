@@ -43,7 +43,6 @@
   "firmware_update_failed": "Failed to update module firmware",
   "firmware_update_installation_successful": "Installation successful",
   "firmware_update_occurring": "Firmware update in progress...",
-  "got_it": "Got it",
   "have_not_run": "No recent runs",
   "have_not_run_description": "After you run some protocols, they will appear here.",
   "heater": "Heater",

@@ -1,15 +1,19 @@
 import * as React from 'react'
-
+import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { mockMagneticModule } from '../../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useRunStatuses } from '../../../Devices/hooks'
+import { useLatchControls } from '../../../ModuleCard/hooks'
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
 import type { Mount } from '@opentrons/components'
 
+jest.mock('@opentrons/react-api-client')
+jest.mock('../../../ModuleCard/hooks')
 jest.mock('../../../ModuleWizardFlows')
 jest.mock('../../../Devices/hooks')
 
@@ -32,16 +36,25 @@ const mockPipetteOffsetCalibrations = [
   },
 ]
 
+const mockCreateLiveCommand = jest.fn()
+const mockToggleLatch = jest.fn()
+
 const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
   typeof ModuleWizardFlows
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
+const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
+>
+const mockUseLatchControls = useLatchControls as jest.MockedFunction<
+  typeof useLatchControls
+>
 
 const render = (
   props: React.ComponentProps<typeof ModuleCalibrationOverflowMenu>
-): ReturnType<typeof renderWithProviders> => {
+) => {
   return renderWithProviders(<ModuleCalibrationOverflowMenu {...props} />, {
     i18nInstance: i18n,
   })
@@ -53,7 +66,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
   beforeEach(() => {
     props = {
       isCalibrated: false,
-      attachedModule: mockMagneticModule,
+      attachedModule: mockHeaterShaker,
       updateRobotStatus: jest.fn(),
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
     }
@@ -64,10 +77,20 @@ describe('ModuleCalibrationOverflowMenu', () => {
       isRunIdle: false,
       isRunTerminal: false,
     })
+    mockUseCreateLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    when(mockUseLatchControls)
+      .calledWith(mockHeaterShaker)
+      .mockReturnValue({
+        toggleLatch: mockToggleLatch,
+        isLatchClosed: true,
+      } as any)
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render overflow menu buttons - not calibrated', () => {

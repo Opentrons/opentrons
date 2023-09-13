@@ -16,7 +16,7 @@ import { ToggleButton } from '../../../atoms/buttons'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
 import { UsageSettings } from './AdvancedTab/UsageSettings'
 import {
-  DisableHoming,
+  GantryHoming,
   DisplayRobotName,
   DeviceReset,
   LegacySettings,
@@ -177,7 +177,7 @@ export function RobotSettingsAdvanced({
           </>
         )}
         <Divider marginY={SPACING.spacing16} />
-        <DisableHoming
+        <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
           isRobotBusy={isRobotBusy}

@@ -12,7 +12,10 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -22,7 +25,10 @@ import { useRunStatuses } from '../../Devices/hooks'
 import { useLatchControls } from '../../ModuleCard/hooks'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+import type {
+  HeaterShakerDeactivateShakerCreateCommand,
+  TCOpenLidCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '../'
 interface ModuleCalibrationOverflowMenuProps {
@@ -71,7 +77,7 @@ export function ModuleCalibrationOverflowMenu({
       const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
         commandType: 'heaterShaker/deactivateShaker',
         params: {
-          moduleId: module.id,
+          moduleId: attachedModule.id,
         },
       }
       createLiveCommand({
@@ -82,8 +88,30 @@ export function ModuleCalibrationOverflowMenu({
         )
       })
     }
-    if (!isLatchClosed) {
+    if (
+      attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      !isLatchClosed
+    ) {
       toggleLatch()
+    }
+
+    if (
+      attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE &&
+      attachedModule.data.lidStatus !== 'open'
+    ) {
+      const lidCommand: TCOpenLidCreateCommand = {
+        commandType: 'thermocycler/openLid',
+        params: {
+          moduleId: attachedModule.id,
+        },
+      }
+      createLiveCommand({
+        command: lidCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
+        )
+      })
     }
     setShowOverflowMenu(false)
     setShowModuleWizard(true)
