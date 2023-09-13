@@ -60,8 +60,8 @@ class PhotometricConfig(VolumetricConfig):
     reservoir_slot: int
     touch_tip: bool
     refill: bool
-    photoplate_column_offset: int
-    dye_well_column_offset: int
+    photoplate_column_offset: List[int]
+    dye_well_column_offset: List[int]
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
@@ -266,6 +266,21 @@ QC_VOLUMES_P: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     1: {
         50: [  # P50
             (50, [1.0]),
+        ],
+        1000: [  # P1000
+            (50, [5.0]),  # T50
+            (200, [200.0]),  # T200
+            (1000, []),  # T1000
+        ],
+    },
+    8: {
+        50: [  # P50
+            (50, [1.0]),
+        ],
+        1000: [  # P1000
+            (50, [5.0]),  # T50
+            (200, [200.0]),  # T200
+            (1000, []),  # T1000
         ],
     },
     96: {

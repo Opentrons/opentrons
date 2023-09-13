@@ -99,7 +99,7 @@ PHOTOMETRIC_CFG = {
         1: photometric_ot3_p1000_single,
         8: photometric_ot3_p1000_multi,
         96: photometric_ot3_p1000_96,
-    }
+    },
 }
 
 
@@ -385,8 +385,8 @@ def build_photometric_cfg(
     same_tip: bool,
     ignore_fail: bool,
     pipette_channels: int,
-    photoplate_column_offset: int,
-    dye_well_column_offset: int,
+    photoplate_column_offset: List[int],
+    dye_well_column_offset: List[int],
     mode: str,
     run_args: RunArgs,
 ) -> PhotometricConfig:
@@ -474,7 +474,9 @@ def _main(
     for v in volumes:
         ui.print_info(f"\t{v} uL")
     all_channels_same_time = (
-        getattr(union_cfg, "increment", False) or union_cfg.pipette_channels == 96
+        getattr(union_cfg, "increment", False)
+        or union_cfg.pipette_channels == 96
+        or args.photometric
     )
     test_resources = TestResources(
         ctx=run_args.ctx,
@@ -523,8 +525,8 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
-    parser.add_argument("--photoplate-col-offset", type=int, default=1)
-    parser.add_argument("--dye-well-col-offset", type=int, default=1)
+    parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
+    parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
     )

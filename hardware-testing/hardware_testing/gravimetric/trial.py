@@ -182,7 +182,7 @@ def build_photometric_trials(
     ctx: ProtocolContext,
     test_report: CSVReport,
     pipette: InstrumentContext,
-    source: Well,
+    sources: List[Well],
     dest: Labware,
     test_volumes: List[float],
     liquid_tracker: LiquidTracker,
@@ -190,9 +190,13 @@ def build_photometric_trials(
     env_sensor: asair_sensor.AsairSensorBase,
 ) -> Dict[float, List[PhotometricTrial]]:
     """Build a list of all the trials that will be run."""
-    trial_list: Dict[float, List[PhotometricTrial]] = {}
+    trial_list: Dict[float, List[PhotometricTrial]] = {vol: [] for vol in test_volumes}
+    total_trials = len(test_volumes) * cfg.trials
+    trials_per_src = int(total_trials / len(sources))
+    sources_per_trials = [src for src in sources for _ in range(trials_per_src)]
+    print("sources per trial")
+    print(sources_per_trials)
     for volume in test_volumes:
-        trial_list[volume] = []
         for trial in range(cfg.trials):
             d: Optional[float] = None
             cv: Optional[float] = None
@@ -207,7 +211,7 @@ def build_photometric_trials(
                     ctx=ctx,
                     test_report=test_report,
                     pipette=pipette,
-                    source=source,
+                    source=sources_per_trials.pop(0),
                     dest=dest,
                     tip_volume=cfg.tip_volume,
                     channel_count=cfg.pipette_channels,

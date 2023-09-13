@@ -4,9 +4,7 @@ from opentrons.protocol_api import ProtocolContext
 metadata = {"protocolName": "photometric-ot3-p50-multi"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
-SLOTS_TIPRACK = {
-    50: [3]
-}
+SLOTS_TIPRACK = {50: [3]}
 SLOT_PLATE = 2
 SLOT_RESERVOIR = 5
 

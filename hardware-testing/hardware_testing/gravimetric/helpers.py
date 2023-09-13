@@ -431,6 +431,7 @@ def get_test_volumes(
         for t, vls in config.QC_VOLUMES_P[pipette][volume]:
             if t == tip:
                 volumes = vls
+                break
     else:
         if extra:
             cfg = config.QC_VOLUMES_EXTRA_G
@@ -442,7 +443,7 @@ def get_test_volumes(
             if t == tip:
                 volumes = vls
                 break
-    print(f"final volumes{volumes}")
+    print(f"final volumes: {volumes}")
     return volumes
 
 
