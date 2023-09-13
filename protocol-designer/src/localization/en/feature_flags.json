@@ -17,7 +17,7 @@
     "description": "Allow users to select 96-channel pipette"
   },
   "OT_PD_ENABLE_FLEX_DECK_MODIFICATION": {
-    "title": "Enable waste chute, flex staging, and trash slot modification",
-    "description": "Allow users to select waste chute, flex staging, and modify trash slot"
+    "title": "Enable Flex deck modification",
+    "description": "Allow users to select waste chute, Flex staging, and modify trash slot"
   }
 }
