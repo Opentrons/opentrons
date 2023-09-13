@@ -859,7 +859,7 @@ class OT3Controller:
         res = await get_tip_ejector_state(self._messenger, node, expected_responses)  # type: ignore[arg-type]
         vals = list(res.values())
         if not all([r == vals[0] for r in vals]):
-            states = {int(sensor): res[sensor] for sensor in res.keys()}
+            states = {int(sensor): res[sensor] for sensor in res}
             raise UnmatchedTipPresenceStates(states)
         tip_present_state = bool(vals[0]) and bool(vals[-1])
         return tip_present_state

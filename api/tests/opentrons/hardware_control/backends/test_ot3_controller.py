@@ -1077,7 +1077,7 @@ async def test_monitor_pressure(
 async def test_get_tip_present(
     controller: OT3Controller,
     tip_state_type: TipStateType,
-    mocked_ejector_response: List[int],
+    mocked_ejector_response: Dict[int, int],
     expectation: ContextManager[None],
 ) -> None:
     mount = OT3Mount.LEFT

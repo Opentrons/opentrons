@@ -538,13 +538,13 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an UnmatchedTipPresenceStatesError."""
-        tip_status_by_sensor = {0: "not detected", 1: "detected"}
+        format_tip_state = {0: "not detected", 1: "detected"}
         msg = (
             "Received two differing tip presence statuses:"
             "\nRear Sensor tips"
-            + tip_status_by_sensor[states[0]]
+            + format_tip_state[states[0]]
             + "\nFront Sensor tips"
-            + tip_status_by_sensor[states[1]]
+            + format_tip_state[states[1]]
         )
         if detail:
             msg += str(detail)
