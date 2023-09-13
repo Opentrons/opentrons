@@ -223,16 +223,10 @@ export function RunSummary(): JSX.Element {
                 />
               </SummaryDatum>
               <SummaryDatum>
-                {`${t('start')}: ${formatTimeWithUtcLabel(
-                  startedAtTimestamp,
-                  true
-                )}`}
+                {`${t('start')}: ${formatTimeWithUtcLabel(startedAtTimestamp)}`}
               </SummaryDatum>
               <SummaryDatum>
-                {`${t('end')}: ${formatTimeWithUtcLabel(
-                  completedAtTimestamp,
-                  true
-                )}`}
+                {`${t('end')}: ${formatTimeWithUtcLabel(completedAtTimestamp)}`}
               </SummaryDatum>
             </Flex>
           </Flex>
@@ -276,7 +270,6 @@ export function RunSummary(): JSX.Element {
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: 80px;
   line-height: 94px;
   color: ${COLORS.white};

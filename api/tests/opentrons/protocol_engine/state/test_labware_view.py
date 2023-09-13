@@ -10,6 +10,8 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters,
     LabwareRole,
     OverlapOffset as SharedDataOverlapOffset,
+    GripperOffsets,
+    OffsetVector,
 )
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point, MountType
@@ -1343,6 +1345,49 @@ def test_get_labware_gripper_offsets(
     ) == LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
         dropOffset=LabwareOffsetVector(x=2, y=0, z=0),
+    )
+
+
+def test_get_labware_gripper_offsets_default_no_slots(
+    well_plate_def: LabwareDefinition,
+    adapter_plate_def: LabwareDefinition,
+) -> None:
+    """It should get the labware's gripper offsets with only a default gripper offset entry."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="labware-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                definitionUri="some-labware-uri",
+                offsetId=None,
+                displayName="Fancy Labware Name",
+            )
+        },
+        definitions_by_uri={
+            "some-labware-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                gripperOffsets={
+                    "default": GripperOffsets(
+                        pickUpOffset=OffsetVector(x=1, y=2, z=3),
+                        dropOffset=OffsetVector(x=4, y=5, z=6),
+                    )
+                }
+            ),
+        },
+    )
+
+    assert (
+        subject.get_labware_gripper_offsets(
+            labware_id="labware-id", slot_name=DeckSlotName.SLOT_D1
+        )
+        is None
+    )
+
+    assert subject.get_labware_gripper_offsets(
+        labware_id="labware-id", slot_name=None
+    ) == LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+        dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
     )
 
 

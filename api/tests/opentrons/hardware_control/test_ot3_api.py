@@ -275,6 +275,16 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
 
 
 @pytest.fixture
+async def mock_reset(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "reset",
+        AsyncMock(),
+    ) as mock_reset:
+        yield mock_reset
+
+
+@pytest.fixture
 async def mock_instrument_handlers(
     ot3_hardware: ThreadManager[OT3API],
 ) -> Iterator[Tuple[MagicMock]]:
@@ -1744,3 +1754,29 @@ async def test_estop_event_deactivate_module(
         )
     else:
         assert len(futures) == 0
+
+
+@pytest.mark.parametrize(
+    "jaw_state",
+    [
+        GripperJawState.UNHOMED,
+        GripperJawState.HOMED_READY,
+        GripperJawState.GRIPPING,
+        GripperJawState.HOLDING,
+    ],
+)
+async def test_stop_only_home_necessary_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_home: AsyncMock,
+    mock_reset: AsyncMock,
+    jaw_state: GripperJawState,
+):
+    gripper_config = gc.load(GripperModel.v1)
+    instr_data = AttachedGripper(config=gripper_config, id="test")
+    await ot3_hardware.cache_gripper(instr_data)
+    ot3_hardware._gripper_handler.get_gripper().current_jaw_displacement = 0
+    ot3_hardware._gripper_handler.get_gripper().state = jaw_state
+
+    await ot3_hardware.stop(home_after=True)
+    if jaw_state == GripperJawState.GRIPPING:
+        mock_home.assert_called_once_with(skip=[Axis.G])

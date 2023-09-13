@@ -101,6 +101,7 @@
   "stored_offsets_for_this_protocol": "Stored Labware Offset data that applies to this protocol",
   "table_view": "Table View",
   "tip_rack": "tip rack",
+  "view_current_offsets": "view current offsets",
   "view_data": "View data",
   "what_is_labware_offset_data": "What is labware offset data?"
 }

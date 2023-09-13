@@ -35,10 +35,10 @@ version_file = $(call python_get_git_version,system-server,$(project_ot3_default
 # specified test
 tests ?= tests
 test_opts ?=
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Other SSH args for buildroot robots
-br_ssh_opts ?= $(default_ssh_opts)
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
+# Other SSH args for robot
+ssh_opts ?= $(default_ssh_opts)
 
 .PHONY: setup
 setup:
@@ -91,14 +91,14 @@ sdist: clean
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
-	$(call push-systemd-unit,$(host),$(br_ssh_key),$(ssh_opts),./opentrons-system-server.service)
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-system-server)
+	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-system-server.service)
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-system-server)
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-system-server,system_server,,,$(version_file))
-	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-system-server)
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),dist/$(sdist_file),/opt/opentrons-system-server,system_server,,,$(version_file))
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-system-server)
 
 .PHONY: dev
 dev: export OT_SYSTEM_SERVER_DOT_ENV_PATH ?= dev.env

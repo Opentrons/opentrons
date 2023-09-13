@@ -23,6 +23,7 @@
   },
   "parameters": {
     "format": "irregular",
+    "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_24_aluminumblock_generic_2ml_screwcap"

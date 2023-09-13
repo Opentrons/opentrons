@@ -460,6 +460,11 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "pushOut": {
+          "title": "Pushout",
+          "description": "push the plunger a small amount farther than necessary for accurate low-volume dispensing",
+          "type": "number"
         }
       },
       "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"]
@@ -515,6 +520,11 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "pushOut": {
+          "title": "Pushout",
+          "description": "push the plunger a small amount farther than necessary for accurate low-volume dispensing",
+          "type": "number"
         }
       },
       "required": ["flowRate", "volume", "pipetteId"]

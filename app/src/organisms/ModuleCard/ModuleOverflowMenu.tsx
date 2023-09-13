@@ -5,7 +5,6 @@ import { Flex, POSITION_RELATIVE } from '@opentrons/components'
 
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useFeatureFlag } from '../../redux/config'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import {
   useIsOT3,
@@ -24,6 +23,7 @@ interface ModuleOverflowMenuProps {
   handleInstructionsClick: () => void
   handleCalibrateClick: () => void
   isLoadedInRun: boolean
+  isPipetteReady: boolean
   robotName: string
   runId?: string
 }
@@ -41,9 +41,10 @@ export const ModuleOverflowMenu = (
     handleInstructionsClick,
     handleCalibrateClick,
     isLoadedInRun,
+    isPipetteReady,
   } = props
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunStill } = useRunStatuses()
@@ -51,8 +52,6 @@ export const ModuleOverflowMenu = (
   const isOT3 = useIsOT3(robotName)
   const isIncompatibleWithOT3 =
     isOT3 && module.moduleModel === 'thermocyclerModuleV1'
-
-  const enableModuleCalibration = useFeatureFlag('enableModuleCalibration')
 
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -78,8 +77,15 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        {enableModuleCalibration ? (
-          <MenuItem onClick={handleCalibrateClick}>{t('calibrate')}</MenuItem>
+        {isOT3 ? (
+          <MenuItem onClick={handleCalibrateClick} disabled={!isPipetteReady}>
+            {i18n.format(
+              module.moduleOffset?.last_modified != null
+                ? t('recalibrate')
+                : t('calibrate'),
+              'capitalize'
+            )}
+          </MenuItem>
         ) : null}
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {

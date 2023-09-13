@@ -93,6 +93,7 @@ class PipetteDict(InstrumentDict):
     ready_to_aspirate: bool
     has_tip: bool
     default_blow_out_volume: float
+    default_push_out_volume: Optional[float]
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
 
 

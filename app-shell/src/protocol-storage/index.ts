@@ -42,11 +42,65 @@ export const getProtocolSrcFilePaths = (
     })
 }
 
+// TODO(jh, 2023-09-11): remove migrateProtocolsToNewDirectory after
+// OT-2 parity work is completed.
+const migrateProtocols = migrateProtocolsToNewDirectory()
+function migrateProtocolsToNewDirectory(): () => Promise<void> {
+  let hasCheckedForMigration = false
+  return function (): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (hasCheckedForMigration) resolve()
+      hasCheckedForMigration = true
+      console.log(
+        `Performing protocol migration to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}...`
+      )
+      copyProtocols(
+        FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH,
+        FileSystem.PROTOCOLS_DIRECTORY_PATH
+      )
+        .then(() => {
+          console.log('Protocol migration complete.')
+          resolve()
+        })
+        .catch(e => {
+          console.log(
+            `Error migrating protocols to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}: ${e}`
+          )
+          resolve()
+        })
+    })
+  }
+
+  function copyProtocols(src: string, dest: string): Promise<void> {
+    return fse
+      .stat(src)
+      .then(doesSrcExist => {
+        if (!doesSrcExist.isDirectory()) return Promise.resolve()
+
+        return fse.readdir(src).then(items => {
+          const protocols = items.map(item => {
+            const srcItem = path.join(src, item)
+            const destItem = path.join(dest, item)
+
+            return fse.copy(srcItem, destItem, {
+              overwrite: false,
+            })
+          })
+          return Promise.all(protocols).then(() => Promise.resolve())
+        })
+      })
+      .catch(e => {
+        return Promise.reject(e)
+      })
+  }
+}
+
 export const fetchProtocols = (
   dispatch: Dispatch,
   source: ListSource
 ): Promise<void> => {
   return ensureDir(FileSystem.PROTOCOLS_DIRECTORY_PATH)
+    .then(() => migrateProtocols())
     .then(() =>
       FileSystem.readDirectoriesWithinDirectory(
         FileSystem.PROTOCOLS_DIRECTORY_PATH

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useRunQuery,
 } from '@opentrons/react-api-client'
+import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/hooks'
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
@@ -13,7 +13,9 @@ export function useLaunchLPC(
   runId: string
 ): { launchLPC: () => void; LPCWizard: JSX.Element | null } {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
-  const { createMaintenanceRun } = useCreateMaintenanceRunMutation()
+  const {
+    createTargetedMaintenanceRun,
+  } = useCreateTargetedMaintenanceRunMutation()
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(
@@ -35,7 +37,7 @@ export function useLaunchLPC(
   }
   return {
     launchLPC: () =>
-      createMaintenanceRun({
+      createTargetedMaintenanceRun({
         labwareOffsets: currentOffsets.map(
           ({ vector, location, definitionUri }) => ({
             vector,

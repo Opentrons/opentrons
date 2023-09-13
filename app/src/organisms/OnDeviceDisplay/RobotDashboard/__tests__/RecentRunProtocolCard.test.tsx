@@ -200,7 +200,8 @@ describe('RecentRunProtocolCard', () => {
       name: 'proceedToRun',
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
+    // expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
     getByLabelText('icon_ot-spinner')
     expect(button).toHaveStyle(`background-color: ${COLORS.green3Pressed}`)
   })

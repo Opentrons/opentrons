@@ -25,6 +25,8 @@ from typing_extensions import TypedDict
 import pytest
 from decoy import Decoy
 
+from opentrons.protocol_engine.types import PostRunHardwareState
+
 try:
     import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
@@ -296,7 +298,8 @@ def _make_ot3_pe_ctx(
             use_virtual_gripper=True,
             block_on_door_open=False,
         ),
-        drop_tips_and_home_after=False,
+        drop_tips_after_run=False,
+        post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
     ) as (
         engine,
         loop,

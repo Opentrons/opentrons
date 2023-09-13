@@ -106,11 +106,13 @@ describe('RunProgressMeter', () => {
   })
 
   it('should show only the total count of commands in run and not show the meter when protocol is non-deterministic', () => {
+    mockUseCommandQuery.mockReturnValue({ data: null } as any)
     const { getByText, queryByText } = render(props)
     expect(getByText('Current Step 42/?')).toBeTruthy()
     expect(queryByText('MOCK PROGRESS BAR')).toBeFalsy()
   })
   it('should give the correct info when run status is idle', () => {
+    mockUseCommandQuery.mockReturnValue({ data: null } as any)
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     const { getByText } = render(props)
     getByText('Current Step:')

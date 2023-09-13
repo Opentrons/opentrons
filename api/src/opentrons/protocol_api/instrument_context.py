@@ -249,6 +249,7 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
@@ -278,6 +279,9 @@ class InstrumentContext(publisher.CommandPublisher):
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
                      If not specified, defaults to 1.0.
         :type rate: float
+        :param push_out: Continue past the plunger bottom to guarantee all liquid
+                        leaves the tip. Specified in microliters. By default, this value is None.
+        :type push_out: float
 
         :returns: This instance.
 
@@ -290,6 +294,10 @@ class InstrumentContext(publisher.CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
+        if self.api_version < APIVersion(2, 15) and push_out:
+            raise APIVersionError(
+                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+            )
         _log.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -351,6 +359,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
+                push_out=push_out,
             )
 
         return self
@@ -853,8 +862,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.  From API version 2.15 on, the API will default to
-        alternating between two different drop tip locations within the trash container
+        the fixed trash in slot 12.  From API version 2.15 on, if the trash container is
+        the default fixed trash in A3 (slot 12), the API will default to
+        dropping tips in different points within the trash container
         in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with

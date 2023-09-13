@@ -48,7 +48,7 @@ describe('RobotSystemVersion', () => {
     const [{ getByText }] = render(props)
     getByText('Robot System Version')
     getByText(
-      'View latest release notes at https://github.com/Opentrons/opentrons'
+      'View latest release notes at https://github.com/Opentrons/opentrons/releases'
     )
     getByText('Current Version')
     getByText('mock7.0.0')

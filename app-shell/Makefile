@@ -23,7 +23,7 @@ dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-*","dist/**/Open
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
-# Other SSH args for buildroot robots
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
 # TODO(mc, 2018-03-27): move all this to some sort of envfile

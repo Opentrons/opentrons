@@ -1,4 +1,4 @@
-export * from './DisableHoming'
+export * from './GantryHoming'
 export * from './DisplayRobotName'
 export * from './DeviceReset'
 export * from './LegacySettings'

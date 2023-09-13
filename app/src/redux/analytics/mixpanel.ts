@@ -20,14 +20,14 @@ const MIXPANEL_OPTS = {
   track_pageview: false,
 }
 
+const initMixpanelInstanceOnce = initializeMixpanelInstanceOnce(MIXPANEL_ID)
+
 export function initializeMixpanel(
   config: AnalyticsConfig,
   isOnDevice: boolean | null
 ): void {
   if (MIXPANEL_ID) {
-    log.debug('Initializing Mixpanel', { config })
-
-    mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
+    initMixpanelInstanceOnce(config)
     setMixpanelTracking(config, isOnDevice)
     trackEvent({ name: 'appOpen', properties: {} }, config)
   } else {
@@ -54,6 +54,7 @@ export function setMixpanelTracking(
   isOnDevice: boolean | null
 ): void {
   if (MIXPANEL_ID) {
+    initMixpanelInstanceOnce(config)
     if (config.optedIn) {
       log.debug('User has opted into analytics; tracking with Mixpanel')
       mixpanel.identify(config.appId)
@@ -65,11 +66,22 @@ export function setMixpanelTracking(
       })
     } else {
       log.debug('User has opted out of analytics; stopping tracking')
-      const config = mixpanel?.get_config?.()
-      if (config != null) {
-        mixpanel.opt_out_tracking?.()
-        mixpanel.reset?.()
-      }
+      mixpanel.opt_out_tracking?.()
+      mixpanel.reset?.()
+    }
+  }
+}
+
+function initializeMixpanelInstanceOnce(
+  MIXPANEL_ID?: string
+): (config: AnalyticsConfig) => undefined {
+  let hasBeenInitialized = false
+
+  return function (config: AnalyticsConfig): undefined {
+    if (!hasBeenInitialized && MIXPANEL_ID) {
+      hasBeenInitialized = true
+      log.debug('Initializing Mixpanel', { config })
+      return mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
     }
   }
 }

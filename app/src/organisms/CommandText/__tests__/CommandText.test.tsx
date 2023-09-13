@@ -10,7 +10,11 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import {
+  LabwareDefinition2,
+  RunTimeCommand,
+  DropTipRunTimeCommand,
+} from '@opentrons/shared-data'
 
 describe('CommandText', () => {
   it('renders correct text for aspirate', () => {
@@ -106,6 +110,26 @@ describe('CommandText', () => {
       )[0]
       getByText('Dropping tip in A1 of Fixed Trash')
     }
+  })
+  it('renders correct text for dropTip into a labware', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        command={
+          {
+            commandType: 'dropTip',
+            params: {
+              labwareId: 'b2a40c9d-31b0-4f27-ad4a-c92ced91204d',
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 0 } },
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+            },
+          } as DropTipRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9')
   })
   it('renders correct text for pickUpTip', () => {
     const command = mockRobotSideAnalysis.commands.find(
@@ -875,7 +899,7 @@ describe('CommandText', () => {
           params: {
             strategy: 'manualMoveWithPause',
             labwareId: mockRobotSideAnalysis.labware[3].id,
-            newLocation: { moduleId: mockRobotSideAnalysis.modules[0].id },
+            newLocation: { slotName: 'A3' },
           },
           id: 'def456',
           result: { offsetId: 'fake_offset_id' },
@@ -892,7 +916,7 @@ describe('CommandText', () => {
       }
     )[0]
     getByText(
-      'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Magnetic Module GEN2 in Slot 1'
+      'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Slot A3'
     )
   })
   it('renders correct text for move labware with gripper off deck', () => {

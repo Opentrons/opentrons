@@ -4,6 +4,7 @@ import { autoUpdater as updater } from 'electron-updater'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
+import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 
 import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch, PlainError } from './types'
@@ -63,20 +64,45 @@ function checkUpdate(dispatch: Dispatch): void {
   }
 }
 
+interface ProgressInfo {
+  total: number
+  delta: number
+  transferred: number
+  percent: number
+  bytesPerSecond: number
+}
+interface DownloadingPayload {
+  progress: ProgressInfo
+  bytesPerSecond: number
+  percent: number
+  total: number
+  transferred: number
+}
+
 function downloadUpdate(dispatch: Dispatch): void {
+  const onDownloading = (payload: DownloadingPayload): void =>
+    dispatch({ type: 'shell:DOWNLOAD_PERCENTAGE', payload })
   const onDownloaded = (): void => done({})
   const onError = (error: Error): void => {
     done({ error: PlainObjectError(error) })
   }
 
+  updater.on('download-progress', onDownloading)
   updater.once('update-downloaded', onDownloaded)
   updater.once('error', onError)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   updater.downloadUpdate()
 
   function done(payload: { error?: PlainError }): void {
+    updater.removeListener('download-progress', onDownloading)
     updater.removeListener('update-downloaded', onDownloaded)
     updater.removeListener('error', onError)
+    if (payload.error == null)
+      dispatch({
+        type: UPDATE_VALUE,
+        payload: { path: 'update.hasJustUpdated', value: true },
+        meta: { shell: true },
+      })
     dispatch({ type: 'shell:DOWNLOAD_UPDATE_RESULT', payload })
   }
 }
