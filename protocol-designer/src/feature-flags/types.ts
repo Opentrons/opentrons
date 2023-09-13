@@ -26,6 +26,7 @@ export type FlagTypes =
   | 'PRERELEASE_MODE'
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
   | 'OT_PD_ALLOW_ALL_TIPRACKS'
+  | 'OT_PD_ALLOW_96_CHANNEL'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
