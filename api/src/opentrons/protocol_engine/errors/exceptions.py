@@ -767,6 +767,19 @@ class InvalidPushOutVolumeError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidDispenseVolumeError(ProtocolEngineError):
+    """Raised when attempting to dispense a volume that was not aspirated."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidPushOutVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class InvalidAxisForRobotType(ProtocolEngineError):
     """Raised when attempting to use an axis that is not present on the given type of robot."""
 
