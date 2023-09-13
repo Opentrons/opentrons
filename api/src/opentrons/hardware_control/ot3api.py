@@ -1926,7 +1926,7 @@ class OT3API(
             self.gantry_load != GantryLoad.HIGH_THROUGHPUT
             and ff.tip_presence_detection_enabled()
         ):
-            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+            await self._backend.check_for_tip_presence(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
 
@@ -2001,7 +2001,7 @@ class OT3API(
             self.gantry_load != GantryLoad.HIGH_THROUGHPUT
             and ff.tip_presence_detection_enabled()
         ):
-            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
+            await self._backend.check_for_tip_presence(realmount, TipStateType.ABSENT)
 
         # home mount axis
         if home_after:
@@ -2066,7 +2066,7 @@ class OT3API(
         # this function with additional state (such as critical points)
         realmount = OT3Mount.from_mount(mount)
         res = await self._backend.get_tip_present_state(realmount)
-        pipette_state_for_mount: PipetteStateDict = {"tip_detected": bool(res)}
+        pipette_state_for_mount: PipetteStateDict = {"tip_detected": res}
         return pipette_state_for_mount
 
     def reset_instrument(

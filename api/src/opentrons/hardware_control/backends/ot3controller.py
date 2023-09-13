@@ -163,6 +163,7 @@ from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
+    UnmatchedTipPresenceStates,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -835,18 +836,33 @@ class OT3Controller:
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
-    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+    async def check_for_tip_presence(
+        self,
+        mount: OT3Mount,
+        tip_state: TipStateType,
+        expect_multiple_responses: bool = False,
+    ) -> None:
         """Raise an error if the expected tip state does not match the current state."""
-        res = await self.get_tip_present_state(mount)
+        res = await self.get_tip_present_state(mount, expect_multiple_responses)
         if res != tip_state.value:
             raise FailedTipStateCheck(tip_state, res)
 
-    async def get_tip_present_state(self, mount: OT3Mount) -> int:
+    async def get_tip_present_state(
+        self,
+        mount: OT3Mount,
+        expect_multiple_responses: bool = False,
+    ) -> bool:
         """Get the state of the tip ejector flag for a given mount."""
-        res = await get_tip_ejector_state(
-            self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
-        )
-        return res
+        expected_responses = 2 if expect_multiple_responses else 1
+        node = sensor_node_for_mount(OT3Mount(mount.value))
+        assert node != NodeId.gripper
+        res = await get_tip_ejector_state(self._messenger, node, expected_responses)  # type: ignore[arg-type]
+        vals = list(res.values())
+        if not all([r == vals[0] for r in vals]):
+            states = {int(sensor): res[sensor] for sensor in res}
+            raise UnmatchedTipPresenceStates(states)
+        tip_present_state = bool(vals[0])
+        return tip_present_state
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[Axis]) -> List[NodeId]:
