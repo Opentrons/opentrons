@@ -20,11 +20,15 @@ export function LabwareLocationField(
   const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem)
   const moduleEntities = useSelector(getModuleEntities)
+  const isLabwarOffDeck =
+    props.labware != null
+      ? robotState?.labware[props.labware]?.slot === 'offDeck'
+      : false
 
   let unoccupiedLabwareLocationsOptions =
     useSelector(getUnocuppiedLabwareLocationOptions) ?? []
 
-  if (props.useGripper) {
+  if (props.useGripper || isLabwarOffDeck) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== 'offDeck'
     )
