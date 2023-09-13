@@ -347,8 +347,8 @@ class ProtocolEngine:
             # By the time E-stop error has gotten to us, it may have been wrapped in other errors,
             # so we need to unwrap them to uncover the E-stop error's inner beauty.
             #
-            # TODO(mm, 2023-09-12): Do we need to scan the exception tree like this? Instead, can we
-            # directly inspect the E-stop state through self._hardware_api.get_estop_state()?
+            # We don't use self._hardware_api.get_estop_state() because the E-stop may have been
+            # released by the time we get here.
             if isinstance(error, EnumeratedError) and self._code_in_error_tree(
                 root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
             ):
