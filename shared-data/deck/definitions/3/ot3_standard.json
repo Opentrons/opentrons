@@ -188,6 +188,18 @@
           "heaterShakerModuleType",
           "magneticBlockType"
         ]
+      },
+      {
+        "id": "Z1",
+        "position": [0.0, 321.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 172.0,
+          "yDimension": 172.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot A1+B1",
+        "compatibleModuleTypes": ["thermocyclerModuleType"]
       }
     ],
     "calibrationPoints": [],
