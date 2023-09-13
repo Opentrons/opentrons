@@ -861,7 +861,7 @@ class OT3Controller:
         if not all([r == vals[0] for r in vals]):
             states = {int(sensor): res[sensor] for sensor in res}
             raise UnmatchedTipPresenceStates(states)
-        tip_present_state = bool(vals[0]) and bool(vals[-1])
+        tip_present_state = bool(vals[0])
         return tip_present_state
 
     @staticmethod
