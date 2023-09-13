@@ -144,7 +144,7 @@ describe('RobotSettingsDashboard', () => {
     getByText('Update Channel')
     getByText('Apply Labware Offsets')
     getByText('Use stored data when setting up a protocol.')
-    getByText('Enable Developer Tools')
+    getByText('Developer Tools')
     getByText('Access additional logging and feature flags.')
   })
 
@@ -247,7 +247,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should call a mock function when tapping enable dev tools', () => {
     const [{ getByText }] = render()
-    const button = getByText('Enable Developer Tools')
+    const button = getByText('Developer Tools')
     fireEvent.click(button)
     expect(mockToggleDevtools).toHaveBeenCalled()
   })
