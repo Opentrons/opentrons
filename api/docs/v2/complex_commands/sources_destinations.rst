@@ -12,13 +12,13 @@ For example, a simple transfer between two wells on a plate could specify::
 
     pipette.transfer(
         volume=100,
-        source=plate['A1'],
-        dest=plate['A2'],
+        source=plate["A1"],
+        dest=plate["A2"],
     )
 
 .. versionadded:: 2.0
 
-This page covers how :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate` operate on source and destination wells. Each method has its own :ref:`restrictions on sources and destinations <source-dest-args>`. They also aspirate and dispense in different :ref:`patterns <complex-transfer-patterns>` that are optimized for their distinct use cases. Finally, you can control the amount of liquid transferred by specifying a :ref:`list of volumes <complex-list-volumes>` rather than a single value.
+This page covers how :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate` operate on source and destination wells. Each method has its own :ref:`restrictions on sources and destinations <source-dest-args>`. They also aspirate and dispense in different :ref:`patterns <complex-transfer-patterns>`, which you can :ref:`optimize for different use cases <complex-optimizing-patterns>`.
 
 
 .. _source-dest-args:
@@ -28,7 +28,7 @@ This page covers how :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.Instr
 
 :py:meth:`~.InstrumentContext.transfer` is the most versatile complex liquid handling function, having the fewest restrictions on what wells it can operate on. You will most likely want to use transfer commands in a majority of cases.
 
-Certain liquid handling cases focus on moving liquid to or from a single well. :py:meth:`~.InstrumentContext.distribute` limits its source to a single well, while :py:meth:`~.InstrumentContext.consolidate` limits its destination to a single well. Distribute actions also make  changes to tip-handling behavior that improve equal distribution.
+Certain liquid handling cases focus on moving liquid to or from a single well. :py:meth:`~.InstrumentContext.distribute` limits its source to a single well, while :py:meth:`~.InstrumentContext.consolidate` limits its destination to a single well. Distribute commands also make  changes to liquid-handling behavior to improve the accuracy of dispensing.
 
 These restrictions and behaviors are summarized as follows:
 
@@ -39,17 +39,17 @@ These restrictions and behaviors are summarized as follows:
      - Accepted wells
    * - ``transfer()``
      - 
-       - **Source:** any number of wells
-       - **Destination:** any number of wells
+       - **Source:** Any number of wells.
+       - **Destination:** Any number of wells.
        - The larger group of wells must be evenly divisible by the smaller group.
    * - ``distribute()``
      - 
-       - **Source:** exactly one well
-       - **Destination:** any number of wells
+       - **Source:** Exactly one well.
+       - **Destination:** Any number of wells.
    * - ``consolidate()``
      - 
-       - **Source:** any number of wells
-       - **Destination:** exactly one well
+       - **Source:** Any number of wells.
+       - **Destination:** Exactly one well.
 
 Singleton wells can be passed by themselves or as a list with one item: ``source=plate['A1']`` and ``source=[plate['A1']]`` are equivalent.
     
@@ -70,7 +70,7 @@ On the other hand, a transfer command with the same arguments would aspirate fro
 Transfer Patterns
 =================
 
-Each complex command uses a different pattern of aspiration and dispensing. In addition, when you provide multiple wells as both the source and destination for ``transfer()``, it maps the source list onto the destination list in a certain way. This section covers both of these patterns.
+Each complex command uses a different pattern of aspiration and dispensing. In addition, when you provide multiple wells as both the source and destination for ``transfer()``, it maps the source list onto the destination list in a certain way.
 
 Aspirating and Dispensing
 -------------------------
@@ -125,7 +125,7 @@ See :ref:`complex-tip-refilling` below for cases where the total amount to be as
     This consolidate aspirates three times and dispenses one time.
     
 .. note::
-    By default all three commands begin by picking up a tip, and conclude by dropping a tip. In general, don't call :py:meth:`.pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with :ref:`complex_params`, by setting ``new_tip="never"``.
+    By default, all three commands begin by picking up a tip and conclude by dropping a tip. In general, don't call :py:meth:`.pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with the :ref:`tip handling complex parameter <param-tip-handling>`, by setting ``new_tip="never"``.
 
 
 .. _many-to-many:
@@ -173,11 +173,11 @@ When the source and destination both contain the same number of wells, the mappi
       - B11
       - B12
 
-There's no requirement that the source and destination lists be mutually exclusive. In fact, this command adapted from the :ref:`tutorial` deliberately uses slices of the same list, with the effect that each aspiration happens in the same location as the previous dispense::
+There's no requirement that the source and destination lists be mutually exclusive. In fact, this command adapted from the :ref:`tutorial` deliberately uses slices of the same list, saved to the variable ``row``, with the effect that each aspiration happens in the same location as the previous dispense::
 
     row = plate.rows()[0]
     pipette.transfer(
-        volume=100, 
+        volume=50, 
         source=row[:11], 
         dest=row[1:],
     )
@@ -210,7 +210,7 @@ There's no requirement that the source and destination lists be mutually exclusi
       - A11
       - A12
       
-When the source and destination lists contain different numbers of wells, ``transfer()`` will always aspirate and dispense as many times as there are wells in the *longer* list. The shorter list will be "stretched" to cover the length of the longer list. Here is an example of transferring from 3 wells to a full row of 12 rows:: 
+When the source and destination lists contain different numbers of wells, ``transfer()`` will always aspirate and dispense as many times as there are wells in the *longer* list. The shorter list will be "stretched" to cover the length of the longer list. Here is an example of transferring from 3 wells to a full row of 12 wells:: 
 
     pipette.transfer(
         volume=50,
@@ -257,13 +257,13 @@ This is why the longer list must be evenly divisible by the shorter list. Changi
     )
     # error: source and destination lists must be divisible
     
-The API raises this error rather than presuming which wells to aspirate from three times and which only two times. If you want to aspirate three times from A1, three times from A2, and three times from A3, use multiple ``transfer()`` commands in sequence::
+The API raises this error rather than presuming which wells to aspirate from three times and which only two times. If you want to aspirate three times from A1, three times from A2, and two times from A3, use multiple ``transfer()`` commands in sequence::
 
     pipette.transfer(50, plate["A1"], plate.columns()[3][:3])
     pipette.transfer(50, plate["A2"], plate.columns()[3][3:6])
     pipette.transfer(50, plate["A3"], plate.columns()[3][6:])
     
-Finally, be aware of the ordering of source and destination lists when constructing them with :ref:`well-accessor-methods`. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to all the wells in the same column::
+Finally, be aware of the ordering of source and destination lists when constructing them with :ref:`well-accessor-methods`. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column::
 
     pipette.transfer(
         volume=20,
@@ -271,7 +271,7 @@ Finally, be aware of the ordering of source and destination lists when construct
         dest=plate.rows()[1:],
     )
     
-However, because the well ordering of :py:meth:`.Labware.rows` goes *across* wells instead of *down* wells, liquid from A1 will be dispensed in B1–B7, liquid from A2 will be dispensed in B8–C2, etc. The intended task is probably better accomplished by repeating transfers in a ``for`` loop::
+However, because the well ordering of :py:meth:`.Labware.rows` goes *across* the plate instead of *down* the plate, liquid from A1 will be dispensed in B1–B7, liquid from A2 will be dispensed in B8–C2, etc. The intended task is probably better accomplished by repeating transfers in a ``for`` loop::
 
     for i in range(12):        
         pipette.transfer(
@@ -285,6 +285,7 @@ Here the repeat index ``i`` picks out:
     - The individual well in the first row, for the source.
     - The corresponding column, which is sliced to form the destination.
 
+.. _complex-optimizing-patterns:
 
 Optimizing Patterns
 -------------------

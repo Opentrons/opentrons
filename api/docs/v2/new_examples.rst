@@ -73,10 +73,6 @@ This code only loads the instruments and labware listed above, and performs no o
             requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext):
-                # load well plate in deck slot D2
-                plate = protocol.load_labware(
-                    load_name="corning_96_wellplate_360ul_flat", location="D2"
-                )
                 # load tip rack in deck slot D3
                 tiprack = protocol.load_labware(
                     load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
@@ -86,6 +82,14 @@ This code only loads the instruments and labware listed above, and performs no o
                     instrument_name="flex_1channel_1000",
                     mount="left",
                     tip_racks=[tiprack]
+                )
+                # load well plate in deck slot D2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location="D2"
+                )
+                # load reservoir in deck slot D1
+                reservoir = protocol.load_labware(
+                    load_name="usascientific_12_reservoir_22ml", location="D1"
                 )
                 # Put protocol commands here
     
@@ -99,10 +103,6 @@ This code only loads the instruments and labware listed above, and performs no o
             metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
-                # load well plate in deck slot 2
-                plate = protocol.load_labware(
-                    load_name="corning_96_wellplate_360ul_flat", location=2
-                )
                 # load tip rack in deck slot 3
                 tiprack = protocol.load_labware(
                     load_name="opentrons_96_tiprack_300ul", location=3
@@ -113,6 +113,14 @@ This code only loads the instruments and labware listed above, and performs no o
                     mount="left",
                     tip_racks=[tiprack]
                 )  
+                # load well plate in deck slot 2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location=2
+                )
+                # load reservoir in deck slot 1
+                reservoir = protocol.load_labware(
+                    load_name="usascientific_12_reservoir_22ml", location=1
+                )
                 # Put protocol commands here
 
 Transferring Liquids

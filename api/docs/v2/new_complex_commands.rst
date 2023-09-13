@@ -17,7 +17,7 @@ There are three complex liquid handling commands: :py:meth:`~.InstrumentContext.
 
 Pages in this section of the documentation cover:
 
-    - :ref:`complex-source-dest`: Which wells commands aspirate from and dispense to.
+    - :ref:`complex-source-dest`: Which wells complex commands aspirate from and dispense to.
     - :ref:`complex-command-order`: The order of basic commands that are part of a complex commmand.
     - :ref:`complex_params`: Additional keyword arguments that affect complex command behavior.
     

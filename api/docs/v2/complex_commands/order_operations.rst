@@ -23,9 +23,8 @@ The order of steps is fixed within complex commands. Aspiration and dispensing a
     6. Dispense into destination
     7. Mix at destination
     8. Touch tip at destination
-    9. Empty disposal volume, if present in tip
-    10. Blow out, if tip is empty
-    11. Drop tip
+    9. Blow out
+    10. Drop tip
     
 The command may repeat some or all of these steps in order to move liquid as requested. :py:meth:`.transfer` repeats as many times as there are wells in the longer of its ``source`` or ``dest`` argument. :py:meth:`.distribute` and :py:meth:`.consolidate` try to repeat as few times as possible. See :ref:`complex-tip-refilling` below for how they behave when they do need to repeat.
 
@@ -120,7 +119,7 @@ Remember that ``distribute()`` includes a disposal volume by default, and this c
     Blowing out at A1 of Opentrons Fixed Trash on 12
     Dropping tip into A1 of Opentrons Fixed Trash on 12
     
-This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use :ref:`complex_params` to reduce or eliminate the disposal volume, or to blow out in a location other than the trash.
+This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use :ref:`complex_params` to reduce or eliminate the :ref:`disposal volume <param-disposal-volume>`, or to :ref:`blow out <param-blow-out>` in a location other than the trash.
 
 .. _distribute-consolidate-volume-list:
 .. _complex-list-volumes:

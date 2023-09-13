@@ -12,6 +12,8 @@ This page describes the accepted values and behavior of each parameter. The para
 
 The API reference entry for :py:meth:`~.InstrumentContext.transfer` also lists the parameters and has more information on their implementation as keyword arguments.
 
+.. _param-tip-handling:
+
 Tip Handling
 ============
 
@@ -46,7 +48,7 @@ Tip Handling Requirements
         volume=100,
         source=plate["A1"],
         dest=[plate["B1"], plate["B2"], plate["B3"]],
-        new_tip="never",  # "once", "always", or unset will error
+        new_tip="never",  # "once", "always", or None will error
     )
 
 Conversely, ``"never"`` requires that the pipette has picked up a tip, or the API will raise an error (because it will attempt to aspirate without a tip attached).
@@ -87,6 +89,7 @@ If this poses a contamination risk, you can work around it in a few ways:
     * Use :ref:`v2-atomic-commands` instead of complex commands.
 
 
+.. _param-mix-before:
 
 Mix Before
 ==========
@@ -109,6 +112,41 @@ Mixing occurs before every aspiration, including when :ref:`complex-tip-refillin
 .. note::
     :py:meth:`~.InstrumentContext.consolidate` ignores any value of ``mix_before``. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
     
+.. _param-disposal-volume:
+
+Disposal Volume
+===============
+
+The ``disposal_volume`` parameter controls how much extra liquid is aspirated as part of a :py:meth:`~.InstrumentContext.distribute` command. Including a disposal volume can improve the accuracy of each dispense. The pipette blows out the disposal volume of liquid after dispensing. To skip aspirating and blowing out extra liquid, set ``disposal_volume=0``.
+
+By default, ``disposal_volume`` is the :ref:`minimum volume <new-pipette-models>` of the pipette, but you can set it to any amount::
+
+    pipette.distribute(
+        volume=100,
+        source=plate["A1"],
+        dest=[plate["B1"], plate["B2"]],
+        disposal_volume=10,  # reduce from default 20 µL to 10 µL
+    )
+    
+.. versionadded:: 2.0
+    
+If the amount to aspirate plus the disposal volume exceeds the tip's capacity, ``distribute()`` will use a :ref:`complex-tip-refilling` strategy. In such cases, the pipette will aspirate and blow out the disposal volume *for each aspiration*. For example, this command will require tip refilling with a 1000 µL pipette::
+    
+    pipette.distribute(
+        volume=120,
+        source=reservoir["A1"],
+        dest=[plate.columns()[0]],
+        disposal_volume=50,
+    )
+    
+The amount to dispense in the destination is 960 µL (120 µL for each of 8 wells in the column). Adding the 50 µL disposal volume exceeds the 1000 µL capacity of the tip. The command will be split across two aspirations, each with the full disposal volume of 50 µL. The pipette will dispose *a total of 100 µL* during the command.
+
+.. note::
+    :py:meth:`~.InstrumentContext.transfer` will not aspirate additional liquid if you set ``disposal_volume``. However, it will perform a very small blow out after each dispense.
+    
+    :py:meth:`~.InstrumentContext.consolidate` ignores ``disposal_volume`` completely.
+
+.. _param-touch-tip:
 
 Touch Tip
 =========
@@ -133,10 +171,12 @@ This parameter always uses default motion behavior for touch tip. Use the :ref:`
     * Only touch the tip after aspirating or dispensing, but not both.
     * Control the speed, radius, or height of the touch tip motion.
 
+.. _param-air-gap:
+
 Air Gap
 =======
 
-The ``air_gap`` parameter controls how much air to aspirate and hold in the bottom of the tip when it also contains liquid. The parameter's value is the amount of air to aspirate in µL.
+The ``air_gap`` parameter controls how much air to aspirate and hold in the bottom of the tip when it contains liquid. The parameter's value is the amount of air to aspirate in µL.
 
 Air-gapping behavior is different for each complex command. The different behaviors all serve the same purpose, which is to never leave the pipette holding liquid at the very bottom of the tip. This helps keep liquids from seeping out of the pipette.
 
@@ -217,6 +257,8 @@ As a result, the transfer is split into two aspirates of 150 µL, each with thei
 	Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
 	Dropping tip into A1 of Opentrons Fixed Trash on 12
 
+.. _param-mix-after:
+
 Mix After
 =========
 
@@ -236,43 +278,12 @@ For example, this transfer command will mix 50 µL of liquid 3 times after each 
 .. note::
     :py:meth:`~.InstrumentContext.distribute` ignores any value of ``mix_after``. Mixing after dispensing would combine (and potentially contaminate) the remaining source liquid with liquid present at the destination.
 
-
-Disposal Volume
-===============
-
-The ``disposal_volume`` parameter controls how much extra liquid is aspirated as part of a :py:meth:`~.InstrumentContext.distribute` command. Including a disposal volume can improve the accuracy of each dispense. The pipette blows out the disposal volume of liquid after dispensing. To skip aspirating and blowing out extra liquid, set ``disposal_volume=0``.
-
-By default, ``disposal_volume`` is the :ref:`minimum volume <new-pipette-models>` of the pipette, but you can set it to any amount::
-
-    pipette.distribute(
-        volume=100,
-        source=plate["A1"],
-        dest=[plate["B1"], plate["B2"]],
-        disposal_volume=50,  # reduce from default 100 µL to 50 µL
-    )
-    
-.. versionadded:: 2.0
-    
-If the amount to aspirate plus the disposal volume exceeds the tip's capacity, ``distribute()`` will use a :ref:`complex-tip-refilling` strategy. In such cases, the pipette will aspirate and blow out the disposal volume *with each aspiration*. For example, this command will require tip refilling with a 1000 µL pipette::
-    
-    pipette.distribute(
-        volume=100,
-        source=reservoir["A1"],
-        dest=[plate.columns()[0]],
-        disposal_volume=250,
-    )
-    
-The amount to dispense in the destination is 800 µL (100 µL for each of 8 wells in the column). Adding the 250 µL disposal volume exceeds the 1000 µL capacity of the tip. The command will be split across two aspirations, each with the full disposal volume of 250 µL. The pipette will dispose *a total of 500 µL* during the command.
-
-.. note::
-    :py:meth:`~.InstrumentContext.transfer` will not aspirate additional liquid if you set ``disposal_volume``. However, it will perform a very small blow out after each dispense.
-    
-    :py:meth:`~.InstrumentContext.consolidate` ignores ``disposal_volume`` completely.
+.. _param-blow-out:
 
 Blow Out
 ========
 
-There are two parameters that control blowout behavior. The ``blow_out`` parameter accepts a Boolean value. When ``True``, the pipette blows out remaining liquid after each dispense. The ``blowout_location`` parameter controls in which of three locations these blowout actions occur. The default blowout location is the trash. Blowout behavior is different for each complex command. 
+There are two parameters that control blowout behavior. The ``blow_out`` parameter accepts a Boolean value. When ``True``, the pipette blows out remaining liquid when the tip is empty or only contains the disposal volume. The ``blowout_location`` parameter controls in which of three locations these blowout actions occur. The default blowout location is the trash. Blowout behavior is different for each complex command. 
 
 .. list-table::
    :header-rows: 1
@@ -285,11 +296,11 @@ There are two parameters that control blowout behavior. The ``blow_out`` paramet
        - Valid locations: ``"trash"``, ``"source well"``, ``"destination well"``
    * - ``distribute()``
      - 
-       - Blow out after final dispense.
+       - Blow out after the final dispense.
        - Valid locations: ``"trash"``, ``"source well"``
    * - ``consolidate()``
      - 
-       - Blow out after only dispense.
+       - Blow out after the only dispense.
        - Valid locations: ``"trash"``, ``"destination well"``
 
 For example, this transfer command will blow out liquid in the trash twice, once after each dispense into a destination well::
@@ -324,7 +335,7 @@ Set ``blowout_location`` when you don't want to waste any liquid by blowing it o
 
 If you need to blow out in a different well, or at a specific location within a well, use the :ref:`blow out building block command <blow-out>` instead.
 
-When setting a blowout location, you must also set ``blow_out=True``, or the location will be ignored::
+When setting a blowout location, you *must* also set ``blow_out=True``, or the location will be ignored::
 
     pipette.transfer(
         volume=100,
@@ -336,7 +347,9 @@ When setting a blowout location, you must also set ``blow_out=True``, or the loc
 
 .. versionadded:: 2.8
 
-With ``transfer()``, the pipette will not blow out at all if you only set ``blowout_location``. With ``distribute()``, the pipette will still blow out (due to ``disposal_volume``) but in the default location of the trash::
+With ``transfer()``, the pipette will not blow out at all if you only set ``blowout_location``.
+
+``blow_out=True`` is also required for distribute commands that blow out by virtue of having a disposal volume::
 
     pipette.distribute(
         volume=100,
@@ -346,6 +359,10 @@ With ``transfer()``, the pipette will not blow out at all if you only set ``blow
         blow_out=True,       # still required to set location!
         blowout_location="source well",
     )
+
+With ``distribute()``, the pipette will still blow out if you only set ``blowout_location``, but in the default location of the trash.
+
+.. _param-trash:
 
 Trash Tips
 ==========
