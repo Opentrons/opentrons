@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 from functools import wraps
 import logging
 from copy import deepcopy
-from typing_extensions import Literal
 from typing import (
     Any,
     Awaitable,
@@ -857,12 +856,11 @@ class OT3Controller:
         expected_responses = 2 if expect_multiple_responses else 1
         node = sensor_node_for_mount(OT3Mount(mount.value))
         assert node != NodeId.gripper
-        res = await get_tip_ejector_state(
-            self._messenger, node, expected_responses
-        )
+        res = await get_tip_ejector_state(self._messenger, node, expected_responses)  # type: ignore[arg-type]
         vals = list(res.values())
         if not all([r == vals[0] for r in vals]):
-            raise UnmatchedTipPresenceStates()
+            states = {int(sensor): res[sensor] for sensor in res.keys()}
+            raise UnmatchedTipPresenceStates(states)
         tip_present_state = bool(vals[0]) and bool(vals[-1])
         return tip_present_state
 

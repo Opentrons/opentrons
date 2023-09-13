@@ -533,11 +533,15 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
 
     def __init__(
         self,
+        states: Dict[int, int],
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an UnmatchedTipPresenceStatesError."""
-        msg = "Received two differing tip presence statuses. Pickup motor may need to be homed."
+        tip_status_by_sensor = {0: "not detected", 1: "detected"}
+        msg = "Received two differing tip presence statuses:" \
+              "\nRear Sensor tips" + tip_status_by_sensor[states[0]] + \
+              "\nFront Sensor tips" + tip_status_by_sensor[states[1]]
         if detail:
             msg += str(detail)
         super().__init__(

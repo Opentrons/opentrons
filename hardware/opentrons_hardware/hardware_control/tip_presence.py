@@ -12,6 +12,7 @@ from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     MultipleMessagesWaitableCallback,
+    WaitableCallback,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipStatusQueryRequest,
@@ -41,7 +42,9 @@ async def get_tip_ejector_state(
             == MessageId.tip_presence_notification
         )
 
-    async def gather_responses(reader: MultipleMessagesWaitableCallback ) -> Dict[SensorId, int]:
+    async def gather_responses(
+        reader: WaitableCallback,
+    ) -> Dict[SensorId, int]:
         data: Dict[SensorId, int] = {}
         async for response, _ in reader:
             assert isinstance(response, PushTipPresenceNotification)
