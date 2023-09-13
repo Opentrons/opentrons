@@ -17,7 +17,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
@@ -117,11 +116,6 @@ export function ModuleCalibrationOverflowMenu({
     setShowModuleWizard(true)
   }
 
-  const handleDeleteCalibration = (): void => {
-    // ToDo (kk:08/23/2023)
-    // call a custom hook to delete calibration data
-  }
-
   React.useEffect(() => {
     if (isRunning) {
       updateRobotStatus(true)
@@ -162,14 +156,6 @@ export function ModuleCalibrationOverflowMenu({
           >
             {isCalibrated ? t('recalibrate_module') : t('calibrate_module')}
           </MenuItem>
-          {isCalibrated ? (
-            <>
-              <Divider />
-              <MenuItem onClick={handleDeleteCalibration} disabled={false}>
-                {t('clear_calibration_data')}
-              </MenuItem>
-            </>
-          ) : null}
         </Flex>
       ) : null}
       {menuOverlay}

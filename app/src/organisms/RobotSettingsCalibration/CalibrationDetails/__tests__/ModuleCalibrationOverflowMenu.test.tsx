@@ -94,10 +94,9 @@ describe('ModuleCalibrationOverflowMenu', () => {
   })
 
   it('should render overflow menu buttons - not calibrated', () => {
-    const [{ getByText, queryByText, getByLabelText }] = render(props)
+    const [{ getByText, getByLabelText }] = render(props)
     getByLabelText('ModuleCalibrationOverflowMenu').click()
     getByText('Calibrate module')
-    expect(queryByText('Clear calibration data')).not.toBeInTheDocument()
   })
 
   it('should render overflow menu buttons - calibrated', () => {
@@ -105,7 +104,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     getByLabelText('ModuleCalibrationOverflowMenu').click()
     getByText('Recalibrate module')
-    getByText('Clear calibration data')
   })
 
   it('should call a mock function when clicking calibrate button', () => {
