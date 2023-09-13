@@ -19,3 +19,7 @@ export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
 )
+export const getAllow96Channel: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ALLOW_96_CHANNEL ?? false
+)
