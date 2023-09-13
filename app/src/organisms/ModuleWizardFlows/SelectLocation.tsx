@@ -47,7 +47,6 @@ export const SelectLocation = (
     proceed()
   }
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  console.log('deckDef', deckDef)
   const bodyText = (
     <>
       <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>

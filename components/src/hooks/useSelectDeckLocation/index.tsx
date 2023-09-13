@@ -58,7 +58,6 @@ export function DeckLocationSelect({
             typeof l === 'object' && 'slotName' in l && l.slotName === slot.id
         )
         const isSelected = isEqual(selectedLocation, slotLocation)
-        console.log('isSelected', isSelected)
         let fill = COLORS.highlightPurple2
         if (isSelected) fill = COLORS.highlightPurple1
         if (isDisabled) fill = COLORS.darkGreyDisabled
