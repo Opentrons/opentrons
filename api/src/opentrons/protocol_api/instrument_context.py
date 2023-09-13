@@ -992,10 +992,14 @@ class InstrumentContext(publisher.CommandPublisher):
                        well.
         :param source: A single well from where liquid will be aspirated.
         :param dest: List of Wells where liquid will be dispensed to.
-        :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
-                       Specifically, ``mix_after``, if specified, is ignored
-                       and ``disposal_volume``, if not specified, is set to the
-                       minimum volume of the pipette
+        :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
+                       Some parameters behave differently than when transferring.
+
+                         - ``disposal_volume`` aspirates additional liquid to improve the accuracy of each dispense. Defaults to the minimum volume of the pipette. See :ref:`param-disposal-volume` for details.
+
+                         - ``mix_after``, if specified, is ignored.
+
+
         :returns: This instance
         """
         _log.debug("Distributing {} from {} to {}".format(volume, source, dest))
@@ -1061,82 +1065,87 @@ class InstrumentContext(publisher.CommandPublisher):
         # TODO: What should happen if the user passes a non-first-row well
         # TODO: ..as src/dest *while using multichannel pipette?
         """
-        Transfer will move a volume of liquid from a source location(s)
-        to a dest location(s). It is a higher-level command, incorporating
-        other :py:class:`InstrumentContext` commands, like :py:meth:`aspirate`
-        and :py:meth:`dispense`, designed to make protocol writing easier at
-        the cost of specificity.
+        Transfer moves liquid from one well or group of wells to another. It is a
+        higher-level command, incorporating other :py:class:`InstrumentContext`
+        commands, like :py:meth:`aspirate` and :py:meth:`dispense`. It makes writing a
+        protocol easier at the cost of specificity. See :ref:`v2-complex-commands` for
+        details on how transfer and other complex commands perform their component steps.
 
         :param volume: The amount, in µL, to aspirate from each source and
                        dispense to each destination.
-                       If ``volume`` is a list, each amount will be used for the
-                       source and target at the matching index. A list item of ``0``
-                       will skip the corresponding wells entirely.
-        :param source: A single well or a list of wells from where liquid
-                       will be aspirated.
-        :param dest: A single well or a list of wells where liquid
-                     will be dispensed to.
-        :param \\**kwargs: See below
+                       If ``volume`` is a list, each amount will be used for the source
+                       and destination at the matching index. A list item of ``0`` will
+                       skip the corresponding wells entirely. See
+                       :ref:`complex-list-volumes` for details and examples.
+        :param source: A single well or a list of wells to aspirate liquid from.
+        :param dest: A single well or a list of wells to dispense liquid into.
 
-        :Keyword Arguments:
+        :Keyword Arguments: Transfer accepts a number of optional parameters that give
+            you greater control over the exact steps it performs. See :ref:`complex_params`
+            or the links under each argument's entry below for additional details and
+            examples.
 
-            * *new_tip* (``string``) --
+            * **new_tip** (*string*) --
+              When to pick up and drop tips during the command. Defaults to ``"once"``.
 
-                - 'never': no tips will be picked up or dropped during transfer
-                - 'once': (default) a single tip will be used for all commands.
-                - 'always': use a new tip for each transfer.
+                - ``"once"``: Use one tip for the entire command.
+                - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
+                - ``"never"``: Do not pick up or drop tips at all.
 
-            * *trash* (``boolean``) --
-              If `True` (default behavior), tips will be
-              dropped in the trash container attached this `Pipette`.
-              If `False` tips will be returned to tiprack.
+              See :ref:`param-tip-handling` for details.
 
-            * *touch_tip* (``boolean``) --
-              If `True`, a :py:meth:`touch_tip` will occur following each
-              :py:meth:`aspirate` and :py:meth:`dispense`. If set to `False`
-              (default behavior), no :py:meth:`touch_tip` will occur.
+            * **trash** (*boolean*) --
+              If ``True`` (default), the pipette will drop tips in its
+              :py:meth:`~.InstrumentContext.trash_container`.
+              If ``False``, the pipette will return tips to their tip rack.
 
-            * *blow_out* (``boolean``) --
-              If `True`, a :py:meth:`blow_out` will occur following each
+              See :ref:`param-trash` for details.
+
+            * **touch_tip** (*boolean*) --
+              If ``True``, perform a :py:meth:`touch_tip` following each
+              :py:meth:`aspirate` and :py:meth:`dispense`. Defaults to ``False``.
+
+              See :ref:`param-touch-tip` for details.
+
+            * **blow_out** (*boolean*) --
+              If ``True``, a :py:meth:`blow_out` will occur following each
               :py:meth:`dispense`, but only if the pipette has no liquid left
-              in it. If set to `False` (default), no :py:meth:`blow_out` will
-              occur.
+              in it. If ``False`` (default), the pipette will not blow out liquid.
 
-            * *blowout_location* (``string``) --
-                - 'source well': blowout excess liquid into source well
-                - 'destination well': blowout excess liquid into destination
-                   well
-                - 'trash': blowout excess liquid into the trash
+              See :ref:`param-blow-out` for details.
 
-                If no ``blowout_location`` specified, no ``disposal_volume``
-                specified, and the pipette contains liquid,
-                a :py:meth:`blow_out` will occur into the source well.
+            * **blowout_location** (*string*) --
+              Accepts one of three string values: ``"trash"``, ``"source well"``, or
+              ``"destination well"``.
 
-                If no ``blowout_location`` specified and either
-                ``disposal_volume`` is specified or the pipette is empty,
-                a :py:meth:`blow_out` will occur into the trash.
+              If ``blow_out`` is ``False`` (its default), this parameter is ignored.
 
-                If ``blow_out`` is set to ``False``, this parameter will be ignored.
+              If ``blow_out`` is ``True`` and this parameter is not set:
 
-            * *mix_before* (``tuple``) --
-              The tuple, if specified, gives the amount of volume to
-              :py:meth:`mix` preceding each :py:meth:`aspirate` during the
-              transfer. The tuple is interpreted as (repetitions, volume).
+                - Blow out into the trash, if the pipette is empty or only contains the disposal volume.
 
-            * *mix_after* (``tuple``) --
-              The tuple, if specified, gives the amount of volume to
-              :py:meth:`mix` after each :py:meth:`dispense` during the
-              transfer. The tuple is interpreted as (repetitions, volume).
+                - Blow out into the source well, if the pipette otherwise contains liquid.
 
-            * *disposal_volume* (``float``) --
-              (:py:meth:`distribute` only) Volume of liquid to be disposed off
-              after distributing. When dispensing multiple times from the same
-              tip, it is recommended to aspirate an extra amount of liquid to
-              be disposed off after distributing.
+            * **mix_before** (*tuple*) --
+              Perform a :py:meth:`mix` before each :py:meth:`aspirate` during the
+              transfer. The first value of the tuple is the number of repetitions, and
+              the second value is the amount of liquid to mix in µL.
 
-            * *carryover* (``boolean``) --
-              If `True` (default), any `volume` that exceeds the maximum volume
-              of this Pipette will be split into multiple smaller volumes.
+              See :ref:`param-mix-before` for details.
+
+            * **mix_after** (*tuple*) --
+              Perform a :py:meth:`mix` after each :py:meth:`dispense` during the
+              transfer. The first value of the tuple is the number of repetitions, and
+              the second value is the amount of liquid to mix in µL.
+
+              See :ref:`param-mix-after` for details.
+
+            * **disposal_volume** (*float*) --
+              Transfer ignores the numeric value of this parameter. If set, the pipette
+              will not aspirate additional liquid, but it will perform a very small blow
+              out after each dispense.
+
+              See :ref:`param-disposal-volume` for details.
 
         :returns: This instance
         """
