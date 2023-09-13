@@ -776,7 +776,7 @@ class InvalidDispenseVolumeError(ProtocolEngineError):
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a InvalidPushOutVolumeError."""
+        """Build a InvalidDispenseVolumeError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
