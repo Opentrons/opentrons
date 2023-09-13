@@ -6,14 +6,13 @@ import {
   reduceCommandCreators,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
+import { configureForVolume } from '../atomic/configureForVolume'
+import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
 import type {
   MixArgs,
   CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
-import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
-import { configureForVolume } from '../atomic/configureForVolume'
-
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {
   pipette: string

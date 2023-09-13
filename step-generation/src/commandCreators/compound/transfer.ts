@@ -19,6 +19,7 @@ import {
   touchTip,
   moveToWell,
 } from '../atomic'
+import { configureForVolume } from '../atomic/configureForVolume'
 import { mixUtil } from './mix'
 import type {
   TransferArgs,
@@ -26,7 +27,6 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
-import { configureForVolume } from '../atomic/configureForVolume'
 export const transfer: CommandCreator<TransferArgs> = (
   args,
   invariantContext,

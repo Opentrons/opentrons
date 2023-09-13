@@ -4,16 +4,12 @@ import { getWellDepth } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import type {
-  ConsolidateArgs,
-  CommandCreator,
-  CurriedCommandCreator,
-} from '../../types'
 import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
 } from '../../utils'
+import { configureForVolume } from '../atomic/configureForVolume'
 import {
   aspirate,
   delay,
@@ -24,7 +20,11 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
-import { configureForVolume } from '../atomic/configureForVolume'
+import type {
+  ConsolidateArgs,
+  CommandCreator,
+  CurriedCommandCreator,
+} from '../../types'
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
   invariantContext,
