@@ -44,6 +44,7 @@ class GravimetricTrial(VolumetricTrial):
     stable: bool
     cfg: config.GravimetricConfig
     scale_delay: int = DELAY_FOR_MEASUREMENT
+    mode: str = ""
 
 
 @dataclass
@@ -120,6 +121,7 @@ def build_gravimetric_trials(
                     acceptable_d=None,
                     cfg=cfg,
                     env_sensor=env_sensor,
+                    mode=cfg.mode,
                 )
             )
     else:
@@ -170,6 +172,7 @@ def build_gravimetric_trials(
                             acceptable_d=d,
                             cfg=cfg,
                             env_sensor=env_sensor,
+                            mode=cfg.mode,
                         )
                     )
     return trial_list

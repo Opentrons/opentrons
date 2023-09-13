@@ -35,6 +35,7 @@ class VolumetricConfig:
     jog: bool
     same_tip: bool
     ignore_fail: bool
+    mode: str
 
 
 @dataclass

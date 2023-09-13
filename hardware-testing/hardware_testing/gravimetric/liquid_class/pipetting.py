@@ -171,6 +171,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     blank: bool = True,
     added_blow_out: bool = True,
     touch_tip: bool = False,
+    mode: str = "",
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     # FIXME: stop using hwapi, and get those functions into core software
@@ -179,30 +180,36 @@ def _pipette_with_liquid_settings(  # noqa: C901
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(mix, aspirate, dispense)
 
+    def _get_max_blow_out_ul() -> float:
+        # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
+        blow_out_ul_per_mm = hw_pipette.config.shaft_ul_per_mm
+        bottom = hw_pipette.plunger_positions.bottom
+        blow_out = hw_pipette.plunger_positions.blow_out
+        return (blow_out - bottom) * blow_out_ul_per_mm
+
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.dispense.blow_out_submerged)
+        vol = min(liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul())
+        hw_api.blow_out(hw_mount, vol)
 
     def _blow_out_remaining_air() -> None:
         # FIXME: using the HW-API to specify that we want to blow-out the full
         #        available blow-out volume
-        # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
-        blow_out_ul_per_mm = hw_pipette.config.shaft_ul_per_mm
-        bottom = hw_pipette.plunger_positions.bottom
-        blow_out = hw_pipette.plunger_positions.blow_out
-        max_blow_out_ul = (blow_out - bottom) * blow_out_ul_per_mm
-        hw_api.blow_out(hw_mount, max_blow_out_ul)
+        hw_api.blow_out(hw_mount, _get_max_blow_out_ul())
 
     def _set_plunger_bottom() -> None:
         # FIXME: this should be deleted immediately once low-volume mode is working
         old_positions = hw_pipette.plunger_positions
-        if (aspirate and aspirate < 5) or (dispense and dispense < 5):
-            old_positions.bottom = 61.5
+        poses = {"default": 71.5, "lowVolumeDefault": 61.5}
+        if mode:
+            old_positions.bottom = poses[mode]
+        elif (aspirate and aspirate < 5) or (dispense and dispense < 5):
+            old_positions.bottom = poses["lowVolumeDefault"]
         else:
-            old_positions.bottom = 71.5
+            old_positions.bottom = poses["default"]
         hw_pipette._set_plunger_positions(old_positions)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
@@ -341,6 +348,7 @@ def mix_with_liquid_class(
     callbacks: PipettingCallbacks,
     blank: bool = False,
     touch_tip: bool = False,
+    mode: str = "",
 ) -> None:
     """Mix with liquid class."""
     liquid_class = get_liquid_class(
@@ -358,6 +366,7 @@ def mix_with_liquid_class(
         mix=mix_volume,
         blank=blank,
         touch_tip=touch_tip,
+        mode=mode,
     )
 
 
@@ -373,6 +382,7 @@ def aspirate_with_liquid_class(
     callbacks: PipettingCallbacks,
     blank: bool = False,
     touch_tip: bool = False,
+    mode: str = "",
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
@@ -390,6 +400,7 @@ def aspirate_with_liquid_class(
         aspirate=aspirate_volume,
         blank=blank,
         touch_tip=touch_tip,
+        mode=mode,
     )
 
 
@@ -406,6 +417,7 @@ def dispense_with_liquid_class(
     blank: bool = False,
     added_blow_out: bool = True,
     touch_tip: bool = False,
+    mode: str = "",
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
@@ -424,4 +436,5 @@ def dispense_with_liquid_class(
         blank=blank,
         added_blow_out=added_blow_out,
         touch_tip=touch_tip,
+        mode=mode,
     )
