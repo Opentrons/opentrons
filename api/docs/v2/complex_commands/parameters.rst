@@ -289,7 +289,7 @@ There are two parameters that control blowout behavior. The ``blow_out`` paramet
        - Valid locations: ``"trash"``, ``"source well"``
    * - ``consolidate()``
      - 
-       - Blow out after final dispense.
+       - Blow out after only dispense.
        - Valid locations: ``"trash"``, ``"destination well"``
 
 For example, this transfer command will blow out liquid in the trash twice, once after each dispense into a destination well::
@@ -304,7 +304,21 @@ For example, this transfer command will blow out liquid in the trash twice, once
 .. versionadded:: 2.0
 
 .. note::
-    If the tip already contains liquid, and then you perform a complex command with ``new_tip="never"`` and ``blow_out=True``, the pipette will blow out *all* of the liquid from the tip.
+    If the tip already contains liquid before the complex command, the default blowout location will shift away from the trash. Transfer and distribute shift to the source well, and consolidate shifts to the destination well. For example, this transfer command will blow out in well B1 because it's the source::
+    
+        pipette.pick_up_tip()
+        pipette.aspirate(100, plate["A1"])    
+        pipette.transfer(
+            volume=100,
+            source=plate["B1"],
+            dest=plate["C1"],
+            new_tip="never",
+            blow_out=True,
+            # no blowout_location
+        )
+        pipette.drop_tip()
+
+    This only occurs when you aspirate and then perform a complex command with ``new_tip="never"`` and ``blow_out=True``.
 
 Set ``blowout_location`` when you don't want to waste any liquid by blowing it out into the trash. For example, you may want to make sure that every last bit of a sample is moved into a destination well. Or you may want to return every last bit of an expensive reagent to the source for use in later pipetting. 
 
@@ -336,3 +350,15 @@ With ``transfer()``, the pipette will not blow out at all if you only set ``blow
 Trash Tips
 ==========
 
+The ``trash`` parameter controls what the pipette does with tips at the end of complex commands. When ``True``, the pipette drops tips into the trash. When ``False``, the pipette returns tips to their original locations in their tip rack. 
+
+The default is ``True``, so you only have to set ``trash`` when you want the tip-returning behavior::
+
+    pipette.transfer(
+        volume=100,
+        source=plate["A1"],
+        dest=plate["B1"],
+        trash=False,
+    )
+
+.. versionadded:: 2.0
