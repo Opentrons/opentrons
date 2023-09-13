@@ -31,11 +31,11 @@ This update may take longer than usual. Allow **approximately 15 minutes** for y
 ### Improved Features
 
 - The API relaxes placement restrictions for the Heater-Shaker Module on Flex.
-- Pipettes drop tips in multiple locations above the trash bin to prevent tips from stacking up.
+- Pipettes drop tips in multiple locations above the fixed trash, to prevent tips from stacking up.
 
 ### Bug Fixes
 
-- Trying to drop tips to a non-fixed-trash labware no longer raises errors
+- The API no longer raises an error when dropping tips into labware other than the fixed trash.
 
 ### Known Issues
 
