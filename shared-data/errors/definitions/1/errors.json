@@ -102,6 +102,10 @@
       "detail": "Misaligned Gantry",
       "category": "roboticsControlError"
     },
+    "2012": {
+      "detail": "Unmatched tip presence states",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -181,10 +185,6 @@
     "4003": {
       "detail": "Not supported on this robot type",
       "category": "generalError"
-    },
-    "4004": {
-      "detail": "Unmatched tip presence states",
-      "category": "roboticsControlError"
     }
   }
 }
