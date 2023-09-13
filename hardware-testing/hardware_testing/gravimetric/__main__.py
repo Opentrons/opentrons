@@ -213,7 +213,7 @@ class RunArgs:
                 kind,
                 False,  # set extra to false so we always do the normal tests first
                 args.channels,
-                mode=args.mode  # NOTE: only needed for increment test
+                mode=args.mode,  # NOTE: only needed for increment test
             )
             if len(vls) > 0:
                 volumes.append(
@@ -234,7 +234,7 @@ class RunArgs:
                     args.user_volumes,
                     kind,
                     True,
-                    args.channels
+                    args.channels,
                 )
                 if len(vls) > 0:
                     volumes.append(
@@ -335,6 +335,7 @@ def build_gravimetric_cfg(
     jog: bool,
     same_tip: bool,
     ignore_fail: bool,
+    mode: str,
     run_args: RunArgs,
 ) -> GravimetricConfig:
     """Build."""
@@ -362,6 +363,7 @@ def build_gravimetric_cfg(
         jog=jog,
         same_tip=same_tip,
         ignore_fail=ignore_fail,
+        mode=mode,
     )
 
 
@@ -380,6 +382,7 @@ def build_photometric_cfg(
     pipette_channels: int,
     photoplate_column_offset: int,
     dye_well_column_offset: int,
+    mode: str,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
@@ -409,6 +412,7 @@ def build_photometric_cfg(
         ignore_fail=ignore_fail,
         photoplate_column_offset=photoplate_column_offset,
         dye_well_column_offset=dye_well_column_offset,
+        mode=mode,
     )
 
 
@@ -435,6 +439,7 @@ def _main(
             args.channels,
             args.photoplate_col_offset,
             args.dye_well_col_offset,
+            args.mode,
             run_args,
         )
         union_cfg = cfg_pm
@@ -454,6 +459,7 @@ def _main(
             args.jog,
             args.same_tip,
             args.ignore_fail,
+            args.mode,
             run_args,
         )
 
@@ -514,7 +520,9 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-fail", action="store_true")
     parser.add_argument("--photoplate-col-offset", type=int, default=1)
     parser.add_argument("--dye-well-col-offset", type=int, default=1)
-    parser.add_argument("--mode", type=str, choices=["default", "lowVolumeDefault"], default="default")
+    parser.add_argument(
+        "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
+    )
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():

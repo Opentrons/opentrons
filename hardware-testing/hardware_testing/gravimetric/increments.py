@@ -47,7 +47,7 @@ INCREMENTS = {
                     14.910,
                     28.940,
                     48.27,
-                ]
+                ],
             }
         },
         1000: {
@@ -113,7 +113,7 @@ INCREMENTS = {
                     1030.000,
                     1137.160,
                 ],
-            }
+            },
         },
     },
     8: {
@@ -262,7 +262,7 @@ INCREMENTS = {
                     873.00,
                     1137.10,
                 ],
-            }
+            },
         },
     },
     96: {
@@ -315,17 +315,18 @@ INCREMENTS = {
                     200.000,
                     1137.10,
                 ],
-            }
+            },
         }
     },
 }
 
 
 def get_volume_increments(
-    channels: int, pipette_volume: int, tip_volume: int, mode: str = "default"
+    channels: int, pipette_volume: int, tip_volume: int, mode: str = ""
 ) -> List[float]:
     """Get volume increments."""
     try:
+        mode = mode if mode else "default"
         return INCREMENTS[channels][pipette_volume][tip_volume][mode]
     except KeyError:
         raise ValueError(

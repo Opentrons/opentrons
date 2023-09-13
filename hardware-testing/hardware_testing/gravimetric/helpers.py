@@ -296,7 +296,7 @@ def _get_volumes(
     kind: config.ConfigType,
     extra: bool,
     channels: int,
-    mode: str = "default"
+    mode: str = "",
 ) -> List[float]:
     if increment:
         test_volumes = get_volume_increments(
