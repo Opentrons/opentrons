@@ -13,19 +13,23 @@ from hardware_testing.data import create_run_id_and_start_time, ui, get_git_desc
 from hardware_testing.protocols import (
     gravimetric_ot3_p50_single,
     gravimetric_ot3_p50_multi,
+    gravimetric_ot3_p50_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_single,
     gravimetric_ot3_p1000_multi,
-    gravimetric_ot3_p1000_96_50ul_tip,
-    gravimetric_ot3_p1000_96_200ul_tip,
-    gravimetric_ot3_p1000_96_1000ul_tip,
-    gravimetric_ot3_p1000_96,
-    photometric_ot3_p1000_96_50ul_tip,
-    photometric_ot3_p1000_96_200ul_tip,
-    photometric_ot3_p50_single,
-    gravimetric_ot3_p50_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_200ul_tip_increment,
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
+    gravimetric_ot3_p1000_96,
+    gravimetric_ot3_p1000_96_50ul_tip,
+    gravimetric_ot3_p1000_96_200ul_tip,
+    gravimetric_ot3_p1000_96_1000ul_tip,
+)
+from hardware_testing.protocols import (
+    photometric_ot3_p50_single,
+    photometric_ot3_p50_multi,
+    photometric_ot3_p1000_single,
+    photometric_ot3_p1000_multi,
+    photometric_ot3_p1000_96,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -87,13 +91,15 @@ GRAVIMETRIC_CFG_INCREMENT = {
 }
 
 PHOTOMETRIC_CFG = {
-    1: {
-        50: photometric_ot3_p50_single,
+    50: {
+        1: photometric_ot3_p50_single,
+        8: photometric_ot3_p50_multi,
     },
-    96: {
-        50: photometric_ot3_p1000_96_50ul_tip,
-        200: photometric_ot3_p1000_96_200ul_tip,
-    },
+    1000: {
+        1: photometric_ot3_p1000_single,
+        8: photometric_ot3_p1000_multi,
+        96: photometric_ot3_p1000_96,
+    }
 }
 
 
@@ -254,7 +260,7 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            protocol_cfg = PHOTOMETRIC_CFG[args.channels][args.tip]
+            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,

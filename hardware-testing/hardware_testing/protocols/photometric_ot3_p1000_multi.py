@@ -1,16 +1,18 @@
 """Photometric OT3 P50."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"protocolName": "photometric-ot3-p50-single"}
+metadata = {"protocolName": "photometric-ot3-p50-multi"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
     50: [3],
+    200: [6],
+    1000: [9],
 }
 SLOT_PLATE = 2
 SLOT_RESERVOIR = 5
 
-RESERVOIR_LABWARE = "nest_96_wellplate_2ml_deep"
+RESERVOIR_LABWARE = "nest_12_reservoir_15ml"
 PHOTOPLATE_LABWARE = "corning_96_wellplate_360ul_flat"
 
 
@@ -24,7 +26,7 @@ def run(ctx: ProtocolContext) -> None:
     ]
     reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
     plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
-    pipette = ctx.load_instrument("p50_single_gen3", "left")
+    pipette = ctx.load_instrument("p1000_multi_gen3", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
         pipette.aspirate(10, reservoir["A1"].top())
