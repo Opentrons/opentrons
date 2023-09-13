@@ -143,7 +143,7 @@ Air-gapping behavior is different for each complex command. The different behavi
 .. list-table::
    :header-rows: 1
 
-   * - Command
+   * - Method
      - Air-gapping behavior
    * - ``transfer()``
      - 
@@ -251,6 +251,8 @@ By default, ``disposal_volume`` is the :ref:`minimum volume <new-pipette-models>
         disposal_volume=50,  # reduce from default 100 µL to 50 µL
     )
     
+.. versionadded:: 2.0
+    
 If the amount to aspirate plus the disposal volume exceeds the tip's capacity, ``distribute()`` will use a :ref:`complex-tip-refilling` strategy. In such cases, the pipette will aspirate and blow out the disposal volume *with each aspiration*. For example, this command will require tip refilling with a 1000 µL pipette::
     
     pipette.distribute(
@@ -270,5 +272,67 @@ The amount to dispense in the destination is 800 µL (100 µL for each of 8 well
 Blow Out
 ========
 
+There are two parameters that control blowout behavior. The ``blow_out`` parameter accepts a Boolean value. When ``True``, the pipette blows out remaining liquid after each dispense. The ``blowout_location`` parameter controls in which of three locations these blowout actions occur. The default blowout location is the trash. Blowout behavior is different for each complex command. 
+
+.. list-table::
+   :header-rows: 1
+
+   * - Method
+     - Blowout behavior
+   * - ``transfer()``
+     -
+       - Blow out after each dispense.
+       - Valid locations: ``"trash"``, ``"source well"``, ``"destination well"``
+   * - ``distribute()``
+     - 
+       - Blow out after final dispense.
+       - Valid locations: ``"trash"``, ``"source well"``
+   * - ``consolidate()``
+     - 
+       - Blow out after final dispense.
+       - Valid locations: ``"trash"``, ``"destination well"``
+
+For example, this transfer command will blow out liquid in the trash twice, once after each dispense into a destination well::
+
+    pipette.transfer(
+        volume=100,
+        source=[plate["A1"], plate["A2"]],
+        dest=[plate["B1"], plate["B2"]],
+        blow_out=True,
+    )
+
+.. versionadded:: 2.0
+
+.. note::
+    If the tip already contains liquid, and then you perform a complex command with ``new_tip="never"`` and ``blow_out=True``, the pipette will blow out *all* of the liquid from the tip.
+
+Set ``blowout_location`` when you don't want to waste any liquid by blowing it out into the trash. For example, you may want to make sure that every last bit of a sample is moved into a destination well. Or you may want to return every last bit of an expensive reagent to the source for use in later pipetting. 
+
+If you need to blow out in a different well, or at a specific location within a well, use the :ref:`blow out building block command <blow-out>` instead.
+
+When setting a blowout location, you must also set ``blow_out=True``, or the location will be ignored::
+
+    pipette.transfer(
+        volume=100,
+        source=plate["A1"],
+        dest=plate["B1"],
+        blow_out=True,  # required to set location
+        blowout_location="destination well",
+    )
+
+.. versionadded:: 2.8
+
+With ``transfer()``, the pipette will not blow out at all if you only set ``blowout_location``. With ``distribute()``, the pipette will still blow out (due to ``disposal_volume``) but in the default location of the trash::
+
+    pipette.distribute(
+        volume=100,
+        source=plate["A1"],
+        dest=[plate["B1"], plate["B2"]],
+        disposal_volume=50,  # causes blow out
+        blow_out=True,       # still required to set location!
+        blowout_location="source well",
+    )
+
 Trash Tips
 ==========
+
