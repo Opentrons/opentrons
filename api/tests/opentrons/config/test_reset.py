@@ -62,6 +62,14 @@ def mock_cal_robot_attitude(
         yield m
 
 
+@pytest.fixture
+def mock_cal_module_offset(
+    robot_model: "RobotModel",
+) -> Generator[MagicMock, None, None]:
+    with patch("opentrons.config.reset.reset_module_calibration") as m:
+        yield m
+
+
 def test_get_options() -> None:
     options = reset.reset_options("OT-2 Standard")
     assert list(options.keys()) == reset._OT_2_RESET_OPTIONS
@@ -75,12 +83,14 @@ def test_reset_empty_set(
     mock_reset_pipette_offset: MagicMock,
     mock_reset_deck_calibration: MagicMock,
     mock_reset_tip_length_calibrations: MagicMock,
+    mock_cal_module_offset: MagicMock,
 ) -> None:
     reset.reset(set())
     mock_reset_boot_scripts.assert_not_called()
     mock_reset_pipette_offset.assert_not_called()
     mock_reset_deck_calibration.assert_not_called()
     mock_reset_tip_length_calibrations.assert_not_called()
+    mock_cal_module_offset.assert_not_called()
 
 
 def test_reset_all_set(
