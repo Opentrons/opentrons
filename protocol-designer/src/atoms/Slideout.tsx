@@ -138,7 +138,9 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         css={`
           ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
-        backgroundColor={COLORS.darkBlackEnabled}
+        backgroundColor={COLORS.transparent}
+        height="92.5%"
+        marginTop="3rem"
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
