@@ -7,8 +7,12 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 metadata = {"protocolName": "Flex IQ: P1000 Multi 200ul"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
-TEST_VOLUME = 200
-DUT = "p1000_multi_gen3"
+# EDIT-START ------>>>>>>
+
+ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT = False
+TEST_VOLUME = 5  # TODO: add support for volumes >250uL (requires multi-dispensing)
+TEST_PIPETTE = "p1000_multi_gen3"
+TEST_TIPS = "opentrons_flex_96_tiprack_50uL"
 TEST_SOURCES = [
     {
         "source": "A1",
@@ -19,6 +23,8 @@ TEST_SOURCES = [
         "destinations": ["A7", "A8", "A9", "A10", "A11", "A12"],
     }
 ]
+
+# <<<<<<------ EDIT-STOP
 
 SUBMERGE_MM = 1.5
 RETRACT_MM = 5.0
@@ -200,14 +206,13 @@ def _assign_starting_volumes_diluent(
 def _transfer(
         volume: float,
         pipette: InstrumentContext,
+        tips: Labware,
         reservoir: Labware,
         plate: Labware,
         source: str, destinations: List[str],
         same_tip: bool = False
 ) -> None:
-    src_ul_per_trial = _diluent_start_volumes_per_trial(
-        reservoir.load_name, len(destinations)
-    )
+    src_ul_per_trial = _start_volumes_per_trial(volume, reservoir.load_name, pipette.channels, len(destinations))
     src_heights = [_ul_to_mm(reservoir.load_name, ul) for ul in src_ul_per_trial]
     dst_height = _ul_to_mm(plate.load_name, volume)
     if same_tip and not pipette.has_tip:
@@ -219,7 +224,7 @@ def _transfer(
         blow_out_pos = plate[dst_name].bottom(dst_height + RETRACT_MM)
         # transfer
         if not same_tip:
-            pipette.pick_up_tip()
+            pipette.pick_up_tip(tips.next_tip(pipette.channels))
         pipette.aspirate(TEST_VOLUME, aspirate_pos)
         pipette.dispense(TEST_VOLUME, dispense_pos)
         pipette.blow_out(blow_out_pos)
@@ -227,7 +232,7 @@ def _transfer(
             pipette.drop_tip()
 
 
-def _transfer_diluent(pipette: InstrumentContext, reservoir: Labware, plate: Labware) -> None:
+def _transfer_diluent(pipette: InstrumentContext, tips: Labware, reservoir: Labware, plate: Labware) -> None:
     diluent_vol = 200 - TEST_VOLUME
     if diluent_vol <= 0:
         return
@@ -237,44 +242,48 @@ def _transfer_diluent(pipette: InstrumentContext, reservoir: Labware, plate: Lab
         for dst in test["destinations"]
     ])
     destinations = [f"A{col}" for col in target_cols]
-    pipette.pick_up_tip()
+    pipette.pick_up_tip(tips.next_tip(pipette.channels))
     for i, dst in enumerate(destinations):
         if i < len(destinations) / 2:
             src = "A11"
         else:
             src = "A12"
-        _transfer(diluent_vol, pipette, reservoir, plate, src, destinations, same_tip=True)
+        _transfer(diluent_vol, pipette, tips, reservoir, plate, src, destinations, same_tip=True)
     pipette.drop_tip()
 
 
-def _transfer_dye(pipette: InstrumentContext, reservoir: Labware, plate: Labware) -> None:
+def _transfer_dye(pipette: InstrumentContext, tips: Labware, reservoir: Labware, plate: Labware) -> None:
     for test in TEST_SOURCES:
-        _transfer(TEST_VOLUME, pipette, reservoir, plate, test["source"], test["destinations"])
+        _transfer(TEST_VOLUME, pipette, tips, reservoir, plate, test["source"], test["destinations"])
 
 
 def run(ctx: ProtocolContext) -> None:
-    dye_pipette = ctx.load_instrument(
-        DUT,
-        "left",
-        tip_racks=[ctx.load_labware("opentrons_flex_96_tiprack_200uL", "D1")]
-    )
+    # the target plate, handle with great care
     plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D3")
-    reservoir_dye = ctx.load_labware(SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "D2")
-    _assign_starting_volumes_dye(ctx, dye_pipette, reservoir_dye)
+
+    # dye tips, pipette, and reservoir
+    dye_tips = ctx.load_labware(TEST_TIPS, "D1")
+    dye_pipette = ctx.load_instrument(TEST_PIPETTE, "left")
+    dye_reservoir = ctx.load_labware(SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "D2")
+    _assign_starting_volumes_dye(ctx, dye_pipette, dye_reservoir)
+
+    # diluent tips, pipette, and reservoir
     if TEST_VOLUME < 200:
-        diluent_pipette = ctx.load_instrument(
-            "p1000_multi_gen3",
-            "right",
-            tip_racks=[ctx.load_labware("opentrons_flex_96_tiprack_200uL", "C1")]
-        )
+        diluent_tips = ctx.load_labware("opentrons_flex_96_tiprack_200uL", "C1")
+        if "p1000_multi" in TEST_PIPETTE and ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT:
+            diluent_pipette = dye_pipette  # share the 8ch pipette
+        else:
+            diluent_pipette = ctx.load_instrument("p1000_multi_gen3", "right")
         if dye_pipette.channels == 8:
-            reservoir_diluent = reservoir_dye
+            reservoir_diluent = dye_reservoir  # share the 12-row reservoir
         else:
             reservoir_diluent = ctx.load_labware(
                 SRC_LABWARE_BY_CHANNELS[diluent_pipette.channels], "C2"
             )
         _assign_starting_volumes_diluent(ctx, dye_pipette, reservoir_diluent)
-        _transfer_diluent(diluent_pipette, reservoir_diluent, plate)
-    _transfer_dye(dye_pipette, reservoir_dye, plate)
 
+        # transfer diluent
+        _transfer_diluent(diluent_pipette, diluent_tips, reservoir_diluent, plate)
 
+    # transfer dye
+    _transfer_dye(dye_pipette, dye_tips, dye_reservoir, plate)
