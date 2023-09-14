@@ -13,19 +13,23 @@ from hardware_testing.data import create_run_id_and_start_time, ui, get_git_desc
 from hardware_testing.protocols import (
     gravimetric_ot3_p50_single,
     gravimetric_ot3_p50_multi,
+    gravimetric_ot3_p50_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_single,
     gravimetric_ot3_p1000_multi,
-    gravimetric_ot3_p1000_96_50ul_tip,
-    gravimetric_ot3_p1000_96_200ul_tip,
-    gravimetric_ot3_p1000_96_1000ul_tip,
-    gravimetric_ot3_p1000_96,
-    photometric_ot3_p1000_96_50ul_tip,
-    photometric_ot3_p1000_96_200ul_tip,
-    photometric_ot3_p50_single,
-    gravimetric_ot3_p50_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_200ul_tip_increment,
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
+    gravimetric_ot3_p1000_96,
+    gravimetric_ot3_p1000_96_50ul_tip,
+    gravimetric_ot3_p1000_96_200ul_tip,
+    gravimetric_ot3_p1000_96_1000ul_tip,
+)
+from hardware_testing.protocols import (
+    photometric_ot3_p50_single,
+    photometric_ot3_p50_multi,
+    photometric_ot3_p1000_single,
+    photometric_ot3_p1000_multi,
+    photometric_ot3_p1000_96,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -87,12 +91,14 @@ GRAVIMETRIC_CFG_INCREMENT = {
 }
 
 PHOTOMETRIC_CFG = {
-    1: {
-        50: photometric_ot3_p50_single,
+    50: {
+        1: photometric_ot3_p50_single,
+        8: photometric_ot3_p50_multi,
     },
-    96: {
-        50: photometric_ot3_p1000_96_50ul_tip,
-        200: photometric_ot3_p1000_96_200ul_tip,
+    1000: {
+        1: photometric_ot3_p1000_single,
+        8: photometric_ot3_p1000_multi,
+        96: photometric_ot3_p1000_96,
     },
 }
 
@@ -212,6 +218,7 @@ class RunArgs:
                 kind,
                 False,  # set extra to false so we always do the normal tests first
                 args.channels,
+                mode=args.mode,  # NOTE: only needed for increment test
             )
             if len(vls) > 0:
                 volumes.append(
@@ -253,7 +260,7 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            protocol_cfg = PHOTOMETRIC_CFG[args.channels][args.tip]
+            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,
@@ -333,6 +340,7 @@ def build_gravimetric_cfg(
     jog: bool,
     same_tip: bool,
     ignore_fail: bool,
+    mode: str,
     run_args: RunArgs,
 ) -> GravimetricConfig:
     """Build."""
@@ -360,6 +368,7 @@ def build_gravimetric_cfg(
         jog=jog,
         same_tip=same_tip,
         ignore_fail=ignore_fail,
+        mode=mode,
     )
 
 
@@ -376,8 +385,9 @@ def build_photometric_cfg(
     same_tip: bool,
     ignore_fail: bool,
     pipette_channels: int,
-    photoplate_column_offset: int,
-    dye_well_column_offset: int,
+    photoplate_column_offset: List[int],
+    dye_well_column_offset: List[int],
+    mode: str,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
@@ -407,6 +417,7 @@ def build_photometric_cfg(
         ignore_fail=ignore_fail,
         photoplate_column_offset=photoplate_column_offset,
         dye_well_column_offset=dye_well_column_offset,
+        mode=mode,
     )
 
 
@@ -433,6 +444,7 @@ def _main(
             args.channels,
             args.photoplate_col_offset,
             args.dye_well_col_offset,
+            args.mode,
             run_args,
         )
         union_cfg = cfg_pm
@@ -452,6 +464,7 @@ def _main(
             args.jog,
             args.same_tip,
             args.ignore_fail,
+            args.mode,
             run_args,
         )
 
@@ -461,7 +474,9 @@ def _main(
     for v in volumes:
         ui.print_info(f"\t{v} uL")
     all_channels_same_time = (
-        getattr(union_cfg, "increment", False) or union_cfg.pipette_channels == 96
+        getattr(union_cfg, "increment", False)
+        or union_cfg.pipette_channels == 96
+        or args.photometric
     )
     test_resources = TestResources(
         ctx=run_args.ctx,
@@ -510,8 +525,11 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
-    parser.add_argument("--photoplate-col-offset", type=int, default=1)
-    parser.add_argument("--dye-well-col-offset", type=int, default=1)
+    parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
+    parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
+    parser.add_argument(
+        "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
+    )
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():

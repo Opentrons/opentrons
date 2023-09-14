@@ -47,9 +47,9 @@ _DYE_MAP: Dict[str, Dict[str, float]] = {
     "C": {"min": 2, "max": 9.999},
     "D": {"min": 1, "max": 1.999},
 }
-_MIN_START_VOLUME_UL = {1: 500, 96: 30000}
-_MIN_END_VOLUME_UL = {1: 400, 96: 10000}
-_MAX_VOLUME_UL = {1: 2000, 96: 165000}
+_MIN_START_VOLUME_UL = {1: 500, 8: 3000, 96: 30000}
+_MIN_END_VOLUME_UL = {1: 400, 8: 3000, 96: 10000}
+_MAX_VOLUME_UL = {1: 2000, 8: 15000, 96: 165000}
 
 
 def _next_tip(
@@ -69,13 +69,15 @@ def _next_tip(
     return resources.tips[0][0]
 
 
-def _get_res_well_name(cfg: config.PhotometricConfig) -> str:
-    return f"A{cfg.dye_well_column_offset}"
+def _get_res_well_names(cfg: config.PhotometricConfig) -> List[str]:
+    return [f"A{col}" for col in cfg.dye_well_column_offset]
 
 
 def _get_photo_plate_dest(cfg: config.PhotometricConfig, trial: int) -> str:
     if cfg.pipette_channels == 96:
         return "A1"
+    elif cfg.pipette_channels == 8:
+        return f"A{trial + 1}"
     else:
         rows = "ABCDEFGH"
         return f"{rows[trial]}{cfg.photoplate_column_offset}"
@@ -192,22 +194,19 @@ def _run_trial(trial: PhotometricTrial) -> None:
 
     _record_measurement_and_store(MeasurementType.ASPIRATE)
     for i in range(num_dispenses):
-
-        for w in trial.dest.wells():
-            trial.liquid_tracker.set_start_volume(w, photoplate_preped_vol)
-        trial.pipette.move_to(
-            trial.dest[_get_photo_plate_dest(trial.cfg, trial.trial)].top()
-        )
-        ui.print_info(
-            f"dispensing to {trial.dest[_get_photo_plate_dest(trial.cfg, trial.trial)]}"
-        )
+        dest_name = _get_photo_plate_dest(trial.cfg, trial.trial)
+        dest_well = trial.dest[dest_name]
+        # FIXME: if 8ch or 96ch, should also set start volumes of other wells
+        trial.liquid_tracker.set_start_volume(dest_well, photoplate_preped_vol)
+        trial.pipette.move_to(dest_well.top())
+        ui.print_info(f"dispensing to {dest_well}")
         # RUN DISPENSE
         dispense_with_liquid_class(
             trial.ctx,
             trial.pipette,
             trial.tip_volume,
             volume_to_dispense,
-            trial.dest[_get_photo_plate_dest(trial.cfg, trial.trial)],
+            dest_well,
             Point(),
             channel_count,
             trial.liquid_tracker,
@@ -359,9 +358,11 @@ def _find_liquid_height(
         and cfg.pipette_channels == 96
     ):
         ui.get_user_ready("REPLACE first tip with NEW TIP")
+    required_ul_per_src = (volume_for_setup * channel_count * cfg.trials) / len(
+        cfg.dye_well_column_offset
+    )
     required_ul = max(
-        (volume_for_setup * channel_count * cfg.trials)
-        + _MIN_END_VOLUME_UL[cfg.pipette_channels],
+        required_ul_per_src + _MIN_END_VOLUME_UL[cfg.pipette_channels],
         _MIN_START_VOLUME_UL[cfg.pipette_channels],
     )
     if not resources.ctx.is_simulating():
@@ -436,15 +437,15 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     ), f"more trials ({trial_total}) than tips ({total_tips})"
 
     _display_dye_information(cfg, resources)
-    _find_liquid_height(
-        cfg, resources, liquid_tracker, reservoir[_get_res_well_name(cfg)]
-    )
+    src_wells = [reservoir[res_well] for res_well in _get_res_well_names(cfg)]
+    for well in src_wells:
+        _find_liquid_height(cfg, resources, liquid_tracker, well)
 
     trials = build_photometric_trials(
         resources.ctx,
         resources.test_report,
         resources.pipette,
-        reservoir[_get_res_well_name(cfg)],
+        src_wells,
         photoplate,
         resources.test_volumes,
         liquid_tracker,
