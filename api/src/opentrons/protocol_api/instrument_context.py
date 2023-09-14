@@ -988,16 +988,15 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Move a volume of liquid from one source to multiple destinations.
 
-        :param volume: The amount of volume to distribute to each destination
-                       well.
-        :param source: A single well from where liquid will be aspirated.
-        :param dest: List of Wells where liquid will be dispensed to.
+        :param volume: The amount, in µL, to dispense into each destination well.
+        :param source: A single well to aspirate liquid from.
+        :param dest: A list of wells to dispense liquid into.
         :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
-                       Some parameters behave differently than when transferring.
+            Some parameters behave differently than when transferring.
 
-                         - ``disposal_volume`` aspirates additional liquid to improve the accuracy of each dispense. Defaults to the minimum volume of the pipette. See :ref:`param-disposal-volume` for details.
+              - ``disposal_volume`` aspirates additional liquid to improve the accuracy of each dispense. Defaults to the minimum volume of the pipette. See :ref:`param-disposal-volume` for details.
 
-                         - ``mix_after``, if specified, is ignored.
+              - ``mix_after`` is ignored.
 
 
         :returns: This instance
@@ -1024,15 +1023,14 @@ class InstrumentContext(publisher.CommandPublisher):
         **kwargs: Any,
     ) -> InstrumentContext:
         """
-        Move liquid from multiple wells (sources) to a single well(destination)
+        Move liquid from multiple source wells to a single destination well.
 
-        :param volume: The amount of volume to consolidate from each source
-                       well.
-        :param source: List of wells from where liquid will be aspirated.
-        :param dest: The single well into which liquid will be dispensed.
-        :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
-                       Specifically, ``mix_before``, if specified, is ignored
-                       and ``disposal_volume`` is ignored and set to 0.
+        :param volume: The amount, in µL, to aspirate from each source well.
+        :param source: A list of wells to aspirate liquid from.
+        :param dest: A single well to dispense liquid into.
+        :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
+                       Some parameters behave differently than when transferring.
+                       ``disposal_volume`` and ``mix_before`` are ignored.
         :returns: This instance
         """
         _log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
