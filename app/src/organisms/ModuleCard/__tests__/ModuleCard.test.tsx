@@ -11,6 +11,7 @@ import {
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import * as RobotApi from '../../../redux/robot-api'
 import { useToaster } from '../../ToasterOven'
+import { useIsOT3 } from '../../Devices/hooks'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
@@ -52,6 +53,7 @@ jest.mock('react-router-dom', () => {
     useHistory: () => ({ push: jest.fn() } as any),
   }
 })
+jest.mock('../../../organisms/Devices/hooks')
 
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
   typeof MagneticModuleData
@@ -203,6 +205,7 @@ const mockHotThermo = {
     portGroup: 'unknown',
   },
 } as ThermocyclerModule
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const mockMakeSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
@@ -250,6 +253,7 @@ describe('ModuleCard', () => {
     when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseIsOT3).calledWith(props.robotName).mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()

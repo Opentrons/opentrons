@@ -9,6 +9,7 @@ import {
   useAllRunsQuery,
   useHost,
   useRunQuery,
+  useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import {
   getProtocol,
@@ -21,6 +22,7 @@ import {
 } from '@opentrons/api-client'
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 
 import type { Dispatch } from '../redux/types'
 
@@ -50,6 +52,11 @@ export function useProtocolReceiptToast(): void {
   const protocolIds = protocolIdsQuery.data?.data ?? []
   const protocolIdsRef = React.useRef(protocolIds)
   const hasRefetched = React.useRef(true)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const animationCommand: SetStatusBarCreateCommand = {
+    commandType: 'setStatusBar',
+    params: { animation: 'confirm' },
+  }
 
   if (protocolIdsQuery.isRefetching) {
     hasRefetched.current = false
@@ -97,6 +104,13 @@ export function useProtocolReceiptToast(): void {
             .catch((e: Error) =>
               console.error(`error invalidating protocols query: ${e.message}`)
             )
+        })
+        .then(() => {
+          createLiveCommand({
+            command: animationCommand,
+          }).catch((e: Error) =>
+            console.warn(`cannot run status bar animation: ${e.message}`)
+          )
         })
         .catch((e: Error) => {
           console.error(e)

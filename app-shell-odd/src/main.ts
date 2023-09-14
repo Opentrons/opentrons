@@ -5,7 +5,6 @@ import path from 'path'
 import { createUi } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
-import { registerRobotLogs } from './robot-logs'
 import {
   registerUpdate,
   updateLatestVersion,
@@ -91,7 +90,6 @@ function startUp(): void {
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
     registerDiscovery(dispatch),
-    registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerRobotSystemUpdate(dispatch),
     registerAppRestart(),

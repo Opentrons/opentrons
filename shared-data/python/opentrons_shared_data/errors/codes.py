@@ -55,6 +55,7 @@ class ErrorCodes(Enum):
     EARLY_CAPACITIVE_SENSE_TRIGGER = _code_from_dict_entry("2009")
     INACCURATE_NON_CONTACT_SWEEP = _code_from_dict_entry("2010")
     MISALIGNED_GANTRY = _code_from_dict_entry("2011")
+    UNMATCHED_TIP_PRESENCE_STATES = _code_from_dict_entry("2012")
     ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
     LABWARE_DROPPED = _code_from_dict_entry("3001")
     LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")

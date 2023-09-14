@@ -700,7 +700,7 @@ async def test_tip_action(
     controller: OT3Controller,
     mock_move_group_run: mock.AsyncMock,
 ) -> None:
-    await controller.tip_action(distance=33, velocity=-5.5, tip_action="home")
+    await controller.home_tip_motors(distance=33, velocity=-5.5, back_off=False)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -713,9 +713,7 @@ async def test_tip_action(
 
     mock_move_group_run.reset_mock()
 
-    await controller.tip_action(
-        distance=33, velocity=-5.5, tip_action="home", back_off=True
-    )
+    await controller.home_tip_motors(distance=33, velocity=-5.5, back_off=True)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         move_groups = move_group_runner._move_groups
@@ -1070,16 +1068,16 @@ async def test_monitor_pressure(
 @pytest.mark.parametrize(
     "tip_state_type, mocked_ejector_response, expectation",
     [
-        [TipStateType.PRESENT, 1, does_not_raise()],
-        [TipStateType.ABSENT, 0, does_not_raise()],
-        [TipStateType.PRESENT, 0, pytest.raises(FailedTipStateCheck)],
-        [TipStateType.ABSENT, 1, pytest.raises(FailedTipStateCheck)],
+        [TipStateType.PRESENT, {0: 1, 1: 1}, does_not_raise()],
+        [TipStateType.ABSENT, {0: 0, 1: 0}, does_not_raise()],
+        [TipStateType.PRESENT, {0: 0, 1: 0}, pytest.raises(FailedTipStateCheck)],
+        [TipStateType.ABSENT, {0: 1, 1: 1}, pytest.raises(FailedTipStateCheck)],
     ],
 )
 async def test_get_tip_present(
     controller: OT3Controller,
     tip_state_type: TipStateType,
-    mocked_ejector_response: int,
+    mocked_ejector_response: Dict[int, int],
     expectation: ContextManager[None],
 ) -> None:
     mount = OT3Mount.LEFT
@@ -1088,7 +1086,7 @@ async def test_get_tip_present(
         return_value=mocked_ejector_response,
     ):
         with expectation:
-            await controller.get_tip_present(mount, tip_state_type)
+            await controller.check_for_tip_presence(mount, tip_state_type)
 
 
 @pytest.mark.parametrize(

@@ -67,7 +67,7 @@ export function CalibrationDataDownload({
     isOT3 &&
     attachedInstruments?.data.some(
       instrument =>
-        instrument.ok && instrument.data.calibratedOffset.last_modified != null
+        instrument.ok && instrument.data.calibratedOffset?.last_modified != null
     )
 
   const onClickSaveAs: React.MouseEventHandler = e => {

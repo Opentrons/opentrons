@@ -96,7 +96,7 @@ export function PipetteFields(props: Props): JSX.Element {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
     return (
-      <Flex width="15rem">
+      <Flex width="13.8rem">
         <PipetteSelect
           nameBlocklist={
             //  filtering out 96-channel for Flex for now
@@ -157,8 +157,8 @@ export function PipetteFields(props: Props): JSX.Element {
 
   return (
     <>
-      <div className={styles.mount_fields_row}>
-        <div className={styles.mount_column}>
+      <div className={styles.mount_fields_row} style={{ overflowX: 'hidden' }}>
+        <div>
           <FormGroup
             key="leftPipetteModel"
             label={i18n.t('modal.pipette_fields.left_pipette')}
@@ -185,7 +185,7 @@ export function PipetteFields(props: Props): JSX.Element {
           leftPipette={values.left.pipetteName}
           rightPipette={values.right.pipetteName}
         />
-        <div className={styles.mount_column}>
+        <div style={{ width: '13.8rem' }}>
           <FormGroup
             key="rightPipetteModel"
             label={i18n.t('modal.pipette_fields.right_pipette')}

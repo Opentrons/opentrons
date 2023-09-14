@@ -100,7 +100,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     analysisCommands.findIndex(c => c.key === lastRunCommand?.key) ?? 0
   const { data: runCommandDetails } = useCommandQuery(
     runId,
-    lastRunCommand?.key ?? null
+    lastRunCommand?.id ?? null
   )
   let countOfTotalText = ''
   if (

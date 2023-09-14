@@ -41,6 +41,7 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
+from opentrons.protocol_engine.types import PostRunHardwareState
 
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
@@ -572,7 +573,8 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(),
-            drop_tips_and_home_after=False,
+            drop_tips_after_run=False,
+            post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         )
     )
 

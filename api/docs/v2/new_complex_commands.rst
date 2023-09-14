@@ -22,4 +22,3 @@ Pages in this section of the documentation cover:
     - :ref:`complex_params`: Additional keyword arguments that affect complex command behavior.
     
 Code samples throughout these pages assume that you've loaded the pipettes and labware from the basic :ref:`protocol-template`.
-                

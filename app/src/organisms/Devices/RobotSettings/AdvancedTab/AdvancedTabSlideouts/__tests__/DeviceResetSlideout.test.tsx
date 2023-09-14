@@ -111,10 +111,10 @@ describe('RobotSettings DeviceResetSlideout', () => {
       'Resets all settings. You’ll have to redo initial setup before using the robot again.'
     )
     expect(queryByText('Clear deck calibration')).toBeNull()
-    getByText('Clear pipette calibration(s)')
+    getByText('Clear pipette calibration')
     expect(queryByText('Clear tip length calibrations')).toBeNull()
     getByText('Clear gripper calibration')
-    getByRole('checkbox', { name: 'Clear pipette calibration(s)' })
+    getByRole('checkbox', { name: 'Clear pipette calibration' })
     getByRole('checkbox', { name: 'Clear gripper calibration' })
     expect(
       queryByRole('checkbox', { name: 'Clear deck calibration' })

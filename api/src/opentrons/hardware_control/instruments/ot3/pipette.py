@@ -13,6 +13,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     MotorConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
+    PlungerHomingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
     PipetteLiquidPropertiesDefinition,
@@ -66,6 +67,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._config_as_dict = config.dict()
         self._plunger_motor_current = config.plunger_motor_configurations
         self._pick_up_configurations = config.pick_up_tip_configurations
+        self._plunger_homing_configurations = config.plunger_homing_configurations
         self._drop_configurations = config.drop_tip_configurations
         self._pipette_offset = pipette_offset_cal
         self._pipette_type = self._config.pipette_type
@@ -111,16 +113,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
-        self._aspirate_flow_rates_lookup = (
-            self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
-        )
-        self._dispense_flow_rates_lookup = (
-            self._active_tip_settings.default_dispense_flowrate.values_by_api_level
-        )
-        self._blowout_flow_rates_lookup = (
-            self._active_tip_settings.default_blowout_flowrate.values_by_api_level
-        )
-
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
         )
@@ -131,6 +123,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
+        self._push_out_volume = self._active_tip_settings.default_push_out_volume
 
         self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
@@ -184,6 +177,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self, pick_up_configs: TipHandlingConfigurations
     ) -> None:
         self._pick_up_configurations = pick_up_configs
+
+    @property
+    def plunger_homing_configurations(self) -> PlungerHomingConfigurations:
+        return self._plunger_homing_configurations
 
     @property
     def drop_configurations(self) -> TipHandlingConfigurations:
@@ -240,6 +237,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
+        self._push_out_volume = self._active_tip_settings.default_push_out_volume
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
 
@@ -424,15 +422,15 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._aspirate_flow_rates_lookup
+        return self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
 
     @property
     def dispense_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._dispense_flow_rates_lookup
+        return self._active_tip_settings.default_dispense_flowrate.values_by_api_level
 
     @property
     def blow_out_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._blowout_flow_rates_lookup
+        return self._active_tip_settings.default_blowout_flowrate.values_by_api_level
 
     @property
     def working_volume(self) -> float:
@@ -548,9 +546,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
                 "flow_acceleration": self.flow_acceleration,
-                "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate.values_by_api_level,
-                "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate.values_by_api_level,
-                "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate.values_by_api_level,
+                "default_aspirate_flow_rates": self.aspirate_flow_rates_lookup,
+                "default_blow_out_flow_rates": self.blow_out_flow_rates_lookup,
+                "default_dispense_flow_rates": self.dispense_flow_rates_lookup,
                 "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,

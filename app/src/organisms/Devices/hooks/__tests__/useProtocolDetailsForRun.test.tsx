@@ -3,7 +3,7 @@ import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 
 import {
-  useProtocolAnalysesQuery,
+  useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
@@ -12,25 +12,32 @@ import { useProtocolDetailsForRun } from '..'
 
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
-import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
+import type { Protocol, Run } from '@opentrons/api-client'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
-const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
-  typeof useProtocolAnalysesQuery
+const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
+  typeof useProtocolAnalysisAsDocumentQuery
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 
+const PROTOCOL_ID = 'fake_protocol_id'
+const PROTOCOL_ANALYSIS = {
+  id: 'fake analysis',
+  status: 'completed',
+  labware: [],
+} as any
 const PROTOCOL_RESPONSE = {
   data: {
     protocolType: 'json',
     createdAt: 'now',
-    id: '1',
+    id: PROTOCOL_ID,
     metadata: { protocolName: 'fake protocol' },
-    analysisSummaries: [{ id: 'fake analysis', status: 'completed' }],
+    analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id, status: 'completed' }],
     key: 'fakeProtocolKey',
   },
 } as Protocol
@@ -43,11 +50,11 @@ describe('useProtocolDetailsForRun hook', () => {
     when(mockUseProtocolQuery)
       .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Protocol>)
-    when(mockUseProtocolAnalysesQuery)
-      .calledWith(null, { staleTime: Infinity }, true)
+    when(mockUseProtocolAnalysisAsDocumentQuery)
+      .calledWith(null, null, { enabled: false, refetchInterval: 5000 })
       .mockReturnValue({
-        data: { data: [] } as any,
-      } as UseQueryResult<ProtocolAnalyses>)
+        data: null,
+      } as UseQueryResult<CompletedProtocolAnalysis | null>)
   })
 
   afterEach(() => {
@@ -66,12 +73,6 @@ describe('useProtocolDetailsForRun hook', () => {
   })
 
   it('returns the protocol file when given a run id', async () => {
-    const PROTOCOL_ID = 'fake_protocol_id'
-    const PROTOCOL_ANALYSIS = {
-      id: 'fake analysis',
-      status: 'completed',
-      labware: [],
-    } as any
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
@@ -80,11 +81,22 @@ describe('useProtocolDetailsForRun hook', () => {
     when(mockUseProtocolQuery)
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .mockReturnValue({ data: PROTOCOL_RESPONSE } as UseQueryResult<Protocol>)
-    when(mockUseProtocolAnalysesQuery)
-      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
+    when(mockUseProtocolAnalysisAsDocumentQuery)
+      .calledWith(PROTOCOL_ID, 'fake analysis', {
+        enabled: true,
+        refetchInterval: 5000,
+      })
       .mockReturnValue({
-        data: { data: [PROTOCOL_ANALYSIS as any] },
-      } as UseQueryResult<ProtocolAnalyses>)
+        data: PROTOCOL_ANALYSIS,
+      } as UseQueryResult<CompletedProtocolAnalysis | null>)
+    when(mockUseProtocolAnalysisAsDocumentQuery)
+      .calledWith(PROTOCOL_ID, 'fake analysis', {
+        enabled: false,
+        refetchInterval: 5000,
+      })
+      .mockReturnValue({
+        data: PROTOCOL_ANALYSIS,
+      } as UseQueryResult<CompletedProtocolAnalysis | null>)
 
     const { result } = renderHook(() => useProtocolDetailsForRun(RUN_ID_2))
 

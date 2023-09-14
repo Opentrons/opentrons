@@ -34,7 +34,10 @@ export const TemperatureCommandText = ({
   const { t } = useTranslation('protocol_command_text')
 
   return t(T_KEYS_BY_COMMAND_TYPE[command.commandType], {
-    temp: command.params.celsius,
+    temp:
+      command.params?.celsius != null
+        ? t('degrees_c', { temp: command.params.celsius })
+        : t('target_temperature'),
     hold_time_seconds:
       'holdTimeSeconds' in command.params
         ? command.params.holdTimeSeconds ?? '0'

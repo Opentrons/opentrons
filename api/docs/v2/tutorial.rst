@@ -192,7 +192,7 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
 .. code-block:: python
 
         # Flex
-        left_pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks[tips])
+        left_pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=[tips])
 
 .. code-block:: python
 

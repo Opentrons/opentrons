@@ -1,3 +1,4 @@
+import mapValues from 'lodash/mapValues'
 import { uuid } from '../../utils'
 import { getOnlyLatestDefs } from '../../labware-defs'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
@@ -23,6 +24,7 @@ import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 // NOTE: this migration removes pipettes, labware, and modules as top level keys and adds necessary
 // params to the load commands. Also, this migrates previous combined
 //  adapter + labware commands to all labware commands and definitions to their commands/definitions split up
+//  as well as removing touch_tip commands from labware where touch_tip is incompatible
 const PD_VERSION = '7.0.0'
 const SCHEMA_VERSION = 7
 interface LabwareLocationUpdate {
@@ -252,6 +254,63 @@ export const migrateFile = (
   }
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
 
+  const migrateSavedStepForms = (
+    savedStepForms: Record<string, any>
+  ): Record<string, any> => {
+    return mapValues(savedStepForms, stepForm => {
+      if (stepForm.stepType === 'moveLiquid') {
+        const aspirateLabware =
+          newLabwareDefinitions[labware[stepForm.aspirate_labware].definitionId]
+        const aspirateTouchTipIncompatible = aspirateLabware?.parameters.quirks?.includes(
+          'touchTipDisabled'
+        )
+        const dispenseLabware =
+          newLabwareDefinitions[labware[stepForm.dispense_labware].definitionId]
+        const dispenseTouchTipIncompatible = dispenseLabware?.parameters.quirks?.includes(
+          'touchTipDisabled'
+        )
+        return {
+          ...stepForm,
+          aspirate_touchTip_checkbox: aspirateTouchTipIncompatible
+            ? false
+            : stepForm.aspirate_touchTip_checkbox ?? false,
+          aspirate_touchTip_mmFromBottom: aspirateTouchTipIncompatible
+            ? null
+            : stepForm.aspirate_touchTip_mmFromBottom ?? null,
+          dispense_touchTip_checkbox: dispenseTouchTipIncompatible
+            ? false
+            : stepForm.dispense_touchTip_checkbox ?? false,
+          dispense_touchTip_mmFromBottom: dispenseTouchTipIncompatible
+            ? null
+            : stepForm.dispense_touchTip_mmFromBottom ?? null,
+        }
+      } else if (stepForm.stepType === 'mix') {
+        const mixLabware =
+          newLabwareDefinitions[labware[stepForm.labware].definitionId]
+        const mixTouchTipIncompatible = mixLabware?.parameters.quirks?.includes(
+          'touchTipDisabled'
+        )
+        return {
+          ...stepForm,
+          mix_touchTip_checkbox: mixTouchTipIncompatible
+            ? false
+            : stepForm.mix_touchTip_checkbox ?? false,
+          mix_touchTip_mmFromBottom: mixTouchTipIncompatible
+            ? null
+            : stepForm.mix_touchTip_mmFromBottom ?? null,
+        }
+      }
+
+      return stepForm
+    })
+  }
+  const filteredavedStepForms = Object.fromEntries(
+    Object.entries(
+      appData.designerApplication?.data?.savedStepForms ?? {}
+    ).filter(([key, value]) => key !== INITIAL_DECK_SETUP_STEP_ID)
+  )
+  const newFilteredavedStepForms = migrateSavedStepForms(filteredavedStepForms)
+
   return {
     ...rest,
     designerApplication: {
@@ -263,7 +322,6 @@ export const migrateFile = (
           ...newLabwareIngreds,
         },
         savedStepForms: {
-          ...appData.designerApplication?.data?.savedStepForms,
           [INITIAL_DECK_SETUP_STEP_ID]: {
             ...appData.designerApplication?.data?.savedStepForms[
               INITIAL_DECK_SETUP_STEP_ID
@@ -272,6 +330,7 @@ export const migrateFile = (
               ...newLabwareLocationUpdate,
             },
           },
+          ...newFilteredavedStepForms,
         },
       },
     },

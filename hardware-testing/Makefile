@@ -105,12 +105,11 @@ test-gravimetric-single:
 
 .PHONY: test-gravimetric-multi
 test-gravimetric-multi:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --no-blank --extra
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1 --no-blank --extra
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1 --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1 --extra --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --no-blank --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --trials 1 --extra --no-blank
 
 .PHONY: test-gravimetric-96
 test-gravimetric-96:

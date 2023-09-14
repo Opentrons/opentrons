@@ -84,6 +84,9 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.module_control import AttachedModulesControl
 
 
+# TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
+
+
 @pytest.fixture
 def fake_settings() -> CapacitivePassSettings:
     return CapacitivePassSettings(
@@ -213,6 +216,19 @@ def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
         ),
     ) as mock_move:
         yield mock_move
+
+
+@pytest.fixture
+def mock_home_gear_motors(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "home_gear_motors",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.home_gear_motors,
+            wraps=ot3_hardware.managed_obj.home_gear_motors,
+        ),
+    ) as mock_home_gear:
+        yield mock_home_gear
 
 
 @pytest.fixture
@@ -644,6 +660,7 @@ async def test_liquid_probe(
             fake_settings_aspirate.log_pressure,
             fake_settings_aspirate.auto_zero_sensor,
             fake_settings_aspirate.num_baseline_reads,
+            probe=InstrumentProbeType.PRIMARY,
         )
 
         return_dict[head_node], return_dict[pipette_node] = 142, 142
@@ -1317,6 +1334,7 @@ async def test_pick_up_tip_full_tiprack(
     mock_instrument_handlers: Tuple[Mock],
     mock_ungrip: AsyncMock,
     mock_move_to_plunger_bottom: AsyncMock,
+    mock_home_gear_motors: AsyncMock,
 ) -> None:
     mock_ungrip.return_value = None
     await ot3_hardware.home()
@@ -1354,8 +1372,6 @@ async def test_pick_up_tip_full_tiprack(
         def _update_gear_motor_pos(
             moves: Optional[List[Move[Axis]]] = None,
             distance: Optional[float] = None,
-            velocity: Optional[float] = None,
-            tip_action: str = "home",
         ) -> None:
             if NodeId.pipette_left not in backend._gear_motor_position:
                 backend._gear_motor_position = {NodeId.pipette_left: 0.0}
@@ -1375,19 +1391,18 @@ async def test_pick_up_tip_full_tiprack(
             OT3Mount.LEFT, 40.0, None, None
         )
         # first call should be "clamp", moving down
-        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up
-        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
-        # last call should be "home"
-        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
-        assert len(tip_action.call_args_list) == 3
+        assert len(tip_action.call_args_list) == 2
+        # home should be called after tip_action is done
+        assert len(mock_home_gear_motors.call_args_list) == 1
 
 
 async def test_drop_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
+    mock_home_gear_motors: AsyncMock,
 ) -> None:
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
@@ -1438,14 +1453,12 @@ async def test_drop_tip_full_tiprack(
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         # first call should be "clamp", moving down
-        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up
-        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
-        # last call should be "home"
-        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
-        assert len(tip_action.call_args_list) == 3
+        assert len(tip_action.call_args_list) == 2
+        # home should be called after tip_action is done
+        assert len(mock_home_gear_motors.call_args_list) == 1
 
 
 @pytest.mark.parametrize(
@@ -1518,6 +1531,14 @@ async def test_home_axis(
     stepper_ok: bool,
     encoder_ok: bool,
 ) -> None:
+    if axis in Axis.pipette_axes():
+        pipette_config = load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 3),
+        )
+        instr_data = AttachedPipette(config=pipette_config, id="fakepip")
+        await ot3_hardware.cache_pipette(Axis.to_ot3_mount(axis), instr_data, None)
 
     backend = ot3_hardware.managed_obj._backend
     origin_pos = {ax: 100 for ax in Axis}
@@ -1674,8 +1695,8 @@ async def test_tip_presence_disabled_ninety_six_channel(
     # TODO remove this check once we enable tip presence for 96 chan.
     with patch.object(
         ot3_hardware.managed_obj._backend,
-        "get_tip_present",
-        AsyncMock(spec=ot3_hardware.managed_obj._backend.get_tip_present),
+        "check_for_tip_presence",
+        AsyncMock(spec=ot3_hardware.managed_obj._backend.check_for_tip_presence),
     ) as tip_present:
         pipette_config = load_pipette_data.load_definition(
             PipetteModelType("p1000"),

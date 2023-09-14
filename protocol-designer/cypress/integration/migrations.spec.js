@@ -26,7 +26,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/7/doItAllV3MigratedToV7.json',
       unusedPipettes: false,
-      migrationModal: 'noBehaviorChange',
+      migrationModal: 'generic',
     },
     {
       title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 7.0.x, schema 7',
@@ -34,7 +34,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
       unusedPipettes: false,
-      migrationModal: 'noBehaviorChange',
+      migrationModal: 'generic',
     },
     {
       title: 'doItAllV6 (schema 6, PD version 6.1.0) -> PD 7.0.x, schema 7',
@@ -42,7 +42,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
       unusedPipettes: false,
-      migrationModal: 'noBehaviorChange',
+      migrationModal: 'generic',
     },
     {
       title:
@@ -58,7 +58,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
         'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 7.0.x, schema 7',
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
       expectedExportFixture: '../../fixtures/protocol/7/mix_7_0_0.json',
-      migrationModal: 'noBehaviorChange',
+      migrationModal: 'generic',
       unusedPipettes: false,
     },
     {

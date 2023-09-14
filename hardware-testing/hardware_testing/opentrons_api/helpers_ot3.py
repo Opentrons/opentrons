@@ -609,10 +609,7 @@ async def move_tip_motor_relative_ot3(
 
     tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict)
 
-    _move_coro = api._backend.tip_action(
-        moves=tip_motor_move[0],
-        tip_action="clamp",
-    )
+    _move_coro = api._backend.tip_action(moves=tip_motor_move[0])
     if motor_current is None:
         await _move_coro
     else:

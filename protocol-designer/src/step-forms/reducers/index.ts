@@ -1227,7 +1227,13 @@ export const moduleInvariantProperties: Reducer<
       )
       const modules = loadModuleCommands.reduce(
         (acc: ModuleEntities, command: LoadModuleCreateCommand) => {
-          const { moduleId, model } = command.params
+          const { moduleId, model, location } = command.params
+          if (moduleId == null) {
+            console.error(
+              `expected module ${model} in location ${location.slotName} to have an id, but id does not`
+            )
+            return acc
+          }
           return {
             ...acc,
             [moduleId]: {

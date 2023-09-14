@@ -68,7 +68,7 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(

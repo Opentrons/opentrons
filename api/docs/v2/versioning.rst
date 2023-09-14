@@ -71,7 +71,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software support the following version ranges: 
+Opentrons robots running the latest software (7.0.0) support the following version ranges: 
 
     * **Flex:** version 2.15.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -162,9 +162,9 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - By default, repeated calls to :py:meth:`.drop_tip` cycle through multiple locations above the trash bin to prevent tips from stacking up.
   
-- Known limitations
+- Bug fixes
 
-  - :py:attr:`.InstrumentContext.starting_tip` is not respected on the second and subsequent calls to :py:meth:`.InstrumentContext.pick_up_tip` with no argument.
+  - :py:attr:`.InstrumentContext.starting_tip` is now respected on the second and subsequent calls to :py:meth:`.InstrumentContext.pick_up_tip` with no argument.
 
   
 

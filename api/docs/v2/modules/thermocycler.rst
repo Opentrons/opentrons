@@ -1,3 +1,5 @@
+:og:description: How to control the lid, block, and temperature profile of the Thermocycler Module in a Python protocol.
+
 .. _thermocycler-module:
 
 *******************

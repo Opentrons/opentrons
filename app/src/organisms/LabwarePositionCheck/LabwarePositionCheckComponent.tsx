@@ -146,17 +146,17 @@ export const LabwarePositionCheckComponent = (
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
-      protocolData?.pipettes ?? []
-    ).map(pip => ({
-      commandType: 'dropTip' as const,
-      params: {
-        pipetteId: pip.id,
-        labwareId: FIXED_TRASH_ID,
-        wellName: 'A1',
-        wellLocation: { origin: 'default' as const },
-      },
-    }))
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] = goldenLPC
+      ? []
+      : (protocolData?.pipettes ?? []).map(pip => ({
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pip.id,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'default' as const },
+          },
+        }))
     chainRunCommands(
       maintenanceRunId,
       [
@@ -263,7 +263,9 @@ export const LabwarePositionCheckComponent = (
       />
     )
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
-    modalContent = <IntroScreen {...movementStepProps} />
+    modalContent = (
+      <IntroScreen {...movementStepProps} {...{ existingOffsets }} />
+    )
   } else if (
     currentStep.section === 'CHECK_POSITIONS' ||
     currentStep.section === 'CHECK_TIP_RACKS' ||
