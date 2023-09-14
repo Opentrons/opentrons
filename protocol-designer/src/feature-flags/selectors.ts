@@ -23,3 +23,7 @@ export const getAllow96Channel: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_96_CHANNEL ?? false
 )
+export const getEnableDeckModification: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_FLEX_DECK_MODIFICATION ?? false
+)
