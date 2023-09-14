@@ -1,0 +1,149 @@
+{
+  "$id": "opentronsFixtureSchemaV1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "brandData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brand"],
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand/manufacturer name"
+        },
+        "brandId": {
+          "type": "array",
+          "description": "An array of manufacture numbers pertaining to a given labware",
+          "items": {
+            "type": "string"
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "URLs for manufacturer page(s)",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "displayCategory": {
+      "type": "string",
+      "enum": [
+        "slot",
+        "extensionSlot",
+        "trash",
+        "other"
+      ]
+    },
+    "safeString": {
+      "description": "a string safe to use for loadName / namespace. Lowercase-only.",
+      "type": "string",
+      "pattern": "^[a-z0-9._]+$"
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "version",
+    "namespace",
+    "metadata",
+    "brand",
+    "parameters",
+    "dimensions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "description": "Which schema version a fixture is using",
+      "type": "number",
+      "enum": [2]
+    },
+    "version": {
+      "description": "Version of the fixture definition itself (eg slot v1/v2/v3). An incrementing integer",
+      "type": "integer",
+      "minimum": 1
+    },
+    "namespace": {
+      "$ref": "#/definitions/safeString"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Properties used for search and display",
+      "additionalProperties": false,
+      "required": ["displayName", "displayCategory"],
+      "properties": {
+        "displayName": {
+          "description": "Easy to remember name of labware",
+          "type": "string"
+        },
+        "displayCategory": {
+          "$ref": "#/definitions/displayCategory",
+          "description": "Label(s) used in UI to categorize fixture"
+        },
+        "tags": {
+          "type": "array",
+          "description": "List of descriptions for a given fixture",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "brand": {
+      "$ref": "#/definitions/brandData",
+      "description": "Real-world fixfure that the definition is modeled from and/or compatible with"
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Internal describers for the fixture",
+      "additionalProperties": false,
+      "required": [
+        "loadName"
+      ],
+      "properties": {
+        "loadName": {
+          "description": "Name used to reference a fixture definition",
+          "$ref": "#/definitions/safeString"
+        }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Outer dimensions of a fixture",
+      "required": ["xDimension", "yDimension", "zDimension"],
+      "properties": {
+        "yDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "zDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "xDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        }
+      }
+    }
+  }
+}
