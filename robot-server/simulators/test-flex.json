@@ -4,19 +4,11 @@
   "attached_instruments": {
     "right": {
       "model": "p1000_single_3.4",
-      "id": "321",
-      "max_volume": 1000,
-      "name": "flex_1channel_1000",
-      "tip_length": 0,
-      "channels": 1
+      "id": "321"
     },
     "left": {
       "model": "p50_single_3.4",
-      "id": "123",
-      "max_volume": 50,
-      "name": "flex_1channel_50",
-      "tip_length": 0,
-      "channels": 1
+      "id": "123"
     }
   },
   "attached_modules": {

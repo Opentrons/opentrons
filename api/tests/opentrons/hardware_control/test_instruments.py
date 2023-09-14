@@ -680,12 +680,10 @@ async def test_reset_instruments(monkeypatch, sim_and_instr):
         types.Mount.LEFT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "flex_1channel_1000",
         },
         types.Mount.RIGHT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "flex_1channel_1000",
         },
     }
     sim_builder, _ = sim_and_instr
