@@ -64,8 +64,15 @@ export function PinnedProtocol(props: {
   cardSize?: CardSizeType
   lastRun?: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
 }): JSX.Element {
-  const { lastRun, protocol, longPress, setShowDeleteConfirmationModal } = props
+  const {
+    lastRun,
+    protocol,
+    longPress,
+    setShowDeleteConfirmationModal,
+    setTargetProtocolId,
+  } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
@@ -139,6 +146,7 @@ export function PinnedProtocol(props: {
         <LongPressModal
           longpress={longpress}
           protocolId={protocol.id}
+          setTargetProtocolId={setTargetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       )}

@@ -20,6 +20,7 @@ const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
 >
 const mockuseHost = useHost as jest.MockedFunction<typeof useHost>
 const mockFunc = jest.fn()
+const mockSetTargetProtocolId = jest.fn()
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -36,6 +37,7 @@ const render = (longPress: UseLongPressResult) => {
         longpress={longPress}
         protocolId={'mockProtocol1'}
         setShowDeleteConfirmationModal={mockFunc}
+        setTargetProtocolId={mockSetTargetProtocolId}
       />
     </MemoryRouter>,
     {
@@ -66,6 +68,7 @@ describe('Long Press Modal', () => {
     const [{ getByText }] = render(result.current)
     const button = getByText('Delete protocol')
     button.click()
+    expect(mockSetTargetProtocolId).toHaveBeenCalledWith('mockProtocol1')
     expect(mockFunc).toHaveBeenCalled()
   })
 
