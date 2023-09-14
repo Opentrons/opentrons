@@ -98,7 +98,7 @@ PHOTOMETRIC_CFG = {
         },
         8: {
             50: photometric_ot3_p50_multi,
-        }
+        },
     },
     1000: {
         1: {
@@ -111,10 +111,7 @@ PHOTOMETRIC_CFG = {
             200: photometric_ot3_p1000_multi,
             1000: photometric_ot3_p1000_multi,
         },
-        96: {
-            50: photometric_ot3_p1000_96_50ul,
-            200: photometric_ot3_p1000_96_200ul
-        }
+        96: {50: photometric_ot3_p1000_96_50ul, 200: photometric_ot3_p1000_96_200ul},
     },
 }
 

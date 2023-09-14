@@ -114,7 +114,7 @@ def create_csv_test_report_photometric(
             CSVSection(
                 title="CONFIG",
                 lines=[
-                    CSVLine(field.name, [field.type])
+                    CSVLine(field.name, [str])  # just convert to a string, always
                     for field in fields(config.PhotometricConfig)
                     if field.name not in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT
                 ],
@@ -143,7 +143,8 @@ def store_config_pm(report: CSVReport, cfg: config.PhotometricConfig) -> None:
     for field in fields(config.PhotometricConfig):
         if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        report("CONFIG", field.name, [getattr(cfg, field.name)])
+        val_str = str(getattr(cfg, field.name)).replace("[", "").replace("]", "")
+        report("CONFIG", field.name, [val_str])
 
 
 def create_csv_test_report(
@@ -214,7 +215,7 @@ def create_csv_test_report(
             CSVSection(
                 title="CONFIG",
                 lines=[
-                    CSVLine(field.name, [_field_type_not_using_typing(field.type)])
+                    CSVLine(field.name, [str])  # just convert to a string, always
                     for field in fields(config.GravimetricConfig)
                     if field.name not in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT
                 ],
@@ -301,7 +302,8 @@ def store_config_gm(report: CSVReport, cfg: config.GravimetricConfig) -> None:
     for field in fields(config.GravimetricConfig):
         if field.name in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        report("CONFIG", field.name, [getattr(cfg, field.name)])
+        val_str = str(getattr(cfg, field.name)).replace("[", "").replace("]", "")
+        report("CONFIG", field.name, [val_str])
 
 
 def store_serial_numbers_pm(
