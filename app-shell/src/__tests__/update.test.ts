@@ -63,7 +63,11 @@ describe('update', () => {
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
-      payload: { error: { name: 'Error', message: 'AH' } },
+      payload: {
+        error: { name: 'Error', message: 'AH' },
+        available: false,
+        info: null,
+      },
     })
   })
 

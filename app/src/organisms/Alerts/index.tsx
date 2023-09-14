@@ -5,6 +5,7 @@ import head from 'lodash/head'
 
 import * as AppAlerts from '../../redux/alerts'
 import { getHasJustUpdated, toggleConfigValue } from '../../redux/config'
+import { getAvailableShellUpdate } from '../../redux/shell'
 import { SUCCESS_TOAST, WARNING_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../ToasterOven'
 import { AnalyticsSettingsModal } from '../AnalyticsSettingsModal'
@@ -25,8 +26,9 @@ export function Alerts(): JSX.Element {
   const activeAlertId: AlertId | null = useSelector((state: State) => {
     return head(AppAlerts.getActiveAlerts(state)) ?? null
   })
+  const isAppUpdateAvailable = Boolean(useSelector(getAvailableShellUpdate))
 
-  const dismissAlert = (remember?: boolean): void => {
+  const dismissDriverAlert = (remember?: boolean): void => {
     if (activeAlertId != null) {
       dispatch(AppAlerts.alertDismissed(activeAlertId, remember))
     }
@@ -39,6 +41,7 @@ export function Alerts(): JSX.Element {
   })
 
   const hasJustUpdated = useSelector(getHasJustUpdated)
+  const removeToast = !isAppUpdateAvailable || isAppUpdateIgnored
 
   // Only run this hook on app startup
   React.useEffect(() => {
@@ -52,7 +55,7 @@ export function Alerts(): JSX.Element {
   }, [])
 
   React.useEffect(() => {
-    if (activeAlertId === AppAlerts.ALERT_APP_UPDATE_AVAILABLE)
+    if (isAppUpdateAvailable && !isAppUpdateIgnored) {
       toastRef.current = makeToast(
         t('opentrons_app_update_available_variation'),
         WARNING_TOAST,
@@ -63,9 +66,11 @@ export function Alerts(): JSX.Element {
           onLinkClick: () => setShowUpdateModal(true),
         }
       )
-    if (isAppUpdateIgnored && toastRef.current != null)
+    } else if (removeToast && toastRef.current) {
       eatToast(toastRef.current)
-  }, [activeAlertId])
+      toastRef.current = null
+    }
+  }, [isAppUpdateAvailable, isAppUpdateIgnored])
 
   return (
     <>
@@ -74,7 +79,7 @@ export function Alerts(): JSX.Element {
       <AnalyticsSettingsModal />
 
       {activeAlertId === AppAlerts.ALERT_U2E_DRIVER_OUTDATED ? (
-        <U2EDriverOutdatedAlert dismissAlert={dismissAlert} />
+        <U2EDriverOutdatedAlert dismissAlert={dismissDriverAlert} />
       ) : null}
       {showUpdateModal ? (
         <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
