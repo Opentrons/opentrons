@@ -1,8 +1,10 @@
 import * as React from 'react'
+import { waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
@@ -26,6 +28,7 @@ import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { ProtocolSetupModules } from '..'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../organisms/Devices/hooks')
@@ -67,6 +70,9 @@ const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFuncti
 const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
   typeof ModuleWizardFlows
 >
+const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -100,7 +106,11 @@ const render = () => {
 }
 
 describe('ProtocolSetupModules', () => {
+  let mockCreateLiveCommand = jest.fn()
+
   beforeEach(() => {
+    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
@@ -130,6 +140,9 @@ describe('ProtocolSetupModules', () => {
         complete: true,
       })
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
+    mockUseCreateLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
   })
 
   afterEach(() => {
@@ -194,7 +207,7 @@ describe('ProtocolSetupModules', () => {
     getByText('Disconnected')
   })
 
-  it('should render module information with calibrate button when a protocol has module', () => {
+  it('should render module information with calibrate button when a protocol has module', async () => {
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .mockReturnValue({
@@ -210,6 +223,16 @@ describe('ProtocolSetupModules', () => {
     const [{ getByText }] = render()
     getByText('Heater-Shaker Module GEN1')
     getByText('Calibrate').click()
+    await waitFor(() => {
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/openLabwareLatch',
+          params: {
+            moduleId: mockApiHeaterShaker.id,
+          },
+        },
+      })
+    })
     getByText('mock ModuleWizardFlows')
   })
 

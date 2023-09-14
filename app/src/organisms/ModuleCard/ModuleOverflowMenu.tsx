@@ -24,6 +24,7 @@ interface ModuleOverflowMenuProps {
   handleCalibrateClick: () => void
   isLoadedInRun: boolean
   isPipetteReady: boolean
+  isTooHot: boolean
   robotName: string
   runId?: string
 }
@@ -42,6 +43,7 @@ export const ModuleOverflowMenu = (
     handleCalibrateClick,
     isLoadedInRun,
     isPipetteReady,
+    isTooHot,
   } = props
 
   const { t, i18n } = useTranslation('module_wizard_flows')
@@ -78,7 +80,10 @@ export const ModuleOverflowMenu = (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
         {isOT3 ? (
-          <MenuItem onClick={handleCalibrateClick} disabled={!isPipetteReady}>
+          <MenuItem
+            onClick={handleCalibrateClick}
+            disabled={!isPipetteReady || isTooHot}
+          >
             {i18n.format(
               module.moduleOffset?.last_modified != null
                 ? t('recalibrate')

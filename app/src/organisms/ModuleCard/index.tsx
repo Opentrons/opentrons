@@ -61,22 +61,18 @@ import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
+import { emitPrepCommandsForModuleCalibration } from '../Devices/emitPrepCommandsForModuleCalibration'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
-import { useLatchControls } from './hooks'
 import { ErrorInfo } from './ErrorInfo'
+import { ModuleSetupModal } from './ModuleSetupModal'
 
-import type {
-  HeaterShakerDeactivateShakerCreateCommand,
-  TCOpenLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type {
   AttachedModule,
   HeaterShakerModule,
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import { ModuleSetupModal } from './ModuleSetupModal'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -165,16 +161,19 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     module.data.currentTemperature != null &&
     module.data.currentTemperature > TOO_HOT_TEMP
 
-  const ThermoTooHot =
+  const thermoTooHot =
     module.moduleType === THERMOCYCLER_MODULE_TYPE &&
     ((module.data.currentTemperature != null &&
       module.data.currentTemperature > TOO_HOT_TEMP) ||
       (module.data.lidTemperature != null &&
         module.data.lidTemperature > TOO_HOT_TEMP))
 
-  const isTooHot = heaterShakerTooHot || ThermoTooHot
+  const tempTooHot =
+    module.moduleType === TEMPERATURE_MODULE_TYPE &&
+    module.data.currentTemperature != null &&
+    module.data.currentTemperature > TOO_HOT_TEMP
 
-  const { toggleLatch, isLatchClosed } = useLatchControls(module)
+  const isTooHot = heaterShakerTooHot || thermoTooHot
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -236,47 +235,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowHSWizard(true)
   }
 
-  const handleCalibrateClick = (): void => {
-    if (
-      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      module.data.currentSpeed != null &&
-      module?.data?.currentSpeed > 0
-    ) {
-      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: {
-          moduleId: module.id,
-        },
-      }
-      createLiveCommand({
-        command: stopShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-    if (module.moduleType === HEATERSHAKER_MODULE_TYPE && !isLatchClosed) {
-      toggleLatch()
-    }
-    if (
-      module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-      module.data.lidStatus !== 'open'
-    ) {
-      const lidCommand: TCOpenLidCreateCommand = {
-        commandType: 'thermocycler/openLid',
-        params: {
-          moduleId: module.id,
-        },
-      }
-      createLiveCommand({
-        command: lidCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
-        )
-      })
-    }
+  //  awaiting each promise to make sure the server receives requests in the right order in case
+  //  there are multiple commands that need to be emitted
+  const handleCalibrateClick = async (): Promise<void> => {
+    await emitPrepCommandsForModuleCalibration(module, createLiveCommand)
     setShowCalModal(true)
   }
 
@@ -354,9 +316,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 updateType="calibration"
                 serialNumber={module.serialNumber}
                 setShowBanner={() => null}
-                handleUpdateClick={() => setShowCalModal(true)}
+                handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
+                isTooHot={isTooHot || tempTooHot}
               />
             ) : null}
             {/* Calibration performs firmware updates, so only show calibration if both true. */}
@@ -370,6 +333,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 serialNumber={module.serialNumber}
                 setShowBanner={setShowFWBanner}
                 handleUpdateClick={handleFirmwareUpdateClick}
+                isTooHot={false}
               />
             ) : null}
             {isTooHot ? (
@@ -487,6 +451,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               runId={runId}
               isLoadedInRun={isLoadedInRun}
               isPipetteReady={isPipetteReady}
+              isTooHot={isTooHot || tempTooHot}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleInstructionsClick={handleInstructionsClick}

@@ -191,6 +191,7 @@ describe('ModuleOverflowMenu', () => {
       handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
       isPipetteReady: true,
+      isTooHot: false,
     }
   })
 
@@ -517,6 +518,18 @@ describe('ModuleOverflowMenu', () => {
     props = {
       ...props,
       isPipetteReady: false,
+    }
+    const { getByRole } = render(props)
+
+    const calibrate = getByRole('button', { name: 'Calibrate' })
+    expect(calibrate).toBeDisabled()
+  })
+
+  it('renders a disabled calibrate button if module is too hot', () => {
+    mockUseIsOT3.mockReturnValue(true)
+    props = {
+      ...props,
+      isTooHot: true,
     }
     const { getByRole } = render(props)
 

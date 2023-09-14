@@ -24,7 +24,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
-  HEATERSHAKER_MODULE_TYPE,
   NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
@@ -47,22 +46,19 @@ import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupM
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
+import { emitPrepCommandsForModuleCalibration } from '../Devices/emitPrepCommandsForModuleCalibration'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
+import { getModuleTooHot } from '../Devices/getModuleTooHot'
 
-import type {
-  HeaterShakerDeactivateShakerCreateCommand,
-  HeaterShakerCloseLatchCreateCommand,
-  TCOpenLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { AttachedProtocolModuleMatch } from './utils'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
+import type { AttachedProtocolModuleMatch } from './utils'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -90,62 +86,14 @@ function RenderModuleStatus({
   const { i18n, t } = useTranslation('protocol_setup')
   const { createLiveCommand } = useCreateLiveCommandMutation()
 
-  const handleCalibrate = (): void => {
-    if (
-      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      module.attachedModuleMatch.data.currentSpeed != null &&
-      module.attachedModuleMatch.data.currentSpeed > 0
-    ) {
-      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: {
-          moduleId: module.attachedModuleMatch.id,
-        },
-      }
-      createLiveCommand({
-        command: stopShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-    if (
-      module.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      module.attachedModuleMatch.data.labwareLatchStatus !== 'idle_closed' &&
-      module.attachedModuleMatch.data.labwareLatchStatus !== 'closing'
-    ) {
-      const latchCommand: HeaterShakerCloseLatchCreateCommand = {
-        commandType: 'heaterShaker/closeLabwareLatch',
-        params: {
-          moduleId: module.attachedModuleMatch.id,
-        },
-      }
-      createLiveCommand({
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-    if (
-      module.attachedModuleMatch?.moduleType === THERMOCYCLER_MODULE_TYPE &&
-      module.attachedModuleMatch.data.lidStatus !== 'open'
-    ) {
-      const lidCommand: TCOpenLidCreateCommand = {
-        commandType: 'thermocycler/openLid',
-        params: {
-          moduleId: module.attachedModuleMatch.id,
-        },
-      }
-      createLiveCommand({
-        command: lidCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
-        )
-      })
+  //  awaiting each promise to make sure the server receives requests in the right order in case
+  //  there are multiple commands that need to be emitted
+  const handleCalibrate = async (): Promise<void> => {
+    if (module.attachedModuleMatch != null) {
+      await emitPrepCommandsForModuleCalibration(
+        module.attachedModuleMatch,
+        createLiveCommand
+      )
     }
     setShowModuleWizard(true)
   }
@@ -189,6 +137,11 @@ function RenderModuleStatus({
       <SmallButton
         buttonCategory="rounded"
         buttonText={i18n.format(t('calibrate'), 'capitalize')}
+        disabled={
+          module.attachedModuleMatch != null
+            ? getModuleTooHot(module.attachedModuleMatch)
+            : false
+        }
         onClick={handleCalibrate}
       />
     )
