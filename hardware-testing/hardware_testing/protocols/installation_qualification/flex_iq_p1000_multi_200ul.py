@@ -150,8 +150,8 @@ def _dye_start_volumes_per_trial(load_name: str, channels: int, trials: int) -> 
     return _start_volumes_per_trial(TEST_VOLUME, load_name, channels, trials)
 
 
-def _diluent_start_volumes_per_trial(load_name: str, channels: int, trials: int) -> List[float]:
-    return _start_volumes_per_trial(max(200 - TEST_VOLUME, 0), load_name, channels, trials)
+def _diluent_start_volumes_per_trial(load_name: str, trials: int) -> List[float]:
+    return _start_volumes_per_trial(max(200 - TEST_VOLUME, 0), load_name, 8, trials)
 
 
 def _assign_starting_volumes_dye(
@@ -191,7 +191,7 @@ def _assign_starting_volumes_diluent(
     source_wells = ["A11", "A12"]
     for well in source_wells:
         src_ul_per_trial = _diluent_start_volumes_per_trial(
-            reservoir.load_name, pipette.channels, num_transfers_per_source_well
+            reservoir.load_name, num_transfers_per_source_well
         )
         first_trial_ul = src_ul_per_trial[0]
         reservoir[well].load_liquid(diluent, first_trial_ul)
@@ -206,7 +206,7 @@ def _transfer(
         same_tip: bool = False
 ) -> None:
     src_ul_per_trial = _diluent_start_volumes_per_trial(
-        reservoir.load_name, pipette.channels, len(destinations)
+        reservoir.load_name, len(destinations)
     )
     src_heights = [_ul_to_mm(reservoir.load_name, ul) for ul in src_ul_per_trial]
     dst_height = _ul_to_mm(plate.load_name, volume)
@@ -259,17 +259,22 @@ def run(ctx: ProtocolContext) -> None:
         tip_racks=[ctx.load_labware("opentrons_flex_96_tiprack_200uL", "D1")]
     )
     plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D3")
-    reservoir = ctx.load_labware(SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "D2")
-
-    _assign_starting_volumes_dye(ctx, dye_pipette, reservoir)
+    reservoir_dye = ctx.load_labware(SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "D2")
+    _assign_starting_volumes_dye(ctx, dye_pipette, reservoir_dye)
     if TEST_VOLUME < 200:
         diluent_pipette = ctx.load_instrument(
             "p1000_multi_gen3",
             "right",
             tip_racks=[ctx.load_labware("opentrons_flex_96_tiprack_200uL", "C1")]
         )
-        _assign_starting_volumes_diluent(ctx, dye_pipette, reservoir)
-        _transfer_diluent(diluent_pipette, reservoir, plate)
-    _transfer_dye(dye_pipette, reservoir, plate)
+        if dye_pipette.channels == 8:
+            reservoir_diluent = reservoir_dye
+        else:
+            reservoir_diluent = ctx.load_labware(
+                SRC_LABWARE_BY_CHANNELS[diluent_pipette.channels], "C2"
+            )
+        _assign_starting_volumes_diluent(ctx, dye_pipette, reservoir_diluent)
+        _transfer_diluent(diluent_pipette, reservoir_diluent, plate)
+    _transfer_dye(dye_pipette, reservoir_dye, plate)
 
 
