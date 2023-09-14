@@ -188,6 +188,9 @@ const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { values } = props
+  const enableDeckModification = useSelector(
+    featureFlagSelectors.getEnableDeckModification
+  )
   return (
     <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       <EquipmentOption
@@ -243,6 +246,33 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           />
         )
       })}
+      {enableDeckModification ? (
+        <EquipmentOption
+          onClick={() => {
+            if (values.additionalEquipment.includes('waste_chute')) {
+              props.setFieldValue(
+                'additionalEquipment',
+                without(values.additionalEquipment, 'waste_chute')
+              )
+            } else {
+              props.setFieldValue('additionalEquipment', [
+                ...values.additionalEquipment,
+                'waste_chute',
+              ])
+            }
+          }}
+          isSelected={values.additionalEquipment.includes('waste_chute')}
+          //  todo(jr, 9/14/23): update the asset
+          image={
+            <AdditionalItemImage
+              src={gripperImage}
+              alt="Opentrons Waste Chute"
+            />
+          }
+          text="Waste Chute"
+          showCheckbox
+        />
+      ) : null}
     </Flex>
   )
 }

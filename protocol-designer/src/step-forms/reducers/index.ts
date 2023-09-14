@@ -115,7 +115,10 @@ import {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
-import { ToggleIsGripperRequiredAction } from '../actions/additionalItems'
+import {
+  ToggleIsGripperRequiredAction,
+  ToggleIsWasteChuteRequiredAction,
+} from '../actions/additionalItems'
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -140,6 +143,7 @@ export type UnsavedFormActions =
   | EditProfileStepAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
+  | ToggleIsWasteChuteRequiredAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -200,6 +204,7 @@ export const unsavedForm = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
+    case 'TOGGLE_IS_WASTE_CHUTE_REQUIRED':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -1335,23 +1340,41 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     TOGGLE_IS_GRIPPER_REQUIRED: (
       state: NormalizedAdditionalEquipmentById
     ): NormalizedAdditionalEquipmentById => {
-      const additionalEquipmentId = Object.keys(state)[0]
-      const existingEquipment = state[additionalEquipmentId]
-
-      let updatedEquipment
-
-      if (existingEquipment && existingEquipment.name === 'gripper') {
-        updatedEquipment = {}
+      let updatedEquipment = { ...state }
+      const gripperId = uuid()
+      if (updatedEquipment.gripper) {
+        delete updatedEquipment.gripper
       } else {
-        const newAdditionalEquipmentId = uuid()
         updatedEquipment = {
-          [newAdditionalEquipmentId]: {
+          ...updatedEquipment,
+          [gripperId]: {
             name: 'gripper' as const,
-            id: newAdditionalEquipmentId,
+            id: gripperId,
           },
         }
       }
-
+      return updatedEquipment
+    },
+    //  @ts-expect-error
+    TOGGLE_IS_WASTE_CHUTE_REQUIRED: (
+      state: NormalizedAdditionalEquipmentById,
+      action: ToggleIsWasteChuteRequiredAction
+    ): NormalizedAdditionalEquipmentById => {
+      const { location } = action.payload
+      let updatedEquipment = { ...state }
+      const wasteChuteId = uuid()
+      if (updatedEquipment.waste_chute) {
+        delete updatedEquipment.waste_chute
+      } else {
+        updatedEquipment = {
+          ...updatedEquipment,
+          [wasteChuteId]: {
+            name: 'waste_chute' as const,
+            id: wasteChuteId,
+            location,
+          },
+        }
+      }
       return updatedEquipment
     },
     DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
