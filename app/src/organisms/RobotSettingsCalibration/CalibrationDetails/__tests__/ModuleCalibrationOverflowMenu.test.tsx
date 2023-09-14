@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { resetAllWhenMocks } from 'jest-when'
 import { waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -35,7 +35,7 @@ const mockPipetteOffsetCalibrations = [
   },
 ]
 
-export const mockHotHeaterShaker = {
+const mockHotHeaterShaker = {
   id: 'heatershaker_id',
   moduleModel: 'heaterShakerModuleV1',
   moduleType: 'heaterShakerModuleType',
@@ -129,7 +129,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
-    resetAllWhenMocks()
   })
 
   it('should render overflow menu buttons - not calibrated', () => {
