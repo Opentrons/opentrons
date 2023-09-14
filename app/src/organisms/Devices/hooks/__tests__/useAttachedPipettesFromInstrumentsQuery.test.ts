@@ -17,7 +17,10 @@ describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
   it('returns attached pipettes', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: {
-        data: [instrumentsResponseLeftPipetteFixture, instrumentsResponseRightPipetteFixture],
+        data: [
+          instrumentsResponseLeftPipetteFixture,
+          instrumentsResponseRightPipetteFixture,
+        ],
       },
     } as any)
 
