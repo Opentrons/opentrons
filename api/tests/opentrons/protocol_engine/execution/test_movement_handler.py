@@ -440,7 +440,6 @@ async def test_check_valid_position(
     hardware_api: HardwareAPI,
 ) -> None:
     """It should check for an exception to determine if the position is ok."""
-
     decoy.when(
         await hardware_api.gantry_position(mount=Mount.LEFT, fail_on_not_homed=True)
     ).then_return(Point(0, 0, 0))

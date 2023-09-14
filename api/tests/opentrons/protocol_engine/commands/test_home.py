@@ -45,21 +45,21 @@ async def test_home_with_invalid_position(
     decoy.when(
         await movement.check_for_valid_position(mount=MountType.LEFT)
     ).then_return(False)
-    decoy.when(
-        await movement.check_for_valid_position(mount=MountType.RIGHT)
-    ).then_return(True)
 
-    data_should_home = HomeParams(
+    data = HomeParams(
         axes=[MotorAxis.X, MotorAxis.Y], skipIfMountPositionOk=MountType.LEFT
     )
-    data_should_not_home = HomeParams(
-        axes=[MotorAxis.X, MotorAxis.Y], skipIfMountPositionOk=MountType.RIGHT
-    )
 
-    result = await subject.execute(data_should_home)
-    assert result == HomeResult()
-
-    result = await subject.execute(data_should_not_home)
+    result = await subject.execute(data)
     assert result == HomeResult()
 
     decoy.verify(await movement.home(axes=[MotorAxis.X, MotorAxis.Y]), times=1)
+    decoy.reset()
+
+    decoy.when(
+        await movement.check_for_valid_position(mount=MountType.LEFT)
+    ).then_return(True)
+    result = await subject.execute(data)
+    assert result == HomeResult()
+
+    decoy.verify(await movement.home(axes=[MotorAxis.X, MotorAxis.Y]), times=0)
