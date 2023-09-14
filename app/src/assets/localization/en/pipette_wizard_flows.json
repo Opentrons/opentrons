@@ -17,6 +17,7 @@
   "calibrate_pipette": "calibrate {{mount}} pipette",
   "calibration_probe_touching": "The calibration probe will touch the sides of the calibration square in slot {{slotNumber}} to determine its exact position.",
   "cancel_attachment": "cancel attachment",
+  "cancel_detachment": "cancel detachment",
   "choose_pipette": "Choose a pipette to attach",
   "complete_cal": "Complete calibration",
   "connect_96_channel": "connect and attach 96-channel pipette",
