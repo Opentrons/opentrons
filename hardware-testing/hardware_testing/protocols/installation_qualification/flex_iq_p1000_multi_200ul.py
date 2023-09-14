@@ -10,9 +10,9 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 # EDIT-START ------>>>>>>
 
 ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT = False
-TEST_VOLUME = 5  # TODO: add support for volumes >250uL (requires multi-dispensing)
+TEST_VOLUME = 200  # TODO: add support for volumes >250uL (requires multi-dispensing)
 TEST_PIPETTE = "p1000_multi_gen3"
-TEST_TIPS = "opentrons_flex_96_tiprack_50uL"
+TEST_TIPS = "opentrons_flex_96_tiprack_200uL"
 TEST_SOURCES = [
     {
         "source": "A1",
@@ -120,7 +120,7 @@ LIQUID_HEIGHT_LOOKUP = {
     ],
     "nest_96_wellplate_2ml_deep": [
         (0, 0),
-        (2000, 38)
+        (2000, 38)  # FIXME: create real lookup table
     ],
 }
 
@@ -259,17 +259,17 @@ def _transfer_dye(pipette: InstrumentContext, tips: Labware, reservoir: Labware,
 
 def run(ctx: ProtocolContext) -> None:
     # the target plate, handle with great care
-    plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D3")
+    plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D2")
 
     # dye tips, pipette, and reservoir
-    dye_tips = ctx.load_labware(TEST_TIPS, "D1")
+    dye_tips = ctx.load_labware(TEST_TIPS, "B2")
     dye_pipette = ctx.load_instrument(TEST_PIPETTE, "left")
-    dye_reservoir = ctx.load_labware(SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "D2")
+    dye_reservoir = ctx.load_labware(SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "C2")
     _assign_starting_volumes_dye(ctx, dye_pipette, dye_reservoir)
 
     # diluent tips, pipette, and reservoir
     if TEST_VOLUME < 200:
-        diluent_tips = ctx.load_labware("opentrons_flex_96_tiprack_200uL", "C1")
+        diluent_tips = ctx.load_labware("opentrons_flex_96_tiprack_200uL", "B3")
         if "p1000_multi" in TEST_PIPETTE and ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT:
             diluent_pipette = dye_pipette  # share the 8ch pipette
         else:
@@ -278,7 +278,7 @@ def run(ctx: ProtocolContext) -> None:
             reservoir_diluent = dye_reservoir  # share the 12-row reservoir
         else:
             reservoir_diluent = ctx.load_labware(
-                SRC_LABWARE_BY_CHANNELS[diluent_pipette.channels], "C2"
+                SRC_LABWARE_BY_CHANNELS[diluent_pipette.channels], "C3"
             )
         _assign_starting_volumes_diluent(ctx, dye_pipette, reservoir_diluent)
 
