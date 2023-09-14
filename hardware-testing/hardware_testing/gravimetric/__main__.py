@@ -29,7 +29,8 @@ from hardware_testing.protocols import (
     photometric_ot3_p50_multi,
     photometric_ot3_p1000_single,
     photometric_ot3_p1000_multi,
-    photometric_ot3_p1000_96,
+    photometric_ot3_p1000_96_50ul,
+    photometric_ot3_p1000_96_200ul,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -92,13 +93,28 @@ GRAVIMETRIC_CFG_INCREMENT = {
 
 PHOTOMETRIC_CFG = {
     50: {
-        1: photometric_ot3_p50_single,
-        8: photometric_ot3_p50_multi,
+        1: {
+            50: photometric_ot3_p50_single,
+        },
+        8: {
+            50: photometric_ot3_p50_multi,
+        }
     },
     1000: {
-        1: photometric_ot3_p1000_single,
-        8: photometric_ot3_p1000_multi,
-        96: photometric_ot3_p1000_96,
+        1: {
+            50: photometric_ot3_p1000_single,
+            200: photometric_ot3_p1000_single,
+            1000: photometric_ot3_p1000_single,
+        },
+        8: {
+            50: photometric_ot3_p1000_multi,
+            200: photometric_ot3_p1000_multi,
+            1000: photometric_ot3_p1000_multi,
+        },
+        96: {
+            50: photometric_ot3_p1000_96_50ul,
+            200: photometric_ot3_p1000_96_200ul
+        }
     },
 }
 
@@ -260,7 +276,7 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels]
+            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][args.tip]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,
