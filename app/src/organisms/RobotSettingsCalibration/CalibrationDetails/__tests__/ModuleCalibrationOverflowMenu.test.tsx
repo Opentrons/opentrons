@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
 import { waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
