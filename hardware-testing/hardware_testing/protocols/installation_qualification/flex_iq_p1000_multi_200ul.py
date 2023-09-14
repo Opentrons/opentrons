@@ -9,7 +9,9 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 # EDIT-START ------>>>>>>
 
-ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT = False
+ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT = True
+RETURN_TIP = True
+
 TEST_VOLUME = 200  # TODO: add support for volumes >250uL (requires multi-dispensing)
 TEST_PIPETTE = "p1000_multi_gen3"
 TEST_TIPS = "opentrons_flex_96_tiprack_200uL"
@@ -21,7 +23,7 @@ TEST_SOURCES = [
     {
         "source": "A2",
         "destinations": ["A7", "A8", "A9", "A10", "A11", "A12"],
-    }
+    },
 ]
 
 # <<<<<<------ EDIT-STOP
@@ -29,10 +31,13 @@ TEST_SOURCES = [
 SUBMERGE_MM = 1.5
 RETRACT_MM = 5.0
 
+DELAY_ASPIRATE = 1.0
+DELAY_DISPENSE = 0.5
+
 SRC_LABWARE_BY_CHANNELS = {
     1: "nest_96_wellplate_2ml_deep",
     8: "nest_12_reservoir_15ml",
-    96: "nest_1_reservoir_195ml"
+    96: "nest_1_reservoir_195ml",
 }
 
 MIN_VOL_SRC = {
@@ -43,13 +48,12 @@ MIN_VOL_SRC = {
 
 
 class LiquidHeightInFlatBottomWell:
-
     def __init__(
-            self,
-            bottom_diameter: float,
-            top_diameter: float,
-            height: float,
-            resolution_mm: float = 0.1
+        self,
+        bottom_diameter: float,
+        top_diameter: float,
+        height: float,
+        resolution_mm: float = 0.1,
     ) -> None:
         self._bottom_radius = bottom_diameter / 2
         self._top_radius = top_diameter / 2
@@ -85,53 +89,32 @@ class LiquidHeightInFlatBottomWell:
 
 
 LIQUID_HEIGHT_LOOKUP = {
-    "nest_1_reservoir_195ml": [
-        (0, 0),
-        (195000, 25)
-    ],
+    "nest_1_reservoir_195ml": [(0, 0), (195000, 25)],
     "nest_12_reservoir_15ml": [
         (0, 0),
-        (300, 1),
-        (600, 2),
-        (900, 3),
-        (1400, 4),
-        (1900, 5),
-        (2500, 6),
-        (3076, 7),
-        (3651, 8),
-        (4227, 9),
-        (4802, 10),
-        (5378, 11),
-        (5953, 12),
-        (6529, 13),
-        (7104, 14),
-        (7680, 15),
-        (8255, 16),
-        (8831, 17),
-        (9406, 18),
-        (9982, 19),
-        (10558, 20),
-        (11133, 21),
-        (11709, 22),
-        (12284, 23),
-        (12860, 24),
-        (13435, 25),
-        (14500, 26.85),
+        (3000, 6.0),
+        (3500, 7.0),
+        (4000, 8.0),
+        (5500, 10.5),
+        (8000, 14.7),
+        (10000, 18.0),
+        (12600, 22.5),
+        (15000, 26.85),  # full depth of well
     ],
     "nest_96_wellplate_2ml_deep": [
         (0, 0),
-        (2000, 38)  # FIXME: create real lookup table
+        (2000, 38),  # FIXME: create real lookup table
     ],
 }
 
 
-def _ul_to_mm(load_name: str, ul: float) -> float:
+def _convert_ul_in_well_to_height_in_well(load_name: str, ul: float) -> float:
     if load_name in LIQUID_HEIGHT_LOOKUP:
         lookup = LIQUID_HEIGHT_LOOKUP[load_name]
         for i in range(len(lookup) - 1):
             low = lookup[i]
             high = lookup[i + 1]
-            if ul > low[0]:
+            if low[0] <= ul <= high[0]:
                 ul_scale = (ul - low[0]) / (high[0] - low[0])
                 return (ul_scale * (high[1] - low[1])) + low[1]
     elif load_name == "corning_96_wellplate_360ul_flat":
@@ -142,17 +125,27 @@ def _ul_to_mm(load_name: str, ul: float) -> float:
     raise ValueError(f"unable to find height of {ul:.1} ul in {load_name}")
 
 
-def _start_volumes_per_trial(volume: float, load_name: str, channels: int, trials: int) -> List[float]:
+def _start_volumes_per_trial(
+    volume: float, load_name: str, channels: int, trials: int
+) -> List[float]:
     ul_per_aspirate = volume * channels
     ul_per_run = ul_per_aspirate * trials
     ul_at_start = ul_per_run + MIN_VOL_SRC[load_name]
+    return [ul_at_start - (ul_per_aspirate * i) for i in range(trials)]
+
+
+def _end_volumes_per_trial(
+    volume: float, load_name: str, channels: int, trials: int
+) -> List[float]:
     return [
-        ul_at_start - (ul_per_aspirate * i)
-        for i in range(trials)
+        ul - (volume * channels)
+        for ul in _start_volumes_per_trial(volume, load_name, channels, trials)
     ]
 
 
-def _dye_start_volumes_per_trial(load_name: str, channels: int, trials: int) -> List[float]:
+def _dye_start_volumes_per_trial(
+    load_name: str, channels: int, trials: int
+) -> List[float]:
     return _start_volumes_per_trial(TEST_VOLUME, load_name, channels, trials)
 
 
@@ -161,13 +154,13 @@ def _diluent_start_volumes_per_trial(load_name: str, trials: int) -> List[float]
 
 
 def _assign_starting_volumes_dye(
-        ctx: ProtocolContext,
-        pipette: InstrumentContext,
-        reservoir: Labware,
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    reservoir: Labware,
 ) -> None:
     dye = ctx.define_liquid(
         name="Dye",
-        description="Dye range for test volume",
+        description="Dye",
         display_color="#FF0000",
     )
     for test in TEST_SOURCES:
@@ -179,9 +172,9 @@ def _assign_starting_volumes_dye(
 
 
 def _assign_starting_volumes_diluent(
-        ctx: ProtocolContext,
-        pipette: InstrumentContext,
-        reservoir: Labware,
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    reservoir: Labware,
 ) -> None:
     if TEST_VOLUME >= 200:
         return
@@ -204,17 +197,24 @@ def _assign_starting_volumes_diluent(
 
 
 def _transfer(
-        volume: float,
-        pipette: InstrumentContext,
-        tips: Labware,
-        reservoir: Labware,
-        plate: Labware,
-        source: str, destinations: List[str],
-        same_tip: bool = False
+    ctx: ProtocolContext,
+    volume: float,
+    pipette: InstrumentContext,
+    tips: Labware,
+    reservoir: Labware,
+    plate: Labware,
+    source: str,
+    destinations: List[str],
+    same_tip: bool = False,
 ) -> None:
-    src_ul_per_trial = _start_volumes_per_trial(volume, reservoir.load_name, pipette.channels, len(destinations))
-    src_heights = [_ul_to_mm(reservoir.load_name, ul) for ul in src_ul_per_trial]
-    dst_height = _ul_to_mm(plate.load_name, volume)
+    end_volumes = _end_volumes_per_trial(
+        volume, reservoir.load_name, pipette.channels, len(destinations)
+    )
+    src_heights = [
+        _convert_ul_in_well_to_height_in_well(reservoir.load_name, ul)
+        for ul in end_volumes
+    ]
+    dst_height = _convert_ul_in_well_to_height_in_well(plate.load_name, volume)
     if same_tip and not pipette.has_tip:
         pipette.pick_up_tip()
     for dst_name, height_src in zip(destinations, src_heights):
@@ -226,21 +226,30 @@ def _transfer(
         if not same_tip:
             pipette.pick_up_tip(tips.next_tip(pipette.channels))
         pipette.aspirate(TEST_VOLUME, aspirate_pos)
+        ctx.delay(seconds=DELAY_ASPIRATE)
         pipette.dispense(TEST_VOLUME, dispense_pos)
+        ctx.delay(seconds=DELAY_DISPENSE)
         pipette.blow_out(blow_out_pos)
         if not same_tip:
-            pipette.drop_tip()
+            if RETURN_TIP:
+                pipette.return_tip()
+            else:
+                pipette.drop_tip()
 
 
-def _transfer_diluent(pipette: InstrumentContext, tips: Labware, reservoir: Labware, plate: Labware) -> None:
+def _transfer_diluent(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    tips: Labware,
+    reservoir: Labware,
+    plate: Labware,
+) -> None:
     diluent_vol = 200 - TEST_VOLUME
     if diluent_vol <= 0:
         return
-    target_cols = set([
-        dst[1:]
-        for test in TEST_SOURCES
-        for dst in test["destinations"]
-    ])
+    target_cols = set(
+        [dst[1:] for test in TEST_SOURCES for dst in test["destinations"]]
+    )
     destinations = [f"A{col}" for col in target_cols]
     pipette.pick_up_tip(tips.next_tip(pipette.channels))
     for i, dst in enumerate(destinations):
@@ -248,13 +257,41 @@ def _transfer_diluent(pipette: InstrumentContext, tips: Labware, reservoir: Labw
             src = "A11"
         else:
             src = "A12"
-        _transfer(diluent_vol, pipette, tips, reservoir, plate, src, destinations, same_tip=True)
-    pipette.drop_tip()
+        _transfer(
+            ctx,
+            diluent_vol,
+            pipette,
+            tips,
+            reservoir,
+            plate,
+            src,
+            destinations,
+            same_tip=True,
+        )
+    if RETURN_TIP:
+        pipette.return_tip()
+    else:
+        pipette.drop_tip()
 
 
-def _transfer_dye(pipette: InstrumentContext, tips: Labware, reservoir: Labware, plate: Labware) -> None:
+def _transfer_dye(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    tips: Labware,
+    reservoir: Labware,
+    plate: Labware,
+) -> None:
     for test in TEST_SOURCES:
-        _transfer(TEST_VOLUME, pipette, tips, reservoir, plate, test["source"], test["destinations"])
+        _transfer(
+            ctx,
+            TEST_VOLUME,
+            pipette,
+            tips,
+            reservoir,
+            plate,
+            test["source"],
+            test["destinations"],
+        )
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -264,7 +301,9 @@ def run(ctx: ProtocolContext) -> None:
     # dye tips, pipette, and reservoir
     dye_tips = ctx.load_labware(TEST_TIPS, "B2")
     dye_pipette = ctx.load_instrument(TEST_PIPETTE, "left")
-    dye_reservoir = ctx.load_labware(SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "C2")
+    dye_reservoir = ctx.load_labware(
+        SRC_LABWARE_BY_CHANNELS[dye_pipette.channels], "C2"
+    )
     _assign_starting_volumes_dye(ctx, dye_pipette, dye_reservoir)
 
     # diluent tips, pipette, and reservoir
@@ -283,7 +322,7 @@ def run(ctx: ProtocolContext) -> None:
         _assign_starting_volumes_diluent(ctx, dye_pipette, reservoir_diluent)
 
         # transfer diluent
-        _transfer_diluent(diluent_pipette, diluent_tips, reservoir_diluent, plate)
+        _transfer_diluent(ctx, diluent_pipette, diluent_tips, reservoir_diluent, plate)
 
     # transfer dye
-    _transfer_dye(dye_pipette, dye_tips, dye_reservoir, plate)
+    _transfer_dye(ctx, dye_pipette, dye_tips, dye_reservoir, plate)
