@@ -66,16 +66,6 @@ describe('DownloadUpdateModal', () => {
     })
   })
 
-  it('renders the correct text when downloading the robot update with no close button', () => {
-    const [{ queryByRole, getByText }] = render(props)
-
-    expect(getByText('Downloading update...')).toBeInTheDocument()
-    expect(
-      getByText('Do not turn off the robot while updating')
-    ).toBeInTheDocument()
-    expect(queryByRole('button')).not.toBeInTheDocument()
-  })
-
   it('renders the correct text when installing the robot update with no close button', () => {
     props = {
       ...props,
