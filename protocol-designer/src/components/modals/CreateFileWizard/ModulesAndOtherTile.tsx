@@ -249,19 +249,19 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       {enableDeckModification ? (
         <EquipmentOption
           onClick={() => {
-            if (values.additionalEquipment.includes('waste_chute')) {
+            if (values.additionalEquipment.includes('wasteChute')) {
               props.setFieldValue(
                 'additionalEquipment',
-                without(values.additionalEquipment, 'waste_chute')
+                without(values.additionalEquipment, 'wasteChute')
               )
             } else {
               props.setFieldValue('additionalEquipment', [
                 ...values.additionalEquipment,
-                'waste_chute',
+                'wasteChute',
               ])
             }
           }}
-          isSelected={values.additionalEquipment.includes('waste_chute')}
+          isSelected={values.additionalEquipment.includes('wasteChute')}
           //  todo(jr, 9/14/23): update the asset
           image={
             <AdditionalItemImage

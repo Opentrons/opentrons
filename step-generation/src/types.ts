@@ -112,7 +112,7 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper' | 'waste_chute'
+    name: 'gripper' | 'wasteChute'
     id: string
     location?: string
   }

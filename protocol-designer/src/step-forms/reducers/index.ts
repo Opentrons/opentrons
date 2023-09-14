@@ -1342,8 +1342,12 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     ): NormalizedAdditionalEquipmentById => {
       let updatedEquipment = { ...state }
       const gripperId = uuid()
-      if (updatedEquipment.gripper) {
-        delete updatedEquipment.gripper
+      const gripperKey = Object.keys(updatedEquipment).find(
+        key => updatedEquipment[key].name === 'gripper'
+      )
+
+      if (gripperKey != null) {
+        updatedEquipment = omit(updatedEquipment, [gripperKey])
       } else {
         updatedEquipment = {
           ...updatedEquipment,
@@ -1355,7 +1359,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       }
       return updatedEquipment
     },
-    //  @ts-expect-error
+    //  @ts-expect-error (jr, 9/14/23): for some reason TS is confused by the
+    //  ToggleIsWasteChuteRequiredAction type
     TOGGLE_IS_WASTE_CHUTE_REQUIRED: (
       state: NormalizedAdditionalEquipmentById,
       action: ToggleIsWasteChuteRequiredAction
@@ -1363,13 +1368,16 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       const { location } = action.payload
       let updatedEquipment = { ...state }
       const wasteChuteId = uuid()
-      if (updatedEquipment.waste_chute) {
-        delete updatedEquipment.waste_chute
+      const wasteChuteKey = Object.keys(updatedEquipment).find(
+        key => updatedEquipment[key].name === 'wasteChute'
+      )
+      if (wasteChuteKey != null) {
+        updatedEquipment = omit(updatedEquipment, [wasteChuteKey])
       } else {
         updatedEquipment = {
           ...updatedEquipment,
           [wasteChuteId]: {
-            name: 'waste_chute' as const,
+            name: 'wasteChute' as const,
             id: wasteChuteId,
             location,
           },

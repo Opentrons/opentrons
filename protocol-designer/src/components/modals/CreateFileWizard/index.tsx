@@ -226,7 +226,7 @@ export function CreateFileWizard(): JSX.Element | null {
       // add waste chute
       if (
         enableDeckModification &&
-        values.additionalEquipment.includes('waste_chute')
+        values.additionalEquipment.includes('wasteChute')
       ) {
         dispatch(toggleIsWasteChuteRequired())
       }
