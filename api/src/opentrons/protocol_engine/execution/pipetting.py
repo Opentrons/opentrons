@@ -217,7 +217,7 @@ class VirtualPipettingHandler(PipettingHandler):
                 "push out value cannot have a negative value."
             )
         self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
-        self._validate_dispense_volume(pipette_id=pipette_id, dispnese_volume=volume)
+        self._validate_dispense_volume(pipette_id=pipette_id, dispense_volume=volume)
         return volume
 
     async def blow_out_in_place(
@@ -237,16 +237,18 @@ class VirtualPipettingHandler(PipettingHandler):
             )
 
     def _validate_dispense_volume(
-        self, pipette_id: str, dispnese_volume: float
+        self, pipette_id: str, dispense_volume: float
     ) -> None:
         """Validate dispense volume."""
         aspirate_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id)
-        if not aspirate_volume:
+        if aspirate_volume is None:
             raise InvalidDispenseVolumeError(
-                "Cannot preform a dispense if there is no volume in attached tip."
+                "Cannot perform a dispense if there is no volume in attached tip."
             )
-        if aspirate_volume and aspirate_volume < dispnese_volume:
-            raise InvalidDispenseVolumeError("Cannot dispense more than tip volume")
+        elif dispense_volume > aspirate_volume:
+            raise InvalidDispenseVolumeError(
+                f"Cannot dispense {dispense_volume} µL when only {aspirate_volume} µL has been aspirated."
+            )
 
 
 def create_pipetting_handler(
