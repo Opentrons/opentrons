@@ -4,10 +4,12 @@ from typing import List
 
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 
+##############################################
+#                EDIT - START                #
+##############################################
+
 metadata = {"protocolName": "Flex IQ: P1000 Multi 200ul"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
-
-# EDIT-START ------>>>>>>
 
 ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT = True
 RETURN_TIP = True
@@ -26,7 +28,9 @@ TEST_SOURCES = [
     },
 ]
 
-# <<<<<<------ EDIT-STOP
+##############################################
+#                 EDIT - END                 #
+##############################################
 
 SUBMERGE_MM = 1.5
 RETRACT_MM = 5.0
