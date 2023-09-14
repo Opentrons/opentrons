@@ -73,12 +73,20 @@ describe('MovePin', () => {
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
       maintenanceRunId: 'fakeRunId',
       command: {
+        commandType: 'home',
+        params: { skipIfMountPositionOk: 'extension' },
+      },
+      waitUntilComplete: true,
+    })
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
+      command: {
         commandType: 'calibration/calibrateGripper',
         params: { jaw: 'front' },
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
@@ -130,6 +138,14 @@ describe('MovePin', () => {
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
       maintenanceRunId: 'fakeRunId',
       command: {
+        commandType: 'home',
+        params: { skipIfMountPositionOk: 'extension' },
+      },
+      waitUntilComplete: true,
+    })
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
+      command: {
         commandType: 'calibration/calibrateGripper',
         params: {
           jaw: 'rear',
@@ -138,7 +154,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
