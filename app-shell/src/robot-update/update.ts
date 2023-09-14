@@ -62,7 +62,8 @@ export function startPremigration(robot: RobotHost): Promise<unknown> {
 export function uploadSystemFile(
   robot: ViewableRobot,
   urlPath: string,
-  file: string
+  file: string,
+  progressCallback: (progress: number) => void
 ): Promise<unknown> {
   const isUsbUpload = robot.ip === OPENTRONS_USB
 
@@ -77,6 +78,7 @@ export function uploadSystemFile(
       ? {
           agent: serialPortHttpAgent,
         }
-      : {}
+      : {},
+    progressCallback
   )
 }
