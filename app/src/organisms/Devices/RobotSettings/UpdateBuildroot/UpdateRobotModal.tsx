@@ -86,9 +86,11 @@ export function UpdateRobotModal({
 
   let heading = ''
   if (updateType === UPGRADE || updateType === DOWNGRADE) {
-    if (systemType === OT2_BALENA)
+    if (systemType === OT2_BALENA) {
       heading = t('robot_operating_update_available')
-    else heading = `${robotName} ${t('update_available')}`
+    } else {
+      heading = `${robotName} ${t('update_available')}`
+    }
   } else if (updateType === REINSTALL) {
     heading = t('robot_up_to_date')
     releaseNotes = t('robot_up_to_date_description')
