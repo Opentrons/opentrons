@@ -171,3 +171,4 @@ export type RobotUpdateAction =
   | { type: 'robotUpdate:SET_SESSION_STEP'; payload: UpdateSessionStep }
   | { type: 'robotUpdate:CLEAR_SESSION' }
   | { type: 'robotUpdate:SET_UPDATE_SEEN'; meta: { robotName: string } }
+  | { type: 'robotUpdate:FILE_UPLOAD_PROGRESS'; payload: number }
