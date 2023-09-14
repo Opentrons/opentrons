@@ -311,6 +311,18 @@ get-latest-tag:
 	git tag -l --sort=-v:refname "ot3@*" --merged | (head -n 1 || Select -First 1)
 
 
+.PHONY:	ssh-key
+ssh-key:
+	ssh-keygen -t rsa -b 4096
+	echo "SSH key generated, now copy to USB drive and connect to Flex"
+
+
+.PHONY: store-ssh-key
+save-ssh-rsa-key-to-robot:
+	echo "make sure USB drive with your public key is connected to Flex"
+	curl --location --request POST "http://$(host):31950/server/ssh_keys/from_local" --header "opentrons-version: 3"
+
+
 # Creates a tarball of the hardware-testing module that can be deployed to a thumb-drive
 .PHONY: setup-usb-module-ot3
 setup-usb-module: sdist Pipfile.lock
