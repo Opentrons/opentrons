@@ -6,6 +6,7 @@
   "additional_off_deck_labware": "Additional Off-Deck Labware",
   "attach_gripper_failure_reason": "Attach the required gripper to continue",
   "attach_gripper": "attach gripper",
+  "attach_module": "Attach module before calibrating",
   "attach_pipette_before_module_calibration": "Attach a pipette before running module calibration",
   "attach_pipette_calibration": "Attach pipette to see calibration information",
   "attach_pipette_cta": "Attach Pipette",

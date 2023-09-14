@@ -10,9 +10,11 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   useOnClickOutside,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import { Tooltip } from '../../../atoms/Tooltip'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
@@ -36,7 +38,11 @@ export function ModuleCalibrationOverflowMenu({
   updateRobotStatus,
   formattedPipetteOffsetCalibrations,
 }: ModuleCalibrationOverflowMenuProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'robot_calibration'])
+  const { t } = useTranslation([
+    'device_settings',
+    'robot_calibration',
+    'module_wizard_flows',
+  ])
 
   const {
     menuOverlay,
@@ -47,6 +53,7 @@ export function ModuleCalibrationOverflowMenu({
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const { isRunRunning: isRunning } = useRunStatuses()
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const OverflowMenuRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -93,7 +100,6 @@ export function ModuleCalibrationOverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={OverflowMenuRef}
-          whiteSpace="nowrap"
           zIndex="5"
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -101,6 +107,7 @@ export function ModuleCalibrationOverflowMenu({
           backgroundColor={COLORS.white}
           top="2.3rem"
           right="0"
+          width="max-content"
           flexDirection={DIRECTION_COLUMN}
         >
           <MenuItem
@@ -110,9 +117,20 @@ export function ModuleCalibrationOverflowMenu({
               requiredAttachOrCalibratePipette ||
               getModuleTooHot(attachedModule)
             }
+            {...targetProps}
           >
             {isCalibrated ? t('recalibrate_module') : t('calibrate_module')}
           </MenuItem>
+          {requiredAttachOrCalibratePipette ||
+          getModuleTooHot(attachedModule) ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t(
+                requiredAttachOrCalibratePipette
+                  ? 'module_wizard_flows:calibrate_pipette'
+                  : 'module_wizard_flows:module_too_hot'
+              )}
+            </Tooltip>
+          ) : null}
         </Flex>
       ) : null}
       {menuOverlay}

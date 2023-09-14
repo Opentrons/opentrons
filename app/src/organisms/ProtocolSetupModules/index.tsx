@@ -47,6 +47,7 @@ import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/util
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
 import { emitPrepCommandsForModuleCalibration } from '../Devices/emitPrepCommandsForModuleCalibration'
+import { useToaster } from '../ToasterOven'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -83,19 +84,26 @@ function RenderModuleStatus({
   calibrationStatus,
   setShowModuleWizard,
 }: RenderModuleStatusProps): JSX.Element {
-  const { i18n, t } = useTranslation('protocol_setup')
+  const { makeSnackbar } = useToaster()
+  const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
 
   //  awaiting each promise to make sure the server receives requests in the right order in case
   //  there are multiple commands that need to be emitted
   const handleCalibrate = async (): Promise<void> => {
     if (module.attachedModuleMatch != null) {
-      await emitPrepCommandsForModuleCalibration(
-        module.attachedModuleMatch,
-        createLiveCommand
-      )
+      if (getModuleTooHot(module.attachedModuleMatch)) {
+        makeSnackbar(t('module_setup_wizard:module_too_hot'))
+      } else {
+        await emitPrepCommandsForModuleCalibration(
+          module.attachedModuleMatch,
+          createLiveCommand
+        )
+        setShowModuleWizard(true)
+      }
+    } else {
+      makeSnackbar(t('attach_module'))
     }
-    setShowModuleWizard(true)
   }
 
   let moduleStatus: JSX.Element = (
@@ -137,11 +145,6 @@ function RenderModuleStatus({
       <SmallButton
         buttonCategory="rounded"
         buttonText={i18n.format(t('calibrate'), 'capitalize')}
-        disabled={
-          module.attachedModuleMatch != null
-            ? getModuleTooHot(module.attachedModuleMatch)
-            : false
-        }
         onClick={handleCalibrate}
       />
     )
