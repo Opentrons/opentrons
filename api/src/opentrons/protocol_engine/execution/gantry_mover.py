@@ -30,8 +30,8 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
 # We rely on this being the same for every OT-3 pipette.
 #
 # We found this number by peeking at the height that OT3Simulator returns for these pipettes:
-#   * Single- and 8-Channel P50 GEN3
-#   * Single-, 8-, and 96-channel P1000 GEN3
+#   * Flex Single- and 8-Channel P50
+#   * Flex Single-, 8-, and 96-channel P1000
 #
 # That OT3Simulator return value is what Protocol Engine uses for simulation when Protocol Engine
 # is configured to not virtualize pipettes, so this number should match it.
