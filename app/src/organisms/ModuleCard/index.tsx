@@ -22,7 +22,6 @@ import {
 import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -48,6 +47,7 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -73,7 +73,6 @@ import type {
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import { getModuleTooHot } from '../Devices/getModuleTooHot'
 
 interface ModuleCardProps {
   module: AttachedModule
