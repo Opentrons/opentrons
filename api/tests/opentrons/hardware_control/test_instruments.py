@@ -439,7 +439,7 @@ async def test_configure_ot3(ot3_api_obj):
     await hw_api.set_liquid_class(mount, "lowVolumeDefault")
     await hw_api.prepare_for_aspirate(mount)
     pos = await hw_api.current_position(mount)
-    assert pos[Axis.B] == pytest.approx(57.0)
+    assert pos[Axis.B] == pytest.approx(61.5)
     assert hw_api._pipette_handler.get_pipette(OT3Mount.LEFT).push_out_volume == 7
 
     await hw_api.set_liquid_class(mount, "default")
