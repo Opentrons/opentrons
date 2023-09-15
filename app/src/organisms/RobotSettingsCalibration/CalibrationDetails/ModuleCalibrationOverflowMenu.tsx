@@ -12,15 +12,15 @@ import {
   useOnClickOutside,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { Tooltip } from '../../../atoms/Tooltip'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { useChainLiveCommands } from '../../../resources/runs/hooks'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useRunStatuses } from '../../Devices/hooks'
+import { getModulePrepCommands } from '../../Devices/getModulePrepCommands'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
-import { emitPrepCommandsForModuleCalibration } from '../../Devices/emitPrepCommandsForModuleCalibration'
 import { getModuleTooHot } from '../../Devices/getModuleTooHot'
 
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -58,28 +58,24 @@ export function ModuleCalibrationOverflowMenu({
   const OverflowMenuRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
 
   const requiredAttachOrCalibratePipette =
     formattedPipetteOffsetCalibrations.length === 0 ||
     (formattedPipetteOffsetCalibrations[0].lastCalibrated == null &&
       formattedPipetteOffsetCalibrations[1].lastCalibrated == null)
 
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
 
-  //  awaiting each promise to make sure the server receives requests in the right order in case
-  //  there are multiple commands that need to be emitted
-  const handleCalibration = async (): Promise<void> => {
-    await emitPrepCommandsForModuleCalibration(
-      setPrepCommandErrorMessage,
-      setIsLoading,
-      attachedModule,
-      createLiveCommand
-    )
+  const handleCalibration = (): void => {
+    chainLiveCommands(getModulePrepCommands(attachedModule), false)
+      .then(() => {})
+      .catch((e: Error) => {
+        setPrepCommandErrorMessage(e.message)
+      })
     setShowOverflowMenu(false)
     setShowModuleWizard(true)
   }
@@ -103,7 +99,7 @@ export function ModuleCalibrationOverflowMenu({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
-          isPrepCommandLoading={isLoading}
+          isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
           }

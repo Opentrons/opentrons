@@ -28,7 +28,6 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
@@ -46,7 +45,11 @@ import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupM
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
-import { emitPrepCommandsForModuleCalibration } from '../Devices/emitPrepCommandsForModuleCalibration'
+import { useChainLiveCommands } from '../../resources/runs/hooks'
+import {
+  getModulePrepCommands,
+  ModulePrepCommandsType,
+} from '../Devices/getModulePrepCommands'
 import { useToaster } from '../ToasterOven'
 import {
   getAttachedProtocolModuleMatches,
@@ -60,6 +63,7 @@ import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
+import type { CommandData } from '@opentrons/api-client'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -75,8 +79,11 @@ interface RenderModuleStatusProps {
   module: AttachedProtocolModuleMatch
   calibrationStatus: ProtocolCalibrationStatus
   setShowModuleWizard: (showModuleWizard: boolean) => void
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
+  chainLiveCommands: (
+    commands: ModulePrepCommandsType[],
+    continuePastCommandFailure: boolean
+  ) => Promise<CommandData[]>
 }
 
 function RenderModuleStatus({
@@ -85,26 +92,25 @@ function RenderModuleStatus({
   module,
   calibrationStatus,
   setShowModuleWizard,
-  setIsLoading,
   setPrepCommandErrorMessage,
+  chainLiveCommands,
 }: RenderModuleStatusProps): JSX.Element {
   const { makeSnackbar } = useToaster()
   const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
-  const { createLiveCommand } = useCreateLiveCommandMutation()
 
-  //  awaiting each promise to make sure the server receives requests in the right order in case
-  //  there are multiple commands that need to be emitted
-  const handleCalibrate = async (): Promise<void> => {
+  const handleCalibrate = (): void => {
     if (module.attachedModuleMatch != null) {
       if (getModuleTooHot(module.attachedModuleMatch)) {
         makeSnackbar(t('module_setup_wizard:module_too_hot'))
       } else {
-        await emitPrepCommandsForModuleCalibration(
-          setPrepCommandErrorMessage,
-          setIsLoading,
-          module.attachedModuleMatch,
-          createLiveCommand
+        chainLiveCommands(
+          getModulePrepCommands(module.attachedModuleMatch),
+          false
         )
+          .then(() => {})
+          .catch((e: Error) => {
+            setPrepCommandErrorMessage(e.message)
+          })
         setShowModuleWizard(true)
       }
     } else {
@@ -171,8 +177,11 @@ interface RowModuleProps {
   module: AttachedProtocolModuleMatch
   setShowMultipleModulesModal: (showMultipleModulesModal: boolean) => void
   calibrationStatus: ProtocolCalibrationStatus
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   isLoading: boolean
+  chainLiveCommands: (
+    commands: ModulePrepCommandsType[],
+    continuePastCommandFailure: boolean
+  ) => Promise<CommandData[]>
   prepCommandErrorMessage: string
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
 }
@@ -182,7 +191,7 @@ function RowModule({
   module,
   setShowMultipleModulesModal,
   calibrationStatus,
-  setIsLoading,
+  chainLiveCommands,
   isLoading,
   prepCommandErrorMessage,
   setPrepCommandErrorMessage,
@@ -261,7 +270,7 @@ function RowModule({
               module={module}
               calibrationStatus={calibrationStatus}
               setShowModuleWizard={setShowModuleWizard}
-              setIsLoading={setIsLoading}
+              chainLiveCommands={chainLiveCommands}
               setPrepCommandErrorMessage={setPrepCommandErrorMessage}
             />
           </Flex>
@@ -284,6 +293,7 @@ export function ProtocolSetupModules({
   setSetupScreen,
 }: ProtocolSetupModulesProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -297,7 +307,6 @@ export function ProtocolSetupModules({
     clearModuleMismatchBanner,
     setClearModuleMismatchBanner,
   ] = React.useState<boolean>(false)
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
@@ -456,8 +465,8 @@ export function ProtocolSetupModules({
                 isDuplicateModuleModel={isDuplicateModuleModel}
                 setShowMultipleModulesModal={setShowMultipleModulesModal}
                 calibrationStatus={calibrationStatus}
-                setIsLoading={setIsLoading}
-                isLoading={isLoading}
+                chainLiveCommands={chainLiveCommands}
+                isLoading={isCommandMutationLoading}
                 prepCommandErrorMessage={prepCommandErrorMessage}
                 setPrepCommandErrorMessage={setPrepCommandErrorMessage}
               />

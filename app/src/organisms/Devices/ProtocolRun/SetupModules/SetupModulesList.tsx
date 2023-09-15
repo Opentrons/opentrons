@@ -18,7 +18,6 @@ import {
   useHoverTooltip,
   TOOLTIP_LEFT,
 } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
@@ -29,9 +28,11 @@ import {
 } from '@opentrons/shared-data'
 import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
+import { useChainLiveCommands } from '../../../../resources/runs/hooks'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
+import { getModulePrepCommands } from '../../getModulePrepCommands'
 import { getModuleTooHot } from '../../getModuleTooHot'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
@@ -44,7 +45,6 @@ import {
 } from '../../hooks'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
-import { emitPrepCommandsForModuleCalibration } from '../../emitPrepCommandsForModuleCalibration'
 import { getModuleImage } from './utils'
 
 import type { ModuleModel } from '@opentrons/shared-data'
@@ -216,21 +216,19 @@ export function ModulesListItem({
     setShowModuleSetupModal,
   ] = React.useState<Boolean>(false)
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
 
-  const handleCalibrateClick = async (): Promise<void> => {
+  const handleCalibrateClick = (): void => {
     if (attachedModuleMatch != null) {
-      await emitPrepCommandsForModuleCalibration(
-        setPrepCommandErrorMessage,
-        setIsLoading,
-        attachedModuleMatch,
-        createLiveCommand
-      )
+      chainLiveCommands(getModulePrepCommands(attachedModuleMatch), false)
+        .then(() => {})
+        .catch((e: Error) => {
+          setPrepCommandErrorMessage(e.message)
+        })
     }
     setShowModuleWizard(true)
   }
@@ -335,7 +333,7 @@ export function ModulesListItem({
           attachedModule={attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
           initialSlotName={slotName}
-          isPrepCommandLoading={isLoading}
+          isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
           }

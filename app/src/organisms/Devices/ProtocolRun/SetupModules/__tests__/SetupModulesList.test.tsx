@@ -2,7 +2,6 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -13,6 +12,7 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
+import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
 import { MultipleModulesModal } from '../MultipleModulesModal'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import {
@@ -34,7 +34,7 @@ jest.mock('../UnMatchedModuleWarning')
 jest.mock('../../../../ModuleCard/ModuleSetupModal')
 jest.mock('../../../../ModuleWizardFlows')
 jest.mock('../MultipleModulesModal')
-
+jest.mock('../../../../../resources/runs/hooks')
 const mockUseIsOt3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
@@ -60,8 +60,8 @@ const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
-const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
+const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
+  typeof useChainLiveCommands
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -108,14 +108,14 @@ const render = (props: React.ComponentProps<typeof SetupModulesList>) => {
 
 describe('SetupModulesList', () => {
   let props: React.ComponentProps<typeof SetupModulesList>
-  let mockCreateLiveCommand = jest.fn()
+  let mockChainLiveCommands = jest.fn()
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
-    mockCreateLiveCommand = jest.fn()
-    mockCreateLiveCommand.mockResolvedValue(null)
+    mockChainLiveCommands = jest.fn()
+    mockChainLiveCommands.mockResolvedValue(null)
     when(mockModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
     when(mockUnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
@@ -132,8 +132,8 @@ describe('SetupModulesList', () => {
         complete: true,
       })
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
-    mockUseCreateLiveCommandMutation.mockReturnValue({
-      createLiveCommand: mockCreateLiveCommand,
+    mockUseChainLiveCommands.mockReturnValue({
+      chainLiveCommands: mockChainLiveCommands,
     } as any)
   })
   afterEach(() => resetAllWhenMocks())

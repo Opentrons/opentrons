@@ -28,7 +28,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { updateModule } from '../../redux/modules'
@@ -47,6 +46,7 @@ import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
+import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -61,7 +61,7 @@ import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
-import { emitPrepCommandsForModuleCalibration } from '../Devices/emitPrepCommandsForModuleCalibration'
+import { getModulePrepCommands } from '../Devices/getModulePrepCommands'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
@@ -130,7 +130,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
   )
-  const { createLiveCommand } = useCreateLiveCommandMutation()
 
   const handleCloseErrorModal = (): void => {
     if (latestRequestId != null) {
@@ -234,21 +233,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const handleInstructionsClick = (): void => {
     setShowHSWizard(true)
   }
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
-
-  //  awaiting each promise to make sure the server receives requests in the right order in case
-  //  there are multiple commands that need to be emitted
-  const handleCalibrateClick = async (): Promise<void> => {
-    await emitPrepCommandsForModuleCalibration(
-      setPrepCommandErrorMessage,
-      setIsLoading,
-      module,
-      createLiveCommand
-    )
+  const handleCalibrateClick = (): void => {
+    if (getModulePrepCommands(module).length > 0) {
+      chainLiveCommands(getModulePrepCommands(module), false)
+        .then(() => {})
+        .catch((e: Error) => {
+          setPrepCommandErrorMessage(e.message)
+        })
+    }
     setShowCalModal(true)
   }
 
@@ -263,7 +261,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         <ModuleWizardFlows
           attachedModule={module}
           closeFlow={() => setShowCalModal(false)}
-          isPrepCommandLoading={isLoading}
+          isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
           }
