@@ -59,7 +59,6 @@ export const ModuleWizardFlows = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
-  console.log('isPrepCommandLoading', isPrepCommandLoading)
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
   const moduleCalibrationSteps = getModuleCalibrationSteps()
