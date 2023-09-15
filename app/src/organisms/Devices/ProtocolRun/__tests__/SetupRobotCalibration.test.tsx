@@ -119,7 +119,7 @@ describe('SetupRobotCalibration', () => {
   it('calls the expandStep function and tracks the analytics event on click', () => {
     const { getByRole } = render()[0]
 
-    fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
+    fireEvent.click(getByRole('button', { name: 'Proceed to modules' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
@@ -130,7 +130,7 @@ describe('SetupRobotCalibration', () => {
   it('does not call the expandStep function on click if calibration is not complete', () => {
     const { getByRole } = render({ calibrationStatus: { complete: false } })[0]
 
-    const button = getByRole('button', { name: 'Proceed to module setup' })
+    const button = getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()
@@ -140,7 +140,7 @@ describe('SetupRobotCalibration', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const { getByRole } = render()[0]
 
-    const button = getByRole('button', { name: 'Proceed to module setup' })
+    const button = getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()

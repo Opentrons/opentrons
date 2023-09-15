@@ -23,7 +23,7 @@
   "module_anchors_extended": "Before the run begins, module should have both anchors fully extended for a firm attachment to the deck.",
   "module_in_slot": "{{moduleName}} in Slot {{slotName}}",
   "module_should_have_anchors": "Module should have both anchors fully extended for a firm attachment to the deck.",
-  "open_labware_latch": "Open Labware Latch",
+  "open_labware_latch": "Open labware latch",
   "open_latch": "Open latch",
   "open": "Open",
   "opening": "Opening...",

@@ -94,7 +94,7 @@ describe('ProtocolSetupLabware', () => {
   it('renders the Labware Setup page', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Labware')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Location')
     getByRole('button', { name: 'Map View' })
   })

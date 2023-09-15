@@ -49,7 +49,7 @@ export const Success = (
     },
     [SUCCESSFULLY_DETACHED]: {
       header: t('gripper_successfully_detached'),
-      buttonText: t('shared:exit'),
+      buttonText: {i18n.format(t('shared:exit'), 'capitalize')},
     },
   }
   const { header, buttonText } = infoByAction[successfulAction]

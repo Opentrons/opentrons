@@ -189,7 +189,7 @@ describe('ProtocolRunSetup', () => {
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      const robotCalibrationSetup = getByText('Robot Calibration')
+      const robotCalibrationSetup = getByText('Instruments')
       robotCalibrationSetup.click()
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
@@ -197,8 +197,8 @@ describe('ProtocolRunSetup', () => {
       when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
       const { getByText } = render()
 
-      getByText('Review required pipettes for this protocol.')
-      const robotCalibrationSetup = getByText('Robot Calibration')
+      getByText('Review required instruments and calibrations for this protocol.')
+      const robotCalibrationSetup = getByText('Instruments')
       robotCalibrationSetup.click()
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
@@ -206,9 +206,9 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
 
       getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
       )
-      const labwareSetup = getByText('Labware Setup')
+      const labwareSetup = getByText('Labware')
       labwareSetup.click()
       expect(getByText('Mock SetupLabware')).toBeVisible()
     })
@@ -245,7 +245,7 @@ describe('ProtocolRunSetup', () => {
 
       const { getByText } = render()
       getByText('STEP 5')
-      getByText('Initial Liquid Setup')
+      getByText('Liquids')
       getByText('View liquid starting locations and volumes')
       getByText('Mock SetupLiquids')
     })
@@ -271,7 +271,7 @@ describe('ProtocolRunSetup', () => {
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
       const { getByText } = render()
-      const moduleSetup = getByText('Module Setup')
+      const moduleSetup = getByText('Modules')
       moduleSetup.click()
       getByText('Mock SetupModules')
     })
@@ -285,16 +285,16 @@ describe('ProtocolRunSetup', () => {
         'Review required pipettes and tip length calibrations for this protocol.'
       )
       getByText('STEP 2')
-      getByText('Module Setup')
+      getByText('Modules')
 
       getByText(
         "Plug in and turn on the required modules via the robot's USB Ports. Place the modules as shown in the deck map."
       )
       getByText('STEP 3')
-      getByText('Labware Setup')
+      getByText('Labware')
 
       getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
       )
     })
 
@@ -323,15 +323,15 @@ describe('ProtocolRunSetup', () => {
         'Review required pipettes and tip length calibrations for this protocol.'
       )
       getByText('STEP 2')
-      getByText('Module Setup')
+      getByText('Modules')
 
       getByText(
-        "Plug in and turn on the required module via the robot's USB Port. Place the module as shown in the deck map."
+        "Install the required modules and power them on."
       )
       getByText('STEP 3')
-      getByText('Labware Setup')
+      getByText('Labware')
       getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
       )
     })
     it('renders view-only info message if run has started', async () => {

@@ -280,7 +280,7 @@ describe('ModuleOverflowMenu', () => {
     const { getByRole } = render(props)
     expect(
       getByRole('button', {
-        name: 'Open Labware Latch',
+        name: 'Open labware latch',
       })
     ).toBeDisabled()
   })
@@ -294,7 +294,7 @@ describe('ModuleOverflowMenu', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button', {
-      name: 'Open Labware Latch',
+      name: 'Open labware latch',
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)

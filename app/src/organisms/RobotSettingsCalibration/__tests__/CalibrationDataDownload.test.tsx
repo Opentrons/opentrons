@@ -148,7 +148,7 @@ describe('CalibrationDataDownload', () => {
 
   it('renders a download calibration data button', () => {
     const [{ getByText }] = render()
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
@@ -163,7 +163,7 @@ describe('CalibrationDataDownload', () => {
       data: { data: [instrumentsResponseFixture.data[0]] },
     } as any)
     const [{ getByText }] = render()
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
   })
@@ -184,7 +184,7 @@ describe('CalibrationDataDownload', () => {
     getByText('Download Calibration Data')
     getByText('Save all three types of calibration data as a JSON file.')
 
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     expect(downloadButton).toBeEnabled()
   })
 
@@ -201,7 +201,7 @@ describe('CalibrationDataDownload', () => {
     getByText('No calibration data available.')
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
     expect(downloadButton).toBeDisabled()
   })
@@ -212,7 +212,7 @@ describe('CalibrationDataDownload', () => {
     getByText('No calibration data available.')
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
     expect(downloadButton).toBeDisabled()
   })
@@ -228,7 +228,7 @@ describe('CalibrationDataDownload', () => {
     )
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
     expect(downloadButton).toBeEnabled() // allow download for empty cal data
   })
@@ -239,7 +239,7 @@ describe('CalibrationDataDownload', () => {
     getByText('No calibration data available.')
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
     expect(downloadButton).toBeDisabled()
   })
