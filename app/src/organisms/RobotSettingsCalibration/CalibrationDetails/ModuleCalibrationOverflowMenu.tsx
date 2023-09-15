@@ -10,26 +10,21 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   useOnClickOutside,
+  useHoverTooltip,
 } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import {
-  HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
 
+import { Tooltip } from '../../../atoms/Tooltip'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { useChainLiveCommands } from '../../../resources/runs/hooks'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useRunStatuses } from '../../Devices/hooks'
-import { useLatchControls } from '../../ModuleCard/hooks'
+import { getModulePrepCommands } from '../../Devices/getModulePrepCommands'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
+import { getModuleTooHot } from '../../Devices/getModuleTooHot'
 
-import type {
-  HeaterShakerDeactivateShakerCreateCommand,
-  TCOpenLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { AttachedModule } from '../../../redux/modules/types'
-import type { FormattedPipetteOffsetCalibration } from '../'
+import type { FormattedPipetteOffsetCalibration } from '..'
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean
   attachedModule: AttachedModule
@@ -43,7 +38,11 @@ export function ModuleCalibrationOverflowMenu({
   updateRobotStatus,
   formattedPipetteOffsetCalibrations,
 }: ModuleCalibrationOverflowMenuProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'robot_calibration'])
+  const { t } = useTranslation([
+    'device_settings',
+    'robot_calibration',
+    'module_wizard_flows',
+  ])
 
   const {
     menuOverlay,
@@ -54,64 +53,29 @@ export function ModuleCalibrationOverflowMenu({
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const { isRunRunning: isRunning } = useRunStatuses()
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const OverflowMenuRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
 
   const requiredAttachOrCalibratePipette =
     formattedPipetteOffsetCalibrations.length === 0 ||
     (formattedPipetteOffsetCalibrations[0].lastCalibrated == null &&
       formattedPipetteOffsetCalibrations[1].lastCalibrated == null)
 
-  const { toggleLatch, isLatchClosed } = useLatchControls(attachedModule)
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
 
   const handleCalibration = (): void => {
-    if (
-      attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      attachedModule.data.currentSpeed != null &&
-      attachedModule.data.currentSpeed > 0
-    ) {
-      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: {
-          moduleId: attachedModule.id,
-        },
+    chainLiveCommands(getModulePrepCommands(attachedModule), false).catch(
+      (e: Error) => {
+        setPrepCommandErrorMessage(e.message)
       }
-      createLiveCommand({
-        command: stopShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-    if (
-      attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      !isLatchClosed
-    ) {
-      toggleLatch()
-    }
-
-    if (
-      attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE &&
-      attachedModule.data.lidStatus !== 'open'
-    ) {
-      const lidCommand: TCOpenLidCreateCommand = {
-        commandType: 'thermocycler/openLid',
-        params: {
-          moduleId: attachedModule.id,
-        },
-      }
-      createLiveCommand({
-        command: lidCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
-        )
-      })
-    }
+    )
     setShowOverflowMenu(false)
     setShowModuleWizard(true)
   }
@@ -135,12 +99,15 @@ export function ModuleCalibrationOverflowMenu({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
+          isPrepCommandLoading={isCommandMutationLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
       {showOverflowMenu ? (
         <Flex
           ref={OverflowMenuRef}
-          whiteSpace="nowrap"
           zIndex="5"
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -148,14 +115,30 @@ export function ModuleCalibrationOverflowMenu({
           backgroundColor={COLORS.white}
           top="2.3rem"
           right="0"
+          width="max-content"
           flexDirection={DIRECTION_COLUMN}
         >
           <MenuItem
             onClick={handleCalibration}
-            disabled={isRunning || requiredAttachOrCalibratePipette}
+            disabled={
+              isRunning ||
+              requiredAttachOrCalibratePipette ||
+              getModuleTooHot(attachedModule)
+            }
+            {...targetProps}
           >
             {isCalibrated ? t('recalibrate_module') : t('calibrate_module')}
           </MenuItem>
+          {requiredAttachOrCalibratePipette ||
+          getModuleTooHot(attachedModule) ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t(
+                requiredAttachOrCalibratePipette
+                  ? 'module_wizard_flows:calibrate_pipette'
+                  : 'module_wizard_flows:module_too_hot'
+              )}
+            </Tooltip>
+          ) : null}
         </Flex>
       ) : null}
       {menuOverlay}

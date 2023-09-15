@@ -26,6 +26,7 @@ describe('Module Update Banner', () => {
       setShowBanner: jest.fn(),
       handleUpdateClick: jest.fn(),
       serialNumber: 'test_number',
+      isTooHot: false,
     }
     when(mockUseIsOT3).calledWith(props.robotName).mockReturnValue(true)
   })
