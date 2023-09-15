@@ -349,11 +349,18 @@ class ProtocolEngine:
             #
             # We don't use self._hardware_api.get_estop_state() because the E-stop may have been
             # released by the time we get here.
-            if isinstance(error, EnumeratedError) and self._code_in_error_tree(
-                root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
-            ):
-                drop_tips_after_run = False
-                post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
+            if isinstance(error, EnumeratedError):
+                if self._code_in_error_tree(
+                    root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
+                ) or self._code_in_error_tree(
+                    # Request from the hardware team for the v7.0 betas: to help in-house debugging
+                    # of pipette overpressure events, leave the pipette where it was like we do
+                    # for E-stops.
+                    root_error=error,
+                    code=ErrorCodes.PIPETTE_OVERPRESSURE,
+                ):
+                    drop_tips_after_run = False
+                    post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
 
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
