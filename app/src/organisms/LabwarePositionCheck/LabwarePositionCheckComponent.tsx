@@ -160,6 +160,26 @@ export const LabwarePositionCheckComponent = (
     chainRunCommands(
       maintenanceRunId,
       [
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'leftZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'rightZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'x' },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'y' },
+        },
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
       ],
