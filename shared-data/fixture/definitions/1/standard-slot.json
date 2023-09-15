@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "version": 1,
+  "namespace": "opentrons",
+  "metadata": {
+    "name": "standard_lot",
+    "displayName": "standard slot"
+  },
+  "parameters": {
+    "loadName": "standard_lot"
+  },
+  "boundingBox": {
+    "width": 30,
+    "height": 30
+  }
+}

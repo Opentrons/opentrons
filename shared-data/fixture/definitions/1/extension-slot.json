@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "version": 1,
+  "namespace": "opentrons",
+  "metadata": {
+    "name": "extension_lot",
+    "displayName": "extension slot"
+  },
+  "parameters": {
+    "loadName": "extension_lot"
+  },
+  "boundingBox": {
+    "xDimension": 128.0,
+    "yDimension": 86.0,
+    "zDimension": 0
+  }
+}
