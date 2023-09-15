@@ -22,9 +22,12 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 import {
-  RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_STOP_REQUESTED,
+  RunStatus,
 } from '@opentrons/api-client'
 
 import { StepMeter } from '../../atoms/StepMeter'
@@ -66,6 +69,12 @@ const Bullet = styled.div`
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
+const START_RUN_STATUSES: RunStatus[] = [
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+]
 
 export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
@@ -155,19 +164,19 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [lastRunCommand, interventionModalCommandKey])
 
-  console.log('runStatus', runStatus)
-
   React.useEffect(() => {
-    if (runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR) {
-      console.log('stop')
+    if (
+      runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+      !isBlockedByDoorStatus
+    ) {
       setIsBlockedByDoorStatus(true)
       pauseRun()
     }
     if (
-      runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+      runStatus != null &&
+      START_RUN_STATUSES.includes(runStatus) &&
       isBlockedByDoorStatus
     ) {
-      console.log('resume')
       setIsBlockedByDoorStatus(prevStatus => !prevStatus)
       playRun()
     }

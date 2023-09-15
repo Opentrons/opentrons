@@ -38,6 +38,7 @@ export function OpenDoorAlertModal(): JSX.Element {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
+            justifyContent={JUSTIFY_CENTER}
             width="100%"
           >
             <StyledText
