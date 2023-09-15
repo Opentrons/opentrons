@@ -224,11 +224,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   ] = React.useState<string>('')
   const handleCalibrateClick = (): void => {
     if (getModulePrepCommands(module).length > 0) {
-      chainLiveCommands(getModulePrepCommands(module), false)
-        .then(() => {})
-        .catch((e: Error) => {
+      chainLiveCommands(getModulePrepCommands(module), false).catch(
+        (e: Error) => {
           setPrepCommandErrorMessage(e.message)
-        })
+        }
+      )
     }
     setShowCalModal(true)
   }
@@ -328,7 +328,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 serialNumber={module.serialNumber}
                 setShowBanner={setShowFWBanner}
                 handleUpdateClick={handleFirmwareUpdateClick}
-                isTooHot={false}
               />
             ) : null}
             {isTooHot ? (

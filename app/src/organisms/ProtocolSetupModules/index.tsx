@@ -106,11 +106,9 @@ function RenderModuleStatus({
         chainLiveCommands(
           getModulePrepCommands(module.attachedModuleMatch),
           false
-        )
-          .then(() => {})
-          .catch((e: Error) => {
-            setPrepCommandErrorMessage(e.message)
-          })
+        ).catch((e: Error) => {
+          setPrepCommandErrorMessage(e.message)
+        })
         setShowModuleWizard(true)
       }
     } else {

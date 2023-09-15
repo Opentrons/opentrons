@@ -21,7 +21,7 @@ interface UpdateBannerProps {
   setShowBanner: (arg0: boolean) => void
   handleUpdateClick: () => void
   serialNumber: string
-  isTooHot: boolean
+  isTooHot?: boolean
   attachPipetteRequired?: boolean
   updatePipetteFWRequired?: boolean
 }

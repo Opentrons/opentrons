@@ -224,11 +224,12 @@ export function ModulesListItem({
 
   const handleCalibrateClick = (): void => {
     if (attachedModuleMatch != null) {
-      chainLiveCommands(getModulePrepCommands(attachedModuleMatch), false)
-        .then(() => {})
-        .catch((e: Error) => {
-          setPrepCommandErrorMessage(e.message)
-        })
+      chainLiveCommands(
+        getModulePrepCommands(attachedModuleMatch),
+        false
+      ).catch((e: Error) => {
+        setPrepCommandErrorMessage(e.message)
+      })
     }
     setShowModuleWizard(true)
   }

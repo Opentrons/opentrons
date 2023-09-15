@@ -71,11 +71,11 @@ export function ModuleCalibrationOverflowMenu({
   ] = React.useState<string>('')
 
   const handleCalibration = (): void => {
-    chainLiveCommands(getModulePrepCommands(attachedModule), false)
-      .then(() => {})
-      .catch((e: Error) => {
+    chainLiveCommands(getModulePrepCommands(attachedModule), false).catch(
+      (e: Error) => {
         setPrepCommandErrorMessage(e.message)
-      })
+      }
+    )
     setShowOverflowMenu(false)
     setShowModuleWizard(true)
   }
