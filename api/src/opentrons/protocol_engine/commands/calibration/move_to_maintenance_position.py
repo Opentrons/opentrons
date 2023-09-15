@@ -107,6 +107,11 @@ class MoveToMaintenancePositionImplementation(
             )
 
         if params.mount != MountType.EXTENSION:
+
+            # disable z since we don't need it
+            if ot3_api.has_gripper():
+                await ot3_api.disengage_axes([Axis.Z_G])
+
             if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
                 mount_to_axis = Axis.by_mount(params.mount.to_hw_mount())
                 await ot3_api.move_axes(
