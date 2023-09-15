@@ -7,10 +7,12 @@ import {
   SPACING,
   TYPOGRAPHY,
   Btn,
+  useHoverTooltip,
   Flex,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
+import { Tooltip } from '../../atoms/Tooltip'
 import { useIsOT3 } from '../../organisms/Devices/hooks'
 
 interface UpdateBannerProps {
@@ -34,7 +36,8 @@ export const UpdateBanner = ({
   updatePipetteFWRequired,
   isTooHot,
 }: UpdateBannerProps): JSX.Element | null => {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'module_wizard_flows'])
+  const [targetProps, tooltipProps] = useHoverTooltip({ placement: 'top' })
   let bannerType: 'error' | 'warning' | 'informing'
   let bannerMessage: string
   let hyperlinkText: string
@@ -63,29 +66,37 @@ export const UpdateBanner = ({
   if (!isOT3 && updateType === 'calibration') return null
 
   return (
-    <Flex
-      paddingBottom={SPACING.spacing4}
-      width="100%"
-      flexDirection={DIRECTION_COLUMN}
-      data-testid={`ModuleCard_${updateType}_update_banner_${serialNumber}`}
-    >
-      <Banner
-        type={bannerType}
-        onCloseClick={() => setShowBanner(false)}
-        closeButton={closeButtonRendered}
+    <>
+      <Flex
+        paddingBottom={SPACING.spacing4}
+        width="100%"
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`ModuleCard_${updateType}_update_banner_${serialNumber}`}
+        {...targetProps}
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          {bannerMessage}
-          <Btn
-            textAlign={ALIGN_START}
-            fontSize={TYPOGRAPHY.fontSizeP}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-            onClick={() => handleUpdateClick()}
-          >
-            {hyperlinkText}
-          </Btn>
-        </Flex>
-      </Banner>
-    </Flex>
+        <Banner
+          type={bannerType}
+          onCloseClick={() => setShowBanner(false)}
+          closeButton={closeButtonRendered}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            {bannerMessage}
+            <Btn
+              textAlign={ALIGN_START}
+              fontSize={TYPOGRAPHY.fontSizeP}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              onClick={() => handleUpdateClick()}
+            >
+              {hyperlinkText}
+            </Btn>
+          </Flex>
+        </Banner>
+      </Flex>
+      {isTooHot ? (
+        <Tooltip tooltipProps={tooltipProps}>
+          {t('module_wizard_flows:module_too_hot')}
+        </Tooltip>
+      ) : null}
+    </>
   )
 }

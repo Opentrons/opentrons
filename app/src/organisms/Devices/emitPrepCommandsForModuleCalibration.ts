@@ -18,7 +18,16 @@ import type {
 import type { CreateLiveCommandMutateParams } from '@opentrons/react-api-client/src/runs/useCreateLiveCommandMutation'
 import type { AttachedModule } from '../../redux/modules/types'
 
-type prepCommandForModuleCalibrationTypes =
+type PrepCommands =
+  | TemperatureModuleDeactivateCreateCommand
+  | HeaterShakerDeactivateHeaterCreateCommand
+  | TCDeactivateLidCreateCommand
+  | TCDeactivateBlockCreateCommand
+  | HeaterShakerDeactivateShakerCreateCommand
+  | HeaterShakerOpenLatchCreateCommand
+  | TCOpenLidCreateCommand
+
+type PrepCommandForModuleCalibrationTypes =
   | 'thermocycler/deactivateLid'
   | 'thermocycler/deactivateBlock'
   | 'temperatureModule/deactivate'
@@ -27,8 +36,9 @@ type prepCommandForModuleCalibrationTypes =
   | 'thermocycler/openLid'
   | 'heaterShaker/openLabwareLatch'
 
-function getPrepCommandForModuleCalibration(
-  prepCommandForModuleCalibrationTypes: prepCommandForModuleCalibrationTypes,
+function prepCommandForModuleCalibration(
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
+  prepCommandForModuleCalibrationTypes: PrepCommandForModuleCalibrationTypes,
   moduleId: string,
   createLiveCommand: UseMutateAsyncFunction<
     CommandData,
@@ -37,14 +47,7 @@ function getPrepCommandForModuleCalibration(
     unknown
   >
 ): void {
-  const prepCommandForModuleCalibration:
-    | TemperatureModuleDeactivateCreateCommand
-    | HeaterShakerDeactivateHeaterCreateCommand
-    | TCDeactivateLidCreateCommand
-    | TCDeactivateBlockCreateCommand
-    | HeaterShakerDeactivateShakerCreateCommand
-    | HeaterShakerOpenLatchCreateCommand
-    | TCOpenLidCreateCommand = {
+  const prepCommandForModuleCalibration: PrepCommands = {
     commandType: prepCommandForModuleCalibrationTypes,
     params: {
       moduleId: moduleId,
@@ -56,10 +59,13 @@ function getPrepCommandForModuleCalibration(
     console.error(
       `error deactivating module status with command type ${prepCommandForModuleCalibration.commandType}: ${e.message}`
     )
+    setErrorMessage(e.message)
   })
 }
 
 export async function emitPrepCommandsForModuleCalibration(
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
   module: AttachedModule,
   createLiveCommand: UseMutateAsyncFunction<
     CommandData,
@@ -68,66 +74,91 @@ export async function emitPrepCommandsForModuleCalibration(
     unknown
   >
 ): Promise<void> {
-  if (module.moduleType === HEATERSHAKER_MODULE_TYPE) {
-    if (module.data.speedStatus !== 'idle') {
-      await getPrepCommandForModuleCalibration(
-        'heaterShaker/deactivateShaker',
-        module.id,
-        createLiveCommand
-      )
+  setIsLoading(true)
+
+  try {
+    switch (module.moduleType) {
+      case HEATERSHAKER_MODULE_TYPE: {
+        if (module.data.speedStatus !== 'idle') {
+          await prepCommandForModuleCalibration(
+            setErrorMessage,
+            'heaterShaker/deactivateShaker',
+            module.id,
+            createLiveCommand
+          )
+        }
+        if (
+          module.data.temperatureStatus !== 'idle' &&
+          module.data.status !== 'idle'
+        ) {
+          await prepCommandForModuleCalibration(
+            setErrorMessage,
+            'heaterShaker/deactivateHeater',
+            module.id,
+            createLiveCommand
+          )
+        }
+        if (
+          module.data.labwareLatchStatus !== 'idle_open' &&
+          module.data.labwareLatchStatus !== 'opening'
+        ) {
+          await prepCommandForModuleCalibration(
+            setErrorMessage,
+            'heaterShaker/openLabwareLatch',
+            module.id,
+            createLiveCommand
+          )
+        }
+        break
+      }
+
+      case THERMOCYCLER_MODULE_TYPE: {
+        if (module.data.lidTargetTemperature != null) {
+          await prepCommandForModuleCalibration(
+            setErrorMessage,
+            'thermocycler/deactivateLid',
+            module.id,
+            createLiveCommand
+          )
+        }
+        if (module.data.targetTemperature != null) {
+          await prepCommandForModuleCalibration(
+            setErrorMessage,
+            'thermocycler/deactivateBlock',
+            module.id,
+            createLiveCommand
+          )
+        }
+        if (module.data.lidStatus !== 'open') {
+          await prepCommandForModuleCalibration(
+            setErrorMessage,
+            'thermocycler/openLid',
+            module.id,
+            createLiveCommand
+          )
+        }
+        break
+      }
+
+      case TEMPERATURE_MODULE_TYPE: {
+        if (module.data.status !== 'idle') {
+          await prepCommandForModuleCalibration(
+            setErrorMessage,
+            'temperatureModule/deactivate',
+            module.id,
+            createLiveCommand
+          )
+        }
+        break
+      }
     }
-    if (
-      module.data.temperatureStatus !== 'idle' &&
-      module.data.status !== 'idle'
-    ) {
-      await getPrepCommandForModuleCalibration(
-        'heaterShaker/deactivateHeater',
-        module.id,
-        createLiveCommand
-      )
+    setIsLoading(false)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      setErrorMessage(error.message)
+    } else {
+      setErrorMessage('Unknown error occurred')
     }
-    if (
-      module.data.labwareLatchStatus !== 'idle_open' &&
-      module.data.labwareLatchStatus !== 'opening'
-    ) {
-      await getPrepCommandForModuleCalibration(
-        'heaterShaker/openLabwareLatch',
-        module.id,
-        createLiveCommand
-      )
-    }
-  }
-  if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
-    if (module.data.lidTargetTemperature != null) {
-      await getPrepCommandForModuleCalibration(
-        'thermocycler/deactivateLid',
-        module.id,
-        createLiveCommand
-      )
-    }
-    if (module.data.targetTemperature != null) {
-      await getPrepCommandForModuleCalibration(
-        'thermocycler/deactivateBlock',
-        module.id,
-        createLiveCommand
-      )
-    }
-    if (module.data.lidStatus !== 'open') {
-      await getPrepCommandForModuleCalibration(
-        'thermocycler/openLid',
-        module.id,
-        createLiveCommand
-      )
-    }
-  }
-  if (
-    module.moduleType === TEMPERATURE_MODULE_TYPE &&
-    module.data.status !== 'idle'
-  ) {
-    await getPrepCommandForModuleCalibration(
-      'temperatureModule/deactivate',
-      module.id,
-      createLiveCommand
-    )
+    setIsLoading(false)
   }
 }

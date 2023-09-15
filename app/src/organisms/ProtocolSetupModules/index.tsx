@@ -75,6 +75,8 @@ interface RenderModuleStatusProps {
   module: AttachedProtocolModuleMatch
   calibrationStatus: ProtocolCalibrationStatus
   setShowModuleWizard: (showModuleWizard: boolean) => void
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
 }
 
 function RenderModuleStatus({
@@ -83,6 +85,8 @@ function RenderModuleStatus({
   module,
   calibrationStatus,
   setShowModuleWizard,
+  setIsLoading,
+  setPrepCommandErrorMessage,
 }: RenderModuleStatusProps): JSX.Element {
   const { makeSnackbar } = useToaster()
   const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
@@ -96,6 +100,8 @@ function RenderModuleStatus({
         makeSnackbar(t('module_setup_wizard:module_too_hot'))
       } else {
         await emitPrepCommandsForModuleCalibration(
+          setPrepCommandErrorMessage,
+          setIsLoading,
           module.attachedModuleMatch,
           createLiveCommand
         )
@@ -165,6 +171,10 @@ interface RowModuleProps {
   module: AttachedProtocolModuleMatch
   setShowMultipleModulesModal: (showMultipleModulesModal: boolean) => void
   calibrationStatus: ProtocolCalibrationStatus
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  isLoading: boolean
+  prepCommandErrorMessage: string
+  setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
 }
 
 function RowModule({
@@ -172,6 +182,10 @@ function RowModule({
   module,
   setShowMultipleModulesModal,
   calibrationStatus,
+  setIsLoading,
+  isLoading,
+  prepCommandErrorMessage,
+  setPrepCommandErrorMessage,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
@@ -189,6 +203,10 @@ function RowModule({
           attachedModule={module.attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
           initialSlotName={module.slotName}
+          isPrepCommandLoading={isLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
       <Flex
@@ -243,6 +261,8 @@ function RowModule({
               module={module}
               calibrationStatus={calibrationStatus}
               setShowModuleWizard={setShowModuleWizard}
+              setIsLoading={setIsLoading}
+              setPrepCommandErrorMessage={setPrepCommandErrorMessage}
             />
           </Flex>
         )}
@@ -277,6 +297,11 @@ export function ProtocolSetupModules({
     clearModuleMismatchBanner,
     setClearModuleMismatchBanner,
   ] = React.useState<boolean>(false)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
@@ -431,6 +456,10 @@ export function ProtocolSetupModules({
                 isDuplicateModuleModel={isDuplicateModuleModel}
                 setShowMultipleModulesModal={setShowMultipleModulesModal}
                 calibrationStatus={calibrationStatus}
+                setIsLoading={setIsLoading}
+                isLoading={isLoading}
+                prepCommandErrorMessage={prepCommandErrorMessage}
+                setPrepCommandErrorMessage={setPrepCommandErrorMessage}
               />
             )
           })}

@@ -234,11 +234,21 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const handleInstructionsClick = (): void => {
     setShowHSWizard(true)
   }
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
 
   //  awaiting each promise to make sure the server receives requests in the right order in case
   //  there are multiple commands that need to be emitted
   const handleCalibrateClick = async (): Promise<void> => {
-    await emitPrepCommandsForModuleCalibration(module, createLiveCommand)
+    await emitPrepCommandsForModuleCalibration(
+      setPrepCommandErrorMessage,
+      setIsLoading,
+      module,
+      createLiveCommand
+    )
     setShowCalModal(true)
   }
 
@@ -253,6 +263,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         <ModuleWizardFlows
           attachedModule={module}
           closeFlow={() => setShowCalModal(false)}
+          isPrepCommandLoading={isLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
       {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (

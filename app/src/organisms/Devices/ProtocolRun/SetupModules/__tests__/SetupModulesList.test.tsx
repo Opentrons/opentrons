@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -27,6 +28,7 @@ import { SetupModulesList } from '../SetupModulesList'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../hooks')
 jest.mock('../UnMatchedModuleWarning')
 jest.mock('../../../../ModuleCard/ModuleSetupModal')
@@ -57,6 +59,9 @@ const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
 >
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -103,11 +108,14 @@ const render = (props: React.ComponentProps<typeof SetupModulesList>) => {
 
 describe('SetupModulesList', () => {
   let props: React.ComponentProps<typeof SetupModulesList>
+  let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
+    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     when(mockModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
     when(mockUnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
@@ -124,6 +132,9 @@ describe('SetupModulesList', () => {
         complete: true,
       })
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
+    mockUseCreateLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
   })
   afterEach(() => resetAllWhenMocks())
 
@@ -217,7 +228,7 @@ describe('SetupModulesList', () => {
     getByText('Connected')
   })
 
-  it('should render a thermocycler module that is connected but not calibrated, OT3', () => {
+  it('should render a thermocycler module that is connected but not calibrated, OT3', async () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -244,7 +255,9 @@ describe('SetupModulesList', () => {
     getByText('Thermocycler Module')
     getByText('Slot A1+B1')
     getByRole('button', { name: 'Calibrate now' }).click()
-    getByText('mock ModuleWizardFlows')
+    await waitFor(() => {
+      getByText('mock ModuleWizardFlows')
+    })
   })
 
   it('should render disabled button when pipette and module are not calibrated', () => {

@@ -65,10 +65,18 @@ export function ModuleCalibrationOverflowMenu({
     (formattedPipetteOffsetCalibrations[0].lastCalibrated == null &&
       formattedPipetteOffsetCalibrations[1].lastCalibrated == null)
 
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
+
   //  awaiting each promise to make sure the server receives requests in the right order in case
   //  there are multiple commands that need to be emitted
   const handleCalibration = async (): Promise<void> => {
     await emitPrepCommandsForModuleCalibration(
+      setPrepCommandErrorMessage,
+      setIsLoading,
       attachedModule,
       createLiveCommand
     )
@@ -95,6 +103,10 @@ export function ModuleCalibrationOverflowMenu({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
+          isPrepCommandLoading={isLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
       {showOverflowMenu ? (
