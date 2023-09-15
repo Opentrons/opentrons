@@ -209,13 +209,13 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         )
           .then(() =>
+            fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
+          )
+          .then(() =>
             FileSystem.removeProtocolByKey(
               action.payload.protocolKey,
               FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH
             )
-          )
-          .then(() =>
-            fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
           )
         break
       }
