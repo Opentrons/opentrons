@@ -25,7 +25,7 @@ describe('UpdateInProgressModal', () => {
   })
   it('renders test and progress bar', () => {
     const { getByText } = render(props)
-    getByText('Updating Right Pipette firmware...')
+    getByText('Updating pipette firmware...')
     getByText('12')
   })
 })

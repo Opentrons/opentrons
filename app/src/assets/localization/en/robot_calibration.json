@@ -123,7 +123,7 @@
   "tip_length_calibration": "Tip Length Calibration",
   "tip_length_invalidates_pipette_offset": "Recalibrating tip length will clear pipette offset data.",
   "tip_length": "tip length calibration",
-  "tip_pick_up_instructions": "<block>Using the controls below or your keyboard, jog the pipette until the nozzle closest to you is centered above the A1 position and level with the top of the tip.</block><br/><block>When the pipette is aligned, you’re ready to test picking up the tip.</block>",
+  "tip_pick_up_instructions": "<block>Using the controls below or your keyboard, jog the pipette until the nozzle closest to you is centered above the A1 position and level with the top of the tip.</block><br/><block>When the pipette is properly aligned, pick up the tip.</block>",
   "title": "robot calibration",
   "to_check": "To check the {{mount}} pipette:",
   "unknown_custom_tiprack": "unknown custom tip rack",

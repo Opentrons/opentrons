@@ -142,9 +142,9 @@ describe('RobotSettingsDashboard', () => {
     getByText('Choose what data to share with Opentrons.')
     getByText('Device Reset')
     getByText('Update Channel')
-    getByText('Apply labware offsets')
+    getByText('Apply Labware Offsets')
     getByText('Use stored data when setting up a protocol.')
-    getByText('Enable Developer Tools')
+    getByText('Developer Tools')
     getByText('Access additional logging and feature flags.')
   })
 
@@ -240,14 +240,14 @@ describe('RobotSettingsDashboard', () => {
 
   it('should call a mock function when tapping enable historic offset', () => {
     const [{ getByText }] = render()
-    const button = getByText('Apply labware offsets')
+    const button = getByText('Apply Labware Offsets')
     fireEvent.click(button)
     expect(mockToggleHistoricOffsets).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping enable dev tools', () => {
     const [{ getByText }] = render()
-    const button = getByText('Enable Developer Tools')
+    const button = getByText('Developer Tools')
     fireEvent.click(button)
     expect(mockToggleDevtools).toHaveBeenCalled()
   })

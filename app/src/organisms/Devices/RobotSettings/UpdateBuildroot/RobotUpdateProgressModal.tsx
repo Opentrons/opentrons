@@ -72,7 +72,6 @@ function RobotUpdateProgressFooter({
 }: RobotUpdateProgressFooterProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
-  // TODO(jh, 08-30-2023: add reinstall logic for zip file installation)
   const installUpdate = React.useCallback(() => {
     dispatch(clearRobotUpdateSession())
     dispatch(startRobotUpdate(robotName))
@@ -123,7 +122,7 @@ function RobotUpdateProgressFooter({
 interface RobotUpdateProgressModalProps {
   robotName: string
   updateStep: UpdateStep
-  stepProgress?: number | null
+  stepProgress: number | null
   error?: string | null
   closeUpdateBuildroot?: () => void
 }
@@ -162,12 +161,8 @@ export function RobotUpdateProgressModal({
     )
   }
 
-  let modalBodyText = t('downloading_update')
-  if (updateStep === 'install') {
-    modalBodyText = t('installing_update')
-  } else if (updateStep === 'restart') {
-    modalBodyText = t('restarting_robot')
-  }
+  let modalBodyText = t('installing_update')
+  if (updateStep === 'restart') modalBodyText = t('restarting_robot')
 
   // Make sure to start the animation when this modal first pops up
   React.useEffect(startUpdatingAnimation, [])

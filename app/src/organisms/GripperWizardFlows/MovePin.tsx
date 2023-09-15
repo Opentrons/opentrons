@@ -67,28 +67,22 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           createRunCommand({
             maintenanceRunId,
             command: {
-              commandType: 'calibration/calibrateGripper' as const,
-              params:
-                jaw === 'rear' && frontJawOffset != null
-                  ? { jaw, otherJawOffset: frontJawOffset }
-                  : { jaw },
+              commandType: 'home' as const,
+              params: {
+                skipIfMountPositionOk: 'extension',
+              },
             },
             waitUntilComplete: true,
           })
             .then(({ data }) => {
-              if (data.status === 'failed') {
-                setErrorMessage(data.error?.detail ?? null)
-              }
-              if (jaw === 'front' && data?.result?.jawOffset != null) {
-                setFrontJawOffset(data.result.jawOffset)
-              }
               createRunCommand({
                 maintenanceRunId,
                 command: {
-                  commandType: 'calibration/moveToMaintenancePosition' as const,
-                  params: {
-                    mount: EXTENSION,
-                  },
+                  commandType: 'calibration/calibrateGripper' as const,
+                  params:
+                    jaw === 'rear' && frontJawOffset != null
+                      ? { jaw, otherJawOffset: frontJawOffset }
+                      : { jaw },
                 },
                 waitUntilComplete: true,
               })
@@ -96,7 +90,26 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                   if (data.status === 'failed') {
                     setErrorMessage(data.error?.detail ?? null)
                   }
-                  proceed()
+                  if (jaw === 'front' && data?.result?.jawOffset != null) {
+                    setFrontJawOffset(data.result.jawOffset)
+                  }
+                  createRunCommand({
+                    maintenanceRunId,
+                    command: {
+                      commandType: 'calibration/moveToMaintenancePosition' as const,
+                      params: {
+                        mount: EXTENSION,
+                      },
+                    },
+                    waitUntilComplete: true,
+                  })
+                    .then(({ data }) => {
+                      if (data.status === 'failed') {
+                        setErrorMessage(data.error?.detail ?? null)
+                      }
+                      proceed()
+                    })
+                    .catch(error => setErrorMessage(error.message))
                 })
                 .catch(error => setErrorMessage(error.message))
             })
@@ -167,7 +180,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
-      buttonText: t('continue'),
+      buttonText: t('continue_calibration'),
       prepImage: (
         <video
           css={css`
