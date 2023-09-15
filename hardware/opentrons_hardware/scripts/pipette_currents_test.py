@@ -79,7 +79,7 @@ sus_str = "----_----"
 async def set_pipette_current(run_current,args) -> None:
 
     currents: Dict[NodeId, Tuple[float, float]] = {}
-    currents[NodeId.pipette_left] = (float(0), float(run_current))
+    currents[NodeId.pipette_right] = (float(0), float(run_current))
 
     async with build.can_messenger(build_settings(args)) as messenger:
         try:
