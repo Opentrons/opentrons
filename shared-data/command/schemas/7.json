@@ -836,6 +836,12 @@
       ],
       "type": "string"
     },
+    "MountType": {
+      "title": "MountType",
+      "description": "An enumeration.",
+      "enum": ["left", "right", "extension"],
+      "type": "string"
+    },
     "HomeParams": {
       "title": "HomeParams",
       "description": "Payload required for a Home command.",
@@ -847,6 +853,14 @@
           "items": {
             "$ref": "#/definitions/MotorAxis"
           }
+        },
+        "skipIfMountPositionOk": {
+          "description": "If this parameter is provided, the gantry will only be homed if the specified mount has an invalid position. If omitted, the homing action will be executed unconditionally.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MountType"
+            }
+          ]
         }
       }
     },
@@ -1233,12 +1247,6 @@
         "p1000_multi_flex",
         "p1000_96"
       ],
-      "type": "string"
-    },
-    "MountType": {
-      "title": "MountType",
-      "description": "An enumeration.",
-      "enum": ["left", "right", "extension"],
       "type": "string"
     },
     "LoadPipetteParams": {
