@@ -30,6 +30,8 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     "nest_96_wellplate_200ul_flat": 2,
     "nest_96_wellplate_2ml_deep": 2,
     "opentrons_96_wellplate_200ul_pcr_full_skirt": 2,
+    "corning_6_wellplate_16.8ml_flat": 2,
+    "corning_24_wellplate_3.4ml_flat": 2,
 }
 
 
