@@ -73,6 +73,7 @@ import type {
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import { getModuleTooHot } from '../Devices/getModuleTooHot'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -155,24 +156,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isOverflowBtnDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
-  const heaterShakerTooHot =
-    module.moduleModel === 'heaterShakerModuleV1' &&
-    module.data.currentTemperature != null &&
-    module.data.currentTemperature > TOO_HOT_TEMP
-
-  const thermoTooHot =
-    module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-    ((module.data.currentTemperature != null &&
-      module.data.currentTemperature > TOO_HOT_TEMP) ||
-      (module.data.lidTemperature != null &&
-        module.data.lidTemperature > TOO_HOT_TEMP))
-
-  const tempTooHot =
-    module.moduleType === TEMPERATURE_MODULE_TYPE &&
-    module.data.currentTemperature != null &&
-    module.data.currentTemperature > TOO_HOT_TEMP
-
-  const isTooHot = heaterShakerTooHot || thermoTooHot
+  const isTooHot = getModuleTooHot(module)
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -331,7 +315,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
-                isTooHot={isTooHot || tempTooHot}
+                isTooHot={isTooHot}
               />
             ) : null}
             {/* Calibration performs firmware updates, so only show calibration if both true. */}
@@ -463,7 +447,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               runId={runId}
               isLoadedInRun={isLoadedInRun}
               isPipetteReady={isPipetteReady}
-              isTooHot={isTooHot || tempTooHot}
+              isTooHot={isTooHot}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleInstructionsClick={handleInstructionsClick}

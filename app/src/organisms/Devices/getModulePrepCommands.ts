@@ -73,15 +73,17 @@ export function getModulePrepCommands(
         params: { moduleId: module.id },
       },
     ]
-  } else if (module.id != null && module.moduleType === TEMPERATURE_MODULE_TYPE)
-    [
-      (modulePrepCommands = [
-        {
-          commandType: 'temperatureModule/deactivate',
-          params: { moduleId: module.id },
-        },
-      ]),
+  } else if (
+    module.id != null &&
+    module.moduleType === TEMPERATURE_MODULE_TYPE
+  ) {
+    modulePrepCommands = [
+      {
+        commandType: 'temperatureModule/deactivate',
+        params: { moduleId: module.id },
+      },
     ]
+  }
 
   return modulePrepCommands
 }
