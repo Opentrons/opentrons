@@ -15,7 +15,7 @@
     ]
   },
   "schemaVersion": 2,
-  "version": 1,
+  "version": 2,
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning 24 Well Plate 3.4 mL Flat",

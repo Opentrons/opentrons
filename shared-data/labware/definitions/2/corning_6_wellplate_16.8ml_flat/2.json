@@ -11,7 +11,7 @@
     "tags": []
   },
   "schemaVersion": 2,
-  "version": 1,
+  "version": 2,
   "namespace": "opentrons",
   "dimensions": {
     "xDimension": 127.76,
