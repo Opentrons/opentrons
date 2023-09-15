@@ -21,7 +21,7 @@ import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
-import { LabwareOffset } from '@opentrons/api-client'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void
