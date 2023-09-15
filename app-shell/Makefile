@@ -48,7 +48,7 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
-	--config.electronVersion=21.3.1 \
+	--config.electronVersion=26.2.1 \
 	--publish never
 
 
