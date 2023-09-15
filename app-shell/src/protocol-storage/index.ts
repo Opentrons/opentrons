@@ -201,14 +201,22 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           })
         break
       }
-
+      // TODO(jh, 2023-09-15): remove the secondary removeProtocolByKey() after
+      // OT-2 parity work is completed.
       case ProtocolStorageActions.REMOVE_PROTOCOL: {
         FileSystem.removeProtocolByKey(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then(() =>
-          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
         )
+          .then(() =>
+            FileSystem.removeProtocolByKey(
+              action.payload.protocolKey,
+              FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH
+            )
+          )
+          .then(() =>
+            fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
+          )
         break
       }
 
