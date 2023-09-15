@@ -21,6 +21,7 @@ import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
+import { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void
@@ -36,6 +37,21 @@ export function SetupLabwarePositionCheck(
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const currentOffsets = runRecord?.data?.labwareOffsets ?? []
+  const sortedOffsets: LabwareOffset[] =
+    currentOffsets.length > 0
+      ? currentOffsets
+          .map(offset => ({
+            ...offset,
+            //  convert into date to sort
+            createdAt: new Date(offset.createdAt),
+          }))
+          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+          .map(offset => ({
+            ...offset,
+            //   convert back into string
+            createdAt: offset.createdAt.toISOString(),
+          }))
+      : []
   const lpcDisabledReason = useLPCDisabledReason({ robotName, runId })
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -54,9 +70,9 @@ export function SetupLabwarePositionCheck(
       marginTop={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >
-      {currentOffsets.length > 0 ? (
+      {sortedOffsets.length > 0 ? (
         <CurrentOffsetsTable
-          currentOffsets={currentOffsets}
+          currentOffsets={sortedOffsets}
           commands={protocolData?.commands ?? []}
           labware={protocolData?.labware ?? []}
           modules={protocolData?.modules ?? []}
