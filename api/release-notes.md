@@ -41,10 +41,14 @@ Python API features
 ### Bug Fixes
 
 - The API no longer raises an error when dropping tips into labware other than the fixed trash.
+- All API versions now properly track tips, including starting at a well other than A1.
 
 ### Known Issues
 
-- Tip tracking starting at a well other than A1 will not pick up tips from the intended locations.
+Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
+
+- JSON protocols created or modified with Protocol Designer v6.0.0 or higher.
+- Python protocols specifying an `apiLevel` of 2.14 or higher.
 
 ---
 
