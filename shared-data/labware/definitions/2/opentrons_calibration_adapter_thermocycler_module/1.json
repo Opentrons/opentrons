@@ -13,7 +13,14 @@
   "dimensions": {
     "xDimension": 116.25,
     "yDimension": 80.5,
-    "zDimension": 27.5
+    "zDimension": 26.4
+  },
+  "stackingOffsetWithModule": {
+    "thermocyclerModuleV2": {
+      "x": 0,
+      "y": 0,
+      "z": 11.0
+    }
   },
   "wells": {
     "A1": {
