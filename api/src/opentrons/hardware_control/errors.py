@@ -1,3 +1,4 @@
+from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 from .types import OT3Mount
 
 
@@ -61,10 +62,14 @@ class FirmwareUpdateFailed(RuntimeError):
     pass
 
 
-class OverPressureDetected(RuntimeError):
+class OverPressureDetected(PipetteOverpressureError):
     """An error raised when the pressure sensor max value is exceeded."""
 
-    pass
+    def __init__(self, mount: str) -> None:
+        return super().__init__(
+            message=f"The pressure sensor on the {mount} mount has exceeded operational limits.",
+            detail={"mount": mount},
+        )
 
 
 class InvalidPipetteName(KeyError):
