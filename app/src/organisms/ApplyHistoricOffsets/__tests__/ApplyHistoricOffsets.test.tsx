@@ -12,12 +12,14 @@ import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 jest.mock('../../../redux/config')
 jest.mock('../../LabwarePositionCheck/utils/labware')
 
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
-const mockGetLabwareDefinitionsFromCommands = getLabwareDefinitionsFromCommands as jest.MockedFunction<
-  typeof getLabwareDefinitionsFromCommands
->
+const mockGetIsLabwareOffsetCodeSnippetsOn =
+  getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
+    typeof getIsLabwareOffsetCodeSnippetsOn
+  >
+const mockGetLabwareDefinitionsFromCommands =
+  getLabwareDefinitionsFromCommands as jest.MockedFunction<
+    typeof getLabwareDefinitionsFromCommands
+  >
 
 const mockLabwareDef = fixture_96_wellplate as LabwareDefinition2
 const mockAdapterDef = fixture_adapter as LabwareDefinition2
@@ -133,7 +135,9 @@ describe('ApplyHistoricOffsets', () => {
     getByText('Opentrons 96 PCR Adapter in Heater-Shaker Module GEN1 in Slot 3')
     // third candidate on module table row
     getByText('Heater-Shaker Module GEN1 in Slot 3')
-    getByTestId('ModalHeader_icon_close_Apply Stored Labware Offset Data?').click()
+    getByTestId(
+      'ModalHeader_icon_close_Apply Stored Labware Offset Data?'
+    ).click()
     expect(queryByText('Apply Stored Labware Offset Data?')).toBeNull()
   })
 

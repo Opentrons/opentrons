@@ -42,25 +42,28 @@ jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
-  typeof useProtocolAnalysisErrors
->
+const mockUseMostRecentCompletedAnalysis =
+  useMostRecentCompletedAnalysis as jest.MockedFunction<
+    typeof useMostRecentCompletedAnalysis
+  >
+const mockUseProtocolAnalysisErrors =
+  useProtocolAnalysisErrors as jest.MockedFunction<
+    typeof useProtocolAnalysisErrors
+  >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
-  typeof useRunCalibrationStatus
->
+const mockUseRunCalibrationStatus =
+  useRunCalibrationStatus as jest.MockedFunction<typeof useRunCalibrationStatus>
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
-const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
-  typeof useStoredProtocolAnalysis
->
-const mockParseAllRequiredModuleModels = parseAllRequiredModuleModels as jest.MockedFunction<
-  typeof parseAllRequiredModuleModels
->
+const mockUseStoredProtocolAnalysis =
+  useStoredProtocolAnalysis as jest.MockedFunction<
+    typeof useStoredProtocolAnalysis
+  >
+const mockParseAllRequiredModuleModels =
+  parseAllRequiredModuleModels as jest.MockedFunction<
+    typeof parseAllRequiredModuleModels
+  >
 const mockSetupLabware = SetupLabware as jest.MockedFunction<
   typeof SetupLabware
 >
@@ -110,10 +113,10 @@ describe('ProtocolRunSetup', () => {
     })
     when(mockUseStoredProtocolAnalysis)
       .calledWith(RUN_ID)
-      .mockReturnValue(({
+      .mockReturnValue({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
-      } as unknown) as ProtocolAnalysisOutput)
+      } as unknown as ProtocolAnalysisOutput)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
@@ -197,7 +200,9 @@ describe('ProtocolRunSetup', () => {
       when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
       const { getByText } = render()
 
-      getByText('Review required instruments and calibrations for this protocol.')
+      getByText(
+        'Review required instruments and calibrations for this protocol.'
+      )
       const robotCalibrationSetup = getByText('Instruments')
       robotCalibrationSetup.click()
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
@@ -325,9 +330,7 @@ describe('ProtocolRunSetup', () => {
       getByText('STEP 2')
       getByText('Modules')
 
-      getByText(
-        "Install the required modules and power them on."
-      )
+      getByText('Install the required modules and power them on.')
       getByText('STEP 3')
       getByText('Labware')
       getByText(
