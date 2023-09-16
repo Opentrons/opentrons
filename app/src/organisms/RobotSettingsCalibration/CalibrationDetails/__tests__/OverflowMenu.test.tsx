@@ -135,7 +135,7 @@ describe('OverflowMenu', () => {
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    getByText('Download calibration data')
+    getByText('Download calibration logs')
     getByText('Delete calibration data')
   })
 
@@ -145,7 +145,7 @@ describe('OverflowMenu', () => {
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
   })
@@ -157,7 +157,7 @@ describe('OverflowMenu', () => {
     )
     fireEvent.click(button)
     fireEvent.click(button)
-    expect(queryByText('Download calibration data')).not.toBeInTheDocument()
+    expect(queryByText('Download calibration logs')).not.toBeInTheDocument()
   })
 
   it('should render Overflow menu buttons - tip length calibrations', () => {
@@ -168,7 +168,7 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
     fireEvent.click(button)
-    getByText('Download calibration data')
+    getByText('Download calibration logs')
     getByText('Delete calibration data')
   })
 
@@ -179,7 +179,7 @@ describe('OverflowMenu', () => {
     })
     const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
     fireEvent.click(button)
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
   })
@@ -201,7 +201,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     const cal = getByText('Recalibrate pipette')
     expect(
-      screen.queryByText('Download calibration data')
+      screen.queryByText('Download calibration logs')
     ).not.toBeInTheDocument()
     fireEvent.click(cal)
     getByText('mock pipette wizard flows')

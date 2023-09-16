@@ -70,7 +70,7 @@ describe('Labware', () => {
 
   it('should render column headers that indicate where the labware is, what is called, and how many are required', () => {
     const { getByRole } = render(props)[0]
-    getByRole('columnheader', { name: 'Labware name' })
+    getByRole('columnheader', { name: 'Labware Name' })
     getByRole('columnheader', { name: 'Quantity' })
   })
   it('should render the correct location, name, and connected status in each table row', () => {
