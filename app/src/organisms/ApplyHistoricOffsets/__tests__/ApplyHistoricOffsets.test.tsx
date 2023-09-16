@@ -12,14 +12,12 @@ import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 jest.mock('../../../redux/config')
 jest.mock('../../LabwarePositionCheck/utils/labware')
 
-const mockGetIsLabwareOffsetCodeSnippetsOn =
-  getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-    typeof getIsLabwareOffsetCodeSnippetsOn
-  >
-const mockGetLabwareDefinitionsFromCommands =
-  getLabwareDefinitionsFromCommands as jest.MockedFunction<
-    typeof getLabwareDefinitionsFromCommands
-  >
+const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
+  typeof getIsLabwareOffsetCodeSnippetsOn
+>
+const mockGetLabwareDefinitionsFromCommands = getLabwareDefinitionsFromCommands as jest.MockedFunction<
+  typeof getLabwareDefinitionsFromCommands
+>
 
 const mockLabwareDef = fixture_96_wellplate as LabwareDefinition2
 const mockAdapterDef = fixture_adapter as LabwareDefinition2

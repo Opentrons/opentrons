@@ -42,28 +42,25 @@ jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
-const mockUseMostRecentCompletedAnalysis =
-  useMostRecentCompletedAnalysis as jest.MockedFunction<
-    typeof useMostRecentCompletedAnalysis
-  >
-const mockUseProtocolAnalysisErrors =
-  useProtocolAnalysisErrors as jest.MockedFunction<
-    typeof useProtocolAnalysisErrors
-  >
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
+>
+const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
+  typeof useProtocolAnalysisErrors
+>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseRunCalibrationStatus =
-  useRunCalibrationStatus as jest.MockedFunction<typeof useRunCalibrationStatus>
+const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
+  typeof useRunCalibrationStatus
+>
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
-const mockUseStoredProtocolAnalysis =
-  useStoredProtocolAnalysis as jest.MockedFunction<
-    typeof useStoredProtocolAnalysis
-  >
-const mockParseAllRequiredModuleModels =
-  parseAllRequiredModuleModels as jest.MockedFunction<
-    typeof parseAllRequiredModuleModels
-  >
+const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
+  typeof useStoredProtocolAnalysis
+>
+const mockParseAllRequiredModuleModels = parseAllRequiredModuleModels as jest.MockedFunction<
+  typeof parseAllRequiredModuleModels
+>
 const mockSetupLabware = SetupLabware as jest.MockedFunction<
   typeof SetupLabware
 >
@@ -113,10 +110,10 @@ describe('ProtocolRunSetup', () => {
     })
     when(mockUseStoredProtocolAnalysis)
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .mockReturnValue(({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
-      } as unknown as ProtocolAnalysisOutput)
+      } as unknown) as ProtocolAnalysisOutput)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
