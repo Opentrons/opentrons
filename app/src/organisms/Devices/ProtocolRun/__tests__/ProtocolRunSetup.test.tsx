@@ -280,7 +280,7 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
 
       getByText('STEP 1')
-      getByText('Robot Calibration')
+      getByText('Instruments')
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
@@ -318,7 +318,7 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
 
       getByText('STEP 1')
-      getByText('Robot Calibration')
+      getByText('Instruments')
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )

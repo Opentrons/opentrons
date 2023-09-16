@@ -26,7 +26,7 @@ export const Success = (
     SuccessStep
 ): JSX.Element => {
   const { proceed, successfulAction, isRobotMoving } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation(['gripper_wizard_flows', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
 
   const infoByAction: {
@@ -49,7 +49,7 @@ export const Success = (
     },
     [SUCCESSFULLY_DETACHED]: {
       header: t('gripper_successfully_detached'),
-      buttonText: {i18n.format(t('shared:exit'), 'capitalize')},
+      buttonText: i18n.format(t('shared:exit'), 'capitalize'),
     },
   }
   const { header, buttonText } = infoByAction[successfulAction]
