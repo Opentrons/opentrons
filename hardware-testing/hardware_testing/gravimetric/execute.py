@@ -319,7 +319,7 @@ def _run_trial(
             trial.liquid_tracker,
             callbacks=pipetting_callbacks,
             blank=trial.blank,
-            mode="",
+            mode=trial.mode,
         )
     else:
         # center channel over well
@@ -351,7 +351,7 @@ def _run_trial(
         trial.liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=trial.blank,
-        mode="",
+        mode=trial.mode,
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
 
@@ -372,7 +372,7 @@ def _run_trial(
         trial.liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=trial.blank,
-        mode="",
+        mode=trial.mode,
     )
     trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     _take_photos(trial, "dispense")
