@@ -33,7 +33,10 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  WASTE_CHUTE_SLOT,
+} from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
@@ -47,8 +50,8 @@ import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
 import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import {
+  createDeckFixture,
   toggleIsGripperRequired,
-  toggleIsWasteChuteRequired,
 } from '../../../step-forms/actions/additionalItems'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
@@ -228,7 +231,7 @@ export function CreateFileWizard(): JSX.Element | null {
         enableDeckModification &&
         values.additionalEquipment.includes('wasteChute')
       ) {
-        dispatch(toggleIsWasteChuteRequired())
+        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
       }
     }
   }

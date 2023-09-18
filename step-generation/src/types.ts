@@ -118,6 +118,11 @@ export interface NormalizedAdditionalEquipmentById {
   }
 }
 
+export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export interface AdditionalEquipmentEntities {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
+}
+
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
@@ -440,6 +445,7 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
+  additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }
 

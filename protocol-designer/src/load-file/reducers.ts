@@ -66,7 +66,9 @@ const unsavedChanges = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'EDIT_MODULE':
-    case 'IS_GRIPPER_REQUIRED':
+    case 'TOGGLE_IS_GRIPPER_REQUIRED':
+    case 'DELETE_DECK_FIXTURE':
+    case 'CREATE_DECK_FIXTURE':
       return true
 
     default:

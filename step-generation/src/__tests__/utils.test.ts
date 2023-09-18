@@ -321,6 +321,7 @@ describe('makeInitialRobotState', () => {
             def: fixtureTrash,
           },
         },
+        additionalEquipmentEntities: {},
       },
       labwareLocations: {
         somePlateId: { slot: '1' },

@@ -38,6 +38,8 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getAdditionalEquipmentRootState,
+  _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import {
@@ -116,8 +118,9 @@ import {
   SaveStepFormsMultiAction,
 } from '../actions'
 import {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
   ToggleIsGripperRequiredAction,
-  ToggleIsWasteChuteRequiredAction,
 } from '../actions/additionalItems'
 type FormState = FormData | null
 const unsavedFormInitialState = null
@@ -143,7 +146,8 @@ export type UnsavedFormActions =
   | EditProfileStepAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
-  | ToggleIsWasteChuteRequiredAction
+  | CreateDeckFixtureAction
+  | DeleteDeckFixtureAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -204,7 +208,8 @@ export const unsavedForm = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
-    case 'TOGGLE_IS_WASTE_CHUTE_REQUIRED':
+    case 'CREATE_DECK_FIXTURE':
+    case 'DELETE_DECK_FIXTURE':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -492,6 +497,8 @@ export type SavedStepFormsActions =
   | ReplaceCustomLabwareDef
   | EditModuleAction
   | ToggleIsGripperRequiredAction
+  | CreateDeckFixtureAction
+  | DeleteDeckFixtureAction
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
@@ -595,7 +602,6 @@ export const savedStepForms = (
         ...stepForm,
       }))
     }
-
     case 'DUPLICATE_LABWARE':
     case 'CREATE_CONTAINER': {
       // auto-update initial deck setup state.
@@ -926,6 +932,46 @@ export const savedStepForms = (
       // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
+    // case 'CREATE_DECK_FIXTURE': {
+    //   const { location, id: wasteChuteId } = action.payload
+    //   const prevInitialDeckSetupStep =
+    //     savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+    //   const updatedEquipmentOnDeckLocation = {
+    //     ...prevInitialDeckSetupStep.additionalEquipmentOnDeckLocationUpdate,
+    //     [wasteChuteId]: location,
+    //   }
+
+    //   return {
+    //     ...savedStepForms,
+    //     [INITIAL_DECK_SETUP_STEP_ID]: {
+    //       ...prevInitialDeckSetupStep,
+    //       additionalEquipmentOnDeckLocationUpdate: updatedEquipmentOnDeckLocation,
+    //     },
+    //   }
+    // }
+
+    // case 'DELETE_DECK_FIXTURE': {
+    //   const { id: wasteChuteId } = action.payload
+    //   const prevInitialDeckSetupStep =
+    //     savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
+    //   const updatedEquipmentOnDeckLocation = {
+    //     ...prevInitialDeckSetupStep.additionalEquipmentOnDeckLocationUpdate,
+    //     [wasteChuteId]: location,
+    //   }
+    //   const updatedEquipmentOnDeckLocationWithoutChute = omit(
+    //     updatedEquipmentOnDeckLocation,
+    //     [wasteChuteId]
+    //   )
+
+    //   return {
+    //     ...savedStepForms,
+    //     [INITIAL_DECK_SETUP_STEP_ID]: {
+    //       ...prevInitialDeckSetupStep,
+    //       additionalEquipmentOnDeckLocationUpdate: updatedEquipmentOnDeckLocationWithoutChute,
+    //     },
+    //   }
+    // }
 
     case 'CHANGE_SAVED_STEP_FORM': {
       const { stepId } = action.payload
@@ -1322,9 +1368,10 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           command.commandType === 'moveLabware' &&
           command.params.strategy === 'usingGripper'
       )
+      //  TODO(jr, 9/18/23): add wasteChute when loadFixture commands exist
       const hasGripper = gripper.length > 0
       const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
-      const additionalEquipmentId = uuid()
+      const additionalEquipmentId = `${uuid()}:gripper`
       const updatedEquipment = {
         [additionalEquipmentId]: {
           name: 'gripper' as const,
@@ -1341,7 +1388,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       state: NormalizedAdditionalEquipmentById
     ): NormalizedAdditionalEquipmentById => {
       let updatedEquipment = { ...state }
-      const gripperId = uuid()
+      const gripperId = `${uuid()}:gripper`
       const gripperKey = Object.keys(updatedEquipment).find(
         key => updatedEquipment[key].name === 'gripper'
       )
@@ -1359,32 +1406,26 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       }
       return updatedEquipment
     },
-    //  @ts-expect-error (jr, 9/14/23): for some reason TS is confused by the
-    //  ToggleIsWasteChuteRequiredAction type
-    TOGGLE_IS_WASTE_CHUTE_REQUIRED: (
+    //  @ts-expect-error
+    CREATE_DECK_FIXTURE: (
       state: NormalizedAdditionalEquipmentById,
-      action: ToggleIsWasteChuteRequiredAction
+      action: CreateDeckFixtureAction
     ): NormalizedAdditionalEquipmentById => {
-      const { location } = action.payload
-      let updatedEquipment = { ...state }
-      const wasteChuteId = uuid()
-      const wasteChuteKey = Object.keys(updatedEquipment).find(
-        key => updatedEquipment[key].name === 'wasteChute'
-      )
-      if (wasteChuteKey != null) {
-        updatedEquipment = omit(updatedEquipment, [wasteChuteKey])
-      } else {
-        updatedEquipment = {
-          ...updatedEquipment,
-          [wasteChuteId]: {
-            name: 'wasteChute' as const,
-            id: wasteChuteId,
-            location,
-          },
-        }
+      const { location, id, name } = action.payload
+      return {
+        ...state,
+        [id]: {
+          name,
+          id,
+          location,
+        },
       }
-      return updatedEquipment
     },
+    //  @ts-expect-error
+    DELETE_DECK_FIXTURE: (
+      state: NormalizedAdditionalEquipmentById,
+      action: DeleteDeckFixtureAction
+    ): NormalizedAdditionalEquipmentById => omit(state, action.payload.id),
     DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
   },
   initialAdditionalEquipmentState

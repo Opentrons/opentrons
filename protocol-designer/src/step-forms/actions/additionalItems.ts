@@ -1,4 +1,5 @@
 import { WASTE_CHUTE_SLOT } from '../../constants'
+import { uuid } from '../../utils'
 
 export interface ToggleIsGripperRequiredAction {
   type: 'TOGGLE_IS_GRIPPER_REQUIRED'
@@ -7,17 +8,37 @@ export interface ToggleIsGripperRequiredAction {
 export const toggleIsGripperRequired = (): ToggleIsGripperRequiredAction => ({
   type: 'TOGGLE_IS_GRIPPER_REQUIRED',
 })
-
-export interface ToggleIsWasteChuteRequiredAction {
-  type: 'TOGGLE_IS_WASTE_CHUTE_REQUIRED'
+export interface CreateDeckFixtureAction {
+  type: 'CREATE_DECK_FIXTURE'
   payload: {
+    name: 'wasteChute'
+    id: string
     location: string
   }
 }
 
-export const toggleIsWasteChuteRequired = (): ToggleIsWasteChuteRequiredAction => ({
-  type: 'TOGGLE_IS_WASTE_CHUTE_REQUIRED',
+export const createDeckFixture = (
+  name: 'wasteChute',
+  location: string
+): CreateDeckFixtureAction => ({
+  type: 'CREATE_DECK_FIXTURE',
   payload: {
-    location: WASTE_CHUTE_SLOT,
+    name,
+    id: `${uuid()}:${name}`,
+    location,
+  },
+})
+
+export interface DeleteDeckFixtureAction {
+  type: 'DELETE_DECK_FIXTURE'
+  payload: {
+    id: string
+  }
+}
+
+export const deleteDeckFixture = (id: string): DeleteDeckFixtureAction => ({
+  type: 'DELETE_DECK_FIXTURE',
+  payload: {
+    id,
   },
 })

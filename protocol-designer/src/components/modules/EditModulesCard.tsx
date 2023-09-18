@@ -15,18 +15,20 @@ import {
   getIsCrashablePipetteSelected,
   ModulesForEditModulesCard,
 } from '../../step-forms'
+import { WASTE_CHUTE_SLOT } from '../../constants'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { getEnableDeckModification } from '../../feature-flags/selectors'
 import { getAdditionalEquipment } from '../../step-forms/selectors'
 import {
+  createDeckFixture,
+  deleteDeckFixture,
   toggleIsGripperRequired,
-  toggleIsWasteChuteRequired,
 } from '../../step-forms/actions/additionalItems'
 import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
-import { GripperOrWasteChuteRow } from './GripperOrWasteChuteRow'
+import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
@@ -45,7 +47,7 @@ export function EditModulesCard(props: Props): JSX.Element {
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
-  const isWasteChuteAttached = Object.values(additionalEquipment).some(
+  const wasteChute = Object.values(additionalEquipment).find(
     equipment => equipment?.name === 'wasteChute'
   )
 
@@ -131,16 +133,22 @@ export function EditModulesCard(props: Props): JSX.Element {
           }
         })}
         {isFlex ? (
-          <GripperOrWasteChuteRow
+          <AdditionalItemsRow
             handleAttachment={() => dispatch(toggleIsGripperRequired())}
             isEquipmentAdded={isGripperAttached}
             name="gripper"
           />
         ) : null}
         {enableDeckModification && isFlex ? (
-          <GripperOrWasteChuteRow
-            handleAttachment={() => dispatch(toggleIsWasteChuteRequired())}
-            isEquipmentAdded={isWasteChuteAttached}
+          <AdditionalItemsRow
+            handleAttachment={() =>
+              dispatch(
+                wasteChute != null
+                  ? deleteDeckFixture(wasteChute.id)
+                  : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
+              )
+            }
+            isEquipmentAdded={wasteChute != null}
             name="wasteChute"
           />
         ) : null}

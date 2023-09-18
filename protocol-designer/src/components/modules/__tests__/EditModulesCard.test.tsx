@@ -24,7 +24,7 @@ import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
-import { GripperOrWasteChuteRow } from '../GripperOrWasteChuteRow'
+import { AdditionalItemsRow } from '../AdditionalItemsRow'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
@@ -249,10 +249,10 @@ describe('EditModulesCard', () => {
   it('displays gripper row with no gripper', () => {
     mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     const wrapper = render(props)
-    expect(wrapper.find(GripperOrWasteChuteRow)).toHaveLength(1)
-    expect(
-      wrapper.find(GripperOrWasteChuteRow).props().isEquipmentAdded
-    ).toEqual(false)
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(1)
+    expect(wrapper.find(AdditionalItemsRow).props().isEquipmentAdded).toEqual(
+      false
+    )
   })
   it('displays gripper row with gripper attached', () => {
     const mockGripperId = 'gripeprId'
@@ -261,10 +261,10 @@ describe('EditModulesCard', () => {
       [mockGripperId]: { name: 'gripper', id: mockGripperId },
     })
     const wrapper = render(props)
-    expect(wrapper.find(GripperOrWasteChuteRow)).toHaveLength(1)
-    expect(
-      wrapper.find(GripperOrWasteChuteRow).props().isEquipmentAdded
-    ).toEqual(true)
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(1)
+    expect(wrapper.find(AdditionalItemsRow).props().isEquipmentAdded).toEqual(
+      true
+    )
   })
   it('displays gripper and waste chute row with both attached', () => {
     const mockGripperId = 'gripeprId'
@@ -281,6 +281,6 @@ describe('EditModulesCard', () => {
     })
 
     const wrapper = render(props)
-    expect(wrapper.find(GripperOrWasteChuteRow)).toHaveLength(2)
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(2)
   })
 })

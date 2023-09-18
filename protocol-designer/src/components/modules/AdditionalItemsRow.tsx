@@ -12,28 +12,36 @@ import {
   SPACING,
   SlotMap,
 } from '@opentrons/components'
+import { WASTE_CHUTE_SLOT } from '../../constants'
 import gripperImage from '../../images/flex_gripper.svg'
 import styles from './styles.css'
 
-interface GripperOrWasteChuteRowProps {
+interface AdditionalItemsRowProps {
   handleAttachment: () => void
   isEquipmentAdded: boolean
   name: 'gripper' | 'wasteChute'
 }
 
-export function GripperOrWasteChuteRow(
-  props: GripperOrWasteChuteRowProps
+export function AdditionalItemsRow(
+  props: AdditionalItemsRowProps
 ): JSX.Element {
   const { handleAttachment, isEquipmentAdded, name } = props
   const { i18n, t } = useTranslation()
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginBottom="0.5rem"
+      height="6rem"
+    >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>
-          {name === 'gripper' ? 'Flex Gripper' : 'Waste Chute'}
+          {name === 'gripper'
+            ? i18n.t('modules.additional_equipment_display_names.gripper')
+            : i18n.t('modules.additional_equipment_display_names.wasteChute')}
         </h4>
         <AdditionalItemImage
+          //  TODO(jr, 9/13/23): update this image to the waste chute asset
           src={gripperImage}
           alt={name === 'gripper' ? 'Flex Gripper' : 'Waste Chute'}
         />
@@ -49,15 +57,22 @@ export function GripperOrWasteChuteRow(
           />
         ) : null}
       </div>
-      <div className={styles.slot_map}>
-        {name === 'wasteChute' && isEquipmentAdded ? (
-          <SlotMap
-            occupiedSlots={['D3']}
-            collisionSlots={[]}
-            robotType={FLEX_ROBOT_TYPE}
-          />
-        ) : null}
-      </div>
+
+      {name === 'wasteChute' && isEquipmentAdded ? (
+        <>
+          <div className={styles.module_col}>
+            <LabeledValue label="Position" value={`Slot ${WASTE_CHUTE_SLOT}`} />
+          </div>
+          <div className={styles.slot_map}>
+            <SlotMap
+              occupiedSlots={['D3']}
+              collisionSlots={[]}
+              robotType={FLEX_ROBOT_TYPE}
+            />
+          </div>
+        </>
+      ) : null}
+
       <div
         className={styles.modules_button_group}
         style={{ alignSelf: ALIGN_CENTER }}

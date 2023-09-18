@@ -40,6 +40,7 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../'
+import { AdditionalEquipmentEntities } from '../types'
 
 const fixtureP10Single = _fixtureP10Single
 const fixtureP10Multi = _fixtureP10Multi
@@ -120,6 +121,7 @@ export function makeContext(): InvariantContext {
     },
   }
   const moduleEntities: ModuleEntities = {}
+  const additionalEquipmentEntities: AdditionalEquipmentEntities = {}
   const pipetteEntities: PipetteEntities = {
     p10SingleId: {
       name: 'p10_single',
@@ -158,6 +160,7 @@ export function makeContext(): InvariantContext {
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     config: DEFAULT_CONFIG,
   }
 }
