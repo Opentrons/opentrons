@@ -38,6 +38,7 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
 class AmbiguousLoadLabwareParamsError(RuntimeError):
     """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""
 
+
 def resolve(
     load_name: str,
     namespace: Optional[str],
