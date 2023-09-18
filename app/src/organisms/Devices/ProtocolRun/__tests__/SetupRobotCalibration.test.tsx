@@ -113,7 +113,7 @@ describe('SetupRobotCalibration', () => {
   it('changes Proceed CTA copy based on next step', () => {
     const { getByRole } = render({ nextStep: 'labware_setup_step' })[0]
 
-    getByRole('button', { name: 'Proceed to labware setup' })
+    getByRole('button', { name: 'Proceed to labware' })
   })
 
   it('calls the expandStep function and tracks the analytics event on click', () => {

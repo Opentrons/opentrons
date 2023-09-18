@@ -289,9 +289,7 @@ describe('ProtocolRunSetup', () => {
       getByText('STEP 2')
       getByText('Modules')
 
-      getByText(
-        "Plug in and turn on the required modules via the robot's USB Ports. Place the modules as shown in the deck map."
-      )
+      getByText('Install the required modules and power them on.')
       getByText('STEP 3')
       getByText('Labware')
 
