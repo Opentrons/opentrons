@@ -242,11 +242,11 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
       },
     })
   )
-  const tempId = unsavedSetTemperatureForm?.moduleId
+  const tempertureModuleId = unsavedSetTemperatureForm?.moduleId
   dispatch(
     changeFormInput({
       update: {
-        moduleId: tempId,
+        moduleId: tempertureModuleId,
       },
     })
   )
