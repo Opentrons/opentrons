@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from opentrons.hardware_control.types import (
     EstopPhysicalStatus as HwEstopPhysicalStatus,
     EstopState as HwEstopState,
+    DoorState as HwDoorState,
 )
 
 
@@ -66,3 +67,21 @@ class EstopStatusModel(BaseModel):
     rightEstopPhysicalStatus: EstopPhysicalStatus = Field(
         ..., description="Physical status of the right estop mount."
     )
+
+
+class DoorState(enum.Enum):
+    OPEN = "open"
+    CLOSED = "closed"
+
+    @classmethod
+    def from_hw_physical_status(cls, hw_state: HwDoorState) -> "DoorState":
+        if hw_state == HwDoorState.OPEN:
+            return cls.OPEN
+        else:
+            return cls.CLOSED
+
+
+class DoorStatusModel(BaseModel):
+    """Model for the current door status."""
+
+    status: DoorState = Field(..., description="Whether the door is open or closed.")

@@ -9,11 +9,10 @@ from robot_server.service.json_api import (
     SimpleBody,
 )
 
-from .models import (
-    EstopStatusModel,
-)
+from .models import EstopStatusModel, DoorStatusModel, DoorState
 from .estop_handler import EstopHandler
-from robot_server.hardware import get_estop_handler
+from robot_server.hardware import get_estop_handler, get_hardware
+from opentrons.hardware_control import HardwareControlAPI
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
@@ -65,3 +64,21 @@ async def put_acknowledge_estop_disengage(
     """Transition from the `logically_engaged` status if applicable."""
     estop_handler.acknowledge_and_clear()
     return await _get_estop_status_response(estop_handler)
+
+
+@control_router.get(
+    "/robot/door/status",
+    summary="Get the status of the robot door.",
+    description="Get whether the robot door is open or closed.",
+    responses={status.HTTP_200_OK: {"model": SimpleBody[DoorStatusModel]}},
+)
+async def get_door_status(
+    hardware: HardwareControlAPI = Depends(get_hardware),
+) -> PydanticResponse[SimpleBody[DoorStatusModel]]:
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(
+            data=DoorStatusModel.construct(
+                status=DoorState.from_hw_physical_status(hardware.door_state)
+            )
+        )
+    )
