@@ -78,6 +78,7 @@ export function ModuleRow(props: Props): JSX.Element {
     occupiedSlotsForMap = ['7', '8', '10', '11']
     //  TC on Flex
   } else if (isFlex && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
+    slotDisplayName = 'Slot A1+B1'
     occupiedSlotsForMap = ['A1', 'B1']
   }
   // If collisionSlots are populated, check which slot is occupied
