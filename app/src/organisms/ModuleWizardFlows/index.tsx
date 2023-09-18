@@ -61,7 +61,9 @@ export const ModuleWizardFlows = (
   const { t } = useTranslation('module_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const moduleCalibrationSteps = getModuleCalibrationSteps(
+    attachedModule.moduleType
+  )
 
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
