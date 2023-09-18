@@ -1,6 +1,6 @@
 """Config."""
 from dataclasses import dataclass
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from typing_extensions import Final
 from enum import Enum
 from opentrons.config.types import LiquidProbeSettings
