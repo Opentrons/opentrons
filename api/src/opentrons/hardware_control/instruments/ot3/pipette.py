@@ -313,8 +313,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         instr = Point(*self._pipette_offset.offset)
         cp_with_tip_length = self._nozzle_manager.critical_point_with_tip_length(
+<<<<<<< HEAD
             cp_override,
             self.current_tip_length if cp_override != CriticalPoint.NOZZLE else 0.0,
+=======
+            cp_override, self.current_tip_length
+>>>>>>> allow nozzle configuration changes through the hw controller
         )
         cp = cp_with_tip_length + instr
 
@@ -449,17 +453,25 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
 
     def update_nozzle_configuration(
+<<<<<<< HEAD
         self,
         back_left_nozzle: str,
         front_right_nozzle: str,
         starting_nozzle: Optional[str] = None,
+=======
+        self, starting_nozzle: str, number_of_nozzles: int
+>>>>>>> allow nozzle configuration changes through the hw controller
     ) -> None:
         """
         Update nozzle configuration manager.
         """
+<<<<<<< HEAD
         self._nozzle_manager.update_nozzle_configuration(
             back_left_nozzle, front_right_nozzle, starting_nozzle
         )
+=======
+        self._nozzle_manager.update_nozzle_with_tips(starting_nozzle, number_of_nozzles)
+>>>>>>> allow nozzle configuration changes through the hw controller
 
     def add_tip(self, tip_length: float) -> None:
         """
