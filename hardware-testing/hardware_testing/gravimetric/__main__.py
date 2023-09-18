@@ -380,8 +380,8 @@ def build_photometric_cfg(
     same_tip: bool,
     ignore_fail: bool,
     pipette_channels: int,
-    photoplate_column_offset: int,
-    dye_well_column_offset: int,
+    photoplate_column_offset: List[int],
+    dye_well_column_offset: List[int],
     mode: str,
     run_args: RunArgs,
 ) -> PhotometricConfig:
@@ -518,8 +518,8 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
-    parser.add_argument("--photoplate-col-offset", type=int, default=1)
-    parser.add_argument("--dye-well-col-offset", type=int, default=1)
+    parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
+    parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
     )
