@@ -5,11 +5,9 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
-import { InputField } from '../InputField'
-import { NormalKeyboard } from './'
-import '../../styles.global.css'
-
+import { touchScreenViewport } from '../../../DesignTokens/constants'
+import { InputField } from '../../InputField'
+import { NormalKeyboard } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
