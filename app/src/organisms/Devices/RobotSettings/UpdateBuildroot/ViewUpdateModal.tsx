@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 
 import {
   OT2_BALENA,
-  UPGRADE,
   getRobotUpdateInfo,
   getRobotUpdateDownloadProgress,
   getRobotUpdateDownloadError,
@@ -54,7 +53,6 @@ export function ViewUpdateModal(
     children: downloadError !== null ? 'close' : 'not now',
   }
 
-  const showReleaseNotes = robotUpdateType === UPGRADE
   let releaseNotes = ''
   if (updateInfo?.releaseNotes) releaseNotes = updateInfo.releaseNotes
 
@@ -85,12 +83,13 @@ export function ViewUpdateModal(
       />
     )
 
-  if (showReleaseNotes)
+  if (robotSystemType != null)
     return (
       <UpdateRobotModal
         robotName={robotName}
         releaseNotes={releaseNotes}
         systemType={robotSystemType}
+        updateType={robotUpdateType}
         closeModal={closeModal}
       />
     )

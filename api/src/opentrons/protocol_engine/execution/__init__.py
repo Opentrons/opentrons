@@ -7,6 +7,7 @@ from .equipment import (
     LoadedLabwareData,
     LoadedPipetteData,
     LoadedModuleData,
+    LoadedConfigureForVolumeData,
 )
 from .movement import MovementHandler
 from .gantry_mover import GantryMover
@@ -30,6 +31,7 @@ __all__ = [
     "LoadedLabwareData",
     "LoadedPipetteData",
     "LoadedModuleData",
+    "LoadedConfigureForVolumeData",
     "MovementHandler",
     "GantryMover",
     "PipettingHandler",

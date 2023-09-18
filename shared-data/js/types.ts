@@ -499,6 +499,7 @@ export interface GripperDefinition {
     polynomial: [[number, number], [number, number]]
     defaultGripForce: number
     defaultHomeForce: number
+    defaultIdleForce: number
     min: number
     max: number
   }

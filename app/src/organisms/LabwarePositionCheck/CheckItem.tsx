@@ -19,6 +19,7 @@ import {
   MoveLabwareCreateCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { useSelector } from 'react-redux'
 import {
   getLabwareDef,
   getLabwareDefinitionsFromCommands,
@@ -26,7 +27,7 @@ import {
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { useChainRunCommands } from '../../resources/runs/hooks'
-import { useFeatureFlag } from '../../redux/config'
+import { useFeatureFlag, getIsOnDevice } from '../../redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -71,6 +72,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   } = props
   const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
@@ -427,6 +429,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               {isTiprack
                 ? t('ensure_nozzle_is_above_tip')
                 : t('ensure_tip_is_above_well')}
+              &nbsp;
+              {isOnDevice
+                ? t('if_not_aligned_tap_to_jog')
+                : t('if_not_aligned_click_to_jog')}
             </StyledText>
           }
           labwareDef={labwareDef}

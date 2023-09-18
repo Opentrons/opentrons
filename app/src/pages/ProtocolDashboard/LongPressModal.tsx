@@ -20,12 +20,14 @@ interface LongPressModalProps {
   longpress: UseLongPressResult
   protocolId: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
 }
 
 export function LongPressModal({
   longpress,
   protocolId,
   setShowDeleteConfirmationModal,
+  setTargetProtocolId,
 }: LongPressModalProps): JSX.Element {
   const history = useHistory()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
@@ -59,6 +61,7 @@ export function LongPressModal({
   }
 
   const handleDeleteClick = (): void => {
+    setTargetProtocolId(protocolId)
     setShowDeleteConfirmationModal(true)
     longpress.setIsLongPressed(false)
   }

@@ -67,7 +67,7 @@ export function getLabwareDisplayLocation(
     } else if ('slotName' in adapter.location) {
       return t('adapter_in_slot', {
         adapter: adapterDisplayName,
-        slot_name: adapter.location.slotName,
+        slot: adapter.location.slotName,
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId
@@ -82,14 +82,14 @@ export function getLabwareDisplayLocation(
         robotSideAnalysis,
         adapter.location.moduleId
       )
-      return t('adapter_in_module_in_slot', {
+      return t('adapter_in_mod_in_slot', {
         count: getOccludedSlotCountForModule(
           getModuleType(moduleModel),
           robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
         ),
         module: getModuleDisplayName(moduleModel),
         adapter: adapterDisplayName,
-        slot_name: slotName,
+        slot: slotName,
       })
     } else {
       console.warn(

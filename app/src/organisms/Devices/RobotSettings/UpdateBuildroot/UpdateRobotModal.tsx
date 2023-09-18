@@ -20,6 +20,9 @@ import {
   robotUpdateChangelogSeen,
   startRobotUpdate,
   OT2_BALENA,
+  UPGRADE,
+  REINSTALL,
+  DOWNGRADE,
 } from '../../../../redux/robot-update'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
@@ -45,11 +48,13 @@ export const FOOTER_BUTTON_STYLE = css`
     text-transform: uppercase;
   }
 `
+type UpdateType = typeof UPGRADE | typeof DOWNGRADE | typeof REINSTALL | null
 
 export interface UpdateRobotModalProps {
   robotName: string
   releaseNotes: string
-  systemType: RobotSystemType | null
+  systemType: RobotSystemType
+  updateType: UpdateType
   closeModal: () => void
 }
 
@@ -57,6 +62,7 @@ export function UpdateRobotModal({
   robotName,
   releaseNotes,
   systemType,
+  updateType,
   closeModal,
 }: UpdateRobotModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
@@ -78,10 +84,17 @@ export function UpdateRobotModal({
     dispatch(robotUpdateChangelogSeen(robotName))
   }, [robotName])
 
-  const heading =
-    systemType === OT2_BALENA
-      ? 'Robot Operating System Update'
-      : `${robotName} ${t('update_available')}`
+  let heading = ''
+  if (updateType === UPGRADE || updateType === DOWNGRADE) {
+    if (systemType === OT2_BALENA) {
+      heading = t('robot_operating_update_available')
+    } else {
+      heading = `${robotName} ${t('update_available')}`
+    }
+  } else if (updateType === REINSTALL) {
+    heading = t('robot_up_to_date')
+    releaseNotes = t('robot_up_to_date_description')
+  }
 
   const robotUpdateFooter = (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
@@ -90,7 +103,7 @@ export function UpdateRobotModal({
         marginRight={SPACING.spacing8}
         css={FOOTER_BUTTON_STYLE}
       >
-        {t('remind_me_later')}
+        {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
       </NewSecondaryBtn>
       <NewPrimaryBtn
         onClick={() => dispatch(startRobotUpdate(robotName))}

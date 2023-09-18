@@ -16,8 +16,14 @@ export function PinnedProtocolCarousel(props: {
   pinnedProtocols: ProtocolResource[]
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
 }): JSX.Element {
-  const { pinnedProtocols, longPress, setShowDeleteConfirmationModal } = props
+  const {
+    pinnedProtocols,
+    longPress,
+    setShowDeleteConfirmationModal,
+    setTargetProtocolId,
+  } = props
   const runs = useAllRunsQuery()
   const cardSize = (): CardSizeType => {
     let size: CardSizeType = 'regular'
@@ -46,6 +52,7 @@ export function PinnedProtocolCarousel(props: {
               protocol={protocol}
               longPress={longPress}
               setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+              setTargetProtocolId={setTargetProtocolId}
             />
           )
         })}

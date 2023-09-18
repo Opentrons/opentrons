@@ -19,6 +19,7 @@ import {
   touchTip,
   moveToWell,
 } from '../atomic'
+import { configureForVolume } from '../atomic/configureForVolume'
 import { mixUtil } from './mix'
 import type {
   TransferArgs,
@@ -162,6 +163,19 @@ export const transfer: CommandCreator<TransferArgs> = (
           } else if (args.changeTip === 'perDest') {
             changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
           }
+
+          const configureForVolumeCommand: CurriedCommandCreator[] =
+            invariantContext.pipetteEntities[args.pipette].name ===
+              'p50_single_flex' ||
+            invariantContext.pipetteEntities[args.pipette].name ===
+              'p50_multi_flex'
+              ? [
+                  curryCommandCreator(configureForVolume, {
+                    pipetteId: args.pipette,
+                    volume: args.volume,
+                  }),
+                ]
+              : []
 
           const tipCommands: CurriedCommandCreator[] = changeTipNow
             ? [
@@ -406,6 +420,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...tipCommands,
             ...preWetTipCommands,
             ...mixBeforeAspirateCommands,
+            ...configureForVolumeCommand,
             curryCommandCreator(aspirate, {
               pipette: args.pipette,
               volume: subTransferVol,

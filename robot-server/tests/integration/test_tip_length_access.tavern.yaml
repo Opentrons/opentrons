@@ -159,3 +159,22 @@ stages:
       method: DELETE
     response:
         status_code: 404
+---
+test_name: Tip length inaccessible on flex
+marks:
+  - ot3_only
+  - usefixtures:
+    - ot3_server_base_url
+stages:
+  - name: GET request 403s
+    request:
+      url: "{ot3_server_base_url}/calibration/tip_length"
+      method: GET
+    response:
+      status_code: 403
+  - name: DELETE request 403s
+    request:
+      url: "{ot3_server_base_url}/calibration/tip_length"
+      method: DELETE
+    response:
+        status_code: 403

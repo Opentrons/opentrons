@@ -44,7 +44,7 @@ describe('OnDeviceDisplayAppFallback', () => {
     const [{ getByText }] = render(props)
     getByText('An unknown error has occurred')
     getByText(
-      'You need to restart your robot. Then download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.'
+      'You need to restart the touchscreen. Then download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.'
     )
     getByText('Restart touchscreen')
   })

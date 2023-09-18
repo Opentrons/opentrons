@@ -39,17 +39,26 @@ if TYPE_CHECKING:
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
 _COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
 
-# Mapping of user-facing pipette names to names used by the internal Opentrons system
-_FLEX_PIPETTE_NAMES_MAP = {
-    "p50_single_gen3": "p50_single_flex",
-    "flex_1channel_50": "p50_single_flex",
-    "p50_multi_gen3": "p50_multi_flex",
-    "flex_8channel_50": "p50_multi_flex",
-    "p1000_single_gen3": "p1000_single_flex",
-    "flex_1channel_1000": "p1000_single_flex",
-    "p1000_multi_gen3": "p1000_multi_flex",
-    "flex_8channel_1000": "p1000_multi_flex",
-    "flex_96channel_1000": "p1000_96",
+# Mapping of public Python Protocol API pipette load names
+# to names used by the internal Opentrons system
+_PIPETTE_NAMES_MAP = {
+    "p10_single": PipetteNameType.P10_SINGLE,
+    "p10_multi": PipetteNameType.P10_MULTI,
+    "p20_single_gen2": PipetteNameType.P20_SINGLE_GEN2,
+    "p20_multi_gen2": PipetteNameType.P20_MULTI_GEN2,
+    "p50_single": PipetteNameType.P50_SINGLE,
+    "p50_multi": PipetteNameType.P50_MULTI,
+    "p300_single": PipetteNameType.P300_SINGLE,
+    "p300_multi": PipetteNameType.P300_MULTI,
+    "p300_single_gen2": PipetteNameType.P300_SINGLE_GEN2,
+    "p300_multi_gen2": PipetteNameType.P300_MULTI_GEN2,
+    "p1000_single": PipetteNameType.P1000_SINGLE,
+    "p1000_single_gen2": PipetteNameType.P1000_SINGLE_GEN2,
+    "flex_1channel_50": PipetteNameType.P50_SINGLE_FLEX,
+    "flex_8channel_50": PipetteNameType.P50_MULTI_FLEX,
+    "flex_1channel_1000": PipetteNameType.P1000_SINGLE_FLEX,
+    "flex_8channel_1000": PipetteNameType.P1000_MULTI_FLEX,
+    "flex_96channel_1000": PipetteNameType.P1000_96,
 }
 
 
@@ -109,20 +118,11 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     pipette_name = ensure_lowercase_name(pipette_name)
 
     try:
-        if pipette_name in _FLEX_PIPETTE_NAMES_MAP.keys():
-            # TODO (spp: 2023-07-11): !!! VERY IMPORTANT!!!
-            #  We DO NOT want to support the old 'gen3' suffixed names for Flex launch.
-            #  This provision to accept the old names is added only for maintaining
-            #  backwards compatibility during internal testing and should be phased out.
-            #  So remove this name mapping and conversion at an appropriate time before launch
-            checked_name = PipetteNameType(_FLEX_PIPETTE_NAMES_MAP[pipette_name])
-        else:
-            checked_name = PipetteNameType(pipette_name)
-        return checked_name
-    except ValueError as e:
+        return _PIPETTE_NAMES_MAP[pipette_name]
+    except KeyError:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
-        ) from e
+        ) from None
 
 
 def ensure_and_convert_deck_slot(

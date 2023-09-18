@@ -36,8 +36,8 @@ const SETTING_BUTTON_STYLE = css`
 
 interface RobotSettingButtonProps {
   settingName: string
-  iconName: IconName
   onClick: React.MouseEventHandler
+  iconName?: IconName
   settingInfo?: string
   rightElement?: React.ReactNode
   dataTestId?: string
@@ -68,7 +68,9 @@ export function RobotSettingButton({
         width="100%"
         whiteSpace="nowrap"
       >
-        <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
+        {iconName != null ? (
+          <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
+        ) : null}
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing2}

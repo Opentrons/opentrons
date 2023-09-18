@@ -68,7 +68,7 @@ export function DeviceReset({
   const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
     'gripperOffsetCalibrations',
-    // 'moduleCalibrations',
+    'moduleCalibration',
     'runsHistory',
   ]
   const availableOptions = options
@@ -116,9 +116,9 @@ export function DeviceReset({
       case 'gripperOffsetCalibrations':
         optionText = t('clear_option_gripper_calibration')
         break
-      // case 'moduleCalibrations':
-      //   optionText = t('clear_option_module_calibrations')
-      //   break
+      case 'moduleCalibration':
+        optionText = t('clear_option_module_calibration')
+        break
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
         subText = t('clear_option_runs_history_subtext')

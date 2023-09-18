@@ -52,6 +52,11 @@ const mockResetConfigOptions = [
     name: 'tip length FooBar',
     description: 'tip length fooBar description',
   },
+  {
+    id: 'moduleCalibration',
+    name: 'module calibration FooBar',
+    description: 'moduleCalibration fooBar description',
+  },
 ]
 
 const render = () => {
@@ -116,6 +121,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByText('Clear gripper calibration')
     getByRole('checkbox', { name: 'Clear pipette calibration' })
     getByRole('checkbox', { name: 'Clear gripper calibration' })
+    getByRole('checkbox', { name: 'Clear module calibration' })
     expect(
       queryByRole('checkbox', { name: 'Clear deck calibration' })
     ).toBeNull()

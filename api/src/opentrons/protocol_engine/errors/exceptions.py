@@ -676,6 +676,19 @@ class GripperNotAttachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, details, wrapping)
 
 
+class CannotPerformGripperAction(ProtocolEngineError):
+    """Raised when trying to perform an illegal gripper action."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CannotPerformGripperAction."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LabwareMovementNotAllowedError(ProtocolEngineError):
     """Raised when attempting an illegal labware movement."""
 
