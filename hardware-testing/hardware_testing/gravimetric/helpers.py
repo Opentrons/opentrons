@@ -329,8 +329,8 @@ def _load_pipette(
     increment: bool,
     gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
-    pip_name = f"flex_{cfg.pipette_channels}channel_{cfg.pipette_volume}"
-    ui.print_info(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
+    pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
+    ui.print_info(f'pipette "{pip_name}" on mount "{pipette_mount}"')
 
     # if we're doing multiple tests in one run, the pipette may already be loaded
     loaded_pipettes = ctx.loaded_instruments
