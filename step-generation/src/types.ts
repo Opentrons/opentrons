@@ -445,6 +445,7 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
+  additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }
 

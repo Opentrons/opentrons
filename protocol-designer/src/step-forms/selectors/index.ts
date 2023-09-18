@@ -79,6 +79,7 @@ import {
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
+import { AdditionalEquipmentOnDeck } from '..'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
@@ -622,18 +623,21 @@ export const getInvariantContext: Selector<
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
+  getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     disableModuleRestrictions,
     allowAllTipracks
   ) => ({
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     config: {
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
