@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 1-Channel 50 μL",
+  "displayName": "Flex 1-Channel 50 \u03bcL",
   "model": "p50",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
@@ -33,7 +33,11 @@
     }
   },
   "availableSensors": {
-    "sensors": ["pressure", "capacitive", "environment"],
+    "sensors": [
+      "pressure",
+      "capacitive",
+      "environment"
+    ],
     "pressure": {
       "count": 1
     },
@@ -56,5 +60,6 @@
   "plungerHomingConfigurations": {
     "current": 1.0,
     "speed": 30
-  }
+  },
+  "tipPresenceCheckDistanceMM": "0.0"
 }

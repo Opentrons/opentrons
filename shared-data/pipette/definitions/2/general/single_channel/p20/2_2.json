@@ -39,11 +39,14 @@
   "channels": 1,
   "shaftDiameter": 1.0,
   "shaftULperMM": 0.785,
-  "backCompatNames": ["p10_single"],
+  "backCompatNames": [
+    "p10_single"
+  ],
   "backlashDistance": 0.0,
   "quirks": [],
   "plungerHomingConfigurations": {
     "current": 1.0,
     "speed": 30
-  }
+  },
+  "tipPresenceCheckDistanceMM": "0.0"
 }

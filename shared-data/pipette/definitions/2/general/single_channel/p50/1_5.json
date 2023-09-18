@@ -43,9 +43,12 @@
   "shaftULperMM": 3.142,
   "backCompatNames": [],
   "backlashDistance": 0.0,
-  "quirks": ["dropTipShake"],
+  "quirks": [
+    "dropTipShake"
+  ],
   "plungerHomingConfigurations": {
     "current": 0.3,
     "speed": 30
-  }
+  },
+  "tipPresenceCheckDistanceMM": "0.0"
 }

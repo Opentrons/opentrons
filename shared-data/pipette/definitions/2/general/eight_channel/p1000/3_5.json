@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 8-Channel 1000 μL",
+  "displayName": "Flex 8-Channel 1000 \u03bcL",
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
@@ -27,7 +27,11 @@
     }
   },
   "availableSensors": {
-    "sensors": ["pressure", "capacitive", "environment"],
+    "sensors": [
+      "pressure",
+      "capacitive",
+      "environment"
+    ],
     "pressure": {
       "count": 2
     },
@@ -40,7 +44,16 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
-    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
+    "availableConfigurations": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ]
   },
   "backCompatNames": [],
   "channels": 8,
@@ -51,5 +64,6 @@
   "plungerHomingConfigurations": {
     "current": 1.0,
     "speed": 30
-  }
+  },
+  "tipPresenceCheckDistanceMM": "0.0"
 }

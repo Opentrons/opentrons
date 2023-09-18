@@ -246,6 +246,11 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     quirks: List[pip_types.Quirks] = Field(
         ..., description="The list of quirks available for the loaded configuration"
     )
+    tip_presence_check_distance_mm: float = Field(
+        default=0,
+        description="The distance the high throughput tip motors will travel to check tip status.",
+        alias="tipPresenceCheckDistanceMM",
+    )
 
     @validator("pipette_type", pre=True)
     def convert_pipette_model_string(cls, v: str) -> pip_types.PipetteModelType:
@@ -329,11 +334,6 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         description="A list of default tiprack paths.",
         regex="opentrons/[a-z0-9._]+/[0-9]",
         alias="defaultTipracks",
-    )
-    tip_presence_check_height_mm: Optional[float] = Field(
-        default=0.0,
-        description="The distance the high throughput tip motors will travel to check tip status.",
-        alias="tipPresenceCheckHeightMM",
     )
 
     @validator("supported_tips", pre=True)
