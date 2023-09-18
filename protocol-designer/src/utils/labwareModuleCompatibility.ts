@@ -40,6 +40,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
     'opentrons_96_well_aluminum_block',
+    'opentrons_aluminum_flat_bottom_plate',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
@@ -82,6 +83,7 @@ const FLAT_BOTTOM_ADAPTER_LOADNAME = 'opentrons_96_flat_bottom_adapter'
 const PCR_ADAPTER_LOADNAME = 'opentrons_96_pcr_adapter'
 const UNIVERSAL_FLAT_ADAPTER_LOADNAME = 'opentrons_universal_flat_adapter'
 const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_well_aluminum_block'
+const ALUMINUM_FLAT_BOTTOM_PLATE = 'opentrons_aluminum_flat_bottom_plate'
 
 export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   string,
@@ -94,10 +96,20 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   ],
   [UNIVERSAL_FLAT_ADAPTER_LOADNAME]: [
     'opentrons/corning_384_wellplate_112ul_flat/2',
+    'opentrons/nest_96_wellplate_200ul_flat/2',
   ],
   [ALUMINUM_BLOCK_96_LOADNAME]: [
     'opentrons/biorad_96_wellplate_200ul_pcr/2',
     'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
+  ],
+  [ALUMINUM_FLAT_BOTTOM_PLATE]: [
+    'opentrons/corning_384_wellplate_112ul_flat/2',
+    'opentrons/corning_96_wellplate_360ul_flat/2',
+    'opentrons/corning_48_wellplate_1.6ml_flat/2',
+    'opentrons/corning_24_wellplate_3.4ml_flat/2',
+    'opentrons/corning_12_wellplate_6.9ml_flat/2',
+    'opentrons/corning_6_wellplate_16.8ml_flat/2',
+    'opentrons/nest_96_wellplate_200ul_flat/2',
   ],
 }
 
@@ -123,6 +135,16 @@ export const getAdapterLabwareIsAMatch = (
   const loadName = Object.values(allLabware).find(lab => lab.id === labwareId)
     ?.def.parameters.loadName
 
+  const aluminumFlatBottomLabwares = [
+    'corning_384_wellplate_112ul_flat',
+    'corning_96_wellplate_360ul_flat',
+    'corning_6_wellplate_16.8ml_flat',
+    'corning_384_wellplate_112ul_flat',
+    'corning_96_wellplate_360ul_flat',
+    'corning_6_wellplate_16.8ml_flat',
+    'nest_96_wellplate_200ul_flat',
+  ]
+
   const deepWellPair =
     loadName === DEEP_WELL_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'nest_96_wellplate_2ml_deep'
@@ -134,18 +156,23 @@ export const getAdapterLabwareIsAMatch = (
     draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt'
   const universalPair =
     loadName === UNIVERSAL_FLAT_ADAPTER_LOADNAME &&
-    draggedLabwareLoadname === 'corning_384_wellplate_112ul_flat'
+    (draggedLabwareLoadname === 'corning_384_wellplate_112ul_flat' ||
+      draggedLabwareLoadname === 'nest_96_wellplate_200ul_flat')
   const aluminumBlock96Pairs =
     loadName === ALUMINUM_BLOCK_96_LOADNAME &&
     (draggedLabwareLoadname === 'biorad_96_wellplate_200ul_pcr' ||
       draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt')
+  const aluminumFlatBottomPlatePairs =
+    loadName === ALUMINUM_FLAT_BOTTOM_PLATE &&
+    aluminumFlatBottomLabwares.includes(draggedLabwareLoadname)
 
   if (
     deepWellPair ||
     flatBottomPair ||
     pcrPair ||
     universalPair ||
-    aluminumBlock96Pairs
+    aluminumBlock96Pairs ||
+    aluminumFlatBottomPlatePairs
   ) {
     return true
   } else {
