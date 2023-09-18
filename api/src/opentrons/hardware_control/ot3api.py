@@ -2264,6 +2264,24 @@ class OT3API(
 
         return pos_at_home[Axis.by_mount(mount)] - self._config.z_retract_distance
 
+    async def update_nozzle_configuration_for_mount(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        starting_nozzle: str,
+        number_of_nozzles: int,
+    ) -> None:
+        """
+        Update a nozzle configuration for a given pipette.
+
+        :param mount: A robot mount that the instrument is on.
+        :param starting_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param number_of_nozzles: an integer for the total number of nozzles you wish to use.
+        :return:
+        """
+        await self._pipette_handler.update_nozzle_configuration(
+            OT3Mount.from_mount(mount), starting_nozzle, number_of_nozzles
+        )
+
     async def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
     ) -> None:

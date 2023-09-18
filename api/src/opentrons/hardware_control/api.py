@@ -1049,6 +1049,21 @@ class API(
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
 
+    async def update_nozzle_configuration_for_mount(
+        self, mount: top_types.Mount, starting_nozzle: str, number_of_nozzles: int
+    ) -> None:
+        """
+        Update a nozzle configuration for a given pipette.
+
+        :param mount: A robot mount that the instrument is on.
+        :param starting_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param number_of_nozzles: an integer for the total number of nozzles you wish to use.
+        :return:
+        """
+        await self._pipette_handler.update_nozzle_configuration(
+            mount, starting_nozzle, number_of_nozzles
+        )
+
     async def pick_up_tip(
         self,
         mount: top_types.Mount,

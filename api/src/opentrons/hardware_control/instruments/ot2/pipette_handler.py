@@ -384,6 +384,12 @@ class PipetteHandlerProvider(Generic[MountType]):
             k: None for k in self._attached_instruments.keys()
         }
 
+    async def update_nozzle_configuration(
+        self, mount: MountType, starting_nozzle: str, number_of_nozzles: int
+    ) -> None:
+        instr = self._attached_instruments[mount]
+        instr.update_nozzle_configuration(starting_nozzle, number_of_nozzles)
+
     async def add_tip(self, mount: MountType, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
