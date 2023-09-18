@@ -108,7 +108,9 @@ class MoveToMaintenancePositionImplementation(
 
         if params.mount != MountType.EXTENSION:
 
-            # disable z since we don't need it
+            # disengage the gripper z to enable the e-brake, this prevents the gripper
+            # z from dropping when the right mount carriage gets released from the
+            # mount during 96-channel detach flow
             if ot3_api.has_gripper():
                 await ot3_api.disengage_axes([Axis.Z_G])
 
