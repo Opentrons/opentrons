@@ -5,8 +5,8 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
-import { InputField } from '../InputField'
+import { touchScreenViewport } from '../../../DesignTokens/constants'
+import { InputField } from '../../InputField'
 import { CustomKeyboard } from './'
 
 import type { Story, Meta } from '@storybook/react'
