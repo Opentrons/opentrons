@@ -248,12 +248,16 @@ export function getAllModuleSlotsByType(
       moduleType === HEATERSHAKER_MODULE_TYPE ||
       moduleType === TEMPERATURE_MODULE_TYPE
     ) {
-      slot = HS_AND_TEMP_SLOTS_FLEX.filter(
-        s => s.value !== supportedSlotOption[0].value
+      slot = supportedSlotOption.concat(
+        HS_AND_TEMP_SLOTS_FLEX.filter(
+          s => s.value !== supportedSlotOption[0].value
+        )
       )
     } else {
-      slot = MAG_BLOCK_SLOTS_FLEX.filter(
-        s => s.value !== supportedSlotOption[0].value
+      slot = supportedSlotOption.concat(
+        MAG_BLOCK_SLOTS_FLEX.filter(
+          s => s.value !== supportedSlotOption[0].value
+        )
       )
     }
   }
