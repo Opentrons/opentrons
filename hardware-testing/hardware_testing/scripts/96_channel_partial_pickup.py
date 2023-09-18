@@ -479,7 +479,7 @@ async def _main() -> None:
                 row = float(input("How many Row to Move: "))
                 row = row*9
                 pickup_loc = Point(pickup_loc[0],
-                                    pickup_loc[1] + y_offset,
+                                    pickup_loc[1] + row,
                                     pickup_loc[2])
             await move_to_point(hw_api, mount, pickup_loc, cp)
             await hw_api.pick_up_tip(mount,
