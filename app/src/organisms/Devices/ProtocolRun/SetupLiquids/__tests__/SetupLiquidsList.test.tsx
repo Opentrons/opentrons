@@ -127,7 +127,7 @@ describe('SetupLiquidsList', () => {
       properties: {},
     })
     getByText('Location')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Volume')
     getAllByText(nestedTextMatcher('200 µL'))
     getByText('4')

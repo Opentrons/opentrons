@@ -83,7 +83,7 @@ describe('UnmountGripper', () => {
       data: instrumentsResponseFixture,
     } as any)
     const { getByText } = render()[0]
-    getByText('Loosen screws and detach gripper')
+    getByText('Loosen screws and detach Flex Gripper')
     getByText(
       'Hold the gripper in place and loosen the bottom gripper screw first. After that move onto the bottom screw. (The screws are captive and will not come apart from the gripper.) Then carefully remove the gripper.'
     )

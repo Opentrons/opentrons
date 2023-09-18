@@ -72,6 +72,6 @@ describe('Success', () => {
       successfulAction: SUCCESSFULLY_DETACHED,
     })[0]
     getByText('Flex Gripper successfully detached')
-    getByRole('button', { name: 'exit' })
+    getByRole('button', { name: 'Exit' })
   })
 })
