@@ -5,11 +5,11 @@ type Mount = 'left' | 'right' | 'extension'
 
 export interface InconsistentCalibrationFailure {
   kind: 'inconsistent-pipette-offset'
-  offsets: Map<'left'|'right', {x: number, y: number, z: number}>
+  offsets: Map<'left' | 'right', { x: number; y: number; z: number }>
   limit: number
 }
 
-export type CalibrationReasonabilityCheckFailure = |InconsistentCalibrationFailure
+export type CalibrationReasonabilityCheckFailure = InconsistentCalibrationFailure
 
 export interface SharedInstrumentData {
   mount: Mount
