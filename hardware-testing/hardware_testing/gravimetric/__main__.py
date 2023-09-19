@@ -286,6 +286,7 @@ class RunArgs:
                 trials=trials,
                 name=name,
                 robot_serial=robot_serial,
+                fw_version=run_args.ctx._core.get_hardware().fw_version,
             )
         else:
             if args.increment:
@@ -313,6 +314,7 @@ class RunArgs:
                 name=name,
                 environment_sensor=environment_sensor,
                 trials=trials,
+                fw_version=run_args.ctx._core.get_hardware().fw_version,
             )
 
         return RunArgs(

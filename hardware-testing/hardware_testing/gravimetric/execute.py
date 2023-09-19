@@ -413,6 +413,7 @@ def build_gm_report(
     name: str,
     environment_sensor: asair_sensor.AsairSensorBase,
     trials: int,
+    fw_version: str,
 ) -> report.CSVReport:
     """Build a CSVReport formated for gravimetric tests."""
     ui.print_header("CREATE TEST-REPORT")
@@ -422,6 +423,7 @@ def build_gm_report(
     test_report.set_tag(pipette_tag)
     test_report.set_operator(operator_name)
     test_report.set_version(git_description)
+    test_report.set_firmware(fw_version)
     report.store_serial_numbers(
         test_report,
         robot=robot_serial,

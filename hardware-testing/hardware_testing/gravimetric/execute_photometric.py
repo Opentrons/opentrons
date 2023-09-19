@@ -284,6 +284,7 @@ def build_pm_report(
     trials: int,
     name: str,
     robot_serial: str,
+    fw_version: str,
 ) -> report.CSVReport:
     """Build a CSVReport formated for photometric tests."""
     ui.print_header("CREATE TEST-REPORT")
@@ -293,6 +294,7 @@ def build_pm_report(
     test_report.set_tag(pipette_tag)
     test_report.set_operator(operator_name)
     test_report.set_version(git_description)
+    test_report.set_firmware(fw_version)
     report.store_serial_numbers_pm(
         test_report,
         robot=robot_serial,
