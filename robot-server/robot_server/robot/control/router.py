@@ -13,6 +13,7 @@ from .models import EstopStatusModel, DoorStatusModel, DoorState
 from .estop_handler import EstopHandler
 from robot_server.hardware import get_estop_handler, get_hardware
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.config import feature_flags as ff
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
@@ -66,6 +67,10 @@ async def put_acknowledge_estop_disengage(
     return await _get_estop_status_response(estop_handler)
 
 
+def get_door_switch_required() -> bool:
+    return ff.enable_door_safety_switch()
+
+
 @control_router.get(
     "/robot/door/status",
     summary="Get the status of the robot door.",
@@ -74,11 +79,13 @@ async def put_acknowledge_estop_disengage(
 )
 async def get_door_status(
     hardware: HardwareControlAPI = Depends(get_hardware),
+    door_required: bool = Depends(get_door_switch_required),
 ) -> PydanticResponse[SimpleBody[DoorStatusModel]]:
     return await PydanticResponse.create(
         content=SimpleBody.construct(
             data=DoorStatusModel.construct(
-                status=DoorState.from_hw_physical_status(hardware.door_state)
+                status=DoorState.from_hw_physical_status(hardware.door_state),
+                doorRequiredClosedForProtocol=door_required,
             )
         )
     )

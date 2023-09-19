@@ -85,3 +85,6 @@ class DoorStatusModel(BaseModel):
     """Model for the current door status."""
 
     status: DoorState = Field(..., description="Whether the door is open or closed.")
+    doorRequiredClosedForProtocol: bool = Field(
+        ..., description="Whether the door must be closed to run a protcol."
+    )
