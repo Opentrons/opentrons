@@ -143,7 +143,7 @@ export function ProtocolRunHeader({
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
-  const isDoorOpen = doorStatus?.data.status === 'open' && doorStatus.?data.doorRequiredClosedForProtocol
+  const isDoorOpen = doorStatus?.data.status === 'open' && doorStatus?.data.doorRequiredClosedForProtocol
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
