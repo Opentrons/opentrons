@@ -1,3 +1,8 @@
+export interface DoorStatus {
+  data: {
+    status: 'open' | 'closed'
+  }
+}
 export type EstopState =
   | 'physicallyEngaged'
   | 'logicallyEngaged'

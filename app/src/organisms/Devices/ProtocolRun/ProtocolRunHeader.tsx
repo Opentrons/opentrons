@@ -16,7 +16,11 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RunStatus,
 } from '@opentrons/api-client'
-import { useRunQuery, useModulesQuery } from '@opentrons/react-api-client'
+import {
+  useRunQuery,
+  useModulesQuery,
+  useDoorQuery,
+} from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -85,11 +89,11 @@ import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'
 import { getHighestPriorityError } from '../../OnDeviceDisplay/RunningProtocol'
 import { RunFailedModal } from './RunFailedModal'
+import { RunProgressMeter } from '../../RunProgressMeter'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { RunProgressMeter } from '../../RunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
@@ -113,7 +117,7 @@ export function ProtocolRunHeader({
   runId,
   makeHandleJumpToStep,
 }: ProtocolRunHeaderProps): JSX.Element | null {
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'shared'])
   const history = useHistory()
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const {
@@ -136,6 +140,10 @@ export function ProtocolRunHeader({
     runRecord?.data.errors?.[0] != null
       ? getHighestPriorityError(runRecord?.data?.errors)
       : null
+  const { data: doorStatus } = useDoorQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
+  const isDoorClosed = doorStatus?.data.status === 'closed'
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -258,6 +266,9 @@ export function ProtocolRunHeader({
         {runStatus === RUN_STATUS_STOPPED ? (
           <Banner type="warning">{t('run_canceled')}</Banner>
         ) : null}
+        {!isDoorClosed ? (
+          <Banner type="warning">{t('shared:close_robot_door')}</Banner>
+        ) : null}
         {isRunCurrent ? (
           <TerminalRunBanner
             {...{
@@ -289,6 +300,7 @@ export function ProtocolRunHeader({
               isProtocolAnalyzing={
                 protocolData == null || !!isProtocolAnalyzing
               }
+              isDoorClosed={isDoorClosed}
             />
           </Flex>
         </Box>
@@ -412,9 +424,16 @@ interface ActionButtonProps {
   robotName: string
   runStatus: RunStatus | null
   isProtocolAnalyzing: boolean
+  isDoorClosed: boolean
 }
 function ActionButton(props: ActionButtonProps): JSX.Element {
-  const { runId, robotName, runStatus, isProtocolAnalyzing } = props
+  const {
+    runId,
+    robotName,
+    runStatus,
+    isProtocolAnalyzing,
+    isDoorClosed,
+  } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
@@ -463,7 +482,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isOtherRunCurrent ||
     isProtocolAnalyzing ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
-    isRobotOnWrongVersionOfSoftware
+    isRobotOnWrongVersionOfSoftware ||
+    !isDoorClosed
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
     play()

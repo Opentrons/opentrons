@@ -29,6 +29,7 @@ import {
   useProtocolQuery,
   useRunQuery,
   useInstrumentsQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
@@ -76,6 +77,7 @@ import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
+const FETCH_DOOR_STATUS_MS = 5000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -104,13 +106,19 @@ export function ProtocolSetupStep({
     'not ready': COLORS.yellow3,
     general: COLORS.light1,
   }
-  const { makeSnackbar } = useToaster()
+  const { makeSnackbar, makeToast } = useToaster()
+  const { t } = useTranslation('shared')
 
   const makeDisabledReasonSnackbar = (): void => {
     if (disabledReason != null) {
       makeSnackbar(disabledReason)
     }
   }
+
+  const { data: doorStatus } = useDoorQuery({
+    refetchInterval: FETCH_DOOR_STATUS_MS,
+  })
+  const isDoorClosed = doorStatus?.data.status === 'closed'
 
   let backgroundColor: string
   if (!disabled) {
@@ -139,6 +147,12 @@ export function ProtocolSetupStep({
       }
       width="100%"
     >
+      {!isDoorClosed
+        ? makeToast(t('close_robot_door'), 'warning', {
+            closeButton: false,
+            disableTimeout: true,
+          })
+        : null}
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={
@@ -411,6 +425,7 @@ function PrepareToRun({
 
   const onPlay = (): void => {
     if (
+      isDoorClosed &&
       isHeaterShakerInProtocol &&
       isReadyToRun &&
       (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
