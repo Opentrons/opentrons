@@ -62,7 +62,7 @@ from .instruments.ot3.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
-    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
@@ -2040,7 +2040,7 @@ class OT3API(
 
     def get_instrument_offset(
         self, mount: OT3Mount
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount, None]:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary, None]:
         """Get instrument calibration data."""
         # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
         #  PipetteDict because the dict is shared with OT2 pipettes which have
@@ -2066,7 +2066,7 @@ class OT3API(
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount]:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary]:
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
