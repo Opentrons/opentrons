@@ -79,7 +79,6 @@ import {
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
-import { AdditionalEquipmentOnDeck } from '..'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 

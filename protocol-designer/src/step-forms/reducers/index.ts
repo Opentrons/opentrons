@@ -38,8 +38,6 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
-  _getAdditionalEquipmentRootState,
-  _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import {
@@ -932,46 +930,6 @@ export const savedStepForms = (
       // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
-    // case 'CREATE_DECK_FIXTURE': {
-    //   const { location, id: wasteChuteId } = action.payload
-    //   const prevInitialDeckSetupStep =
-    //     savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-    //   const updatedEquipmentOnDeckLocation = {
-    //     ...prevInitialDeckSetupStep.additionalEquipmentOnDeckLocationUpdate,
-    //     [wasteChuteId]: location,
-    //   }
-
-    //   return {
-    //     ...savedStepForms,
-    //     [INITIAL_DECK_SETUP_STEP_ID]: {
-    //       ...prevInitialDeckSetupStep,
-    //       additionalEquipmentOnDeckLocationUpdate: updatedEquipmentOnDeckLocation,
-    //     },
-    //   }
-    // }
-
-    // case 'DELETE_DECK_FIXTURE': {
-    //   const { id: wasteChuteId } = action.payload
-    //   const prevInitialDeckSetupStep =
-    //     savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-
-    //   const updatedEquipmentOnDeckLocation = {
-    //     ...prevInitialDeckSetupStep.additionalEquipmentOnDeckLocationUpdate,
-    //     [wasteChuteId]: location,
-    //   }
-    //   const updatedEquipmentOnDeckLocationWithoutChute = omit(
-    //     updatedEquipmentOnDeckLocation,
-    //     [wasteChuteId]
-    //   )
-
-    //   return {
-    //     ...savedStepForms,
-    //     [INITIAL_DECK_SETUP_STEP_ID]: {
-    //       ...prevInitialDeckSetupStep,
-    //       additionalEquipmentOnDeckLocationUpdate: updatedEquipmentOnDeckLocationWithoutChute,
-    //     },
-    //   }
-    // }
 
     case 'CHANGE_SAVED_STEP_FORM': {
       const { stepId } = action.payload
