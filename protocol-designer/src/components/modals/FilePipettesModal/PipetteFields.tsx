@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useMemo, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import {
@@ -98,17 +97,17 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const initialTabIndex = props.initialTabIndex || 1
 
+  React.useEffect(() => {
+    if (values.left.pipetteName === 'p1000_96') {
+      values.right = { pipetteName: null, tiprackDefURI: null }
+    }
+  }, [values.left])
+
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
 
     const filter96 = !allow96Channel || mount === RIGHT ? ['p1000_96'] : []
-
-    useEffect(() => {
-      if (values.left.pipetteName === 'p1000_96') {
-        values.right = { pipetteName: null, tiprackDefURI: null }
-      }
-    }, [values.left])
 
     return (
       <Flex width="13.8rem">
