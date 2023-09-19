@@ -488,7 +488,9 @@ function PrepareToRun({
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: FETCH_DOOR_STATUS_MS,
   })
-  const isDoorOpen = doorStatus?.data.status === 'open'
+  const isDoorOpen =
+    doorStatus?.data.status === 'open' &&
+    doorStatus?.data.doorRequiredClosedForProtocol
   React.useEffect(() => {
     // Note show snackbar when instruments and modules are all green
     // but the robot door is open

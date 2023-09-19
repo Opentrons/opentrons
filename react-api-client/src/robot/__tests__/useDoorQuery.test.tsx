@@ -18,7 +18,9 @@ const mockGetDoorStatus = getDoorStatus as jest.MockedFunction<
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const DOOR_RESPONSE: DoorStatus = { data: { status: 'open' } } as DoorStatus
+const DOOR_RESPONSE: DoorStatus = {
+  data: { status: 'open', doorRequiredClosedForProtocol: true },
+} as DoorStatus
 
 describe('useDoorQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>

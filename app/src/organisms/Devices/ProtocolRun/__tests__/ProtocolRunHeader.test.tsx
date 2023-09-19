@@ -242,6 +242,7 @@ const mockEstopStatus = {
 const mockDoorStatus = {
   data: {
     status: 'closed',
+    doorRequiredClosedForProtocol: true,
   },
 }
 
@@ -849,7 +850,9 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders banner when the robot door is open', () => {
-    const mockOpenDoorStatus = { data: { status: 'open' } }
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
     mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
     const [{ getByText }] = render()
     getByText('Close the robot door before starting the run')

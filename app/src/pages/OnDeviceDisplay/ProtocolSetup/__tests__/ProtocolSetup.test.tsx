@@ -195,6 +195,7 @@ const mockOffset = {
 const mockDoorStatus = {
   data: {
     status: 'closed',
+    doorRequiredClosedForProtocol: true,
   },
 }
 const MOCK_MAKE_SNACKBAR = jest.fn()
@@ -378,6 +379,7 @@ describe('ProtocolSetup', () => {
     const mockOpenDoorStatus = {
       data: {
         status: 'open',
+        doorRequiredClosedForProtocol: true,
       },
     }
     mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
