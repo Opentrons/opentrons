@@ -353,7 +353,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         if self._log.isEnabledFor(logging.DEBUG):
             info_str = "cp: {}{}: {} (from: ".format(
-                cp_type, " (from override)" if cp_override else "", cp
+                cp_override, " (from override)" if cp_override else "", cp
             )
             info_str += "model offset: {} + instrument offset: {}".format(
                 cp_with_tip_length, instr

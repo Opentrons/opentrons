@@ -1,5 +1,5 @@
 import pytest
-from typing import Dict, List, ContextManager, Tuple, Optional
+from typing import Dict, List, ContextManager, Tuple
 
 from contextlib import nullcontext as does_not_raise
 from opentrons.hardware_control.instruments import nozzle_manager

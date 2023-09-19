@@ -40,32 +40,38 @@ class NozzleConfigurationManager:
         nozzle_configuration: CurrentNozzleConfiguration,
         current_scalar: float,
     ) -> None:
-        nozzle_map_ordered_dict = OrderedDict(nozzle_map)
-        self._nozzle_map: List[Tuple(str, List[float])] = list(
+        sorted_nozzlemap = list(nozzle_map.keys())
+        sorted_nozzlemap.sort(key=lambda x: int(x[1::]))
+        nozzle_map_ordered_dict = OrderedDict(
+            {k: nozzle_map[k] for k in sorted_nozzlemap}
+        )
+        self._nozzle_map: List[Tuple[str, List[float]]] = list(
             nozzle_map_ordered_dict.items()
         )
         self._nozzle_map_key_lookup = list(nozzle_map_ordered_dict.keys())
         self._current_nozzle_configuration = nozzle_configuration
 
-        self._xy_nozzle: Final[str] = self._get_nozzle_index_for(
+        self._xy_nozzle: Final[int] = self._get_nozzle_index_for(
             CriticalPoint.XY_CENTER
         )
-        self._front_nozzle: Final[str] = self._get_nozzle_index_for(
+        self._front_nozzle: Final[int] = self._get_nozzle_index_for(
             CriticalPoint.FRONT_NOZZLE
         )
         self._current_scalar: Final[float] = current_scalar
 
     def _get_nozzle_index_for(self, critical_point: CriticalPoint) -> int:
         max_num_tips = len(self._nozzle_map) - 1
-        if critical_point == CriticalPoint.XY_CENTER:
-            index = max_num_tips // 2 - max_num_tips // MAXIMUM_ALLOWED_COLUMNS
+        if critical_point == CriticalPoint.XY_CENTER and max_num_tips > 8:
+            index = max_num_tips // 2 - (MAXIMUM_ALLOWED_ROWS - 1) // 2
+        elif critical_point == CriticalPoint.XY_CENTER and max_num_tips < 8:
+            index = max_num_tips // 2
         elif critical_point == CriticalPoint.FRONT_NOZZLE and max_num_tips > 1:
             # front left nozzle of the 96 channel and
             # front nozzle of the 8 channel
             index = MAXIMUM_ALLOWED_ROWS - 1
         else:
             index = 0
-        return index
+        return int(index)
 
     @classmethod
     def build_from_nozzlemap(

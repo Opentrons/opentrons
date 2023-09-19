@@ -1060,7 +1060,7 @@ class API(
         :param number_of_nozzles: an integer for the total number of nozzles you wish to use.
         :return:
         """
-        await self._pipette_handler.update_nozzle_configuration(
+        await self.update_nozzle_configuration(
             mount, starting_nozzle, number_of_nozzles
         )
 
