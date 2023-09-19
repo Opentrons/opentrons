@@ -44,9 +44,10 @@ export function OpenDoorAlertModal(): JSX.Element {
             <StyledText
               as="h4"
               marginBottom={SPACING.spacing4}
+              textAlign={TYPOGRAPHY.textAlignCenter}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              {t('door_is_open')}
+              {t('door_is_open_')}
             </StyledText>
             <StyledText
               as="p"

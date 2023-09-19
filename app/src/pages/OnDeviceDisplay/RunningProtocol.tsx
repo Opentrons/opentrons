@@ -20,6 +20,7 @@ import {
   useProtocolQuery,
   useRunQuery,
   useRunActionMutations,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -118,10 +119,10 @@ export function RunningProtocol(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
-  const [
-    isBlockedByDoorStatus,
-    setIsBlockedByDoorStatus,
-  ] = React.useState<boolean>(false)
+  const { data: doorStatus } = useDoorQuery()
+  const isDoorOpen =
+    doorStatus?.data.status === 'open' &&
+    doorStatus?.data.doorRequiredClosedForProtocol
 
   React.useEffect(() => {
     if (
@@ -165,26 +166,26 @@ export function RunningProtocol(): JSX.Element {
   }, [lastRunCommand, interventionModalCommandKey])
 
   React.useEffect(() => {
-    if (
-      runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-      !isBlockedByDoorStatus
-    ) {
-      setIsBlockedByDoorStatus(true)
+    if (runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && isDoorOpen) {
+      console.log(1)
       pauseRun()
     }
     if (
       runStatus != null &&
       START_RUN_STATUSES.includes(runStatus) &&
-      isBlockedByDoorStatus
+      !isDoorOpen
     ) {
-      setIsBlockedByDoorStatus(prevStatus => !prevStatus)
+      console.log(2)
       playRun()
     }
-  }, [runStatus, pauseRun, playRun, isBlockedByDoorStatus])
+  }, [runStatus, pauseRun, playRun, isDoorOpen])
+
+  console.log('runStatus', runStatus)
+  console.log('door status', doorStatus?.data.status)
 
   return (
     <>
-      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && isDoorOpen ? (
         <OpenDoorAlertModal />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
