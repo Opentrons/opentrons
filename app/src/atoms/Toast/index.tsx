@@ -163,11 +163,9 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes slidedown {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, 50%, 0);
         filter: opacity(0);
       }
     }
@@ -180,11 +178,9 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes fadeUpAndOut {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, -10%, 0);
         filter: opacity(0%);
       }
     }
