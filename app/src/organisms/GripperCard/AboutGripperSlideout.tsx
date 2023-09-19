@@ -46,13 +46,15 @@ export const AboutGripperSlideout = (
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
               {t('current_version')}
             </StyledText>
             <StyledText
               as="p"
               paddingTop={SPACING.spacing4}
-              paddingBottom={SPACING.spacing12}
+              paddingBottom={SPACING.spacing16}
+              color={COLORS.darkBlackEnabled}
             >
               {firmwareVersion}
             </StyledText>
