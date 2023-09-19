@@ -48,6 +48,7 @@ class GravimetricConfig(VolumetricConfig):
     gantry_speed: int
     scale_delay: int
     isolate_channels: List[int]
+    isolate_volumes: List[float]
 
 
 @dataclass

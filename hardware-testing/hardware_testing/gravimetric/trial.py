@@ -126,13 +126,15 @@ def build_gravimetric_trials(
             )
     else:
         for volume in test_volumes:
+            if cfg.isolate_volumes and (volume not in cfg.isolate_volumes):
+                ui.print_info(f"skipping volume: {volume} ul")
+                continue
             trial_list[volume] = {}
             for channel in channels_to_test:
-                for t, vls in config.QC_VOLUMES_G[cfg.pipette_channels][
-                    cfg.pipette_volume
-                ]:
-                    if t == cfg.tip_volume:
-                        standard_qc_volumes = vls
+                vls_list = config.QC_VOLUMES_G[cfg.pipette_channels][cfg.pipette_volume]
+                standard_qc_volumes = [
+                    vls for t, vls in vls_list if t == cfg.tip_volume
+                ][-1]
                 print(standard_qc_volumes)
                 if (
                     cfg.isolate_channels and (channel + 1) not in cfg.isolate_channels

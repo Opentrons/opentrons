@@ -143,7 +143,8 @@ def store_config_pm(report: CSVReport, cfg: config.PhotometricConfig) -> None:
     for field in fields(config.PhotometricConfig):
         if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        val_str = str(getattr(cfg, field.name)).replace("[", "").replace("]", "")
+        val_str = str(getattr(cfg, field.name))
+        val_str = val_str.replace("[", "").replace("]", "").replace(",", "-")
         report("CONFIG", field.name, [val_str])
 
 
@@ -223,7 +224,7 @@ def create_csv_test_report(
             CSVSection(
                 title="VOLUMES",
                 lines=[
-                    CSVLine(f"volume-{m}-{round(v, 2)}-{s}-{i}", [float])
+                    CSVLine(f"volume-{m}-{round(v, 2)}-{s}-{i}", [float, str])
                     for v in volumes
                     for s in volume_stat_type
                     for m in ["aspirate", "dispense"]
@@ -294,6 +295,10 @@ def create_csv_test_report(
             ),
         ],
     )
+    # NOTE: just immediately clear all the "isolate" flags on the volume section
+    #       so that final CSV is guaranteed to not be filled with a bunch of "None"
+    for line in report["VOLUMES"]:
+        line.store([None, ""])
     return report
 
 
@@ -356,7 +361,7 @@ def store_serial_numbers(
 
 
 def store_volume_all(
-    report: CSVReport, mode: str, volume: float, average: float, cv: float, d: float
+    report: CSVReport, mode: str, volume: float, average: float, cv: float, d: float, flag: str = ""
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -364,13 +369,13 @@ def store_volume_all(
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_all-average",
-        [round(average, 2)],
+        [round(average, 2), flag],
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-cv", [round(cv * 100.0, 2)]
+        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-cv", [round(cv * 100.0, 2), flag]
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-d", [round(d * 100.0, 2)]
+        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-d", [round(d * 100.0, 2), flag]
     )
 
 
@@ -384,6 +389,7 @@ def store_volume_per_channel(
     d: float,
     celsius: float,
     humidity: float,
+    flag: str = ""
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -391,27 +397,27 @@ def store_volume_per_channel(
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-average",
-        [round(average, 2)],
+        [round(average, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-cv",
-        [round(cv * 100.0, 2)],
+        [round(cv * 100.0, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-d",
-        [round(d * 100.0, 2)],
+        [round(d * 100.0, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-celsius-pipette-avg",
-        [round(celsius, 2)],
+        [round(celsius, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-humidity-pipette-avg",
-        [round(humidity, 2)],
+        [round(humidity, 2), flag],
     )
 
 
@@ -423,6 +429,7 @@ def store_volume_per_trial(
     average: float,
     cv: float,
     d: float,
+    flag: str = "",
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -430,17 +437,17 @@ def store_volume_per_trial(
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-average",
-        [round(average, 2)],
+        [round(average, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-cv",
-        [round(cv * 100.0, 2)],
+        [round(cv * 100.0, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-d",
-        [round(d * 100.0, 2)],
+        [round(d * 100.0, 2), flag],
     )
 
 

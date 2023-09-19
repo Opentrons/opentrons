@@ -240,6 +240,16 @@ class RunArgs:
                         vls,
                     )
                 )
+        if args.isolate_volumes:
+            # check that all volumes passed in are actually test volumes
+            all_vols = set([
+                vol
+                for tip_vol_list in volumes
+                for vol in tip_vol_list[-1]
+            ])
+            for isolated_volume in args.isolate_volumes:
+                assert isolated_volume in all_vols, f"cannot isolate volume {isolated_volume}, " \
+                                                    f"not a test volume"
         if args.extra:
             # if we use extra, add those tests after
             for tip in tip_volumes:
@@ -351,6 +361,7 @@ def build_gravimetric_cfg(
     gantry_speed: int,
     scale_delay: int,
     isolate_channels: List[int],
+    isolate_volumes: List[float],
     extra: bool,
     jog: bool,
     same_tip: bool,
@@ -378,6 +389,7 @@ def build_gravimetric_cfg(
         gantry_speed=gantry_speed,
         scale_delay=scale_delay,
         isolate_channels=isolate_channels,
+        isolate_volumes=isolate_volumes,
         kind=ConfigType.gravimetric,
         extra=extra,
         jog=jog,
@@ -475,6 +487,7 @@ def _main(
             args.gantry_speed,
             args.scale_delay,
             args.isolate_channels if args.isolate_channels else [],
+            args.isolate_volumes if args.isolate_volumes else [],
             args.extra,
             args.jog,
             args.same_tip,
@@ -536,6 +549,7 @@ if __name__ == "__main__":
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
+    parser.add_argument("--isolate-volumes", nargs="+", type=float, default=None)
     parser.add_argument("--extra", action="store_true")
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")

@@ -786,6 +786,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     d=aspirate_d,
                     celsius=aspirate_celsius_avg,
                     humidity=aspirate_humidity_avg,
+                    flag="isolated" if cfg.isolate_volumes else "",
                 )
                 report.store_volume_per_channel(
                     report=resources.test_report,
@@ -797,6 +798,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     d=dispense_d,
                     celsius=dispense_celsius_avg,
                     humidity=dispense_humidity_avg,
+                    flag="isolated" if cfg.isolate_volumes else "",
                 )
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
@@ -841,6 +843,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     average=aspirate_average,
                     cv=aspirate_cv,
                     d=aspirate_d,
+                    flag="isolated" if cfg.isolate_volumes else "",
                 )
                 report.store_volume_per_trial(
                     report=resources.test_report,
@@ -850,6 +853,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     average=dispense_average,
                     cv=dispense_cv,
                     d=dispense_d,
+                    flag="isolated" if cfg.isolate_volumes else "",
                 )
 
             ui.print_header(f"{volume} uL channel all CALCULATIONS")
@@ -870,6 +874,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 average=aspirate_average,
                 cv=aspirate_cv,
                 d=aspirate_d,
+                flag="isolated" if cfg.isolate_volumes else "",
             )
             report.store_volume_all(
                 report=resources.test_report,
@@ -878,6 +883,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 average=dispense_average,
                 cv=dispense_cv,
                 d=dispense_d,
+                flag="isolated" if cfg.isolate_volumes else "",
             )
     finally:
         _return_tip = False if calibration_tip_in_use else cfg.return_tip
