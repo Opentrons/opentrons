@@ -26,9 +26,13 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
     {
       ...options,
       enabled: host !== null,
-        onError: () => {
-          queryClient.resetQueries([host, '/subsystems/updates/current', subsystem])
-        }
+      onError: () => {
+        queryClient.resetQueries([
+          host,
+          '/subsystems/updates/current',
+          subsystem,
+        ])
+      },
     }
   )
 
