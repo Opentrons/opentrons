@@ -1,4 +1,4 @@
-"""Flex IQ: P1000 Multi 200ul."""
+"""Flex IQ: P50 Single 1ul."""
 from math import pi
 from typing import List, Optional, Dict, Tuple
 
@@ -8,25 +8,23 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 #                EDIT - START                #
 ##############################################
 
-metadata = {"protocolName": "Flex IQ: P1000 Multi 200ul"}
+metadata = {"protocolName": "Flex IQ: P50 Single 1ul"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT = False
 RETURN_TIP = False
 DILUENT_WELLS = ["A11", "A12"]
 
-TEST_VOLUME = 200
-TEST_PUSH_OUT = 15
-TEST_PIPETTE = "flex_8channel_1000"
-TEST_TIPS = "opentrons_flex_96_tiprack_200uL"
+TEST_VOLUME = 1
+TEST_PUSH_OUT = 6
+TEST_PIPETTE = "flex_1channel_50"
+TEST_TIPS = "opentrons_flex_96_tiprack_50uL"
 TEST_SOURCES = [
     {
-        "source": "A1",
-        "destinations": ["A1", "A2", "A3", "A4", "A5", "A6"],
-    },
-    {
-        "source": "A2",
-        "destinations": ["A7", "A8", "A9", "A10", "A11", "A12"],
+        "source": "A4",
+        "destinations": [
+            "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"
+        ],
     },
 ]
 
@@ -71,7 +69,8 @@ def _get_diluent_volume() -> float:
 
 
 SRC_LABWARE_BY_CHANNELS = {
-    1: "nest_96_wellplate_2ml_deep",
+    # 1: "nest_96_wellplate_2ml_deep",
+    1: "nest_12_reservoir_15ml",
     8: "nest_12_reservoir_15ml",
     96: "nest_1_reservoir_195ml",
 }

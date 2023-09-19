@@ -17,7 +17,7 @@ DILUENT_WELLS = ["A11", "A12"]
 
 TEST_VOLUME = 1
 TEST_PUSH_OUT = 6
-TEST_PIPETTE = "p50_multi_gen3"
+TEST_PIPETTE = "flex_8channel_50"
 TEST_TIPS = "opentrons_flex_96_tiprack_50uL"
 TEST_SOURCES = [
     {
@@ -387,8 +387,9 @@ def run(ctx: ProtocolContext) -> None:
         if "p1000_multi" in TEST_PIPETTE and ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT:
             diluent_pipette = dye_pipette  # share the 8ch pipette
         else:
-            diluent_pipette = ctx.load_instrument("p1000_multi_gen3", "right")
-        if dye_pipette.channels == 8:
+            diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
+        diluent_labware = SRC_LABWARE_BY_CHANNELS[diluent_pipette.channels]
+        if dye_reservoir.load_name == diluent_labware:
             reservoir_diluent = dye_reservoir  # share the 12-row reservoir
         else:
             reservoir_diluent = ctx.load_labware(
