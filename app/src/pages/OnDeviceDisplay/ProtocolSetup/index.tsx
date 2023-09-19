@@ -106,19 +106,13 @@ export function ProtocolSetupStep({
     'not ready': COLORS.yellow3,
     general: COLORS.light1,
   }
-  const { makeSnackbar, makeToast } = useToaster()
-  const { t } = useTranslation('shared')
+  const { makeSnackbar } = useToaster()
 
   const makeDisabledReasonSnackbar = (): void => {
     if (disabledReason != null) {
       makeSnackbar(disabledReason)
     }
   }
-
-  const { data: doorStatus } = useDoorQuery({
-    refetchInterval: FETCH_DOOR_STATUS_MS,
-  })
-  const isDoorClosed = doorStatus?.data.status === 'closed'
 
   let backgroundColor: string
   if (!disabled) {
@@ -147,12 +141,6 @@ export function ProtocolSetupStep({
       }
       width="100%"
     >
-      {!isDoorClosed
-        ? makeToast(t('close_robot_door'), 'warning', {
-            closeButton: false,
-            disableTimeout: true,
-          })
-        : null}
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={
@@ -329,9 +317,10 @@ function PrepareToRun({
   confirmAttachment,
   play,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
-  const { makeSnackbar } = useToaster()
+  const { makeSnackbar, makeToast, eatToast } = useToaster()
+  const toastRef = React.useRef<string | null>(null)
 
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -425,7 +414,6 @@ function PrepareToRun({
 
   const onPlay = (): void => {
     if (
-      isDoorClosed &&
       isHeaterShakerInProtocol &&
       isReadyToRun &&
       (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
@@ -497,6 +485,22 @@ function PrepareToRun({
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
+  const { data: doorStatus } = useDoorQuery({
+    refetchInterval: FETCH_DOOR_STATUS_MS,
+  })
+  const isDoorOpen = doorStatus?.data.status === 'open'
+  console.log('doorStatus', doorStatus?.data.status)
+  React.useEffect(() => {
+    if (isDoorOpen) {
+      toastRef.current = makeToast(t('shared:close_robot_door'), 'warning', {
+        closeButton: false,
+        disableTimeout: true,
+      })
+    } else if (!isDoorOpen && toastRef.current != null) {
+      eatToast(toastRef.current)
+    }
+  }, [isDoorOpen])
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -546,7 +550,7 @@ function PrepareToRun({
               }
             />
             <PlayButton
-              disabled={isLoading}
+              disabled={isLoading || isDoorOpen}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
             />
