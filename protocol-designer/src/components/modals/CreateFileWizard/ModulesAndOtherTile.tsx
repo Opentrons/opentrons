@@ -26,6 +26,7 @@ import {
   ModuleModel,
   getModuleDisplayName,
   getModuleType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   FormModulesByType,
@@ -191,6 +192,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const enableDeckModification = useSelector(
     featureFlagSelectors.getEnableDeckModification
   )
+  const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
   return (
     <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       <EquipmentOption
@@ -246,7 +248,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           />
         )
       })}
-      {enableDeckModification ? (
+      {enableDeckModification && isFlex ? (
         <EquipmentOption
           onClick={() => {
             if (values.additionalEquipment.includes('wasteChute')) {
