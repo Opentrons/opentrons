@@ -3,7 +3,6 @@
   "version": 1,
   "namespace": "opentrons",
   "metadata": {
-    "name": "extension_lot",
     "displayName": "extension slot"
   },
   "parameters": {

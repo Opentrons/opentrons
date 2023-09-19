@@ -3,7 +3,6 @@
   "version": 1,
   "namespace": "opentrons",
   "metadata": {
-    "name": "trash_chute",
     "displayName": "trash chute"
   },
   "parameters": {

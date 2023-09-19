@@ -3,7 +3,6 @@
   "version": 1,
   "namespace": "opentrons",
   "metadata": {
-    "name": "standard_lot",
     "displayName": "standard slot"
   },
   "parameters": {
