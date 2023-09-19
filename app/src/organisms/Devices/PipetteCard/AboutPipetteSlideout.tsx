@@ -58,13 +58,15 @@ export const AboutPipetteSlideout = (
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
               {t('current_version')}
             </StyledText>
             <StyledText
               as="p"
               paddingTop={SPACING.spacing4}
-              paddingBottom={SPACING.spacing12}
+              paddingBottom={SPACING.spacing16}
+              color={COLORS.darkBlackEnabled}
             >
               {instrumentInfo.firmwareVersion}
             </StyledText>
@@ -74,8 +76,8 @@ export const AboutPipetteSlideout = (
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkGreyEnabled}
-          data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
           textTransform={TYPOGRAPHY.textTransformUppercase}
+          data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
         >
           {t('serial_number')}
         </StyledText>

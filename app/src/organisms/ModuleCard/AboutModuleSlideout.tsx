@@ -99,24 +99,37 @@ export const AboutModuleSlideout = (
             data-testid={`alert_item_version_${String(module.moduleModel)}`}
             color={COLORS.darkGreyEnabled}
           >
-            <StyledText as="h6">{t('current_version')}</StyledText>
-            <StyledText as="p" paddingTop={SPACING.spacing4}>
-              {t('version', { version: module.firmwareVersion })}
+            <StyledText
+              as="h6"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.darkGreyEnabled}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
+            >
+              {t('current_version')}
+            </StyledText>
+            <StyledText
+              as="p"
+              paddingTop={SPACING.spacing4}
+              paddingBottom={SPACING.spacing16}
+              color={COLORS.darkBlackEnabled}
+            >
+              {module.firmwareVersion}
             </StyledText>
           </Flex>
         </Flex>
         <StyledText
-          paddingTop={SPACING.spacing16}
           as="h6"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={COLORS.darkGreyEnabled}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel
           )}`}
-          color={COLORS.darkBlackEnabled}
         >
           {t('serial_number')}
         </StyledText>
         <StyledText
-          as="h6"
+          as="p"
           paddingTop={SPACING.spacing4}
           data-testid={`alert_item_serial_${String(module.moduleModel)}`}
         >
