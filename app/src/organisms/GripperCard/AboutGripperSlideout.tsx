@@ -46,9 +46,8 @@ export const AboutGripperSlideout = (
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
-              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
-              {t('current_version')}
+              {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
             <StyledText
               as="p"
@@ -64,7 +63,6 @@ export const AboutGripperSlideout = (
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkGreyEnabled}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>

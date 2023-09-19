@@ -58,9 +58,8 @@ export const AboutPipetteSlideout = (
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
-              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
-              {t('current_version')}
+              {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
             <StyledText
               as="p"
@@ -76,10 +75,9 @@ export const AboutPipetteSlideout = (
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkGreyEnabled}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
           data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
         >
-          {t('serial_number')}
+          {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>
         <StyledText
           as="p"

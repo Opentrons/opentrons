@@ -37,7 +37,7 @@ export const AboutModuleSlideout = (
   props: AboutModuleSlideoutProps
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick, firmwareUpdateClick } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { i18n, t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
@@ -103,9 +103,8 @@ export const AboutModuleSlideout = (
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
-              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
-              {t('current_version')}
+              {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
             <StyledText
               as="p"
@@ -121,12 +120,11 @@ export const AboutModuleSlideout = (
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkGreyEnabled}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel
           )}`}
         >
-          {t('serial_number')}
+          {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>
         <StyledText
           as="p"
