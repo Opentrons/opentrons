@@ -8,9 +8,5 @@
   },
   "parameters": {
     "loadName": "standard_lot"
-  },
-  "boundingBox": {
-    "width": 30,
-    "height": 30
   }
 }

@@ -8,10 +8,5 @@
   },
   "parameters": {
     "loadName": "extension_lot"
-  },
-  "boundingBox": {
-    "xDimension": 128.0,
-    "yDimension": 86.0,
-    "zDimension": 0
   }
 }
