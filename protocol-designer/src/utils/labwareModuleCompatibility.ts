@@ -96,7 +96,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   ],
   [UNIVERSAL_FLAT_ADAPTER_LOADNAME]: [
     'opentrons/corning_384_wellplate_112ul_flat/2',
-    'opentrons/nest_96_wellplate_200ul_flat/2',
+    // 'opentrons/nest_96_wellplate_200ul_flat/2',
     //  TODO(jr, 9/18/23): comment this out
     // 'opentrons/corning_96_wellplate_360ul_flat/2',
     // 'opentrons/corning_48_wellplate_1.6ml_flat/2',
