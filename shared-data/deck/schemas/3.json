@@ -139,6 +139,46 @@
       "type": "object",
       "required": ["orderedSlots", "calibrationPoints"],
       "properties": {
+        "fixtureLocations": {
+          "type": "array",
+          "description": "fixture locations available for placing fixtures",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "position",
+              "displayName",
+              "compatibleFixtures"
+            ],
+            "properties": {
+              "id": {
+                "description": "Unique identifier for slot",
+                "type": "string"
+              },
+              "position": {
+                "$ref": "#/definitions/xyzArray"
+              },
+              "displayName": {
+                "description": "A human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
+                "type": "string"
+              },
+              "compatibleFixtures": {
+                "description": "An array of fixture types that can be placed in this location.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "standardSlot",
+                    "wasteChute",
+                    "extensionSlot",
+                    "movableTrash"
+                  ]
+                }
+              }
+            }
+          }
+        },
+
         "orderedSlots": {
           "type": "array",
           "description": "Ordered slots available for placing labware",

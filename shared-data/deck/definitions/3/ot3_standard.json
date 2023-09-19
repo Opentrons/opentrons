@@ -19,127 +19,74 @@
           0.0,
           -0.5
         ],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location D1",
         "compatibleFixtures": [
-          "StandardSlot",
+          "standardSlot",
           "wasteChute"
         ]
       },
       {
         "id": "D2",
         "position": [164.0, 0.0, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location D2",
         "compatibleFixtures": [
-          "StandardSlot"]
+          "standardSlot"]
       },
       {
         "id": "D3",
         "position": [328.0, 0.0, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location D3",
         "compatibleFixtures": [
-          "StandardSlot",
-          "ExtensionSlot"
+          "standardSlot",
+          "extensionSlot"
         ]
       },
       {
         "id": "C1",
         "position": [0.0, 107, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location C1",
         "compatibleFixtures": [
-          "StandardSlot"
+          "standardSlot"
         ]
       },
       {
         "id": "C2",
         "position": [164.0, 107, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location C2",
         "compatibleFixtures": [
-          "StandardSlot"
+          "standardSlot"
         ]
       },
       {
         "id": "C3",
         "position": [328.0, 107, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location C3",
         "compatibleFixtures": [
-          "StandardSlot",
-          "ExtensionSlot"
+          "standardSlot",
+          "extensionSlot"
         ]
       },
             {
         "id": "B1",
         "position": [0.0, 214.0, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location B1",
         "compatibleFixtures": [
-          "StandardSlot"]
+          "standardSlot"]
       },
       {
         "id": "B2",
         "position": [164.0, 214.0, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location B2",
         "compatibleFixtures": [
-          "StandardSlot"]
+          "standardSlot"]
       },
       {
         "id": "B3",
         "position": [328.0, 214.0, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
         "displayName": "Fixture Location C3",
         "compatibleFixtures": [
-          "StandardSlot",
-          "ExtensionSlot"
+          "standardSlot",
+          "extensionSlot"
         ]
       }
     ],

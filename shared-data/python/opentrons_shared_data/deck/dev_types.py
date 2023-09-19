@@ -44,6 +44,12 @@ class SlotDefV3(TypedDict, total=False):
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
 
 
+class FixtureLocationDefV3(TypedDict, total=False):
+    id: str
+    position: List[float]
+    displayName: str
+
+
 class CalibrationPoint(TypedDict):
     id: str
     position: List[float]
@@ -94,6 +100,7 @@ Fixture = Union[
 
 class LocationsV3(TypedDict):
     orderedSlots: List[SlotDefV3]
+    fixtureLocations: List[FixtureLocationDefV3]
     calibrationPoints: List[CalibrationPoint]
     fixtures: List[Fixture]
 

@@ -76,6 +76,16 @@
           "$ref": "#/definitions/safeString"
         }
       }
+    },
+    "boundingBox": {
+      "type": "object",
+      "description": "The active area (both pipettes can reach) of a fixture on the deck",
+      "required": ["xDimension", "yDimension", "zDimension"],
+      "properties": {
+        "xDimension": { "$ref": "#/definitions/positiveNumber" },
+        "yDimension": { "$ref": "#/definitions/positiveNumber" },
+        "zDimension": { "$ref": "#/definitions/positiveNumber" }
+      }
     }
   }
 }
