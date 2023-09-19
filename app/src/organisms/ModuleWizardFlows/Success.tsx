@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
   COLORS,
+  JUSTIFY_FLEX_END,
   PrimaryButton,
   RESPONSIVENESS,
   TYPOGRAPHY,
@@ -38,6 +39,7 @@ export const Success = (
       // TODO: iconColor unused, change SimpleWizardBody props interface
       iconColor={COLORS.errorEnabled}
       isSuccess
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
     >
       <PrimaryButton disabled={isRobotMoving} onClick={handleOnClick}>
         {t('exit')}
