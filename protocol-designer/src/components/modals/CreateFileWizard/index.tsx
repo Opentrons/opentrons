@@ -62,6 +62,7 @@ import { WizardHeader } from './WizardHeader'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
+import { TrashBinTile } from './TrashBinTile'
 
 type WizardStep =
   | 'robotType'
@@ -71,6 +72,7 @@ type WizardStep =
   | 'second_pipette_type'
   | 'second_pipette_tips'
   | 'modulesAndOther'
+  | 'trashBin'
 const WIZARD_STEPS: WizardStep[] = [
   'robotType',
   'metadata',
@@ -79,6 +81,7 @@ const WIZARD_STEPS: WizardStep[] = [
   'second_pipette_type',
   'second_pipette_tips',
   'modulesAndOther',
+  'trashBin',
 ]
 
 export function CreateFileWizard(): JSX.Element | null {
@@ -262,6 +265,7 @@ export function CreateFileWizard(): JSX.Element | null {
         createProtocolFile={createProtocolFile}
         proceed={proceed}
         goBack={goBack}
+        handleCancel={handleCancel}
       />
     </ModalShell>
   ) : null
@@ -367,10 +371,17 @@ interface CreateFileFormProps {
   createProtocolFile: (values: FormState) => void
   goBack: () => void
   proceed: () => void
+  handleCancel: () => void
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
-  const { currentWizardStep, createProtocolFile, proceed, goBack } = props
+  const {
+    currentWizardStep,
+    createProtocolFile,
+    proceed,
+    goBack,
+    handleCancel,
+  } = props
 
   const contentsByWizardStep: {
     [wizardStep in WizardStep]: (
@@ -395,11 +406,25 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     second_pipette_tips: (formikProps: FormikProps<FormState>) => (
       <SecondPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
     ),
-    modulesAndOther: (formikProps: FormikProps<FormState>) => (
-      <ModulesAndOtherTile
-        {...formikProps}
+    modulesAndOther: (formikProps: FormikProps<FormState>) => {
+      const handleOt2Create = (): void => {
+        createProtocolFile(formikProps.values)
+        handleCancel
+      }
+      return formikProps.values.fields.robotType === FLEX_ROBOT_TYPE ? (
+        <ModulesAndOtherTile {...{ ...formikProps, proceed }} goBack={goBack} />
+      ) : (
+        <ModulesAndOtherTile
+          {...formikProps}
+          goBack={goBack}
+          proceed={handleOt2Create}
+        />
+      )
+    },
+    trashBin: (formikProps: FormikProps<FormState>) => (
+      <TrashBinTile
+        {...{ ...formikProps, goBack }}
         proceed={() => createProtocolFile(formikProps.values)}
-        goBack={goBack}
       />
     ),
   }

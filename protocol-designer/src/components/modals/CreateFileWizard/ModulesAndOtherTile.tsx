@@ -165,7 +165,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             }}
           />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('modal.create_file_wizard.review_file_details')}
+            {robotType === OT2_ROBOT_TYPE
+              ? i18n.t('modal.create_file_wizard.review_file_details')
+              : i18n.t('application.next')}
           </PrimaryButton>
         </Flex>
       </Flex>
