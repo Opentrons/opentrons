@@ -207,6 +207,7 @@ export function RobotUpdateProgressModal({
     <LegacyModal
       title={`${t('updating')} ${robotName}`}
       width="40rem"
+      height="18.4rem"
       onClose={completedUpdating ? completeRobotUpdateHandler : undefined}
       footer={
         completedUpdating ? (
