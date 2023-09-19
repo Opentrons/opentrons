@@ -14,7 +14,7 @@ import type { Subsystem } from '@opentrons/api-client'
 
 const POLL_INTERVAL_MS = 5000
 
-export function FirmwareUpdateTakeover(): JSX.Element {
+export function FirmwareUpdateTakeover(): React.ReactNode {
   const [
     showUpdateNeededModal,
     setShowUpdateNeededModal,
@@ -54,7 +54,6 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   React.useEffect(() => {
     if (
       subsystemUpdateInstrument != null &&
-      maintenanceRunData == null &&
       !isUnboxingFlowOngoing &&
       externalSubsystemUpdate == null
     ) {
@@ -62,7 +61,6 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     }
   }, [
     subsystemUpdateInstrument,
-    maintenanceRunData,
     isUnboxingFlowOngoing,
     externalSubsystemUpdate,
   ])
@@ -71,6 +69,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     []
   )
 
+  if (maintenanceRunData != null) return null
   return (
     <>
       {memoizedSubsystem != null && showUpdateNeededModal ? (
