@@ -60,7 +60,7 @@ const BANNER_LINK_CSS = css`
   cursor: pointer;
   margin-left: ${SPACING.spacing8};
 `
-const SUBSYSTEM_UPDATE_POLL_MS = 3000
+const SUBSYSTEM_UPDATE_POLL_MS = 5000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t, i18n } = useTranslation(['device_details', 'protocol_setup'])
@@ -99,7 +99,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     subsystem,
     {
-      enabled: pipetteIsBad,
+      enabled: isOt3,
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
@@ -191,7 +191,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           isExpanded={true}
         />
       )}
-      {!pipetteIsBad && (
+      {!pipetteIsBad && subsystemUpdateData == null && (
         <>
           <Box
             padding={`${SPACING.spacing16} ${SPACING.spacing8}`}
@@ -276,7 +276,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           </Box>
         </>
       )}
-      {pipetteIsBad && (
+      {(pipetteIsBad || subsystemUpdateData != null) && (
         <InstrumentCard
           label={i18n.format(t('mount', { side: mount }), 'capitalize')}
           description={t('instrument_attached')}
