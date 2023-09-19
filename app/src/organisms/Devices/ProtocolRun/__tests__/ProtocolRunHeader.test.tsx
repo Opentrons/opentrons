@@ -855,6 +855,6 @@ describe('ProtocolRunHeader', () => {
     }
     mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
     const [{ getByText }] = render()
-    getByText('Close the robot door before starting the run')
+    getByText('Close the robot door before starting the run.')
   })
 })
