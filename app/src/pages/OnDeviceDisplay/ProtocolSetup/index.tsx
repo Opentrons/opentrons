@@ -77,7 +77,7 @@ import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
-const FETCH_DOOR_STATUS_MS = 10000
+const FETCH_DOOR_STATUS_MS = 5000
 const SNACK_BAR_DURATION_MS = 7000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
