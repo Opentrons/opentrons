@@ -18,7 +18,8 @@
   },
   "OT_PD_ENABLE_FLEX_DECK_MODIFICATION": {
     "title": "Enable Flex deck modification",
-    "description": "Allow users to select waste chute, Flex staging, and modify trash slot",
+    "description": "Allow users to select waste chute, Flex staging, and modify trash slot"
+  },
   "OT_PD_ENABLE_OFF_DECK_VIS_AND_MULTI_TIP": {
     "title": "Enable off deck visuals and multi tiprack support",
     "description": "Allow users to see off deck labware visualizations and multi tiprack support"
