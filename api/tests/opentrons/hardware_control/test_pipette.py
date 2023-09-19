@@ -287,7 +287,7 @@ def test_flow_rate_setting(
         [
             lazy_fixture("hardware_pipette_ot3"),
             pipette_load_name.convert_pipette_model("p1000_96", "3.3"),
-            Point(13.5, -57.0, -259.15),
+            Point(9.0, -61.5, -259.15),
             Point(-36.0, -88.5, -259.15),
         ],
     ],
