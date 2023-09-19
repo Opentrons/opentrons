@@ -201,7 +201,7 @@ class OT3PipetteHandler:
         offset_data: PipetteOffsetByPipetteMount,
     ) -> PipetteOffsetSummary:
         if mount == OT3Mount.LEFT:
-            other_pipette = self.get_pipette(OT3Mount.RIGHT)
+            other_pipette = self._attached_instruments.get(OT3Mount.RIGHT, None)
             if other_pipette:
                 other_offset = other_pipette.pipette_offset.offset
             else:
@@ -210,7 +210,7 @@ class OT3PipetteHandler:
                 offset_data.offset, other_offset
             )
         else:
-            other_pipette = self.get_pipette(OT3Mount.LEFT)
+            other_pipette = self._attached_instruments.get(OT3Mount.LEFT, None)
             if other_pipette:
                 other_offset = other_pipette.pipette_offset.offset
             else:

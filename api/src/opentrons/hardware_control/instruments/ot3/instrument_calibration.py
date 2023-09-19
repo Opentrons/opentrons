@@ -48,7 +48,9 @@ class PipetteOffsetByPipetteMount:
 
 @dataclass
 class PipetteOffsetSummary(PipetteOffsetByPipetteMount):
-    reasonability_check_failures: typing.List[ReasonabilityCheckFailure] = field(default_factory=list)
+    reasonability_check_failures: typing.List[ReasonabilityCheckFailure] = field(
+        default_factory=list
+    )
 
 
 @dataclass
