@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { useSelector } from 'react-redux'
 import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
@@ -24,6 +25,8 @@ import {
   getAllPipetteNames,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+import { getAllow96Channel } from '../../../feature-flags/selectors'
+
 import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
@@ -66,6 +69,7 @@ interface PipetteTypeTileProps extends WizardTileProps {
 }
 export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
   const { allowNoPipette, tileHeader, proceed, goBack } = props
+
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -100,6 +104,7 @@ interface OT2FieldProps extends FormikProps<FormState> {
 function PipetteField(props: OT2FieldProps): JSX.Element {
   const { mount, values, setFieldValue, allowNoPipette } = props
   const robotType = values.fields.robotType
+  const allow96Channel = useSelector(getAllow96Channel)
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
@@ -116,6 +121,9 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         //  filter out 96-channel for now
         o => o.name.includes('Flex') && o.value !== 'p1000_96'
       ),
+      ...allPipetteOptions.filter(
+        o => o.value === 'p1000_96' && allow96Channel
+      ), // break out to deal with FF
       ...allPipetteOptions.filter(o => o.name.includes(GEN2)),
       ...allPipetteOptions.filter(o => o.name.includes(GEN1)),
       ...(allowNoPipette ? [{ name: 'None', value: '' }] : []),
