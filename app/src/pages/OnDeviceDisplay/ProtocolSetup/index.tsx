@@ -489,7 +489,6 @@ function PrepareToRun({
     refetchInterval: FETCH_DOOR_STATUS_MS,
   })
   const isDoorOpen = doorStatus?.data.status === 'open'
-  console.log('doorStatus', doorStatus?.data.status)
   React.useEffect(() => {
     if (isDoorOpen) {
       toastRef.current = makeToast(t('shared:close_robot_door'), 'warning', {

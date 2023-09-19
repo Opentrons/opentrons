@@ -143,7 +143,7 @@ export function ProtocolRunHeader({
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
-  const isDoorClosed = doorStatus?.data.status === 'closed'
+  const isDoorOpen = doorStatus?.data.status === 'open'
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -266,7 +266,7 @@ export function ProtocolRunHeader({
         {runStatus === RUN_STATUS_STOPPED ? (
           <Banner type="warning">{t('run_canceled')}</Banner>
         ) : null}
-        {!isDoorClosed ? (
+        {isDoorOpen ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
         {isRunCurrent ? (
@@ -300,7 +300,7 @@ export function ProtocolRunHeader({
               isProtocolAnalyzing={
                 protocolData == null || !!isProtocolAnalyzing
               }
-              isDoorClosed={isDoorClosed}
+              isDoorOpen={isDoorOpen}
             />
           </Flex>
         </Box>
@@ -424,16 +424,10 @@ interface ActionButtonProps {
   robotName: string
   runStatus: RunStatus | null
   isProtocolAnalyzing: boolean
-  isDoorClosed: boolean
+  isDoorOpen: boolean
 }
 function ActionButton(props: ActionButtonProps): JSX.Element {
-  const {
-    runId,
-    robotName,
-    runStatus,
-    isProtocolAnalyzing,
-    isDoorClosed,
-  } = props
+  const { runId, robotName, runStatus, isProtocolAnalyzing, isDoorOpen } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
@@ -483,7 +477,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolAnalyzing ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
-    !isDoorClosed
+    isDoorOpen
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
     play()

@@ -353,7 +353,7 @@ describe('ProtocolRunHeader', () => {
     mockUseIsOT3.mockReturnValue(true)
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
-    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus })
+    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
   })
 
   afterEach(() => {
