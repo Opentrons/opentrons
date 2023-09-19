@@ -10,8 +10,8 @@ Complex commands perform a series of :ref:`v2-atomic-commands` in order. In fact
 
 This page describes what steps you should expect the robot to perform when using different complex commands with different required and :ref:`optional <complex_params>` parameters.
 
-Complete Order
-==============
+Step Sequence
+=============
 
 The order of steps is fixed within complex commands. Aspiration and dispensing are the only required actions. You can enable or disable all of the other actions with :ref:`complex_params`. A complex command designed to perform every possible action will proceed in this order:
 
@@ -40,7 +40,7 @@ The smallest possible number of steps in a complex command is just two: aspirati
         new_tip="never",
     )
 
-Let's look at another example, a distribute command that adds touch tip steps (and does not turn off tip handling). The code for this command is::
+Here's another example, a distribute command that adds touch tip steps (and does not turn off tip handling). The code for this command is::
 
     pipette.distribute(
         volume=100,
@@ -119,7 +119,7 @@ Remember that ``distribute()`` includes a disposal volume by default, and this c
     Blowing out at A1 of Opentrons Fixed Trash on 12
     Dropping tip into A1 of Opentrons Fixed Trash on 12
     
-This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use :ref:`complex_params` to reduce or eliminate the :ref:`disposal volume <param-disposal-volume>`, or to :ref:`blow out <param-blow-out>` in a location other than the trash.
+This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use :ref:`complex liquid handling parameters <complex_params>` to reduce or eliminate the :ref:`disposal volume <param-disposal-volume>`, or to :ref:`blow out <param-blow-out>` in a location other than the trash.
 
 .. _distribute-consolidate-volume-list:
 .. _complex-list-volumes:

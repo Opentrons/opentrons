@@ -13,7 +13,11 @@ Complex Commands
 
 Complex liquid handling commands combine multiple :ref:`v2-atomic-commands` into a single method call. These commands make it easier to handle larger groups of wells and repeat actions without having to write your own control flow code. They integrate tip-handling behavior and can pick up, use, and drop multiple tips depending on how you want to handle your liquids. They can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip.
 
-There are three complex liquid handling commands: :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate`. Each is optimized for a different liquid handling scenario.
+There are three complex liquid handling commands, each optimized for a different liquid handling scenario: 
+
+    - :py:meth:`.InstrumentContext.transfer`
+    - :py:meth:`.InstrumentContext.distribute`
+    - :py:meth:`.InstrumentContext.consolidate`
 
 Pages in this section of the documentation cover:
 

@@ -6,9 +6,9 @@
 Sources and Destinations
 ************************
 
-Complex commands require both ``source`` and ``dest`` (destination) arguments, in order to move liquid from one well or group of wells to another. This contrasts with the :ref:`v2-atomic-commands` :py:meth:`~.InstrumentContext.aspirate` and :py:meth:`~.InstrumentContext.dispense`, which only operate in a single location.
+The :py:meth:`.InstrumentContext.transfer`, :py:meth:`.InstrumentContext.distribute`, and :py:meth:`.InstrumentContext.consolidate` methods form the family of complex liquid handling commands. These methods require ``source`` and ``dest`` (destination) arguments to move liquid from one well, or group of wells, to another. In contrast, the :ref:`building block commands <v2-atomic-commands>` :py:meth:`~.InstrumentContext.aspirate` and :py:meth:`~.InstrumentContext.dispense` only operate in a single location.
 
-For example, a simple transfer between two wells on a plate could specify::
+For example, this command performs a simple transfer between two wells on a plate::
 
     pipette.transfer(
         volume=100,
@@ -18,19 +18,21 @@ For example, a simple transfer between two wells on a plate could specify::
 
 .. versionadded:: 2.0
 
-This page covers how :py:meth:`~.InstrumentContext.transfer` , :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate` operate on source and destination wells. Each method has its own :ref:`restrictions on sources and destinations <source-dest-args>`. They also aspirate and dispense in different :ref:`patterns <complex-transfer-patterns>`, which you can :ref:`optimize for different use cases <complex-optimizing-patterns>`.
+This page covers the restrictions on sources and destinations for complex commands, their different patterns of aspirating and dispensing, and how to optimize them for different use cases.
 
 
 .. _source-dest-args:
 
-``source`` and ``dest`` Arguments
-=================================
+Source and Destination Arguments
+================================
 
-:py:meth:`~.InstrumentContext.transfer` is the most versatile complex liquid handling function, having the fewest restrictions on what wells it can operate on. You will most likely want to use transfer commands in a majority of cases.
+As noted above, the :py:meth:`~.InstrumentContext.transfer`, :py:meth:`~.InstrumentContext.distribute`, and :py:meth:`~.InstrumentContext.consolidate` methods require ``source`` and ``dest`` (destination) arguments to aspirate and dispense liquid. However, each method handles liquid sources and destinations differently. Understanding how complex commands work with source and destination wells is essential to using these methods effectively.
+
+:py:meth:`~.InstrumentContext.transfer` is the most versatile complex liquid handling function, because it has the fewest restrictions on what wells it can operate on. You will likely use transfer commands in many of your protocols.
 
 Certain liquid handling cases focus on moving liquid to or from a single well. :py:meth:`~.InstrumentContext.distribute` limits its source to a single well, while :py:meth:`~.InstrumentContext.consolidate` limits its destination to a single well. Distribute commands also make  changes to liquid-handling behavior to improve the accuracy of dispensing.
 
-These restrictions and behaviors are summarized as follows:
+The following table summarizes the source and destination restrictions for each method.
 
 .. list-table::
    :header-rows: 1
@@ -51,9 +53,9 @@ These restrictions and behaviors are summarized as follows:
        - **Source:** Any number of wells.
        - **Destination:** Exactly one well.
 
-Singleton wells can be passed by themselves or as a list with one item: ``source=plate['A1']`` and ``source=[plate['A1']]`` are equivalent.
+A single well can be passed by itself or as a list with one item: ``source=plate['A1']`` and ``source=[plate['A1']]`` are equivalent.
     
-The section on :ref:`many-to-many transfers <many-to-many>` below covers how ``transfer()`` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to ``transfer()`` in sequence or by using a :ref:`complex-list-volumes` to skip certain wells.
+The section on :ref:`many-to-many transfers <many-to-many>` below covers how ``transfer()`` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to ``transfer()`` in sequence or by using a :ref:`list of volumes <complex-list-volumes>` to skip certain wells.
 
 For distributing and consolidating, the API will not raise an error if you use a list of wells as the argument that is limited to exactly one well. Instead, the API will ignore everything except the first well in the list. For example, the following command will only aspirate from well A1::
 
@@ -263,7 +265,7 @@ The API raises this error rather than presuming which wells to aspirate from thr
     pipette.transfer(50, plate["A2"], plate.columns()[3][3:6])
     pipette.transfer(50, plate["A3"], plate.columns()[3][6:])
     
-Finally, be aware of the ordering of source and destination lists when constructing them with :ref:`well-accessor-methods`. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column::
+Finally, be aware of the ordering of source and destination lists when constructing them with :ref:`well accessor methods <well-accessor-methods>`. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column::
 
     pipette.transfer(
         volume=20,
@@ -290,7 +292,7 @@ Here the repeat index ``i`` picks out:
 Optimizing Patterns
 -------------------
 
-Choosing the right complex command optimizes gantry movement and ultimately can save time in your protocol. For example, say you want to take liquid from a reservoir and put 50 µL in each well of the first row of a plate. You could use ``transfer()``, like this::
+Choosing the right complex command optimizes gantry movement and helps save time in your protocol. For example, say you want to take liquid from a reservoir and put 50 µL in each well of the first row of a plate. You could use ``transfer()``, like this::
 
     pipette.transfer(
         volume=50,

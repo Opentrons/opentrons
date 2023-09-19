@@ -10,7 +10,7 @@ Complex commands accept a number of optional parameters that give you greater co
 
 This page describes the accepted values and behavior of each parameter. The parameters are organized in the order that they first add a step. Some parameters, such as ``touch_tip``, add multiple steps. See :ref:`complex-command-order` for more details on the sequence of steps performed by complex commands.
 
-The API reference entry for :py:meth:`~.InstrumentContext.transfer` also lists the parameters and has more information on their implementation as keyword arguments.
+The API reference entry for :py:meth:`.InstrumentContext.transfer` also lists the parameters and has more information on their implementation as keyword arguments.
 
 .. _param-tip-handling:
 
@@ -25,7 +25,7 @@ The ``new_tip`` parameter controls if and when complex commands pick up new tips
    * - Value
      - Behavior
    * - ``"once"``
-     - This is the default behavior for all complex commands.
+     - 
         - Pick up a tip at the start of the command.
         - Use the tip for all liquid handling.
         - Drop the tip at the end of the command.
@@ -33,6 +33,8 @@ The ``new_tip`` parameter controls if and when complex commands pick up new tips
      - Pick up and drop a tip for each set of aspirate and dispense steps.
    * - ``"never"``
      - Do not pick up or drop tips at all.
+     
+``"once"`` is the default behavior for all complex commands.
 
 .. versionadded:: 2.0
      
@@ -58,7 +60,7 @@ Avoiding Cross-Contamination
 
 One reason to set ``new_tip="always"`` is to avoid cross-contamination between wells. However, you should always do a dry run of your protocol to test that the pipette is picking up and dropping tips in the way that your application requires.
 
-:py:meth:`~.InstrumentContext.transfer` will pick up a new tip before *every* aspirate when ``new_tip="always"``. This includes when :ref:`complex-tip-refilling` requires multiple aspirations from a single source well.
+:py:meth:`~.InstrumentContext.transfer` will pick up a new tip before *every* aspirate when ``new_tip="always"``. This includes when :ref:`tip refilling <complex-tip-refilling>` requires multiple aspirations from a single source well.
 
 :py:meth:`~.InstrumentContext.distribute` and :py:meth:`~.InstrumentContext.consolidate` only pick up one tip, even when ``new_tip="always"``. For example, this distribute command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 μL)::
 
@@ -86,7 +88,7 @@ If this poses a contamination risk, you can work around it in a few ways:
 
     * Use ``transfer()`` with ``new_tip="always"`` instead.
     * Set :py:obj:`.well_bottom_clearance` high enough that the tip doesn't contact liquid in the destination well.
-    * Use :ref:`v2-atomic-commands` instead of complex commands.
+    * Use :ref:`building block commands <v2-atomic-commands>` instead of complex commands.
 
 
 .. _param-mix-before:
@@ -107,7 +109,7 @@ For example, this transfer command will mix 50 µL of liquid 3 times before each
     
 .. versionadded:: 2.0
 
-Mixing occurs before every aspiration, including when :ref:`complex-tip-refilling` is required.
+Mixing occurs before every aspiration, including when :ref:`tip refilling <complex-tip-refilling>` is required.
 
 .. note::
     :py:meth:`~.InstrumentContext.consolidate` ignores any value of ``mix_before``. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
@@ -130,7 +132,7 @@ By default, ``disposal_volume`` is the :ref:`minimum volume <new-pipette-models>
     
 .. versionadded:: 2.0
     
-If the amount to aspirate plus the disposal volume exceeds the tip's capacity, ``distribute()`` will use a :ref:`complex-tip-refilling` strategy. In such cases, the pipette will aspirate and blow out the disposal volume *for each aspiration*. For example, this command will require tip refilling with a 1000 µL pipette::
+If the amount to aspirate plus the disposal volume exceeds the tip's capacity, ``distribute()`` will use a :ref:`tip refilling strategy <complex-tip-refilling>`. In such cases, the pipette will aspirate and blow out the disposal volume *for each aspiration*. For example, this command will require tip refilling with a 1000 µL pipette::
     
     pipette.distribute(
         volume=120,
@@ -164,7 +166,7 @@ For example, this transfer command aspirates, touches the tip at the source, dis
 
 .. versionadded:: 2.0
 
-Touch tip occurs after every aspiration, including when :ref:`complex-tip-refilling` is required.
+Touch tip occurs after every aspiration, including when :ref:`tip refilling <complex-tip-refilling>` is required.
 
 This parameter always uses default motion behavior for touch tip. Use the :ref:`touch tip building block command <touch-tip>` if you need to:
 
@@ -233,7 +235,7 @@ When consolidating, air gaps still occur after every aspiration. In this example
     Dispensing 210.0 uL into B1 of well plate on 2 at 92.86 uL/sec
     Dropping tip into A1 of Opentrons Fixed Trash on 12
     
-If adding an air gap would exceed the pipette's maximum volume, the complex command will use a :ref:`complex-tip-refilling` strategy. For example, this command uses a 300 µL pipette to transfer 300 µL of liquid plus an air gap::
+If adding an air gap would exceed the pipette's maximum volume, the complex command will use a :ref:`tip refilling strategy <complex-tip-refilling>`. For example, this command uses a 300 µL pipette to transfer 300 µL of liquid plus an air gap::
 
     pipette.transfer(
         volume=300,
