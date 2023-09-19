@@ -1,4 +1,3 @@
-import { WASTE_CHUTE_SLOT } from '../../constants'
 import { uuid } from '../../utils'
 
 export interface ToggleIsGripperRequiredAction {
