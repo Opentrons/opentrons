@@ -235,7 +235,12 @@ def _pipette_with_liquid_settings(  # noqa: C901
                 "this should only happen during blank trials"
             )
             hw_api.dispense(hw_mount)
-        hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
+        if mode:
+            # NOTE: increment test requires the plunger's "bottom" position
+            #       does not change during the entire test run
+            hw_api.set_liquid_class(hw_mount, mode)
+        else:
+            hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
         hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
