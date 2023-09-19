@@ -29,6 +29,7 @@ import {
   useProtocolQuery,
   useRunQuery,
   useInstrumentsQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
@@ -76,6 +77,8 @@ import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
+const FETCH_DOOR_STATUS_MS = 5000
+const SNACK_BAR_DURATION_MS = 7000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -315,7 +318,7 @@ function PrepareToRun({
   confirmAttachment,
   play,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
 
@@ -482,6 +485,20 @@ function PrepareToRun({
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
+  const { data: doorStatus } = useDoorQuery({
+    refetchInterval: FETCH_DOOR_STATUS_MS,
+  })
+  const isDoorOpen =
+    doorStatus?.data.status === 'open' &&
+    doorStatus?.data.doorRequiredClosedForProtocol
+  React.useEffect(() => {
+    // Note show snackbar when instruments and modules are all green
+    // but the robot door is open
+    if (isReadyToRun && isDoorOpen) {
+      makeSnackbar(t('shared:close_robot_door'), SNACK_BAR_DURATION_MS)
+    }
+  }, [isDoorOpen])
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -495,7 +512,7 @@ function PrepareToRun({
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
-        overflowY="hidden"
+        overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -531,7 +548,7 @@ function PrepareToRun({
               }
             />
             <PlayButton
-              disabled={isLoading}
+              disabled={isLoading || isDoorOpen}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
             />

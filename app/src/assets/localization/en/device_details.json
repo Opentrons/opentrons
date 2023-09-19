@@ -31,7 +31,7 @@
   "detach_gripper": "Detach gripper",
   "detach_pipette": "Detach pipette",
   "disengaged": "Disengaged",
-  "download_run_log": "Download run log",
+  "download_run_log": "Download protocol run log",
   "empty": "Empty",
   "error_details": "error details",
   "estop_disconnected": "E-stop disconnected. Robot movement is halted.",

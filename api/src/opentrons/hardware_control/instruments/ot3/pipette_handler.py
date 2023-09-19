@@ -45,7 +45,11 @@ from opentrons.hardware_control.constants import (
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
-from .instrument_calibration import PipetteOffsetByPipetteMount
+from .instrument_calibration import (
+    PipetteOffsetSummary,
+    PipetteOffsetByPipetteMount,
+    check_instrument_offset_reasonability,
+)
 
 
 MOD_LOG = logging.getLogger(__name__)
@@ -159,16 +163,16 @@ class OT3PipetteHandler:
         else:
             _reset(mount)
 
-    def get_instrument_offset(
-        self, mount: OT3Mount
-    ) -> Optional[PipetteOffsetByPipetteMount]:
+    def get_instrument_offset(self, mount: OT3Mount) -> Optional[PipetteOffsetSummary]:
         """Get the specified pipette's offset."""
         assert mount != OT3Mount.GRIPPER, "Wrong mount type to fetch pipette offset"
         try:
             pipette = self.get_pipette(mount)
         except top_types.PipetteNotAttachedError:
             return None
-        return pipette.pipette_offset
+        return self._return_augmented_offset_data(
+            pipette, mount, pipette.pipette_offset
+        )
 
     def reset_instrument_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """
@@ -180,14 +184,47 @@ class OT3PipetteHandler:
 
     def save_instrument_offset(
         self, mount: OT3Mount, delta: top_types.Point
-    ) -> PipetteOffsetByPipetteMount:
+    ) -> PipetteOffsetSummary:
         """
         Save a new instrument offset the pipette offset to a particular value.
         :param mount: Modify the given mount.
         :param delta: The offset to set for the pipette.
         """
         pipette = self.get_pipette(mount)
-        return pipette.save_pipette_offset(mount, delta)
+        offset_data = pipette.save_pipette_offset(mount, delta)
+        return self._return_augmented_offset_data(pipette, mount, offset_data)
+
+    def _return_augmented_offset_data(
+        self,
+        pipette: Pipette,
+        mount: OT3Mount,
+        offset_data: PipetteOffsetByPipetteMount,
+    ) -> PipetteOffsetSummary:
+        if mount == OT3Mount.LEFT:
+            other_pipette = self._attached_instruments.get(OT3Mount.RIGHT, None)
+            if other_pipette:
+                other_offset = other_pipette.pipette_offset.offset
+            else:
+                other_offset = top_types.Point(0, 0, 0)
+            reasonability = check_instrument_offset_reasonability(
+                offset_data.offset, other_offset
+            )
+        else:
+            other_pipette = self._attached_instruments.get(OT3Mount.LEFT, None)
+            if other_pipette:
+                other_offset = other_pipette.pipette_offset.offset
+            else:
+                other_offset = top_types.Point(0, 0, 0)
+            reasonability = check_instrument_offset_reasonability(
+                other_offset, offset_data.offset
+            )
+        return PipetteOffsetSummary(
+            offset=offset_data.offset,
+            source=offset_data.source,
+            status=offset_data.status,
+            last_modified=offset_data.last_modified,
+            reasonability_check_failures=reasonability,
+        )
 
     # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
     # instead of potentially returning an empty dict

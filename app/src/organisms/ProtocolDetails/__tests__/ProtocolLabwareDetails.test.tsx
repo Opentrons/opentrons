@@ -72,7 +72,7 @@ describe('ProtocolLabwareDetails', () => {
 
   it('should render an opentrons labware', () => {
     const { getByText } = render(props)
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
     getByText('Quantity')
     getByText('1')
@@ -129,7 +129,7 @@ describe('ProtocolLabwareDetails', () => {
     } as LoadLabwareRunTimeCommand)
 
     const { getByText } = render(props)
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
     getByText('Quantity')
     getByText('2')

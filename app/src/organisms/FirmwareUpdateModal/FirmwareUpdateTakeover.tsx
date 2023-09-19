@@ -80,7 +80,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
       ) : null}
-      {externalsubsystemUpdateData != null ? (
+      {externalsubsystemUpdateData != null && maintenanceRunData == null ? (
         <Portal level="top">
           <UpdateInProgressModal
             percentComplete={externalsubsystemUpdateData.data.updateProgress}
