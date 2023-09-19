@@ -197,8 +197,7 @@ const mockDoorStatus = {
     status: 'closed',
   },
 }
-const MOCK_MAKE_TOAST = jest.fn()
-const MOCK_EAT_TOAST = jest.fn()
+const MOCK_MAKE_SNACKBAR = jest.fn()
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
@@ -282,9 +281,8 @@ describe('ProtocolSetup', () => {
     when(mockUseToaster)
       .calledWith()
       .mockReturnValue(({
-        makeToast: MOCK_MAKE_TOAST,
-        eatToast: MOCK_EAT_TOAST,
-      } as unknown) as ToasterContextType)
+        makeSnackbar: MOCK_MAKE_SNACKBAR,
+      } as unknown) as any)
   })
 
   afterEach(() => {
@@ -384,13 +382,9 @@ describe('ProtocolSetup', () => {
     }
     mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
     const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(MOCK_MAKE_TOAST).toBeCalledWith(
+    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run',
-      'warning',
-      {
-        closeButton: false,
-        disableTimeout: true,
-      }
+      7000
     )
     expect(getByRole('button', { name: 'play' })).toBeDisabled()
   })

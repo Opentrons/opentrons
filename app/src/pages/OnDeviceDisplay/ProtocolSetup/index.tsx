@@ -77,7 +77,8 @@ import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
-const FETCH_DOOR_STATUS_MS = 5000
+const FETCH_DOOR_STATUS_MS = 10000
+const SNACK_BAR_DURATION_MS = 7000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -319,8 +320,7 @@ function PrepareToRun({
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
-  const { makeSnackbar, makeToast, eatToast } = useToaster()
-  const toastRef = React.useRef<string | null>(null)
+  const { makeSnackbar } = useToaster()
 
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -490,13 +490,10 @@ function PrepareToRun({
   })
   const isDoorOpen = doorStatus?.data.status === 'open'
   React.useEffect(() => {
-    if (isDoorOpen) {
-      toastRef.current = makeToast(t('shared:close_robot_door'), 'warning', {
-        closeButton: false,
-        disableTimeout: true,
-      })
-    } else if (!isDoorOpen && toastRef.current != null) {
-      eatToast(toastRef.current)
+    // Note show snackbar when instruments and modules are all green
+    // but the robot door is open
+    if (isReadyToRun && isDoorOpen) {
+      makeSnackbar(t('shared:close_robot_door'), SNACK_BAR_DURATION_MS)
     }
   }, [isDoorOpen])
 
@@ -513,7 +510,7 @@ function PrepareToRun({
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
-        overflowY="hidden"
+        overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
