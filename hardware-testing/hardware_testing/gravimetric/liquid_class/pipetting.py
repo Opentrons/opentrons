@@ -193,7 +193,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
         #        we again use the hardware controller
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.dispense(hw_mount, push_out=liquid_class.dispense.blow_out_submerged)
+        push_out = min(liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul())
+        hw_api.dispense(hw_mount, push_out=push_out)
 
     def _blow_out_remaining_air() -> None:
         # FIXME: using the HW-API to specify that we want to blow-out the full

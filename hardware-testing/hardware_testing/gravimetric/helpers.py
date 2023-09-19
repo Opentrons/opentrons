@@ -152,11 +152,12 @@ def _sense_liquid_height(
     hwapi = get_sync_hw_api(ctx)
     pipette.move_to(well.top())
     lps = config._get_liquid_probe_settings(cfg, well)
-    heights = []
-    for i in range(5):
-        heights.append(well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps))
-    depth = well.depth - (sum(heights) / len(heights))
-    return depth
+    well_bottom_z = well.bottom().point.z
+    # NOTE: very important that probing is done only 1x time,
+    #       with a DRY tip, for reliability
+    liquid_z = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    liquid_depth = liquid_z - well_bottom_z
+    return liquid_depth
 
 
 def _calculate_average(volume_list: List[float]) -> float:

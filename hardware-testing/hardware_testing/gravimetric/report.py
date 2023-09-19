@@ -143,7 +143,7 @@ def store_config_pm(report: CSVReport, cfg: config.PhotometricConfig) -> None:
     for field in fields(config.PhotometricConfig):
         if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        val_str = str(getattr(cfg, field.name))
+        val_str = str(getattr(cfg, field.name)).replace(" ", "")
         val_str = val_str.replace("[", "").replace("]", "").replace(",", "-")
         report("CONFIG", field.name, [val_str])
 
@@ -297,8 +297,8 @@ def create_csv_test_report(
     )
     # NOTE: just immediately clear all the "isolate" flags on the volume section
     #       so that final CSV is guaranteed to not be filled with a bunch of "None"
-    for line in report["VOLUMES"]:
-        line.store([None, ""])
+    for line in report["VOLUMES"].lines:
+        line.store(None, "")
     return report
 
 
@@ -307,7 +307,8 @@ def store_config_gm(report: CSVReport, cfg: config.GravimetricConfig) -> None:
     for field in fields(config.GravimetricConfig):
         if field.name in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        val_str = str(getattr(cfg, field.name)).replace("[", "").replace("]", "")
+        val_str = str(getattr(cfg, field.name)).replace(" ", "")
+        val_str = val_str.replace("[", "").replace("]", "").replace(",", "-")
         report("CONFIG", field.name, [val_str])
 
 
@@ -361,7 +362,13 @@ def store_serial_numbers(
 
 
 def store_volume_all(
-    report: CSVReport, mode: str, volume: float, average: float, cv: float, d: float, flag: str = ""
+    report: CSVReport,
+    mode: str,
+    volume: float,
+    average: float,
+    cv: float,
+    d: float,
+    flag: str = "",
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -372,10 +379,14 @@ def store_volume_all(
         [round(average, 2), flag],
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-cv", [round(cv * 100.0, 2), flag]
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel_all-cv",
+        [round(cv * 100.0, 2), flag],
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-d", [round(d * 100.0, 2), flag]
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel_all-d",
+        [round(d * 100.0, 2), flag],
     )
 
 
@@ -389,7 +400,7 @@ def store_volume_per_channel(
     d: float,
     celsius: float,
     humidity: float,
-    flag: str = ""
+    flag: str = "",
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]

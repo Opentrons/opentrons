@@ -178,7 +178,7 @@ class RunArgs:
         )
         return _ctx
 
-    @classmethod
+    @classmethod  # noqa: C901
     def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
@@ -242,14 +242,13 @@ class RunArgs:
                 )
         if args.isolate_volumes:
             # check that all volumes passed in are actually test volumes
-            all_vols = set([
-                vol
-                for tip_vol_list in volumes
-                for vol in tip_vol_list[-1]
-            ])
+            all_vols = set(
+                [vol for tip_vol_list in volumes for vol in tip_vol_list[-1]]
+            )
             for isolated_volume in args.isolate_volumes:
-                assert isolated_volume in all_vols, f"cannot isolate volume {isolated_volume}, " \
-                                                    f"not a test volume"
+                assert isolated_volume in all_vols, (
+                    f"cannot isolate volume {isolated_volume}, " f"not a test volume"
+                )
         if args.extra:
             # if we use extra, add those tests after
             for tip in tip_volumes:
@@ -296,7 +295,7 @@ class RunArgs:
                 trials=trials,
                 name=name,
                 robot_serial=robot_serial,
-                fw_version=run_args.ctx._core.get_hardware().fw_version,
+                fw_version=_ctx._core.get_hardware().fw_version,
             )
         else:
             if args.increment:
@@ -324,7 +323,7 @@ class RunArgs:
                 name=name,
                 environment_sensor=environment_sensor,
                 trials=trials,
-                fw_version=run_args.ctx._core.get_hardware().fw_version,
+                fw_version=_ctx._core.get_hardware().fw_version,
             )
 
         return RunArgs(
