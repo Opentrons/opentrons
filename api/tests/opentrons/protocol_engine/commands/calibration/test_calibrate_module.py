@@ -60,7 +60,7 @@ async def test_calibrate_module_implementation(
         location
     )
     decoy.when(
-        subject._state_view.modules.get_module_calibration_offset(module_id)
+        subject._state_view.modules.get_module_offset_vector(module_id)
     ).then_return(ModuleOffsetVector(x=0, y=0, z=0))
     decoy.when(
         subject._state_view.geometry.get_nominal_well_position(

@@ -380,7 +380,8 @@ class ModuleOffsetVector(BaseModel):
     z: float
 
 
-class ModuleOffsetData(BaseModel):
+@dataclass
+class ModuleOffsetData:
     """Module calibration offset data."""
 
     moduleOffsetVector: ModuleOffsetVector

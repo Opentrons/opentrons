@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot
+from numpy import array, dot, linalg
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -676,34 +676,19 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
-        """Get the stored module calibration offset."""
-        offset = ModuleOffsetVector(x=0, y=0, z=0)
+    def get_module_offset_vector(self, module_id: str) -> ModuleOffsetVector:
+        """Get the stored module calibration offset without slot transforms."""
         module_serial = self.get(module_id).serialNumber
         if module_serial is not None:
             offset_data = self._state.module_offset_by_serial.get(module_serial)
             if offset_data:
-                offset = offset_data.moduleOffsetVector
-                calibrated_slot = offset_data.location.slotName
-                module_slot = self.get_location(module_id).slotName
-                # NOTE (ba, 2023-08-31): If the module was physically moved and
-                # rotated to a different deck slot location, then we also need to
-                # rotate the calibrated module offset by 180 degrees around the Z axis.
-                if _needs_rotation(module_id, calibrated_slot, module_slot):
-                    pre_rotation = array([offset.x, offset.y, offset.z])
-                    rotation_vector = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
-                    offset_vector = dot(pre_rotation, rotation_vector)  # type: ignore[no-untyped-call]
-                    offset = ModuleOffsetVector(
-                        x=offset_vector[0],
-                        y=offset_vector[1],
-                        z=offset_vector[2],
-                    )
-        return offset
+                return offset_data.moduleOffsetVector
+        return ModuleOffsetVector(x=0, y=0, z=0)
 
     def get_nominal_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
-        """Get the module's offset vector computed with slot transform."""
+        """Get the module's nominal offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.id
 
@@ -730,14 +715,53 @@ class ModuleView(HasState[ModuleState]):
             z=xformed[2],
         )
 
+    def get_rotated_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
+        """Get the modules offset with slot rotation if applicable."""
+        offset = LabwareOffsetVector(x=0, y=0, z=0)
+        definition = self.get_definition(module_id)
+        module_serial = self.get(module_id).serialNumber
+        if module_serial is not None:
+            offset_data = self._state.module_offset_by_serial.get(module_serial)
+            if offset_data:
+                offset_vec = offset_data.moduleOffsetVector
+                calibrated_slot = offset_data.location.slotName.id
+                module_slot = self.get_location(module_id).slotName.id
+
+                saved_offset = array([offset_vec.x, offset_vec.y, offset_vec.z, 0])
+                orig_xform = array(
+                    definition.slotTransforms.get(str(deck_type.value), {}).get(
+                        calibrated_slot,
+                    )["labwareOffset"]
+                )
+
+                # NOTE: Take the inverse of the original slot transform
+                # and multiply it by the saved offset to get the inverse offset.
+                inverse_xform = linalg.inv(orig_xform)  # type: ignore[no-untyped-call]
+                inverse_offset = dot(saved_offset, inverse_xform)  # type: ignore[no-untyped-call]
+                new_xform = array(
+                    definition.slotTransforms.get(str(deck_type.value), {}).get(
+                        module_slot,
+                    )["labwareOffset"]
+                )
+
+                new_offset = dot(inverse_offset, new_xform)  # type: ignore[no-untyped-call]
+                offset = LabwareOffsetVector(
+                    x=new_offset[0],
+                    y=new_offset[1],
+                    z=new_offset[2],
+                )
+        return offset
+
     def get_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform and calibrated module offsets."""
         offset_vector = self.get_nominal_module_offset(module_id, deck_type)
 
-        # add the calibrated module offset if there is one
-        cal_offset = self.get_module_calibration_offset(module_id)
+        # add the calibrated module + rotated offset if there is one
+        cal_offset = self.get_rotated_module_offset(module_id, deck_type)
         return LabwareOffsetVector(
             x=offset_vector.x + cal_offset.x,
             y=offset_vector.y + cal_offset.y,

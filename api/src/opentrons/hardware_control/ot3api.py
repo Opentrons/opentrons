@@ -2052,10 +2052,9 @@ class OT3API(
             self._log.warning(f"Could not save calibration: unknown module {module_id}")
             return None
         # TODO (ba, 2023-03-22): gripper_id and pipette_id should probably be combined to instrument_id
-        instrument_id = None
-        if self._gripper_handler.has_gripper():
+        if mount == OT3Mount.GRIPPER and self._gripper_handler.has_gripper():
             instrument_id = self._gripper_handler.get_gripper().gripper_id
-        elif self._pipette_handler.has_pipette(mount):
+        else:
             instrument_id = self._pipette_handler.get_pipette(mount).pipette_id
         module_type = module.MODULE_TYPE
         self._log.info(

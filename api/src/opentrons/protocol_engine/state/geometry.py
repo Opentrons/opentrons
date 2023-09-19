@@ -18,7 +18,6 @@ from ..types import (
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
-    ModuleOffsetVector,
     LabwareLocation,
     LabwareOffsetVector,
     DeckType,
@@ -188,13 +187,14 @@ class GeometryView:
 
     def _get_calibrated_module_offset(
         self, location: LabwareLocation
-    ) -> ModuleOffsetVector:
+    ) -> LabwareOffsetVector:
         """Get a labware location's underlying calibrated module offset, if it is on a module."""
         if isinstance(location, ModuleLocation):
             module_id = location.moduleId
-            return self._modules.get_module_calibration_offset(module_id)
+            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
+            return self._modules.get_module_offset(module_id, deck_type)
         elif isinstance(location, DeckSlotLocation):
-            return ModuleOffsetVector(x=0, y=0, z=0)
+            return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(location, OnLabwareLocation):
             labware_data = self._labware.get(location.labwareId)
             return self._get_calibrated_module_offset(labware_data.location)
