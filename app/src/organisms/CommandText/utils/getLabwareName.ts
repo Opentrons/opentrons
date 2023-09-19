@@ -7,7 +7,11 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 
-const FIXED_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+const FIXED_TRASH_DEF_URIS = [
+  'opentrons/opentrons_1_trash_850ml_fixed/1',
+  'opentrons/opentrons_1_trash_1100ml_fixed/1',
+  'opentrons/opentrons_1_trash_3200ml_fixed/1',
+]
 export function getLabwareName(
   analysis: CompletedProtocolAnalysis,
   labwareId: string
@@ -15,7 +19,7 @@ export function getLabwareName(
   const loadedLabware = getLoadedLabware(analysis, labwareId)
   if (loadedLabware == null) {
     return ''
-  } else if (loadedLabware.definitionUri === FIXED_TRASH_DEF_URI) {
+  } else if (FIXED_TRASH_DEF_URIS.includes(loadedLabware.definitionUri)) {
     return 'Fixed Trash'
   } else if (loadedLabware.displayName != null) {
     return loadedLabware.displayName

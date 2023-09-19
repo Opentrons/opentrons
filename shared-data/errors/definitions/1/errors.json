@@ -102,6 +102,10 @@
       "detail": "Misaligned Gantry",
       "category": "roboticsControlError"
     },
+    "2012": {
+      "detail": "Unmatched tip presence states",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -166,6 +170,10 @@
       "detail": "Invalid Instrument Data",
       "category": "roboticsInteractionError"
     },
+    "3017": {
+      "detail": "Invalid Liquid Class Name",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -180,6 +188,14 @@
     },
     "4003": {
       "detail": "Not supported on this robot type",
+      "category": "generalError"
+    },
+    "4004": {
+      "detail": "Command Precondition Violated",
+      "category": "generalError"
+    },
+    "4005": {
+      "detail": "Command Parameter Limit Violated",
       "category": "generalError"
     }
   }

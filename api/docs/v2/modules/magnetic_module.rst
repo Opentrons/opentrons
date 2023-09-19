@@ -1,3 +1,5 @@
+:og:description: How to engage and disengage the Magnetic Module for the OT-2 in a Python protocol.
+
 .. _magnetic-module:
 
 ***************

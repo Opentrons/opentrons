@@ -166,28 +166,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
         .catch(error => {
           setShowErrorMessage(error.message)
         })
-    } else if (
-      isSuccess &&
-      flowType === FLOWS.DETACH &&
-      currentStepIndex !== totalStepCount
-    ) {
-      chainRunCommands?.(
-        [
-          {
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
-            },
-          },
-        ],
-        false
-      )
-        .then(() => {
-          proceed()
-        })
-        .catch(error => {
-          setShowErrorMessage(error.message)
-        })
     } else {
       proceed()
     }
@@ -266,7 +244,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
             aria-label="Results_errorExit"
             marginRight={SPACING.spacing4}
           >
-            {i18n.format(t('cancel_attachment'), 'capitalize')}
+            {flowType === FLOWS.DETACH
+              ? i18n.format(t('cancel_detachment'), 'capitalize')
+              : i18n.format(t('cancel_attachment'), 'capitalize')}
           </SecondaryButton>
         )}
         <CheckPipetteButton

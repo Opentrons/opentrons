@@ -114,7 +114,7 @@
   "start_time": "Start Time",
   "start": "Start",
   "status_blocked-by-open-door": "Paused - door open",
-  "status_failed": "Completed",
+  "status_failed": "Failed",
   "status_finishing": "Finishing",
   "status_idle": "Not started",
   "status_pause-requested": "Pause requested",

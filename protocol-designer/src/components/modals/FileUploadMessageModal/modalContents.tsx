@@ -1,6 +1,5 @@
 import * as React from 'react'
 import assert from 'assert'
-import semver from 'semver'
 import styles from './modalContents.css'
 import { ModalContents } from './types'
 import { FileUploadMessage } from '../../../load-file'
@@ -52,8 +51,7 @@ export const genericDidMigrateMessage: ModalContents = {
       </p>
       <p>
         Updating the file may make changes to liquid handling actions. Please
-        review your file in the Protocol Designer as well as with a water run on
-        the robot.
+        review your file in the Protocol Designer.
       </p>
       <p>As always, please contact us with any questions or feedback.</p>
     </>
@@ -126,7 +124,16 @@ export function getMigrationMessage(migrationsRan: string[]): ModalContents {
   if (migrationsRan.includes('3.0.0')) {
     return toV3MigrationMessage
   }
-  if (migrationsRan.every(migration => semver.gt(migration, '4.0.0'))) {
+  const noBehaviorMigrations = [
+    ['5.0.0'],
+    ['5.0.0', '5.1.0'],
+    ['5.0.0', '5.1.0', '5.2.0'],
+  ]
+  if (
+    noBehaviorMigrations.some(migrationList =>
+      migrationsRan.every(migration => migrationList.includes(migration))
+    )
+  ) {
     return noBehaviorChangeMessage
   }
   return genericDidMigrateMessage

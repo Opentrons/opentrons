@@ -51,6 +51,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        push_out: Optional[float],
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -60,6 +61,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             rate: The rate for how quickly to dispense.
             flow_rate: The flow rate in µL/s to dispense at.
             in_place: Whether this is in-place.
+            push_out: The amount to push the plunger below bottom position.
         """
         ...
 
@@ -224,6 +226,14 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
+        ...
+
+    def configure_for_volume(self, volume: float) -> None:
+        """Configure the pipette for a specific volume.
+
+        Args:
+            volume: The volume to preppare to handle.
+        """
         ...
 
 

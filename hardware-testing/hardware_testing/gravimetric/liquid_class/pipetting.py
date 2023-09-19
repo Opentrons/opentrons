@@ -188,29 +188,17 @@ def _pipette_with_liquid_settings(  # noqa: C901
         return (blow_out - bottom) * blow_out_ul_per_mm
 
     def _dispense_with_added_blow_out() -> None:
-        # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
-        # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
+        # dispense all liquid, plus some air
+        # FIXME: push-out is not supported in Legacy core, so here
+        #        we again use the hardware controller
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        vol = min(liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul())
-        hw_api.blow_out(hw_mount, vol)
+        hw_api.dispense(hw_mount, push_out=liquid_class.dispense.blow_out_submerged)
 
     def _blow_out_remaining_air() -> None:
         # FIXME: using the HW-API to specify that we want to blow-out the full
         #        available blow-out volume
         hw_api.blow_out(hw_mount, _get_max_blow_out_ul())
-
-    def _set_plunger_bottom() -> None:
-        # FIXME: this should be deleted immediately once low-volume mode is working
-        old_positions = hw_pipette.plunger_positions
-        poses = {"default": 71.5, "lowVolumeDefault": 61.5}
-        if mode:
-            old_positions.bottom = poses[mode]
-        elif (aspirate and aspirate < 5) or (dispense and dispense < 5):
-            old_positions.bottom = poses["lowVolumeDefault"]
-        else:
-            old_positions.bottom = poses["default"]
-        hw_pipette._set_plunger_positions(old_positions)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -241,7 +229,13 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
-        _set_plunger_bottom()
+        if hw_pipette.current_volume > 0:
+            print(
+                "WARNING: removing trailing air-gap from pipette, "
+                "this should only happen during blank trials"
+            )
+            hw_api.dispense(hw_mount)
+        hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
         hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
@@ -385,8 +379,9 @@ def aspirate_with_liquid_class(
     mode: str = "",
 ) -> None:
     """Aspirate with liquid class."""
+    pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), pipette.channels, tip_volume, int(aspirate_volume)
+        pip_size, pipette.channels, tip_volume, int(aspirate_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -420,8 +415,9 @@ def dispense_with_liquid_class(
     mode: str = "",
 ) -> None:
     """Dispense with liquid class."""
+    pip_size = 50 if "50" in pipette.name else 1000
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), pipette.channels, tip_volume, int(dispense_volume)
+        pip_size, pipette.channels, tip_volume, int(dispense_volume)
     )
     _pipette_with_liquid_settings(
         ctx,

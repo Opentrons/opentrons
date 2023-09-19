@@ -43,7 +43,7 @@ describe('EstopPressedModal - Touchscreen', () => {
     getByText('E-stop')
     getByText('Engaged')
     getByText(
-      'First, safely clear the deck of any labware or spills. Then, twist the E-stop button counterclockwise. Finally, have Flex move the gantry to its home position.'
+      'First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have Flex move the gantry to its home position.'
     )
     getByText('Resume robot operations')
     expect(getByTestId('Estop_pressed_button')).toBeDisabled()
@@ -85,7 +85,7 @@ describe('EstopPressedModal - Desktop', () => {
     getByText('E-stop pressed')
     getByText('E-stop Engaged')
     getByText(
-      'First, safely clear the deck of any labware or spills. Then, twist the E-stop button counterclockwise. Finally, have Flex move the gantry to its home position.'
+      'First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have Flex move the gantry to its home position.'
     )
     expect(
       getByRole('button', { name: 'Resume robot operations' })

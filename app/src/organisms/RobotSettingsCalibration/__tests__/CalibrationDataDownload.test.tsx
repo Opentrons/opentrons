@@ -3,7 +3,10 @@ import { saveAs } from 'file-saver'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
@@ -54,6 +57,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
+>
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
 >
 
 let mockTrackEvent: jest.Mock
@@ -111,6 +117,9 @@ describe('CalibrationDataDownload', () => {
         mockTipLengthCalibration3,
       ])
     mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [] },
+    } as any)
+    mockUseModulesQuery.mockReturnValue({
       data: { data: [] },
     } as any)
   })
@@ -221,7 +230,7 @@ describe('CalibrationDataDownload', () => {
     const downloadButton = getByRole('button', {
       name: 'Download calibration data',
     })
-    expect(downloadButton).toBeDisabled()
+    expect(downloadButton).toBeEnabled() // allow download for empty cal data
   })
 
   it('renders disabled button when tip lengths are not calibrated', () => {

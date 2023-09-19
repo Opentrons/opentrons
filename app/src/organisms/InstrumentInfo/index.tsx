@@ -20,9 +20,8 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
-import { useMaintenanceRunTakeover } from '../TakeoverModal'
-import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -35,7 +34,6 @@ interface InstrumentInfoProps {
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t, i18n } = useTranslation('instruments_dashboard')
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
@@ -57,11 +55,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     instrument != null &&
     instrument.ok &&
     instrument.mount !== 'extension' &&
-    // @ts-expect-error the mount acts as a type narrower here
     instrument.data?.channels === 96
 
   const handleDetach: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -89,7 +85,6 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -128,7 +123,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               label={t('last_calibrated')}
               value={
                 instrument.data.calibratedOffset?.last_modified != null
-                  ? formatTimestamp(
+                  ? formatTimeWithUtcLabel(
                       instrument.data.calibratedOffset?.last_modified
                     )
                   : i18n.format(t('no_cal_data'), 'capitalize')

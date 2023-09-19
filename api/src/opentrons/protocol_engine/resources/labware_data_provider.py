@@ -82,5 +82,5 @@ class LabwareDataProvider:
                 f"No calibrated tip length found for {pipette_serial},"
                 f" using nominal fallback value of {nominal_fallback}"
             )
-            log.warning(message, exc_info=e)
+            log.debug(message, exc_info=e)
             return nominal_fallback

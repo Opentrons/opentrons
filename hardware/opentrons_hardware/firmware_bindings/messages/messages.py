@@ -94,6 +94,8 @@ MessageDefinition = Union[
     defs.TipStatusQueryRequest,
     defs.GetMotorUsageRequest,
     defs.GetMotorUsageResponse,
+    defs.GripperJawStateRequest,
+    defs.GripperJawStateResponse,
 ]
 
 

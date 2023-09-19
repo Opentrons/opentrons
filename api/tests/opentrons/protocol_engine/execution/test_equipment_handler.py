@@ -22,7 +22,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.actions import ActionDispatcher, AddPipetteConfigAction
+from opentrons.protocol_engine.actions import ActionDispatcher
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     DeckType,
@@ -69,9 +69,10 @@ def _make_config(use_virtual_modules: bool) -> Config:
 
 @pytest.fixture(autouse=True)
 def patch_mock_pipette_data_provider(
-    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Mock out move_types.py functions."""
+    """Mock out pipette_data_provider top level functions."""
     for name, func in inspect.getmembers(pipette_data_provider, inspect.isfunction):
         monkeypatch.setattr(pipette_data_provider, name, decoy.mock(func=func))
 
@@ -150,6 +151,14 @@ def loaded_static_pipette_data(
 
 
 @pytest.fixture
+def virtual_pipette_data_provider(
+    decoy: Decoy,
+) -> pipette_data_provider.VirtualPipetteDataProvider:
+    """Virtual pipette data provider."""
+    return decoy.mock(cls=pipette_data_provider.VirtualPipetteDataProvider)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -157,6 +166,7 @@ def subject(
     labware_data_provider: LabwareDataProvider,
     module_data_provider: ModuleDataProvider,
     model_utils: ModelUtils,
+    virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> EquipmentHandler:
     """Get an EquipmentHandler test subject with its dependencies mocked out."""
     return EquipmentHandler(
@@ -166,6 +176,7 @@ def subject(
         labware_data_provider=labware_data_provider,
         module_data_provider=module_data_provider,
         model_utils=model_utils,
+        virtual_pipette_data_provider=virtual_pipette_data_provider,
     )
 
 
@@ -629,7 +640,11 @@ async def test_load_pipette(
         pipette_id=None,
     )
 
-    assert result == LoadedPipetteData(pipette_id="unique-id")
+    assert result == LoadedPipetteData(
+        pipette_id="unique-id",
+        serial_number="world",
+        static_config=loaded_static_pipette_data,
+    )
 
     decoy.verify(
         await hardware_api.cache_instruments(
@@ -637,13 +652,6 @@ async def test_load_pipette(
                 HwMount.LEFT: PipetteNameType.P300_SINGLE.value,
                 HwMount.RIGHT: PipetteNameType.P300_MULTI.value,
             }
-        ),
-        action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id="unique-id",
-                serial_number="world",
-                config=loaded_static_pipette_data,
-            )
         ),
     )
 
@@ -674,22 +682,15 @@ async def test_load_pipette_96_channels(
     )
 
     result = await subject.load_pipette(
-        pipette_name="p1000_96",
+        pipette_name=PipetteNameType.P1000_96,
         mount=MountType.LEFT,
         pipette_id=None,
     )
 
-    assert result == LoadedPipetteData(pipette_id="unique-id")
-
-    decoy.verify(
-        await hardware_api.cache_instruments({HwMount.LEFT: "p1000_96"}),
-        action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id="unique-id",
-                serial_number="world",
-                config=loaded_static_pipette_data,
-            )
-        ),
+    assert result == LoadedPipetteData(
+        pipette_id="unique-id",
+        serial_number="world",
+        static_config=loaded_static_pipette_data,
     )
 
 
@@ -718,16 +719,10 @@ async def test_load_pipette_uses_provided_id(
         pipette_id="my-pipette-id",
     )
 
-    assert result == LoadedPipetteData(pipette_id="my-pipette-id")
-
-    decoy.verify(
-        action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id="my-pipette-id",
-                serial_number="world",
-                config=loaded_static_pipette_data,
-            )
-        )
+    assert result == LoadedPipetteData(
+        pipette_id="my-pipette-id",
+        serial_number="world",
+        static_config=loaded_static_pipette_data,
     )
 
 
@@ -738,6 +733,7 @@ async def test_load_pipette_use_virtual(
     action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
+    virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
     decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
@@ -748,8 +744,8 @@ async def test_load_pipette_use_virtual(
     )
 
     decoy.when(
-        pipette_data_provider.get_virtual_pipette_static_config(
-            PipetteNameType.P300_SINGLE.value
+        virtual_pipette_data_provider.get_virtual_pipette_static_config(
+            PipetteNameType.P300_SINGLE.value, "unique-id"
         )
     ).then_return(loaded_static_pipette_data)
 
@@ -757,16 +753,10 @@ async def test_load_pipette_use_virtual(
         pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT, pipette_id=None
     )
 
-    assert result == LoadedPipetteData(pipette_id="unique-id")
-
-    decoy.verify(
-        action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id="unique-id",
-                serial_number="fake-serial",
-                config=loaded_static_pipette_data,
-            )
-        )
+    assert result == LoadedPipetteData(
+        pipette_id="unique-id",
+        serial_number="fake-serial",
+        static_config=loaded_static_pipette_data,
     )
 
 

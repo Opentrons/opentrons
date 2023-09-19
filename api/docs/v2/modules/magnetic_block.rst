@@ -1,3 +1,5 @@
+:og:description: How to use the Magnetic Block with the Flex Gripper in a Python protocol.
+
 .. _magnetic-block:
 
 **************

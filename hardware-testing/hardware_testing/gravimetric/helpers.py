@@ -331,12 +331,7 @@ def _load_pipette(
     increment: bool,
     gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
-    load_str_channels = {1: "single_gen3", 8: "multi_gen3", 96: "96"}
-    pip_channels = pipette_channels
-    if pip_channels not in load_str_channels:
-        raise ValueError(f"unexpected number of channels: {pip_channels}")
-    chnl_str = load_str_channels[pip_channels]
-    pip_name = f"p{pipette_volume}_{chnl_str}"
+    pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
     ui.print_info(f'pipette "{pip_name}" on mount "{pipette_mount}"')
 
     # if we're doing multiple tests in one run, the pipette may already be loaded

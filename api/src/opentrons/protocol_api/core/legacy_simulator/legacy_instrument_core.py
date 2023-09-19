@@ -122,6 +122,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        push_out: Optional[float],
     ) -> None:
         if not in_place:
             self.move_to(location=location, well_core=well_core)
@@ -416,3 +417,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         """Raise TipAttachedError if tip."""
         if self.has_tip():
             raise TipAttachedError(f"Cannot {action} with a tip attached")
+
+    def configure_for_volume(self, volume: float) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass

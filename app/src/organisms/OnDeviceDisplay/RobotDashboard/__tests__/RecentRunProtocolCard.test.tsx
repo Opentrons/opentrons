@@ -4,9 +4,9 @@ import { formatDistance } from 'date-fns'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
@@ -191,15 +191,19 @@ describe('RecentRunProtocolCard', () => {
     getByText('Missing hardware')
   })
 
-  it('when tapping a card, mock functions is called', () => {
+  it('when tapping a card, mock functions is called and loading state is activated', () => {
     const [{ getByLabelText }] = render(props)
     const button = getByLabelText('RecentRunProtocolCard')
+    expect(button).toHaveStyle(`background-color: ${COLORS.green3}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
+    // expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    getByLabelText('icon_ot-spinner')
+    expect(button).toHaveStyle(`background-color: ${COLORS.green3Pressed}`)
   })
 
   it('should render the skeleton when react query is loading', () => {

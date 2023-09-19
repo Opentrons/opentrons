@@ -105,9 +105,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # pipette
     p1000 = protocol.load_instrument(
-        "p1000_multi_gen3", "left", tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3]
+        "flex_8channel_1000", "left", tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3]
     )
-    p50 = protocol.load_instrument("p50_multi_gen3", "right", tip_racks=[tiprack_50_1, tiprack_50_2])
+    p50 = protocol.load_instrument("flex_8channel_50", "right", tip_racks=[tiprack_50_1, tiprack_50_2])
 
     # tip and sample tracking
     if COLUMNS == 1:

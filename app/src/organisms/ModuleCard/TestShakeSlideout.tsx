@@ -34,9 +34,9 @@ import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
-import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
+import { ModuleSetupModal } from './ModuleSetupModal'
 
 import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
@@ -64,7 +64,10 @@ export const TestShakeSlideout = (
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const [shakeValue, setShakeValue] = React.useState<number | null>(null)
-  const [showWizard, setShowWizard] = React.useState<boolean>(false)
+  const [
+    showModuleSetupModal,
+    setShowModuleSetupModal,
+  ] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
@@ -286,10 +289,10 @@ export const TestShakeSlideout = (
           ) : null}
         </Flex>
       </Flex>
-      {showWizard && (
-        <HeaterShakerWizard
-          onCloseClick={() => setShowWizard(false)}
-          attachedModule={module}
+      {showModuleSetupModal && (
+        <ModuleSetupModal
+          close={() => setShowModuleSetupModal(false)}
+          moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
       <Link
@@ -297,7 +300,7 @@ export const TestShakeSlideout = (
         marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
         id="HeaterShaker_Attachment_Instructions"
-        onClick={() => setShowWizard(true)}
+        onClick={() => setShowModuleSetupModal(true)}
       >
         {t('show_attachment_instructions')}
       </Link>

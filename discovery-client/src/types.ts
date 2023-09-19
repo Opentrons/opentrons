@@ -169,6 +169,8 @@ export interface DiscoveryClientOptions {
   onListChange: (robots: DiscoveryClientRobot[]) => unknown
   /** Optional logger */
   logger?: Logger
+  /** Whether to enable discovering robots over MDNS (defaults to true) */
+  enableMDNS?: boolean
 }
 
 export interface DiscoveryClient {

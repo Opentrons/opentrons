@@ -3,6 +3,10 @@ from __future__ import annotations
 import logging
 from contextlib import nullcontext
 from typing import Any, List, Optional, Sequence, Union, cast
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    CommandParameterLimitViolated,
+)
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
@@ -101,7 +105,18 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def starting_tip(self) -> Union[labware.Well, None]:
-        """The starting tip from which the pipette pick up"""
+        """
+        Which well of a tip rack the pipette should start at when automatically choosing tips to pick up.
+
+        See :py:meth:`.pick_up_tip()`.
+
+        .. note::
+
+            In robot software versions 6.3.0 and 6.3.1, protocols specifying API level 2.14 would
+            not respect ``starting_tip`` on the second and subsequent calls to
+            :py:meth:`.InstrumentContext.pick_up_tip` with no argument. This is fixed for all API
+            levels as of robot software version 7.0.0.
+        """
         return self._starting_tip
 
     @starting_tip.setter
@@ -238,6 +253,7 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
@@ -267,6 +283,9 @@ class InstrumentContext(publisher.CommandPublisher):
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
                      If not specified, defaults to 1.0.
         :type rate: float
+        :param push_out: Continue past the plunger bottom to guarantee all liquid
+                        leaves the tip. Specified in microliters. By default, this value is None.
+        :type push_out: float
 
         :returns: This instance.
 
@@ -279,6 +298,10 @@ class InstrumentContext(publisher.CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
+        if self.api_version < APIVersion(2, 15) and push_out:
+            raise APIVersionError(
+                "Unsupported parameter push_out. Change your API version to 2.15 or above to use this parameter."
+            )
         _log.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -340,6 +363,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
+                push_out=push_out,
             )
 
         return self
@@ -660,6 +684,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will pick up the next available
         tip in its :py:attr:`InstrumentContext.tip_racks` list.
+        Within each tip rack, tips will be picked up in the order specified by
+        the labware definition and :py:meth:`.Labware.wells`.
+        To adjust where the sequence starts, see :py:obj:`.starting_tip`.
 
         The tip to pick up can be manually specified with the `location`
         argument. The `location` argument can be specified in several ways:
@@ -839,8 +866,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.  From API version 2.15 on, the API will default to
-        alternating between two different drop tip locations within the trash container
+        the fixed trash in slot 12.  From API version 2.15 on, if the trash container is
+        the default fixed trash in A3 (slot 12), the API will default to
+        dropping tips in different points within the trash container
         in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
@@ -1555,3 +1583,46 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __str__(self) -> str:
         return "{} on {} mount".format(self._core.get_display_name(), self.mount)
+
+    @requires_version(2, 15)
+    def configure_for_volume(self, volume: float) -> None:
+        """Configure a pipette to handle a specific volume of liquid, specified in µL. Depending on the
+        volume, the pipette will enter a certain pipetting mode. Changing pipette modes alters properties
+        of the instance of :py:class:`.InstrumentContext`, such as default flow rate, minimum volume, and
+        maximum volume. The pipette will remain in the mode set by this function until it is called again.
+
+        The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode
+        to accurately dispense 1 µL of liquid. Low-volume mode can only be set by calling this function.
+
+        For more information on available modes for certain pipettes, see :ref:`pipette-volume-modes`.
+
+        .. note ::
+
+            Changing a pipette's mode will reset its :ref:`flow rates <new-plunger-flow-rates>`.
+
+        This function will raise an error if called when the pipette's tip contains liquid. It won't
+        raise an error if no tip is attached, but changing modes may affect which tips the pipette can
+        subsequently pick up without raising an error.
+
+        This function will also raise an error if ``volume`` is outside the :ref:`overall minimum and
+        maximum capacities <new-pipette-models>` of the pipette (e.g., setting ``volume=1`` for a Flex
+        1000 µL pipette).
+
+        :param volume: The volume, in µL, that the pipette will prepare to handle.
+        :type volume: float
+        """
+        if self._core.get_current_volume():
+            raise CommandPreconditionViolated(
+                message=f"Cannot switch modes of {str(self)} while it contains liquid"
+            )
+        if volume < 0:
+            raise CommandParameterLimitViolated(
+                command_name="configure_for_volume",
+                parameter_name="volume",
+                limit_statement="must be greater than 0",
+                actual_value=str(volume),
+            )
+        last_location = self._get_last_location_by_api_version()
+        if last_location and isinstance(last_location.labware, labware.Well):
+            self.move_to(last_location.labware.top())
+        self._core.configure_for_volume(volume)

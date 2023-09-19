@@ -1,7 +1,6 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload, Union
-from typing_extensions import Literal
+from typing import Optional, overload
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -22,7 +21,7 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleId,
 )
-from ..actions import ActionDispatcher, AddPipetteConfigAction
+from ..actions import ActionDispatcher
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
@@ -61,6 +60,8 @@ class LoadedPipetteData:
     """The result of a load pipette procedure."""
 
     pipette_id: str
+    serial_number: str
+    static_config: pipette_data_provider.LoadedStaticPipetteData
 
 
 @dataclass(frozen=True)
@@ -72,6 +73,16 @@ class LoadedModuleData:
     definition: ModuleDefinition
 
 
+@dataclass(frozen=True)
+class LoadedConfigureForVolumeData:
+    """The result of a load liquid class procedure."""
+
+    pipette_id: str
+    serial_number: str
+    volume: float
+    static_config: pipette_data_provider.LoadedStaticPipetteData
+
+
 class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
@@ -80,6 +91,7 @@ class EquipmentHandler:
     _labware_data_provider: LabwareDataProvider
     _module_data_provider: ModuleDataProvider
     _model_utils: ModelUtils
+    _virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider
 
     def __init__(
         self,
@@ -89,6 +101,9 @@ class EquipmentHandler:
         labware_data_provider: Optional[LabwareDataProvider] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
         model_utils: Optional[ModelUtils] = None,
+        virtual_pipette_data_provider: Optional[
+            pipette_data_provider.VirtualPipetteDataProvider
+        ] = None,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware_api = hardware_api
@@ -97,6 +112,10 @@ class EquipmentHandler:
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._model_utils = model_utils or ModelUtils()
+        self._virtual_pipette_data_provider = (
+            virtual_pipette_data_provider
+            or pipette_data_provider.VirtualPipetteDataProvider()
+        )
 
     async def load_labware(
         self,
@@ -155,7 +174,7 @@ class EquipmentHandler:
 
     async def load_pipette(
         self,
-        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
+        pipette_name: PipetteNameType,
         mount: MountType,
         pipette_id: Optional[str],
     ) -> LoadedPipetteData:
@@ -219,24 +238,17 @@ class EquipmentHandler:
         else:
             serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
             static_pipette_config = (
-                pipette_data_provider.get_virtual_pipette_static_config(
-                    pipette_name_value
+                self._virtual_pipette_data_provider.get_virtual_pipette_static_config(
+                    pipette_name_value, pipette_id
                 )
             )
+        serial = serial_number or ""
 
-        # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
-        # see if additional config data like this can be returned from the command impl
-        # alongside, but outside of, the command result.
-        # this pattern could potentially improve `loadLabware` and `loadModule`, too
-        self._action_dispatcher.dispatch(
-            AddPipetteConfigAction(
-                pipette_id=pipette_id,
-                serial_number=serial_number,
-                config=static_pipette_config,
-            )
+        return LoadedPipetteData(
+            pipette_id=pipette_id,
+            serial_number=serial,
+            static_config=static_pipette_config,
         )
-
-        return LoadedPipetteData(pipette_id=pipette_id)
 
     async def load_magnetic_block(
         self,
@@ -328,6 +340,51 @@ class EquipmentHandler:
             module_id=self._model_utils.ensure_id(module_id),
             serial_number=attached_module.serial_number,
             definition=attached_module.definition,
+        )
+
+    async def configure_for_volume(
+        self,
+        pipette_id: str,
+        volume: float,
+    ) -> LoadedConfigureForVolumeData:
+        """Ensure the requested volume can be configured for the given pipette.
+
+        Args:
+            pipette_id: The identifier for the pipette.
+            volume: The volume to configure the pipette for
+
+        Returns:
+            A LoadedConfiguredVolumeData object.
+        """
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
+
+        if not use_virtual_pipettes:
+            mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
+
+            await self._hardware_api.configure_for_volume(mount, volume)
+            pipette_dict = self._hardware_api.get_attached_instrument(mount)
+
+            serial_number = pipette_dict["pipette_id"]
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_dict
+            )
+
+        else:
+            model = self._state_store.pipettes.get_model_name(pipette_id)
+            self._virtual_pipette_data_provider.configure_virtual_pipette_for_volume(
+                pipette_id, volume, model
+            )
+
+            serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
+            static_pipette_config = self._virtual_pipette_data_provider.get_virtual_pipette_static_config_by_model_string(
+                model, pipette_id
+            )
+
+        return LoadedConfigureForVolumeData(
+            pipette_id=pipette_id,
+            serial_number=serial_number,
+            volume=volume,
+            static_config=static_pipette_config,
         )
 
     @overload

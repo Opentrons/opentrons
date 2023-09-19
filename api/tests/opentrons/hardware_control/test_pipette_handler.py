@@ -12,7 +12,7 @@ from opentrons.hardware_control.instruments.ot2.pipette_handler import (
 )
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as OT3Pipette
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
-    PipetteHandlerProvider as OT3PipetteHandlerProvider,
+    OT3PipetteHandler,
     TipMotorPickUpTipSpec,
 )
 
@@ -35,11 +35,9 @@ def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
 
 
 @pytest.fixture
-def subject_ot3(
-    decoy: Decoy, mock_pipette_ot3: OT3Pipette
-) -> OT3PipetteHandlerProvider:
+def subject_ot3(decoy: Decoy, mock_pipette_ot3: OT3Pipette) -> OT3PipetteHandler:
     inst_by_mount = {types.Mount.LEFT: mock_pipette_ot3, types.Mount.RIGHT: None}
-    subject = OT3PipetteHandlerProvider(attached_instruments=inst_by_mount)
+    subject = OT3PipetteHandler(attached_instruments=inst_by_mount)
     return subject
 
 

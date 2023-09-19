@@ -96,8 +96,8 @@ def run(protocol: protocol_api.ProtocolContext):
     DIL = reservoir["A5"]
 
     # pipette
-    p50 = protocol.load_instrument("p50_multi_gen3", "left", tip_racks=[tiprack_50_1, tiprack_50_2])
-    p1000 = protocol.load_instrument("p1000_multi_gen3", "right", tip_racks=[tiprack_200_1])
+    p50 = protocol.load_instrument("flex_8channel_50", "left", tip_racks=[tiprack_50_1, tiprack_50_2])
+    p1000 = protocol.load_instrument("flex_8channel_1000", "right", tip_racks=[tiprack_200_1])
 
     # samples
     src_file_path = inspect.getfile(lambda: None)
