@@ -18,4 +18,5 @@ pytestmark = pytest.mark.xfail(
 @pytest.mark.parametrize("defname", list_deck_def_paths(version=3))
 def test_v3_defs(defname):
     defn = load_deck_definition(name=defname, version=3)
+    print(defn["locations"]["fixtureLocations"])
     typeguard.check_type("defn", defn, DeckDefinitionV3)

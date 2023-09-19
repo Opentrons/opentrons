@@ -3,7 +3,6 @@ opentrons_shared_data.deck.dev_types: types for deck defs
 
 This should only be imported if typing.TYPE_CHECKING is True
 """
-import enum
 from typing import Any, Dict, List, NewType, Union, Optional
 from typing_extensions import Literal, TypedDict
 
@@ -36,11 +35,17 @@ class BoundingBox(TypedDict):
 
 
 # move to fixture types
-class FixtureType(str, enum.Enum):
-    extensionSlot = "extensionSlot"
-    standardSlot = "standardSlot"
-    movableTrash = "movableTrash"
-    trashChute = "trashChute"
+ExtensionSlot = Literal["extensionSlot"]
+StandardSlot = Literal["standardSlot"]
+MovableTrash = Literal["movableTrash"]
+TrashChute = Literal["trashChute"]
+
+FixtureType = Union[
+    ExtensionSlot,
+    StandardSlot,
+    MovableTrash,
+    TrashChute,
+]
 
 
 class AllowedAs(TypedDict, total=False):
@@ -62,6 +67,7 @@ class FixtureLocationDefV3(TypedDict, total=False):
     id: str
     position: List[float]
     displayName: str
+    compatibleFixtures: List[FixtureType]
 
 
 class CalibrationPoint(TypedDict):
@@ -114,7 +120,7 @@ Fixture = Union[
 
 class LocationsV3(TypedDict):
     orderedSlots: List[SlotDefV3]
-    fixtureLocations: Optional[List[FixtureLocationDefV3]]
+    fixtureLocations: List[FixtureLocationDefV3]
     calibrationPoints: List[CalibrationPoint]
     fixtures: List[Fixture]
 

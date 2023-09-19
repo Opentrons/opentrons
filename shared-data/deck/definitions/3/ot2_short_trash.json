@@ -11,6 +11,7 @@
     "model": "OT-2 Standard"
   },
   "locations": {
+    "fixtureLocations": [],
     "orderedSlots": [
       {
         "id": "1",
