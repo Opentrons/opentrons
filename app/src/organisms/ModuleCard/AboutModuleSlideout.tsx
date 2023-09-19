@@ -97,7 +97,6 @@ export const AboutModuleSlideout = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             data-testid={`alert_item_version_${String(module.moduleModel)}`}
-            color={COLORS.darkGreyEnabled}
           >
             <StyledText
               as="h6"
@@ -110,7 +109,6 @@ export const AboutModuleSlideout = (
               as="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
-              color={COLORS.darkBlackEnabled}
             >
               {module.firmwareVersion}
             </StyledText>

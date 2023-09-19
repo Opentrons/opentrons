@@ -65,7 +65,6 @@ export const AboutPipetteSlideout = (
               as="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
-              color={COLORS.darkBlackEnabled}
             >
               {instrumentInfo.firmwareVersion}
             </StyledText>

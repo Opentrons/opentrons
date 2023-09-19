@@ -53,7 +53,6 @@ export const AboutGripperSlideout = (
               as="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
-              color={COLORS.darkBlackEnabled}
             >
               {firmwareVersion}
             </StyledText>
