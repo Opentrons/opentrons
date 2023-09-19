@@ -281,10 +281,10 @@ push-ot3-gravimetric:
 	$(MAKE) apply-patches-gravimetric
 	-$(MAKE) sync-sw-ot3
 	$(MAKE) remove-patches-gravimetric
-	scp $(ssh_helper) -r -O hardware_testing/labware/opentrons_flex_96_tiprack_50ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper) -r -O hardware_testing/labware/opentrons_flex_96_tiprack_200ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper) -r -O hardware_testing/labware/opentrons_flex_96_tiprack_1000ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper) -r -O hardware_testing/labware/radwag_pipette_calibration_vial/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper) -r hardware_testing/labware/opentrons_flex_96_tiprack_50ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper) -r hardware_testing/labware/opentrons_flex_96_tiprack_200ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper) -r hardware_testing/labware/opentrons_flex_96_tiprack_1000ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper) -r hardware_testing/labware/radwag_pipette_calibration_vial/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
