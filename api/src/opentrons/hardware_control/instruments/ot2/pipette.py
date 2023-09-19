@@ -345,7 +345,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         instr = Point(*self._pipette_offset.offset)
         cp_with_tip_length = self._nozzle_manager.critical_point_with_tip_length(
-            cp_override, self.current_tip_length
+            cp_override,
+            self.current_tip_length if cp_override != CriticalPoint.NOZZLE else 0.0,
         )
 
         cp = cp_with_tip_length + instr

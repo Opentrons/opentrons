@@ -56,7 +56,7 @@ class NozzleConfigurationManager:
         self._current_scalar: Final[float] = current_scalar
 
     def _get_nozzle_index_for(self, critical_point: CriticalPoint) -> int:
-        max_num_tips = len(self._nozzle_map)
+        max_num_tips = len(self._nozzle_map) - 1
         if critical_point == CriticalPoint.XY_CENTER:
             index = max_num_tips // 2 - max_num_tips // MAXIMUM_ALLOWED_COLUMNS
         elif critical_point == CriticalPoint.FRONT_NOZZLE and max_num_tips > 1:
@@ -113,7 +113,7 @@ class NozzleConfigurationManager:
         self, cp_override: Optional[CriticalPoint]
     ) -> List[float]:
         if cp_override == CriticalPoint.XY_CENTER:
-            return self._nozzle_map[self._xy_nozzle - 1][1]
+            return self._nozzle_map[self._xy_nozzle][1]
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
             return self._nozzle_map[self._front_nozzle][1]
         else:
