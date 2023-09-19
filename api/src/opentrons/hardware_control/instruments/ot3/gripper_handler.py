@@ -139,13 +139,14 @@ class GripperHandler:
             raise GripError("Gripper jaw must be homed before moving")
 
     def is_ready_for_idle(self) -> bool:
-        """Raise an exception if it is not currently valid to idle the jaw."""
+        """Gripper can idle when the jaw is not currently gripping."""
         gripper = self.get_gripper()
         if gripper.state == GripperJawState.UNHOMED:
             self._log.warning(
                 "Gripper jaw is not homed and cannot move to idle position."
             )
-        return gripper.state == GripperJawState.GRIPPING
+            return False
+        return gripper.state != GripperJawState.GRIPPING
 
     def is_ready_for_jaw_home(self) -> bool:
         """Raise an exception if it is not currently valid to home the jaw."""

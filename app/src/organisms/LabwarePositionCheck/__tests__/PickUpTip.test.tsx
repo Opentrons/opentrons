@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import type { MatcherFunction } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useProtocolMetadata } from '../../Devices/hooks'
@@ -10,6 +9,7 @@ import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import type { CommandData } from '@opentrons/api-client'
+import type { MatcherFunction } from '@testing-library/react'
 
 jest.mock('../../Devices/hooks')
 jest.mock('../../../redux/config')
@@ -111,7 +111,9 @@ describe('PickUpTip', () => {
     })
     getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
     getByText(
-      "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap <bold>Move pipette</bold> and then jog the pipette until it is properly aligned."
+      nestedTextMatcher(
+        "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
+      )
     )
   })
   it('executes correct chained commands when confirm placement CTA is clicked', async () => {

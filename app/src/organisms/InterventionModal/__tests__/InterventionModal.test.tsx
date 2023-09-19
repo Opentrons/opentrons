@@ -95,7 +95,7 @@ describe('InterventionModal', () => {
     }
     const { getByText, queryAllByText } = render(props)
     getByText('Move labware on Otie')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('mockLabware')
     queryAllByText('A1')
     queryAllByText('D3')
@@ -130,7 +130,7 @@ describe('InterventionModal', () => {
     }
     const { getByText, queryAllByText } = render(props)
     getByText('Move labware on Otie')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('mockLabware')
     queryAllByText('A1')
     queryAllByText('C1')

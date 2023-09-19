@@ -28,9 +28,12 @@ import {
 } from '@opentrons/shared-data'
 import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
+import { useChainLiveCommands } from '../../../../resources/runs/hooks'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
+import { getModulePrepCommands } from '../../getModulePrepCommands'
+import { getModuleTooHot } from '../../getModuleTooHot'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import {
@@ -203,7 +206,7 @@ export function ModulesListItem({
   isOt3,
   calibrationStatus,
 }: ModulesListItemProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -213,6 +216,24 @@ export function ModulesListItem({
     setShowModuleSetupModal,
   ] = React.useState<Boolean>(false)
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
+
+  const handleCalibrateClick = (): void => {
+    if (attachedModuleMatch != null) {
+      chainLiveCommands(
+        getModulePrepCommands(attachedModuleMatch),
+        false
+      ).catch((e: Error) => {
+        setPrepCommandErrorMessage(e.message)
+      })
+    }
+    setShowModuleWizard(true)
+  }
+
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
@@ -260,21 +281,28 @@ export function ModulesListItem({
     )
   }
 
+  const isModuleTooHot =
+    attachedModuleMatch != null ? getModuleTooHot(attachedModuleMatch) : false
+
+  let calibrateDisabledReason = t('calibrate_pipette_before_module_calibration')
+  if (calibrationStatus.reason === 'attach_pipette_failure_reason') {
+    calibrateDisabledReason = t('attach_pipette_before_module_calibration')
+  } else if (isModuleTooHot) {
+    calibrateDisabledReason = t('module_wizard_flows:module_too_hot')
+  }
+
   let renderModuleStatus: JSX.Element = (
     <>
       <TertiaryButton
         {...targetProps}
-        onClick={() => setShowModuleWizard(true)}
-        disabled={!calibrationStatus?.complete}
+        onClick={handleCalibrateClick}
+        disabled={!calibrationStatus?.complete || isModuleTooHot}
       >
         {t('calibrate_now')}
       </TertiaryButton>
-      {!calibrationStatus?.complete && calibrationStatus?.reason != null ? (
-        <Tooltip tooltipProps={tooltipProps}>
-          {calibrationStatus.reason === 'attach_pipette_failure_reason'
-            ? t('attach_pipette_before_module_calibration')
-            : t('calibrate_pipette_before_module_calibration')}
-        </Tooltip>
+      {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
+      isModuleTooHot ? (
+        <Tooltip tooltipProps={tooltipProps}>{calibrateDisabledReason}</Tooltip>
       ) : null}
     </>
   )
@@ -306,6 +334,10 @@ export function ModulesListItem({
           attachedModule={attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
           initialSlotName={slotName}
+          isPrepCommandLoading={isCommandMutationLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
       <Box

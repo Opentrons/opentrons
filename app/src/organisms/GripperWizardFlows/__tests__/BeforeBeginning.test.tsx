@@ -48,7 +48,7 @@ describe('BeforeBeginning', () => {
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+      'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
@@ -114,7 +114,7 @@ describe('BeforeBeginning', () => {
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'

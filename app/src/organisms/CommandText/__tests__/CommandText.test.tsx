@@ -5,7 +5,11 @@ import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
 
 import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/gantry'
-import type { BlowoutRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type {
+  BlowoutRunTimeCommand,
+  DispenseRunTimeCommand,
+  ConfigureForVolumeRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
@@ -35,7 +39,7 @@ describe('CommandText', () => {
       )
     }
   })
-  it('renders correct text for dispense', () => {
+  it('renders correct text for dispense without pushOut', () => {
     const command = mockRobotSideAnalysis.commands.find(
       c => c.commandType === 'dispense'
     )
@@ -50,6 +54,31 @@ describe('CommandText', () => {
       )[0]
       getByText(
         'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec'
+      )
+    }
+  })
+  it('renders correct text for dispense with pushOut', () => {
+    const command = mockRobotSideAnalysis.commands.find(
+      c => c.commandType === 'dispense'
+    )
+    const pushOutDispenseCommand = {
+      ...command,
+      params: {
+        ...command?.params,
+        pushOut: 10,
+      },
+    } as DispenseRunTimeCommand
+    expect(pushOutDispenseCommand).not.toBeUndefined()
+    if (pushOutDispenseCommand != null) {
+      const { getByText } = renderWithProviders(
+        <CommandText
+          robotSideAnalysis={mockRobotSideAnalysis}
+          command={pushOutDispenseCommand}
+        />,
+        { i18nInstance: i18n }
+      )[0]
+      getByText(
+        'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec and pushing out 10 µL'
       )
     }
   })
@@ -94,6 +123,24 @@ describe('CommandText', () => {
       )[0]
       getByText('Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5')
     }
+  })
+  it('renders correct text for configureForVolume', () => {
+    const command = {
+      commandType: 'configureForVolume',
+      params: {
+        volume: 1,
+        pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+      },
+    } as ConfigureForVolumeRunTimeCommand
+
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        command={command}
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Configure P300 Single-Channel GEN1 to aspirate 1 µL')
   })
   it('renders correct text for dropTip', () => {
     const command = mockRobotSideAnalysis.commands.find(

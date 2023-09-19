@@ -21,6 +21,7 @@ import {
   usePipettesQuery,
   useDismissCurrentRunMutation,
   useEstopQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
@@ -188,6 +189,9 @@ const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
+  typeof useDoorQuery
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -233,6 +237,12 @@ const mockEstopStatus = {
     status: DISENGAGED,
     leftEstopPhysicalStatus: DISENGAGED,
     rightEstopPhysicalStatus: NOT_PRESENT,
+  },
+}
+const mockDoorStatus = {
+  data: {
+    status: 'closed',
+    doorRequiredClosedForProtocol: true,
   },
 }
 
@@ -344,6 +354,7 @@ describe('ProtocolRunHeader', () => {
     mockUseIsOT3.mockReturnValue(true)
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
+    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
   })
 
   afterEach(() => {
@@ -836,5 +847,14 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText, getByLabelText }] = render()
     getByText('Run completed.')
     getByLabelText('ot-spinner')
+  })
+
+  it('renders banner when the robot door is open', () => {
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Close the robot door before starting the run.')
   })
 })

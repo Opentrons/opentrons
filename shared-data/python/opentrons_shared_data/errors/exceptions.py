@@ -716,6 +716,21 @@ class InvalidInstrumentData(RoboticsInteractionError):
         super().__init__(ErrorCodes.INVALID_INSTRUMENT_DATA, message, detail, wrapping)
 
 
+class InvalidLiquidClassName(RoboticsInteractionError):
+    """An error indicating that a liquid class name does not exist on a pipette."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidLiquidClassName."""
+        super().__init__(
+            ErrorCodes.INVALID_LIQUID_CLASS_NAME, message, detail, wrapping
+        )
+
+
 class APIRemoved(GeneralError):
     """An error indicating that a specific API is no longer available."""
 
@@ -737,4 +752,48 @@ class APIRemoved(GeneralError):
         )
         super().__init__(
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
+        )
+
+
+class CommandPreconditionViolated(GeneralError):
+    """An error indicating that a command was issued in a robot state incompatible with it."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandPreconditionViolated instance."""
+        super().__init__(
+            ErrorCodes.COMMAND_PRECONDITION_VIOLATED, message, detail, wrapping
+        )
+
+
+class CommandParameterLimitViolated(GeneralError):
+    """An error indicating that a command's parameter limit was violated."""
+
+    def __init__(
+        self,
+        command_name: str,
+        parameter_name: str,
+        limit_statement: str,
+        actual_value: str,
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
+    ) -> None:
+        """Build a CommandParameterLimitViolated error."""
+        wrapping_checked = wrapping or []
+        super().__init__(
+            ErrorCodes.COMMAND_PARAMETER_LIMIT_VIOLATED,
+            f"The parameter {parameter_name} of {command_name} must be {limit_statement} but is {actual_value}",
+            detail={
+                "command": command_name,
+                "argument": parameter_name,
+                "limit": limit_statement,
+                "value": actual_value,
+            },
+            wrapping=[
+                PythonException(e) if isinstance(e, BaseException) else e
+                for e in wrapping_checked
+            ],
         )

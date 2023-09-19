@@ -30,4 +30,8 @@ export const ToasterContext = React.createContext<ToasterContextType>({
 
 export type MakeSnackbarOptions = Omit<SnackbarProps, 'message'>
 
-type MakeSnackbar = (message: string, options?: MakeSnackbarOptions) => void
+type MakeSnackbar = (
+  message: string,
+  duration?: number,
+  options?: MakeSnackbarOptions
+) => void

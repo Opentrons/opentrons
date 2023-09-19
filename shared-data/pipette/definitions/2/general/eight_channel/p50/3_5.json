@@ -21,7 +21,7 @@
     },
     "lowVolumeDefault": {
       "top": 0.0,
-      "bottom": 57.0,
+      "bottom": 61.5,
       "blowout": 76.5,
       "drop": 91.5
     }

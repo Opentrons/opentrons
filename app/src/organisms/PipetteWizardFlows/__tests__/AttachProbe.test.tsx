@@ -55,6 +55,10 @@ describe('AttachProbe', () => {
           params: { axes: ['leftZ'] },
         },
         {
+          commandType: 'home',
+          params: { skipIfMountPositionOk: 'left' },
+        },
+        {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },
         },
@@ -164,6 +168,10 @@ describe('AttachProbe', () => {
         {
           commandType: 'home',
           params: { axes: ['leftZ'] },
+        },
+        {
+          commandType: 'home',
+          params: { skipIfMountPositionOk: 'left' },
         },
         {
           commandType: 'calibration/calibratePipette',

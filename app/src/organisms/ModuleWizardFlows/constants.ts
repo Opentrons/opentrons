@@ -27,6 +27,6 @@ export const FLEX_SLOT_NAMES_BY_MOD_TYPE: {
 } = {
   [HEATERSHAKER_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3'],
   [TEMPERATURE_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3'],
-  [THERMOCYCLER_MODULE_TYPE]: ['B1'],
+  [THERMOCYCLER_MODULE_TYPE]: ['A1'],
 }
 export const LEFT_SLOTS: string[] = ['A1', 'B1', 'C1', 'D1']

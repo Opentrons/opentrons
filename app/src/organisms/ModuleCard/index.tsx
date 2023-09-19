@@ -22,13 +22,11 @@ import {
 import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { updateModule } from '../../redux/modules'
@@ -47,7 +45,9 @@ import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
+import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -61,22 +61,18 @@ import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
+import { getModulePrepCommands } from '../Devices/getModulePrepCommands'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
-import { useLatchControls } from './hooks'
 import { ErrorInfo } from './ErrorInfo'
+import { ModuleSetupModal } from './ModuleSetupModal'
 
-import type {
-  HeaterShakerDeactivateShakerCreateCommand,
-  TCOpenLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type {
   AttachedModule,
   HeaterShakerModule,
 } from '../../redux/modules/types'
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import { ModuleSetupModal } from './ModuleSetupModal'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -134,7 +130,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
   )
-  const { createLiveCommand } = useCreateLiveCommandMutation()
 
   const handleCloseErrorModal = (): void => {
     if (latestRequestId != null) {
@@ -160,21 +155,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isOverflowBtnDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
-  const heaterShakerTooHot =
-    module.moduleModel === 'heaterShakerModuleV1' &&
-    module.data.currentTemperature != null &&
-    module.data.currentTemperature > TOO_HOT_TEMP
-
-  const ThermoTooHot =
-    module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-    ((module.data.currentTemperature != null &&
-      module.data.currentTemperature > TOO_HOT_TEMP) ||
-      (module.data.lidTemperature != null &&
-        module.data.lidTemperature > TOO_HOT_TEMP))
-
-  const isTooHot = heaterShakerTooHot || ThermoTooHot
-
-  const { toggleLatch, isLatchClosed } = useLatchControls(module)
+  const isTooHot = getModuleTooHot(module)
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -236,46 +217,18 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowHSWizard(true)
   }
 
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
   const handleCalibrateClick = (): void => {
-    if (
-      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      module.data.currentSpeed != null &&
-      module?.data?.currentSpeed > 0
-    ) {
-      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: {
-          moduleId: module.id,
-        },
-      }
-      createLiveCommand({
-        command: stopShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-    if (module.moduleType === HEATERSHAKER_MODULE_TYPE && !isLatchClosed) {
-      toggleLatch()
-    }
-    if (
-      module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-      module.data.lidStatus !== 'open'
-    ) {
-      const lidCommand: TCOpenLidCreateCommand = {
-        commandType: 'thermocycler/openLid',
-        params: {
-          moduleId: module.id,
-        },
-      }
-      createLiveCommand({
-        command: lidCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
-        )
-      })
+    if (getModulePrepCommands(module).length > 0) {
+      chainLiveCommands(getModulePrepCommands(module), false).catch(
+        (e: Error) => {
+          setPrepCommandErrorMessage(e.message)
+        }
+      )
     }
     setShowCalModal(true)
   }
@@ -291,6 +244,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         <ModuleWizardFlows
           attachedModule={module}
           closeFlow={() => setShowCalModal(false)}
+          isPrepCommandLoading={isCommandMutationLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
       {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
@@ -354,9 +311,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 updateType="calibration"
                 serialNumber={module.serialNumber}
                 setShowBanner={() => null}
-                handleUpdateClick={() => setShowCalModal(true)}
+                handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
+                isTooHot={isTooHot}
               />
             ) : null}
             {/* Calibration performs firmware updates, so only show calibration if both true. */}
@@ -487,6 +445,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               runId={runId}
               isLoadedInRun={isLoadedInRun}
               isPipetteReady={isPipetteReady}
+              isTooHot={isTooHot}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleInstructionsClick={handleInstructionsClick}
