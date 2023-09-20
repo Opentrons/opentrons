@@ -15,14 +15,20 @@ import {
   getIsCrashablePipetteSelected,
   ModulesForEditModulesCard,
 } from '../../step-forms'
+import { WASTE_CHUTE_SLOT } from '../../constants'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
+import { getEnableDeckModification } from '../../feature-flags/selectors'
 import { getAdditionalEquipment } from '../../step-forms/selectors'
-import { toggleIsGripperRequired } from '../../step-forms/actions/additionalItems'
+import {
+  createDeckFixture,
+  deleteDeckFixture,
+  toggleIsGripperRequired,
+} from '../../step-forms/actions/additionalItems'
 import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
-import { GripperRow } from './GripperRow'
+import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
@@ -33,12 +39,16 @@ export interface Props {
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
+  const enableDeckModification = useSelector(getEnableDeckModification)
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
   const additionalEquipment = useSelector(getAdditionalEquipment)
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
+  )
+  const wasteChute = Object.values(additionalEquipment).find(
+    equipment => equipment?.name === 'wasteChute'
   )
 
   const dispatch = useDispatch()
@@ -85,9 +95,6 @@ export function EditModulesCard(props: Props): JSX.Element {
         : moduleType !== 'magneticBlockType'
   )
 
-  const handleGripperClick = (): void => {
-    dispatch(toggleIsGripperRequired())
-  }
   return (
     <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
@@ -126,9 +133,23 @@ export function EditModulesCard(props: Props): JSX.Element {
           }
         })}
         {isFlex ? (
-          <GripperRow
-            handleGripper={handleGripperClick}
-            isGripperAdded={isGripperAttached}
+          <AdditionalItemsRow
+            handleAttachment={() => dispatch(toggleIsGripperRequired())}
+            isEquipmentAdded={isGripperAttached}
+            name="gripper"
+          />
+        ) : null}
+        {enableDeckModification && isFlex ? (
+          <AdditionalItemsRow
+            handleAttachment={() =>
+              dispatch(
+                wasteChute != null
+                  ? deleteDeckFixture(wasteChute.id)
+                  : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
+              )
+            }
+            isEquipmentAdded={wasteChute != null}
+            name="wasteChute"
           />
         ) : null}
       </div>

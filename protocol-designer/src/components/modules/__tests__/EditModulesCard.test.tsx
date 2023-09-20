@@ -17,17 +17,19 @@ import {
   selectors as stepFormSelectors,
 } from '../../../step-forms'
 import { getRobotType } from '../../../file-data/selectors'
+import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { FormPipette } from '../../../step-forms/types'
 import { getAdditionalEquipment } from '../../../step-forms/selectors'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
-import { GripperRow } from '../GripperRow'
+import { AdditionalItemsRow } from '../AdditionalItemsRow'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
 jest.mock('../../../file-data/selectors')
+jest.mock('../../../feature-flags/selectors')
 
 const getDisableModuleRestrictionsMock = featureFlagSelectors.getDisableModuleRestrictions as jest.MockedFunction<
   typeof featureFlagSelectors.getDisableModuleRestrictions
@@ -40,6 +42,9 @@ const mockGetRobotType = getRobotType as jest.MockedFunction<
 >
 const mockGetAdditionalEquipment = getAdditionalEquipment as jest.MockedFunction<
   typeof getAdditionalEquipment
+>
+const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
+  typeof getEnableDeckModification
 >
 describe('EditModulesCard', () => {
   let store: any
@@ -88,6 +93,7 @@ describe('EditModulesCard', () => {
         tiprackDefURI: null,
       },
     })
+    mockGetEnableDeckModification.mockReturnValue(false)
 
     props = {
       modules: {},
@@ -243,8 +249,10 @@ describe('EditModulesCard', () => {
   it('displays gripper row with no gripper', () => {
     mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     const wrapper = render(props)
-    expect(wrapper.find(GripperRow)).toHaveLength(1)
-    expect(wrapper.find(GripperRow).props().isGripperAdded).toEqual(false)
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(1)
+    expect(wrapper.find(AdditionalItemsRow).props().isEquipmentAdded).toEqual(
+      false
+    )
   })
   it('displays gripper row with gripper attached', () => {
     const mockGripperId = 'gripeprId'
@@ -253,7 +261,26 @@ describe('EditModulesCard', () => {
       [mockGripperId]: { name: 'gripper', id: mockGripperId },
     })
     const wrapper = render(props)
-    expect(wrapper.find(GripperRow)).toHaveLength(1)
-    expect(wrapper.find(GripperRow).props().isGripperAdded).toEqual(true)
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(1)
+    expect(wrapper.find(AdditionalItemsRow).props().isEquipmentAdded).toEqual(
+      true
+    )
+  })
+  it('displays gripper and waste chute row with both attached', () => {
+    const mockGripperId = 'gripeprId'
+    const mockWasteChuteId = 'wasteChuteId'
+    mockGetEnableDeckModification.mockReturnValue(true)
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
+    mockGetAdditionalEquipment.mockReturnValue({
+      mockGripperId: { name: 'gripper', id: mockGripperId },
+      mockWasteChuteId: {
+        name: 'wasteChute',
+        id: mockWasteChuteId,
+        location: 'D3',
+      },
+    })
+
+    const wrapper = render(props)
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(2)
   })
 })

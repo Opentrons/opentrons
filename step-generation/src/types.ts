@@ -112,9 +112,15 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper'
+    name: 'gripper' | 'wasteChute'
     id: string
+    location?: string
   }
+}
+
+export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export interface AdditionalEquipmentEntities {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]

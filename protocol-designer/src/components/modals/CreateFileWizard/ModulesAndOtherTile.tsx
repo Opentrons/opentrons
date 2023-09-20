@@ -26,12 +26,13 @@ import {
   ModuleModel,
   getModuleDisplayName,
   getModuleType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   FormModulesByType,
   getIsCrashablePipetteSelected,
 } from '../../../step-forms'
-import gripperImage from '../../../images/flex_gripper.svg'
+import gripperImage from '../../../images/flex_gripper.png'
 import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
@@ -187,18 +188,22 @@ const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
 }
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
-  const { values } = props
+  const { values, setFieldValue } = props
+  const enableDeckModification = useSelector(
+    featureFlagSelectors.getEnableDeckModification
+  )
+  const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
   return (
     <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       <EquipmentOption
         onClick={() => {
           if (values.additionalEquipment.includes('gripper')) {
-            props.setFieldValue(
+            setFieldValue(
               'additionalEquipment',
               without(values.additionalEquipment, 'gripper')
             )
           } else {
-            props.setFieldValue('additionalEquipment', [
+            setFieldValue('additionalEquipment', [
               ...values.additionalEquipment,
               'gripper',
             ])
@@ -224,16 +229,13 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             text={getModuleDisplayName(moduleModel)}
             onClick={() => {
               if (values.modulesByType[moduleType].onDeck) {
-                props.setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
-                props.setFieldValue(`modulesByType.${moduleType}.model`, null)
-                props.setFieldValue(`modulesByType.${moduleType}.slot`, null)
+                setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
+                setFieldValue(`modulesByType.${moduleType}.model`, null)
+                setFieldValue(`modulesByType.${moduleType}.slot`, null)
               } else {
-                props.setFieldValue(`modulesByType.${moduleType}.onDeck`, true)
-                props.setFieldValue(
-                  `modulesByType.${moduleType}.model`,
-                  moduleModel
-                )
-                props.setFieldValue(
+                setFieldValue(`modulesByType.${moduleType}.onDeck`, true)
+                setFieldValue(`modulesByType.${moduleType}.model`, moduleModel)
+                setFieldValue(
                   `modulesByType.${moduleType}.slot`,
                   DEFAULT_SLOT_MAP[moduleModel]
                 )
@@ -243,6 +245,33 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           />
         )
       })}
+      {enableDeckModification && isFlex ? (
+        <EquipmentOption
+          onClick={() => {
+            if (values.additionalEquipment.includes('wasteChute')) {
+              setFieldValue(
+                'additionalEquipment',
+                without(values.additionalEquipment, 'wasteChute')
+              )
+            } else {
+              setFieldValue('additionalEquipment', [
+                ...values.additionalEquipment,
+                'wasteChute',
+              ])
+            }
+          }}
+          isSelected={values.additionalEquipment.includes('wasteChute')}
+          //  todo(jr, 9/14/23): update the asset
+          image={
+            <AdditionalItemImage
+              src={gripperImage}
+              alt="Opentrons Waste Chute"
+            />
+          }
+          text="Waste Chute"
+          showCheckbox
+        />
+      ) : null}
     </Flex>
   )
 }

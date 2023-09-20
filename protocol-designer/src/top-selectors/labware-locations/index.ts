@@ -23,6 +23,7 @@ import {
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
+  getAdditionalEquipmentEntities,
 } from '../../step-forms/selectors'
 import { getIsAdapter } from '../../utils'
 import type { RobotState } from '@opentrons/step-generation'
@@ -198,8 +199,29 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
   getPipetteEntities,
   getModuleEntities,
   getLabwareEntities,
-  (robotState, pipetteEntities, moduleEntities, labwareEntities) => {
-    if (robotState == null) return { pipettes: {}, labware: {}, modules: {} }
+  getAdditionalEquipmentEntities,
+  (
+    robotState,
+    pipetteEntities,
+    moduleEntities,
+    labwareEntities,
+    additionalEquipmentEntities
+  ) => {
+    if (robotState == null)
+      return {
+        pipettes: {},
+        labware: {},
+        modules: {},
+        additionalEquipmentOnDeck: {},
+      }
+
+    // only allow wasteChute since its the only additional equipment that is like an entity
+    // that deck setup needs to be aware of
+    const filteredAdditionalEquipment = Object.fromEntries(
+      Object.entries(additionalEquipmentEntities).filter(
+        ([_, entity]) => entity.name === 'wasteChute'
+      )
+    )
     return {
       pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
         ...pipEntity,
@@ -213,6 +235,12 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
         ...modEntity,
         ...robotState.modules[modId],
       })),
+      additionalEquipmentOnDeck: mapValues(
+        filteredAdditionalEquipment,
+        additionalEquipmentEntity => ({
+          ...additionalEquipmentEntity,
+        })
+      ),
     }
   }
 )

@@ -24,6 +24,7 @@ import {
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from '../types'
+import { AdditionalEquipmentOnDeck } from '..'
 export { createPresavedStepForm } from './createPresavedStepForm'
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
@@ -118,7 +119,6 @@ export const getSlotIsEmpty = (
   } else if (slot === '12' || slot === 'A3') {
     return false
   }
-
   // NOTE: should work for both deck slots and module slots
   return (
     [
@@ -127,6 +127,10 @@ export const getSlotIsEmpty = (
       ),
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
+      ),
+      ...values(initialDeckSetup.additionalEquipmentOnDeck).filter(
+        (additionalEquipment: AdditionalEquipmentOnDeck) =>
+          additionalEquipment.location === slot
       ),
     ].length === 0
   )

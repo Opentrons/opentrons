@@ -13,8 +13,14 @@ import { createNewProtocol } from '../../../../load-file/actions'
 import { createCustomLabwareDefAction } from '../../../../labware-defs/actions'
 import { createModule, createPipettes } from '../../../../step-forms/actions'
 import { changeSavedStepForm } from '../../../../steplist/actions'
-import { toggleIsGripperRequired } from '../../../../step-forms/actions/additionalItems'
-import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
+import {
+  toggleIsGripperRequired,
+  createDeckFixture,
+} from '../../../../step-forms/actions/additionalItems'
+import {
+  getAllowAllTipracks,
+  getEnableDeckModification,
+} from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
 import { CreateFileWizard } from '..'
 
@@ -66,6 +72,12 @@ const mockGetTiprackOptions = getTiprackOptions as jest.MockedFunction<
 const mockCreateModule = createModule as jest.MockedFunction<
   typeof createModule
 >
+const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
+  typeof createDeckFixture
+>
+const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
+  typeof getEnableDeckModification
+>
 const render = () => {
   return renderWithProviders(<CreateFileWizard />)[0]
 }
@@ -78,6 +90,7 @@ const ten = '10uL'
 
 describe('CreateFileWizard', () => {
   beforeEach(() => {
+    mockGetEnableDeckModification.mockReturnValue(false)
     mockGetNewProtocolModal.mockReturnValue(true)
     mockGetAllowAllTipracks.mockReturnValue(false)
     mockGetLabwareDefsByURI.mockReturnValue({
@@ -153,6 +166,7 @@ describe('CreateFileWizard', () => {
     expect(mockToggleNewProtocolModal).toHaveBeenCalled()
   })
   it('renders the wizard for a Flex with custom tiprack', () => {
+    mockGetEnableDeckModification.mockReturnValue(true)
     const Custom = 'custom'
     mockGetCustomLabwareDefsByURI.mockReturnValue({
       [Custom]: fixtureTipRack10ul,
@@ -205,13 +219,15 @@ describe('CreateFileWizard', () => {
     next = getByRole('button', { name: 'Next' })
     next.click()
     getByText('Step 6 / 6')
-    //  select gripper
+    //  select gripper and waste chute
     getByLabelText('EquipmentOption_flex_Gripper').click()
+    getByLabelText('EquipmentOption_flex_Waste Chute').click()
     getByRole('button', { name: 'Review file details' }).click()
     expect(mockCreateNewProtocol).toHaveBeenCalled()
     expect(mockCreatePipettes).toHaveBeenCalled()
     expect(mockCreateCustomLabwareDefAction).toHaveBeenCalled()
     expect(mockToggleIsGripperRequired).toHaveBeenCalled()
+    expect(mockCreateDeckFixture).toHaveBeenCalled()
     expect(mockChangeSavedStepForm).toHaveBeenNthCalledWith(
       4,
       expect.objectContaining({

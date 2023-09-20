@@ -52,6 +52,7 @@ describe('StepCreationButton', () => {
         labware: {},
         pipettes: {},
         modules: {},
+        additionalEquipmentOnDeck: {},
       })
 
     when(getIsMultiSelectModeMock)
@@ -133,6 +134,7 @@ describe('StepCreationButton', () => {
         .mockReturnValue({
           labware: {},
           pipettes: {},
+          additionalEquipmentOnDeck: {},
           modules: {
             abcdef: {
               id: 'abcdef',
