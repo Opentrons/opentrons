@@ -42,7 +42,7 @@ describe('AboutPipetteSlideout', () => {
 
     getByText('About Left Pipette Pipette')
     getByText('123')
-    getByText('Serial Number')
+    getByText('SERIAL NUMBER')
     const button = getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
@@ -63,7 +63,7 @@ describe('AboutPipetteSlideout', () => {
 
     const { getByText } = render(props)
 
-    getByText('Current Version')
+    getByText('CURRENT VERSION')
     getByText('12')
   })
 })
