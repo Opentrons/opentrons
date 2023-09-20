@@ -82,10 +82,7 @@ export const shouldShowWasteChuteHint: Selector<boolean> = createSelector(
     if (prevTimelineFrame == null) {
       return false
     }
-
     const { newLocation } = unsavedForm
-    console.log('newLocation', newLocation)
-
     if (newLocation === WASTE_CHUTE_SLOT) {
       return true
     }
