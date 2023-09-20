@@ -18,7 +18,7 @@ stages:
       url: '{ot2_server_base_url}/protocols'
       files:
         files:
-          tests/integration/sessions/fixture_load_opentrons_96_filtertiprack_20ul.py
+          tests/integration/protocols/load_opentrons_96_filtertiprack_20ul.py
     response:
       status_code: 201
       save:
