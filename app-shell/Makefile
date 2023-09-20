@@ -48,7 +48,7 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
-	--config.electronVersion=21.3.1 \
+	--config.electronVersion=26.2.1 \
 	--publish never
 
 
@@ -171,5 +171,5 @@ dev-app-update.yml:
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
-	webpack
+	NODE_OPTIONS=--openssl-legacy-provider webpack
 	$(electron)

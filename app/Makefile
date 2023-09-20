@@ -61,7 +61,7 @@ dev-odd:
 .PHONY: dev-server
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
-	webpack-dev-server --hot
+	NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --hot
 
 .PHONY: dev-shell
 dev-shell:
