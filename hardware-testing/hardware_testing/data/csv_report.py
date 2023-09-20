@@ -135,7 +135,7 @@ class CSVLine:
         self._elapsed_time = time() - self._start_time
         for i, expected_type in enumerate(self._data_types):
             if data[i] is None:
-                self._data[i] = data[i]
+                self._data[i] = None
             else:
                 try:
                     self._data[i] = expected_type(data[i])
@@ -144,8 +144,8 @@ class CSVLine:
                         f"[{self.tag}] unexpected data type {type(data[i])} "
                         f'with value "{data[i]}" at index {i}'
                     )
-        self._stored = True
-        if print_results and CSVResult in self._data_types:
+        self._stored = bool(None not in self._data)
+        if self._stored and print_results and CSVResult in self._data_types:
             print_csv_result(self.tag, CSVResult.from_bool(self.result_passed))
 
 

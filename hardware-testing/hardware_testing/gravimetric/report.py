@@ -114,7 +114,7 @@ def create_csv_test_report_photometric(
             CSVSection(
                 title="CONFIG",
                 lines=[
-                    CSVLine(field.name, [field.type])
+                    CSVLine(field.name, [str])  # just convert to a string, always
                     for field in fields(config.PhotometricConfig)
                     if field.name not in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT
                 ],
@@ -143,7 +143,9 @@ def store_config_pm(report: CSVReport, cfg: config.PhotometricConfig) -> None:
     for field in fields(config.PhotometricConfig):
         if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        report("CONFIG", field.name, [getattr(cfg, field.name)])
+        val_str = str(getattr(cfg, field.name)).replace(" ", "")
+        val_str = val_str.replace("[", "").replace("]", "").replace(",", "-")
+        report("CONFIG", field.name, [val_str])
 
 
 def create_csv_test_report(
@@ -214,7 +216,7 @@ def create_csv_test_report(
             CSVSection(
                 title="CONFIG",
                 lines=[
-                    CSVLine(field.name, [_field_type_not_using_typing(field.type)])
+                    CSVLine(field.name, [str])  # just convert to a string, always
                     for field in fields(config.GravimetricConfig)
                     if field.name not in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT
                 ],
@@ -222,7 +224,7 @@ def create_csv_test_report(
             CSVSection(
                 title="VOLUMES",
                 lines=[
-                    CSVLine(f"volume-{m}-{round(v, 2)}-{s}-{i}", [float])
+                    CSVLine(f"volume-{m}-{round(v, 2)}-{s}-{i}", [float, str])
                     for v in volumes
                     for s in volume_stat_type
                     for m in ["aspirate", "dispense"]
@@ -244,7 +246,7 @@ def create_csv_test_report(
                     for v in volumes
                     for c in range(pip_channels_tested)
                     for t in range(trials)
-                    for m in ["aspirate", "dispense"]
+                    for m in ["aspirate", "dispense", "liquid_height"]
                 ],
             ),
             CSVSection(
@@ -293,6 +295,10 @@ def create_csv_test_report(
             ),
         ],
     )
+    # NOTE: just immediately clear all the "isolate" flags on the volume section
+    #       so that final CSV is guaranteed to not be filled with a bunch of "None"
+    for line in report["VOLUMES"].lines:
+        line.store(None, "")
     return report
 
 
@@ -301,7 +307,9 @@ def store_config_gm(report: CSVReport, cfg: config.GravimetricConfig) -> None:
     for field in fields(config.GravimetricConfig):
         if field.name in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        report("CONFIG", field.name, [getattr(cfg, field.name)])
+        val_str = str(getattr(cfg, field.name)).replace(" ", "")
+        val_str = val_str.replace("[", "").replace("]", "").replace(",", "-")
+        report("CONFIG", field.name, [val_str])
 
 
 def store_serial_numbers_pm(
@@ -354,7 +362,13 @@ def store_serial_numbers(
 
 
 def store_volume_all(
-    report: CSVReport, mode: str, volume: float, average: float, cv: float, d: float
+    report: CSVReport,
+    mode: str,
+    volume: float,
+    average: float,
+    cv: float,
+    d: float,
+    flag: str = "",
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -362,13 +376,17 @@ def store_volume_all(
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_all-average",
-        [round(average, 2)],
+        [round(average, 2), flag],
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-cv", [round(cv * 100.0, 2)]
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel_all-cv",
+        [round(cv * 100.0, 2), flag],
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-d", [round(d * 100.0, 2)]
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel_all-d",
+        [round(d * 100.0, 2), flag],
     )
 
 
@@ -382,6 +400,7 @@ def store_volume_per_channel(
     d: float,
     celsius: float,
     humidity: float,
+    flag: str = "",
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -389,27 +408,27 @@ def store_volume_per_channel(
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-average",
-        [round(average, 2)],
+        [round(average, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-cv",
-        [round(cv * 100.0, 2)],
+        [round(cv * 100.0, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-d",
-        [round(d * 100.0, 2)],
+        [round(d * 100.0, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-celsius-pipette-avg",
-        [round(celsius, 2)],
+        [round(celsius, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-humidity-pipette-avg",
-        [round(humidity, 2)],
+        [round(humidity, 2), flag],
     )
 
 
@@ -421,6 +440,7 @@ def store_volume_per_trial(
     average: float,
     cv: float,
     d: float,
+    flag: str = "",
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -428,17 +448,17 @@ def store_volume_per_trial(
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-average",
-        [round(average, 2)],
+        [round(average, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-cv",
-        [round(cv * 100.0, 2)],
+        [round(cv * 100.0, 2), flag],
     )
     report(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-d",
-        [round(d * 100.0, 2)],
+        [round(d * 100.0, 2), flag],
     )
 
 
@@ -453,36 +473,36 @@ def store_encoder(
     encoder_aspirated: float,
 ) -> None:
     """Store encoder information."""
-    vol_in_tag = str(round(volume, 2))
+    vol_in_tag = str(round(volume, 5))
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-target",
-        [round(estimate_bottom, 2)],
+        [round(estimate_bottom, 5)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-encoder",
-        [round(encoder_bottom, 2)],
+        [round(encoder_bottom, 5)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-drift",
-        [round(encoder_bottom - estimate_bottom, 2)],
+        [round(encoder_bottom - estimate_bottom, 5)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-target",
-        [round(estimate_aspirated, 2)],
+        [round(estimate_aspirated, 5)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-encoder",
-        [round(encoder_aspirated, 2)],
+        [round(encoder_aspirated, 5)],
     )
     report(
         "ENCODER",
         f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-drift",
-        [round(encoder_aspirated - estimate_aspirated, 2)],
+        [round(encoder_aspirated - estimate_aspirated, 5)],
     )
 
 
@@ -519,6 +539,7 @@ def store_trial(
     channel: int,
     aspirate: float,
     dispense: float,
+    liquid_height: float,
 ) -> None:
     """Report trial."""
     vol_in_tag = str(round(volume, 2))
@@ -531,6 +552,11 @@ def store_trial(
         "TRIALS",
         f"trial-{trial + 1}-dispense-{vol_in_tag}-ul-channel_{channel + 1}",
         [dispense],
+    )
+    report(
+        "TRIALS",
+        f"trial-{trial + 1}-liquid_height-{vol_in_tag}-ul-channel_{channel + 1}",
+        [liquid_height],
     )
 
 
