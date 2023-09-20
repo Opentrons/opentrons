@@ -20,6 +20,7 @@ export function LabwareLocationField(
     useGripper: boolean
   } & { canSave: boolean } & { labware: string }
 ): JSX.Element {
+  const { labware, useGripper, value } = props
   const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem)
   const moduleEntities = useSelector(getModuleEntities)
@@ -28,11 +29,9 @@ export function LabwareLocationField(
   )
   const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
   const isLabwareOffDeck =
-    props.labware != null
-      ? robotState?.labware[props.labware]?.slot === 'offDeck'
-      : false
+    labware != null ? robotState?.labware[labware]?.slot === 'offDeck' : false
   const displayWasteChuteValue =
-    props.useGripper && hasWasteChute && !isLabwareOffDeck
+    useGripper && hasWasteChute && !isLabwareOffDeck
 
   let unoccupiedLabwareLocationsOptions =
     useSelector(getUnocuppiedLabwareLocationOptions) ?? []
@@ -41,22 +40,20 @@ export function LabwareLocationField(
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== 'offDeck' && option.value !== WASTE_CHUTE_SLOT
     )
-  } else if (props.useGripper || isLabwareOffDeck) {
+  } else if (useGripper || isLabwareOffDeck) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== 'offDeck'
     )
   } else if (!displayWasteChuteValue) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.name !== 'D3 - Waste Chute'
+      option => option.name !== 'Waste Chute in D3'
     )
   }
-  const location: string = props.value as string
+  const location: string = value as string
 
-  const bothFieldsSelected = props.labware != null && props.value != null
+  const bothFieldsSelected = labware != null && value != null
   const labwareDisplayName =
-    props.labware != null
-      ? labwareEntities[props.labware]?.def.metadata.displayName
-      : ''
+    labware != null ? labwareEntities[labware]?.def.metadata.displayName : ''
   let locationString = `slot ${location}`
   if (location != null) {
     if (robotState?.modules[location] != null) {
