@@ -22,6 +22,7 @@ import {
 import { QuaternaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useIsOT3 } from '../../organisms/Devices/hooks'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
@@ -51,6 +52,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
+  const isOT3 = useIsOT3(name)
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
@@ -94,14 +96,17 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   )
 
   const wifiAddress = addresses.find(addr => addr.ip === wifi?.ipAddress)
-  const isOT3ConnectedViaWifi =
+  const isConnectedViaWifi =
     wifiAddress != null && wifiAddress.healthStatus === HEALTH_STATUS_OK
 
   const ethernetAddress = addresses.find(
     addr => addr.ip === ethernet?.ipAddress
   )
+  // do not show ethernet connection for OT-2
   const isOT3ConnectedViaEthernet =
-    ethernetAddress != null && ethernetAddress.healthStatus === HEALTH_STATUS_OK
+    isOT3 &&
+    ethernetAddress != null &&
+    ethernetAddress.healthStatus === HEALTH_STATUS_OK
 
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
   const isOT3ConnectedViaUSB =
@@ -112,7 +117,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   if (isOT3ConnectedViaEthernet) {
     iconName = 'ethernet'
     tooltipTranslationKey = 'device_settings:ethernet'
-  } else if (isOT3ConnectedViaWifi) {
+  } else if (isConnectedViaWifi) {
     iconName = 'wifi'
     tooltipTranslationKey = 'device_settings:wifi'
   } else if ((local != null && local) || isOT3ConnectedViaUSB) {
