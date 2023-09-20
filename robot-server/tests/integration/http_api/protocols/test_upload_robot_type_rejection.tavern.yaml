@@ -30,6 +30,7 @@ stages:
 test_name: Make sure an OT-3 server rejects OT-2 protocols.
 
 marks:
+  - ot3_only
   - usefixtures:
     - ot3_server_base_url
   - parametrize:
