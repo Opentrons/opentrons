@@ -33,9 +33,12 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
-  const initialModuleState =
-    prevRobotState.modules[initialLabwareSlot]?.moduleState ?? null
+  const initialAdapterSlot = prevRobotState.labware[initialLabwareSlot]?.slot
+  const initialSlot =
+    initialAdapterSlot != null ? initialAdapterSlot : initialLabwareSlot
 
+  const initialModuleState =
+    prevRobotState.modules[initialSlot]?.moduleState ?? null
   if (initialModuleState != null) {
     if (
       initialModuleState.type === THERMOCYCLER_MODULE_TYPE &&
@@ -43,7 +46,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     ) {
       errors.push(errorCreators.thermocyclerLidClosed())
     } else if (initialModuleState.type === HEATERSHAKER_MODULE_TYPE) {
-      if (initialModuleState.latchOpen === false) {
+      if (initialModuleState.latchOpen !== true) {
         errors.push(errorCreators.heaterShakerLatchClosed())
       } else if (initialModuleState.targetSpeed !== null) {
         errors.push(errorCreators.heaterShakerIsShaking())
@@ -55,18 +58,28 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       ? newLocation.moduleId
       : null
 
+  const destAdapterId =
+    newLocation !== 'offDeck' && 'labwareId' in newLocation
+      ? newLocation.labwareId
+      : null
+  const destModuleIdUnderAdapter =
+    destAdapterId != null ? prevRobotState.labware[destAdapterId].slot : null
+  const destinationModuleId =
+    destModuleIdUnderAdapter != null ? destModuleIdUnderAdapter : destModuleId
+
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
   }
-  if (destModuleId != null) {
-    const destModuleState = prevRobotState.modules[destModuleId].moduleState
+  if (destinationModuleId != null) {
+    const destModuleState =
+      prevRobotState.modules[destinationModuleId].moduleState
     if (
       destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
       destModuleState.lidOpen !== true
     ) {
       errors.push(errorCreators.thermocyclerLidClosed())
     } else if (destModuleState.type === HEATERSHAKER_MODULE_TYPE) {
-      if (destModuleState.latchOpen === false) {
+      if (destModuleState.latchOpen !== true) {
         errors.push(errorCreators.heaterShakerLatchClosed())
       }
       if (destModuleState.targetSpeed !== null) {

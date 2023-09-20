@@ -111,8 +111,7 @@ export const getIsAdapter = (
   labwareId: string,
   labwareEntities: LabwareEntities
 ): boolean => {
-  if (labwareEntities[labwareId]) return false
-
+  if (labwareEntities[labwareId] == null) return false
   return (
     labwareEntities[labwareId].def.allowedRoles?.includes('adapter') ?? false
   )

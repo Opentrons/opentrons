@@ -437,7 +437,7 @@ def create_tip_action_group(
     return move_group
 
 
-def create_gear_motor_home_group(
+def create_tip_motor_home_group(
     distance: float,
     velocity: float,
     backoff: Optional[bool] = False,

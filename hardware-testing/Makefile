@@ -97,18 +97,21 @@ test-photometric:
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --extra --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --extra --no-blank --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank --trials 1 --increment --tip 50
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 50
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 200
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 1000
 
 .PHONY: test-gravimetric-multi
 test-gravimetric-multi:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1 --no-blank --extra
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1 --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1 --extra --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --no-blank --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --trials 1 --extra --no-blank
 
 .PHONY: test-gravimetric-96
 test-gravimetric-96:
@@ -119,6 +122,8 @@ test-gravimetric:
 	-$(MAKE) apply-patches-gravimetric
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
+	$(MAKE) test-gravimetric-96
+	$(MAKE) test-photometric
 	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-production-qc
@@ -247,6 +252,22 @@ endef
 .PHONY: sync-sw-ot3
 sync-sw-ot3: push-ot3
 	cd .. && $(MAKE) push-ot3 host=$(host)
+
+.PHONY: push-ot3-fixture
+push-ot3-fixture:
+	$(MAKE) apply-patches-fixture
+	-$(MAKE) sync-sw-ot3
+	$(MAKE) remove-patches-fixture
+
+
+.PHONY: apply-patches-fixture
+apply-patches-fixture:
+	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --allow-empty
+
+.PHONY: remove-patches-fixture
+remove-patches-fixture:
+	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --reverse --allow-empty
+
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:

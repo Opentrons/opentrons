@@ -1,14 +1,16 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { Flex, SPACING } from '@opentrons/components'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { GlobalStyle } from '../../atoms/GlobalStyle'
 import { CardButton } from '.'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Odd/Molecules/CardButton',
+  title: 'ODD/Molecules/CardButton',
   component: CardButton,
+  parameters: touchScreenViewport,
   decorators: [
     Story => (
       <>

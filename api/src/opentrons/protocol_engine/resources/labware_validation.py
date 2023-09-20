@@ -4,6 +4,11 @@ from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons.protocols.models import LabwareDefinition
 
 
+def is_flex_trash(load_name: str) -> bool:
+    """Check if a labware is a large trash."""
+    return load_name == "opentrons_1_trash_3200ml_fixed"
+
+
 def validate_definition_is_labware(definition: LabwareDefinition) -> bool:
     """Validate that one of the definition's allowed roles is `labware`.
 

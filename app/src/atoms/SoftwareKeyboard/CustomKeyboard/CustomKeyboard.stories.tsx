@@ -5,15 +5,18 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
+
+import '../../../styles.global.css'
+import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { CustomKeyboard } from '.'
-import '../../../styles.global.css'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/SoftwareKeyboard/CustomKeyboard',
   component: CustomKeyboard,
+  parameters: touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {

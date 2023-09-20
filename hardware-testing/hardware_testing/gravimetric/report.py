@@ -1,7 +1,7 @@
 """Report."""
 from dataclasses import fields
 from enum import Enum
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Dict
 
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -79,7 +79,7 @@ class EnvironmentReportState(str, Enum):
 
 
 def create_csv_test_report_photometric(
-    volumes: List[float], cfg: config.PhotometricConfig, run_id: str
+    volumes: List[float], trials: int, name: str, run_id: str
 ) -> CSVReport:
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
@@ -92,11 +92,11 @@ def create_csv_test_report_photometric(
                 0,
                 trial,
             )
-            for trial in range(cfg.trials)
+            for trial in range(trials)
         ]
 
     report = CSVReport(
-        test_name=cfg.name,
+        test_name=name,
         run_id=run_id,
         sections=[
             CSVSection(
@@ -104,7 +104,9 @@ def create_csv_test_report_photometric(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
-                    CSVLine("tips", [str]),
+                    CSVLine("tips_50ul", [str]),
+                    CSVLine("tips_200ul", [str]),
+                    CSVLine("tips_1000ul", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
                 ],
@@ -133,21 +135,29 @@ def create_csv_test_report_photometric(
             ),
         ],
     )
-    # might as well set the configuration values now
+    return report
+
+
+def store_config_pm(report: CSVReport, cfg: config.PhotometricConfig) -> None:
+    """Store the config file list."""
     for field in fields(config.PhotometricConfig):
         if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
             continue
         report("CONFIG", field.name, [getattr(cfg, field.name)])
-    return report
 
 
 def create_csv_test_report(
-    volumes: List[float], cfg: config.GravimetricConfig, run_id: str
+    volumes: List[float],
+    pipette_channels: int,
+    increment: bool,
+    trials: int,
+    name: str,
+    run_id: str,
 ) -> CSVReport:
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
     meas_info = [field.name.replace("_", "-") for field in fields(MeasurementData)]
-    if cfg.pipette_channels == 8 and not cfg.increment:
+    if pipette_channels == 8 and not increment:
         pip_channels_tested = 8
     else:
         pip_channels_tested = 1
@@ -167,7 +177,7 @@ def create_csv_test_report(
                 trial,
             )
             for channel in range(pip_channels_tested)
-            for trial in range(cfg.trials)
+            for trial in range(trials)
         ]
 
     # Get label for different volume stores, "channel_all", "channel_1" through channel count,
@@ -175,7 +185,7 @@ def create_csv_test_report(
     volume_stat_type = (
         ["channel_all"]
         + [f"channel_{c+1}" for c in range(pip_channels_tested)]
-        + [f"trial_{t+1}" for t in range(cfg.trials)]
+        + [f"trial_{t+1}" for t in range(trials)]
     )
 
     def _field_type_not_using_typing(t: Any) -> Any:
@@ -184,15 +194,18 @@ def create_csv_test_report(
         return t
 
     report = CSVReport(
-        test_name=cfg.name,
+        test_name=name,
         run_id=run_id,
+        validate_meta_data=False,  # to avoid >3 columns in CSV (:shrug:)
         sections=[
             CSVSection(
                 title="SERIAL-NUMBERS",
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
-                    CSVLine("tips", [str]),
+                    CSVLine("tips_50ul", [str]),
+                    CSVLine("tips_200ul", [str]),
+                    CSVLine("tips_1000ul", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
@@ -230,7 +243,7 @@ def create_csv_test_report(
                     )
                     for v in volumes
                     for c in range(pip_channels_tested)
-                    for t in range(cfg.trials)
+                    for t in range(trials)
                     for m in ["aspirate", "dispense"]
                 ],
             ),
@@ -263,28 +276,47 @@ def create_csv_test_report(
                     if volume is not None or trial < config.NUM_BLANK_TRIALS
                 ],
             ),
+            CSVSection(
+                title="ENCODER",
+                lines=[
+                    CSVLine(
+                        f"encoder-volume-{round(v, 2)}-channel_{c}"
+                        f"-trial-{t + 1}-{i}-{d}",
+                        [float],
+                    )
+                    for v in volumes
+                    for c in range(pip_channels_tested)
+                    for t in range(trials)
+                    for i in ["start", "end"]
+                    for d in ["target", "encoder", "drift"]
+                ],
+            ),
         ],
     )
-    # might as well set the configuration values now
+    return report
+
+
+def store_config_gm(report: CSVReport, cfg: config.GravimetricConfig) -> None:
+    """Store the config file list."""
     for field in fields(config.GravimetricConfig):
         if field.name in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT:
             continue
         report("CONFIG", field.name, [getattr(cfg, field.name)])
-    return report
 
 
 def store_serial_numbers_pm(
     report: CSVReport,
     robot: str,
     pipette: str,
-    tips: str,
+    tips: Dict[str, str],
     environment: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
-    report("SERIAL-NUMBERS", "tips", [tips])
+    for tip in tips.keys():
+        report("SERIAL-NUMBERS", tip, [tips[tip]])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])
 
@@ -304,7 +336,7 @@ def store_serial_numbers(
     report: CSVReport,
     robot: str,
     pipette: str,
-    tips: str,
+    tips: Dict[str, str],
     scale: str,
     environment: str,
     liquid: str,
@@ -314,7 +346,8 @@ def store_serial_numbers(
     report.set_device_id(pipette, pipette)
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
-    report("SERIAL-NUMBERS", "tips", [tips])
+    for tip in tips.keys():
+        report("SERIAL-NUMBERS", tip, [tips[tip]])
     report("SERIAL-NUMBERS", "scale", [scale])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])
@@ -406,6 +439,50 @@ def store_volume_per_trial(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-d",
         [round(d * 100.0, 2)],
+    )
+
+
+def store_encoder(
+    report: CSVReport,
+    volume: float,
+    channel: int,
+    trial: int,
+    estimate_bottom: float,
+    encoder_bottom: float,
+    estimate_aspirated: float,
+    encoder_aspirated: float,
+) -> None:
+    """Store encoder information."""
+    vol_in_tag = str(round(volume, 2))
+    report(
+        "ENCODER",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-target",
+        [round(estimate_bottom, 2)],
+    )
+    report(
+        "ENCODER",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-encoder",
+        [round(encoder_bottom, 2)],
+    )
+    report(
+        "ENCODER",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-start-drift",
+        [round(encoder_bottom - estimate_bottom, 2)],
+    )
+    report(
+        "ENCODER",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-target",
+        [round(estimate_aspirated, 2)],
+    )
+    report(
+        "ENCODER",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-encoder",
+        [round(encoder_aspirated, 2)],
+    )
+    report(
+        "ENCODER",
+        f"encoder-volume-{vol_in_tag}-channel_{channel}-trial-{trial + 1}-end-drift",
+        [round(encoder_aspirated - estimate_aspirated, 2)],
     )
 
 

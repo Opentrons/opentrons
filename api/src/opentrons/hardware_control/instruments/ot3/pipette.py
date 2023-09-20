@@ -13,6 +13,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     MotorConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
+    PlungerHomingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
     PipetteLiquidPropertiesDefinition,
@@ -66,6 +67,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._config_as_dict = config.dict()
         self._plunger_motor_current = config.plunger_motor_configurations
         self._pick_up_configurations = config.pick_up_tip_configurations
+        self._plunger_homing_configurations = config.plunger_homing_configurations
         self._drop_configurations = config.drop_tip_configurations
         self._pipette_offset = pipette_offset_cal
         self._pipette_type = self._config.pipette_type
@@ -175,6 +177,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self, pick_up_configs: TipHandlingConfigurations
     ) -> None:
         self._pick_up_configurations = pick_up_configs
+
+    @property
+    def plunger_homing_configurations(self) -> PlungerHomingConfigurations:
+        return self._plunger_homing_configurations
 
     @property
     def drop_configurations(self) -> TipHandlingConfigurations:

@@ -144,7 +144,7 @@ class PlungerPositions(BaseModel):
     )
 
 
-class TipHandlingConfigurations(BaseModel):
+class PlungerHomingConfigurations(BaseModel):
     current: float = Field(
         ...,
         description="Either the z motor current needed for picking up tip or the plunger motor current for dropping tip off the nozzle.",
@@ -153,6 +153,9 @@ class TipHandlingConfigurations(BaseModel):
         ...,
         description="The speed to move the z or plunger axis for tip pickup or drop off.",
     )
+
+
+class TipHandlingConfigurations(PlungerHomingConfigurations):
     presses: int = Field(
         default=0.0, description="The number of tries required to force pick up a tip."
     )
@@ -215,6 +218,9 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     )
     drop_tip_configurations: TipHandlingConfigurations = Field(
         ..., alias="dropTipConfigurations"
+    )
+    plunger_homing_configurations: PlungerHomingConfigurations = Field(
+        ..., alias="plungerHomingConfigurations"
     )
     plunger_motor_configurations: MotorConfigurations = Field(
         ..., alias="plungerMotorConfigurations"

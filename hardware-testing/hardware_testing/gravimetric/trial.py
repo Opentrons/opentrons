@@ -22,12 +22,12 @@ class VolumetricTrial:
     pipette: InstrumentContext
     test_report: CSVReport
     liquid_tracker: LiquidTracker
-    inspect: bool
     trial: int
     tip_volume: int
     volume: float
     mix: bool
     acceptable_cv: Optional[float]
+    acceptable_d: Optional[float]
     env_sensor: asair_sensor.AsairSensorBase
 
 
@@ -68,17 +68,12 @@ class TestResources:
 
     ctx: ProtocolContext
     pipette: InstrumentContext
-    pipette_tag: str
     tipracks: List[Labware]
     test_volumes: List[float]
-    run_id: str
-    start_time: float
-    operator_name: str
-    robot_serial: str
-    tip_batch: str
-    git_description: str
     tips: Dict[int, List[Well]]
     env_sensor: asair_sensor.AsairSensorBase
+    recorder: Optional[GravimetricRecorder]
+    test_report: CSVReport
 
 
 def build_gravimetric_trials(
@@ -118,11 +113,11 @@ def build_gravimetric_trials(
                     test_report=test_report,
                     liquid_tracker=liquid_tracker,
                     blank=blank,
-                    inspect=cfg.inspect,
                     mix=cfg.mix,
                     stable=True,
                     scale_delay=cfg.scale_delay,
                     acceptable_cv=None,
+                    acceptable_d=None,
                     cfg=cfg,
                     env_sensor=env_sensor,
                 )
@@ -137,6 +132,14 @@ def build_gravimetric_trials(
                 trial_list[volume][channel] = []
                 channel_offset = helpers._get_channel_offset(cfg, channel)
                 for trial in range(cfg.trials):
+                    d: Optional[float] = None
+                    cv: Optional[float] = None
+                    if not cfg.increment:
+                        d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
+                            cfg.pipette_volume
+                        ][cfg.tip_volume][volume]
+                        d = d * (1 - config.QC_TEST_SAFETY_FACTOR)
+                        cv = cv * (1 - config.QC_TEST_SAFETY_FACTOR)
                     trial_list[volume][channel].append(
                         GravimetricTrial(
                             ctx=ctx,
@@ -152,11 +155,11 @@ def build_gravimetric_trials(
                             test_report=test_report,
                             liquid_tracker=liquid_tracker,
                             blank=blank,
-                            inspect=cfg.inspect,
                             mix=cfg.mix,
                             stable=True,
                             scale_delay=cfg.scale_delay,
-                            acceptable_cv=None,
+                            acceptable_cv=cv,
+                            acceptable_d=d,
                             cfg=cfg,
                             env_sensor=env_sensor,
                         )
@@ -180,6 +183,14 @@ def build_photometric_trials(
     for volume in test_volumes:
         trial_list[volume] = []
         for trial in range(cfg.trials):
+            d: Optional[float] = None
+            cv: Optional[float] = None
+            if not cfg.increment:
+                d, cv = config.QC_TEST_MIN_REQUIREMENTS[96][cfg.pipette_volume][
+                    cfg.tip_volume
+                ][volume]
+                d = d * (1 - config.QC_TEST_SAFETY_FACTOR)
+                cv = cv * (1 - config.QC_TEST_SAFETY_FACTOR)
             trial_list[volume].append(
                 PhotometricTrial(
                     ctx=ctx,
@@ -191,10 +202,10 @@ def build_photometric_trials(
                     volume=volume,
                     trial=trial,
                     liquid_tracker=liquid_tracker,
-                    inspect=cfg.inspect,
                     cfg=cfg,
                     mix=cfg.mix,
-                    acceptable_cv=None,
+                    acceptable_cv=cv,
+                    acceptable_d=d,
                     env_sensor=env_sensor,
                 )
             )
@@ -206,7 +217,6 @@ def _finish_test(
     resources: TestResources,
     return_tip: bool,
 ) -> None:
-    ui.print_title("CHANGE PIPETTES")
     if resources.pipette.has_tip:
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
@@ -218,7 +228,12 @@ def _finish_test(
             resources.pipette.aspirate(10)  # to pull any droplets back up
         ui.print_info("dropping tip")
         helpers._drop_tip(resources.pipette, return_tip)
+
+
+def _change_pipettes(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+) -> None:
+    ui.print_title("CHANGE PIPETTES")
     ui.print_info("moving to attach position")
-    resources.pipette.move_to(
-        resources.ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150))
-    )
+    pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
