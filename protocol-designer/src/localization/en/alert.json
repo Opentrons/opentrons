@@ -84,6 +84,10 @@
 
       "body4a": "To batch edit Transfer or Mix advanced settings:",
       "body4b": "Only include Transfer or Mix steps in your selection."
+    },
+    "waste_chute_warning": {
+      "title": "Disgarding of labware in the Waste Chute",
+      "body1": "You are about to move your labware to be disgarded in the Waste Chute. Note that this action is irreversible unless you delete this move labware step. "
     }
   },
   "timeline": {
