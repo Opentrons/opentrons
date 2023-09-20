@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AlertsModal } from './AlertsModal'
+import { AlertsModal } from '.'
 import { useToaster } from '../ToasterOven'
 
 export interface AlertsContextProps {

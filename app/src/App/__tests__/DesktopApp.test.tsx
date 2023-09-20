@@ -13,7 +13,7 @@ import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
-import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
+import { AlertsModal } from '../../organisms/Alerts'
 import { useIsOT3 } from '../../organisms/Devices/hooks'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
@@ -28,7 +28,7 @@ jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../hooks')
-jest.mock('../../organisms/Alerts/AlertsModal')
+jest.mock('../../organisms/Alerts')
 
 const mockCalibrationDashboard = CalibrationDashboard as jest.MockedFunction<
   typeof CalibrationDashboard

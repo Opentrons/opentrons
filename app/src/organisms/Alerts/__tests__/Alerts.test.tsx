@@ -10,7 +10,7 @@ import { AlertsModal } from '../AlertsModal'
 import { AnalyticsSettingsModal } from '../../AnalyticsSettingsModal'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 import { UpdateAppModal } from '../../UpdateAppModal'
-import { useRemoveActiveAppUpdateToast } from '../useRemoveActiveAppUpdateToast.ts'
+import { useRemoveActiveAppUpdateToast } from '..'
 
 import type { State } from '../../../redux/types'
 import type { AlertId } from '../../../redux/alerts/types'
@@ -27,7 +27,7 @@ jest.mock('../../UpdateAppModal', () => ({
 jest.mock('../../../redux/alerts/selectors')
 jest.mock('../../../redux/shell')
 jest.mock('../../../redux/config')
-jest.mock('../useRemoveActiveAppUpdateToast.ts')
+jest.mock('..')
 
 const getActiveAlerts = AppAlerts.getActiveAlerts as jest.MockedFunction<
   typeof AppAlerts.getActiveAlerts

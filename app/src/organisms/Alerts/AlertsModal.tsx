@@ -11,7 +11,7 @@ import { useToaster } from '../ToasterOven'
 import { AnalyticsSettingsModal } from '../AnalyticsSettingsModal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
-import { useRemoveActiveAppUpdateToast } from './useRemoveActiveAppUpdateToast.ts'
+import { useRemoveActiveAppUpdateToast } from '.'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { AlertId } from '../../redux/alerts/types'
