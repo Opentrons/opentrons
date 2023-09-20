@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
+import { INCONSISTENT_PIPETTE_OFFSET } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useModulesQuery,
@@ -23,6 +24,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
+import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
@@ -138,6 +140,16 @@ export function InstrumentsAndModules({
     attachedPipettes,
     RIGHT
   )
+  const pipetteCalibrationWarning =
+    attachedInstruments?.data.some((i): i is PipetteData => {
+      const failuresList =
+        i.ok && i.data.calibratedOffset?.reasonability_check_failures != null
+          ? i.data.calibratedOffset?.reasonability_check_failures
+          : []
+      if (failuresList.length > 0) {
+        return failuresList[0]?.kind === INCONSISTENT_PIPETTE_OFFSET
+      } else return false
+    }) ?? false
 
   return (
     <Flex
@@ -178,6 +190,11 @@ export function InstrumentsAndModules({
             width="100%"
           >
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
+          </Flex>
+        )}
+        {pipetteCalibrationWarning && (currentRunId == null || isRunTerminal) && (
+          <Flex paddingBottom={SPACING.spacing16}>
+            <PipetteRecalibrationWarning />
           </Flex>
         )}
         {isRobotViewable ? (
