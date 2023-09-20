@@ -62,7 +62,7 @@ from .instruments.ot3.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
-    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
@@ -1449,6 +1449,9 @@ class OT3API(
                     f"unable to home {Axis.Z_R.name} axis"
                     f"with {self.gantry_load.name} gantry load"
                 )
+
+        if skip:
+            checked_axes = [ax for ax in checked_axes if ax not in skip]
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1707,6 +1710,18 @@ class OT3API(
                 acquire_lock=acquire_lock,
             )
 
+    async def configure_for_volume(
+        self, mount: Union[top_types.Mount, OT3Mount], volume: float
+    ) -> None:
+        checked_mount = OT3Mount.from_mount(mount)
+        await self._pipette_handler.configure_for_volume(checked_mount, volume)
+
+    async def set_liquid_class(
+        self, mount: Union[top_types.Mount, OT3Mount], liquid_class: str
+    ) -> None:
+        checked_mount = OT3Mount.from_mount(mount)
+        await self._pipette_handler.set_liquid_class(checked_mount, liquid_class)
+
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0
@@ -1774,7 +1789,7 @@ class OT3API(
         Dispense a volume of liquid in microliters(uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
-            realmount, volume, rate
+            realmount, volume, rate, push_out
         )
         if not dispense_spec:
             return
@@ -2100,7 +2115,7 @@ class OT3API(
 
     def get_instrument_offset(
         self, mount: OT3Mount
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount, None]:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary, None]:
         """Get instrument calibration data."""
         # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
         #  PipetteDict because the dict is shared with OT2 pipettes which have
@@ -2126,7 +2141,7 @@ class OT3API(
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount]:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary]:
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
@@ -2483,4 +2498,4 @@ class OT3API(
         return self.estop_status
 
     def get_estop_state(self) -> EstopState:
-        return self._backend.estop_state_machine.stat
+        return self._backend.estop_state_machine.state
