@@ -3,30 +3,26 @@ import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 
-import { getEstopStatus } from '@opentrons/api-client'
+import { getDoorStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
-import { useEstopQuery } from '..'
+import { useDoorQuery } from '..'
 
-import type { HostConfig, Response, EstopStatus } from '@opentrons/api-client'
+import type { HostConfig, Response, DoorStatus } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-const mockGetEstopStatus = getEstopStatus as jest.MockedFunction<
-  typeof getEstopStatus
+const mockGetDoorStatus = getDoorStatus as jest.MockedFunction<
+  typeof getDoorStatus
 >
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const ESTOP_STATE_RESPONSE: EstopStatus = {
-  data: {
-    status: 'disengaged',
-    leftEstopPhysicalStatus: 'disengaged',
-    rightEstopPhysicalStatus: 'disengaged',
-  },
-}
+const DOOR_RESPONSE: DoorStatus = {
+  data: { status: 'open', doorRequiredClosedForProtocol: true },
+} as DoorStatus
 
-describe('useEstopQuery hook', () => {
+describe('useDoorQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
 
   beforeEach(() => {
@@ -45,32 +41,30 @@ describe('useEstopQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(useEstopQuery, { wrapper })
+    const { result } = renderHook(useDoorQuery, { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
 
-  it('should return no data if estop request fails', () => {
+  it('should return no data if lights request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetEstopStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    when(mockGetDoorStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useEstopQuery, { wrapper })
+    const { result } = renderHook(useDoorQuery, { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
 
-  it('should return estop state response data', async () => {
+  it('should return lights response data', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetEstopStatus)
+    when(mockGetDoorStatus)
       .calledWith(HOST_CONFIG)
-      .mockResolvedValue({
-        data: ESTOP_STATE_RESPONSE,
-      } as Response<EstopStatus>)
+      .mockResolvedValue({ data: DOOR_RESPONSE } as Response<DoorStatus>)
 
-    const { result, waitFor } = renderHook(useEstopQuery, { wrapper })
+    const { result, waitFor } = renderHook(useDoorQuery, { wrapper })
 
     await waitFor(() => result.current?.data != null)
 
-    expect(result.current?.data).toEqual(ESTOP_STATE_RESPONSE)
+    expect(result.current?.data).toEqual(DOOR_RESPONSE)
   })
 })

@@ -23,7 +23,7 @@ const BANNER_LINK_CSS = css`
   cursor: pointer;
   margin-left: ${SPACING.spacing8};
 `
-const SUBSYSTEM_UPDATE_POLL_MS = 3000
+const SUBSYSTEM_UPDATE_POLL_MS = 5000
 
 export function GripperCard({
   attachedGripper,
@@ -54,7 +54,6 @@ export function GripperCard({
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     'gripper',
     {
-      enabled: attachedGripper != null && !attachedGripper.ok,
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
@@ -89,7 +88,8 @@ export function GripperCard({
         ]
   return (
     <>
-      {attachedGripper == null || attachedGripper.ok ? (
+      {(attachedGripper == null || attachedGripper.ok) &&
+      subsystemUpdateData == null ? (
         <InstrumentCard
           description={
             attachedGripper != null
@@ -122,7 +122,7 @@ export function GripperCard({
           menuOverlayItems={menuOverlayItems}
         />
       ) : null}
-      {attachedGripper?.ok === false ? (
+      {attachedGripper?.ok === false || subsystemUpdateData != null ? (
         <InstrumentCard
           label={i18n.format(t('mount', { side: 'extension' }), 'capitalize')}
           description={t('instrument_attached')}

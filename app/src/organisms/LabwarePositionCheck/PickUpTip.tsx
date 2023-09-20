@@ -393,13 +393,15 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             location: displayLocation,
           })}
           body={
-            <StyledText as="p">
-              {t('ensure_nozzle_is_above_tip')}
-              &nbsp;
-              {isOnDevice
-                ? t('if_not_aligned_tap_to_jog')
-                : t('if_not_aligned_click_to_jog')}
-            </StyledText>
+            <Trans
+              t={t}
+              i18nKey={
+                isOnDevice
+                  ? 'ensure_nozzle_is_above_tip_odd'
+                  : 'ensure_nozzle_is_above_tip_desktop'
+              }
+              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+            />
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}

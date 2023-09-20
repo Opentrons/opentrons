@@ -185,7 +185,7 @@ async def _test_ethernet(api: OT3API, report: CSVReport, section: str) -> None:
 async def _test_wifi(report: CSVReport, section: str) -> None:
     ssid = ""
     password: Optional[str] = None
-    result = CSVResult.FAIL
+    result: Optional[CSVResult] = CSVResult.FAIL
     wifi_ip: Optional[str] = None
 
     def _finish() -> None:
@@ -336,7 +336,7 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
                     inp = ui.get_user_answer(
                         f"does {test_name.upper()} count TRANSMIT = RECEIVE"
                     )
-                    result = CSVResult.from_bool(inp)
+                    result = CSVResult.from_bool(inp)  # type: ignore[assignment]
                 report(section, test_name, [result])
         else:
             if api.is_simulator:

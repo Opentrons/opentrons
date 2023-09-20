@@ -245,8 +245,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
             marginRight={SPACING.spacing4}
           >
             {flowType === FLOWS.DETACH
-              ? i18n.format(t('cancel_detachment'), 'capitalize')
-              : i18n.format(t('cancel_attachment'), 'capitalize')}
+              ? i18n.format(t('cancel_detachment'))
+              : i18n.format(t('cancel_attachment'))}
           </SecondaryButton>
         )}
         <CheckPipetteButton
