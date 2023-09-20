@@ -12,3 +12,9 @@ export function aspirateFromPristineWell(): CommandCreatorWarning {
       'Aspirating from a pristine well. No liquids were ever added to this well',
   }
 }
+export function moveNonemptyLabwareToWasteChute(): CommandCreatorWarning {
+  return {
+    type: 'LABWARE_IN_WASTE_CHUTE_NOT_EMPTY',
+    message: 'Discarding a non-emtpy labware to the waste chute ',
+  }
+}

@@ -161,6 +161,10 @@
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
         "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
+      },
+      "LABWARE_IN_WASTE_CHUTE_NOT_EMPTY": {
+        "title": "Moving labware into waste chute",
+        "body": "Your labware has either liquid or tips, be avised that you are discarding of the liquid or tips in your labware"
       }
     }
   },

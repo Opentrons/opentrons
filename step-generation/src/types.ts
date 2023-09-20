@@ -517,6 +517,7 @@ export interface CommandCreatorError {
 export type WarningType =
   | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
   | 'ASPIRATE_FROM_PRISTINE_WELL'
+  | 'LABWARE_IN_WASTE_CHUTE_NOT_EMPTY'
 
 export interface CommandCreatorWarning {
   message: string
