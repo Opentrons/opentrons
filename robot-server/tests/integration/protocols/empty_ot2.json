@@ -1,0 +1,16 @@
+{
+  "$otSharedSchema": "#/protocol/schemas/6",
+  "schemaVersion": 6,
+  "metadata": {},
+  "robot": {
+    "model": "OT-2 Standard",
+    "deckId": "ot2_standard"
+  },
+  "pipettes": {},
+  "modules": {},
+  "labware": {},
+  "liquids": {},
+  "labwareDefinitions": {},
+  "commands": [],
+  "commandAnnotations": []
+}
