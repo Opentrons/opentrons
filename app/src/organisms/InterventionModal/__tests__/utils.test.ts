@@ -14,7 +14,6 @@ import {
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
-  getLabwareDisplayLocationFromRunData,
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
   getModuleModelFromRunData,
@@ -31,58 +30,6 @@ jest.mock('@opentrons/shared-data', () => {
 const mockGetSlotHasMatingSurfaceUnitVector = getSlotHasMatingSurfaceUnitVector as jest.MockedFunction<
   typeof getSlotHasMatingSurfaceUnitVector
 >
-
-describe('getLabwareDisplayLocationFromRunData', () => {
-  const mockTranslator = jest.fn()
-
-  it('uses off_deck copy when labware location is off deck', () => {
-    getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      'offDeck',
-      mockTranslator,
-      'OT-2 Standard'
-    )
-    expect(mockTranslator).toHaveBeenLastCalledWith('off_deck')
-  })
-
-  it('uses slot copy and slot name when labware location is a slot', () => {
-    getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      {
-        slotName: '3',
-      },
-      mockTranslator,
-      'OT-2 Standard'
-    )
-    expect(mockTranslator).toHaveBeenLastCalledWith('slot', { slot_name: '3' })
-  })
-
-  it('returns an empty string if the location is a module that cannot be found in protocol data', () => {
-    const res = getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      { moduleId: 'badID' },
-      mockTranslator,
-      'OT-2 Standard'
-    )
-
-    expect(res).toEqual('')
-  })
-
-  it('uses module in slot copy when location is a module in the protocol data', () => {
-    getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      { moduleId: 'mockModuleID' },
-      mockTranslator,
-      'OT-2 Standard'
-    )
-
-    expect(mockTranslator).toHaveBeenLastCalledWith('module_in_slot', {
-      count: 1,
-      module: 'Heater-Shaker Module GEN1',
-      slot_name: '3',
-    })
-  })
-})
 
 describe('getLabwareNameFromRunData', () => {
   it('returns an empty string if it cannot find matching loaded labware', () => {

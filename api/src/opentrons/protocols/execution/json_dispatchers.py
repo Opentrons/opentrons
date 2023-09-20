@@ -66,7 +66,7 @@ temperature_module_command_map: "JsonV4TemperatureModuleDispatch" = {
 }
 
 
-def tc_do_nothing(module: ThermocyclerContext, params) -> None:
+def tc_do_nothing(module: ThermocyclerContext, params: object) -> None:
     pass
 
 

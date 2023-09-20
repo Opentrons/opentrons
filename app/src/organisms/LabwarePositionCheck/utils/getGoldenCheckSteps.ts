@@ -3,12 +3,14 @@ import { SECTIONS } from '../constants'
 import {
   CompletedProtocolAnalysis,
   LoadedPipette,
+  getLabwareDefURI,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 import type { LabwarePositionCheckStep, CheckPositionsStep } from '../types'
 import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import { getLabwareDefinitionsFromCommands } from './labware'
 
 function getPrimaryPipetteId(pipettes: LoadedPipette[]): string {
   if (pipettes.length < 1) {
@@ -51,8 +53,15 @@ function getAllCheckSectionSteps(
     labware,
     modules
   )
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
   const labwareLocations = labwareLocationCombos.reduce<LabwareLocationCombo[]>(
     (acc, labwareLocationCombo) => {
+      const labwareDef = labwareDefinitions.find(
+        def => getLabwareDefURI(def) === labwareLocationCombo.definitionUri
+      )
+      if ((labwareDef?.allowedRoles ?? []).includes('adapter')) {
+        return acc
+      }
       // remove duplicate definitionUri in same location
       const comboAlreadyExists = acc.some(
         accLocationCombo =>
@@ -65,11 +74,14 @@ function getAllCheckSectionSteps(
     []
   )
 
-  return labwareLocations.map(({ location, labwareId, moduleId }) => ({
-    section: SECTIONS.CHECK_POSITIONS,
-    labwareId: labwareId,
-    pipetteId: getPrimaryPipetteId(pipettes),
-    location,
-    moduleId,
-  }))
+  return labwareLocations.map(
+    ({ location, labwareId, moduleId, adapterId }) => ({
+      section: SECTIONS.CHECK_POSITIONS,
+      labwareId: labwareId,
+      pipetteId: getPrimaryPipetteId(pipettes),
+      location,
+      moduleId,
+      adapterId,
+    })
+  )
 }

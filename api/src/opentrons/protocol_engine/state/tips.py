@@ -8,7 +8,6 @@ from ..actions import (
     Action,
     UpdateCommandAction,
     ResetTipsAction,
-    AddPipetteConfigAction,
 )
 from ..commands import (
     Command,
@@ -17,6 +16,7 @@ from ..commands import (
     DropTipResult,
     DropTipInPlaceResult,
 )
+from ..commands.configuring_common import PipetteConfigUpdateResultMixin
 
 
 class TipRackWellState(Enum):
@@ -56,6 +56,11 @@ class TipStore(HasState[TipState], HandlesActions):
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
+            if isinstance(action.private_result, PipetteConfigUpdateResultMixin):
+                config = action.private_result.config
+                self._state.channels_by_pipette_id[
+                    action.private_result.pipette_id
+                ] = config.channels
             self._handle_command(action.command)
 
         elif isinstance(action, ResetTipsAction):
@@ -65,10 +70,6 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.tips_by_labware_id[labware_id][
                     well_name
                 ] = TipRackWellState.CLEAN
-
-        elif isinstance(action, AddPipetteConfigAction):
-            config = action.config
-            self._state.channels_by_pipette_id[action.pipette_id] = config.channels
 
     def _handle_command(self, command: Command) -> None:
         if (
@@ -167,14 +168,11 @@ class TipView(HasState[TipState]):
                 return next(iter(wells))
 
         else:
-            for well_name, tip_state in wells.items():
-                seen_start = (
-                    starting_tip_name is None
-                    or well_name == starting_tip_name
-                    or wells[starting_tip_name] == TipRackWellState.USED
-                )
+            if starting_tip_name is not None:
+                wells = _drop_wells_before_starting_tip(wells, starting_tip_name)
 
-                if seen_start and tip_state == TipRackWellState.CLEAN:
+            for well_name, tip_state in wells.items():
+                if tip_state == TipRackWellState.CLEAN:
                     return well_name
 
         return None
@@ -202,3 +200,17 @@ class TipView(HasState[TipState]):
     def get_tip_length(self, pipette_id: str) -> float:
         """Return the given pipette's tip length."""
         return self._state.length_by_pipette_id.get(pipette_id, 0)
+
+
+def _drop_wells_before_starting_tip(
+    wells: TipRackStateByWellName, starting_tip_name: str
+) -> TipRackStateByWellName:
+    """Drop any wells that come before the starting tip and return the remaining ones after."""
+    seen_starting_well = False
+    remaining_wells = {}
+    for well_name, tip_state in wells.items():
+        if well_name == starting_tip_name:
+            seen_starting_well = True
+        if seen_starting_well:
+            remaining_wells[well_name] = tip_state
+    return remaining_wells

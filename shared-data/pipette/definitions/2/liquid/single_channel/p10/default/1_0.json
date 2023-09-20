@@ -39,7 +39,7 @@
           "2": [[12.5135, 0, 0.7945]]
         }
       },
-      "defaultBlowoutVolume": 2.356
+      "defaultPushOutVolume": 0
     }
   },
   "maxVolume": 10,

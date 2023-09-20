@@ -1,5 +1,4 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing_extensions import Literal
 from typing import Dict, Optional, Type, Union, List, Tuple
 
 from opentrons.protocol_engine.commands import LoadModuleResult
@@ -256,17 +255,20 @@ class ProtocolCore(
             DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
         ],
         use_gripper: bool,
+        pause_for_manual_move: bool,
         pick_up_offset: Optional[Tuple[float, float, float]],
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
         to_location = self._convert_labware_location(location=new_location)
 
-        strategy = (
-            LabwareMovementStrategy.USING_GRIPPER
-            if use_gripper
-            else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
-        )
+        if use_gripper:
+            strategy = LabwareMovementStrategy.USING_GRIPPER
+        elif pause_for_manual_move:
+            strategy = LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
+        else:
+            strategy = LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE
+
         _pick_up_offset = (
             LabwareOffsetVector(
                 x=pick_up_offset[0], y=pick_up_offset[1], z=pick_up_offset[2]
@@ -405,10 +407,8 @@ class ProtocolCore(
                 load_module_result=load_module_result, model=model
             )
 
-    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
-    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_instrument(
-        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
+        self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 

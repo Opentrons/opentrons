@@ -51,6 +51,7 @@ class SettingDefinition:
         restart_required: bool = False,
         show_if: Optional[Tuple[str, bool]] = None,
         internal_only: bool = False,
+        default_true_on_robot_types: Optional[List[RobotTypeEnum]] = None,
     ):
         self.id = _id
         #: The id of the setting for programmatic access through
@@ -70,6 +71,8 @@ class SettingDefinition:
         #: A list of RobotTypeEnums that are compatible with this feature flag.
         self.internal_only = internal_only
         #: A flag determining whether this setting is user-facing.
+        self.default_true_on_robot_types = default_true_on_robot_types or []
+        #: Robot types for which null/unset means the setting is activated
 
     def __repr__(self) -> str:
         return "{}: {}".format(self.__class__, self.id)
@@ -152,7 +155,7 @@ settings = [
         old_id="disable-home-on-boot",
         title="Disable home on boot",
         description="Prevent robot from homing motors on boot",
-        robot_type=[RobotTypeEnum.OT2],
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="useOldAspirationFunctions",
@@ -171,6 +174,7 @@ settings = [
         "pause your robot only after it has completed its "
         "current motion.",
         robot_type=[RobotTypeEnum.OT2],
+        default_true_on_robot_types=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="disableFastProtocolUpload",
@@ -251,6 +255,14 @@ settings_by_id: Dict[str, SettingDefinition] = {s.id: s for s in settings}
 settings_by_old_id: Dict[str, SettingDefinition] = {
     s.old_id: s for s in settings if s.old_id
 }
+
+
+def get_setting_definition(setting_id: str) -> Optional[SettingDefinition]:
+    clean = _clean_id(setting_id)
+    for setting in settings:
+        if setting.id == clean:
+            return setting
+    return None
 
 
 def get_adv_setting(setting: str, robot_type: RobotTypeEnum) -> Optional[Setting]:
@@ -749,11 +761,18 @@ def _ensure(data: Mapping[str, Any]) -> SettingsMap:
 
 def get_setting_with_env_overload(setting_name: str, robot_type: RobotTypeEnum) -> bool:
     env_name = "OT_API_FF_" + setting_name
+    defn = get_setting_definition(setting_name)
     if env_name in os.environ:
         return os.environ[env_name].lower() in {"1", "true", "on"}
     else:
         s = get_adv_setting(setting_name, robot_type)
-        return s.value is True if s is not None else False
+        if s is not None:
+            return s.value is True
+        if defn is None:
+            return False
+        if robot_type in defn.default_true_on_robot_types:
+            return True
+        return False
 
 
 _SETTINGS_RESTART_REQUIRED = False

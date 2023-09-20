@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { fireEvent, waitFor } from '@testing-library/react'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -12,6 +12,7 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
+import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
 import { MultipleModulesModal } from '../MultipleModulesModal'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import {
@@ -19,16 +20,21 @@ import {
   useModuleRenderInfoForProtocolById,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
+  useRunCalibrationStatus,
 } from '../../../hooks'
-import { HeaterShakerWizard } from '../../../HeaterShakerWizard'
+import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import { SetupModulesList } from '../SetupModulesList'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../hooks')
 jest.mock('../UnMatchedModuleWarning')
-jest.mock('../../../HeaterShakerWizard')
+jest.mock('../../../../ModuleCard/ModuleSetupModal')
+jest.mock('../../../../ModuleWizardFlows')
 jest.mock('../MultipleModulesModal')
+jest.mock('../../../../../resources/runs/hooks')
 const mockUseIsOt3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
@@ -36,8 +42,8 @@ const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolByI
 const mockUnMatchedModuleWarning = UnMatchedModuleWarning as jest.MockedFunction<
   typeof UnMatchedModuleWarning
 >
-const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
-  typeof HeaterShakerWizard
+const mockModuleSetupModal = ModuleSetupModal as jest.MockedFunction<
+  typeof ModuleSetupModal
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
@@ -47,6 +53,15 @@ const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
 >
 const mockMultipleModulesModal = MultipleModulesModal as jest.MockedFunction<
   typeof MultipleModulesModal
+>
+const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
+  typeof ModuleWizardFlows
+>
+const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
+  typeof useRunCalibrationStatus
+>
+const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
+  typeof useChainLiveCommands
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -75,6 +90,16 @@ const mockTCModule = {
   displayName: 'Thermocycler Module',
 }
 
+const mockCalibratedData = {
+  offset: {
+    x: 0.1640625,
+    y: -1.2421875,
+    z: -1.759999999999991,
+  },
+  slot: '7',
+  last_modified: '2023-06-01T14:42:20.131798+00:00',
+}
+
 const render = (props: React.ComponentProps<typeof SetupModulesList>) => {
   return renderWithProviders(<SetupModulesList {...props} />, {
     i18nInstance: i18n,
@@ -83,14 +108,15 @@ const render = (props: React.ComponentProps<typeof SetupModulesList>) => {
 
 describe('SetupModulesList', () => {
   let props: React.ComponentProps<typeof SetupModulesList>
+  let mockChainLiveCommands = jest.fn()
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
-    when(mockHeaterShakerWizard).mockReturnValue(
-      <div>mockHeaterShakerWizard</div>
-    )
+    mockChainLiveCommands = jest.fn()
+    mockChainLiveCommands.mockResolvedValue(null)
+    when(mockModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
     when(mockUnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
     )
@@ -100,6 +126,15 @@ describe('SetupModulesList', () => {
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: true,
+      })
+    mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
+    mockUseChainLiveCommands.mockReturnValue({
+      chainLiveCommands: mockChainLiveCommands,
+    } as any)
   })
   afterEach(() => resetAllWhenMocks())
 
@@ -111,7 +146,7 @@ describe('SetupModulesList', () => {
     const { getByText } = render(props)
     getByText('Module Name')
     getByText('Location')
-    getByText('Connection Status')
+    getByText('Status')
   })
 
   it('should render a magnetic module that is connected', () => {
@@ -126,17 +161,17 @@ describe('SetupModulesList', () => {
         nestedLabwareId: null,
         protocolLoadOrder: 0,
         slotName: '1',
-        attachedModuleMatch: mockMagneticModuleGen2,
+        attachedModuleMatch: {
+          ...mockMagneticModuleGen2,
+          moduleOffset: mockCalibratedData,
+        },
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Connected')
-    expect(getByTestId('status_label_Connected_1')).toHaveStyle({
-      backgroundColor: COLORS.successBackgroundLight,
-    })
   })
 
   it('should render a magnetic module that is NOT connected', () => {
@@ -155,13 +190,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Magnetic Module')
     getByText('Slot 1')
     getByText('Not connected')
-    expect(getByTestId('status_label_Not connected_1')).toHaveStyle({
-      backgroundColor: COLORS.warningBackgroundLight,
-    })
   })
 
   it('should render a thermocycler module that is connected, OT2', () => {
@@ -182,7 +214,10 @@ describe('SetupModulesList', () => {
         nestedLabwareId: null,
         protocolLoadOrder: 0,
         slotName: '7',
-        attachedModuleMatch: mockThermocycler,
+        attachedModuleMatch: {
+          ...mockThermocycler,
+          moduleOffset: mockCalibratedData,
+        },
       },
     } as any)
     mockUseIsOt3.mockReturnValue(false)
@@ -191,6 +226,71 @@ describe('SetupModulesList', () => {
     getByText('Thermocycler Module')
     getByText('Slot 7,8,10,11')
     getByText('Connected')
+  })
+
+  it('should render a thermocycler module that is connected but not calibrated, OT3', async () => {
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
+    mockUseModuleRenderInfoForProtocolById.mockReturnValue({
+      [mockTCModule.moduleId]: {
+        moduleId: mockTCModule.moduleId,
+        x: MOCK_TC_COORDS[0],
+        y: MOCK_TC_COORDS[1],
+        z: MOCK_TC_COORDS[2],
+        moduleDef: mockTCModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 0,
+        slotName: '7',
+        attachedModuleMatch: mockThermocycler,
+      },
+    } as any)
+    mockUseIsOt3.mockReturnValue(true)
+
+    const { getByText, getByRole } = render(props)
+    getByText('Thermocycler Module')
+    getByText('Slot A1+B1')
+    getByRole('button', { name: 'Calibrate now' }).click()
+    await waitFor(() => {
+      getByText('mock ModuleWizardFlows')
+    })
+  })
+
+  it('should render disabled button when pipette and module are not calibrated', () => {
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        complete: false,
+        reason: 'calibrate_pipette_failure_reason',
+      })
+    mockUseModuleRenderInfoForProtocolById.mockReturnValue({
+      [mockTCModule.moduleId]: {
+        moduleId: mockTCModule.moduleId,
+        x: MOCK_TC_COORDS[0],
+        y: MOCK_TC_COORDS[1],
+        z: MOCK_TC_COORDS[2],
+        moduleDef: mockTCModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 0,
+        slotName: '7',
+        attachedModuleMatch: mockThermocycler,
+      },
+    } as any)
+    mockUseIsOt3.mockReturnValue(true)
+
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {
@@ -211,7 +311,10 @@ describe('SetupModulesList', () => {
         nestedLabwareId: null,
         protocolLoadOrder: 0,
         slotName: '7',
-        attachedModuleMatch: mockThermocycler,
+        attachedModuleMatch: {
+          ...mockThermocycler,
+          moduleOffset: mockCalibratedData,
+        },
       },
     } as any)
     mockUseIsOt3.mockReturnValue(true)
@@ -326,7 +429,7 @@ describe('SetupModulesList', () => {
     const { getByText } = render(props)
     const moduleSetup = getByText('View module setup instructions')
     fireEvent.click(moduleSetup)
-    getByText('mockHeaterShakerWizard')
+    getByText('mockModuleSetupModal')
   })
   it('shoulde render a magnetic block', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({

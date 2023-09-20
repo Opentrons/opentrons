@@ -1,4 +1,5 @@
 """Test the CompletedAnalysisStore."""
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -92,7 +93,6 @@ def _completed_analysis_resource(
 
 async def test_get_by_analysis_id_prefers_cache(
     subject: CompletedAnalysisStore,
-    sql_engine: Engine,
     memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
     decoy: Decoy,
@@ -106,9 +106,8 @@ async def test_get_by_analysis_id_prefers_cache(
     assert (await subject.get_by_id("analysis-id")) is resource
 
 
-async def test_get_by_analysis_falls_back_to_sql(
+async def test_get_by_analysis_id_falls_back_to_sql(
     subject: CompletedAnalysisStore,
-    sql_engine: Engine,
     memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
     decoy: Decoy,
@@ -124,9 +123,8 @@ async def test_get_by_analysis_falls_back_to_sql(
     assert analysis_from_sql == resource
 
 
-async def test_get_by_analysis_id_caches_results(
+async def test_get_by_analysis_id_stores_results_in_cache(
     subject: CompletedAnalysisStore,
-    sql_engine: Engine,
     memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
     decoy: Decoy,
@@ -142,8 +140,32 @@ async def test_get_by_analysis_id_caches_results(
     decoy.verify(memcache.insert("analysis-id", from_sql))
 
 
+async def test_get_by_analysis_id_as_document(
+    subject: CompletedAnalysisStore,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should return the analysis serialized as a JSON string."""
+    resource = _completed_analysis_resource("analysis-id", "protocol-id")
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+    await subject.add(resource)
+    result = await subject.get_by_id_as_document("analysis-id")
+    assert result is not None
+    assert json.loads(result) == {
+        "id": "analysis-id",
+        "result": "ok",
+        "status": "completed",
+        "commands": [],
+        "errors": [],
+        "labware": [],
+        "liquids": [],
+        "modules": [],
+        "pipettes": [],
+        "result": "ok",
+    }
+
+
 async def test_get_ids_by_protocol(
-    subject: CompletedAnalysisStore, sql_engine: Engine, protocol_store: ProtocolStore
+    subject: CompletedAnalysisStore, protocol_store: ProtocolStore
 ) -> None:
     """It should return correct analysis id lists."""
     resource_1 = _completed_analysis_resource("analysis-id-1", "protocol-id-1")
@@ -154,14 +176,14 @@ async def test_get_ids_by_protocol(
     await subject.add(resource_1)
     await subject.add(resource_2)
     await subject.add(resource_3)
-    assert sorted(subject.get_ids_by_protocol("protocol-id-1")) == sorted(
-        ["analysis-id-1", "analysis-id-2"]
-    )
+    assert subject.get_ids_by_protocol("protocol-id-1") == [
+        "analysis-id-1",
+        "analysis-id-2",
+    ]
 
 
 async def test_get_by_protocol(
     subject: CompletedAnalysisStore,
-    sql_engine: Engine,
     memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
     decoy: Decoy,

@@ -101,7 +101,6 @@ export const UnmountGripper = (
     <SimpleWizardBody
       iconColor={COLORS.errorEnabled}
       header={t('gripper_still_attached')}
-      subHeader={t('please_retry_gripper_detach')}
       isSuccess={false}
     >
       <Flex

@@ -16,7 +16,7 @@ Your robot needs to attach a disposable tip to the pipette before it can aspirat
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Picking Up a Tip
------------------
+----------------
 
 To pick up a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` method without any arguments::
     
@@ -174,6 +174,7 @@ Aspiration Flow Rates
 ^^^^^^^^^^^^^^^^^^^^^
 
 Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-rates>` measured in µL/s. Specifying the ``rate`` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to aspirate at twice its normal rate::
+
 
     pipette.aspirate(200, plate['A1'], rate=2.0)
 
@@ -425,6 +426,7 @@ Call the :py:meth:`.ProtocolContext.set_rail_lights` method to turn the robot's 
 This example turns the rail lights on::
 
     protocol.set_rail_lights(True)
+
 
 This example turns the rail lights off::
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { format, formatDistance } from 'date-fns'
+import { formatDistance } from 'date-fns'
 import styled, { css } from 'styled-components'
 
 import {
@@ -19,6 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -63,8 +64,15 @@ export function PinnedProtocol(props: {
   cardSize?: CardSizeType
   lastRun?: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
 }): JSX.Element {
-  const { lastRun, protocol, longPress, setShowDeleteConfirmationModal } = props
+  const {
+    lastRun,
+    protocol,
+    longPress,
+    setShowDeleteConfirmationModal,
+    setTargetProtocolId,
+  } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
@@ -131,13 +139,14 @@ export function PinnedProtocol(props: {
             : t('no_history')}
         </StyledText>
         <StyledText as="p">
-          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
+          {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
       </Flex>
       {longpress.isLongPressed && (
         <LongPressModal
           longpress={longpress}
           protocolId={protocol.id}
+          setTargetProtocolId={setTargetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       )}

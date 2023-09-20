@@ -29,11 +29,11 @@ import {
   useProtocolQuery,
   useRunQuery,
   useInstrumentsQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
@@ -42,7 +42,6 @@ import {
   ProtocolSetupStepSkeleton,
 } from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { useMaintenanceRunTakeover } from '../../../organisms/TakeoverModal'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -76,9 +75,10 @@ import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
+const FETCH_DOOR_STATUS_MS = 5000
+const SNACK_BAR_DURATION_MS = 7000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -177,13 +177,15 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon
-          marginLeft={SPACING.spacing8}
-          name="more"
-          size="3rem"
-          // Required to prevent inconsistent component height.
-          style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
-        />
+        {disabled ? null : (
+          <Icon
+            marginLeft={SPACING.spacing8}
+            name="more"
+            size="3rem"
+            // Required to prevent inconsistent component height.
+            style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
+          />
+        )}
       </Flex>
     </Btn>
   )
@@ -240,33 +242,6 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   )
 }
 
-const PLAY_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.blueEnabled};
-  }
-
-  &:active {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
 interface PlayButtonProps {
   ready: boolean
   onPlay?: () => void
@@ -278,6 +253,33 @@ function PlayButton({
   onPlay,
   ready,
 }: PlayButtonProps): JSX.Element {
+  const playButtonStyle = css`
+    -webkit-tap-highlight-color: transparent;
+    &:focus {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:hover {
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+      color: ${COLORS.white};
+    }
+
+    &:focus-visible {
+      box-shadow: ${ODD_FOCUS_VISIBLE};
+      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+    }
+
+    &:active {
+      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      color: ${COLORS.white};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack60};
+    }
+  `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
@@ -292,7 +294,7 @@ function PlayButton({
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
-      css={PLAY_BUTTON_STYLE}
+      css={playButtonStyle}
     >
       <Icon
         color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
@@ -316,7 +318,7 @@ function PrepareToRun({
   confirmAttachment,
   play,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
 
@@ -339,10 +341,10 @@ function PrepareToRun({
   const { data: attachedInstruments } = useInstrumentsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
-    protocolRecord?.data.files[0].name
+    protocolRecord?.data.files[0].name ??
+    ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -356,12 +358,6 @@ function PrepareToRun({
 
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
-  const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
-    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
@@ -385,13 +381,16 @@ function PrepareToRun({
     hasMissingModulesForOdd: isMissingModules,
     hasMissingCalForOdd: !areInstrumentsReady,
   })
+  const requiredCalibration = attachedModules.some(
+    module => module.moduleOffset?.last_modified == null
+  )
 
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  // True if any sever request is still pending.
+  // True if any server request is still pending.
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
@@ -408,14 +407,15 @@ function PrepareToRun({
   })
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
-  const modulesStatus = isMissingModules ? 'not ready' : 'ready'
+  const modulesStatus =
+    isMissingModules || requiredCalibration ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
 
   const onPlay = (): void => {
     if (
       isHeaterShakerInProtocol &&
-      !isHeaterShakerShaking &&
+      isReadyToRun &&
       (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
     ) {
       confirmAttachment()
@@ -452,9 +452,15 @@ function PrepareToRun({
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
       : t('multiple_modules_missing')
 
-  const modulesDetail = isMissingModules
-    ? missingModulesText
-    : connectedModulesText
+  const modulesDetail = (): string => {
+    if (isMissingModules) {
+      return missingModulesText
+    } else if (requiredCalibration) {
+      return t('calibration_required')
+    } else {
+      return connectedModulesText
+    }
+  }
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -479,6 +485,20 @@ function PrepareToRun({
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
+  const { data: doorStatus } = useDoorQuery({
+    refetchInterval: FETCH_DOOR_STATUS_MS,
+  })
+  const isDoorOpen =
+    doorStatus?.data.status === 'open' &&
+    doorStatus?.data.doorRequiredClosedForProtocol
+  React.useEffect(() => {
+    // Note show snackbar when instruments and modules are all green
+    // but the robot door is open
+    if (isReadyToRun && isDoorOpen) {
+      makeSnackbar(t('shared:close_robot_door'), SNACK_BAR_DURATION_MS)
+    }
+  }, [isDoorOpen])
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -492,7 +512,7 @@ function PrepareToRun({
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
-        overflowY="hidden"
+        overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -512,7 +532,7 @@ function PrepareToRun({
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap="anywhere"
                 >
-                  {truncateString(protocolName as string, 100)}
+                  {truncateString(protocolName, 100)}
                 </StyledText>
               </>
             ) : (
@@ -528,7 +548,7 @@ function PrepareToRun({
               }
             />
             <PlayButton
-              disabled={isLoading}
+              disabled={isLoading || isDoorOpen}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
             />
@@ -553,13 +573,12 @@ function PrepareToRun({
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
               title={t('modules')}
-              detail={modulesDetail}
+              detail={modulesDetail()}
               status={modulesStatus}
               disabled={protocolModulesInfo.length === 0}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
-                setODDMaintenanceFlowInProgress()
                 launchLPC()
               }}
               title={t('labware_position_check')}

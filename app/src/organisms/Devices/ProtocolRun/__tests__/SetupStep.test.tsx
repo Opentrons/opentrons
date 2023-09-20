@@ -12,9 +12,9 @@ describe('SetupStep', () => {
     title = 'stub title',
     description = 'stub description',
     label = 'stub label',
-    calibrationStatusComplete = null,
     toggleExpanded = toggleExpandedMock,
     children = <button>stub children</button>,
+    rightElement = <div>right element</div>,
   }: Partial<React.ComponentProps<typeof SetupStep>> = {}) => {
     return renderWithProviders(
       <SetupStep
@@ -25,7 +25,7 @@ describe('SetupStep', () => {
           label,
           toggleExpanded,
           children,
-          calibrationStatusComplete,
+          rightElement,
         }}
       />,
       { i18nInstance: i18n }
@@ -55,5 +55,6 @@ describe('SetupStep', () => {
     getByText('stub label')
     getByText('stub title')
     queryAllByText('stub description')
+    queryAllByText('right element')
   })
 })

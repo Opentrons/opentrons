@@ -105,7 +105,6 @@ export function SetupLabwareMap({
                         }
                       >
                         {topLabwareDefinition != null &&
-                        topLabwareDisplayName != null &&
                         topLabwareId != null ? (
                           <React.Fragment
                             key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}

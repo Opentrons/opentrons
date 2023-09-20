@@ -2,13 +2,14 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useSortedProtocols } from '../hooks'
 import { StoredProtocolData } from '../../../redux/protocol-storage'
 
 import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { State } from '../../../redux/types'
 
 const mockStoredProtocolData = [
   {
@@ -17,6 +18,7 @@ const mockStoredProtocolData = [
     srcFileNames: ['secondProtocol.json'],
     srcFiles: [],
     mostRecentAnalysis: {
+      robotType: FLEX_ROBOT_TYPE,
       createdAt: '2022-05-03T21:36:12.494778+00:00',
       files: [
         {
@@ -102,6 +104,7 @@ const mockStoredProtocolData = [
     srcFileNames: ['testProtocol.json'],
     srcFiles: [],
     mostRecentAnalysis: {
+      robotType: OT2_ROBOT_TYPE,
       createdAt: '2022-05-10T17:04:43.132768+00:00',
       files: [
         {
@@ -375,6 +378,53 @@ describe('useSortedProtocols', () => {
     )
     expect(thirdProtocol.protocolKey).toBe(
       '3dc99ffa-f85e-4c01-ab0a-edecff432dac'
+    )
+  })
+
+  it('should return an object with protocols sorted by flex then ot-2', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+
+    const { result } = renderHook(
+      () => useSortedProtocols('flex', mockStoredProtocolData),
+      { wrapper }
+    )
+    const firstProtocol = result.current[0]
+    const secondProtocol = result.current[1]
+    const thirdProtocol = result.current[2]
+
+    expect(firstProtocol.protocolKey).toBe(
+      '26ed5a82-502f-4074-8981-57cdda1d066d'
+    )
+    expect(secondProtocol.protocolKey).toBe(
+      '3dc99ffa-f85e-4c01-ab0a-edecff432dac'
+    )
+    expect(thirdProtocol.protocolKey).toBe(
+      'f130337e-68ad-4b5d-a6d2-cbc20515b1f7'
+    )
+  })
+  it('should return an object with protocols sorted by ot-2 then flex', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+
+    const { result } = renderHook(
+      () => useSortedProtocols('ot2', mockStoredProtocolData),
+      { wrapper }
+    )
+    const firstProtocol = result.current[0]
+    const secondProtocol = result.current[1]
+    const thirdProtocol = result.current[2]
+
+    expect(firstProtocol.protocolKey).toBe(
+      '3dc99ffa-f85e-4c01-ab0a-edecff432dac'
+    )
+    expect(secondProtocol.protocolKey).toBe(
+      'f130337e-68ad-4b5d-a6d2-cbc20515b1f7'
+    )
+    expect(thirdProtocol.protocolKey).toBe(
+      '26ed5a82-502f-4074-8981-57cdda1d066d'
     )
   })
 })

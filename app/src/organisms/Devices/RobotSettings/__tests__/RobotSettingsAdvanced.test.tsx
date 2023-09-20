@@ -8,7 +8,7 @@ import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useIsOT3 } from '../../hooks'
 import {
-  DisableHoming,
+  GantryHoming,
   DisplayRobotName,
   DeviceReset,
   LegacySettings,
@@ -34,7 +34,7 @@ jest.mock('../../../../redux/shell/update', () => ({
 }))
 jest.mock('../../hooks/useIsOT3')
 jest.mock('../AdvancedTab/DisplayRobotName')
-jest.mock('../AdvancedTab/DisableHoming')
+jest.mock('../AdvancedTab/GantryHoming')
 jest.mock('../AdvancedTab/DeviceReset')
 jest.mock('../AdvancedTab/LegacySettings')
 jest.mock('../AdvancedTab/OpenJupyterControl')
@@ -54,8 +54,8 @@ const mockGetShellUpdateState = getShellUpdateState as jest.MockedFunction<
 const mockAboutRobotName = DisplayRobotName as jest.MockedFunction<
   typeof DisplayRobotName
 >
-const mockDisableHoming = DisableHoming as jest.MockedFunction<
-  typeof DisableHoming
+const mockGantryHoming = GantryHoming as jest.MockedFunction<
+  typeof GantryHoming
 >
 const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
 const mockLegacySettings = LegacySettings as jest.MockedFunction<
@@ -112,7 +112,7 @@ describe('RobotSettings Advanced tab', () => {
       downloading: true,
     } as ShellUpdateState)
     mockAboutRobotName.mockReturnValue(<div>Mock AboutRobotName Section</div>)
-    mockDisableHoming.mockReturnValue(<div>Mock DisableHoming Section</div>)
+    mockGantryHoming.mockReturnValue(<div>Mock GantryHoming Section</div>)
     mockDeviceReset.mockReturnValue(<div>Mock DeviceReset Section</div>)
     mockLegacySettings.mockReturnValue(<div>Mock LegacySettings Section</div>)
     mockOpenJupyterControl.mockReturnValue(
@@ -149,9 +149,9 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock AboutRobotName Section')
   })
 
-  it('should render DisableHoming section', () => {
+  it('should render GantryHoming section', () => {
     const [{ getByText }] = render()
-    getByText('Mock DisableHoming Section')
+    getByText('Mock GantryHoming Section')
   })
 
   it('should render DeviceReset section', () => {
@@ -209,6 +209,12 @@ describe('RobotSettings Advanced tab', () => {
   it('should render UsageSettings section', () => {
     const [{ getByText }] = render()
     getByText('Mock UsageSettings Section')
+  })
+
+  it('should not render UsageSettings for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock UsageSettings Section')).toBeNull()
   })
 
   it('should render UseOlderAspirateBehavior section for OT-2', () => {

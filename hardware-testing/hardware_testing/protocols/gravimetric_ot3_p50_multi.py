@@ -6,7 +6,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {
-    50: [5, 6, 8, 9],
+    50: [2, 3, 5, 6, 8, 9],
 }
 LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 
@@ -19,7 +19,7 @@ def run(ctx: ProtocolContext) -> None:
         for slot in slots
     ]
     vial = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
-    pipette = ctx.load_instrument("p50_multi_gen3", "left")
+    pipette = ctx.load_instrument("flex_8channel_50", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
         pipette.aspirate(pipette.min_volume, vial["A1"].top())

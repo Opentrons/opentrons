@@ -14,7 +14,7 @@ import {
   Box,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
@@ -22,13 +22,11 @@ import { Modal } from '../../molecules/Modal'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface DeleteProtocolConfirmationModalProps {
-  protocolName?: string
-  protocolId?: string
+  protocolId: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
 }
 
 export function DeleteProtocolConfirmationModal({
-  protocolName,
   protocolId,
   setShowDeleteConfirmationModal,
 }: DeleteProtocolConfirmationModalProps): JSX.Element {
@@ -41,6 +39,10 @@ export function DeleteProtocolConfirmationModal({
   }
   const host = useHost()
   const queryClient = useQueryClient()
+  const { data: protocolRecord } = useProtocolQuery(protocolId)
+  const protocolName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name
 
   const handleCloseModal = (): void => {
     setShowDeleteConfirmationModal(false)

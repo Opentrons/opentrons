@@ -40,11 +40,12 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
-    create_gear_motor_home_group,
+    create_tip_motor_home_group,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
     moving_axes_in_move_group,
+    gripper_jaw_state_from_fw,
 )
 
 try:
@@ -92,7 +93,6 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
-    SensorId,
     ErrorCode,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -127,6 +127,7 @@ from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
     EstopState,
+    GripperJawState,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -152,6 +153,9 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
     set_deck_light,
     get_deck_light_state,
 )
+from opentrons_hardware.hardware_control.gripper_settings import (
+    get_gripper_jaw_state,
+)
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -164,6 +168,7 @@ from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
+    UnmatchedTipPresenceStates,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -642,12 +647,11 @@ class OT3Controller:
             positions = await asyncio.gather(*coros)
         # TODO(CM): default gear motor homing routine to have some acceleration
         if Axis.Q in checked_axes:
-            await self.tip_action(
+            await self.home_tip_motors(
                 distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
                 velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     Axis.to_kind(Axis.Q)
                 ],
-                tip_action="home",
             )
         for position in positions:
             self._handle_motor_status_response(position)
@@ -665,26 +669,31 @@ class OT3Controller:
             )
         return new_group
 
+    async def home_tip_motors(
+        self,
+        distance: float,
+        velocity: float,
+        back_off: bool = True,
+    ) -> None:
+        move_group = create_tip_motor_home_group(distance, velocity, back_off)
+
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+        )
+        positions = await runner.run(can_messenger=self._messenger)
+        if NodeId.pipette_left in positions:
+            self._gear_motor_position = {
+                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+            }
+        else:
+            log.debug("no position returned from NodeId.pipette_left")
+
     async def tip_action(
         self,
-        moves: Optional[List[Move[Axis]]] = None,
-        distance: Optional[float] = None,
-        velocity: Optional[float] = None,
-        tip_action: str = "home",
-        back_off: Optional[bool] = False,
+        moves: List[Move[Axis]],
     ) -> None:
-        # TODO: split this into two functions for homing and 'clamp'
-        move_group = []
-        # make sure either moves or distance and velocity is not None
-        assert bool(moves) ^ (bool(distance) and bool(velocity))
-        if moves is not None:
-            move_group = create_tip_action_group(
-                moves, [NodeId.pipette_left], tip_action
-            )
-        elif distance is not None and velocity is not None:
-            move_group = create_gear_motor_home_group(
-                float(distance), float(velocity), back_off
-            )
+        move_group = create_tip_action_group(moves, [NodeId.pipette_left], "clamp")
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
@@ -731,6 +740,10 @@ class OT3Controller:
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
+
+    async def get_jaw_state(self) -> GripperJawState:
+        res = await get_gripper_jaw_state(self._messenger)
+        return gripper_jaw_state_from_fw(res)
 
     @staticmethod
     def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
@@ -832,18 +845,33 @@ class OT3Controller:
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
-    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+    async def check_for_tip_presence(
+        self,
+        mount: OT3Mount,
+        tip_state: TipStateType,
+        expect_multiple_responses: bool = False,
+    ) -> None:
         """Raise an error if the expected tip state does not match the current state."""
-        res = await self.get_tip_present_state(mount)
+        res = await self.get_tip_present_state(mount, expect_multiple_responses)
         if res != tip_state.value:
             raise FailedTipStateCheck(tip_state, res)
 
-    async def get_tip_present_state(self, mount: OT3Mount) -> int:
+    async def get_tip_present_state(
+        self,
+        mount: OT3Mount,
+        expect_multiple_responses: bool = False,
+    ) -> bool:
         """Get the state of the tip ejector flag for a given mount."""
-        res = await get_tip_ejector_state(
-            self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
-        )
-        return res
+        expected_responses = 2 if expect_multiple_responses else 1
+        node = sensor_node_for_mount(OT3Mount(mount.value))
+        assert node != NodeId.gripper
+        res = await get_tip_ejector_state(self._messenger, node, expected_responses)  # type: ignore[arg-type]
+        vals = list(res.values())
+        if not all([r == vals[0] for r in vals]):
+            states = {int(sensor): res[sensor] for sensor in res}
+            raise UnmatchedTipPresenceStates(states)
+        tip_present_state = bool(vals[0])
+        return tip_present_state
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[Axis]) -> List[NodeId]:
@@ -1085,9 +1113,8 @@ class OT3Controller:
                     q_msg = _pop_queue()
                     if q_msg:
                         mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
-                        raise OverPressureDetected(
-                            f"The pressure sensor on the {mount} mount has exceeded operational limits."
-                        )
+                        raise OverPressureDetected(mount.name)
+
         else:
             yield
 
@@ -1101,7 +1128,7 @@ class OT3Controller:
         log_pressure: bool = True,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
-        sensor_id: SensorId = SensorId.S0,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
@@ -1116,7 +1143,7 @@ class OT3Controller:
             log_pressure,
             auto_zero_sensor,
             num_baseline_reads,
-            sensor_id,
+            sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
             self._position.update({node: point[0]})

@@ -29,11 +29,13 @@ class VolumetricConfig:
     increment: bool
     return_tip: bool
     mix: bool
-    inspect: bool
     user_volumes: bool
     kind: ConfigType
     extra: bool
     jog: bool
+    same_tip: bool
+    ignore_fail: bool
+    mode: str
 
 
 @dataclass
@@ -46,6 +48,7 @@ class GravimetricConfig(VolumetricConfig):
     gantry_speed: int
     scale_delay: int
     isolate_channels: List[int]
+    isolate_volumes: List[float]
 
 
 @dataclass
@@ -58,6 +61,8 @@ class PhotometricConfig(VolumetricConfig):
     reservoir_slot: int
     touch_tip: bool
     refill: bool
+    photoplate_column_offset: List[int]
+    dye_well_column_offset: List[int]
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
@@ -220,8 +225,8 @@ QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     },
     96: {
         1000: [  # P1000
-            (50, []),  # T50
-            (200, []),  # T200
+            (50, [5.0]),  # T50
+            (200, [200.0]),  # T200
             (1000, [1000.0]),  # T1000
         ],
     },
@@ -259,6 +264,26 @@ QC_VOLUMES_EXTRA_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
 }
 
 QC_VOLUMES_P: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
+    1: {
+        50: [  # P50
+            (50, [1.0]),
+        ],
+        1000: [  # P1000
+            (50, [5.0]),  # T50
+            (200, [200.0]),  # T200
+            (1000, []),  # T1000
+        ],
+    },
+    8: {
+        50: [  # P50
+            (50, [1.0]),
+        ],
+        1000: [  # P1000
+            (50, [5.0]),  # T50
+            (200, [200.0]),  # T200
+            (1000, []),  # T1000
+        ],
+    },
     96: {
         1000: [  # P1000
             (50, [5.0]),  # T50
@@ -275,6 +300,7 @@ QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
         96: 9,
     },
     ConfigType.photometric: {
+        1: 8,
         96: 5,
     },
 }

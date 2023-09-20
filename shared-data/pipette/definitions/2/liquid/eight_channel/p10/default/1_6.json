@@ -34,10 +34,8 @@
           ]
         }
       },
-      "dispense": {
-        "default": { "1": [[12.74444519, 0.0, 0.8058688085]] }
-      },
-      "defaultBlowoutVolume": 2.356
+      "dispense": { "default": { "1": [[12.74444519, 0.0, 0.8058688085]] } },
+      "defaultPushOutVolume": 0
     }
   },
   "defaultTipOverlapDictionary": {

@@ -82,7 +82,7 @@ describe('SetupTipLengthCalibrationButton', () => {
 
   it('renders the calibrate now button if tip length not calibrated', () => {
     const { getByRole } = render()
-    expect(getByRole('button', { name: 'Calibrate Now' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Calibrate now' })).toBeTruthy()
   })
 
   it('renders the recalibrate link if tip length calibrated and run unstarted', () => {
@@ -92,7 +92,7 @@ describe('SetupTipLengthCalibrationButton', () => {
 
   it('button launches the tip length calibration wizard when clicked - no calibration', () => {
     const { getByText } = render()
-    const calibrateBtn = getByText('Calibrate Now')
+    const calibrateBtn = getByText('Calibrate now')
     calibrateBtn.click()
     expect(mockTipLengthCalLauncher).toHaveBeenCalled()
   })

@@ -28,7 +28,7 @@ DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
 
-MUST_PASS_CURRENT = 0.4  # the target spec (must pass here)
+MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
@@ -39,10 +39,10 @@ TEST_SPEEDS = [
     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
 ]
 PLUNGER_CURRENTS_SPEED = {
-    0.3: TEST_SPEEDS,
-    0.4: TEST_SPEEDS,
-    0.5: TEST_SPEEDS,
-    0.75: TEST_SPEEDS,
+    MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
+    MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
+    MUST_PASS_CURRENT - 0.25: TEST_SPEEDS,
+    MUST_PASS_CURRENT: TEST_SPEEDS,
     DEFAULT_CURRENT: TEST_SPEEDS,
 }
 
@@ -65,11 +65,7 @@ def _get_section_tag(current: float) -> str:
 
 
 def _includes_result(current: float, speed: float) -> bool:
-    # TODO: figure out the current/speed thresholds
-    #       for what should be considered an overall PASS or FAIL.
-    #       Until then, give everything a PASS or FAIL, so we can
-    #       review the results more easily
-    return True
+    return current >= MUST_PASS_CURRENT
 
 
 def _build_csv_report(trials: int) -> CSVReport:
@@ -157,10 +153,7 @@ async def _record_plunger_alignment(
         enc = est
     _stalled_mm = est - enc
     print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
-    if not api.is_simulator:
-        _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
-    else:
-        _did_pass = speed < MAX_SPEED
+    _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
     # NOTE: only tests that are required to PASS need to show a results in the file
     data = [round(current, 2), round(speed, 2), round(est, 2), round(enc, 2)]
     if _includes_result(current, speed):
@@ -190,6 +183,7 @@ async def _test_direction(
         api, mount, report, trial, current, speed, direction, "start"
     )
     if not aligned:
+        print("ERROR: unable to align at the start")
         return False
     # move the plunger
     _plunger_target = {"down": bottom, "up": top + 1.0}[direction]

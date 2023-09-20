@@ -69,6 +69,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           },
         },
         {
+          commandType: 'home' as const,
+          params: {
+            skipIfMountPositionOk: mount,
+          },
+        },
+        {
           commandType: 'calibration/calibratePipette' as const,
           params: {
             mount: mount,
