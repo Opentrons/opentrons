@@ -16,7 +16,7 @@ Your robot needs to attach a disposable tip to the pipette before it can aspirat
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Picking Up a Tip
-----------------
+-----------------
 
 To pick up a tip, call the :py:meth:`~.InstrumentContext.pick_up_tip` method without any arguments::
     
@@ -177,10 +177,6 @@ Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-ra
 
     pipette.aspirate(200, plate['A1'], rate=2.0)
 
-.. Removed note related to API v1
-
-.. Removed note because pipette clearance defaults and locations are now covered
-
 .. versionadded:: 2.0
 
 .. _new-dispense:
@@ -203,7 +199,7 @@ If the pipette doesn’t move, you can specify an additional dispense action wit
     pipette.dispense(100)     # dispense 100 µL at current position
     
 Dispense by Well or Location
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :py:meth:`~.InstrumentContext.dispense` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``.
 
@@ -383,7 +379,7 @@ This example delays a protocol for 5 minutes and 10 seconds::
     protocol.delay(minutes=5, seconds=10)
 
 Pause Until Resumed
--------------------
+--------------------
 
 Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the Opentrons App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
 
