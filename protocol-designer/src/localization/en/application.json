@@ -1,4 +1,17 @@
 {
+  "exit_batch_edit": "exit batch edit",
+  "go_back": "Go back",
+  "labware": "labware",
+  "new_location": "new location",
+  "n_steps_selected": "{{n}} steps selected",
+  "networking": {
+    "generic_verification_failure": "Something went wrong with your unique link. Fill out the form below to have a new one sent to your email. Please contact the Opentrons Support team if you require further help.",
+    "unauthorized_verification_failure": "This unique link has expired and is no longer valid, to have a new link sent to your email, fill out the form below.",
+    "validation_server_failure": "There was a problem communicating with the Opentrons validation server. Please make sure you are still connected to the internet and try again. If this problem persists, please contact Opentrons support."
+  },
+  "next": "Next",
+  "no_batch_edit_shared_settings": "Batch editing of settings is only available for Transfer or Mix steps",
+  "manually": "Manually",
   "stepType": {
     "mix": "mix",
     "moveLabware": "move labware",
@@ -24,15 +37,7 @@
     "cycles": "cycles",
     "rpm": "rpm"
   },
-  "version": "Protocol Designer Version",
-  "networking": {
-    "generic_verification_failure": "Something went wrong with your unique link. Fill out the form below to have a new one sent to your email. Please contact the Opentrons Support team if you require further help.",
-    "unauthorized_verification_failure": "This unique link has expired and is no longer valid, to have a new link sent to your email, fill out the form below.",
-    "validation_server_failure": "There was a problem communicating with the Opentrons validation server. Please make sure you are still connected to the internet and try again. If this problem persists, please contact Opentrons support."
-  },
-  "exit_batch_edit": "exit batch edit",
-  "n_steps_selected": "{{n}} steps selected",
-  "no_batch_edit_shared_settings": "Batch editing of settings is only available for Transfer or Mix steps",
-  "go_back": "Go back",
-  "next": "Next"
+  "waste_chute_slot": "Waste chute in slot D3",
+  "with_gripper": "With gripper",
+  "version": "Protocol Designer Version"
 }

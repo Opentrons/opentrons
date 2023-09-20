@@ -11,6 +11,8 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
+import { WASTE_CHUTE_SLOT } from '../../constants'
+import { getHasWasteChute } from '../../components/labware'
 import {
   AllTemporalPropertiesForTimelineFrame,
   selectors as stepFormSelectors,
@@ -88,6 +90,7 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
   }
 )
 
+//  TODO(jr, 9/20/23): we should test this util since it does a lot.
 export const getUnocuppiedLabwareLocationOptions: Selector<
   Option[] | null
 > = createSelector(
@@ -95,10 +98,19 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   getModuleEntities,
   getRobotType,
   getLabwareEntities,
-  (robotState, moduleEntities, robotType, labwareEntities) => {
+  getAdditionalEquipmentEntities,
+  (
+    robotState,
+    moduleEntities,
+    robotType,
+    labwareEntities,
+    additionalEquipmentEntities
+  ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
+    const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+
     if (robotState == null) return null
 
     const { modules, labware } = robotState
@@ -179,18 +191,30 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
           !Object.values(labware)
             .map(lw => lw.slot)
             .includes(slotId) &&
-          slotId !== trashSlot
+          slotId !== trashSlot &&
+          (hasWasteChute ? slotId !== WASTE_CHUTE_SLOT : true)
       )
       .map(slotId => ({ name: slotId, value: slotId }))
-
     const offDeck = { name: 'Off Deck', value: 'offDeck' }
+    const wasteChuteSlot = {
+      name: 'Waste Chute in D3',
+      value: WASTE_CHUTE_SLOT,
+    }
 
-    return [
-      ...unoccupiedAdapterOptions,
-      ...unoccupiedModuleOptions,
-      ...unoccupiedSlotOptions,
-      offDeck,
-    ]
+    return hasWasteChute
+      ? [
+          wasteChuteSlot,
+          ...unoccupiedAdapterOptions,
+          ...unoccupiedModuleOptions,
+          ...unoccupiedSlotOptions,
+          offDeck,
+        ]
+      : [
+          ...unoccupiedAdapterOptions,
+          ...unoccupiedModuleOptions,
+          ...unoccupiedSlotOptions,
+          offDeck,
+        ]
   }
 )
 
