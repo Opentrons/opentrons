@@ -1,16 +1,18 @@
-"""Photometric OT3 P1000."""
+"""Photometric OT3 P50."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"protocolName": "photometric-ot3-p1000-96-200ul-tip"}
+metadata = {"protocolName": "photometric-ot3-p50-single"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
-    200: [5, 6, 8, 9, 11],
+    50: [3],
+    200: [6],
+    1000: [9],
 }
-SLOT_PLATE = 3
-SLOT_RESERVOIR = 2
+SLOT_PLATE = 2
+SLOT_RESERVOIR = 5
 
-RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
+RESERVOIR_LABWARE = "nest_96_wellplate_2ml_deep"
 PHOTOPLATE_LABWARE = "corning_96_wellplate_360ul_flat"
 
 
@@ -18,15 +20,13 @@ def run(ctx: ProtocolContext) -> None:
     """Run."""
     tipracks = [
         # FIXME: use official tip-racks once available
-        ctx.load_labware(
-            f"opentrons_flex_96_tiprack_{size}uL_adp", slot, namespace="custom_beta"
-        )
+        ctx.load_labware(f"opentrons_flex_96_tiprack_{size}uL", slot)
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
     ]
     reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
     plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
-    pipette = ctx.load_instrument("p1000_96", "left")
+    pipette = ctx.load_instrument("p1000_single_gen3", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
         pipette.aspirate(10, reservoir["A1"].top())

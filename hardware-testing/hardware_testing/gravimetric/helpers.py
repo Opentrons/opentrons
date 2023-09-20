@@ -152,9 +152,12 @@ def _sense_liquid_height(
     hwapi = get_sync_hw_api(ctx)
     pipette.move_to(well.top())
     lps = config._get_liquid_probe_settings(cfg, well)
-    height = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
-    depth = well.depth - height
-    return depth
+    well_bottom_z = well.bottom().point.z
+    # NOTE: very important that probing is done only 1x time,
+    #       with a DRY tip, for reliability
+    liquid_z = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    liquid_depth = liquid_z - well_bottom_z
+    return liquid_depth
 
 
 def _calculate_average(volume_list: List[float]) -> float:
@@ -268,6 +271,8 @@ def _pick_up_tip(
             OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
         )
 
+    pipette.home_plunger()
+
 
 def _drop_tip(
     pipette: InstrumentContext, return_tip: bool, minimum_z_height: int = 0
@@ -292,14 +297,13 @@ def _get_volumes(
     kind: config.ConfigType,
     extra: bool,
     channels: int,
+    mode: str = "",
 ) -> List[float]:
     if increment:
-        print("if")
         test_volumes = get_volume_increments(
-            pipette_channels, pipette_volume, tip_volume
+            pipette_channels, pipette_volume, tip_volume, mode=mode
         )
     elif user_volumes and not ctx.is_simulating():
-        print("elif")
         _inp = input(
             f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
         )
@@ -307,7 +311,6 @@ def _get_volumes(
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        print("else")
         test_volumes = get_test_volumes(
             kind, channels, pipette_volume, tip_volume, extra
         )
@@ -393,8 +396,16 @@ def _load_tipracks(
     loaded_labwares = ctx.loaded_labwares
     pre_loaded_tips: List[Labware] = []
     for ls in tiprack_load_settings:
-        if ls[0] in loaded_labwares.keys() and loaded_labwares[ls[0]].name == ls[1]:
-            pre_loaded_tips.append(loaded_labwares[ls[0]])
+        if ls[0] in loaded_labwares.keys():
+            if loaded_labwares[ls[0]].name == ls[1]:
+                pre_loaded_tips.append(loaded_labwares[ls[0]])
+            else:
+                # If something is in the slot that's not what we want, remove it
+                # we use this only for the 96 channel
+                ui.print_info(
+                    f"Removing {loaded_labwares[ls[0]].name} from slot {ls[0]}"
+                )
+                del ctx._core.get_deck()[ls[0]]  # type: ignore[attr-defined]
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
@@ -416,6 +427,7 @@ def get_test_volumes(
         for t, vls in config.QC_VOLUMES_P[pipette][volume]:
             if t == tip:
                 volumes = vls
+                break
     else:
         if extra:
             cfg = config.QC_VOLUMES_EXTRA_G
@@ -427,7 +439,7 @@ def get_test_volumes(
             if t == tip:
                 volumes = vls
                 break
-    print(f"final volumes{volumes}")
+    print(f"final volumes: {volumes}")
     return volumes
 
 

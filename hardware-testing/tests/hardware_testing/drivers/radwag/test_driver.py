@@ -1,7 +1,7 @@
 """Radwag driver tests."""
 
 from typing import List
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
@@ -23,8 +23,8 @@ def scale_connection() -> MagicMock:
 @pytest.fixture
 def subject(scale_connection: MagicMock) -> RadwagScale:
     """Test subject."""
-    r = RadwagScale(connection=scale_connection)
-    return r
+    with patch("builtins.open", mock_open()):
+        return RadwagScale(connection=scale_connection)
 
 
 def create_radwag_result_line(

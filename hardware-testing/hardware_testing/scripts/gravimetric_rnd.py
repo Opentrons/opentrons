@@ -7,7 +7,7 @@ from hardware_testing.gravimetric.measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from hardware_testing.gravimetric.scale import Scale  # type: ignore[import]
+from hardware_testing.gravimetric.measurement.scale import Scale  # type: ignore[import]
 
 metadata = {"protocolName": "gravimetric-rnd", "apiLevel": "2.12"}
 CALIBRATE_SCALE = False

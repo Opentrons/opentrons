@@ -26,6 +26,7 @@ import { ReleaseNotes } from '../../molecules/ReleaseNotes'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Banner } from '../../atoms/Banner'
 import { ProgressBar } from '../../atoms/ProgressBar'
+import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '../../redux/types'
 import { StyledText } from '../../atoms/text'
@@ -79,6 +80,8 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
   background: ${COLORS.medGreyEnabled};
 `
 
+const RESTART_APP_AFTER_TIME = 5000
+
 export interface UpdateAppModalProps {
   closeModal: (arg0: boolean) => void
 }
@@ -97,13 +100,17 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const releaseNotes = updateInfo?.releaseNotes
   const { t } = useTranslation('app_settings')
   const history = useHistory()
+  const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
 
-  if (downloaded) setTimeout(() => dispatch(applyShellUpdate()), 5000)
+  if (downloaded)
+    setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
 
   const handleRemindMeLaterClick = (): void => {
     history.push('/app-settings/general')
     closeModal(true)
   }
+
+  removeActiveAppUpdateToast()
 
   const appUpdateFooter = (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
