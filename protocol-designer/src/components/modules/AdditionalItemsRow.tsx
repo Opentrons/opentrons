@@ -13,7 +13,7 @@ import {
   SlotMap,
 } from '@opentrons/components'
 import { WASTE_CHUTE_SLOT } from '../../constants'
-import gripperImage from '../../images/flex_gripper.svg'
+import gripperImage from '../../images/flex_gripper.png'
 import styles from './styles.css'
 
 interface AdditionalItemsRowProps {
@@ -31,7 +31,7 @@ export function AdditionalItemsRow(
   return (
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom="0.5rem"
+      marginBottom={SPACING.spacing8}
       height="6rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -58,7 +58,7 @@ export function AdditionalItemsRow(
         ) : null}
       </div>
 
-      {name === 'wasteChute' && isEquipmentAdded ? (
+      {isEquipmentAdded && name === 'wasteChute' ? (
         <>
           <div className={styles.module_col}>
             <LabeledValue label="Position" value={`Slot ${WASTE_CHUTE_SLOT}`} />
