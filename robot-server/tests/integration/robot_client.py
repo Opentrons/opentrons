@@ -303,3 +303,17 @@ class RobotClient:
         )
         response.raise_for_status()
         return response
+
+    async def get_sessions(self) -> Response:
+        """GET /sessions."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/sessions")
+        response.raise_for_status()
+        return response
+
+    async def delete_session(self, session_id: str) -> Response:
+        """DELETE /sessions/{session_id}."""
+        response = await self.httpx_client.delete(
+            url=f"{self.base_url}/sessions/{session_id}"
+        )
+        response.raise_for_status()
+        return response
