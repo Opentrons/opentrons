@@ -285,13 +285,13 @@ For example, this transfer command will mix 50 µL of liquid 3 times after each 
 Blow Out
 ========
 
-There are two parameters that control blowout behavior. The ``blow_out`` parameter accepts a Boolean value. When ``True``, the pipette blows out remaining liquid when the tip is empty or only contains the disposal volume. The ``blowout_location`` parameter controls in which of three locations these blowout actions occur. The default blowout location is the trash. Blowout behavior is different for each complex command. 
+There are two parameters that control whether and where the pipette blows out liquid. The ``blow_out`` parameter accepts a Boolean value. When ``True``, the pipette blows out remaining liquid when the tip is empty or only contains the disposal volume. The ``blowout_location`` parameter controls in which of three locations these blowout actions occur. The default blowout location is the trash. Blowout behavior is different for each complex command. 
 
 .. list-table::
    :header-rows: 1
 
    * - Method
-     - Blowout behavior
+     - Blowout behavior and location
    * - ``transfer()``
      -
        - Blow out after each dispense.
@@ -315,23 +315,6 @@ For example, this transfer command will blow out liquid in the trash twice, once
     )
 
 .. versionadded:: 2.0
-
-.. note::
-    If the tip already contains liquid before the complex command, the default blowout location will shift away from the trash. Transfer and distribute shift to the source well, and consolidate shifts to the destination well. For example, this transfer command will blow out in well B1 because it's the source::
-    
-        pipette.pick_up_tip()
-        pipette.aspirate(100, plate["A1"])    
-        pipette.transfer(
-            volume=100,
-            source=plate["B1"],
-            dest=plate["C1"],
-            new_tip="never",
-            blow_out=True,
-            # no blowout_location
-        )
-        pipette.drop_tip()
-
-    This only occurs when you aspirate and then perform a complex command with ``new_tip="never"`` and ``blow_out=True``.
 
 Set ``blowout_location`` when you don't want to waste any liquid by blowing it out into the trash. For example, you may want to make sure that every last bit of a sample is moved into a destination well. Or you may want to return every last bit of an expensive reagent to the source for use in later pipetting. 
 
@@ -363,6 +346,23 @@ With ``transfer()``, the pipette will not blow out at all if you only set ``blow
     )
 
 With ``distribute()``, the pipette will still blow out if you only set ``blowout_location``, but in the default location of the trash.
+
+.. note::
+    If the tip already contains liquid before the complex command, the default blowout location will shift away from the trash. ``transfer()`` and ``distribute()`` shift to the source well, and ``consolidate()`` shifts to the destination well. For example, this transfer command will blow out in well B1 because it's the source::
+    
+        pipette.pick_up_tip()
+        pipette.aspirate(100, plate["A1"])    
+        pipette.transfer(
+            volume=100,
+            source=plate["B1"],
+            dest=plate["C1"],
+            new_tip="never",
+            blow_out=True,
+            # no blowout_location
+        )
+        pipette.drop_tip()
+
+    This only occurs when you aspirate and then perform a complex command with ``new_tip="never"`` and ``blow_out=True``.
 
 .. _param-trash:
 
