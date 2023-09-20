@@ -26,6 +26,7 @@
   "current_step": "Current Step",
   "current_temperature": "Current: {{temperature}} °C",
   "data_out_of_date": "This data is likely out of date",
+  "door_is_open": "Robot door is open",
   "door_open_pause": "Current Step - Paused - Door Open",
   "download_run_log": "Download run log",
   "downloading_run_log": "Downloading run log",

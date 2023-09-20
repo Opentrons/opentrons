@@ -16,7 +16,6 @@ import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../../i18n'
-import { useToaster } from '../../../../organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
@@ -37,6 +36,7 @@ import {
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
+import { OpenDoorAlertModal } from '../../../../organisms/OpenDoorAlertModal'
 import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -72,7 +72,7 @@ jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/config')
 jest.mock('../ConfirmAttachedModal')
-jest.mock('../../../../organisms/ToasterOven')
+jest.mock('../../../../organisms/OpenDoorAlertModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -132,7 +132,9 @@ const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
 const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
-const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
+const mockOpenDoorAlertModal = OpenDoorAlertModal as jest.MockedFunction<
+  typeof OpenDoorAlertModal
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -198,7 +200,6 @@ const mockDoorStatus = {
     doorRequiredClosedForProtocol: true,
   },
 }
-const MOCK_MAKE_SNACKBAR = jest.fn()
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
@@ -279,11 +280,7 @@ describe('ProtocolSetup', () => {
       <div>mock ConfirmAttachedModal</div>
     )
     mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
-    when(mockUseToaster)
-      .calledWith()
-      .mockReturnValue(({
-        makeSnackbar: MOCK_MAKE_SNACKBAR,
-      } as unknown) as any)
+    mockOpenDoorAlertModal.mockReturnValue(<div>mock OpenDoorAlertModal</div>)
   })
 
   afterEach(() => {
@@ -375,7 +372,7 @@ describe('ProtocolSetup', () => {
     expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
   })
 
-  it('should render toast and make a button disabled when a robot door is open', () => {
+  it('should render open door alert modal when door is open', () => {
     const mockOpenDoorStatus = {
       data: {
         status: 'open',
@@ -383,11 +380,7 @@ describe('ProtocolSetup', () => {
       },
     }
     mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
-    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
-      'Close the robot door before starting the run.',
-      7000
-    )
-    expect(getByRole('button', { name: 'play' })).toBeDisabled()
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('mock OpenDoorAlertModal')
   })
 })

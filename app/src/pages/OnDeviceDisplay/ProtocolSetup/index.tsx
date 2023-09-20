@@ -73,12 +73,12 @@ import {
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
+import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
-import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
 const FETCH_DOOR_STATUS_MS = 5000
-const SNACK_BAR_DURATION_MS = 7000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -491,16 +491,10 @@ function PrepareToRun({
   const isDoorOpen =
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
-  React.useEffect(() => {
-    // Note show snackbar when instruments and modules are all green
-    // but the robot door is open
-    if (isReadyToRun && isDoorOpen) {
-      makeSnackbar(t('shared:close_robot_door'), SNACK_BAR_DURATION_MS)
-    }
-  }, [isDoorOpen])
 
   return (
     <>
+      {isReadyToRun && isDoorOpen ? <OpenDoorAlertModal /> : null}
       {/* Empty box to detect scrolling */}
       <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}

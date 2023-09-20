@@ -241,7 +241,6 @@ export function ProtocolRunHeader({
               robotName={robotName}
             />
           )}
-
         <Flex>
           {protocolKey != null ? (
             <Link to={`/protocols/${protocolKey}`}>
@@ -268,7 +267,11 @@ export function ProtocolRunHeader({
         {runStatus === RUN_STATUS_STOPPED ? (
           <Banner type="warning">{t('run_canceled')}</Banner>
         ) : null}
-        {isDoorOpen ? (
+        {/* Note: This banner is for before running a protocol */}
+        {isDoorOpen &&
+        runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+        runStatus != null &&
+        CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
         {isRunCurrent ? (
