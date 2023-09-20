@@ -54,6 +54,75 @@ They also use the labware listed below:
       - Opentrons 96 Tip Rack 300 µL
       - ``opentrons_96_tiprack_300ul``
 
+.. _protocol-template:
+      
+Protocol Template
+=================
+
+This code only loads the instruments and labware listed above, and performs no other actions. Many code snippets from elsewhere in the documentation will run without modification when added at the bottom of this template. You can also use it to start writing and testing your own code.
+
+.. tabs::
+
+    .. tab:: Flex 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load tip rack in deck slot D3
+                tiprack = protocol.load_labware(
+                    load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="flex_1channel_1000",
+                    mount="left",
+                    tip_racks=[tiprack]
+                )
+                # load well plate in deck slot D2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location="D2"
+                )
+                # load reservoir in deck slot D1
+                reservoir = protocol.load_labware(
+                    load_name="usascientific_12_reservoir_22ml", location="D1"
+                )
+                # Put protocol commands here
+    
+    .. tab:: OT-2 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '2.14'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load tip rack in deck slot 3
+                tiprack = protocol.load_labware(
+                    load_name="opentrons_96_tiprack_300ul", location=3
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="p300_single_gen2",
+                    mount="left",
+                    tip_racks=[tiprack]
+                )  
+                # load well plate in deck slot 2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location=2
+                )
+                # load reservoir in deck slot 1
+                reservoir = protocol.load_labware(
+                    load_name="usascientific_12_reservoir_22ml", location=1
+                )
+                # Put protocol commands here
+
 Transferring Liquids
 ====================
 
