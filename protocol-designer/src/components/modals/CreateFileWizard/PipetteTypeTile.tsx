@@ -34,19 +34,21 @@ import { HandleEnter } from './HandleEnter'
 
 import type { FormState, WizardTileProps } from './types'
 
-export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
+export function FirstPipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
   const mount = LEFT
+  const allow96Channel = useSelector(getAllow96Channel)
   return (
     <PipetteTypeTile
       {...props}
       mount={mount}
       allowNoPipette={false}
+      display96Channel={allow96Channel}
       tileHeader={i18n.t('modal.create_file_wizard.choose_first_pipette')}
     />
   )
 }
 export function SecondPipetteTypeTile(
-  props: WizardTileProps
+  props: PipetteTypeTileProps
 ): JSX.Element | null {
   if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
@@ -57,6 +59,7 @@ export function SecondPipetteTypeTile(
         {...props}
         mount={RIGHT}
         allowNoPipette
+        allow96Channel={false}
         tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')}
       />
     )
@@ -65,10 +68,17 @@ export function SecondPipetteTypeTile(
 interface PipetteTypeTileProps extends WizardTileProps {
   mount: Mount
   allowNoPipette: boolean
+  display96Channel: boolean
   tileHeader: string
 }
 export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
-  const { allowNoPipette, tileHeader, proceed, goBack } = props
+  const {
+    allowNoPipette,
+    display96Channel,
+    tileHeader,
+    proceed,
+    goBack,
+  } = props
 
   return (
     <HandleEnter onEnter={proceed}>
@@ -79,7 +89,11 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           gridGap={SPACING.spacing32}
         >
           <Text as="h2">{tileHeader}</Text>
-          <PipetteField {...props} allowNoPipette={allowNoPipette} />
+          <PipetteField
+            {...props}
+            allowNoPipette={allowNoPipette}
+            display96Channel={display96Channel}
+          />
         </Flex>
         <Flex
           alignItems={ALIGN_CENTER}
@@ -99,10 +113,17 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
 interface OT2FieldProps extends FormikProps<FormState> {
   mount: Mount
   allowNoPipette: boolean
+  display96Channel: boolean
 }
 
 function PipetteField(props: OT2FieldProps): JSX.Element {
-  const { mount, values, setFieldValue, allowNoPipette } = props
+  const {
+    mount,
+    values,
+    setFieldValue,
+    allowNoPipette,
+    display96Channel,
+  } = props
   const robotType = values.fields.robotType
   const allow96Channel = useSelector(getAllow96Channel)
   const pipetteOptions = React.useMemo(() => {
@@ -116,18 +137,10 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         value: name,
         name: getPipetteNameSpecs(name)?.displayName ?? '',
       }))
-    return [
-      ...allPipetteOptions.filter(
-        //  filter out 96-channel for now
-        o => o.name.includes('Flex') && o.value !== 'p1000_96'
-      ),
-      ...allPipetteOptions.filter(
-        o => o.value === 'p1000_96' && allow96Channel
-      ), // break out to deal with FF
-      ...allPipetteOptions.filter(o => o.name.includes(GEN2)),
-      ...allPipetteOptions.filter(o => o.name.includes(GEN1)),
-      ...(allowNoPipette ? [{ name: 'None', value: '' }] : []),
-    ]
+    const noneOption = allowNoPipette ? [{ name: 'None', value: '' }] : []
+    return allow96Channel && display96Channel
+      ? [...allPipetteOptions, ...noneOption]
+      : [...allPipetteOptions.filter(o => o.value != 'p1000_96'), ...noneOption]
   }, [robotType])
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName

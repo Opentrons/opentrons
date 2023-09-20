@@ -93,6 +93,7 @@ export function DropdownField(props: DropdownFieldProps): JSX.Element {
             </option>
           ))}
         </select>
+
         <div className={styles.dropdown_icon}>
           <Icon name="menu-down" width="100%" />
         </div>

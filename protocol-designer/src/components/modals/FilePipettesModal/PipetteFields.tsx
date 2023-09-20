@@ -113,7 +113,6 @@ export function PipetteFields(props: Props): JSX.Element {
       <Flex width="13.8rem">
         <PipetteSelect
           nameBlocklist={
-            //  filtering out 96-channel for Flex for now
             robotType === OT2_ROBOT_TYPE
               ? OT3_PIPETTES
               : [...OT2_PIPETTES, ...filter96]
@@ -130,6 +129,7 @@ export function PipetteFields(props: Props): JSX.Element {
             onSetFieldValue(targetToClear, null)
             onSetFieldTouched(targetToClear, false)
           }}
+          disabled={mount === RIGHT && values.left.pipetteName === 'p1000_96'}
           id={`PipetteSelect_${mount}`}
           className={styles.pipette_select}
         />
