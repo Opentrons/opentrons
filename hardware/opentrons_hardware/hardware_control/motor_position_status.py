@@ -25,18 +25,15 @@ from opentrons_hardware.firmware_bindings.constants import (
     MotorPositionFlags,
 )
 
-from .types import NodeMap
+from .types import NodeMap, MotorPositionStatus
 
 
 log = logging.getLogger(__name__)
 
 
-MotorPositionStatus = NodeMap[Tuple[float, float, bool, bool]]
-
-
 async def _parser_motor_position_response(
     reader: WaitableCallback,
-) -> MotorPositionStatus:
+) -> NodeMap[MotorPositionStatus]:
     data = {}
     async for response, arb_id in reader:
         assert isinstance(response, MotorPositionResponse)
@@ -62,9 +59,9 @@ async def _parser_motor_position_response(
 
 async def get_motor_position(
     can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-) -> MotorPositionStatus:
+) -> NodeMap[MotorPositionStatus]:
     """Request node to respond with motor and encoder status."""
-    data: MotorPositionStatus = {}
+    data: NodeMap[MotorPositionStatus] = {}
 
     def _listener_filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) in nodes) and (
@@ -92,7 +89,7 @@ async def get_motor_position(
 
 async def _parser_update_motor_position_response(
     reader: WaitableCallback, expected: NodeId
-) -> Tuple[float, float, bool, bool]:
+) -> MotorPositionStatus:
     async for response, arb_id in reader:
         assert isinstance(response, UpdateMotorPositionEstimationResponse)
         node = NodeId(arb_id.parts.originating_node_id)
@@ -114,7 +111,7 @@ async def _parser_update_motor_position_response(
 
 async def update_motor_position_estimation(
     can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-) -> MotorPositionStatus:
+) -> NodeMap[MotorPositionStatus]:
     """Updates the estimation of motor position on selected nodes.
 
     Request node to update motor position from its encoder and respond

@@ -1,5 +1,5 @@
 """Types and definitions for hardware bindings."""
-from typing import Mapping, TypeVar, Dict, List, Optional
+from typing import Mapping, TypeVar, Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -11,6 +11,8 @@ NodeMap = Mapping[NodeId, MapPayload]
 NodeList = List[NodeId]
 
 NodeDict = Dict[NodeId, MapPayload]
+
+MotorPositionStatus = Tuple[float, float, bool, bool]
 
 
 @dataclass

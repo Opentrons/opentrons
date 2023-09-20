@@ -73,7 +73,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from .types import NodeDict
+from .types import NodeDict, MotorPositionStatus
 
 log = logging.getLogger(__name__)
 
@@ -127,7 +127,7 @@ class MoveGroupRunner:
 
     async def execute(
         self, can_messenger: CanMessenger
-    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+    ) -> NodeDict[MotorPositionStatus]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
         prep() and execute() can be used to replace a single call to run() to
@@ -144,9 +144,7 @@ class MoveGroupRunner:
         move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
-    async def run(
-        self, can_messenger: CanMessenger
-    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+    async def run(self, can_messenger: CanMessenger) -> NodeDict[MotorPositionStatus]:
         """Run the move group.
 
         Args:
@@ -170,7 +168,7 @@ class MoveGroupRunner:
     @staticmethod
     def _accumulate_move_completions(
         completions: _Completions,
-    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+    ) -> NodeDict[MotorPositionStatus]:
         position: NodeDict[
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
