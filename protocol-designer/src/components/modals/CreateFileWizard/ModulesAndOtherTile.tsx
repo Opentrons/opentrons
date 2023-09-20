@@ -195,30 +195,6 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
   return (
     <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
-      <EquipmentOption
-        onClick={() => {
-          if (values.additionalEquipment.includes('gripper')) {
-            setFieldValue(
-              'additionalEquipment',
-              without(values.additionalEquipment, 'gripper')
-            )
-          } else {
-            setFieldValue('additionalEquipment', [
-              ...values.additionalEquipment,
-              'gripper',
-            ])
-          }
-        }}
-        isSelected={values.additionalEquipment.includes('gripper')}
-        image={
-          <AdditionalItemImage
-            src={gripperImage}
-            alt="Opentrons Flex Gripper"
-          />
-        }
-        text="Gripper"
-        showCheckbox
-      />
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         return (
@@ -245,6 +221,30 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           />
         )
       })}
+      <EquipmentOption
+        onClick={() => {
+          if (values.additionalEquipment.includes('gripper')) {
+            setFieldValue(
+              'additionalEquipment',
+              without(values.additionalEquipment, 'gripper')
+            )
+          } else {
+            setFieldValue('additionalEquipment', [
+              ...values.additionalEquipment,
+              'gripper',
+            ])
+          }
+        }}
+        isSelected={values.additionalEquipment.includes('gripper')}
+        image={
+          <AdditionalItemImage
+            src={gripperImage}
+            alt="Opentrons Flex Gripper"
+          />
+        }
+        text="Gripper"
+        showCheckbox
+      />
       {enableDeckModification && isFlex ? (
         <EquipmentOption
           onClick={() => {
