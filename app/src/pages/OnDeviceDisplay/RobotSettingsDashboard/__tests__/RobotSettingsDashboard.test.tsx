@@ -15,6 +15,7 @@ import {
   TouchScreenSleep,
   TouchscreenBrightness,
   NetworkSettings,
+  Privacy,
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../../organisms/RobotSettingsDashboard'
@@ -33,6 +34,7 @@ jest.mock('../../../../organisms/Navigation')
 jest.mock('../../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
 jest.mock('../../../../organisms/RobotSettingsDashboard/NetworkSettings')
 jest.mock('../../../../organisms/RobotSettingsDashboard/DeviceReset')
+jest.mock('../../../../organisms/RobotSettingsDashboard/Privacy')
 jest.mock('../../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
 jest.mock('../../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
 jest.mock('../../../../organisms/RobotSettingsDashboard/UpdateChannel')
@@ -60,6 +62,7 @@ const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
   typeof NetworkSettings
 >
 const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
+const mockPrivacy = Privacy as jest.MockedFunction<typeof Privacy>
 const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
   typeof RobotSystemVersion
 >
@@ -98,6 +101,7 @@ describe('RobotSettingsDashboard', () => {
     mockTouchScreenSleep.mockReturnValue(<div>Mock Touchscreen Sleep</div>)
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
+    mockPrivacy.mockReturnValue(<div>Mock Privacy</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
     mockGetRobotSettings.mockReturnValue([
       {
@@ -134,14 +138,14 @@ describe('RobotSettingsDashboard', () => {
     getByText('Control the strip of color lights on the front of the robot.')
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
+    getByText('Privacy')
+    getByText('Choose what data to share with Opentrons.')
     getByText('Device Reset')
     getByText('Update Channel')
-    getByText('Apply labware offsets')
+    getByText('Apply Labware Offsets')
     getByText('Use stored data when setting up a protocol.')
-    getByText('Enable Developer Tools')
+    getByText('Developer Tools')
     getByText('Access additional logging and feature flags.')
-    getByText('Share App Analytics')
-    getByText('Share Robot Logs')
   })
 
   it('should render component when tapping robot name button', () => {
@@ -197,6 +201,13 @@ describe('RobotSettingsDashboard', () => {
     getByText('Mock Touchscreen Brightness')
   })
 
+  it('should render component when tapping privacy', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Privacy')
+    fireEvent.click(button)
+    getByText('Mock Privacy')
+  })
+
   it('should render component when tapping device rest', () => {
     const [{ getByText }] = render()
     const button = getByText('Device Reset')
@@ -224,19 +235,19 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByTestId }] = render()
     expect(
       getByTestId('RobotSettingButton_home_gantry_on_restart')
-    ).toHaveTextContent('Off')
+    ).toHaveTextContent('On')
   })
 
   it('should call a mock function when tapping enable historic offset', () => {
     const [{ getByText }] = render()
-    const button = getByText('Apply labware offsets')
+    const button = getByText('Apply Labware Offsets')
     fireEvent.click(button)
     expect(mockToggleHistoricOffsets).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping enable dev tools', () => {
     const [{ getByText }] = render()
-    const button = getByText('Enable Developer Tools')
+    const button = getByText('Developer Tools')
     fireEvent.click(button)
     expect(mockToggleDevtools).toHaveBeenCalled()
   })

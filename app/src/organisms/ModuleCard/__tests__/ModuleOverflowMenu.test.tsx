@@ -191,6 +191,7 @@ describe('ModuleOverflowMenu', () => {
       handleCalibrateClick: jest.fn(),
       isLoadedInRun: false,
       isPipetteReady: true,
+      isTooHot: false,
     }
   })
 
@@ -250,11 +251,11 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set module temperature',
     })
     getByRole('button', {
-      name: 'Close Labware Latch',
+      name: 'Close labware latch',
     })
     const aboutButton = getByRole('button', { name: 'About module' })
     getByRole('button', { name: 'Show attachment instructions' })
-    const testButton = getByRole('button', { name: 'Test Shake' })
+    const testButton = getByRole('button', { name: 'Test shake' })
     fireEvent.click(testButton)
     expect(props.handleTestShakeClick).toHaveBeenCalled()
     fireEvent.click(aboutButton)
@@ -279,7 +280,7 @@ describe('ModuleOverflowMenu', () => {
     const { getByRole } = render(props)
     expect(
       getByRole('button', {
-        name: 'Open Labware Latch',
+        name: 'Open labware latch',
       })
     ).toBeDisabled()
   })
@@ -293,7 +294,7 @@ describe('ModuleOverflowMenu', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button', {
-      name: 'Open Labware Latch',
+      name: 'Open labware latch',
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
@@ -307,7 +308,7 @@ describe('ModuleOverflowMenu', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button', {
-      name: 'Close Labware Latch',
+      name: 'Close labware latch',
     })
 
     fireEvent.click(btn)
@@ -501,7 +502,19 @@ describe('ModuleOverflowMenu', () => {
     expect(about).not.toBeDisabled()
   })
 
+  it('not render calibrate button when a robot is OT-2', () => {
+    props = {
+      ...props,
+      isPipetteReady: false,
+    }
+    const { queryByRole } = render(props)
+
+    const calibrate = queryByRole('button', { name: 'Calibrate' })
+    expect(calibrate).not.toBeInTheDocument()
+  })
+
   it('renders a disabled calibrate button if the pipettes are not attached or need a firmware update', () => {
+    mockUseIsOT3.mockReturnValue(true)
     props = {
       ...props,
       isPipetteReady: false,
@@ -510,5 +523,29 @@ describe('ModuleOverflowMenu', () => {
 
     const calibrate = getByRole('button', { name: 'Calibrate' })
     expect(calibrate).toBeDisabled()
+  })
+
+  it('renders a disabled calibrate button if module is too hot', () => {
+    mockUseIsOT3.mockReturnValue(true)
+    props = {
+      ...props,
+      isTooHot: true,
+    }
+    const { getByRole } = render(props)
+
+    const calibrate = getByRole('button', { name: 'Calibrate' })
+    expect(calibrate).toBeDisabled()
+  })
+
+  it('a mock function should be called when clicking Calibrate if pipette is ready', () => {
+    mockUseIsOT3.mockReturnValue(true)
+    props = {
+      ...props,
+      isPipetteReady: true,
+    }
+    const { getByRole } = render(props)
+
+    getByRole('button', { name: 'Calibrate' }).click()
+    expect(props.handleCalibrateClick).toHaveBeenCalled()
   })
 })

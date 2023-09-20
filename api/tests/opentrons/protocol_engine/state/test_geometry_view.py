@@ -944,8 +944,11 @@ def test_get_tip_drop_location(
     labware_view: LabwareView,
     mock_pipette_view: PipetteView,
     subject: GeometryView,
+    tip_rack_def: LabwareDefinition,
 ) -> None:
     """It should get relative drop tip location for a pipette/labware combo."""
+    decoy.when(labware_view.get_definition("tip-rack-id")).then_return(tip_rack_def)
+
     decoy.when(mock_pipette_view.get_return_tip_scale("pipette-id")).then_return(0.5)
 
     decoy.when(
@@ -966,15 +969,14 @@ def test_get_tip_drop_location(
     assert location == WellLocation(offset=WellOffset(x=1, y=2, z=1337))
 
 
-def test_get_tip_drop_location_with_trash(
+def test_get_tip_drop_location_with_non_tiprack(
     decoy: Decoy,
     labware_view: LabwareView,
     subject: GeometryView,
+    reservoir_def: LabwareDefinition,
 ) -> None:
-    """It should get relative drop tip location for a the fixed trash."""
-    decoy.when(
-        labware_view.get_has_quirk(labware_id="labware-id", quirk="fixedTrash")
-    ).then_return(True)
+    """It should get relative drop tip location for a labware that is not a tiprack."""
+    decoy.when(labware_view.get_definition("labware-id")).then_return(reservoir_def)
 
     location = subject.get_checked_tip_drop_location(
         pipette_id="pipette-id",

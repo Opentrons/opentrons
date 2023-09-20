@@ -55,7 +55,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # pipette
     p1000 = protocol.load_instrument(
-        "p1000_single_gen3",
+        "flex_1channel_1000",
         "right",
         tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3, tiprack_200_4, tiprack_200_5, tiprack_200_6],
     )

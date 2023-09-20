@@ -32,7 +32,6 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
@@ -63,7 +62,7 @@ from .instruments.ot3.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
-    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
@@ -92,7 +91,6 @@ from .types import (
     OT3AxisKind,
     OT3Mount,
     OT3AxisMap,
-    GripperJawState,
     InstrumentProbeType,
     GripperProbe,
     UpdateStatus,
@@ -746,7 +744,7 @@ class OT3API(
         """Immediately disengage all present motors and clear motor and module tasks."""
         if disengage_before_stopping:
             await self.disengage_axes(
-                [ax for ax in Axis if self._backend.axis_is_present(ax)]
+                [ax for ax in Axis if self._backend.axis_is_present(ax) if ax != Axis.G]
             )
         await self._stop_motors()
 
@@ -757,7 +755,13 @@ class OT3API(
         self._log.info("Resetting OT3API")
         await self.reset()
         if home_after:
-            await self.home()
+            skip = []
+            if (
+                self._gripper_handler.has_gripper()
+                and not self._gripper_handler.is_ready_for_jaw_home()
+            ):
+                skip.append(Axis.G)
+            await self.home(skip=skip)
 
     async def reset(self) -> None:
         """Reset the stored state of the system."""
@@ -790,11 +794,11 @@ class OT3API(
         try:
             gripper = self._gripper_handler.get_gripper()
             self._log.info("Homing gripper jaw.")
+
             dc = self._gripper_handler.get_duty_cycle_by_grip_force(
                 gripper.default_home_force
             )
             await self._ungrip(duty_cycle=dc)
-            gripper.state = GripperJawState.HOMED_READY
         except GripperNotAttachedError:
             pass
 
@@ -895,6 +899,14 @@ class OT3API(
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
+            await self._refresh_jaw_state()
+
+    async def _refresh_jaw_state(self) -> None:
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            gripper.state = await self._backend.get_jaw_state()
+        except GripperNotAttachedError:
+            pass
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
@@ -1065,7 +1077,6 @@ class OT3API(
             checked_max = None
 
         await self._cache_and_maybe_retract_mount(realmount)
-        await self._move_gripper_to_idle_position(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1175,7 +1186,6 @@ class OT3API(
         else:
             checked_max = None
         await self._cache_and_maybe_retract_mount(realmount)
-        await self._move_gripper_to_idle_position(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1194,28 +1204,21 @@ class OT3API(
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
+        if mount != OT3Mount.GRIPPER:
+            await self.idle_gripper()
         self._last_moved_mount = mount
 
-    async def _move_gripper_to_idle_position(self, mount_in_use: OT3Mount) -> None:
-        """Move gripper to its idle, gripped position.
-
-        If the gripper is not currently in use, puts its jaws in a low-current,
-        gripped position. Experimental behavior in order to prevent gripper jaws
-        from colliding into thermocycler lid & lid latch clips.
-        """
-        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
-        if (
-            self._gripper_handler.gripper
-            and mount_in_use != OT3Mount.GRIPPER
-            and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
-        ):
-            if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
-                self._log.warning(
-                    "Gripper jaw is not homed. Can't be moved to idle position"
+    async def idle_gripper(self) -> None:
+        """Move gripper to its idle, gripped position."""
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            if self._gripper_handler.is_ready_for_idle():
+                await self.grip(
+                    force_newtons=gripper.default_idle_force,
+                    stay_engaged=False,
                 )
-            else:
-                # allows for safer gantry movement at minimum force
-                await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+        except GripperNotAttachedError:
+            pass
 
     def _build_moves(
         self,
@@ -1419,7 +1422,11 @@ class OT3API(
                     await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(self, axes: Optional[List[Axis]] = None) -> None:
+    async def home(
+        self,
+        axes: Optional[List[Axis]] = None,
+        skip: Optional[List[Axis]] = None,
+    ) -> None:
         """
         Worker function to home the robot by axis or list of
         desired axes.
@@ -1442,6 +1449,9 @@ class OT3API(
                     f"unable to home {Axis.Z_R.name} axis"
                     f"with {self.gantry_load.name} gantry load"
                 )
+
+        if skip:
+            checked_axes = [ax for ax in checked_axes if ax not in skip]
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1558,6 +1568,7 @@ class OT3API(
                 duty_cycle=duty_cycle, stay_engaged=stay_engaged
             )
             await self._cache_encoder_position()
+            self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
         except Exception:
             self._log.exception(
                 f"Gripper grip failed, encoder pos: {self._encoder_position[Axis.G]}"
@@ -1570,6 +1581,7 @@ class OT3API(
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
             await self._cache_encoder_position()
+            self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1585,6 +1597,7 @@ class OT3API(
             jaw_displacement_mm = (width_max - jaw_width_mm) / 2.0
             await self._backend.gripper_hold_jaw(int(1000 * jaw_displacement_mm))
             await self._cache_encoder_position()
+            self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
@@ -1597,21 +1610,24 @@ class OT3API(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
         )
         await self._grip(duty_cycle=dc, stay_engaged=stay_engaged)
-        self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
+        """
+        Release gripped object.
+
+        To simply open the jaw, use `home_gripper_jaw` instead.
+        """
         # get default grip force for release if not provided
         self._gripper_handler.check_ready_for_jaw_move()
+        # TODO: check jaw width to make sure it is actually gripping something
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_home_force
         )
         await self._ungrip(duty_cycle=dc)
-        self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
         await self._hold_jaw_width(jaw_width_mm)
-        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
     async def _move_to_plunger_bottom(
         self, mount: OT3Mount, rate: float, acquire_lock: bool = True
@@ -1694,6 +1710,18 @@ class OT3API(
                 acquire_lock=acquire_lock,
             )
 
+    async def configure_for_volume(
+        self, mount: Union[top_types.Mount, OT3Mount], volume: float
+    ) -> None:
+        checked_mount = OT3Mount.from_mount(mount)
+        await self._pipette_handler.configure_for_volume(checked_mount, volume)
+
+    async def set_liquid_class(
+        self, mount: Union[top_types.Mount, OT3Mount], liquid_class: str
+    ) -> None:
+        checked_mount = OT3Mount.from_mount(mount)
+        await self._pipette_handler.set_liquid_class(checked_mount, liquid_class)
+
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0
@@ -1761,7 +1789,7 @@ class OT3API(
         Dispense a volume of liquid in microliters(uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
-            realmount, volume, rate
+            realmount, volume, rate, push_out
         )
         if not dispense_spec:
             return
@@ -1918,6 +1946,10 @@ class OT3API(
         # This extra shake ensures those tips are removed
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
+
+        # fixme: really only need this during labware position check so user
+        # can verify if a tip is properly attached
+        await self.move_rel(realmount, top_types.Point(z=spec.retract_target))
 
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
@@ -2083,7 +2115,7 @@ class OT3API(
 
     def get_instrument_offset(
         self, mount: OT3Mount
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount, None]:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary, None]:
         """Get instrument calibration data."""
         # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
         #  PipetteDict because the dict is shared with OT2 pipettes which have
@@ -2109,7 +2141,7 @@ class OT3API(
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount]:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary]:
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:

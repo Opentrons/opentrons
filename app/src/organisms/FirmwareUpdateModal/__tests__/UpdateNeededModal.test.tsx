@@ -48,6 +48,7 @@ describe('UpdateNeededModal', () => {
     props = {
       setShowUpdateModal: jest.fn(),
       subsystem: 'pipette_left',
+      setInitiatedSubsystemUpdate: jest.fn(),
     }
     mockUseInstrumentQuery.mockReturnValue({
       data: {

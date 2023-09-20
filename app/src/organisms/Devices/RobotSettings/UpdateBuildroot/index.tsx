@@ -45,8 +45,10 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
 
   const robotSystemType = getRobotSystemType(robot)
 
+  // TODO(jh, 09-14-2023: add download logic to app-shell/redux/progress bar.
   let updateStep: UpdateStep
-  if (step == null) updateStep = 'download'
+  const DOWNLOAD_STEPS = ['getToken']
+  if (step == null || DOWNLOAD_STEPS.includes(step)) updateStep = 'download'
   else if (step === 'finished') updateStep = 'finished'
   else if (step === 'restart' || step === 'restarting') updateStep = 'restart'
   else updateStep = 'install'

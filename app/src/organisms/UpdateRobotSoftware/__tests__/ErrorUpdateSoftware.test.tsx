@@ -34,13 +34,13 @@ describe('ErrorUpdateSoftware', () => {
     const [{ getByText }] = render(props)
     getByText('Software update error')
     getByText('mock error message')
-    getByText('Proceed without updating')
+    getByText('Proceed without update')
     getByText('Try again')
   })
 
-  it('call mockPush when tapping Proceed without updating', () => {
+  it('call mockPush when tapping Proceed without update', () => {
     const [{ getByText }] = render(props)
-    getByText('Proceed without updating').click()
+    getByText('Proceed without update').click()
     expect(mockPush).toBeCalledWith('/emergency-stop')
   })
 

@@ -4,21 +4,15 @@
     "t20": {
       "defaultAspirateFlowRate": {
         "default": 7.6,
-        "valuesByApiLevel": {
-          "2.0": 7.6
-        }
+        "valuesByApiLevel": { "2.0": 7.6 }
       },
       "defaultDispenseFlowRate": {
         "default": 7.6,
-        "valuesByApiLevel": {
-          "2.0": 7.6
-        }
+        "valuesByApiLevel": { "2.0": 7.6 }
       },
       "defaultBlowOutFlowRate": {
         "default": 7.6,
-        "valuesByApiLevel": {
-          "2.0": 7.6
-        }
+        "valuesByApiLevel": { "2.0": 7.6 }
       },
       "defaultTipLength": 31.1,
       "aspirate": {
@@ -209,27 +203,20 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 3.534,
       "defaultPushOutVolume": 0
     },
     "t10": {
       "defaultAspirateFlowRate": {
         "default": 7.6,
-        "valuesByApiLevel": {
-          "2.0": 7.6
-        }
+        "valuesByApiLevel": { "2.0": 7.6 }
       },
       "defaultDispenseFlowRate": {
         "default": 7.6,
-        "valuesByApiLevel": {
-          "2.0": 7.6
-        }
+        "valuesByApiLevel": { "2.0": 7.6 }
       },
       "defaultBlowOutFlowRate": {
         "default": 7.6,
-        "valuesByApiLevel": {
-          "2.0": 7.6
-        }
+        "valuesByApiLevel": { "2.0": 7.6 }
       },
       "defaultTipLength": 31.1,
       "aspirate": {
@@ -300,7 +287,6 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 3.534,
       "defaultPushOutVolume": 0
     }
   },

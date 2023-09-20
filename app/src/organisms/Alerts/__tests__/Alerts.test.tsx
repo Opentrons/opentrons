@@ -1,7 +1,9 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 
 import { mountWithStore } from '@opentrons/components'
 import * as AppAlerts from '../../../redux/alerts'
+import { getAvailableShellUpdate } from '../../../redux/shell'
 import { TOAST_ANIMATION_DURATION } from '../../../atoms/Toast'
 import { Alerts } from '..'
 import { AnalyticsSettingsModal } from '../../AnalyticsSettingsModal'
@@ -14,19 +16,20 @@ import type { AlertId } from '../../../redux/alerts/types'
 jest.mock('../../AnalyticsSettingsModal', () => ({
   AnalyticsSettingsModal: () => <></>,
 }))
-
 jest.mock('../U2EDriverOutdatedAlert', () => ({
   U2EDriverOutdatedAlert: () => <></>,
 }))
-
 jest.mock('../../UpdateAppModal', () => ({
   UpdateAppModal: () => <></>,
 }))
-
 jest.mock('../../../redux/alerts/selectors')
+jest.mock('../../../redux/shell')
 
 const getActiveAlerts = AppAlerts.getActiveAlerts as jest.MockedFunction<
   typeof AppAlerts.getActiveAlerts
+>
+const mockGetAvailableShellUpdate = getAvailableShellUpdate as jest.MockedFunction<
+  typeof getAvailableShellUpdate
 >
 
 const MOCK_STATE: State = { mockState: true } as any
@@ -47,6 +50,7 @@ describe('app-wide Alerts component', () => {
 
   beforeEach(() => {
     stubActiveAlerts([])
+    when(mockGetAvailableShellUpdate).mockReturnValue('true')
   })
 
   afterEach(() => {
@@ -119,6 +123,13 @@ describe('app-wide Alerts component', () => {
     wrapper.setProps({ initialState: updatedState })
     setTimeout(() => {
       expect(wrapper.contains('successfully updated')).toBe(true)
+    }, TOAST_ANIMATION_DURATION)
+  })
+  it('should not render an app update toast if a software update is no longer available', () => {
+    when(mockGetAvailableShellUpdate).mockReturnValue('false')
+    const { wrapper } = render()
+    setTimeout(() => {
+      expect(wrapper.contains('View Update')).toBe(false)
     }, TOAST_ANIMATION_DURATION)
   })
 })

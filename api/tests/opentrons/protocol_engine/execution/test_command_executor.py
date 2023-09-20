@@ -271,8 +271,12 @@ async def test_execute(
     await subject.execute("command-id")
 
     decoy.verify(
-        action_dispatcher.dispatch(UpdateCommandAction(command=running_command)),
-        action_dispatcher.dispatch(UpdateCommandAction(command=completed_command)),
+        action_dispatcher.dispatch(
+            UpdateCommandAction(private_result=None, command=running_command)
+        ),
+        action_dispatcher.dispatch(
+            UpdateCommandAction(private_result=None, command=completed_command)
+        ),
     )
 
 
@@ -392,7 +396,9 @@ async def test_execute_raises_protocol_engine_error(
     await subject.execute("command-id")
 
     decoy.verify(
-        action_dispatcher.dispatch(UpdateCommandAction(command=running_command)),
+        action_dispatcher.dispatch(
+            UpdateCommandAction(private_result=None, command=running_command)
+        ),
         action_dispatcher.dispatch(
             FailCommandAction(
                 command_id="command-id",

@@ -1,8 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import probing1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import probing8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
@@ -67,21 +64,18 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   const attachedPipetteChannels = attachedPipette.data.channels
-  let pipetteAttachProbeVideoSource, pipetteProbingVideoSource, i18nKey
+  let pipetteAttachProbeVideoSource, i18nKey
   switch (attachedPipetteChannels) {
     case 1:
       pipetteAttachProbeVideoSource = attachProbe1
-      pipetteProbingVideoSource = probing1
       i18nKey = 'install_probe'
       break
     case 8:
       pipetteAttachProbeVideoSource = attachProbe8
-      pipetteProbingVideoSource = probing8
       i18nKey = 'install_probe_8_channel'
       break
     case 96:
       pipetteAttachProbeVideoSource = attachProbe96
-      pipetteProbingVideoSource = probing96
       i18nKey = 'install_probe_96_channel'
       break
   }
@@ -98,24 +92,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         controls={false}
       >
         <source src={pipetteAttachProbeVideoSource} />
-      </video>
-    </Flex>
-  )
-
-  // TODO: add assets for probing actual module calibration adapters (ND 8/25/23)
-  const pipetteProbingVid = (
-    <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
-      <video
-        css={css`
-          max-width: 100%;
-          max-height: 100%;
-        `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
-        data-testid={pipetteProbingVideoSource}
-      >
-        <source src={pipetteProbingVideoSource} />
       </video>
     </Flex>
   )
@@ -139,7 +115,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   if (isRobotMoving)
     return (
       <InProgressModal
-        alternativeSpinner={isExiting ? null : pipetteProbingVid}
+        // TODO ND: 9/6/23 use spinner until animations are made
+        alternativeSpinner={null}
         description={
           isExiting
             ? t('stand_back')

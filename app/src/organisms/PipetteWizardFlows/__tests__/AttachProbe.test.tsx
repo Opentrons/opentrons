@@ -55,6 +55,10 @@ describe('AttachProbe', () => {
           params: { axes: ['leftZ'] },
         },
         {
+          commandType: 'home',
+          params: { skipIfMountPositionOk: 'left' },
+        },
+        {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },
         },
@@ -98,7 +102,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
     getByTestId('Pipette_Probing_1.webm')
   })
@@ -115,7 +119,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
     getByTestId('Pipette_Probing_96.webm')
   })
@@ -130,7 +134,7 @@ describe('AttachProbe', () => {
     getByText('Stand back, robot is in motion')
     expect(
       screen.queryByText(
-        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
       )
     ).not.toBeInTheDocument()
   })
@@ -164,6 +168,10 @@ describe('AttachProbe', () => {
         {
           commandType: 'home',
           params: { axes: ['leftZ'] },
+        },
+        {
+          commandType: 'home',
+          params: { skipIfMountPositionOk: 'left' },
         },
         {
           commandType: 'calibration/calibratePipette',

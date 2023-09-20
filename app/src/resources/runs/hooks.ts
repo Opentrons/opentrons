@@ -4,12 +4,14 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
 import {
   useCreateCommandMutation,
+  useCreateLiveCommandMutation,
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import {
   chainRunCommandsRecursive,
   chainMaintenanceCommandsRecursive,
+  chainLiveCommandsRecursive,
 } from './utils'
 import { getIsOnDevice } from '../../redux/config'
 import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
@@ -18,6 +20,7 @@ import type {
   UseCreateMaintenanceRunMutationResult,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
+import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 
 export type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation
@@ -93,6 +96,30 @@ export function useChainMaintenanceCommands(): {
         maintenanceRunId,
         commands,
         createMaintenanceCommand,
+        continuePastCommandFailure,
+        setIsLoading
+      ),
+    isCommandMutationLoading: isLoading,
+  }
+}
+
+export function useChainLiveCommands(): {
+  chainLiveCommands: (
+    commands: ModulePrepCommandsType[],
+    continuePastCommandFailure: boolean
+  ) => ReturnType<typeof chainLiveCommandsRecursive>
+  isCommandMutationLoading: boolean
+} {
+  const [isLoading, setIsLoading] = React.useState(false)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  return {
+    chainLiveCommands: (
+      commands: ModulePrepCommandsType[],
+      continuePastCommandFailure: boolean
+    ) =>
+      chainLiveCommandsRecursive(
+        commands,
+        createLiveCommand,
         continuePastCommandFailure,
         setIsLoading
       ),

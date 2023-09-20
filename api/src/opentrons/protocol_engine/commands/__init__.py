@@ -36,6 +36,7 @@ from .command_unions import (
     CommandCreate,
     CommandResult,
     CommandType,
+    CommandPrivateResult,
 )
 
 from .aspirate import (
@@ -141,6 +142,7 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+    LoadPipettePrivateResult,
 )
 
 from .move_labware import (
@@ -256,6 +258,14 @@ from .retract_axis import (
     RetractAxisCommandType,
 )
 
+from .configure_for_volume import (
+    ConfigureForVolume,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeResult,
+    ConfigureForVolumeCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -263,8 +273,10 @@ __all__ = [
     "CommandCreate",
     "CommandResult",
     "CommandType",
+    "CommandPrivateResult",
     # base interfaces
     "AbstractCommandImpl",
+    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
@@ -351,6 +363,7 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    "LoadPipettePrivateResult",
     # move labware command models
     "MoveLabware",
     "MoveLabwareCreate",
@@ -444,4 +457,10 @@ __all__ = [
     "thermocycler",
     # calibration command bundle
     "calibration",
+    # configure pipette volume command bundle
+    "ConfigureForVolume",
+    "ConfigureForVolumeCreate",
+    "ConfigureForVolumeParams",
+    "ConfigureForVolumeResult",
+    "ConfigureForVolumeCommandType",
 ]

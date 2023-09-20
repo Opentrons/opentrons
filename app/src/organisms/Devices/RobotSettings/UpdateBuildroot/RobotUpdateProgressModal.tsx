@@ -15,6 +15,7 @@ import {
   SPACING,
   BORDERS,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -26,6 +27,7 @@ import {
 } from '../../../../redux/robot-update'
 import successIcon from '../../../../assets/images/icon_success.png'
 
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 import type { Dispatch } from '../../../../redux/types'
 import type { UpdateStep } from '.'
 import type { RobotUpdateAction } from '../../../../redux/robot-update/types'
@@ -70,11 +72,30 @@ function RobotUpdateProgressFooter({
 }: RobotUpdateProgressFooterProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
-  // TODO(jh, 08-30-2023: add reinstall logic for zip file installation)
   const installUpdate = React.useCallback(() => {
     dispatch(clearRobotUpdateSession())
     dispatch(startRobotUpdate(robotName))
   }, [robotName])
+
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const idleCommand: SetStatusBarCreateCommand = {
+    commandType: 'setStatusBar',
+    params: { animation: 'idle' },
+  }
+
+  // Called if the update fails
+  const startIdleAnimationIfFailed = (): void => {
+    if (errorMessage) {
+      createLiveCommand({
+        command: idleCommand,
+        waitUntilComplete: false,
+      }).catch((e: Error) =>
+        console.warn(`cannot run status bar animation: ${e.message}`)
+      )
+    }
+  }
+
+  React.useEffect(startIdleAnimationIfFailed, [])
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
@@ -101,7 +122,7 @@ function RobotUpdateProgressFooter({
 interface RobotUpdateProgressModalProps {
   robotName: string
   updateStep: UpdateStep
-  stepProgress?: number | null
+  stepProgress: number | null
   error?: string | null
   closeUpdateBuildroot?: () => void
 }
@@ -124,12 +145,27 @@ export function RobotUpdateProgressModal({
     return dispatch(clearRobotUpdateSession())
   }
 
-  let modalBodyText = t('downloading_update')
-  if (updateStep === 'install') {
-    modalBodyText = t('installing_update')
-  } else if (updateStep === 'restart') {
-    modalBodyText = t('restarting_robot')
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const updatingCommand: SetStatusBarCreateCommand = {
+    commandType: 'setStatusBar',
+    params: { animation: 'updating' },
   }
+
+  // Called when the first step of the update begins
+  const startUpdatingAnimation = (): void => {
+    createLiveCommand({
+      command: updatingCommand,
+      waitUntilComplete: false,
+    }).catch((e: Error) =>
+      console.warn(`cannot run status bar animation: ${e.message}`)
+    )
+  }
+
+  let modalBodyText = t('installing_update')
+  if (updateStep === 'restart') modalBodyText = t('restarting_robot')
+
+  // Make sure to start the animation when this modal first pops up
+  React.useEffect(startUpdatingAnimation, [])
 
   // Account for update methods that do not require download & decreasing percent oddities.
   React.useEffect(() => {

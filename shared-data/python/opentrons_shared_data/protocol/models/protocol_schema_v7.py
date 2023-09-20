@@ -64,6 +64,7 @@ class Params(BaseModel):
     loadName: Optional[str]
     namespace: Optional[str]
     version: Optional[int]
+    pushOut: Optional[float]
 
 
 class Command(BaseModel):
