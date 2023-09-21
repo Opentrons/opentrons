@@ -40,6 +40,7 @@ export const getHasWasteChute = (
 ): boolean => {
   return Object.values(additionalEquipmentEntities).some(
     additionalEquipmentEntity =>
-      additionalEquipmentEntity.location === WASTE_CHUTE_SLOT
+      additionalEquipmentEntity.location === WASTE_CHUTE_SLOT &&
+      additionalEquipmentEntity.name === 'wasteChute'
   )
 }
