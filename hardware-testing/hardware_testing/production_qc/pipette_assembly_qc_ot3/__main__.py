@@ -1448,9 +1448,11 @@ def _create_csv_and_get_callbacks(
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
-            data.append_data_to_file(test_name, file_name, data_str + "\n")
+            data.append_data_to_file(test_name, run_id, file_name, data_str + "\n")
         else:
-            data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
+            data.insert_data_to_file(
+                test_name, run_id, file_name, data_str + "\n", line_number
+            )
 
     def _cache_pressure_data_callback(
         d: List[Any], first_row_value: Optional[str] = None

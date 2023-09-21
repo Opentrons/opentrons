@@ -484,7 +484,7 @@ class CSVReport:
         _report_str = str(self)
         assert self._file_name, "must set tag before saving to disk"
         return data_io.dump_data_to_file(
-            self._test_name, self._file_name, _report_str + "\n"
+            self._test_name, self._run_id, self._file_name, _report_str + "\n"
         )
 
     def print_results(self) -> None:
