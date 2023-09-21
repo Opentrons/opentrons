@@ -601,10 +601,13 @@ class API(
         # No internal code passes OT3 axes as arguments on an OT2. But a user/ client
         # can still explicitly specify an OT3 axis even when working on an OT2.
         # Adding this check in order to prevent misuse of axes types.
-        if axes and any(axis not in Axis.ot2_axes() for axis in axes):
-            raise UnsupportedHardwareCommand(
-                message=f"At least one axis in {axes} is not supported on the OT2."
-            )
+        if axes:
+            unsupported = list(axis not in Axis.ot2_axes() for axis in axes)
+            if any(unsupported):
+                raise UnsupportedHardwareCommand(
+                    message=f"At least one axis in {axes} is not supported on the OT2.",
+                    detail={"unsupported_axes": unsupported},
+                )
         self._reset_last_mount()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis.ot2_axes()]
