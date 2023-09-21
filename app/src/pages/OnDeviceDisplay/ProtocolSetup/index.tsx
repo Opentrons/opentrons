@@ -310,6 +310,7 @@ interface PrepareToRunProps {
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   play: () => void
+  setupScreen: SetupScreens
 }
 
 function PrepareToRun({
@@ -317,6 +318,7 @@ function PrepareToRun({
   setSetupScreen,
   confirmAttachment,
   play,
+  setupScreen,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
@@ -491,10 +493,11 @@ function PrepareToRun({
   const isDoorOpen =
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
-
   return (
     <>
-      {isReadyToRun && isDoorOpen ? <OpenDoorAlertModal /> : null}
+      {isReadyToRun && isDoorOpen && setupScreen === 'prepare to run' ? (
+        <OpenDoorAlertModal />
+      ) : null}
       {/* Empty box to detect scrolling */}
       <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}
@@ -667,6 +670,7 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         play={play}
+        setupScreen={setupScreen}
       />
     ),
     instruments: (
