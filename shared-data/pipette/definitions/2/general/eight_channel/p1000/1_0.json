@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 8-Channel 1000 μL",
+  "displayName": "Flex 8-Channel 1000 \u03bcL",
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
@@ -40,7 +40,17 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
-    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
+    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8],
+    "perTipPickupCurrent": {
+      "1": 0.2,
+      "2": 0.3,
+      "3": 0.4,
+      "4": 0.5,
+      "5": 0.6,
+      "6": 0.7,
+      "7": 0.8,
+      "8": 0.9
+    }
   },
   "backCompatNames": [],
   "channels": 8,

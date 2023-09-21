@@ -180,9 +180,9 @@ class PartialTipDefinition(BaseModel):
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
     )
-    per_tip_pickup_current: float = Field(
-        default=0.5,
-        description="A current scale for pick up tip in a partial tip configuration",
+    per_tip_pickup_current: Dict[int, float] = Field(
+        default=None,
+        description="A current dictionary look-up by partial tip configuration.",
         alias="perTipPickupCurrent",
     )
 
