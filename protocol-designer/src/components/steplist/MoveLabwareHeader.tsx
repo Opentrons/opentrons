@@ -6,13 +6,13 @@ import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
 } from '../../step-forms/selectors'
-import { WASTE_CHUTE_SLOT } from '../../constants'
 import { getHasWasteChute } from '../labware'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'

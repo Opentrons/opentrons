@@ -1,5 +1,8 @@
 import { createSelector } from 'reselect'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_SLOT,
+} from '@opentrons/shared-data'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 import {
   getUnsavedForm,
@@ -10,7 +13,6 @@ import isEmpty from 'lodash/isEmpty'
 import { BaseState, Selector } from '../types'
 import { HintKey } from '.'
 import { getHasWasteChute } from '../components/labware'
-import { WASTE_CHUTE_SLOT } from '../constants'
 
 const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 

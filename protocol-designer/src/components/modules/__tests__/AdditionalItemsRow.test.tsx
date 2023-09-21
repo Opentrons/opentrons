@@ -1,6 +1,7 @@
 import * as React from 'react'
+import i18n from 'i18next'
 import { renderWithProviders, SlotMap } from '@opentrons/components'
-import { WASTE_CHUTE_SLOT } from '../../../constants'
+import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
 
@@ -9,7 +10,9 @@ jest.mock('@opentrons/components/src/slotmap/SlotMap')
 const mockSlotMap = SlotMap as jest.MockedFunction<typeof SlotMap>
 
 const render = (props: React.ComponentProps<typeof AdditionalItemsRow>) => {
-  return renderWithProviders(<AdditionalItemsRow {...props} />)[0]
+  return renderWithProviders(<AdditionalItemsRow {...props} />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 describe('AdditionalItemsRow', () => {
@@ -25,7 +28,7 @@ describe('AdditionalItemsRow', () => {
   it('renders no gripper', () => {
     const { getByRole, getByText } = render(props)
     getByText('Flex Gripper')
-    getByRole('button', { name: 'Add' }).click()
+    getByRole('button', { name: 'add' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
   })
   it('renders a gripper', () => {
@@ -38,7 +41,7 @@ describe('AdditionalItemsRow', () => {
     getByAltText('Flex Gripper')
     getByText('Model:')
     getByText('GEN1')
-    getByRole('button', { name: 'Remove' }).click()
+    getByRole('button', { name: 'remove' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
   })
   it('renders no waste chute', () => {
@@ -48,7 +51,7 @@ describe('AdditionalItemsRow', () => {
     }
     const { getByRole, getByText } = render(props)
     getByText('Waste Chute')
-    getByRole('button', { name: 'Add' }).click()
+    getByRole('button', { name: 'add' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
   })
   it('renders a waste chute', () => {
@@ -63,7 +66,7 @@ describe('AdditionalItemsRow', () => {
     getByText('mock slot map')
     getByText('Position:')
     getByText(`Slot ${WASTE_CHUTE_SLOT}`)
-    getByRole('button', { name: 'Remove' }).click()
+    getByRole('button', { name: 'remove' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
   })
 })

@@ -445,6 +445,7 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
+  additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }
 
@@ -517,6 +518,8 @@ export interface CommandCreatorError {
 export type WarningType =
   | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
   | 'ASPIRATE_FROM_PRISTINE_WELL'
+  | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
+  | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
 
 export interface CommandCreatorWarning {
   message: string

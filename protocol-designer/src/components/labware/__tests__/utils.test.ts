@@ -1,4 +1,4 @@
-import { WASTE_CHUTE_SLOT } from '../../../constants'
+import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import { getHasWasteChute } from '..'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 

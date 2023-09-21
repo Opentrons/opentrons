@@ -153,6 +153,7 @@ beforeEach(() => {
     labwareEntities: {},
     moduleEntities: {},
     pipetteEntities: {},
+    additionalEquipmentEntities: {},
     config: DEFAULT_CONFIG,
   }
 })

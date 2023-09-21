@@ -1,7 +1,6 @@
-import { getModuleDisplayName } from '@opentrons/shared-data'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { WASTE_CHUTE_SLOT } from '../../../../constants'
+import { getModuleDisplayName, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import { i18n } from '../../../../localization'
 import {
   getAdditionalEquipmentEntities,

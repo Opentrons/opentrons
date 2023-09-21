@@ -5,13 +5,13 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   FLEX_ROBOT_TYPE,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
-import { WASTE_CHUTE_SLOT } from '../../constants'
 import { getHasWasteChute } from '../../components/labware'
 import {
   AllTemporalPropertiesForTimelineFrame,
