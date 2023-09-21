@@ -15,6 +15,6 @@ Building block commands execute some of the most basic actions that your robot c
 
 Pages in this section of the documentation cover:
 
-- :ref:`pipette-tips`
-- :ref:`liquid-control`
-- :ref:`new-utility-commands`
+- :ref:`pipette-tips`: Get started with commands for picking up pipette tips, dropping tips, returning tips, and working with used tips. 
+- :ref:`liquid-control`: Learn about aspirating and dispensing liquids, blow out and touch tip procedures, mixing, and creating air gaps.
+- :ref:`new-utility-commands`: Control various robot functions such as pausing or delaying a protocol, checking the robot’s door, turning robot lights on/off, and more.
