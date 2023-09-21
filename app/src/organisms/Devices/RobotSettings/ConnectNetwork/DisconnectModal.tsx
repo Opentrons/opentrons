@@ -101,8 +101,8 @@ export const DisconnectModal = ({
   const isDisconnected =
     isRequestSucceeded ||
     (isRequestPending && status !== CONNECTABLE) ||
-    // as a fallback, if polled wifi interface is null presume successful disconnection
-    wifi == null
+    // as a fallback, if polled wifi interface ipAddress is null presume successful disconnection
+    wifi?.ipAddress == null
 
   if (isDisconnected) {
     disconnectModalBody = t('disconnect_from_wifi_network_success')

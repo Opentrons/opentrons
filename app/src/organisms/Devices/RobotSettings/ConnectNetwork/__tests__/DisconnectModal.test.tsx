@@ -151,7 +151,10 @@ describe('DisconnectModal', () => {
   it('renders success body when wifi is not connected', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue({ wifi: null, ethernet: null })
+      .mockReturnValue({
+        wifi: { ...MOCK_WIFI, ipAddress: null },
+        ethernet: null,
+      })
     const { getByRole, getByText } = render()
 
     getByText('Disconnected from Wi-Fi')
