@@ -31,6 +31,7 @@ ssh_key ?= $(default_ssh_key)
 ssh_opts ?= $(default_ssh_opts)
 # Helper to safely bundle ssh options
 ssh_helper = $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts)
+ssh_helper_ot3 = $(ssh_helper) -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa
 
 # Source discovery
 # For the python sources
@@ -174,7 +175,7 @@ format:
 	$(python) -m black hardware_testing tests setup.py
 
 define move-plot-webpage-ot3
-ssh -i $(2) $(3) root@$(1) \
+ssh $(ssh_helper_ot3) root@$(1) \
 "function cleanup () { mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
 mv /data/plot/index.html /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
@@ -185,13 +186,13 @@ endef
 
 .PHONY: push-plot-webpage-ot3
 push-plot-webpage-ot3:
-	scp $(ssh_helper) -r hardware_testing/tools/plot root@$(host):/data
+	scp $(ssh_helper_ot3) -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage-ot3,$(host),$(ssh_key),$(ssh_opts))
 
 .PHONY: push-description-ot3
 push-description-ot3:
 	$(python) -c "from hardware_testing.data import create_git_description_file; create_git_description_file()"
-	scp $(ssh_helper) ./.hardware-testing-description root@$(host):/data/
+	scp $(ssh_helper_ot3) ./.hardware-testing-description root@$(host):/data/
 
 .PHONY: restart
 restart:
@@ -220,7 +221,7 @@ push-all: clean wheel push-no-restart push-plot-webpage
 
 .PHONY: term
 term:
-	ssh $(ssh_helper) root@$(host)
+	ssh $(ssh_helper_ot3) root@$(host)
 
 .PHONY: list-ports
 list-ports:
@@ -236,10 +237,10 @@ push-all-and-term: push-all term
 .PHONY: pull-data-ot3
 pull-data-ot3:
 	mkdir -p "./.pulled-data"
-	scp $(ssh_helper) -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
+	scp $(ssh_helper_ot3) -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
 
 define delete-test-data-cmd
-ssh -i $(2) $(3) root@$(1) \
+ssh $(ssh_helper_ot3) root@$(1) \
 "rm -rf /data/testing_data/$(4)"
 endef
 
@@ -248,8 +249,8 @@ delete-data-ot3:
 	$(call delete-test-data-cmd,$(host),$(ssh_key),$(ssh_opts),$(test))
 
 define push-and-update-fw
-scp -i $(2) $(3) $(4) root@$(1):/tmp/
-ssh -i $(2) $(3) root@$(1) \
+scp $(ssh_helper_ot3) $(4) root@$(1):/tmp/
+ssh $(ssh_helper_ot3) root@$(1) \
 "function cleanup () { (rm -rf /tmp/$(4) || true) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
 (unzip -o /tmp/$(4) -d /usr/lib/firmware || cleanup) &&\
@@ -289,10 +290,10 @@ push-ot3-gravimetric:
 	$(MAKE) apply-patches-gravimetric
 	-$(MAKE) sync-sw-ot3
 	$(MAKE) remove-patches-gravimetric
-	scp $(ssh_helper) -r hardware_testing/labware/opentrons_flex_96_tiprack_50ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper) -r hardware_testing/labware/opentrons_flex_96_tiprack_200ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper) -r hardware_testing/labware/opentrons_flex_96_tiprack_1000ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper) -r hardware_testing/labware/radwag_pipette_calibration_vial/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/opentrons_flex_96_tiprack_50ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/opentrons_flex_96_tiprack_200ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/opentrons_flex_96_tiprack_1000ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/radwag_pipette_calibration_vial/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
@@ -314,11 +315,28 @@ update-patches-gravimetric:
 
 .PHONY: push-photometric-ot2
 push-photometric-ot2:
-	scp $(ssh_helper) -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
+	scp $(ssh_helper_ot3) -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
 
 .PHONY: get-latest-tag
 get-latest-tag:
 	git tag -l --sort=-v:refname "ot3@*" --merged | (head -n 1 || Select -First 1)
+
+
+.PHONY:	create-ssh-key
+create-ssh-key:
+	ssh-keygen -t rsa -b 4096 -f ~/.ssh/robot_key -N ""
+	echo "ssh key generated"
+
+
+.PHONY: push-ssh-key
+push-ssh-key:
+	echo "make sure USB drive with your public key is connected to Flex"
+	curl --location --request POST "http://$(host):31950/server/ssh_keys/from_local" --header "opentrons-version: 3"
+
+
+.PHONY: term-ot3
+term-ot3:
+	ssh $(ssh_helper_ot3) root@$(host)
 
 
 # Creates a tarball of the hardware-testing module that can be deployed to a thumb-drive

@@ -10,6 +10,7 @@ from hardware_testing.opentrons_api.types import OT3AxisKind
 from hardware_testing.gravimetric import config
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
 from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from .definition import LiquidClassSettings
 from .defaults import get_liquid_class
@@ -172,6 +173,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     added_blow_out: bool = True,
     touch_tip: bool = False,
     mode: str = "",
+    clear_accuracy_function: bool = False,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     # FIXME: stop using hwapi, and get those functions into core software
@@ -242,6 +244,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
             hw_api.set_liquid_class(hw_mount, mode)
         else:
             hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
+        if clear_accuracy_function:
+            clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
         hw_api.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
@@ -349,6 +353,7 @@ def mix_with_liquid_class(
     blank: bool = False,
     touch_tip: bool = False,
     mode: str = "",
+    clear_accuracy_function: bool = False,
 ) -> None:
     """Mix with liquid class."""
     liquid_class = get_liquid_class(
@@ -367,6 +372,7 @@ def mix_with_liquid_class(
         blank=blank,
         touch_tip=touch_tip,
         mode=mode,
+        clear_accuracy_function=clear_accuracy_function,
     )
 
 
@@ -383,6 +389,7 @@ def aspirate_with_liquid_class(
     blank: bool = False,
     touch_tip: bool = False,
     mode: str = "",
+    clear_accuracy_function: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
     pip_size = 50 if "50" in pipette.name else 1000
@@ -402,6 +409,7 @@ def aspirate_with_liquid_class(
         blank=blank,
         touch_tip=touch_tip,
         mode=mode,
+        clear_accuracy_function=clear_accuracy_function,
     )
 
 
@@ -419,6 +427,7 @@ def dispense_with_liquid_class(
     added_blow_out: bool = True,
     touch_tip: bool = False,
     mode: str = "",
+    clear_accuracy_function: bool = False,
 ) -> None:
     """Dispense with liquid class."""
     pip_size = 50 if "50" in pipette.name else 1000
@@ -439,4 +448,5 @@ def dispense_with_liquid_class(
         added_blow_out=added_blow_out,
         touch_tip=touch_tip,
         mode=mode,
+        clear_accuracy_function=clear_accuracy_function,
     )
