@@ -42,11 +42,16 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   let renderedImg: JSX.Element
   if (!errorMessage)
     renderedImg = (
-      <img alt={IMAGE_ALT} src={successIcon} height="50%" width="50%" />
+      <img alt={IMAGE_ALT} src={successIcon} height="208px" width="250px" />
     )
   else
     renderedImg = (
-      <Icon name="alert-circle" size="25%" color={COLORS.errorEnabled} />
+      <Icon
+        name="alert-circle"
+        height="40px"
+        color={COLORS.errorEnabled}
+        margin={SPACING.spacing24}
+      />
     )
 
   return (
@@ -104,6 +109,7 @@ function RobotUpdateProgressFooter({
           onClick={installUpdate}
           marginRight={SPACING.spacing8}
           css={FOOTER_BUTTON_STYLE}
+          border="none"
         >
           {t('try_again')}
         </NewSecondaryBtn>
@@ -207,7 +213,6 @@ export function RobotUpdateProgressModal({
     <LegacyModal
       title={`${t('updating')} ${robotName}`}
       width="40rem"
-      height="18.4rem"
       onClose={completedUpdating ? completeRobotUpdateHandler : undefined}
       footer={
         completedUpdating ? (
@@ -219,26 +224,26 @@ export function RobotUpdateProgressModal({
         ) : null
       }
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        padding={SPACING.spacing48}
-      >
-        {completedUpdating ? (
+      {completedUpdating ? (
+        <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
           <SuccessOrError errorMessage={error} />
-        ) : (
-          <>
-            <StyledText>{modalBodyText}</StyledText>
-            <ProgressBar
-              percentComplete={progressPercent.current}
-              outerStyles={UPDATE_PROGRESS_BAR_STYLE}
-            />
-            <StyledText css={dontTurnOffMessage}>
-              {t('do_not_turn_off')}
-            </StyledText>
-          </>
-        )}
-      </Flex>
+        </Flex>
+      ) : (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          alignItems={ALIGN_CENTER}
+          padding={SPACING.spacing48}
+        >
+          <StyledText>{modalBodyText}</StyledText>
+          <ProgressBar
+            percentComplete={progressPercent.current}
+            outerStyles={UPDATE_PROGRESS_BAR_STYLE}
+          />
+          <StyledText css={dontTurnOffMessage}>
+            {t('do_not_turn_off')}
+          </StyledText>
+        </Flex>
+      )}
     </LegacyModal>
   )
 }
