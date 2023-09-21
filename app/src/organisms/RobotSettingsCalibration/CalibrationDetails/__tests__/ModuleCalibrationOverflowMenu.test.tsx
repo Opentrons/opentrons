@@ -240,12 +240,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
       expect(mockChainLiveCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'thermocycler/closeLid',
-            params: {
-              moduleId: mockTCHeating.id,
-            },
-          },
-          {
             commandType: 'thermocycler/deactivateLid',
             params: {
               moduleId: mockTCHeating.id,
