@@ -7,7 +7,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { INCONSISTENT_PIPETTE_OFFSET } from '@opentrons/api-client'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
@@ -16,10 +15,10 @@ import {
   useIsOT3,
   usePipetteOffsetCalibrations,
 } from '../Devices/hooks'
+import { getShowPipetteCalibrationWarning } from '../Devices/utils'
 import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
-import type { PipetteData } from '@opentrons/api-client'
 import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsPipetteOffsetCalibrationProps {
@@ -55,16 +54,6 @@ export function RobotSettingsPipetteOffsetCalibration({
       ot3AttachedRightPipetteOffsetCal != null)
   )
     showPipetteOffsetCalItems = true
-  const pipetteCalibrationWarning =
-    instrumentsData?.data.some((i): i is PipetteData => {
-      const failuresList =
-        i.ok && i.data.calibratedOffset?.reasonability_check_failures != null
-          ? i.data.calibratedOffset?.reasonability_check_failures
-          : []
-      if (failuresList.length > 0) {
-        return failuresList[0]?.kind === INCONSISTENT_PIPETTE_OFFSET
-      } else return false
-    }) ?? false
 
   return (
     <Flex
@@ -80,7 +69,9 @@ export function RobotSettingsPipetteOffsetCalibration({
       {isOT3 ? (
         <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
       ) : null}
-      {pipetteCalibrationWarning && <PipetteRecalibrationWarning />}
+      {getShowPipetteCalibrationWarning(instrumentsData) && (
+        <PipetteRecalibrationWarning />
+      )}
       {showPipetteOffsetCalItems ? (
         <PipetteOffsetCalibrationItems
           robotName={robotName}
