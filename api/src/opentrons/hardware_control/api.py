@@ -763,7 +763,7 @@ class API(
             if fail_on_not_homed:
                 raise PositionUnknownError(
                     message="Cannot make a relative move because absolute position"
-                            " is unknown.",
+                    " is unknown.",
                     detail={
                         "mount": str(mount),
                         "fail_on_not_homed": fail_on_not_homed,

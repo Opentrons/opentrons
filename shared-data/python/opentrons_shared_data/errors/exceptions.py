@@ -686,15 +686,12 @@ class PipetteOverpressureError(RoboticsInteractionError):
 
     def __init__(
         self,
-        mount: str,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an PipetteOverpressureError."""
-        msg = (
-            f"The pressure sensor on the {mount} mount has exceeded operational limits."
-        )
-        super().__init__(ErrorCodes.PIPETTE_OVERPRESSURE, msg, detail, wrapping)
+        super().__init__(ErrorCodes.PIPETTE_OVERPRESSURE, message, detail, wrapping)
 
 
 class EStopActivatedError(RoboticsInteractionError):

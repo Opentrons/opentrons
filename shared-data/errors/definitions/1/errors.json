@@ -106,7 +106,7 @@
       "detail": "Unmatched tip presence states",
       "category": "roboticsControlError"
     },
-    "2013": {  
+    "2013": {
       "detail": "Position Unknown",
       "category": "roboticsControlError"
     },

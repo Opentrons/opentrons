@@ -1095,6 +1095,7 @@ class OT3Controller:
 
     @asynccontextmanager
     async def _monitor_overpressure(self, mounts: List[NodeId]) -> AsyncIterator[None]:
+        msg = "The pressure sensor on the {} mount has exceeded operational limits."
         if ff.overpressure_detection_enabled() and mounts:
             tools_with_id = map_pipette_type_to_sensor_id(
                 mounts, self._subsystem_manager.device_info
@@ -1120,7 +1121,10 @@ class OT3Controller:
                     q_msg = _pop_queue()
                     if q_msg:
                         mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
-                        raise PipetteOverpressureError(str(mount))
+                        raise PipetteOverpressureError(
+                            message=msg.format(str(mount)),
+                            detail={"mount": mount},
+                        )
         else:
             yield
 
