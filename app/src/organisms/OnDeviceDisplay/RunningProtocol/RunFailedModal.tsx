@@ -99,7 +99,13 @@ export function RunFailedModal({
               </StyledText>
             </Flex>
           </Flex>
-          <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <StyledText
+            as="p"
+            textAlign={TYPOGRAPHY.textAlignLeft}
+            css={css`
+              word-break: break-word;
+            `}
+          >
             {t('contact_information')}
           </StyledText>
         </Flex>
