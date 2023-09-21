@@ -1,4 +1,3 @@
-import * as warningCreators from '../warningCreators'
 import type { MoveLabwareParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 

@@ -9,13 +9,13 @@ import {
   PipetteName,
   getPipetteNameSpecs,
   FLEX_ROBOT_TYPE,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,
   ModulesForEditModulesCard,
 } from '../../step-forms'
-import { WASTE_CHUTE_SLOT } from '../../constants'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { getEnableDeckModification } from '../../feature-flags/selectors'

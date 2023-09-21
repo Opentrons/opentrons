@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import {
   OutlineButton,
   Flex,
@@ -12,7 +11,7 @@ import {
   SPACING,
   SlotMap,
 } from '@opentrons/components'
-import { WASTE_CHUTE_SLOT } from '../../constants'
+import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
 import styles from './styles.css'
 
@@ -26,7 +25,6 @@ export function AdditionalItemsRow(
   props: AdditionalItemsRowProps
 ): JSX.Element {
   const { handleAttachment, isEquipmentAdded, name } = props
-  const { i18n, t } = useTranslation()
 
   return (
     <Flex
@@ -81,9 +79,7 @@ export function AdditionalItemsRow(
           className={styles.module_button}
           onClick={handleAttachment}
         >
-          {isEquipmentAdded
-            ? i18n.format(t('shared.remove'), 'capitalize')
-            : i18n.format(t('shared.add'), 'capitalize')}
+          {isEquipmentAdded ? i18n.t('shared.remove') : i18n.t('shared.add')}
         </OutlineButton>
       </div>
     </Flex>

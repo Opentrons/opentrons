@@ -156,5 +156,3 @@ export const DND_TYPES = {
 // Values for TC fields
 export const THERMOCYCLER_STATE: 'thermocyclerState' = 'thermocyclerState'
 export const THERMOCYCLER_PROFILE: 'thermocyclerProfile' = 'thermocyclerProfile'
-
-export const WASTE_CHUTE_SLOT: 'D3' = 'D3'

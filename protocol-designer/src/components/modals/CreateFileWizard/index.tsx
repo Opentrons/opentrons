@@ -26,6 +26,7 @@ import {
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
   TEMPERATURE_MODULE_V2,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   actions as stepFormActions,
@@ -33,10 +34,7 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  WASTE_CHUTE_SLOT,
-} from '../../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
