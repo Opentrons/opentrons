@@ -353,17 +353,6 @@ jobs:
       - name: 'deploy internal-release release builds to s3'
         run: |
           aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
-      - name: 'update internal-releases releases.json'
-        if: needs.determine-build-type.outputs.type == 'release'
-        run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
-          node ./scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
-
-      - name: 'update release releases.json'
-        if: needs.determine-build-type.outputs.type == 'release'
-        run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
-          node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
 
       - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
@@ -429,3 +418,15 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}
+
+      - name: 'update internal-releases releases.json'
+        if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+        run: |
+          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
+          node ./scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
+
+      - name: 'update release releases.json'
+        if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
+        run: |
+          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
+          node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
