@@ -183,11 +183,11 @@ export function InstrumentsAndModules({
           </Flex>
         )}
         {getShowPipetteCalibrationWarning(attachedInstruments) &&
-          (currentRunId == null || isRunTerminal) ? (
-            <Flex paddingBottom={SPACING.spacing16}>
-              <PipetteRecalibrationWarning />
-            </Flex>
-          ): null}
+        (currentRunId == null || isRunTerminal) ? (
+          <Flex paddingBottom={SPACING.spacing16}>
+            <PipetteRecalibrationWarning />
+          </Flex>
+        ) : null}
         {isRobotViewable ? (
           <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
