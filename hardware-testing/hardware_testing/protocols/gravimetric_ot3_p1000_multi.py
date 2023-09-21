@@ -1,7 +1,7 @@
 """Gravimetric OT3 P1000."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"protocolName": "gravimetric-ot3-p1000-multi"}
+metadata = {"protocolName": "gravimetric-ot3-p1000-multi-reservoir"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
@@ -10,7 +10,7 @@ SLOTS_TIPRACK = {
     200: [10, 5],
     1000: [3, 9],
 }
-LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
+LABWARE_ON_SCALE = "usascientific_12_reservoir_22ml"
 
 
 def run(ctx: ProtocolContext) -> None:
