@@ -8,7 +8,7 @@ const versionFinder = require('./git-version')
 
 const parseArgs = require('./deploy/lib/parseArgs')
 const USAGE =
-  '\nUsage:\n node ./scripts/update-releases-json <releases-json-path> <project> <artifact-dir>'
+  '\nUsage:\n node ./scripts/update-releases-json <releases-json-path> <project> <artifact-dir> <url-base>'
 
 async function readOrDefaultReleases(releasesPath) {
   try {
@@ -29,21 +29,21 @@ const FILES_IN_RELEASE_JSON = [
   /beta.*yml$/,
 ]
 
-function artifactNameToObj(artifactName) {
+function artifactNameToObj(artifactName, urlBase) {
   if (artifactName.search(/Opentrons.*\.exe$/) !== -1) {
-    return { 'Opentrons.exe': artifactName }
+    return { 'Opentrons.exe': urlBase + artifactName }
   } else if (artifactName.search(/Opentrons.*\.dmg$/) !== -1) {
-    return { 'Opentrons.dmg': artifactName }
+    return { 'Opentrons.dmg': urlBase + artifactName }
   } else if (artifactName.search(/Opentrons.*\.AppImage$/) !== -1) {
-    return { 'Opentrons.AppImage': artifactName }
+    return { 'Opentrons.AppImage': urlBase + artifactName }
   } else if (artifactName.search(/(latest|alpha|beta).*yml$/) !== -1) {
-    return { [artifactName]: artifactName }
+    return { [artifactName]: urlBase + artifactName }
   } else {
     throw new Error(`Unmatched artifact ${artifactName}`)
   }
 }
 
-async function artifactsFromDir(artifactDirPath) {
+async function artifactsFromDir(artifactDirPath, urlBase) {
   const files = await fs.readdir(artifactDirPath, { withFileTypes: true })
   return files
     .filter(
@@ -51,23 +51,25 @@ async function artifactsFromDir(artifactDirPath) {
         dirent.isFile() &&
         FILES_IN_RELEASE_JSON.some(re => dirent.name.search(re) !== -1)
     )
-    .map(dirent => artifactNameToObj(dirent.name))
+    .map(dirent => artifactNameToObj(dirent.name, urlBase))
     .reduce((prev, current) => ({ ...prev, ...current }))
 }
 
 async function main() {
   const { args } = parseArgs(process.argv.slice(2))
-  const [releasesPath, project, artifactDirPath] = args
-  if (!releasesPath || !project || !artifactDirPath) {
+  const [releasesPath, project, artifactDirPath, urlBase] = args
+  if (!releasesPath || !project || !artifactDirPath || !urlBase) {
     throw new Error(USAGE)
   }
   const releasesData = await readOrDefaultReleases(releasesPath)
   const version = await versionFinder.versionForProject(project)
   releasesData.production[version] = {
-    ...(await artifactsFromDir(artifactDirPath)),
+    ...(await artifactsFromDir(
+      artifactDirPath,
+      urlBase.endsWith('/') ? urlBase : `${urlBase}/`
+    )),
     revoked: false,
   }
-
   ;(await fs.open(releasesPath, 'w')).writeFile(JSON.stringify(releasesData))
 }
 
@@ -77,7 +79,7 @@ if (require.main === module) {
       console.log('release file updated')
     })
     .catch(error => {
-      console.error('Release file update failed:', error)
+      console.error('Release file update failed:', error.message)
       process.exitCode = -1
     })
 }
