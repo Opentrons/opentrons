@@ -44,7 +44,6 @@ function mapStateToProps(state: BaseState): SP {
       ),
       dismissId: warning.type,
     }))
-
   const _stepId = getSelectedStepId(state)
 
   return {

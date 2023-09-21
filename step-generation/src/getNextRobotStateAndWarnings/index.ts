@@ -90,10 +90,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'moveLabware':
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
-      console.log(
-        'robotStateAndWarnings',
-        robotStateAndWarnings.warnings.length
-      )
       break
 
     case 'touchTip':

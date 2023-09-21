@@ -41,7 +41,6 @@ export const reduceCommandCreators = (
         invariantContext,
         prev.robotState
       )
-      console.log('updates', updates.warnings.length)
       return {
         ...prev,
         robotState: updates.robotState,
