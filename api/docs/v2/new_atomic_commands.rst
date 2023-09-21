@@ -11,7 +11,7 @@ Building Block Commands
     basic_commands/liquids
     basic_commands/utilities
 
-Building block commands execute some of the most basic actions that your robot can complete. But basic doesn’t mean these commands lack capabilities. They perform important tasks in your protocols. They're also foundational to the :ref:`complex commands <v2-complex-commands>` that help you write and run longer, more intricate procedures.
+Building block commands execute some of the most basic actions that your robot can complete. But basic doesn’t mean these commands lack capabilities. They perform important tasks in your protocols. They're also foundational to the :ref:`complex commands <v2-complex-commands>` that help you combine multiple actions into fewer lines of code.
 
 Pages in this section of the documentation cover:
 
