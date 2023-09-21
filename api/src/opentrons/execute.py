@@ -41,6 +41,7 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
+from opentrons.protocol_engine import command_monitor as pe_command_monitor
 from opentrons.protocol_engine.types import PostRunHardwareState
 
 from opentrons.protocols import parse
@@ -59,6 +60,7 @@ from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
 
 from opentrons.protocol_engine import (
+    Command as ProtocolEngineCommand,
     Config,
     DeckType,
     EngineStatus,
@@ -407,13 +409,6 @@ def execute(  # noqa: C901
     else:
         # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
         # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
-        if emit_runlog:
-            raise NotImplementedError(
-                f"Printing the run log is not currently supported for Python protocols"
-                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-                f" Pass --no-print-runlog to opentrons_execute"
-                f" or emit_runlog=None to opentrons.execute.execute()."
-            )
         if custom_data_paths:
             raise NotImplementedError(
                 f"The custom_data_paths argument is not currently supported for Python protocols"
@@ -425,9 +420,11 @@ def execute(  # noqa: C901
             protocol_name=protocol_name,
             extra_labware=extra_labware,
             hardware_api=_get_global_hardware_controller(_get_robot_type()).wrapped(),
+            emit_runlog=emit_runlog,
         )
 
 
+# TODO: This is printing an ever-deepening tree of commands. We need to emit $=after entries.
 def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
     level = 0
     last_dollar = None
@@ -642,8 +639,13 @@ def _run_file_pe(
     protocol_name: str,
     extra_labware: Dict[str, FoundLabware],
     hardware_api: HardwareControlAPI,
+    emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
     """Run a protocol file with Protocol Engine."""
+
+    def send_command_to_emit_runlog(event: pe_command_monitor.Event) -> None:
+        if emit_runlog is not None:
+            emit_runlog(_adapt_command(event))
 
     async def run(protocol_source: ProtocolSource) -> None:
         protocol_engine = await create_protocol_engine(
@@ -657,9 +659,12 @@ def _run_file_pe(
             hardware_api=hardware_api,
         )
 
-        # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
-        # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-        result = await protocol_runner.run(protocol_source)
+        with pe_command_monitor.monitor_commands(
+            protocol_engine, callback=send_command_to_emit_runlog
+        ):
+            # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
+            # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
+            result = await protocol_runner.run(protocol_source)
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
             raise _ProtocolEngineExecuteError(result.state_summary.errors)
@@ -730,6 +735,28 @@ def _adapt_protocol_source(
         )
 
         yield protocol_source
+
+
+def _before_or_after(
+    event: pe_command_monitor.Event,
+) -> command_types.MessageSequenceId:
+    if isinstance(event, pe_command_monitor.RunningEvent):
+        return "before"
+    elif isinstance(event, pe_command_monitor.NoLongerRunningEvent):
+        return "after"
+
+
+def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMessage:
+    before_or_after = _before_or_after(event)
+
+    message: command_types.CommentMessage = {
+        "name": "command.COMMENT",
+        "id": event.command.id,
+        "$": before_or_after,
+        "payload": {"text": event.command.json()},
+        "error": None,
+    }
+    return message
 
 
 def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:

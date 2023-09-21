@@ -1,9 +1,10 @@
 """Protocol engine state management."""
 from __future__ import annotations
+from contextlib import contextmanager
 
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Any, Callable, Dict, Generator, List, Optional, Sequence, TypeVar
 from opentrons.protocol_engine.types import ModuleOffsetVector
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
@@ -237,6 +238,13 @@ class StateStore(StateView, ActionHandler):
             is_done = predicate()
 
         return is_done
+
+    @contextmanager
+    def on_state_update(
+        self, callback: Callable[[], None]
+    ) -> Generator[None, None, None]:
+        with self._change_notifier.on_change(callback):
+            yield
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""

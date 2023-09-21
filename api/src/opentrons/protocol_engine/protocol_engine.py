@@ -1,7 +1,8 @@
 """ProtocolEngine class definition."""
 from contextlib import AsyncExitStack
+import contextlib
 from logging import getLogger
-from typing import Dict, Optional, Union
+from typing import Callable, Dict, Generator, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -202,6 +203,14 @@ class ProtocolEngine:
             self._state_store.commands.get_command_is_final,
             command_id=command_id,
         )
+
+    # TODO: Work out multithreading concerns.
+    @contextlib.contextmanager
+    def on_state_update(
+        self, callback: Callable[[], None]
+    ) -> Generator[None, None, None]:
+        with self._state_store.on_state_update(callback):
+            yield
 
     async def add_and_execute_command(
         self, request: commands.CommandCreate
