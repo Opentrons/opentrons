@@ -80,6 +80,7 @@ async def get_app(
             web.post("/server/restart", control.restart),
             web.get("/server/ssh_keys", ssh_key_management.list_keys),
             web.post("/server/ssh_keys", ssh_key_management.add),
+            web.post("/server/ssh_keys/from_local", ssh_key_management.add_from_local),
             web.delete("/server/ssh_keys", ssh_key_management.clear),
             web.delete("/server/ssh_keys/{key_md5}", ssh_key_management.remove),
             web.post("/server/name", name_management.set_name_endpoint),

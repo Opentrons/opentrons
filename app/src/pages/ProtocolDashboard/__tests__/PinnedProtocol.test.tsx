@@ -39,6 +39,7 @@ const props = {
   protocol: mockProtocol,
   longPress: jest.fn(),
   setShowDeleteConfirmationModal: jest.fn(),
+  setTargetProtocolId: jest.fn(),
 }
 
 const render = () => {

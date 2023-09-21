@@ -19,12 +19,13 @@ describe('UpdateInProgressModal', () => {
   beforeEach(() => {
     props = {
       percentComplete: 12,
+      subsystem: 'pipette_right',
     }
     mockProgressBar.mockReturnValue('12' as any)
   })
   it('renders test and progress bar', () => {
     const { getByText } = render(props)
-    getByText('Updating firmware...')
+    getByText('Updating pipette firmware...')
     getByText('12')
   })
 })

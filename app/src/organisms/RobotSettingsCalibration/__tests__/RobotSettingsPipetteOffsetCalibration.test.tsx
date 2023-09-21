@@ -94,7 +94,7 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     const [{ getByText }] = render()
     getByText('Pipette Calibrations')
     getByText(
-      `Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut divots on deck slots.`
+      `Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut squares on deck slots.`
     )
     getByText('PipetteOffsetCalibrationItems')
   })

@@ -22,7 +22,7 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
      */
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
-      theme={'hg-theme-default oddTheme1'}
+      theme={'hg-theme-default oddTheme1 numpad'}
       onChange={onChange}
       layoutName="default"
       display={customDisplay}

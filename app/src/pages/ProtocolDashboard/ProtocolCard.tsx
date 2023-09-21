@@ -39,7 +39,7 @@ export function ProtocolCard(props: {
   protocol: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
-  setTargetProtocol: (targetProtocol: ProtocolResource) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
   lastRun?: string
 }): JSX.Element {
   const {
@@ -47,7 +47,7 @@ export function ProtocolCard(props: {
     lastRun,
     longPress,
     setShowDeleteConfirmationModal,
-    setTargetProtocol,
+    setTargetProtocolId,
   } = props
   const history = useHistory()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
@@ -90,9 +90,9 @@ export function ProtocolCard(props: {
   React.useEffect(() => {
     if (longpress.isLongPressed) {
       longPress(true)
-      setTargetProtocol(protocol)
+      setTargetProtocolId(protocol.id)
     }
-  }, [longpress.isLongPressed, longPress])
+  }, [longpress.isLongPressed, longPress, protocol.id, setTargetProtocolId])
 
   const failedAnalysisHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
@@ -199,6 +199,7 @@ export function ProtocolCard(props: {
           <LongPressModal
             longpress={longpress}
             protocolId={protocol.id}
+            setTargetProtocolId={setTargetProtocolId}
             setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
           />
         )}

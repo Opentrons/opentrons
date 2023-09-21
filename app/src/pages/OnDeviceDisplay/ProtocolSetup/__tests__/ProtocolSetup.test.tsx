@@ -9,6 +9,7 @@ import {
   useInstrumentsQuery,
   useRunQuery,
   useProtocolQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
@@ -35,6 +36,7 @@ import {
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
+import { OpenDoorAlertModal } from '../../../../organisms/OpenDoorAlertModal'
 import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -70,6 +72,7 @@ jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/config')
 jest.mock('../ConfirmAttachedModal')
+jest.mock('../../../../organisms/OpenDoorAlertModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -125,6 +128,12 @@ const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.Mock
 >
 const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
   typeof ConfirmAttachedModal
+>
+const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
+  typeof useDoorQuery
+>
+const mockOpenDoorAlertModal = OpenDoorAlertModal as jest.MockedFunction<
+  typeof OpenDoorAlertModal
 >
 
 const render = (path = '/') => {
@@ -183,6 +192,13 @@ const mockOffset = {
   definitionUri: 'fake_def_uri',
   location: { slotName: 'A1' },
   vector: { x: 1, y: 2, z: 3 },
+}
+
+const mockDoorStatus = {
+  data: {
+    status: 'closed',
+    doorRequiredClosedForProtocol: true,
+  },
 }
 
 describe('ProtocolSetup', () => {
@@ -263,6 +279,8 @@ describe('ProtocolSetup', () => {
     mockConfirmAttachedModal.mockReturnValue(
       <div>mock ConfirmAttachedModal</div>
     )
+    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
+    mockOpenDoorAlertModal.mockReturnValue(<div>mock OpenDoorAlertModal</div>)
   })
 
   afterEach(() => {
@@ -352,5 +370,17 @@ describe('ProtocolSetup', () => {
     mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
     const [{ getAllByTestId }] = render(`/runs/${RUN_ID}/setup/`)
     expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+  })
+
+  it('should render open door alert modal when door is open', () => {
+    const mockOpenDoorStatus = {
+      data: {
+        status: 'open',
+        doorRequiredClosedForProtocol: true,
+      },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('mock OpenDoorAlertModal')
   })
 })

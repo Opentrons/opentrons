@@ -182,7 +182,7 @@ describe('SetupLabwareList', () => {
     })
 
     getAllByText('mock labware list item')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Location')
     getByText('Placement')
   })

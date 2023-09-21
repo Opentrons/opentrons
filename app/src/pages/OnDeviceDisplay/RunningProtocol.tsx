@@ -21,7 +21,10 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+} from '@opentrons/api-client'
 
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -44,6 +47,7 @@ import {
 import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
+import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -147,6 +151,9 @@ export function RunningProtocol(): JSX.Element {
 
   return (
     <>
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+        <OpenDoorAlertModal />
+      ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}

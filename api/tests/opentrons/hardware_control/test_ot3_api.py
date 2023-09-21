@@ -74,6 +74,7 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
 )
+from opentrons_shared_data.errors.exceptions import CommandParameterLimitViolated
 from opentrons.hardware_control.modules import (
     Thermocycler,
     TempDeck,
@@ -272,6 +273,16 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
         ),
     ) as mock_refresh:
         yield mock_refresh
+
+
+@pytest.fixture
+async def mock_reset(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "reset",
+        AsyncMock(),
+    ) as mock_reset:
+        yield mock_reset
 
 
 @pytest.fixture
@@ -549,7 +560,7 @@ async def test_blow_out_error(
         assume(blowout_volume > max_input_vol)
 
         # check that blowout does not allow input values that would blow out too far
-        with pytest.raises(ValueError):
+        with pytest.raises(CommandParameterLimitViolated):
             await ot3_hardware.blow_out(mount, blowout_volume)
 
 
@@ -1744,3 +1755,29 @@ async def test_estop_event_deactivate_module(
         )
     else:
         assert len(futures) == 0
+
+
+@pytest.mark.parametrize(
+    "jaw_state",
+    [
+        GripperJawState.UNHOMED,
+        GripperJawState.HOMED_READY,
+        GripperJawState.GRIPPING,
+        GripperJawState.HOLDING,
+    ],
+)
+async def test_stop_only_home_necessary_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_home: AsyncMock,
+    mock_reset: AsyncMock,
+    jaw_state: GripperJawState,
+):
+    gripper_config = gc.load(GripperModel.v1)
+    instr_data = AttachedGripper(config=gripper_config, id="test")
+    await ot3_hardware.cache_gripper(instr_data)
+    ot3_hardware._gripper_handler.get_gripper().current_jaw_displacement = 0
+    ot3_hardware._gripper_handler.get_gripper().state = jaw_state
+
+    await ot3_hardware.stop(home_after=True)
+    if jaw_state == GripperJawState.GRIPPING:
+        mock_home.assert_called_once_with(skip=[Axis.G])

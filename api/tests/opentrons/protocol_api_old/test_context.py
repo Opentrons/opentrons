@@ -447,7 +447,7 @@ def test_instrument_trash_ot3(ctx, get_labware_def):
     ctx.home()
 
     mount = Mount.LEFT
-    instr = ctx.load_instrument("p1000_single_gen3", mount)
+    instr = ctx.load_instrument("flex_1channel_1000", mount)
 
     assert instr.trash_container.name == "opentrons_1_trash_3200ml_fixed"
 

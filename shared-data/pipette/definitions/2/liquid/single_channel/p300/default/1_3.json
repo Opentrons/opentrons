@@ -40,7 +40,6 @@
           "2": [[302.3895337, 0, 18.83156277]]
         }
       },
-      "defaultBlowoutVolume": 58.905,
       "defaultPushOutVolume": 0
     },
     "t300": {
@@ -82,7 +81,6 @@
           "2": [[302.3895337, 0, 18.83156277]]
         }
       },
-      "defaultBlowoutVolume": 58.905,
       "defaultPushOutVolume": 0
     }
   },

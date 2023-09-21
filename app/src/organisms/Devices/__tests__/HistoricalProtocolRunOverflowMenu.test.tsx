@@ -148,7 +148,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       name: 'View protocol run record',
     })
     const rerunBtn = getByRole('button', { name: 'Rerun protocol now' })
-    getByRole('button', { name: 'Download run log' })
+    getByRole('button', { name: 'Download protocol run log' })
     const deleteBtn = getByRole('button', {
       name: 'Delete protocol run record',
     })

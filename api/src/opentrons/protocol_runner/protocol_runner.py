@@ -155,6 +155,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         self._task_queue.set_run_func(
@@ -248,6 +249,7 @@ class JsonRunner(AbstractRunner):
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         for command in commands:

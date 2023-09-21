@@ -29,6 +29,7 @@ import {
   useProtocolQuery,
   useRunQuery,
   useInstrumentsQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
@@ -72,10 +73,12 @@ import {
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
+import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
-import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
+const FETCH_DOOR_STATUS_MS = 5000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -174,13 +177,15 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon
-          marginLeft={SPACING.spacing8}
-          name="more"
-          size="3rem"
-          // Required to prevent inconsistent component height.
-          style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
-        />
+        {disabled ? null : (
+          <Icon
+            marginLeft={SPACING.spacing8}
+            name="more"
+            size="3rem"
+            // Required to prevent inconsistent component height.
+            style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
+          />
+        )}
       </Flex>
     </Btn>
   )
@@ -313,7 +318,7 @@ function PrepareToRun({
   confirmAttachment,
   play,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
 
@@ -480,8 +485,16 @@ function PrepareToRun({
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
+  const { data: doorStatus } = useDoorQuery({
+    refetchInterval: FETCH_DOOR_STATUS_MS,
+  })
+  const isDoorOpen =
+    doorStatus?.data.status === 'open' &&
+    doorStatus?.data.doorRequiredClosedForProtocol
+
   return (
     <>
+      {isReadyToRun && isDoorOpen ? <OpenDoorAlertModal /> : null}
       {/* Empty box to detect scrolling */}
       <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}
@@ -493,7 +506,7 @@ function PrepareToRun({
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
-        overflowY="hidden"
+        overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -529,7 +542,7 @@ function PrepareToRun({
               }
             />
             <PlayButton
-              disabled={isLoading}
+              disabled={isLoading || isDoorOpen}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
             />

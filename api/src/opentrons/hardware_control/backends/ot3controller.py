@@ -45,6 +45,7 @@ from .ot3utils import (
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
     moving_axes_in_move_group,
+    gripper_jaw_state_from_fw,
 )
 
 try:
@@ -127,6 +128,7 @@ from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
     EstopState,
+    GripperJawState,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -151,6 +153,9 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
     set_deck_light,
     get_deck_light_state,
+)
+from opentrons_hardware.hardware_control.gripper_settings import (
+    get_gripper_jaw_state,
 )
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
@@ -732,6 +737,10 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
+    async def get_jaw_state(self) -> GripperJawState:
+        res = await get_gripper_jaw_state(self._messenger)
+        return gripper_jaw_state_from_fw(res)
+
     @staticmethod
     def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
         lookup_name = {
@@ -1085,9 +1094,8 @@ class OT3Controller:
                     q_msg = _pop_queue()
                     if q_msg:
                         mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
-                        raise OverPressureDetected(
-                            f"The pressure sensor on the {mount} mount has exceeded operational limits."
-                        )
+                        raise OverPressureDetected(mount.name)
+
         else:
             yield
 
