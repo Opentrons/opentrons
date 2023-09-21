@@ -8,19 +8,8 @@ export function forMoveLabware(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { labwareId, newLocation } = params
-  const { robotState, warnings } = robotStateAndWarnings
-  console.log('warnings before', warnings.length)
-  warnings.push(warningCreators.moveNonemptyLabwareToWasteChute())
-  console.log('warnings after', warnings.length)
-  const { liquidState, tipState } = robotState
-  const test = liquidState.labware[labwareId]
-  const tiprackHasTip =
-    tipState.tipracks[labwareId] != null
-      ? Object.values(tipState.tipracks[labwareId]).some(
-          value => value === true
-        )
-      : false
-  console.log('tiprackHasTip', tiprackHasTip)
+  const { robotState } = robotStateAndWarnings
+
   let newLocationString = ''
   if (newLocation === 'offDeck') {
     newLocationString = newLocation
@@ -31,8 +20,6 @@ export function forMoveLabware(
   } else if ('labwareId' in newLocation) {
     newLocationString = newLocation.labwareId
   }
-  console.log(newLocationString)
-  console.log(tiprackHasTip && newLocationString === 'D3')
 
   robotState.labware[labwareId].slot = newLocationString
 }

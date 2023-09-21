@@ -5,12 +5,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
+import * as warningCreators from '../../warningCreators'
 import { uuid } from '../../utils'
 import type {
   CommandCreator,
   CommandCreatorError,
   MoveLabwareArgs,
 } from '../../types'
+import { CommandCreatorWarning } from '../..'
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   args,
@@ -18,8 +20,18 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   prevRobotState
 ) => {
   const { labware, useGripper, newLocation } = args
+  const { tipState } = prevRobotState
+
+  const { additionalEquipmentEntities } = invariantContext
+
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
+  const warnings: CommandCreatorWarning[] = []
+
+  const tiprackHasTip =
+    tipState.tipracks[labware] != null
+      ? Object.values(tipState.tipracks[labware]).some(value => value === true)
+      : false
 
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
@@ -70,6 +82,14 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
   }
+  if (
+    tiprackHasTip &&
+    newLocation !== 'offDeck' &&
+    'labwareId' in newLocation &&
+    newLocation.labwareId === WASTE_CHUTE_SLOT
+  ) {
+    warnings.push(warningCreators.tiprackInWasteChuteHasTips())
+  }
   if (destinationModuleId != null) {
     const destModuleState =
       prevRobotState.modules[destinationModuleId].moduleState
@@ -109,5 +129,6 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   ]
   return {
     commands,
+    warnings: warnings.length > 0 ? warnings : undefined,
   }
 }
