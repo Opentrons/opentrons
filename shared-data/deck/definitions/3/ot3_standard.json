@@ -105,9 +105,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "D1"}
-            ]
       },
       {
         "id": "D2",
@@ -119,9 +118,8 @@
           "zDimension": 0
         },
         "displayName": "Slot D2",
-        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":[
+        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "D2"}
-            ]
       },
       {
         "id": "D3",
@@ -138,9 +136,8 @@
           "heaterShakerModuleType",
           "magneticBlockType"
         ],
-        "allowedAs":[
+        "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "D3"}
-            ]
       },
             {
         "id": "D3",
@@ -156,9 +153,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "extensionSlot", "fixtureLocation": "D3"}
-            ]
       },
       {
         "id": "C1",
@@ -174,9 +170,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "C1"}
-            ]
       },
       {
         "id": "C2",
@@ -188,9 +183,8 @@
           "zDimension": 0
         },
         "displayName": "Slot C2",
-        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":[
+        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "C2"}
-            ]
       },
       {
         "id": "C3",
@@ -206,9 +200,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "C3"}
-            ]
       },
             {
         "id": "C3",
@@ -224,9 +217,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "extensionSlot", "fixtureLocation": "C3"}
-            ]
       },
       {
         "id": "B1",
@@ -243,9 +235,8 @@
           "thermocyclerModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "B1"}
-            ]
       },
       {
         "id": "B2",
@@ -257,9 +248,8 @@
           "zDimension": 0
         },
         "displayName": "Slot B2",
-        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":[
+        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "B2"}
-            ]
       },
       {
         "id": "B3",
@@ -275,9 +265,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "B3"}
-            ]
       },
             {
         "id": "B3",
@@ -293,9 +282,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "extensionSlot", "fixtureLocation": "B3"}
-            ]
       },
       {
         "id": "A1",
@@ -312,9 +300,8 @@
           "heaterShakerModuleType",
           "thermocyclerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "A1"}
-            ]
       },
       {
         "id": "A2",
@@ -326,9 +313,8 @@
           "zDimension": 0
         },
         "displayName": "Slot A2",
-        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":[
+        "compatibleModuleTypes": ["magneticBlockType"], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "A2"}
-            ]
       },
       {
         "id": "A3",
@@ -343,9 +329,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "standardSlot", "fixtureLocation": "A3"}
-            ]
       },
             {
         "id": "A3",
@@ -360,9 +345,8 @@
           "temperatureModuleType",
           "heaterShakerModuleType",
           "magneticBlockType"
-        ], "allowedAs":[
+        ], "allowedAs":
               {"fixtureType": "extensionSlot", "fixtureLocation": "A3"}
-            ]
       }
     ],
     "calibrationPoints": [],
