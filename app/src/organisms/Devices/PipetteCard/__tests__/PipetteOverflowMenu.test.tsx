@@ -45,6 +45,7 @@ describe('PipetteOverflowMenu', () => {
       handleAboutSlideout: jest.fn(),
       handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: false,
+      isRunActive: false,
     }
   })
   afterEach(() => {

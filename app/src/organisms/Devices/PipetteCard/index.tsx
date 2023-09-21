@@ -62,6 +62,7 @@ interface PipetteCardProps {
   pipetteIsBad: boolean
   updatePipette: () => void
   pipetteId?: AttachedPipette['id'] | null
+  isRunActive: boolean
 }
 const BANNER_LINK_STYLE = css`
   text-decoration: underline;
@@ -92,6 +93,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteIs96Channel,
     pipetteIsBad,
     updatePipette,
+    isRunActive,
   } = props
   const {
     menuOverlay,
@@ -351,6 +353,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               handleCalibrate={handleCalibrate}
               isPipetteCalibrated={isPipetteCalibrated}
               pipetteSettings={settings}
+              isRunActive={isRunActive}
             />
           </Box>
           {menuOverlay}
