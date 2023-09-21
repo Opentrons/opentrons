@@ -40,10 +40,12 @@ import { DetachPipette } from './DetachPipette'
 import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
+import { useFilterWizardStepsFrom } from '../../resources/wizards/hooks'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
+import type { PipetteWizardStep } from '../../organisms/PipetteWizardFlows/types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -64,10 +66,11 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipetteMount = mount === LEFT ? 'pipette_left' : 'pipette_right'
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
-  const pipetteWizardSteps = React.useMemo(
+  const unfilteredPipetteWizardSteps = React.useMemo(
     () =>
       memoizedPipetteInfo == null
         ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
@@ -78,6 +81,10 @@ export const PipetteWizardFlows = (
           ),
     []
   )
+  const pipetteWizardSteps = useFilterWizardStepsFrom(
+    unfilteredPipetteWizardSteps,
+    attachedPipetteMount
+  ) as PipetteWizardStep[]
   const requiredPipette = memoizedPipetteInfo?.find(
     pipette => pipette.mount === mount
   )
@@ -339,7 +346,7 @@ export const PipetteWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        subsystem={attachedPipetteMount}
         description={t('firmware_updating')}
       />
     )

@@ -32,8 +32,10 @@ import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { useFilterWizardStepsFrom } from '../../resources/wizards/hooks'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { ModuleCalibrationWizardStep } from '../../organisms/ModuleWizardFlows/types'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -61,7 +63,13 @@ export const ModuleWizardFlows = (
   const { t } = useTranslation('module_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const attachedPipetteMount =
+    attachedPipette?.mount === LEFT ? 'pipette_left' : 'pipette_right'
+
+  const moduleCalibrationSteps = useFilterWizardStepsFrom(
+    getModuleCalibrationSteps(),
+    attachedPipetteMount
+  ) as ModuleCalibrationWizardStep[]
 
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
@@ -263,9 +271,7 @@ export const ModuleWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={
-          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
-        }
+        subsystem={attachedPipetteMount}
         description={t('firmware_update')}
       />
     )
