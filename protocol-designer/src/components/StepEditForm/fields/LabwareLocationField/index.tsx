@@ -1,8 +1,10 @@
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { WASTE_CHUTE_SLOT } from '../../../../constants'
 import { i18n } from '../../../../localization'
 import {
+  getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
 } from '../../../../step-forms/selectors'
@@ -10,6 +12,7 @@ import {
   getRobotStateAtActiveItem,
   getUnocuppiedLabwareLocationOptions,
 } from '../../../../top-selectors/labware-locations'
+import { getHasWasteChute } from '../../../labware'
 import { StepFormDropdown } from '../StepFormDropdownField'
 
 export function LabwareLocationField(
@@ -17,29 +20,40 @@ export function LabwareLocationField(
     useGripper: boolean
   } & { canSave: boolean } & { labware: string }
 ): JSX.Element {
+  const { labware, useGripper, value } = props
   const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem)
   const moduleEntities = useSelector(getModuleEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
+  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
   const isLabwareOffDeck =
-    props.labware != null
-      ? robotState?.labware[props.labware]?.slot === 'offDeck'
-      : false
+    labware != null ? robotState?.labware[labware]?.slot === 'offDeck' : false
+  const displayWasteChuteValue =
+    useGripper && hasWasteChute && !isLabwareOffDeck
 
   let unoccupiedLabwareLocationsOptions =
     useSelector(getUnocuppiedLabwareLocationOptions) ?? []
 
-  if (props.useGripper || isLabwareOffDeck) {
+  if (isLabwareOffDeck && hasWasteChute) {
+    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
+      option => option.value !== 'offDeck' && option.value !== WASTE_CHUTE_SLOT
+    )
+  } else if (useGripper || isLabwareOffDeck) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== 'offDeck'
     )
+  } else if (!displayWasteChuteValue) {
+    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
+      option => option.name !== 'Waste Chute in D3'
+    )
   }
-  const location: string = props.value as string
+  const location: string = value as string
 
-  const bothFieldsSelected = props.labware != null && props.value != null
+  const bothFieldsSelected = labware != null && value != null
   const labwareDisplayName =
-    props.labware != null
-      ? labwareEntities[props.labware]?.def.metadata.displayName
-      : ''
+    labware != null ? labwareEntities[labware]?.def.metadata.displayName : ''
   let locationString = `slot ${location}`
   if (location != null) {
     if (robotState?.modules[location] != null) {

@@ -45,7 +45,7 @@ import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
-import type { WizardTileProps } from './types'
+import type { AdditionalEquipment, WizardTileProps } from './types'
 
 const getCrashableModuleSelected = (
   modules: FormModulesByType,
@@ -59,6 +59,7 @@ const getCrashableModuleSelected = (
 
   return crashableModuleOnDeck
 }
+
 export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   const {
     handleChange,
@@ -114,6 +115,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     />
   )
   const robotType = values.fields.robotType
+
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -193,32 +195,23 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     featureFlagSelectors.getEnableDeckModification
   )
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
+
+  const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
+    if (values.additionalEquipment.includes(equipment)) {
+      setFieldValue(
+        'additionalEquipment',
+        without(values.additionalEquipment, equipment)
+      )
+    } else {
+      setFieldValue('additionalEquipment', [
+        ...values.additionalEquipment,
+        equipment,
+      ])
+    }
+  }
+
   return (
     <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
-      <EquipmentOption
-        onClick={() => {
-          if (values.additionalEquipment.includes('gripper')) {
-            setFieldValue(
-              'additionalEquipment',
-              without(values.additionalEquipment, 'gripper')
-            )
-          } else {
-            setFieldValue('additionalEquipment', [
-              ...values.additionalEquipment,
-              'gripper',
-            ])
-          }
-        }}
-        isSelected={values.additionalEquipment.includes('gripper')}
-        image={
-          <AdditionalItemImage
-            src={gripperImage}
-            alt="Opentrons Flex Gripper"
-          />
-        }
-        text="Gripper"
-        showCheckbox
-      />
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         return (
@@ -245,21 +238,21 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           />
         )
       })}
+      <EquipmentOption
+        onClick={() => handleSetEquipmentOption('gripper')}
+        isSelected={values.additionalEquipment.includes('gripper')}
+        image={
+          <AdditionalItemImage
+            src={gripperImage}
+            alt="Opentrons Flex Gripper"
+          />
+        }
+        text="Gripper"
+        showCheckbox
+      />
       {enableDeckModification && isFlex ? (
         <EquipmentOption
-          onClick={() => {
-            if (values.additionalEquipment.includes('wasteChute')) {
-              setFieldValue(
-                'additionalEquipment',
-                without(values.additionalEquipment, 'wasteChute')
-              )
-            } else {
-              setFieldValue('additionalEquipment', [
-                ...values.additionalEquipment,
-                'wasteChute',
-              ])
-            }
-          }}
+          onClick={() => handleSetEquipmentOption('wasteChute')}
           isSelected={values.additionalEquipment.includes('wasteChute')}
           //  todo(jr, 9/14/23): update the asset
           image={

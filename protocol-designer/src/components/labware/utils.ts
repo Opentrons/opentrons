@@ -1,8 +1,9 @@
 import reduce from 'lodash/reduce'
-import { AIR } from '@opentrons/step-generation'
+import { AdditionalEquipmentEntities, AIR } from '@opentrons/step-generation'
 import { WellFill } from '@opentrons/components'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { ContentsByWell, WellContents } from '../../labware-ingred/types'
+import { WASTE_CHUTE_SLOT } from '../../constants'
 
 const ingredIdsToColor = (
   groupIds: string[],
@@ -33,3 +34,13 @@ export const wellFillFromWellContents = (
     },
     {}
   )
+
+export const getHasWasteChute = (
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+): boolean => {
+  return Object.values(additionalEquipmentEntities).some(
+    additionalEquipmentEntity =>
+      additionalEquipmentEntity.location === WASTE_CHUTE_SLOT &&
+      additionalEquipmentEntity.name === 'wasteChute'
+  )
+}

@@ -84,6 +84,10 @@
 
       "body4a": "To batch edit Transfer or Mix advanced settings:",
       "body4b": "Only include Transfer or Mix steps in your selection."
+    },
+    "waste_chute_warning": {
+      "title": "Disposing labware",
+      "body1": "Moving labware to the Waste Chute permanently discards it. You can't use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable."
     }
   },
   "timeline": {
