@@ -204,6 +204,7 @@ export function InstrumentsAndModules({
                 pipetteIs96Channel={is96ChannelAttached}
                 pipetteIsBad={badLeftPipette != null}
                 updatePipette={() => setSubsystemToUpdate('pipette_left')}
+                isRunActive={currentRunId != null && !isRunTerminal}
               />
               {isOT3 && (
                 <GripperCard
@@ -213,6 +214,7 @@ export function InstrumentsAndModules({
                     attachedGripper?.data?.calibratedOffset != null
                   }
                   setSubsystemToUpdate={setSubsystemToUpdate}
+                  isRunActive={currentRunId != null && !isRunTerminal}
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -252,6 +254,7 @@ export function InstrumentsAndModules({
                   pipetteIs96Channel={false}
                   pipetteIsBad={badRightPipette != null}
                   updatePipette={() => setSubsystemToUpdate('pipette_right')}
+                  isRunActive={currentRunId != null && !isRunTerminal}
                 />
               )}
               {rightColumnModules.map((module, index) => (
