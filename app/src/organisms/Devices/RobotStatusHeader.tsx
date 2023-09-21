@@ -10,6 +10,7 @@ import {
   Flex,
   Icon,
   useHoverTooltip,
+  useInterval,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -40,6 +41,8 @@ type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {
     robotModel: string | null
   }
+
+const STATUS_REFRESH_MS = 5000
 
 export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const { name, local, robotModel, ...styleProps } = props
@@ -125,10 +128,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     tooltipTranslationKey = 'device_settings:wired_usb'
   }
 
-  React.useEffect(() => {
-    dispatch(fetchStatus(name))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  useInterval(() => dispatch(fetchStatus(name)), STATUS_REFRESH_MS, true)
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
