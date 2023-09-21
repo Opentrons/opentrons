@@ -86,8 +86,8 @@
       "body4b": "Only include Transfer or Mix steps in your selection."
     },
     "waste_chute_warning": {
-      "title": "Discarding of labware in the Waste Chute",
-      "body1": "You are about to move your labware to be discarded in the Waste Chute. Note that this action is irreversible unless you delete this move labware step. "
+      "title": "Disposing labware",
+      "body1": "Moving labware to the Waste Chute permanently discards it. You can't use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable."
     }
   },
   "timeline": {

@@ -45,7 +45,7 @@ import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
-import type { AdditionalEquipment, FormState, WizardTileProps } from './types'
+import type { AdditionalEquipment, WizardTileProps } from './types'
 
 const getCrashableModuleSelected = (
   modules: FormModulesByType,
