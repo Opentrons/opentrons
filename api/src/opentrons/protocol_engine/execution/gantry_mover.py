@@ -108,7 +108,7 @@ class HardwareGantryMover(GantryMover):
                 fail_on_not_homed=fail_on_not_homed,
             )
         except PositionUnknownError as e:
-            raise MustHomeError(str(e)) from e
+            raise MustHomeError(message=str(e), wrapping=[e])
 
     def get_max_travel_z(self, pipette_id: str) -> float:
         """Get the maximum allowed z-height for pipette movement.
@@ -168,7 +168,7 @@ class HardwareGantryMover(GantryMover):
                 fail_on_not_homed=True,
             )
         except PositionUnknownError as e:
-            raise MustHomeError(str(e)) from e
+            raise MustHomeError(message=str(e), wrapping=[e])
 
         return point
 

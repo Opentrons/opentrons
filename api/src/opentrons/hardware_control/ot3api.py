@@ -890,15 +890,16 @@ class OT3API(
                 message=f"Cannot return position for {mount} if no gripper is attached",
                 detail={"mount": str(mount)},
             )
-
+        mount_axes = [Axis.X, Axis.Y, Axis.by_mount(mount)]
         if refresh:
             await self.refresh_positions()
         elif not self._current_position:
             raise PositionUnknownError(
-                message=f"Motor positions for {str(mount)} are missing; must first home motors.",
-                detail={"mount": str(mount)},
+                message=f"Motor positions for {str(mount)} mount are missing ("
+                f"{mount_axes}); must first home motors.",
+                detail={"mount": str(mount), "missing_axes": mount_axes},
             )
-        self._assert_motor_ok([Axis.X, Axis.Y, Axis.by_mount(mount)])
+        self._assert_motor_ok(mount_axes)
 
         return self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), self._current_position, critical_point

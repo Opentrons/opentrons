@@ -641,14 +641,20 @@ class API(
         plunger_ax = Axis.of_plunger(mount)
         position_axes = [Axis.X, Axis.Y, z_ax, plunger_ax]
 
-        if fail_on_not_homed and (
-            not self._backend.is_homed([ot2_axis_to_string(a) for a in position_axes])
-            or not self._current_position
-        ):
-            raise PositionUnknownError(
-                message=f"Current position of {str(mount)} pipette is unknown, please home."
-            )
-
+        if fail_on_not_homed:
+            if not self._current_position:
+                raise PositionUnknownError(
+                    message=f"Current position of {str(mount)} pipette is unknown,"
+                    " please home.",
+                    detail={"mount": str(mount), "missing_axes": position_axes},
+                )
+            axes_str = [ot2_axis_to_string(a) for a in position_axes]
+            if not self._backend.is_homed(axes_str):
+                unhomed = self._backend._unhomed_axes(axes_str)
+                raise PositionUnknownError(
+                    message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
+                    detail={"mount": str(mount), "unhomed_axes": unhomed},
+                )
         elif not self._current_position and not refresh:
             raise PositionUnknownError(
                 message="Current position is unknown; please home motors."
@@ -733,7 +739,8 @@ class API(
         The effector of the pipette mount axis are the mount critical points but only in z.
         """
         raise UnsupportedHardwareCommand(
-            message="move_axes is not supported on the OT-2."
+            message="move_axes is not supported on the OT-2.",
+            detail={"axes_commanded": list(position.keys())},
         )
 
     async def move_rel(
@@ -752,23 +759,32 @@ class API(
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
         # really want to fix it when we're not gearing up for a release.
-        mhe = PositionUnknownError(
-            message="Cannot make a relative move because absolute position is unknown"
-        )
         if not self._current_position:
             if fail_on_not_homed:
-                raise mhe
+                raise PositionUnknownError(
+                    message="Cannot make a relative move because absolute position"
+                            " is unknown.",
+                    detail={
+                        "mount": str(mount),
+                        "fail_on_not_homed": fail_on_not_homed,
+                    },
+                )
             else:
                 await self.home()
 
         target_position = target_position_from_relative(
             mount, delta, self._current_position
         )
+
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
-        if fail_on_not_homed and not self._backend.is_homed(
-            [ot2_axis_to_string(axis) for axis in axes_moving if axis is not None]
-        ):
-            raise mhe
+        axes_str = [ot2_axis_to_string(a) for a in axes_moving]
+        if fail_on_not_homed and not self._backend.is_homed(axes_str):
+            unhomed = self._backend._unhomed_axes(axes_str)
+            raise PositionUnknownError(
+                message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
+                detail={"mount": str(mount), "unhomed_axes": unhomed},
+            )
+
         await self._cache_and_maybe_retract_mount(mount)
         await self._move(
             target_position,
