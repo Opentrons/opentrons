@@ -1442,13 +1442,14 @@ class OT3API(
             checked_axes.append(Axis.Q)
             # NOTE: Z_R current is dropped very low when 96CH attached,
             #       so trying to home it would cause timeout error
-            if not axes:
-                checked_axes.remove(Axis.Z_R)
-            elif Axis.Z_R in axes:
-                raise RuntimeError(
-                    f"unable to home {Axis.Z_R.name} axis"
-                    f"with {self.gantry_load.name} gantry load"
+            if axes and Axis.Z_R in axes:
+                self._log.warning(
+                    f"unable to home {Axis.Z_R.name} axis with"
+                    f" {self.gantry_load.name} gantry load, skipping axis"
                 )
+
+            if Axis.Z_R in checked_axes:
+                checked_axes.remove(Axis.Z_R)
 
         if skip:
             checked_axes = [ax for ax in checked_axes if ax not in skip]
@@ -1501,10 +1502,13 @@ class OT3API(
         will call home if the stepper position is inaccurate.
         """
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R:
-            raise RuntimeError(
+            # NOTE: Z_R current is dropped very low when 96CH attached,
+            #       so trying to retract it would cause timeout error
+            self._log.warning(
                 f"unable to retract {Axis.Z_R.name} axis"
-                f"with {self.gantry_load.name} gantry load"
+                f"with {self.gantry_load.name} gantry load, skipping"
             )
+            return
 
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
