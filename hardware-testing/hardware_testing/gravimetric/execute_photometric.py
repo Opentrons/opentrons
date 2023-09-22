@@ -413,10 +413,8 @@ def _find_liquid_height(
         raise RuntimeError(
             f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
         )
-    input("about to retract, press ENTER:")
     resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
     if not cfg.same_tip:
-        input("about to drop-tips, press ENTER:")
         resources.pipette.drop_tip(home_after=False)  # always trash setup tips
         resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
         # NOTE: the first tip-rack should have already been replaced
