@@ -21,6 +21,7 @@ from .helpers import (
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
+    get_list_of_wells_affected,
 )
 from .trial import (
     PhotometricTrial,
@@ -196,7 +197,9 @@ def _run_trial(trial: PhotometricTrial) -> None:
     for i in range(num_dispenses):
         dest_name = _get_photo_plate_dest(trial.cfg, trial.trial)
         dest_well = trial.dest[dest_name]
-        # FIXME: if 8ch or 96ch, should also set start volumes of other wells
+        affected_wells = get_list_of_wells_affected(dest_well, trial.pipette.channels)
+        for dest_well in affected_wells:
+            trial.liquid_tracker.set_start_volume(dest_well, photoplate_preped_vol)
         trial.liquid_tracker.set_start_volume(dest_well, photoplate_preped_vol)
         trial.pipette.move_to(dest_well.top())
         ui.print_info(f"dispensing to {dest_well}")

@@ -97,13 +97,29 @@ def get_list_of_wells_affected(
     channels: int,
 ) -> List[Well]:
     """Get list of wells affected."""
-    if channels > 1 and not well_is_reservoir(well):
-        well_col = well.well_name[1:]  # the "1" in "A1"
-        wells_list = [w for w in well.parent.columns_by_name()[well_col]]
-        assert well in wells_list, "Well is not inside column"
-    else:
-        wells_list = [well]
-    return wells_list
+    labware = well.parent
+    num_rows = len(labware.rows())
+    num_cols = len(labware.columns())
+    if num_rows == 1 and num_cols == 1:
+        return [well]  # aka: 1-well reservoir
+    if channels == 1:
+        return [well]  # 1ch pipette
+    if channels == 8:
+        if num_rows == 1:
+            return [well]  # aka: 12-well reservoir
+        else:
+            assert (
+                num_rows == 8
+            ), f"8ch pipette cannot go to labware with {num_rows} rows"
+            well_col = well.well_name[1:]  # the "1" in "A1"
+            wells_list = [w for w in well.parent.columns_by_name()[well_col]]
+            assert well in wells_list, "Well is not inside column"
+            return wells_list
+    if channels == 96:
+        return labware.wells()
+    raise ValueError(
+        f"unable to find affected wells for {channels}ch pipette (well={well})"
+    )
 
 
 def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
