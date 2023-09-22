@@ -35,10 +35,6 @@ export function getModulePrepCommands(
   if (module.id != null && module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     modulePrepCommands = [
       {
-        commandType: 'thermocycler/closeLid',
-        params: { moduleId: module.id },
-      },
-      {
         commandType: 'thermocycler/deactivateLid',
         params: { moduleId: module.id },
       },
