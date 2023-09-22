@@ -11,11 +11,13 @@ type WizardStep =
   | PipetteWizardStep
   | GripperWizardStep
 
-export function useFilterWizardStepsFrom(
-  wizardSteps: WizardStep[],
+type FilteredWizardSteps<FlowStep extends WizardStep> = FlowStep[]
+
+export function useFilterWizardStepsFrom<FlowStep extends WizardStep>(
+  wizardSteps: FlowStep[],
   subsystem: Subsystem
-): WizardStep[] {
-  const filterFirmwareUpdate = (): WizardStep[] => {
+): FilteredWizardSteps<FlowStep> {
+  const filterFirmwareUpdate = (): FilteredWizardSteps<FlowStep> => {
     const updateNeeded =
       attachedInstruments?.data?.some(
         (i): i is BadGripper | BadPipette => !i.ok && i.subsystem === subsystem
@@ -24,7 +26,8 @@ export function useFilterWizardStepsFrom(
       ? wizardSteps.filter(step => step.section !== 'FIRMWARE_UPDATE')
       : wizardSteps
   }
-
   const { data: attachedInstruments } = useInstrumentsQuery()
-  return filterFirmwareUpdate()
+
+  const filteredForFirmwareUpdate = filterFirmwareUpdate()
+  return filteredForFirmwareUpdate
 }

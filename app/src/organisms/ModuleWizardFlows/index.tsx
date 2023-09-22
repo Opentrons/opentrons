@@ -23,7 +23,7 @@ import {
 } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
+import { useFilteredModuleCalibrationSteps } from './useFilteredModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
@@ -32,10 +32,8 @@ import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { useFilterWizardStepsFrom } from '../../resources/wizards/hooks'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import type { ModuleCalibrationWizardStep } from '../../organisms/ModuleWizardFlows/types'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -66,10 +64,9 @@ export const ModuleWizardFlows = (
   const attachedPipetteMount =
     attachedPipette?.mount === LEFT ? 'pipette_left' : 'pipette_right'
 
-  const moduleCalibrationSteps = useFilterWizardStepsFrom(
-    getModuleCalibrationSteps(),
+  const moduleCalibrationSteps = useFilteredModuleCalibrationSteps(
     attachedPipetteMount
-  ) as ModuleCalibrationWizardStep[]
+  )
 
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []

@@ -1,8 +1,8 @@
 import { when } from 'jest-when'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { useFilterWizardStepsFrom } from '../hooks'
-import { getModuleCalibrationSteps } from '../../../organisms/ModuleWizardFlows/getModuleCalibrationSteps'
-import { getGripperWizardSteps } from '../../../organisms/GripperWizardFlows/getGripperWizardSteps'
+import { getModuleCalibrationSteps } from '../../../organisms/ModuleWizardFlows/useFilteredModuleCalibrationSteps'
+import { getGripperWizardSteps } from '../../../organisms/GripperWizardFlows/useFilteredGripperWizardSteps'
 import { getPipetteWizardSteps } from '../../../organisms/PipetteWizardFlows/getPipetteWizardSteps'
 
 jest.mock('@opentrons/react-api-client')

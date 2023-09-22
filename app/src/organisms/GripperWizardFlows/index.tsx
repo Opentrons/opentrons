@@ -24,7 +24,7 @@ import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
 } from '../../resources/runs/hooks'
-import { getGripperWizardSteps } from './getGripperWizardSteps'
+import { useFilteredGripperWizardSteps } from './useFilteredGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { MovePin } from './MovePin'
@@ -32,7 +32,6 @@ import { MountGripper } from './MountGripper'
 import { UnmountGripper } from './UnmountGripper'
 import { Success } from './Success'
 import { ExitConfirmation } from './ExitConfirmation'
-import { useFilterWizardStepsFrom } from '../../resources/wizards/hooks'
 
 import type { GripperWizardFlowType } from './types'
 import type { AxiosError } from 'axios'
@@ -43,7 +42,6 @@ import type {
   CommandData,
 } from '@opentrons/api-client'
 import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
-import type { GripperWizardStep } from '../../organisms/GripperWizardFlows/types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -211,10 +209,7 @@ export const GripperWizard = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
-  const gripperWizardSteps = useFilterWizardStepsFrom(
-    getGripperWizardSteps(flowType),
-    'gripper'
-  ) as GripperWizardStep[]
+  const gripperWizardSteps = useFilteredGripperWizardSteps(flowType, 'gripper')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [
     frontJawOffset,

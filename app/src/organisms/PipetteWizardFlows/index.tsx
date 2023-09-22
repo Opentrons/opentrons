@@ -27,8 +27,7 @@ import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
-import { getPipetteWizardSteps } from './getPipetteWizardSteps'
-import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProtocol'
+import { useFilteredPipetteWizardSteps } from './useFilteredPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
@@ -40,12 +39,10 @@ import { DetachPipette } from './DetachPipette'
 import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
-import { useFilterWizardStepsFrom } from '../../resources/wizards/hooks'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
-import type { PipetteWizardStep } from '../../organisms/PipetteWizardFlows/types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -70,21 +67,16 @@ export const PipetteWizardFlows = (
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
-  const unfilteredPipetteWizardSteps = React.useMemo(
-    () =>
-      memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
-        : getPipetteWizardStepsForProtocol(
-            attachedPipettes,
-            memoizedPipetteInfo,
-            mount
-          ),
-    []
-  )
-  const pipetteWizardSteps = useFilterWizardStepsFrom(
-    unfilteredPipetteWizardSteps,
-    attachedPipetteMount
-  ) as PipetteWizardStep[]
+
+  const pipetteWizardSteps = useFilteredPipetteWizardSteps({
+    memoizedPipetteInfo,
+    flowType,
+    mount,
+    selectedPipette,
+    isGantryEmpty,
+    attachedPipettes,
+    subsystem: attachedPipetteMount,
+  })
   const requiredPipette = memoizedPipetteInfo?.find(
     pipette => pipette.mount === mount
   )
