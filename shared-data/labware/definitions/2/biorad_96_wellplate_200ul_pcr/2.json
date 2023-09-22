@@ -1025,5 +1025,12 @@
       "y": 0,
       "z": 15.41
     }
+  },
+  "stackingOffsetWithModule": {
+    "thermocyclerModuleV2": {
+      "x": 0,
+      "y": 0,
+      "z": 10.75
+    }
   }
 }
