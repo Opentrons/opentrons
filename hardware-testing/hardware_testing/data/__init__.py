@@ -22,7 +22,7 @@ def _build_git_description_string() -> str:
     raw_hash = _git("rev-parse", "--short", "HEAD")
     description_split = raw_description.split("-")
     description = "_".join(description_split)
-    desc_with_hash = description + "_" + raw_hash
+    desc_with_hash = description + "-" + raw_hash
     mods = _git("ls-files", "-m").replace("\n", " ")
     if not mods:
         return desc_with_hash
