@@ -560,10 +560,25 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's overlap with requested module model."""
         definition = self.get_definition(labware_id)
         stacking_overlap = definition.stackingOffsetWithModule.get(
-            str(module_model.value), OverlapOffset(x=0, y=0, z=0)
+            str(module_model.value)
         )
+        if not stacking_overlap:
+            if self._is_thermocycler_on_ot2(module_model):
+                return OverlapOffset(x=0, y=0, z=10.7)
+            else:
+                return OverlapOffset(x=0, y=0, z=0)
+
         return OverlapOffset(
             x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
+        )
+
+    def _is_thermocycler_on_ot2(self, module_model: ModuleModel) -> bool:
+        """Whether the given module is a thermocycler with the current deck being an OT2 deck."""
+        robot_model = self.get_deck_definition()["robot"]["model"]
+        return (
+            module_model
+            in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
+            and robot_model == "OT-2 Standard"
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
