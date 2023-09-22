@@ -103,7 +103,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_OPTIMIZATIONS = `
   backface-visibility: hidden;
   perspective: 1000;
-  will-change: opacity, transform3d;
+  will-change: opacity, transform;
   `
   const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
