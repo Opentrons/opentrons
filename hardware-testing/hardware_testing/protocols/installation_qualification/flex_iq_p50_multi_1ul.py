@@ -44,13 +44,13 @@ TEST_SOURCES = [
 ##############################################
 
 SUBMERGE_MM = {
-    "aspirate": 1.5,
+    "aspirate": 3.0,
     "dispense": 1.0,
 }
 RETRACT_MM = 5.0
 MIN_MM_FROM_BOTTOM = 1.0
 
-DILUENT_PUSH_OUT = 20
+DILUENT_PUSH_OUT = 15
 
 TOUCH_TIP_SPEED = 30
 TOUCH_TIP_DEPTH = -1
