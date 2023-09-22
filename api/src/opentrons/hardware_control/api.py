@@ -1050,18 +1050,22 @@ class API(
             blowout_spec.instr.ready_to_aspirate = False
 
     async def update_nozzle_configuration_for_mount(
-        self, mount: top_types.Mount, starting_nozzle: str, number_of_nozzles: int
+        self, mount: top_types.Mount, back_left_nozzle: str, front_right_nozzle: str
     ) -> None:
         """
         Update a nozzle configuration for a given pipette.
 
+        The expectation of this function is that the back_left_nozzle/front_right_nozzle are the two corners
+        of a rectangle of nozzles. A call to this function that does not follow that schema will result
+        in an error.
+
         :param mount: A robot mount that the instrument is on.
-        :param starting_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
-        :param number_of_nozzles: an integer for the total number of nozzles you wish to use.
+        :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
         :return:
         """
         await self.update_nozzle_configuration(
-            mount, starting_nozzle, number_of_nozzles
+            mount, back_left_nozzle, front_right_nozzle
         )
 
     async def pick_up_tip(
