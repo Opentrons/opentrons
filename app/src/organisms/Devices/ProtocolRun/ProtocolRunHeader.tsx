@@ -497,7 +497,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolAnalyzing ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
-    isDoorOpen
+    (isDoorOpen &&
+      runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+      runStatus != null &&
+      CANCELLABLE_STATUSES.includes(runStatus))
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
     play()
