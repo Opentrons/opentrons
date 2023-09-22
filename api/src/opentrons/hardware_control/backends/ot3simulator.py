@@ -544,6 +544,14 @@ class OT3Simulator:
         """Save the current."""
         yield
 
+    @asynccontextmanager
+    async def restore_z_r_run_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily restore the active current ONLY when homing or
+        retracting the Z_R axis while the 96-channel is attached.
+        """
+        yield
+
     @ensure_yield
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         new_mods_at_ports = [

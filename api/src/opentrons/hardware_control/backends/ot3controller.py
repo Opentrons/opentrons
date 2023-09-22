@@ -382,10 +382,13 @@ class OT3Controller:
         async for update in self._subsystem_manager.update_firmware(subsystems, force):
             yield update
 
+    def get_current_settings(
+        self, gantry_load: GantryLoad
+    ) -> OT3AxisMap[CurrentConfig]:
+        return get_current_settings(self._configuration.current_settings, gantry_load)
+
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
-        self._current_settings = get_current_settings(
-            self._configuration.current_settings, gantry_load
-        )
+        self._current_settings = self.get_current_settings(gantry_load)
         await self.set_default_currents()
 
     async def update_motor_status(self) -> None:
@@ -937,6 +940,25 @@ class OT3Controller:
         finally:
             self._current_settings = old_current_settings
             await self.set_default_currents()
+
+    @asynccontextmanager
+    async def restore_z_r_run_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily restore the active current ONLY when homing or
+        retracting the Z_R axis while the 96-channel is attached.
+        """
+        assert self._current_settings
+        high_throughput_settings = deepcopy(self._current_settings)
+        conf = self.get_current_settings(GantryLoad.LOW_THROUGHPUT)[Axis.Z_R]
+        # outside of homing and retracting, Z_R run current should
+        # be reduced to its hold current
+        await self.set_active_current({Axis.Z_R: conf.run_current})
+        try:
+            yield
+        finally:
+            await self.set_active_current(
+                {Axis.Z_R: high_throughput_settings[Axis.Z_R].run_current}
+            )
 
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
