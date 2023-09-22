@@ -22,7 +22,7 @@ export function getAllWellsFromPrimaryWells(
   labwareDef: LabwareDefinition2
 ): string[] {
   const allWells = primaryWells.reduce((acc: string[], well: string) => {
-    const nextWellSet = getWellSetForMultichannel(labwareDef, well)
+    const nextWellSet = getWellSetForMultichannel(labwareDef, well, 8)
 
     // filter out any nulls (but you shouldn't get any)
     if (!nextWellSet) {

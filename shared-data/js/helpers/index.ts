@@ -16,6 +16,7 @@ import type {
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
+export { orderWells } from './orderWells'
 
 export * from './parseProtocolData'
 export * from './volume'

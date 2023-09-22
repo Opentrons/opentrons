@@ -46,13 +46,18 @@ export class SelectableLabware extends React.Component<Props> {
   ) => WellGroup = selectedWells => {
     const labwareDef = this.props.labwareProps.definition
     // Returns PRIMARY WELLS from the selection.
-    if (this.props.pipetteChannels === 8) {
+    if (this.props.pipetteChannels === 8 || this.props.pipetteChannels === 96) {
+      const channels = this.props.pipetteChannels
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
       const primaryWells: WellGroup = reduce(
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
-          const wellSet = getWellSetForMultichannel(labwareDef, wellName)
+          const wellSet = getWellSetForMultichannel(
+            labwareDef,
+            wellName,
+            channels
+          )
           if (!wellSet) return acc
           return { ...acc, [wellSet[0]]: null }
         },
@@ -71,13 +76,17 @@ export class SelectableLabware extends React.Component<Props> {
   ) => {
     const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
-      if (this.props.pipetteChannels === 8) {
+      if (
+        this.props.pipetteChannels === 8 ||
+        this.props.pipetteChannels === 96
+      ) {
+        const channels = this.props.pipetteChannels
         const selectedWells = this._getWellsFromRect(rect)
         const allWellsForMulti: WellGroup = reduce(
           selectedWells,
           (acc: WellGroup, _, wellName: string): WellGroup => {
             const wellSetForMulti =
-              getWellSetForMultichannel(labwareDef, wellName) || []
+              getWellSetForMultichannel(labwareDef, wellName, channels) || []
             const channelWells = arrayToWellGroup(wellSetForMulti)
             return {
               ...acc,
@@ -106,9 +115,14 @@ export class SelectableLabware extends React.Component<Props> {
   }
 
   handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
-    if (this.props.pipetteChannels === 8) {
+    if (this.props.pipetteChannels === 8 || this.props.pipetteChannels === 96) {
+      const channels = this.props.pipetteChannels
       const labwareDef = this.props.labwareProps.definition
-      const wellSet = getWellSetForMultichannel(labwareDef, args.wellName)
+      const wellSet = getWellSetForMultichannel(
+        labwareDef,
+        args.wellName,
+        channels
+      )
       const nextHighlightedWells = arrayToWellGroup(wellSet || [])
       nextHighlightedWells &&
         this.props.updateHighlightedWells(nextHighlightedWells)
@@ -129,18 +143,19 @@ export class SelectableLabware extends React.Component<Props> {
       pipetteChannels,
       selectedPrimaryWells,
     } = this.props
-
     // For rendering, show all wells not just primary wells
-    const allSelectedWells =
-      pipetteChannels === 8
+    let allSelectedWells =
+      pipetteChannels === 8 || pipetteChannels === 96
         ? reduce<WellGroup, WellGroup>(
             selectedPrimaryWells,
             (acc, _, wellName): WellGroup => {
               const wellSet = getWellSetForMultichannel(
                 this.props.labwareProps.definition,
-                wellName
+                wellName,
+                pipetteChannels
               )
               if (!wellSet) return acc
+              console.log('wellSet', wellSet)
               return { ...acc, ...arrayToWellGroup(wellSet) }
             },
             {}

@@ -16,6 +16,205 @@ const fixture12Trough = fixture_12_trough as LabwareDefinition2
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixture384Plate = fixture_384_plate as LabwareDefinition2
 const fixtureOverlappyWellplate = fixture_overlappy_wellplate as LabwareDefinition2
+const EIGHT_CHANNEL = 8
+const NINETY_SIX_CHANNEL = 96
+const wellsForReservoir = [
+  'A1',
+  'A1',
+  'A1',
+  'A1',
+  'A1',
+  'A1',
+  'A1',
+  'A1',
+  'A2',
+  'A2',
+  'A2',
+  'A2',
+  'A2',
+  'A2',
+  'A2',
+  'A2',
+  'A3',
+  'A3',
+  'A3',
+  'A3',
+  'A3',
+  'A3',
+  'A3',
+  'A3',
+  'A4',
+  'A4',
+  'A4',
+  'A4',
+  'A4',
+  'A4',
+  'A4',
+  'A4',
+  'A5',
+  'A5',
+  'A5',
+  'A5',
+  'A5',
+  'A5',
+  'A5',
+  'A5',
+  'A6',
+  'A6',
+  'A6',
+  'A6',
+  'A6',
+  'A6',
+  'A6',
+  'A6',
+  'A7',
+  'A7',
+  'A7',
+  'A7',
+  'A7',
+  'A7',
+  'A7',
+  'A7',
+  'A8',
+  'A8',
+  'A8',
+  'A8',
+  'A8',
+  'A8',
+  'A8',
+  'A8',
+  'A9',
+  'A9',
+  'A9',
+  'A9',
+  'A9',
+  'A9',
+  'A9',
+  'A9',
+  'A10',
+  'A10',
+  'A10',
+  'A10',
+  'A10',
+  'A10',
+  'A10',
+  'A10',
+  'A11',
+  'A11',
+  'A11',
+  'A11',
+  'A11',
+  'A11',
+  'A11',
+  'A11',
+  'A12',
+  'A12',
+  'A12',
+  'A12',
+  'A12',
+  'A12',
+  'A12',
+  'A12',
+]
+
+const wellsFor96WellPlate = [
+  'A1',
+  'B1',
+  'C1',
+  'D1',
+  'E1',
+  'F1',
+  'G1',
+  'H1',
+  'A2',
+  'B2',
+  'C2',
+  'D2',
+  'E2',
+  'F2',
+  'G2',
+  'H2',
+  'A3',
+  'B3',
+  'C3',
+  'D3',
+  'E3',
+  'F3',
+  'G3',
+  'H3',
+  'A4',
+  'B4',
+  'C4',
+  'D4',
+  'E4',
+  'F4',
+  'G4',
+  'H4',
+  'A5',
+  'B5',
+  'C5',
+  'D5',
+  'E5',
+  'F5',
+  'G5',
+  'H5',
+  'A6',
+  'B6',
+  'C6',
+  'D6',
+  'E6',
+  'F6',
+  'G6',
+  'H6',
+  'A7',
+  'B7',
+  'C7',
+  'D7',
+  'E7',
+  'F7',
+  'G7',
+  'H7',
+  'A8',
+  'B8',
+  'C8',
+  'D8',
+  'E8',
+  'F8',
+  'G8',
+  'H8',
+  'A9',
+  'B9',
+  'C9',
+  'D9',
+  'E9',
+  'F9',
+  'G9',
+  'H9',
+  'A10',
+  'B10',
+  'C10',
+  'D10',
+  'E10',
+  'F10',
+  'G10',
+  'H10',
+  'A11',
+  'B11',
+  'C11',
+  'D11',
+  'E11',
+  'F11',
+  'G11',
+  'H11',
+  'A12',
+  'B12',
+  'C12',
+  'D12',
+  'E12',
+  'F12',
+  'G12',
+  'H12',
+]
 
 describe('findWellAt', () => {
   it('should determine if given (x, y) is within a rectangular well', () => {
@@ -106,7 +305,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
   it('96-flat', () => {
     const labwareDef = fixture96Plate
 
-    expect(getWellSetForMultichannel(labwareDef, 'A1')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'A1', EIGHT_CHANNEL)).toEqual([
       'A1',
       'B1',
       'C1',
@@ -117,7 +316,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'H1',
     ])
 
-    expect(getWellSetForMultichannel(labwareDef, 'B1')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'B1', EIGHT_CHANNEL)).toEqual([
       'A1',
       'B1',
       'C1',
@@ -128,7 +327,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'H1',
     ])
 
-    expect(getWellSetForMultichannel(labwareDef, 'H1')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'H1', EIGHT_CHANNEL)).toEqual([
       'A1',
       'B1',
       'C1',
@@ -139,7 +338,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'H1',
     ])
 
-    expect(getWellSetForMultichannel(labwareDef, 'A2')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'A2', EIGHT_CHANNEL)).toEqual([
       'A2',
       'B2',
       'C2',
@@ -149,18 +348,25 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'G2',
       'H2',
     ])
+
+    //  96-channel
+    expect(
+      getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
+    ).toEqual(wellsFor96WellPlate)
   })
 
   it('invalid well', () => {
     const labwareDef = fixture96Plate
 
-    expect(getWellSetForMultichannel(labwareDef, 'A13')).toBeFalsy()
+    expect(
+      getWellSetForMultichannel(labwareDef, 'A13', EIGHT_CHANNEL)
+    ).toBeFalsy()
   })
 
   it('trough-12row', () => {
     const labwareDef = fixture12Trough
 
-    expect(getWellSetForMultichannel(labwareDef, 'A1')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'A1', EIGHT_CHANNEL)).toEqual([
       'A1',
       'A1',
       'A1',
@@ -171,7 +377,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'A1',
     ])
 
-    expect(getWellSetForMultichannel(labwareDef, 'A2')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'A2', EIGHT_CHANNEL)).toEqual([
       'A2',
       'A2',
       'A2',
@@ -181,12 +387,17 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'A2',
       'A2',
     ])
+
+    //  96-channel
+    expect(
+      getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
+    ).toEqual(wellsForReservoir)
   })
 
   it('384-plate', () => {
     const labwareDef = fixture384Plate
 
-    expect(getWellSetForMultichannel(labwareDef, 'C1')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'C1', EIGHT_CHANNEL)).toEqual([
       'A1',
       'C1',
       'E1',
@@ -197,7 +408,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'O1',
     ])
 
-    expect(getWellSetForMultichannel(labwareDef, 'F2')).toEqual([
+    expect(getWellSetForMultichannel(labwareDef, 'F2', EIGHT_CHANNEL)).toEqual([
       'B2',
       'D2',
       'F2',
@@ -207,5 +418,10 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'N2',
       'P2',
     ])
+
+    //  96-channel
+    // expect(
+    //   getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
+    // ).toEqual([])
   })
 })

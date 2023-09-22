@@ -9,6 +9,7 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   HEATERSHAKER_MODULE_TYPE,
   PipetteNameSpecs,
+  orderWells,
 } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
@@ -37,7 +38,6 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsTallLabwareEastWestOfHeaterShaker,
-  orderWells,
   pipetteAdjacentHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
 } from '../utils'

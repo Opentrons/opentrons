@@ -2,7 +2,8 @@ import zipWith from 'lodash/zipWith'
 import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
-import type { WellOrderOption } from '../types'
+
+type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'
 
 // labware definitions in shared-data have an ordering
 // attribute which is an Array of Arrays of wells. Each inner

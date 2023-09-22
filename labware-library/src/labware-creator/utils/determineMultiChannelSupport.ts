@@ -16,7 +16,7 @@ export const determineMultiChannelSupport = (
   // allow multichannel pipette options only if
   // all 8 channels fit into the first column correctly
   const multiChannelTipsFirstColumn =
-    def !== null ? getWellNamePerMultiTip(def, 'A1') : null
+    def !== null ? getWellNamePerMultiTip(def, 'A1', 8) : null
 
   const allowMultiChannel =
     multiChannelTipsFirstColumn !== null &&

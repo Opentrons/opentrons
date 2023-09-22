@@ -12,15 +12,23 @@ import { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import { Selector } from '../types'
 import { SubstepItemData } from '../steplist/types'
 
+type MultiChannels = 8 | 96
+
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
   wells: string[]
 ): string[] {
   // `wells` is all the wells that pipette's channel 1 interacts with.
-  if (pipetteEntity.spec.channels === 8) {
+  if (pipetteEntity.spec.channels === 8 || pipetteEntity.spec.channels === 96) {
     return wells.reduce((acc: string[], well: string) => {
-      const setOfWellsForMulti = getWellNamePerMultiTip(labwareEntity.def, well)
+      const channels = pipetteEntity.spec.channels as MultiChannels
+      const setOfWellsForMulti = getWellNamePerMultiTip(
+        labwareEntity.def,
+        well,
+        channels
+      )
+
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
   }
@@ -95,11 +103,12 @@ function _getSelectedWellsForStep(
 
       if (pipetteSpec.channels === 1) {
         wells.push(commandWellName)
-      } else if (pipetteSpec.channels === 8) {
+      } else if (pipetteSpec.channels === 8 || pipetteSpec.channels === 96) {
         const wellSet =
           getWellSetForMultichannel(
             invariantContext.labwareEntities[labwareId].def,
-            commandWellName
+            commandWellName,
+            pipetteSpec.channels
           ) || []
         wells.push(...wellSet)
       } else {
@@ -186,7 +195,8 @@ function _getSelectedWellsForSubstep(
       if (activeTips && activeTips.labwareId === labwareId) {
         const multiTipWellSet = getWellSetForMultichannel(
           invariantContext.labwareEntities[labwareId].def,
-          activeTips.wellName
+          activeTips.wellName,
+          8
         )
         if (multiTipWellSet) tipWellSet = multiTipWellSet
       }

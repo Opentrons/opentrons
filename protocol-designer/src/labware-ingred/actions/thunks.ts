@@ -146,13 +146,14 @@ export const duplicateLabware: (
 
   if (templateLabwareDefURI && duplicateSlot) {
     if (templateAdapterDefURI != null && templateAdapterId != null) {
+      const adapterDuplicateId = uuid() + ':' + templateAdapterDefURI
       dispatch({
         type: 'DUPLICATE_LABWARE',
         payload: {
           //  you can't set a nick name for adapters
           duplicateLabwareNickname: templateAdapterDisplayName ?? '',
           templateLabwareId: templateAdapterId,
-          duplicateLabwareId: uuid() + ':' + templateAdapterDefURI,
+          duplicateLabwareId: adapterDuplicateId,
           slot: duplicateSlot,
         },
       })
@@ -162,18 +163,19 @@ export const duplicateLabware: (
           duplicateLabwareNickname,
           templateLabwareId,
           duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
-          slot: templateAdapterId,
+          slot: adapterDuplicateId,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'DUPLICATE_LABWARE',
+        payload: {
+          duplicateLabwareNickname,
+          templateLabwareId,
+          duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
+          slot: templateLabwareIdIsOffDeck ? 'offDeck' : duplicateSlot,
         },
       })
     }
-    dispatch({
-      type: 'DUPLICATE_LABWARE',
-      payload: {
-        duplicateLabwareNickname,
-        templateLabwareId,
-        duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
-        slot: templateLabwareIdIsOffDeck ? 'offDeck' : duplicateSlot,
-      },
-    })
   }
 }

@@ -21,14 +21,23 @@ type WellSetByPrimaryWell = string[][]
 
 // Compute all well sets for a labware def (non-memoized)
 function _getAllWellSetsForLabware(
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition2,
+  channels: 8 | 96
 ): WellSetByPrimaryWell {
   const allWells: string[] = Object.keys(labwareDef.wells)
 
   return allWells.reduce(
     (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
-      const wellSet = getWellNamePerMultiTip(labwareDef, well)
-      return wellSet === null ? acc : [...acc, wellSet]
+      const wellSet = getWellNamePerMultiTip(labwareDef, well, channels)
+      console.log(wellSet, 'wellSet')
+
+      if (wellSet === null) {
+        return acc
+      } else if (channels === 8) {
+        return [...acc, wellSet]
+      } else {
+        return [wellSet]
+      }
     },
     []
   )
@@ -37,12 +46,14 @@ function _getAllWellSetsForLabware(
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
 export interface WellSetHelpers {
   getAllWellSetsForLabware: (
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition2,
+    channels: 8 | 96
   ) => WellSetByPrimaryWell
 
   getWellSetForMultichannel: (
     labwareDef: LabwareDefinition2,
-    well: string
+    well: string,
+    channels: 8 | 96
   ) => string[] | null | undefined
 
   canPipetteUseLabware: (
@@ -60,7 +71,8 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
   }> = {}
 
   const getAllWellSetsForLabware = (
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition2,
+    channels: 8 | 96
   ): WellSetByPrimaryWell => {
     const labwareDefURI = getLabwareDefURI(labwareDef)
     const c = cache[labwareDefURI]
@@ -71,7 +83,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       return c.wellSetByPrimaryWell
     }
 
-    const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
+    const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef, channels)
 
     cache[labwareDefURI] = {
       labwareDef,
@@ -82,16 +94,23 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
   const getWellSetForMultichannel = (
     labwareDef: LabwareDefinition2,
-    well: string
+    well: string,
+    channels: 8 | 96
   ): string[] | null | undefined => {
     /** Given a well for a labware, returns the well set it belongs to (or null)
      * for 8-channel access.
      * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
      * Or A1 for trough => ['A1', 'A1', 'A1', ...]
      **/
-    const allWellSets = getAllWellSetsForLabware(labwareDef)
+    const allWellSets = getAllWellSetsForLabware(labwareDef, channels)
+    const allWells: string[] = allWellSets.reduce(
+      (acc, wells) => acc.concat(wells),
+      []
+    )
 
-    return allWellSets.find((wellSet: string[]) => wellSet.includes(well))
+    return channels === 8
+      ? allWellSets.find((wellSet: string[]) => wellSet.includes(well))
+      : allWells
   }
 
   const canPipetteUseLabware = (
@@ -103,19 +122,18 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       return true
     }
 
-    const allWellSets = getAllWellSetsForLabware(labwareDef)
+    const allWellSets = getAllWellSetsForLabware(labwareDef, 8)
     return allWellSets.some(wellSet => {
       const uniqueWells = uniq(wellSet)
       // if all wells are non-null, and there are either 1 (reservoir-like)
       // or 8 (well plate-like) unique wells in the set,
-      // then assume multi-channel will work
+      // then assume both 8 and 96 channel pipettes will work
       return (
         uniqueWells.every(well => well != null) &&
         [1, 8].includes(uniqueWells.length)
       )
     })
   }
-
   return {
     getAllWellSetsForLabware,
     getWellSetForMultichannel,

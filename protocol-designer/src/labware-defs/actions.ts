@@ -81,8 +81,8 @@ const getIsOverwriteMismatched = (
   const matchedMultiUse =
     matchedWellOrdering &&
     isEqual(
-      getAllWellSetsForLabware(newDef),
-      getAllWellSetsForLabware(overwrittenDef)
+      getAllWellSetsForLabware(newDef, 8),
+      getAllWellSetsForLabware(overwrittenDef, 8)
     )
   return !(matchedWellOrdering && matchedMultiUse)
 }
@@ -98,6 +98,7 @@ const _createCustomLabwareDef: (
   const customLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
   )
+
   // @ts-expect-error(sa, 2021-6-20): null check
   const file = event.currentTarget.files[0]
   const reader = new FileReader()
