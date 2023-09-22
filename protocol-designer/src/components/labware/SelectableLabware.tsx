@@ -144,7 +144,7 @@ export class SelectableLabware extends React.Component<Props> {
       selectedPrimaryWells,
     } = this.props
     // For rendering, show all wells not just primary wells
-    let allSelectedWells =
+    const allSelectedWells =
       pipetteChannels === 8 || pipetteChannels === 96
         ? reduce<WellGroup, WellGroup>(
             selectedPrimaryWells,
@@ -155,7 +155,6 @@ export class SelectableLabware extends React.Component<Props> {
                 pipetteChannels
               )
               if (!wellSet) return acc
-              console.log('wellSet', wellSet)
               return { ...acc, ...arrayToWellGroup(wellSet) }
             },
             {}

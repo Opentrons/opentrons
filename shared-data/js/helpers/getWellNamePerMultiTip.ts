@@ -49,7 +49,7 @@ export function getWellNamePerMultiTip(
   }
 
   const { x, y } = topWell
-  let offsetYTipPositions: number[] = range(0, 8).map(
+  let offsetYTipPositions: number[] = range(0, channels).map(
     tipNo => y - tipNo * OFFSET_8_CHANNEL
   )
   const orderedWells = orderWells(labwareDef.ordering, 't2b', 'l2r')
@@ -72,6 +72,7 @@ export function getWellNamePerMultiTip(
     },
     []
   )
+  console.log(' wellsAccessed', wellsAccessed)
   // let ninetySixChannelWells = orderedWells
   //  special casing 384 well plates since its the only labware
   //  where the full 96-channel tip rack can't aspirate from

@@ -29,7 +29,6 @@ function _getAllWellSetsForLabware(
   return allWells.reduce(
     (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
       const wellSet = getWellNamePerMultiTip(labwareDef, well, channels)
-      console.log(wellSet, 'wellSet')
 
       if (wellSet === null) {
         return acc
