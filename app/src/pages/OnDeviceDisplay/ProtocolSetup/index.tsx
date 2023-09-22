@@ -74,7 +74,6 @@ import {
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 
@@ -421,7 +420,11 @@ function PrepareToRun({
       confirmAttachment()
     } else {
       if (isReadyToRun) {
-        play()
+        if (isDoorOpen) {
+          makeSnackbar(t('shared:close_robot_door'))
+        } else {
+          play()
+        }
       } else {
         makeSnackbar(
           i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
@@ -492,9 +495,10 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
+  console.log('isDoorOpen', isDoorOpen)
+
   return (
     <>
-      {isReadyToRun && isDoorOpen ? <OpenDoorAlertModal /> : null}
       {/* Empty box to detect scrolling */}
       <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}
