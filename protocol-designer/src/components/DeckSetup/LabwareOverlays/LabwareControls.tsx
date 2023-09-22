@@ -13,12 +13,14 @@ import { LabwareHighlight } from './LabwareHighlight'
 import styles from './LabwareOverlays.css'
 
 interface LabwareControlsProps {
+  allLabware: LabwareOnDeck[]
+  has96Channel: boolean
   labwareOnDeck: LabwareOnDeck
-  selectedTerminalItemId?: TerminalItemId | null
   slot: DeckSlot
   setHoveredLabware: (labware?: LabwareOnDeck | null) => unknown
   setDraggedLabware: (labware?: LabwareOnDeck | null) => unknown
   swapBlocked: boolean
+  selectedTerminalItemId?: TerminalItemId | null
 }
 
 export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
@@ -29,11 +31,18 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
     setHoveredLabware,
     setDraggedLabware,
     swapBlocked,
+    allLabware,
+    has96Channel,
   } = props
+
   const canEdit = selectedTerminalItemId === START_TERMINAL_ITEM_ID
   const [x, y] = slot.position
   const width = labwareOnDeck.def.dimensions.xDimension
   const height = labwareOnDeck.def.dimensions.yDimension
+  const isTiprack = labwareOnDeck.def.parameters.isTiprack
+  const adapterId = Object.values(allLabware).find(
+    adapter => adapter.id === labwareOnDeck.slot
+  )?.id
   return (
     <>
       <RobotCoordsForeignDiv
@@ -48,6 +57,7 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
         {canEdit ? (
           // @ts-expect-error(sa, 2021-6-21): react dnd type mismatch
           <EditLabware
+            adapterId={has96Channel && isTiprack ? adapterId : undefined}
             labwareOnDeck={labwareOnDeck}
             setHoveredLabware={setHoveredLabware}
             setDraggedLabware={setDraggedLabware}

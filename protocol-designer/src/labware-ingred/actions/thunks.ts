@@ -63,11 +63,35 @@ export const createContainer: (
 
   if (slot) {
     const id = `${uuid()}:${args.labwareDefURI}`
-    dispatch({
-      type: 'CREATE_CONTAINER',
-      payload: { ...args, id, slot },
-    })
+    const adapterId =
+      args.adapterUnderLabwareDefURI != null
+        ? `${uuid()}:${args.adapterUnderLabwareDefURI}`
+        : null
 
+    if (adapterId != null && args.adapterUnderLabwareDefURI != null) {
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: {
+          ...args,
+          labwareDefURI: args.adapterUnderLabwareDefURI,
+          id: adapterId,
+          slot,
+        },
+      })
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: {
+          ...args,
+          id,
+          slot: adapterId,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: { ...args, id, slot },
+      })
+    }
     if (isTiprack) {
       // Tipracks cannot be named, but should auto-increment.
       // We can't rely on reducers to do that themselves bc they don't have access
@@ -80,21 +104,33 @@ export const createContainer: (
     console.warn('no slots available, cannot create labware')
   }
 }
-export const duplicateLabware: (
+
+interface DuplicateArgs {
   templateLabwareId: string
-) => ThunkAction<DuplicateLabwareAction> = templateLabwareId => (
-  dispatch,
-  getState
-) => {
+  templateAdapterId?: string
+}
+export const duplicateLabware: (
+  args: DuplicateArgs
+) => ThunkAction<DuplicateLabwareAction> = args => (dispatch, getState) => {
+  const { templateLabwareId, templateAdapterId } = args
   const state = getState()
   const robotType = state.fileData.robotType
   const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
     templateLabwareId
   ].labwareDefURI
+  const tempAdapterEntity =
+    templateAdapterId != null
+      ? stepFormSelectors.getLabwareEntities(state)[templateAdapterId]
+      : null
+  const templateAdapterDefURI = tempAdapterEntity?.labwareDefURI ?? null
+  const templateAdapterDisplayName =
+    tempAdapterEntity?.def.metadata.displayName ?? null
+
   assert(
     templateLabwareDefURI,
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
+
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
@@ -109,6 +145,27 @@ export const duplicateLabware: (
   )
 
   if (templateLabwareDefURI && duplicateSlot) {
+    if (templateAdapterDefURI != null && templateAdapterId != null) {
+      dispatch({
+        type: 'DUPLICATE_LABWARE',
+        payload: {
+          //  you can't set a nick name for adapters
+          duplicateLabwareNickname: templateAdapterDisplayName ?? '',
+          templateLabwareId: templateAdapterId,
+          duplicateLabwareId: uuid() + ':' + templateAdapterDefURI,
+          slot: duplicateSlot,
+        },
+      })
+      dispatch({
+        type: 'DUPLICATE_LABWARE',
+        payload: {
+          duplicateLabwareNickname,
+          templateLabwareId,
+          duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
+          slot: templateAdapterId,
+        },
+      })
+    }
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {

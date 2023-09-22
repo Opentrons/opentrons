@@ -40,6 +40,7 @@ interface DNDP {
 interface OP {
   slot: DeckSlotDefinition & { id: DeckSlot } // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleType | null
+  has96Channel: boolean
   selectedTerminalItemId?: TerminalItemId | null
   handleDragHover?: () => unknown
 }
@@ -68,6 +69,7 @@ export const SlotControlsComponent = (
     draggedItem,
     itemType,
     customLabwareDefs,
+    has96Channel,
   } = props
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
@@ -82,11 +84,12 @@ export const SlotControlsComponent = (
 
   let slotBlocked: string | null = null
   if (
-    isOver &&
-    moduleType != null &&
-    draggedDef != null &&
-    !getLabwareIsCompatible(draggedDef, moduleType) &&
-    !isCustomLabware
+    (isOver &&
+      moduleType != null &&
+      draggedDef != null &&
+      !getLabwareIsCompatible(draggedDef, moduleType) &&
+      !isCustomLabware) ||
+    (has96Channel && draggedDef?.parameters.isTiprack)
   ) {
     slotBlocked = 'Labware incompatible with this module'
   }

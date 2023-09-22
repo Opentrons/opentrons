@@ -50,6 +50,7 @@ describe('SlotControlsComponent', () => {
       },
       itemType: DND_TYPES.LABWARE,
       customLabwareDefs: {},
+      has96Channel: false,
     }
 
     getLabwareIsCompatibleSpy = jest.spyOn(

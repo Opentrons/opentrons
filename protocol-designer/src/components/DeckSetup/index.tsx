@@ -110,6 +110,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     robotType,
     trashSlot,
   } = props
+  const pipettes = activeDeckSetup.pipettes
+  const has96Channel = Object.values(pipettes).some(
+    pip => pip.name === 'p1000_96'
+  )
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
   // But when swapping labware when at least one is on a module, we need to be aware
@@ -277,6 +281,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   />
                 ) : (
                   <LabwareControls
+                    has96Channel={has96Channel}
+                    allLabware={allLabware}
                     slot={labwareInterfaceSlotDef}
                     setHoveredLabware={setHoveredLabware}
                     setDraggedLabware={setDraggedLabware}
@@ -297,6 +303,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             !isAdapter ? (
               //  @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
               <SlotControls
+                has96Channel={has96Channel}
                 key={slot.id}
                 slot={labwareInterfaceSlotDef}
                 selectedTerminalItemId={props.selectedTerminalItemId}
@@ -345,6 +352,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           return (
             // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
             <SlotControls
+              has96Channel={has96Channel}
               key={slot.id}
               slot={slot}
               selectedTerminalItemId={props.selectedTerminalItemId}
@@ -393,6 +401,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 </>
               ) : (
                 <LabwareControls
+                  has96Channel={has96Channel}
+                  allLabware={allLabware}
                   slot={slot}
                   setHoveredLabware={setHoveredLabware}
                   setDraggedLabware={setDraggedLabware}
@@ -441,6 +451,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             />
             <g>
               <LabwareControls
+                has96Channel={has96Channel}
+                allLabware={allLabware}
                 slot={deckDefSlot}
                 setHoveredLabware={setHoveredLabware}
                 setDraggedLabware={setDraggedLabware}

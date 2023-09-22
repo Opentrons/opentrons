@@ -18,6 +18,8 @@ import {
 } from '../../labware-defs'
 import { selectors as stepFormSelectors, ModuleOnDeck } from '../../step-forms'
 import { BaseState, ThunkDispatch } from '../../types'
+import { getPipetteEntities } from '../../step-forms/selectors'
+import { adapter96ChannelDefUri } from '../modals/CreateFileWizard'
 interface SP {
   customLabwareDefs: LabwareSelectionModalProps['customLabwareDefs']
   slot: LabwareSelectionModalProps['slot']
@@ -25,11 +27,18 @@ interface SP {
   moduleType: LabwareSelectionModalProps['moduleType']
   permittedTipracks: LabwareSelectionModalProps['permittedTipracks']
   isNextToHeaterShaker: boolean
+  has96Channel: boolean
+  adapterDefUri?: string
   adapterLoadName?: string
 }
 
 function mapStateToProps(state: BaseState): SP {
   const slot = labwareIngredSelectors.selectedAddLabwareSlot(state) || null
+  const pipettes = getPipetteEntities(state)
+  const has96Channel = Object.values(pipettes).some(
+    pip => pip.name === 'p1000_96'
+  )
+
   // TODO: Ian 2019-10-29 needs revisit to support multiple manualIntervention steps
   const modulesById = stepFormSelectors.getInitialDeckSetup(state).modules
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
@@ -57,6 +66,8 @@ function mapStateToProps(state: BaseState): SP {
     parentSlot,
     moduleType,
     isNextToHeaterShaker,
+    has96Channel,
+    adapterDefUri: has96Channel ? adapter96ChannelDefUri : undefined,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
     adapterLoadName: adapterLoadNameOnDeck,
   }
@@ -77,11 +88,18 @@ function mergeProps(
     onUploadLabware: fileChangeEvent =>
       dispatch(labwareDefActions.createCustomLabwareDef(fileChangeEvent)),
     selectLabware: labwareDefURI => {
+      console.log(labwareDefURI)
+      console.log(stateProps.permittedTipracks)
       if (stateProps.slot) {
         dispatch(
           createContainer({
             slot: stateProps.slot,
             labwareDefURI,
+            adapterUnderLabwareDefURI: stateProps.permittedTipracks.includes(
+              labwareDefURI
+            )
+              ? stateProps.adapterDefUri
+              : undefined,
           })
         )
       }

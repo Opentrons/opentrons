@@ -84,6 +84,7 @@ const PCR_ADAPTER_LOADNAME = 'opentrons_96_pcr_adapter'
 const UNIVERSAL_FLAT_ADAPTER_LOADNAME = 'opentrons_universal_flat_adapter'
 const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_well_aluminum_block'
 const ALUMINUM_FLAT_BOTTOM_PLATE = 'opentrons_aluminum_flat_bottom_plate'
+export const ADAPTER_96_CHANNEL = 'opentrons_flex_96_tiprack_adapter'
 
 export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   string,
@@ -118,15 +119,28 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
     'opentrons/corning_6_wellplate_16.8ml_flat/2',
     'opentrons/nest_96_wellplate_200ul_flat/2',
   ],
+  [ADAPTER_96_CHANNEL]: [
+    'opentrons/opentrons_flex_96_tiprack_50ul/1',
+    'opentrons/opentrons_flex_96_tiprack_200ul/1',
+    'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+    'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+    'opentrons/opentrons_flex_96_filtertiprack_200ul/1',
+    'opentrons/opentrons_flex_96_filtertiprack_1000ul/1',
+  ],
 }
 
 export const getLabwareCompatibleWithAdapter = (
+  permittedTipracks: string[],
   adapterLoadName?: string
-): string[] =>
-  adapterLoadName != null
-    ? COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterLoadName]
-    : []
-
+): string[] => {
+  if (permittedTipracks.length > 0) {
+    return permittedTipracks
+  } else {
+    return adapterLoadName != null
+      ? COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterLoadName]
+      : []
+  }
+}
 export const getLabwareIsCustom = (
   customLabwares: LabwareDefByDefURI,
   labwareOnDeck: LabwareOnDeck
@@ -152,6 +166,15 @@ export const getAdapterLabwareIsAMatch = (
     'nest_96_wellplate_200ul_flat',
   ]
 
+  const adapter96Tipracks = [
+    'opentrons_flex_96_tiprack_50ul',
+    'opentrons_flex_96_tiprack_200ul',
+    'opentrons_flex_96_tiprack_1000ul',
+    'opentrons_flex_96_filtertiprack_50ul',
+    'opentrons_flex_96_filtertiprack_200ul',
+    'opentrons_flex_96_filtertiprack_1000ul',
+  ]
+
   const deepWellPair =
     loadName === DEEP_WELL_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'nest_96_wellplate_2ml_deep'
@@ -172,6 +195,9 @@ export const getAdapterLabwareIsAMatch = (
   const aluminumFlatBottomPlatePairs =
     loadName === ALUMINUM_FLAT_BOTTOM_PLATE &&
     flatBottomLabwares.includes(draggedLabwareLoadname)
+  const adapter96ChannelPairs =
+    loadName === ADAPTER_96_CHANNEL &&
+    adapter96Tipracks.includes(draggedLabwareLoadname)
 
   if (
     deepWellPair ||
@@ -179,7 +205,8 @@ export const getAdapterLabwareIsAMatch = (
     pcrPair ||
     universalPair ||
     aluminumBlock96Pairs ||
-    aluminumFlatBottomPlatePairs
+    aluminumFlatBottomPlatePairs ||
+    adapter96ChannelPairs
   ) {
     return true
   } else {

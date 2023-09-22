@@ -113,17 +113,19 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   if (destinationModuleId != null) {
     const destModuleState =
       prevRobotState.modules[destinationModuleId].moduleState
-    if (
-      destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
-      destModuleState.lidOpen !== true
-    ) {
-      errors.push(errorCreators.thermocyclerLidClosed())
-    } else if (destModuleState.type === HEATERSHAKER_MODULE_TYPE) {
-      if (destModuleState.latchOpen !== true) {
-        errors.push(errorCreators.heaterShakerLatchClosed())
-      }
-      if (destModuleState.targetSpeed !== null) {
-        errors.push(errorCreators.heaterShakerIsShaking())
+    if (destModuleState != null) {
+      if (
+        destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
+        destModuleState.lidOpen !== true
+      ) {
+        errors.push(errorCreators.thermocyclerLidClosed())
+      } else if (destModuleState.type === HEATERSHAKER_MODULE_TYPE) {
+        if (destModuleState.latchOpen !== true) {
+          errors.push(errorCreators.heaterShakerLatchClosed())
+        }
+        if (destModuleState.targetSpeed !== null) {
+          errors.push(errorCreators.heaterShakerIsShaking())
+        }
       }
     }
   }
