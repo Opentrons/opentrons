@@ -125,8 +125,8 @@ def insert_data_to_file(
 ) -> None:
     """Insert new data at a specified line."""
     test_path = create_folder_for_test_data(test_name)
-    run_path = create_folder_for_test_data(run_id)
-    data_path = test_path / run_path / file_name
+    run_path = create_folder_for_test_data(test_path / run_id)
+    data_path = run_path / file_name
     # read data from file, insert line, then overwrite previous file
     with open(data_path, "r") as f:
         contents = f.readlines()
