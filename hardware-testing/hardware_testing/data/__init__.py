@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from subprocess import check_output
 from time import time
-from typing import Tuple
+from typing import Tuple, Union
 
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 
@@ -70,7 +70,7 @@ def create_test_name_from_file(f: str) -> str:
     return os.path.basename(f).replace("_", "-").replace(".py", "")
 
 
-def create_folder_for_test_data(test_name: str) -> Path:
+def create_folder_for_test_data(test_name: Union[str, Path]) -> Path:
     """Create a folder for test data."""
     base = _initialize_testing_data_base_dir()
     test_path = base / test_name
@@ -100,28 +100,34 @@ def create_file_name(
     return f"{test_name}_{run_id}_{tag}.{extension}"
 
 
-def _save_data(test_name: str, file_name: str, data: str, perm: str = "w+") -> Path:
+def _save_data(
+    test_name: str, run_id: str, file_name: str, data: str, perm: str = "w+"
+) -> Path:
     test_path = create_folder_for_test_data(test_name)
-    data_path = test_path / file_name
+    run_path = create_folder_for_test_data(test_path / run_id)
+    data_path = test_path / run_path / file_name
     with open(data_path, perm) as f:
         f.write(data)
     return data_path
 
 
-def dump_data_to_file(test_name: str, file_name: str, data: str) -> Path:
+def dump_data_to_file(test_name: str, run_id: str, file_name: str, data: str) -> Path:
     """Save entire file contents to a file on disk."""
-    return _save_data(test_name, file_name, data, perm="w+")
+    return _save_data(test_name, run_id, file_name, data, perm="w+")
 
 
-def append_data_to_file(test_name: str, file_name: str, data: str) -> Path:
+def append_data_to_file(test_name: str, run_id: str, file_name: str, data: str) -> Path:
     """Append new content to an already existing file on disk."""
-    return _save_data(test_name, file_name, data, perm="a+")
+    return _save_data(test_name, run_id, file_name, data, perm="a+")
 
 
-def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) -> None:
+def insert_data_to_file(
+    test_name: str, run_id: str, file_name: str, data: str, line: int
+) -> None:
     """Insert new data at a specified line."""
     test_path = create_folder_for_test_data(test_name)
-    data_path = test_path / file_name
+    run_path = create_folder_for_test_data(test_path / run_id)
+    data_path = run_path / file_name
     # read data from file, insert line, then overwrite previous file
     with open(data_path, "r") as f:
         contents = f.readlines()

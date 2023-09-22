@@ -496,14 +496,22 @@ class GravimetricRecorder:
             new_sample = recording[-1]
             csv_line = new_sample.as_csv(_start_time)
             append_data_to_file(
-                str(self._cfg.test_name), _file_name, csv_line + "\n"
+                str(self._cfg.test_name),
+                str(self._cfg.run_id),
+                _file_name,
+                csv_line + "\n",
             )  # type: ignore[arg-type]
 
         # add the header to the CSV file
         dump_data_to_file(
-            self._cfg.test_name, self._file_name, GravimetricSample.csv_header() + "\n"
+            self._cfg.test_name,
+            self._cfg.run_id,
+            self._file_name,
+            GravimetricSample.csv_header() + "\n",
         )
         _rec = self._record_samples(timeout=timeout, on_new_sample=_on_new_sample)
         # add a final newline character to the CSV file
-        append_data_to_file(self._cfg.test_name, self._file_name, "\n")
+        append_data_to_file(
+            self._cfg.test_name, self._cfg.run_id, self._file_name, "\n"
+        )
         return _rec
