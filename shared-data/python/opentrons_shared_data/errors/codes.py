@@ -79,6 +79,7 @@ class ErrorCodes(Enum):
     NOT_SUPPORTED_ON_ROBOT_TYPE = _code_from_dict_entry("4003")
     COMMAND_PRECONDITION_VIOLATED = _code_from_dict_entry("4004")
     COMMAND_PARAMETER_LIMIT_VIOLATED = _code_from_dict_entry("4005")
+    API_MISCONFIGURATION = _code_from_dict_entry("4006")
 
     @classmethod
     @lru_cache(25)
