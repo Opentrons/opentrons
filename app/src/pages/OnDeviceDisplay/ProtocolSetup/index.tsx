@@ -74,7 +74,6 @@ import {
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 
@@ -246,32 +245,42 @@ interface PlayButtonProps {
   ready: boolean
   onPlay?: () => void
   disabled?: boolean
+  isDoorOpen: boolean
 }
 
 function PlayButton({
   disabled = false,
   onPlay,
   ready,
+  isDoorOpen,
 }: PlayButtonProps): JSX.Element {
   const playButtonStyle = css`
     -webkit-tap-highlight-color: transparent;
     &:focus {
-      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      background-color: ${ready && !isDoorOpen
+        ? COLORS.bluePressed
+        : COLORS.darkBlack40};
       color: ${COLORS.white};
     }
 
     &:hover {
-      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+      background-color: ${ready && !isDoorOpen
+        ? COLORS.blueEnabled
+        : COLORS.darkBlack20};
       color: ${COLORS.white};
     }
 
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${ready ? COLORS.blueEnabled : COLORS.darkBlack20};
+      background-color: ${ready && !isDoorOpen
+        ? COLORS.blueEnabled
+        : COLORS.darkBlack20};
     }
 
     &:active {
-      background-color: ${ready ? COLORS.bluePressed : COLORS.darkBlack40};
+      background-color: ${ready && !isDoorOpen
+        ? COLORS.bluePressed
+        : COLORS.darkBlack40};
       color: ${COLORS.white};
     }
 
@@ -284,7 +293,9 @@ function PlayButton({
     <Btn
       alignItems={ALIGN_CENTER}
       backgroundColor={
-        disabled || !ready ? COLORS.darkBlack20 : COLORS.blueEnabled
+        disabled || !ready || isDoorOpen
+          ? COLORS.darkBlack20
+          : COLORS.blueEnabled
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
@@ -297,7 +308,9 @@ function PlayButton({
       css={playButtonStyle}
     >
       <Icon
-        color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
+        color={
+          disabled || !ready || isDoorOpen ? COLORS.darkBlack60 : COLORS.white
+        }
         name="play-icon"
         size="2.5rem"
       />
@@ -415,19 +428,23 @@ function PrepareToRun({
   const isReadyToRun = areInstrumentsReady && !isMissingModules
 
   const onPlay = (): void => {
-    if (
-      isHeaterShakerInProtocol &&
-      isReadyToRun &&
-      (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
-    ) {
-      confirmAttachment()
+    if (isDoorOpen) {
+      makeSnackbar(t('shared:close_robot_door'))
     } else {
-      if (isReadyToRun) {
-        play()
+      if (
+        isHeaterShakerInProtocol &&
+        isReadyToRun &&
+        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+      ) {
+        confirmAttachment()
       } else {
-        makeSnackbar(
-          i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
-        )
+        if (isReadyToRun) {
+          play()
+        } else {
+          makeSnackbar(
+            i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
+          )
+        }
       }
     }
   }
@@ -495,9 +512,6 @@ function PrepareToRun({
     doorStatus?.data.doorRequiredClosedForProtocol
   return (
     <>
-      {isReadyToRun && isDoorOpen && setupScreen === 'prepare to run' ? (
-        <OpenDoorAlertModal />
-      ) : null}
       {/* Empty box to detect scrolling */}
       <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}
@@ -545,9 +559,10 @@ function PrepareToRun({
               }
             />
             <PlayButton
-              disabled={isLoading || isDoorOpen}
+              disabled={isLoading}
               onPlay={!isLoading ? onPlay : undefined}
               ready={!isLoading ? isReadyToRun : false}
+              isDoorOpen={isDoorOpen}
             />
           </Flex>
         </Flex>
