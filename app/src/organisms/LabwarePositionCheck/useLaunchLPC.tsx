@@ -29,7 +29,7 @@ export function useLaunchLPC(
   const handleCloseLPC = (): void => {
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {
-        onSuccess: () => {
+        onSettled: () => {
           setMaintenanceRunId(null)
         },
       })
