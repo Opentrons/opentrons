@@ -70,6 +70,7 @@ export function useLaunchLPC(
           mostRecentAnalysis={mostRecentAnalysis}
           existingOffsets={runRecord?.data?.labwareOffsets ?? []}
           maintenanceRunId={maintenanceRunId}
+          setMaintenanceRunId={setMaintenanceRunId}
         />
       ) : null,
   }

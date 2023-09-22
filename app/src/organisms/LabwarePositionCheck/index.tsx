@@ -13,6 +13,7 @@ interface LabwarePositionCheckModalProps {
   existingOffsets: LabwareOffset[]
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   caughtError?: Error
+  setMaintenanceRunId: (id: string | null) => void
 }
 
 // We explicitly wrap LabwarePositionCheckComponent in an ErrorBoundary because an error might occur while pulling in
