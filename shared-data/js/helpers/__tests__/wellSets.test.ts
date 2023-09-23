@@ -3,15 +3,16 @@ import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.jso
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
-
 import { makeWellSetHelpers } from '../wellSets'
 import { findWellAt } from '../getWellNamePerMultiTip'
+import { get96Channel384WellPlateWells, orderWells } from '..'
 
 import type { LabwareDefinition2, PipetteNameSpecs } from '../../types'
 import type { WellSetHelpers } from '../wellSets'
 
 const fixtureP10Single = pipetteNameSpecsFixtures.p10_single as PipetteNameSpecs
 const fixtureP10Multi = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
+const fixtureP100096 = (pipetteNameSpecsFixtures.p1000_96 as any) as PipetteNameSpecs
 const fixture12Trough = fixture_12_trough as LabwareDefinition2
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixture384Plate = fixture_384_plate as LabwareDefinition2
@@ -20,100 +21,16 @@ const EIGHT_CHANNEL = 8
 const NINETY_SIX_CHANNEL = 96
 const wellsForReservoir = [
   'A1',
-  'A1',
-  'A1',
-  'A1',
-  'A1',
-  'A1',
-  'A1',
-  'A1',
-  'A2',
-  'A2',
-  'A2',
-  'A2',
-  'A2',
-  'A2',
-  'A2',
   'A2',
   'A3',
-  'A3',
-  'A3',
-  'A3',
-  'A3',
-  'A3',
-  'A3',
-  'A3',
-  'A4',
-  'A4',
-  'A4',
-  'A4',
-  'A4',
-  'A4',
-  'A4',
   'A4',
   'A5',
-  'A5',
-  'A5',
-  'A5',
-  'A5',
-  'A5',
-  'A5',
-  'A5',
-  'A6',
-  'A6',
-  'A6',
-  'A6',
-  'A6',
-  'A6',
-  'A6',
   'A6',
   'A7',
-  'A7',
-  'A7',
-  'A7',
-  'A7',
-  'A7',
-  'A7',
-  'A7',
-  'A8',
-  'A8',
-  'A8',
-  'A8',
-  'A8',
-  'A8',
-  'A8',
   'A8',
   'A9',
-  'A9',
-  'A9',
-  'A9',
-  'A9',
-  'A9',
-  'A9',
-  'A9',
-  'A10',
-  'A10',
-  'A10',
-  'A10',
-  'A10',
-  'A10',
-  'A10',
   'A10',
   'A11',
-  'A11',
-  'A11',
-  'A11',
-  'A11',
-  'A11',
-  'A11',
-  'A11',
-  'A12',
-  'A12',
-  'A12',
-  'A12',
-  'A12',
-  'A12',
-  'A12',
   'A12',
 ]
 
@@ -279,11 +196,13 @@ describe('canPipetteUseLabware', () => {
     canPipetteUseLabware = helpers.canPipetteUseLabware
   })
 
-  it('returns false when wells are too close together for multi channel pipette', () => {
+  it('returns false when wells are too close together for multi channel pipettes', () => {
     const labwareDef = fixtureOverlappyWellplate
     const pipette = fixtureP10Multi
+    const pipette96 = fixtureP100096
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
+    expect(canPipetteUseLabware(pipette96, labwareDef)).toBe(false)
   })
 
   it('returns true when pipette is single channel', () => {
@@ -396,6 +315,12 @@ describe('getWellSetForMultichannel (integration test)', () => {
 
   it('384-plate', () => {
     const labwareDef = fixture384Plate
+    const well96Channel = 'A1'
+    const all384Wells = orderWells(labwareDef.ordering, 't2b', 'l2r')
+    const ninetySixChannelWells = get96Channel384WellPlateWells(
+      all384Wells,
+      well96Channel
+    )
 
     expect(getWellSetForMultichannel(labwareDef, 'C1', EIGHT_CHANNEL)).toEqual([
       'A1',
@@ -420,8 +345,8 @@ describe('getWellSetForMultichannel (integration test)', () => {
     ])
 
     //  96-channel
-    // expect(
-    //   getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
-    // ).toEqual([])
+    expect(
+      getWellSetForMultichannel(labwareDef, well96Channel, NINETY_SIX_CHANNEL)
+    ).toEqual(ninetySixChannelWells)
   })
 })

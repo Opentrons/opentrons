@@ -11,10 +11,10 @@
 // A 384 plate has 48 well sets, 2 for each column b/c it has staggered columns.
 //
 // If a labware has no possible well sets, then it is not compatible with multi-channel pipettes.
-import { getLabwareDefURI } from '.'
 import uniq from 'lodash/uniq'
 
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
+import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
 
 type WellSetByPrimaryWell = string[][]
@@ -29,7 +29,6 @@ function _getAllWellSetsForLabware(
   return allWells.reduce(
     (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
       const wellSet = getWellNamePerMultiTip(labwareDef, well, channels)
-
       if (wellSet === null) {
         return acc
       } else if (channels === 8) {
@@ -101,15 +100,33 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
      * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
      * Or A1 for trough => ['A1', 'A1', 'A1', ...]
      **/
-    const allWellSets = getAllWellSetsForLabware(labwareDef, channels)
-    const allWells: string[] = allWellSets.reduce(
-      (acc, wells) => acc.concat(wells),
-      []
+    const allWellSetsFor8Channel = getAllWellSetsForLabware(
+      labwareDef,
+      channels
+    )
+    /**  getting all wells from the plate and turning into 1D array for 96-channel
+     */
+    const orderedWellsFor96Channel = orderWells(
+      labwareDef.ordering,
+      't2b',
+      'l2r'
     )
 
+    let ninetySixChannelWells = orderedWellsFor96Channel
+    /**  special casing 384 well plates to be every other well
+     * both on the x and y ases.
+     */
+    if (orderedWellsFor96Channel.length === 384) {
+      ninetySixChannelWells = get96Channel384WellPlateWells(
+        orderedWellsFor96Channel,
+        well
+      )
+    }
     return channels === 8
-      ? allWellSets.find((wellSet: string[]) => wellSet.includes(well))
-      : allWells
+      ? allWellSetsFor8Channel.find((wellSet: string[]) =>
+          wellSet.includes(well)
+        )
+      : ninetySixChannelWells
   }
 
   const canPipetteUseLabware = (

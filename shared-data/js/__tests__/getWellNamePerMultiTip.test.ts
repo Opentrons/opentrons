@@ -14,7 +14,6 @@ const fixture384Plate = fixture_384_plate as LabwareDefinition2
 const fixture12Trough = fixture_12_trough as LabwareDefinition2
 const fixture24Tuberack = fixture_24_tuberack as LabwareDefinition2
 const EIGHT_CHANNEL = 8
-const NINETY_SIX_CHANNEL = 96
 
 describe('96 plate', () => {
   const labware = fixture96Plate
