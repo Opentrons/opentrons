@@ -1430,8 +1430,9 @@ def _create_csv_and_get_callbacks(
     run_id = data.create_run_id()
     test_name = Path(__file__).parent.name.replace("_", "-")
     folder_path = data.create_folder_for_test_data(test_name)
+    run_path = data.create_folder_for_test_data(folder_path / run_id)
     file_name = data.create_file_name(test_name, run_id, pipette_sn)
-    csv_display_name = os.path.join(folder_path, file_name)
+    csv_display_name = os.path.join(run_path, file_name)
     print(f"CSV: {csv_display_name}")
     start_time = time()
 
@@ -1448,9 +1449,11 @@ def _create_csv_and_get_callbacks(
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
-            data.append_data_to_file(test_name, file_name, data_str + "\n")
+            data.append_data_to_file(test_name, run_id, file_name, data_str + "\n")
         else:
-            data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
+            data.insert_data_to_file(
+                test_name, run_id, file_name, data_str + "\n", line_number
+            )
 
     def _cache_pressure_data_callback(
         d: List[Any], first_row_value: Optional[str] = None

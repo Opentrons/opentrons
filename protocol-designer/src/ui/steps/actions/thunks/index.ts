@@ -182,6 +182,10 @@ export const saveStepForm: () => ThunkAction<any> = () => (
     dispatch(tutorialActions.addHint('protocol_can_enter_batch_edit'))
   }
 
+  if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {
+    dispatch(tutorialActions.addHint('waste_chute_warning'))
+  }
+
   // save the form
   dispatch(_saveStepForm(unsavedForm))
 }

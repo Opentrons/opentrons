@@ -26,6 +26,7 @@ import {
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
   TEMPERATURE_MODULE_V2,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   actions as stepFormActions,
@@ -45,7 +46,11 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
-import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
+import { getEnableDeckModification } from '../../../feature-flags/selectors'
+import {
+  createDeckFixture,
+  toggleIsGripperRequired,
+} from '../../../step-forms/actions/additionalItems'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
@@ -81,6 +86,7 @@ export function CreateFileWizard(): JSX.Element | null {
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
+  const enableDeckModification = useSelector(getEnableDeckModification)
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
 
@@ -217,6 +223,14 @@ export function CreateFileWizard(): JSX.Element | null {
           })
         )
       })
+
+      // add waste chute
+      if (
+        enableDeckModification &&
+        values.additionalEquipment.includes('wasteChute')
+      ) {
+        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+      }
     }
   }
   const wizardHeader = (

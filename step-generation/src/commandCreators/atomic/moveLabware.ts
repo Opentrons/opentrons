@@ -3,14 +3,23 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   LabwareMovementStrategy,
   THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
+import * as warningCreators from '../../warningCreators'
 import { uuid } from '../../utils'
+import {
+  getHasWasteChute,
+  getTiprackHasTips,
+  getLabwareHasLiquid,
+  CommandCreatorWarning,
+} from '../..'
 import type {
   CommandCreator,
   CommandCreatorError,
   MoveLabwareArgs,
 } from '../../types'
+
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   args,
@@ -18,8 +27,19 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   prevRobotState
 ) => {
   const { labware, useGripper, newLocation } = args
+  const { additionalEquipmentEntities } = invariantContext
+  const { tipState, liquidState } = prevRobotState
+  const tiprackHasTip = getTiprackHasTips(tipState, labware)
+  const labwareHasLiquid = getLabwareHasLiquid(liquidState, labware)
+
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
+  const warnings: CommandCreatorWarning[] = []
+
+  const newLocationInWasteChute =
+    newLocation !== 'offDeck' &&
+    'slotName' in newLocation &&
+    newLocation.slotName === WASTE_CHUTE_SLOT
 
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
@@ -70,6 +90,21 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
   }
+
+  if (
+    tiprackHasTip &&
+    newLocationInWasteChute &&
+    getHasWasteChute(additionalEquipmentEntities)
+  ) {
+    warnings.push(warningCreators.tiprackInWasteChuteHasTips())
+  } else if (
+    labwareHasLiquid &&
+    newLocationInWasteChute &&
+    getHasWasteChute(additionalEquipmentEntities)
+  ) {
+    warnings.push(warningCreators.labwareInWasteChuteHasLiquid())
+  }
+
   if (destinationModuleId != null) {
     const destModuleState =
       prevRobotState.modules[destinationModuleId].moduleState
@@ -109,5 +144,6 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   ]
   return {
     commands,
+    warnings: warnings.length > 0 ? warnings : undefined,
   }
 }

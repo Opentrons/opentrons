@@ -17,6 +17,7 @@ interface GripperCardProps {
   attachedGripper: GripperData | BadGripper | null
   isCalibrated: boolean
   setSubsystemToUpdate: (subsystem: Subsystem | null) => void
+  isRunActive: boolean
 }
 const BANNER_LINK_CSS = css`
   text-decoration: underline;
@@ -29,6 +30,7 @@ export function GripperCard({
   attachedGripper,
   isCalibrated,
   setSubsystemToUpdate,
+  isRunActive,
 }: GripperCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
   const [
@@ -62,7 +64,7 @@ export function GripperCard({
       ? [
           {
             label: t('attach_gripper'),
-            disabled: attachedGripper != null,
+            disabled: attachedGripper != null || isRunActive,
             onClick: handleAttach,
           },
         ]
@@ -72,12 +74,12 @@ export function GripperCard({
               attachedGripper.data.calibratedOffset?.last_modified != null
                 ? t('recalibrate_gripper')
                 : t('calibrate_gripper'),
-            disabled: attachedGripper == null,
+            disabled: attachedGripper == null || isRunActive,
             onClick: handleCalibrate,
           },
           {
             label: t('detach_gripper'),
-            disabled: attachedGripper == null,
+            disabled: attachedGripper == null || isRunActive,
             onClick: handleDetach,
           },
           {

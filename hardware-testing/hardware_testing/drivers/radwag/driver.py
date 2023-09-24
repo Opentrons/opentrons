@@ -1,7 +1,7 @@
 """Radwag Scale Driver."""
 from abc import ABC, abstractmethod
 from typing import Tuple, Optional
-
+import datetime
 from serial import Serial  # type: ignore[import]
 
 from .commands import (
@@ -9,6 +9,7 @@ from .commands import (
     RadwagWorkingMode,
     RadwagFilter,
     RadwagValueRelease,
+    RadwagAmbiant,
     radwag_command_format,
 )
 from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_parse
@@ -86,6 +87,7 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
+        self._raw_log = open("/data/testing_data/scale_raw.txt", "w")
 
     @classmethod
     def create(
@@ -102,6 +104,7 @@ class RadwagScale(RadwagScaleBase):
         cmd_str = radwag_command_format(cmd)
         cmd_bytes = cmd_str.encode("utf-8")
         send_len = self._connection.write(cmd_bytes)
+        self._raw_log.write(f"{datetime.datetime.now()} --> {cmd_bytes!r}\n")
         assert send_len == len(cmd_bytes), (
             f'Radwag command "{cmd}" ({str(cmd_bytes)} '
             f"bytes) only sent {send_len} bytes"
@@ -117,6 +120,7 @@ class RadwagScale(RadwagScaleBase):
             self._connection.timeout = prev_timeout
         else:
             response = self._connection.readline()
+        self._raw_log.write(f"{datetime.datetime.now()} <-- {response}\n")
         data = radwag_response_parse(response.decode("utf-8"), command)
         return data
 
@@ -150,6 +154,7 @@ class RadwagScale(RadwagScaleBase):
     def disconnect(self) -> None:
         """Disconnect."""
         self._connection.close()
+        self._raw_log.close()
 
     def read_serial_number(self) -> str:
         """Read serial number."""
@@ -181,6 +186,14 @@ class RadwagScale(RadwagScaleBase):
         """Set the value release type."""
         cmd = RadwagCommand.SET_VALUE_RELEASE
         res = self._write_command_and_read_response(cmd, append=str(val_rel.value))
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
+
+    def ambiant(self, amb_rel: RadwagAmbiant) -> None:
+        """Set the value release type."""
+        cmd = RadwagCommand.SET_AMBIENT_CONDITIONS_STATE
+        res = self._write_command_and_read_response(cmd, append=str(amb_rel.value))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -270,6 +283,10 @@ class SimRadwagScale(RadwagScaleBase):
 
     def value_release(self, val_rel: RadwagValueRelease) -> None:
         """Value release."""
+        return
+
+    def ambiant(self, amb_rel: RadwagAmbiant) -> None:
+        """Set the value release type."""
         return
 
     def continuous_transmission(self, enable: bool) -> None:

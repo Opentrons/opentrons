@@ -5,12 +5,14 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   FLEX_ROBOT_TYPE,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
+import { getHasWasteChute } from '../../components/labware'
 import {
   AllTemporalPropertiesForTimelineFrame,
   selectors as stepFormSelectors,
@@ -23,6 +25,7 @@ import {
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
+  getAdditionalEquipmentEntities,
 } from '../../step-forms/selectors'
 import { getIsAdapter } from '../../utils'
 import type { RobotState } from '@opentrons/step-generation'
@@ -87,6 +90,7 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
   }
 )
 
+//  TODO(jr, 9/20/23): we should test this util since it does a lot.
 export const getUnocuppiedLabwareLocationOptions: Selector<
   Option[] | null
 > = createSelector(
@@ -94,10 +98,19 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   getModuleEntities,
   getRobotType,
   getLabwareEntities,
-  (robotState, moduleEntities, robotType, labwareEntities) => {
+  getAdditionalEquipmentEntities,
+  (
+    robotState,
+    moduleEntities,
+    robotType,
+    labwareEntities,
+    additionalEquipmentEntities
+  ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
+    const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+
     if (robotState == null) return null
 
     const { modules, labware } = robotState
@@ -178,18 +191,30 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
           !Object.values(labware)
             .map(lw => lw.slot)
             .includes(slotId) &&
-          slotId !== trashSlot
+          slotId !== trashSlot &&
+          (hasWasteChute ? slotId !== WASTE_CHUTE_SLOT : true)
       )
       .map(slotId => ({ name: slotId, value: slotId }))
-
     const offDeck = { name: 'Off Deck', value: 'offDeck' }
+    const wasteChuteSlot = {
+      name: 'Waste Chute in D3',
+      value: WASTE_CHUTE_SLOT,
+    }
 
-    return [
-      ...unoccupiedAdapterOptions,
-      ...unoccupiedModuleOptions,
-      ...unoccupiedSlotOptions,
-      offDeck,
-    ]
+    return hasWasteChute
+      ? [
+          wasteChuteSlot,
+          ...unoccupiedAdapterOptions,
+          ...unoccupiedModuleOptions,
+          ...unoccupiedSlotOptions,
+          offDeck,
+        ]
+      : [
+          ...unoccupiedAdapterOptions,
+          ...unoccupiedModuleOptions,
+          ...unoccupiedSlotOptions,
+          offDeck,
+        ]
   }
 )
 
@@ -198,8 +223,29 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
   getPipetteEntities,
   getModuleEntities,
   getLabwareEntities,
-  (robotState, pipetteEntities, moduleEntities, labwareEntities) => {
-    if (robotState == null) return { pipettes: {}, labware: {}, modules: {} }
+  getAdditionalEquipmentEntities,
+  (
+    robotState,
+    pipetteEntities,
+    moduleEntities,
+    labwareEntities,
+    additionalEquipmentEntities
+  ) => {
+    if (robotState == null)
+      return {
+        pipettes: {},
+        labware: {},
+        modules: {},
+        additionalEquipmentOnDeck: {},
+      }
+
+    // only allow wasteChute since its the only additional equipment that is like an entity
+    // that deck setup needs to be aware of
+    const filteredAdditionalEquipment = Object.fromEntries(
+      Object.entries(additionalEquipmentEntities).filter(
+        ([_, entity]) => entity.name === 'wasteChute'
+      )
+    )
     return {
       pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
         ...pipEntity,
@@ -213,6 +259,12 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
         ...modEntity,
         ...robotState.modules[modId],
       })),
+      additionalEquipmentOnDeck: mapValues(
+        filteredAdditionalEquipment,
+        additionalEquipmentEntity => ({
+          ...additionalEquipmentEntity,
+        })
+      ),
     }
   }
 )

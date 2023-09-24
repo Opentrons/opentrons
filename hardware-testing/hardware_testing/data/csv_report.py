@@ -135,7 +135,7 @@ class CSVLine:
         self._elapsed_time = time() - self._start_time
         for i, expected_type in enumerate(self._data_types):
             if data[i] is None:
-                self._data[i] = data[i]
+                self._data[i] = None
             else:
                 try:
                     self._data[i] = expected_type(data[i])
@@ -144,8 +144,8 @@ class CSVLine:
                         f"[{self.tag}] unexpected data type {type(data[i])} "
                         f'with value "{data[i]}" at index {i}'
                     )
-        self._stored = True
-        if print_results and CSVResult in self._data_types:
+        self._stored = bool(None not in self._data)
+        if self._stored and print_results and CSVResult in self._data_types:
             print_csv_result(self.tag, CSVResult.from_bool(self.result_passed))
 
 
@@ -411,7 +411,8 @@ class CSVReport:
     @property
     def parent(self) -> Path:
         """Parent directory of this report file."""
-        return data_io.create_folder_for_test_data(self._test_name)
+        test_path = data_io.create_folder_for_test_data(self._test_name)
+        return data_io.create_folder_for_test_data(test_path / self._run_id)
 
     @property
     def tag(self) -> str:
@@ -423,8 +424,7 @@ class CSVReport:
         """Get file-path."""
         if not self._file_name:
             raise RuntimeError("must set tag of report using `Report.set_tag()`")
-        test_path = data_io.create_folder_for_test_data(self._test_name)
-        return test_path / self._file_name
+        return self.parent / self._file_name
 
     def _cache_start_time(self, start_time: Optional[float] = None) -> None:
         checked_start_time = start_time if start_time else time()
@@ -484,7 +484,7 @@ class CSVReport:
         _report_str = str(self)
         assert self._file_name, "must set tag before saving to disk"
         return data_io.dump_data_to_file(
-            self._test_name, self._file_name, _report_str + "\n"
+            self._test_name, self._run_id, self._file_name, _report_str + "\n"
         )
 
     def print_results(self) -> None:

@@ -34,7 +34,7 @@ describe('AboutGripperSlideout', () => {
     props = { ...props, firmwareVersion: '12' }
     const { getByText } = render(props)
 
-    getByText('Current Version')
+    getByText('CURRENT VERSION')
     getByText('12')
   })
 })

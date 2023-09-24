@@ -46,6 +46,7 @@ describe('GripperCard', () => {
       } as GripperData,
       isCalibrated: true,
       setSubsystemToUpdate: jest.fn(),
+      isRunActive: false,
     }
     mockGripperWizardFlows.mockReturnValue(<>wizard flow launched</>)
     mockAboutGripperSlideout.mockReturnValue(<>about gripper</>)
@@ -87,6 +88,7 @@ describe('GripperCard', () => {
       } as GripperData,
       isCalibrated: false,
       setSubsystemToUpdate: jest.fn(),
+      isRunActive: false,
     }
 
     const { getByText } = render(props)
@@ -127,6 +129,7 @@ describe('GripperCard', () => {
       attachedGripper: null,
       isCalibrated: false,
       setSubsystemToUpdate: jest.fn(),
+      isRunActive: false,
     }
     const { getByText, getByRole } = render(props)
     const overflowButton = getByRole('button', {
@@ -144,6 +147,7 @@ describe('GripperCard', () => {
       } as any,
       isCalibrated: false,
       setSubsystemToUpdate: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Extension mount')
@@ -162,6 +166,7 @@ describe('GripperCard', () => {
       } as any,
       isCalibrated: true,
       setSubsystemToUpdate: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Extension mount')

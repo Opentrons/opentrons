@@ -94,6 +94,7 @@ export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'
 export const TROUGH_LABWARE = 'troughId'
 export const DEFAULT_BLOWOUT_WELL = 'A1'
+export const TIPRACK_1 = 'tiprack1Id'
 export const AIR_GAP_META = { isAirGap: true } // to differentiate if the aspirate or dispense command is an air gap or not
 // =================
 type MakeAspDispHelper<P> = (

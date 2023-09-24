@@ -32,6 +32,7 @@ import {
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { AdditionalEquipmentEntities } from '../types'
 import type {
   Config,
   InvariantContext,
@@ -120,6 +121,7 @@ export function makeContext(): InvariantContext {
     },
   }
   const moduleEntities: ModuleEntities = {}
+  const additionalEquipmentEntities: AdditionalEquipmentEntities = {}
   const pipetteEntities: PipetteEntities = {
     p10SingleId: {
       name: 'p10_single',
@@ -158,6 +160,7 @@ export function makeContext(): InvariantContext {
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     config: DEFAULT_CONFIG,
   }
 }

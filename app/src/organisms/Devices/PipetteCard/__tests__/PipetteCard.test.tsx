@@ -81,6 +81,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
     when(mockAboutPipettesSlideout).mockReturnValue(
@@ -121,6 +122,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('left Mount')
@@ -136,6 +138,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText, getByRole } = render(props)
     getByText('Both Mounts')
@@ -156,6 +159,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('right Mount')
@@ -170,6 +174,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('right Mount')
@@ -184,6 +189,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('left Mount')
@@ -199,6 +205,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { queryByText } = render(props)
     expect(queryByText('Calibrate now')).toBeNull()
@@ -213,6 +220,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Calibrate now')
@@ -226,6 +234,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByRole, getByText, queryByText } = render(props)
 
@@ -248,6 +257,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: true,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Right mount')
@@ -268,6 +278,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: true,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Right mount')
