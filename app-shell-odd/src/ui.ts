@@ -59,7 +59,7 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
   // open new windows (<a target="_blank" ...) in browser windows
-  mainWindow.webContents.on('new-window', (event, url) => {
+  mainWindow.webContents.on('will-navigate', (event, url) => {
     log.debug('Opening external link', { url })
     event.preventDefault()
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
