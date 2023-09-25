@@ -31,9 +31,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
   const isMulti = pipette ? pipette.spec.channels > 1 : false
   return {
-    primaryWellCount: Array.isArray(selectedWells)
-      ? selectedWells.length
-      : undefined,
+    primaryWellCount: 1,
     isMulti,
   }
 }

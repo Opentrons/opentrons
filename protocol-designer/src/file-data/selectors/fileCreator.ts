@@ -118,7 +118,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     labwareDefsByURI
   ) => {
     const { author, description, created } = fileMetadata
-    console.log(initialRobotState.labware)
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
     // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
