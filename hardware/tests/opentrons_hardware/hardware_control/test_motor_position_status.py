@@ -21,6 +21,7 @@ from opentrons_hardware.firmware_bindings.arbitration_id import (
 )
 
 from opentrons_hardware.hardware_control import motor_position_status
+from opentrons_hardware.hardware_control.types import MotorPositionStatus
 
 
 def motor_position_response() -> md.MotorPositionResponse:
@@ -78,6 +79,6 @@ async def test_parse_motor_position(waitable_reader: AsyncIter) -> None:
         ),
         1,
     )
-    expected = (0.123, 0.123, True, False)
+    expected = MotorPositionStatus(0.123, 0.123, True, False)
     for n in nodes:
         assert data.get(n) == expected

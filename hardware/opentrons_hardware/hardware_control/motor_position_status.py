@@ -33,18 +33,23 @@ from .types import NodeMap, MotorPositionStatus
 log = logging.getLogger(__name__)
 
 
-_MotorStatusMoves = Union[MoveCompleted, TipActionResponse, MotorPositionResponse, UpdateMotorPositionEstimationResponse]
+_MotorStatusMoves = Union[
+    MoveCompleted,
+    TipActionResponse,
+    MotorPositionResponse,
+    UpdateMotorPositionEstimationResponse,
+]
 
 
 def extract_motor_status_info(msg: _MotorStatusMoves) -> MotorPositionStatus:
-    return (
-        float(msg.payload.current_position_um.value / 1000.0),
-        float(msg.payload.encoder_position_um.value) / 1000.0,
-        bool(
+    return MotorPositionStatus(
+        motor_position=float(msg.payload.current_position_um.value / 1000.0),
+        encoder_position=float(msg.payload.encoder_position_um.value) / 1000.0,
+        motor_ok=bool(
             msg.payload.position_flags.value
             & MotorPositionFlags.stepper_position_ok.value
         ),
-        bool(
+        encoder_ok=bool(
             msg.payload.position_flags.value
             & MotorPositionFlags.encoder_position_ok.value
         ),
@@ -129,7 +134,7 @@ async def update_motor_position_estimation(
                 data[node] = await asyncio.wait_for(
                     _parser_update_motor_position_response(reader, node), timeout
                 )
-                if not data[node][2]:
+                if not data[node].motor_ok:
                     # If the stepper_ok flag isn't set, that means the node didn't update position.
                     # This probably is because the motor is off. It's rare.
                     raise RoboticsControlError(

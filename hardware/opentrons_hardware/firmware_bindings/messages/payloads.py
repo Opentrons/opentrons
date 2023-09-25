@@ -229,8 +229,8 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 class MotorPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 
-    current_position: utils.UInt32Field
-    encoder_position: utils.Int32Field
+    current_position_um: utils.UInt32Field
+    encoder_position_um: utils.Int32Field
     position_flags: MotorPositionFlagsField
 
 

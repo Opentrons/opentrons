@@ -13,8 +13,6 @@ NodeList = List[NodeId]
 
 NodeDict = Dict[NodeId, MapPayload]
 
-MotorPositionStatus = Tuple[float, float, bool, bool]
-
 
 @dataclass
 class PCBARevision:
@@ -33,3 +31,27 @@ class MoveCompleteAck(Enum):
     stopped_by_condition = MoveAckId.stopped_by_condition.value
     timeout = MoveAckId.timeout.value
     position_error = MoveAckId.position_error.value
+
+
+@dataclass
+class MotorPositionStatus:
+    """Motor Position Status information."""
+
+    motor_position: float
+    encoder_position: float
+    motor_ok: bool
+    encoder_ok: bool
+
+
+@dataclass
+class MoveStatus:
+    """Move status: same as MotorPositionStatus, but with an extra move_ack field."""
+
+    position_status: MotorPositionStatus
+    move_ack: MoveCompleteAck
+
+    def get_positions_only(self) -> Tuple[float, float]:
+        return (
+            self.position_status.motor_position,
+            self.position_status.encoder_position,
+        )

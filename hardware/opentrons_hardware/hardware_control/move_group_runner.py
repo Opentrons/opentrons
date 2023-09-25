@@ -72,14 +72,24 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     MoveStopConditionField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motor_position_status import (
+    extract_motor_status_info,
+)
 
-from .types import NodeDict, MotorPositionStatus
+from .types import NodeDict, MotorPositionStatus, MoveStatus, MoveCompleteAck
 
 log = logging.getLogger(__name__)
 
 _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
 _CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
 _Completions = List[_CompletionPacket]
+
+
+def extract_move_complete_info(msg: _AcceptableMoves) -> MoveStatus:
+    return MoveStatus(
+        position_status=extract_motor_status_info(msg),
+        move_ack=MoveCompleteAck(msg.payload.ack_id.value),
+    )
 
 
 class MoveGroupRunner:
@@ -125,9 +135,7 @@ class MoveGroupRunner:
         await self._send_groups(can_messenger)
         self._is_prepped = True
 
-    async def execute(
-        self, can_messenger: CanMessenger
-    ) -> NodeDict[MotorPositionStatus]:
+    async def execute(self, can_messenger: CanMessenger) -> NodeDict[MoveStatus]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
         prep() and execute() can be used to replace a single call to run() to
@@ -144,7 +152,7 @@ class MoveGroupRunner:
         move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
-    async def run(self, can_messenger: CanMessenger) -> NodeDict[MotorPositionStatus]:
+    async def run(self, can_messenger: CanMessenger) -> NodeDict[MoveStatus]:
         """Run the move group.
 
         Args:
@@ -168,54 +176,27 @@ class MoveGroupRunner:
     @staticmethod
     def _accumulate_move_completions(
         completions: _Completions,
-    ) -> NodeDict[MotorPositionStatus]:
-        position: NodeDict[
-            List[Tuple[Tuple[int, int], float, float, bool, bool]]
-        ] = defaultdict(list)
+    ) -> NodeDict[MoveStatus]:
+        position: NodeDict[List[Tuple[Tuple[int, int], MoveStatus]]] = defaultdict(list)
         gear_motor_position: NodeDict[
-            List[Tuple[Tuple[int, int], float, float, bool, bool]]
+            List[Tuple[Tuple[int, int], MoveStatus]]
         ] = defaultdict(list)
         for arbid, completion in completions:
+            move_info = (
+                (
+                    completion.payload.group_id.value,
+                    completion.payload.seq_id.value,
+                ),
+                extract_move_complete_info(completion),
+            )
             if isinstance(completion, TipActionResponse):
                 # if any completions are TipActionResponses, separate them from the 'positions'
                 # dict so the left pipette's position doesn't get overwritten
                 gear_motor_position[NodeId(arbid.parts.originating_node_id)].append(
-                    (
-                        (
-                            completion.payload.group_id.value,
-                            completion.payload.seq_id.value,
-                        ),
-                        float(completion.payload.current_position_um.value) / 1000.0,
-                        float(completion.payload.encoder_position_um.value) / 1000.0,
-                        bool(
-                            completion.payload.position_flags.value
-                            & MotorPositionFlags.stepper_position_ok.value
-                        ),
-                        bool(
-                            completion.payload.position_flags.value
-                            & MotorPositionFlags.encoder_position_ok.value
-                        ),
-                    )
+                    move_info
                 )
             else:
-                position[NodeId(arbid.parts.originating_node_id)].append(
-                    (
-                        (
-                            completion.payload.group_id.value,
-                            completion.payload.seq_id.value,
-                        ),
-                        float(completion.payload.current_position_um.value) / 1000.0,
-                        float(completion.payload.encoder_position_um.value) / 1000.0,
-                        bool(
-                            completion.payload.position_flags.value
-                            & MotorPositionFlags.stepper_position_ok.value
-                        ),
-                        bool(
-                            completion.payload.position_flags.value
-                            & MotorPositionFlags.encoder_position_ok.value
-                        ),
-                    )
-                )
+                position[NodeId(arbid.parts.originating_node_id)].append(move_info)
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
         if any(gear_motor_position):
@@ -226,7 +207,7 @@ class MoveGroupRunner:
                             poslist, key=lambda position_element: position_element[0]
                         )
                     )
-                )[1:]
+                )[1]
                 for node, poslist in gear_motor_position.items()
             }
         return {
@@ -234,7 +215,7 @@ class MoveGroupRunner:
                 reversed(
                     sorted(poslist, key=lambda position_element: position_element[0])
                 )
-            )[1:]
+            )[1]
             for node, poslist in position.items()
         }
 
