@@ -35,6 +35,7 @@ interface CalibrationTaskListProps {
   pipOffsetCalLauncher: DashboardCalOffsetInvoker
   tipLengthCalLauncher: DashboardCalTipLengthInvoker
   deckCalLauncher: DashboardCalDeckInvoker
+  wasExitBeforeCompletion: boolean
 }
 
 export function CalibrationTaskList({
@@ -42,6 +43,7 @@ export function CalibrationTaskList({
   pipOffsetCalLauncher,
   tipLengthCalLauncher,
   deckCalLauncher,
+  wasExitBeforeCompletion,
 }: CalibrationTaskListProps): JSX.Element {
   const prevActiveIndex = React.useRef<[number, number] | null>(null)
   const [hasLaunchedWizard, setHasLaunchedWizard] = React.useState<boolean>(
@@ -125,9 +127,15 @@ export function CalibrationTaskList({
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
-            <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
+            {wasExitBeforeCompletion ? (
+              <Icon name="ot-alert" size="3rem" color={COLORS.yellow2} />
+            ) : (
+              <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
+            )}
             <StyledText as="h1" marginTop={SPACING.spacing24}>
-              {t('calibrations_complete')}
+              {wasExitBeforeCompletion
+                ? t('calibrations_aborted')
+                : t('calibrations_complete')}
             </StyledText>
             <PrimaryButton
               marginTop={SPACING.spacing24}
