@@ -6,7 +6,7 @@ from typing import List
 from opentrons.util.broker import Broker
 
 
-def test_non_context_manager_subscriptions() -> None:
+def test_broker() -> None:
     """Test subscribing, receiving messages, and unsubscribing."""
     subject = Broker[int]()
 
