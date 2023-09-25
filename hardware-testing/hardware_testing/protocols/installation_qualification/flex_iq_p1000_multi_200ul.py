@@ -71,7 +71,7 @@ def _get_diluent_volume() -> float:
 
 
 SRC_LABWARE_BY_CHANNELS = {
-    1: "nest_96_wellplate_2ml_deep",
+    1: "nest_12_reservoir_15ml",
     8: "nest_12_reservoir_15ml",
     96: "nest_1_reservoir_195ml",
 }
@@ -169,7 +169,7 @@ def _build_diluent_info() -> Optional[Tuple[float, Dict[str, List[str]]]]:
         [int(dst[1:]) for test in TEST_SOURCES for dst in test["destinations"]]
     )
     dest = [f"A{col}" for col in sorted(list(target_cols))]
-    num_dest_per_src = int(len(dest) / len(DILUENT_WELLS))
+    num_dest_per_src = ceil(len(dest) / len(DILUENT_WELLS))
     src_to_dest = {
         src: dest[i * num_dest_per_src : i * num_dest_per_src + num_dest_per_src]
         for i, src in enumerate(DILUENT_WELLS)
@@ -241,6 +241,8 @@ def _assign_starting_volumes_diluent(
         src_ul_per_trial = _diluent_start_volumes_per_trial(
             reservoir.load_name, len(destinations)
         )
+        if not src_ul_per_trial:
+            continue
         first_trial_ul = src_ul_per_trial[0]
         reservoir[source].load_liquid(diluent, first_trial_ul)
 
