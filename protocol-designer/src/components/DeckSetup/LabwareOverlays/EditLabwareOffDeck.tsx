@@ -129,7 +129,10 @@ const mapDispatchToProps = (
 ): DP => ({
   editLiquids: () =>
     dispatch(openIngredientSelector(ownProps.labwareEntity.id)),
-  duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareEntity.id)),
+  duplicateLabware: () =>
+    dispatch(
+      duplicateLabware({ templateLabwareId: ownProps.labwareEntity.id })
+    ),
   deleteLabware: () => {
     window.confirm(
       `Are you sure you want to permanently delete this ${getLabwareDisplayName(
