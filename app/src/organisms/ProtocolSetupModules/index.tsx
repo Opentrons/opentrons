@@ -73,6 +73,8 @@ const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'CALIBRATION_CUTOUTS',
 ]
 
+const ATTACHED_MODULE_POLL_MS = 5000
+
 interface RenderModuleStatusProps {
   isModuleReady: boolean
   isDuplicateModuleModel: boolean
@@ -314,7 +316,9 @@ export function ProtocolSetupModules({
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
-  const attachedModules = useAttachedModules()
+  const attachedModules = useAttachedModules({
+    refetchInterval: ATTACHED_MODULE_POLL_MS,
+  })
 
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : ''
