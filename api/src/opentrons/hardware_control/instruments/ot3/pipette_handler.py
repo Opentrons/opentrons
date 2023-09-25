@@ -405,7 +405,6 @@ class OT3PipetteHandler:
         }
 
     async def update_nozzle_configuration(
-<<<<<<< HEAD
         self,
         mount: MountType,
         back_left_nozzle: str,
@@ -417,13 +416,6 @@ class OT3PipetteHandler:
             instr.update_nozzle_configuration(
                 back_left_nozzle, front_right_nozzle, starting_nozzle
             )
-=======
-        self, mount: MountType, back_left_nozzle: str, front_right_nozzle: str
-    ) -> None:
-        instr = self._attached_instruments[OT3Mount.from_mount(mount)]
-        if instr:
-            instr.update_nozzle_configuration(back_left_nozzle, front_right_nozzle)
->>>>>>> update the signatures of the api calls to nozzle manager
 
     async def add_tip(self, mount: OT3Mount, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
