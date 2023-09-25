@@ -57,9 +57,9 @@ export const OffDeckLabwareSlideout = (
 
   const offDeckEntries =
     robotState?.labware != null
-      ? Object.entries(robotState?.labware)
-          .filter(([key, value]) => value.slot === 'offDeck')
-          .reverse()
+      ? Object.entries(robotState?.labware).filter(
+          ([key, value]) => value.slot === 'offDeck'
+        )
       : null
   const offDeck =
     offDeckEntries != null && offDeckEntries.length > 0
