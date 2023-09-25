@@ -1,7 +1,8 @@
 """A simple pub/sub message broker."""
 
 
-from typing import Callable, Generic, Set, TypeVar
+from contextlib import contextmanager
+from typing import Callable, Generator, Generic, Set, TypeVar
 
 
 _MessageT = TypeVar("_MessageT")
@@ -16,11 +17,27 @@ class Broker(Generic[_MessageT]):
     def __init__(self) -> None:
         self._callbacks: Set[Callable[[_MessageT], None]] = set()
 
-    def subscribe(self, callback: Callable[[_MessageT], None]) -> Callable[[], None]:
-        """Register ``callback`` to be called by a subsequent `publish`.
+    @contextmanager
+    def subscribed(
+        self, callback: Callable[[_MessageT], None]
+    ) -> Generator[None, None, None]:
+        """Register a callback to be called on each message.
 
-        You must not subscribe the same callback again
-        unless you first unsubscribe it.
+        The callback is subscribed when this context manager is entered,
+        and unsubscribed when it's exited.
+
+        You must not subscribe the same callback again unless you first usubscribe it.
+        """
+        unsubscribe = self.subscribe(callback)
+        try:
+            yield
+        finally:
+            unsubscribe()
+
+    def subscribe(self, callback: Callable[[_MessageT], None]) -> Callable[[], None]:
+        """Register a callback to be called on each message.
+
+        You must not subscribe the same callback again unless you first unsubscribe it.
 
         Returns:
             A function that you can call to unsubscribe ``callback``.
