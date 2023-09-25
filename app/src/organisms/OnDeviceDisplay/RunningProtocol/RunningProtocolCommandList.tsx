@@ -69,7 +69,7 @@ const COMMAND_ROW_STYLE = css`
 //   backdrop-filter: blur(1.5px);
 // `
 
-type VisibleIndexRange = {
+interface VisibleIndexRange {
   lowestVisibleIndex: number
   highestVisibleIndex: number
 }
@@ -105,10 +105,6 @@ export function RunningProtocolCommandList({
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
-  // const [
-  //   isCurrentCommandVisible,
-  //   setIsCurrentCommandVisible,
-  // ] = React.useState<boolean>(true)
   const [visibleRange, setVisibleRange] = React.useState<VisibleIndexRange>({
     lowestVisibleIndex: 0,
     highestVisibleIndex: 0,
@@ -134,26 +130,19 @@ export function RunningProtocolCommandList({
   }
 
   React.useEffect(() => {
+    // Note (kk:09/25/2023) Need -1 because the element of highestVisibleIndex cannot really readable
+    // due to limited space
     const isCurrentCommandVisible =
       currentRunCommandIndex != null &&
       currentRunCommandIndex >= visibleRange.lowestVisibleIndex &&
-      currentRunCommandIndex <= visibleRange.highestVisibleIndex
+      currentRunCommandIndex <= visibleRange.highestVisibleIndex - 1
 
     if (
-      viewPortRef.current != null &&
+      ref.current != null &&
       !isCurrentCommandVisible &&
       currentRunCommandIndex != null
     ) {
-      console.log('scrollToIndex')
-      viewPortRef.current.scrollIntoView()
-      // const scrollOptions = {
-      //   index: currentRunCommandIndex,
-      //   alignToTop: true,
-      //   prerender: 20,
-      //   delay: -1,
-      //   offset: 0,
-      // }
-      ref?.current?.scrollToIndex(currentRunCommandIndex)
+      ref.current.scrollToIndex(currentRunCommandIndex)
     }
   }, [
     currentRunCommandIndex,
@@ -214,10 +203,6 @@ export function RunningProtocolCommandList({
                 currentRunCommandIndex != null &&
                 currentRunCommandIndex >= 0
               ) {
-                // setIsCurrentCommandVisible(
-                //   currentRunCommandIndex >= lowestVisibleIndex &&
-                //     currentRunCommandIndex <= highestVisibleIndex
-                // )
                 setVisibleRange({
                   lowestVisibleIndex,
                   highestVisibleIndex,
