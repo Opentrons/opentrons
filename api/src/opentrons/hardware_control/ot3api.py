@@ -165,7 +165,7 @@ AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis
 Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
 
 
-def adjust_high_throughput_z_current(func: Wrapped) -> Wrapped:
+def _adjust_high_throughput_z_current(func: Wrapped) -> Wrapped:
     """
     A decorator that temproarily and conditionally changes the active current (based on the axis input)
     before a function is executed and the cleans up afterwards
@@ -1354,7 +1354,7 @@ class OT3API(
         target_pos.update({axis: self._backend.home_position()[axis]})
         return origin, target_pos
 
-    @adjust_high_throughput_z_current
+    @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:
         """
         Perform home; base on axis motor/encoder statuses, shorten homing time
@@ -1501,7 +1501,7 @@ class OT3API(
         await self.retract_axis(Axis.by_mount(mount))
 
     @ExecutionManagerProvider.wait_for_running
-    @adjust_high_throughput_z_current
+    @_adjust_high_throughput_z_current
     async def retract_axis(self, axis: Axis) -> None:
         """
         Move an axis to its home position, without engaging the limit switch,
