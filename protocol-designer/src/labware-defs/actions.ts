@@ -13,8 +13,8 @@ import {
 } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
-import { ThunkAction } from '../types'
-import { LabwareUploadMessage } from './types'
+import type { ThunkAction } from '../types'
+import type { LabwareUploadMessage } from './types'
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage
@@ -75,30 +75,32 @@ const _labwareDefsMatchingDisplayName = (
 
 const getIsOverwriteMismatched = (
   newDef: LabwareDefinition2,
-  overwrittenDef: LabwareDefinition2
+  overwrittenDef: LabwareDefinition2,
+  channel: 8 | 96
 ): boolean => {
   const matchedWellOrdering = isEqual(newDef.ordering, overwrittenDef.ordering)
   const matchedMultiUse =
     matchedWellOrdering &&
     isEqual(
-      getAllWellSetsForLabware(newDef, 8),
-      getAllWellSetsForLabware(overwrittenDef, 8)
+      getAllWellSetsForLabware(newDef, channel),
+      getAllWellSetsForLabware(overwrittenDef, channel)
     )
   return !(matchedWellOrdering && matchedMultiUse)
 }
 
 const _createCustomLabwareDef: (
-  onlyTiprack: boolean
-) => (
-  event: React.SyntheticEvent<HTMLInputElement>
-) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
+  onlyTiprack: boolean,
+  has96Channel: boolean
+) => (event: React.SyntheticEvent<HTMLInputElement>) => ThunkAction<any> = (
+  onlyTiprack,
+  has96Channel
+) => event => (dispatch, getState) => {
   const allLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getLabwareDefsByURI(getState())
   )
   const customLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
   )
-
   // @ts-expect-error(sa, 2021-6-20): null check
   const file = event.currentTarget.files[0]
   const reader = new FileReader()
@@ -199,7 +201,8 @@ const _createCustomLabwareDef: (
           isOverwriteMismatched: getIsOverwriteMismatched(
             // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
             parsedLabwareDef,
-            matchingDefs[0]
+            matchingDefs[0],
+            has96Channel ? 96 : 8
           ),
         })
       )
@@ -242,11 +245,21 @@ const _createCustomLabwareDef: (
 }
 
 export const createCustomLabwareDef: (
-  event: React.SyntheticEvent<HTMLInputElement>
-) => ThunkAction<any> = _createCustomLabwareDef(false)
+  event: React.SyntheticEvent<HTMLInputElement>,
+  has96Channel: boolean
+) => (event: React.SyntheticEvent<HTMLInputElement>) => ThunkAction<any> = (
+  event,
+  has96Channel
+) => _createCustomLabwareDef(false, has96Channel)
+
 export const createCustomTiprackDef: (
-  event: React.SyntheticEvent<HTMLInputElement>
-) => ThunkAction<any> = _createCustomLabwareDef(true)
+  event: React.SyntheticEvent<HTMLInputElement>,
+  has96Channel: boolean
+) => (event: React.SyntheticEvent<HTMLInputElement>) => ThunkAction<any> = (
+  event,
+  has96Channel
+) => _createCustomLabwareDef(true, has96Channel)
+
 interface DismissLabwareUploadMessage {
   type: 'DISMISS_LABWARE_UPLOAD_MESSAGE'
 }

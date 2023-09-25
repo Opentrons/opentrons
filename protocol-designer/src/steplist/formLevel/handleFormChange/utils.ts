@@ -19,10 +19,11 @@ export function chainPatchUpdaters(
 // included in that set. Used to convert multi to single.
 export function getAllWellsFromPrimaryWells(
   primaryWells: string[],
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition2,
+  channels: 8 | 96
 ): string[] {
   const allWells = primaryWells.reduce((acc: string[], well: string) => {
-    const nextWellSet = getWellSetForMultichannel(labwareDef, well, 8)
+    const nextWellSet = getWellSetForMultichannel(labwareDef, well, channels)
 
     // filter out any nulls (but you shouldn't get any)
     if (!nextWellSet) {

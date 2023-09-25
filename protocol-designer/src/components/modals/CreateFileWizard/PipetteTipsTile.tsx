@@ -23,7 +23,7 @@ import {
   Btn,
   JUSTIFY_END,
 } from '@opentrons/components'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs, LEFT } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
@@ -237,7 +237,14 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               </Flex>
               <input
                 type="file"
-                onChange={e => dispatch(createCustomTiprackDef(e))}
+                onChange={e =>
+                  dispatch(
+                    createCustomTiprackDef(
+                      e,
+                      values.pipettesByMount[LEFT].pipetteName === 'p1000_96'
+                    )
+                  )
+                }
               />
             </OutlineButton>
           </Flex>

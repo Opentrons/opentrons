@@ -6,6 +6,7 @@ import { BoundingRect, GenericRect } from '../collision-types'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
+  PipetteEntities,
 } from '@opentrons/step-generation'
 
 export const registerSelectors: (arg0: any) => void =
@@ -126,4 +127,8 @@ export const getStagingAreaSlots = (
   if (stagingAreas == null) return null
   //  we can assume that the location is always a string
   return stagingAreas.map(area => area.location as string)
+}
+
+export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
+  return Object.values(pipettes).some(pip => pip.name === 'p1000_96')
 }

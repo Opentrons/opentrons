@@ -60,6 +60,7 @@ import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { TerminalItemId } from '../../steplist'
 import { getSelectedTerminalItemId } from '../../ui/steps'
+import { getHas96Channel } from '../../utils'
 import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
 import { SlotWarning } from './SlotWarning'
@@ -111,9 +112,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     trashSlot,
   } = props
   const pipettes = activeDeckSetup.pipettes
-  const has96Channel = Object.values(pipettes).some(
-    pip => pip.name === 'p1000_96'
-  )
+  const has96Channel = getHas96Channel(pipettes)
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
   // But when swapping labware when at least one is on a module, we need to be aware
