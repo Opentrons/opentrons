@@ -3,7 +3,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { useFilterWizardStepsFrom } from '../hooks'
 import { getModuleCalibrationSteps } from '../../../organisms/ModuleWizardFlows/useFilteredModuleCalibrationSteps'
 import { getGripperWizardSteps } from '../../../organisms/GripperWizardFlows/useFilteredGripperWizardSteps'
-import { getPipetteWizardSteps } from '../../../organisms/PipetteWizardFlows/getPipetteWizardSteps'
+import { getPipetteWizardSteps } from '../../../organisms/PipetteWizardFlows/useFilteredPipetteWizardSteps'
 
 jest.mock('@opentrons/react-api-client')
 

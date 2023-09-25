@@ -4,7 +4,7 @@ import {
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { FLOWS, SECTIONS } from '../constants'
-import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'
+import { getPipetteWizardStepsForProtocol } from '../useFilteredPipetteWizardSteps'
 
 import type { PipetteWizardStep } from '../types'
 

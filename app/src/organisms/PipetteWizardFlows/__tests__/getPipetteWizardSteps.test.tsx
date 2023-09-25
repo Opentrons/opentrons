@@ -5,7 +5,7 @@ import {
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
 import { FLOWS, SECTIONS } from '../constants'
-import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
+import { getPipetteWizardSteps } from '../useFilteredPipetteWizardSteps'
 import type { PipetteWizardStep } from '../types'
 
 describe('getPipetteWizardSteps', () => {

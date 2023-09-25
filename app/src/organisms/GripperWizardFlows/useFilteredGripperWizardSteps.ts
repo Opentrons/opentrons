@@ -14,6 +14,12 @@ import { useFilterWizardStepsFrom } from '../../resources/wizards/hooks'
 import type { Subsystem } from '@opentrons/api-client'
 import type { GripperWizardStep, GripperWizardFlowType } from './types'
 
+export const useFilteredGripperWizardSteps = (
+  flowType: GripperWizardFlowType,
+  subsystem: Subsystem
+): GripperWizardStep[] =>
+  useFilterWizardStepsFrom(getGripperWizardSteps(flowType), subsystem)
+
 export const getGripperWizardSteps = (
   flowType: GripperWizardFlowType
 ): GripperWizardStep[] => {
@@ -60,9 +66,3 @@ export const getGripperWizardSteps = (
     }
   }
 }
-
-export const useFilteredGripperWizardSteps = (
-  flowType: GripperWizardFlowType,
-  subsystem: Subsystem
-): GripperWizardStep[] =>
-  useFilterWizardStepsFrom(getGripperWizardSteps(flowType), subsystem)
