@@ -12,7 +12,7 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
-import { getHasWasteChute } from '../../components/labware'
+import { getTrashBinSlot, getHasWasteChute } from '../../components/labware'
 import {
   AllTemporalPropertiesForTimelineFrame,
   selectors as stepFormSelectors,
@@ -107,7 +107,10 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
     additionalEquipmentEntities
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
-    const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
+    const trashSlot =
+      robotType === FLEX_ROBOT_TYPE
+        ? getTrashBinSlot(additionalEquipmentEntities) ?? ''
+        : '12'
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
 

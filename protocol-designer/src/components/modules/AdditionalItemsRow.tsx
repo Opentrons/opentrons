@@ -63,7 +63,7 @@ export function AdditionalItemsRow(
           </div>
           <div className={styles.slot_map}>
             <SlotMap
-              occupiedSlots={['D3']}
+              occupiedSlots={[WASTE_CHUTE_SLOT]}
               collisionSlots={[]}
               robotType={FLEX_ROBOT_TYPE}
             />

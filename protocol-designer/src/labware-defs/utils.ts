@@ -18,8 +18,7 @@ const definitionsContext = require.context(
 
 let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {
-  // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
-  // also, more convenient & performant to make a map {labwareDefURI: def} not an array
+  // NOTE: unlike labware-library, more convenient & performant to make a map {labwareDefURI: def} not an array
   if (!_definitions) {
     _definitions = definitionsContext.keys().reduce((acc, filename) => {
       const def: LabwareDefinition2 = definitionsContext(filename)

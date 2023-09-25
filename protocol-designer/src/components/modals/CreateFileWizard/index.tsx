@@ -21,7 +21,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   SPAN7_8_10_11_SLOT,
-  FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
@@ -61,6 +60,7 @@ import { WizardHeader } from './WizardHeader'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
 
+export const DEFAULT_TRASH_BIN_SLOT = 'A3'
 type WizardStep =
   | 'robotType'
   | 'metadata'
@@ -190,20 +190,6 @@ export function CreateFileWizard(): JSX.Element | null {
           },
         })
       )
-      // default trash labware locations in initial deck setup step
-      dispatch(
-        steplistActions.changeSavedStepForm({
-          stepId: INITIAL_DECK_SETUP_STEP_ID,
-          update: {
-            labwareLocationUpdate: {
-              [FIXED_TRASH_ID]: {
-                slotName:
-                  values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
-              },
-            },
-          },
-        })
-      )
       // create modules
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
@@ -230,6 +216,28 @@ export function CreateFileWizard(): JSX.Element | null {
         values.additionalEquipment.includes('wasteChute')
       ) {
         dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+      }
+      if (
+        enableDeckModification &&
+        values.fields.robotType === FLEX_ROBOT_TYPE &&
+        values.additionalEquipment.includes('trashBin')
+      ) {
+        dispatch(
+          createDeckFixture(
+            'trashBin',
+
+            DEFAULT_TRASH_BIN_SLOT
+          )
+        )
+      } else {
+        dispatch(
+          createDeckFixture(
+            'trashBin',
+            values.fields.robotType === FLEX_ROBOT_TYPE
+              ? DEFAULT_TRASH_BIN_SLOT
+              : '12'
+          )
+        )
       }
     }
   }

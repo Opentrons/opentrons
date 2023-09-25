@@ -37,6 +37,7 @@ export interface Props {
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
 }
 
+//  TODO(jr, 9/25/23): add trash bin support here
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
   const enableDeckModification = useSelector(getEnableDeckModification)
@@ -50,7 +51,9 @@ export function EditModulesCard(props: Props): JSX.Element {
   const wasteChute = Object.values(additionalEquipment).find(
     equipment => equipment?.name === 'wasteChute'
   )
-
+  const trashBin = Object.values(additionalEquipment).find(
+    equipment => equipment?.name === 'trashBin'
+  )
   const dispatch = useDispatch()
   const robotType = useSelector(getRobotType)
 
@@ -140,17 +143,19 @@ export function EditModulesCard(props: Props): JSX.Element {
           />
         ) : null}
         {enableDeckModification && isFlex ? (
-          <AdditionalItemsRow
-            handleAttachment={() =>
-              dispatch(
-                wasteChute != null
-                  ? deleteDeckFixture(wasteChute.id)
-                  : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
-              )
-            }
-            isEquipmentAdded={wasteChute != null}
-            name="wasteChute"
-          />
+          <>
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                dispatch(
+                  wasteChute != null
+                    ? deleteDeckFixture(wasteChute.id)
+                    : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
+                )
+              }
+              isEquipmentAdded={wasteChute != null}
+              name="wasteChute"
+            />
+          </>
         ) : null}
       </div>
     </Card>

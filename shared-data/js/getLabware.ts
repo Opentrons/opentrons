@@ -63,6 +63,9 @@ export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_right',
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
   'opentrons_96_aluminumblock_nest_wellplate_100ul',
+  'opentrons_1_trash_850ml_fixed',
+  'opentrons_1_trash_1100ml_fixed',
+  'opentrons_1_trash_3200ml_fixed',
 ]
 
 export function getLabwareV1Def(
