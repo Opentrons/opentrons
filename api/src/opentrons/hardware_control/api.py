@@ -1050,7 +1050,11 @@ class API(
             blowout_spec.instr.ready_to_aspirate = False
 
     async def update_nozzle_configuration_for_mount(
-        self, mount: top_types.Mount, back_left_nozzle: str, front_right_nozzle: str
+        self,
+        mount: top_types.Mount,
+        back_left_nozzle: str,
+        front_right_nozzle: str,
+        starting_nozzle: Optional[str] = None,
     ) -> None:
         """
         Update a nozzle configuration for a given pipette.
@@ -1062,10 +1066,13 @@ class API(
         :param mount: A robot mount that the instrument is on.
         :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
         :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
+        of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
+        none is provided.
         :return:
         """
         await self.update_nozzle_configuration(
-            mount, back_left_nozzle, front_right_nozzle
+            mount, back_left_nozzle, front_right_nozzle, starting_nozzle
         )
 
     async def pick_up_tip(

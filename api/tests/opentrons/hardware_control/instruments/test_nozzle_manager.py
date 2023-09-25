@@ -157,18 +157,18 @@ def test_update_nozzles_with_critical_points(
     argvalues=[
         [
             {
-                "A1": [1, 1, 1],
-                "B1": [0.5, 0.5, 0.5],
-                "C1": [2, 2, 2],
-                "D1": [1.5, 1.5, 1.5],
-                "E1": [2.1, 2.1, 2.1],
-                "F1": [3, 3, 3],
-                "G1": [0.5, 0.6, 0.7],
-                "H1": [2.3, 2.1, 2.5],
+                "A1": [0.0, 31.5, 0.8],
+                "B1": [0.0, 22.5, 0.8],
+                "C1": [0.0, 13.5, 0.8],
+                "D1": [0.0, 4.5, 0.8],
+                "E1": [0.0, -4.5, 0.8],
+                "F1": [0.0, -13.5, 0.8],
+                "G1": [0.0, -22.5, 0.8],
+                "H1": [0.0, -31.5, 0.8],
             },
             ("D1", "H1"),
             does_not_raise(),
-            Point(1.5, 1.5, 1.5),
+            Point(0.0, 4.5, 0.8),
         ],
         [
             {"A1": [1, 1, 1]},
@@ -178,7 +178,7 @@ def test_update_nozzles_with_critical_points(
         ],
     ],
 )
-def test_update_nozzles_with_tips(
+def test_update_nozzle_configuration(
     nozzle_map: Dict[str, List[float]],
     updated_nozzle_configuration: Tuple[str, str],
     exception: ContextManager[None],
@@ -186,5 +186,5 @@ def test_update_nozzles_with_tips(
 ) -> None:
     subject = build_nozzle_manger(nozzle_map)
     with exception:
-        subject.update_nozzle_with_tips(*updated_nozzle_configuration)
+        subject.update_nozzle_configuration(*updated_nozzle_configuration)
     assert subject.starting_nozzle_offset == expected_cp

@@ -8,7 +8,7 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.types import Point
 from opentrons_shared_data.errors import (
     ErrorCodes,
-    EnumeratedError,
+    GeneralError,
 )
 
 INTERNOZZLE_SPACING = 9
@@ -18,7 +18,8 @@ class NozzleConfigurationType(Enum):
     """
     Nozzle Configuration Type.
 
-    Represents
+    Represents the current nozzle
+    configuration stored in NozzleMap
     """
 
     COLUMN = "COLUMN"
@@ -43,7 +44,7 @@ class NozzleConfigurationType(Enum):
         length of the default physical configuration of the pipette.
         :param current_nozzlemap_length: integer representing the
         length of the current physical configuration of the pipette.
-
+        :return : nozzle configuration type
         """
         if physical_nozzlemap_length == current_nozzlemap_length:
             return NozzleConfigurationType.FULL
@@ -60,6 +61,16 @@ class NozzleConfigurationType(Enum):
 
 @dataclass
 class NozzleMap:
+    """
+    Nozzle Map.
+
+    A data store class that can build
+    and store nozzle configurations
+    based on the physical default
+    nozzle map of the pipette and
+    the requested starting/ending tips.
+    """
+
     back_left: str
     front_right: str
     starting_nozzle: str
@@ -82,8 +93,8 @@ class NozzleMap:
 
     @property
     def front_nozzle(self) -> Point:
-        # front left nozzle of the 96 channel and
-        # front nozzle of the 8 channel
+        # front left-most nozzle of the 96 channel in a given configuration
+        # and front nozzle of the 8 channel
         if self.starting_nozzle == self.front_right:
             return self.map_store[self.front_right]
         map_store_list = list(self.map_store.values())
@@ -126,15 +137,54 @@ class NozzleMap:
             ),
         )
 
+    @staticmethod
+    def validate_nozzle_configuration(
+        back_left_nozzle: str,
+        front_right_nozzle: str,
+        default_configuration: "NozzleMap",
+        current_configuration: Optional["NozzleMap"] = None,
+    ) -> None:
+        """
+        Validate nozzle configuration.
+        """
+        if back_left_nozzle > front_right_nozzle:
+            raise IncompatibleNozzleConfiguration(
+                message=f"Back left nozzle {back_left_nozzle} provided is not to the back or left of {front_right_nozzle}.",
+                detail={
+                    "current_nozzle_configuration": current_configuration,
+                    "requested_back_left_nozzle": back_left_nozzle,
+                    "requested_front_right_nozzle": front_right_nozzle,
+                },
+            )
+        if not default_configuration.map_store.get(back_left_nozzle):
+            raise IncompatibleNozzleConfiguration(
+                message=f"Starting nozzle {back_left_nozzle} does not exist in the nozzle map.",
+                detail={
+                    "current_nozzle_configuration": current_configuration,
+                    "requested_back_left_nozzle": back_left_nozzle,
+                    "requested_front_right_nozzle": front_right_nozzle,
+                },
+            )
 
-class IncompatibleNozzleConfiguration(EnumeratedError):
+        if not default_configuration.map_store.get(front_right_nozzle):
+            raise IncompatibleNozzleConfiguration(
+                message=f"Ending nozzle {front_right_nozzle} does not exist in the nozzle map.",
+                detail={
+                    "current_nozzle_configuration": current_configuration,
+                    "requested_back_left_nozzle": back_left_nozzle,
+                    "requested_front_right_nozzle": front_right_nozzle,
+                },
+            )
+
+
+class IncompatibleNozzleConfiguration(GeneralError):
     """Error raised if nozzle configuration is incompatible with the currently loaded pipette."""
 
     def __init__(
         self,
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
+        wrapping: Optional[Sequence[GeneralError]] = None,
     ) -> None:
         """Build a IncompatibleNozzleConfiguration error."""
         super().__init__(
@@ -179,48 +229,25 @@ class NozzleConfigurationManager:
     def starting_nozzle_offset(self) -> Point:
         return self._current_nozzle_configuration.starting_nozzle_offset
 
-    def update_nozzle_with_tips(
+    def update_nozzle_configuration(
         self,
         back_left_nozzle: str,
         front_right_nozzle: str,
         starting_nozzle: Optional[str] = None,
     ) -> None:
-        if back_left_nozzle > front_right_nozzle:
-            raise IncompatibleNozzleConfiguration(
-                message=f"Starting nozzle {back_left_nozzle} must not be greater than the ending nozzle {front_right_nozzle}.",
-                detail={
-                    "current_nozzle_configuration": self._current_nozzle_configuration,
-                    "requested_back_left_nozzle": back_left_nozzle,
-                    "requested_front_right_nozzle": front_right_nozzle,
-                },
-            )
-        if not self._physical_nozzle_map.map_store.get(back_left_nozzle):
-            raise IncompatibleNozzleConfiguration(
-                message=f"Starting nozzle {back_left_nozzle} does not exist in the nozzle map.",
-                detail={
-                    "current_nozzle_configuration": self._current_nozzle_configuration,
-                    "requested_back_left_nozzle": back_left_nozzle,
-                    "requested_front_right_nozzle": front_right_nozzle,
-                },
-            )
-
-        if not self._physical_nozzle_map.map_store.get(front_right_nozzle):
-            raise IncompatibleNozzleConfiguration(
-                message=f"Ending nozzle {front_right_nozzle} does not exist in the nozzle map.",
-                detail={
-                    "current_nozzle_configuration": self._current_nozzle_configuration,
-                    "requested_back_left_nozzle": back_left_nozzle,
-                    "requested_front_right_nozzle": front_right_nozzle,
-                },
-            )
-
         if (
             back_left_nozzle == self._physical_nozzle_map.back_left
             and front_right_nozzle == self._physical_nozzle_map.front_right
         ):
             self._current_nozzle_configuration = self._physical_nozzle_map
         else:
-            # determine nozzle configuration based on the difference
+            NozzleMap.validate_nozzle_configuration(
+                back_left_nozzle,
+                front_right_nozzle,
+                self._physical_nozzle_map,
+                self._current_nozzle_configuration,
+            )
+
             self._current_nozzle_configuration = NozzleMap.build(
                 self._physical_nozzle_map.map_store,
                 starting_nozzle=starting_nozzle or back_left_nozzle,

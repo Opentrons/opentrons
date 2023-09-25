@@ -449,13 +449,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
 
     def update_nozzle_configuration(
-        self, back_left_nozzle: str, front_right_nozzle: str
+        self,
+        back_left_nozzle: str,
+        front_right_nozzle: str,
+        starting_nozzle: Optional[str] = None,
     ) -> None:
         """
         Update nozzle configuration manager.
         """
-        self._nozzle_manager.update_nozzle_with_tips(
-            back_left_nozzle, front_right_nozzle
+        self._nozzle_manager.update_nozzle_configuration(
+            back_left_nozzle, front_right_nozzle, starting_nozzle
         )
 
     def add_tip(self, tip_length: float) -> None:
