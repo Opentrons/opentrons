@@ -87,7 +87,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         if (module != null) {
           nickName = `${nicknamesById[labwareId]} in ${module}`
         } else if (isOffDeck) {
-          nickName = `Off deck - ${nicknamesById[labwareId]}`
+          nickName = `Off-deck - ${nicknamesById[labwareId]}`
         }
 
         if (!moveLabwarePresavedStep) {
