@@ -77,7 +77,7 @@ import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 
-const FETCH_DOOR_STATUS_MS = 5000
+const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -369,7 +369,10 @@ function PrepareToRun({
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
-  const attachedModules = useAttachedModules()
+  const attachedModules =
+    useAttachedModules({
+      refetchInterval: FETCH_DURATION_MS,
+    }) ?? []
 
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
@@ -505,7 +508,7 @@ function PrepareToRun({
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
   const { data: doorStatus } = useDoorQuery({
-    refetchInterval: FETCH_DOOR_STATUS_MS,
+    refetchInterval: FETCH_DURATION_MS,
   })
   const isDoorOpen =
     doorStatus?.data.status === 'open' &&
