@@ -11,9 +11,12 @@ import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { getModuleUnderLabware } from '../modules/utils'
-import { Options } from '@opentrons/components'
-import { LabwareEntity } from '@opentrons/step-generation'
-import { Selector } from '../../types'
+import { getLabwareOffDeck } from './utils'
+
+import type { Options } from '@opentrons/components'
+import type { LabwareEntity } from '@opentrons/step-generation'
+import type { Selector } from '../../types'
+
 export const getLabwareNicknamesById: Selector<
   Record<string, string>
 > = createSelector(
@@ -35,7 +38,7 @@ export const _sortLabwareDropdownOptions = (options: Options): Options =>
     return a.name.localeCompare(b.name)
   })
 
-/** Returns options for labware dropdowns, excluding tiprack labware.
+/** Returns options for labware dropdowns.
  * Ordered by display name / nickname, but with fixed trash at the bottom.
  */
 export const getLabwareOptions: Selector<Options> = createSelector(
@@ -60,6 +63,11 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         labwareId: string
       ): Options => {
         const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
+        const isOffDeck = getLabwareOffDeck(
+          initialDeckSetup,
+          savedStepForms ?? {},
+          labwareId
+        )
         const isAdapterOrAluminumBlock =
           isAdapter ||
           labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
@@ -74,10 +82,13 @@ export const getLabwareOptions: Selector<Options> = createSelector(
                 `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
               )
             : null
-        const nickName =
-          module != null
-            ? `${nicknamesById[labwareId]} in ${module}`
-            : nicknamesById[labwareId]
+
+        let nickName = nicknamesById[labwareId]
+        if (module != null) {
+          nickName = `${nicknamesById[labwareId]} in ${module}`
+        } else if (isOffDeck) {
+          nickName = `Off-deck - ${nicknamesById[labwareId]}`
+        }
 
         if (!moveLabwarePresavedStep) {
           return getIsTiprack(labwareEntity.def) || isAdapter
