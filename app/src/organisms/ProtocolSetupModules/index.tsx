@@ -65,6 +65,8 @@ import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
 import type { CommandData } from '@opentrons/api-client'
 
+const ATTACHED_MODULE_POLL_MS = 5000
+
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
   'BARCODE_COVERS',
@@ -72,8 +74,6 @@ const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'SLOT_10_EXPANSION',
   'CALIBRATION_CUTOUTS',
 ]
-
-const ATTACHED_MODULE_POLL_MS = 5000
 
 interface RenderModuleStatusProps {
   isModuleReady: boolean
@@ -316,9 +316,10 @@ export function ProtocolSetupModules({
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
-  const attachedModules = useAttachedModules({
-    refetchInterval: ATTACHED_MODULE_POLL_MS,
-  })
+  const attachedModules =
+    useAttachedModules({
+      refetchInterval: ATTACHED_MODULE_POLL_MS,
+    }) ?? []
 
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : ''

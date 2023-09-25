@@ -204,7 +204,8 @@ export function InstrumentsAndModules({
                 }
                 isPipetteCalibrated={
                   isOT3 && attachedLeftPipette?.ok
-                    ? attachedLeftPipette?.data?.calibratedOffset != null
+                    ? attachedLeftPipette?.data?.calibratedOffset
+                        ?.last_modified != null
                     : leftMountOffsetCalibration != null
                 }
                 mount={LEFT}
@@ -218,7 +219,8 @@ export function InstrumentsAndModules({
                   attachedGripper={attachedGripper}
                   isCalibrated={
                     attachedGripper?.ok === true &&
-                    attachedGripper?.data?.calibratedOffset != null
+                    attachedGripper?.data?.calibratedOffset?.last_modified !=
+                      null
                   }
                   setSubsystemToUpdate={setSubsystemToUpdate}
                 />
@@ -252,7 +254,8 @@ export function InstrumentsAndModules({
                   }
                   isPipetteCalibrated={
                     isOT3 && attachedRightPipette?.ok
-                      ? attachedRightPipette?.data?.calibratedOffset != null
+                      ? attachedRightPipette?.data?.calibratedOffset
+                          ?.last_modified != null
                       : rightMountOffsetCalibration != null
                   }
                   mount={RIGHT}
