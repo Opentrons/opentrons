@@ -17,8 +17,10 @@ RETRACT_MM = 0.25
 MAX_TRAVEL = 29.8 - RETRACT_MM  # FIXME: what is the max travel?
 ENDSTOP_OVERRUN_MM = 0.25
 ENDSTOP_OVERRUN_SPEED = 5
-SPEEDS_TO_TEST: List[float] = [3, 6, 9, 12, 15]
+SPEEDS_TO_TEST: List[float] = [3, 8, 12]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
+    0.7: SPEEDS_TO_TEST,
+    1.0: SPEEDS_TO_TEST,
     1.5: SPEEDS_TO_TEST,
 }
 
