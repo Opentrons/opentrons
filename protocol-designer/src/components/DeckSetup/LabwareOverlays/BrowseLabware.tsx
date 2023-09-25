@@ -22,7 +22,11 @@ interface DP {
 type Props = OP & DP
 
 function BrowseLabwareOverlay(props: Props): JSX.Element | null {
-  if (props.labwareOnDeck.def.parameters.isTiprack) return null
+  if (
+    props.labwareOnDeck.def.parameters.isTiprack ||
+    props.labwareOnDeck.def.allowedRoles?.includes('adapter')
+  )
+    return null
   return (
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <a className={styles.overlay_button} onClick={props.drillDown}>
