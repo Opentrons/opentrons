@@ -39,7 +39,8 @@ class NozzleConfigurationType(Enum):
         Determine the nozzle configuration based on the starting and
         ending nozzle.
 
-        :param nozzle_difference: the difference between
+        :param nozzle_difference: the difference between the back
+        left and front right nozzle
         :param physical_nozzlemap_length: integer representing the
         length of the default physical configuration of the pipette.
         :param current_nozzlemap_length: integer representing the
@@ -85,14 +86,14 @@ class NozzleMap:
         return self.map_store[self.starting_nozzle]
 
     @property
-    def xy_nozzle(self) -> Point:
+    def xy_center_offset(self) -> Point:
         difference = self.map_store[self.front_right] - self.map_store[self.back_left]
         return self.map_store[self.back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
         )
 
     @property
-    def front_nozzle(self) -> Point:
+    def front_nozzle_offset(self) -> Point:
         # front left-most nozzle of the 96 channel in a given configuration
         # and front nozzle of the 8 channel
         if self.starting_nozzle == self.front_right:
@@ -269,9 +270,9 @@ class NozzleConfigurationManager:
         tip_length: float = 0.0,
     ) -> Point:
         if cp_override == CriticalPoint.XY_CENTER:
-            current_nozzle = self._current_nozzle_configuration.xy_nozzle
+            current_nozzle = self._current_nozzle_configuration.xy_center_offset
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
-            current_nozzle = self._current_nozzle_configuration.front_nozzle
+            current_nozzle = self._current_nozzle_configuration.front_nozzle_offset
         else:
             current_nozzle = self.starting_nozzle_offset
         return current_nozzle - Point(0, 0, tip_length)
