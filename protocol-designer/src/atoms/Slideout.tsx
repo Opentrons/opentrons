@@ -140,7 +140,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         `}
         backgroundColor={COLORS.transparent}
         height="92.5%"
-        marginTop="3rem"
+        marginTop={SPACING.spacing48}
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
@@ -151,7 +151,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         backgroundColor={COLORS.white}
         boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
         height="92.5%"
-        marginTop="3rem"
+        marginTop={SPACING.spacing48}
       >
         <Flex
           paddingY={SPACING.spacing16}
@@ -170,7 +170,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               marginBottom={SPACING.spacing16}
             >
               <Text
-                as="h2"
+                as="h3"
                 overflowWrap="anywhere"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}

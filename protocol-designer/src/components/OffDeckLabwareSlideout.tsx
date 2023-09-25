@@ -57,9 +57,9 @@ export const OffDeckLabwareSlideout = (
 
   const offDeckEntries =
     robotState?.labware != null
-      ? Object.entries(robotState?.labware).filter(
-          ([key, value]) => value.slot === 'offDeck'
-        )
+      ? Object.entries(robotState?.labware)
+          .filter(([key, value]) => value.slot === 'offDeck')
+          .reverse()
       : null
   const offDeck =
     offDeckEntries != null && offDeckEntries.length > 0
@@ -102,7 +102,7 @@ export const OffDeckLabwareSlideout = (
         >
           <Icon
             name="ot-alert"
-            size="1rem"
+            size="2rem"
             color={COLORS.darkBlack90}
             marginBottom={SPACING.spacing32}
           />

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Icon,
@@ -23,6 +24,39 @@ import styles from './LabwareOverlays.css'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../../types'
+
+const NAME_LABWARE_OVERLAY_STYLE = css`
+  z-index: 1;
+  bottom: 0;
+  position: ${POSITION_ABSOLUTE};
+  width: 127.76px;
+  height: 85.45px;
+  opacity: 0;
+  &:hover {
+    opacity: 1;
+  }
+`
+
+const REGULAR_OVERLAY_STYLE = css`
+  z-index: 1;
+  padding: ${SPACING.spacing8};
+  background-color: ${COLORS.darkBlack90};
+  flex-direction: ${DIRECTION_COLUMN};
+  color: ${COLORS.white};
+  display: flex;
+  align-items: ${ALIGN_FLEX_START};
+  justify-content: ${JUSTIFY_SPACE_AROUND};
+  border-radius: ${BORDERS.borderRadiusSize4};
+  bottom: 0;
+  font-size: 0.7rem;
+  position: ${POSITION_ABSOLUTE};
+  width: 127.76px;
+  height: 85.45px;
+  opacity: 0;
+  &:hover {
+    opacity: 1;
+  }
+`
 
 interface OP {
   labwareEntity: LabwareEntity
@@ -50,19 +84,7 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
   const { isTiprack } = labwareEntity.def.parameters
   if (isYetUnnamed && !isTiprack) {
     return (
-      <div
-        css={css`
-          z-index: 1;
-          bottom: 0;
-          position: ${POSITION_ABSOLUTE};
-          width: 127.76px;
-          height: 85.45px;
-          opacity: 0;
-          &:hover {
-            opacity: 1;
-          }
-        `}
-      >
+      <div css={NAME_LABWARE_OVERLAY_STYLE}>
         <NameThisLabware
           labwareOnDeck={labwareEntity}
           editLiquids={editLiquids}
@@ -71,28 +93,7 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
     )
   } else {
     return (
-      <div
-        css={css`
-          z-index: 1;
-          padding: ${SPACING.spacing8};
-          background-color: ${COLORS.darkBlack90};
-          flex-direction: ${DIRECTION_COLUMN};
-          color: ${COLORS.white};
-          display: flex;
-          align-items: ${ALIGN_FLEX_START};
-          justify-content: ${JUSTIFY_SPACE_AROUND};
-          border-radius: 0.5rem;
-          bottom: 0;
-          font-size: 0.7rem;
-          position: ${POSITION_ABSOLUTE};
-          width: 127.76px;
-          height: 85.45px;
-          opacity: 0;
-          &:hover {
-            opacity: 1;
-          }
-        `}
-      >
+      <div css={REGULAR_OVERLAY_STYLE}>
         {!isTiprack ? (
           <a className={styles.overlay_button} onClick={editLiquids}>
             <Icon className={styles.overlay_icon} name="pencil" />
