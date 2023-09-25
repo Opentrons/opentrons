@@ -316,9 +316,10 @@ export function ProtocolSetupModules({
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
-  const attachedModules = useAttachedModules({
-    refetchInterval: ATTACHED_MODULE_POLL_MS,
-  })
+  const attachedModules =
+    useAttachedModules({
+      refetchInterval: ATTACHED_MODULE_POLL_MS,
+    }) ?? []
 
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : ''
