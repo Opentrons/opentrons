@@ -148,7 +148,7 @@ def test_update_nozzles_with_critical_points(
     expected: List[float],
 ) -> None:
     subject = build_nozzle_manger(nozzle_map)
-    new_cp = subject.update_nozzle_with_critical_point(critical_point_configuration)
+    new_cp = subject.critical_point_with_tip_length(critical_point_configuration)
     assert new_cp == expected
 
 
@@ -187,4 +187,4 @@ def test_update_nozzles_with_tips(
     subject = build_nozzle_manger(nozzle_map)
     with exception:
         subject.update_nozzle_with_tips(*updated_nozzle_configuration)
-    assert subject.nozzle_offset == expected_cp
+    assert subject.starting_nozzle_offset == expected_cp
