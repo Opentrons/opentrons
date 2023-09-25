@@ -16,11 +16,12 @@ import {
   POSITION_ABSOLUTE,
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import SuccessIcon from '../../assets/images/icon_success.png'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
-import { FLEX_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 
 interface Props extends StyleProps {
   iconColor: string
