@@ -1,6 +1,6 @@
 """Utilities for gathering motor position/status for an OT3 axis."""
 import asyncio
-from typing import Set, Tuple
+from typing import Set, Tuple, Union
 import logging
 
 from opentrons_shared_data.errors.exceptions import (
@@ -15,6 +15,8 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MotorPositionRequest,
     MotorPositionResponse,
+    MoveCompleted,
+    TipActionResponse,
     UpdateMotorPositionEstimationRequest,
     UpdateMotorPositionEstimationResponse,
 )
@@ -31,6 +33,24 @@ from .types import NodeMap, MotorPositionStatus
 log = logging.getLogger(__name__)
 
 
+_MotorStatusMoves = Union[MoveCompleted, TipActionResponse, MotorPositionResponse, UpdateMotorPositionEstimationResponse]
+
+
+def extract_motor_status_info(msg: _MotorStatusMoves) -> MotorPositionStatus:
+    return (
+        float(msg.payload.current_position_um.value / 1000.0),
+        float(msg.payload.encoder_position_um.value) / 1000.0,
+        bool(
+            msg.payload.position_flags.value
+            & MotorPositionFlags.stepper_position_ok.value
+        ),
+        bool(
+            msg.payload.position_flags.value
+            & MotorPositionFlags.encoder_position_ok.value
+        ),
+    )
+
+
 async def _parser_motor_position_response(
     reader: WaitableCallback,
 ) -> NodeMap[MotorPositionStatus]:
@@ -38,22 +58,7 @@ async def _parser_motor_position_response(
     async for response, arb_id in reader:
         assert isinstance(response, MotorPositionResponse)
         node = NodeId(arb_id.parts.originating_node_id)
-        data.update(
-            {
-                node: (
-                    float(response.payload.current_position.value / 1000.0),
-                    float(response.payload.encoder_position.value) / 1000.0,
-                    bool(
-                        response.payload.position_flags.value
-                        & MotorPositionFlags.stepper_position_ok.value
-                    ),
-                    bool(
-                        response.payload.position_flags.value
-                        & MotorPositionFlags.encoder_position_ok.value
-                    ),
-                )
-            }
-        )
+        data.update({node: extract_motor_status_info(response)})
     return data
 
 
@@ -94,18 +99,7 @@ async def _parser_update_motor_position_response(
         assert isinstance(response, UpdateMotorPositionEstimationResponse)
         node = NodeId(arb_id.parts.originating_node_id)
         if node == expected:
-            return (
-                float(response.payload.current_position.value / 1000.0),
-                float(response.payload.encoder_position.value) / 1000.0,
-                bool(
-                    response.payload.position_flags.value
-                    & MotorPositionFlags.stepper_position_ok.value
-                ),
-                bool(
-                    response.payload.position_flags.value
-                    & MotorPositionFlags.encoder_position_ok.value
-                ),
-            )
+            return extract_motor_status_info(response)
     raise StopAsyncIteration
 
 
