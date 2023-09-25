@@ -9,7 +9,7 @@ from opentrons.commands import types
 MODULE_LOG = logging.getLogger(__name__)
 
 
-class Broker:
+class LegacyBroker:
     def __init__(self) -> None:
         self.subscriptions: Dict[
             Literal["command"],
