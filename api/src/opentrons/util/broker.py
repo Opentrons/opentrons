@@ -1,4 +1,4 @@
-"""A simple pub/sub message broker for monitoring equipment loads."""
+"""A simple pub/sub message broker."""
 
 
 from typing import Callable, Generic, Set, TypeVar
@@ -7,22 +7,13 @@ from typing import Callable, Generic, Set, TypeVar
 _MessageT = TypeVar("_MessageT")
 
 
-class EquipmentBroker(Generic[_MessageT]):
+class Broker(Generic[_MessageT]):
     """A simple pub/sub message broker.
 
-    This is currently meant for monitoring equipment loads
-    (pipette, labware, and module loads)
-    on an APIv2 `ProtocolContext`.
-
-    This duplicates much of `opentrons.legacy_broker.LegacyBroker`,
-    which covers most other APIv2 events, like aspirates and moves,
-    but doesn't cover equipment loads.
-    To cover equipment loads, we felt more comfortable
-    duplicating `opentrons.legacy_broker.LegacyBroker`'s responsibilities here
-    than attempting to extend it without breaking anything.
+    Subscribers can listen to events. Publishers can push events to all subscribers.
     """
 
-    def __init__(self) -> None:  # noqa: D107
+    def __init__(self) -> None:
         self._callbacks: Set[Callable[[_MessageT], None]] = set()
 
     def subscribe(self, callback: Callable[[_MessageT], None]) -> Callable[[], None]:

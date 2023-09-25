@@ -5,19 +5,20 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Optional, Union, Type
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
+from opentrons.util.broker import Broker
+
 from opentrons import protocol_reader
+from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -447,7 +448,7 @@ async def test_load_legacy_python(
         legacy_context_creator.create(
             protocol=legacy_protocol,
             broker=matchers.IsA(LegacyBroker),
-            equipment_broker=matchers.IsA(EquipmentBroker),
+            equipment_broker=matchers.IsA(Broker),
         )
     ).then_return(legacy_context)
 
@@ -575,7 +576,7 @@ async def test_load_legacy_json(
         legacy_context_creator.create(
             legacy_protocol,
             broker=matchers.IsA(LegacyBroker),
-            equipment_broker=matchers.IsA(EquipmentBroker),
+            equipment_broker=matchers.IsA(Broker),
         )
     ).then_return(legacy_context)
 
