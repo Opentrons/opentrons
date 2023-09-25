@@ -44,14 +44,13 @@ class MotorPositionStatus:
 
 
 @dataclass
-class MoveStatus:
+class MoveStatus(MotorPositionStatus):
     """Move status: same as MotorPositionStatus, but with an extra move_ack field."""
 
-    position_status: MotorPositionStatus
     move_ack: MoveCompleteAck
 
     def get_positions_only(self) -> Tuple[float, float]:
         return (
-            self.position_status.motor_position,
-            self.position_status.encoder_position,
+            self.motor_position,
+            self.encoder_position,
         )
