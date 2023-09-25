@@ -52,7 +52,7 @@ async function artifactsFromDir(artifactDirPath, urlBase) {
         FILES_IN_RELEASE_JSON.some(re => dirent.name.search(re) !== -1)
     )
     .map(dirent => artifactNameToObj(dirent.name, urlBase))
-    .reduce((prev, current) => ({ ...prev, ...current }))
+    .reduce((prev, current) => ({ ...prev, ...current }), {})
 }
 
 async function main() {
