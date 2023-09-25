@@ -1,3 +1,5 @@
+# noqa: D100
+
 from __future__ import annotations
 import logging
 from typing import Callable, Dict, List
@@ -10,6 +12,14 @@ MODULE_LOG = logging.getLogger(__name__)
 
 
 class LegacyBroker:
+    """A pub/sub message broker.
+
+    Deprecated:
+        Use the newer, more generic `opentrons.utils.Broker` class instead.
+        This class is coupled to old types from `opentrons.commands`.
+        https://opentrons.atlassian.net/browse/RSS-270
+    """
+
     def __init__(self) -> None:
         self.subscriptions: Dict[
             Literal["command"],
@@ -17,7 +27,7 @@ class LegacyBroker:
         ] = {}
         self.logger = MODULE_LOG
 
-    def subscribe(
+    def subscribe(  # noqa: D102
         self,
         topic: Literal["command"],
         handler: Callable[[types.CommandMessage], None],
@@ -34,8 +44,10 @@ class LegacyBroker:
 
         return unsubscribe
 
-    def publish(self, topic: Literal["command"], message: types.CommandMessage) -> None:
+    def publish(  # noqa: D102
+        self, topic: Literal["command"], message: types.CommandMessage
+    ) -> None:
         [handler(message) for handler in self.subscriptions.get(topic, [])]
 
-    def set_logger(self, logger: logging.Logger) -> None:
+    def set_logger(self, logger: logging.Logger) -> None:  # noqa: D102
         self.logger = logger
