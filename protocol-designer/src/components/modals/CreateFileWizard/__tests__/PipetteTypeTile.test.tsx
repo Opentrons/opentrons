@@ -62,7 +62,7 @@ describe('PipetteTypeTile', () => {
   it('renders the correct pipettes for flex with no empty pip allowed and btn ctas work', () => {
     const { getByText, getAllByText, getByRole } = render(props)
     getByText('header')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(4)
+    expect(getAllByText('mock EquipmentOption')).toHaveLength(5)
     getByText('Go back')
     getByRole('button', { name: 'GoBack_button' }).click()
     expect(props.goBack).toHaveBeenCalled()

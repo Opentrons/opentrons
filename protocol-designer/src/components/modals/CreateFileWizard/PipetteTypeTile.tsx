@@ -57,7 +57,7 @@ export function SecondPipetteTypeTile(
         {...props}
         mount={RIGHT}
         allowNoPipette
-        allow96Channel={false}
+        display96Channel={false}
         tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')}
       />
     )
@@ -138,7 +138,10 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
     const noneOption = allowNoPipette ? [{ name: 'None', value: '' }] : []
     return allow96Channel && display96Channel
       ? [...allPipetteOptions, ...noneOption]
-      : [...allPipetteOptions.filter(o => o.value !== 'p1000_96'), ...noneOption]
+      : [
+          ...allPipetteOptions.filter(o => o.value !== 'p1000_96'),
+          ...noneOption,
+        ]
   }, [robotType])
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName
