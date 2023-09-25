@@ -9,7 +9,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI
@@ -124,7 +124,7 @@ class LegacyContextCreator:
     def create(
         self,
         protocol: LegacyProtocol,
-        broker: Optional[Broker],
+        broker: Optional[LegacyBroker],
         equipment_broker: Optional[EquipmentBroker[LegacyLoadInfo]],
     ) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""

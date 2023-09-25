@@ -8,7 +8,7 @@ from typing import List, cast, Optional, Union, Type
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine.types import PostRunHardwareState
@@ -446,7 +446,7 @@ async def test_load_legacy_python(
     decoy.when(
         legacy_context_creator.create(
             protocol=legacy_protocol,
-            broker=matchers.IsA(Broker),
+            broker=matchers.IsA(LegacyBroker),
             equipment_broker=matchers.IsA(EquipmentBroker),
         )
     ).then_return(legacy_context)
@@ -574,7 +574,7 @@ async def test_load_legacy_json(
     decoy.when(
         legacy_context_creator.create(
             legacy_protocol,
-            broker=matchers.IsA(Broker),
+            broker=matchers.IsA(LegacyBroker),
             equipment_broker=matchers.IsA(EquipmentBroker),
         )
     ).then_return(legacy_context)

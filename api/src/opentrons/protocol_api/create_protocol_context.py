@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.config import feature_flags
 from opentrons.hardware_control import (
@@ -46,7 +46,7 @@ def create_protocol_context(
     deck_type: str,
     protocol_engine: Optional[ProtocolEngine] = None,
     protocol_engine_loop: Optional[asyncio.AbstractEventLoop] = None,
-    broker: Optional[Broker] = None,
+    broker: Optional[LegacyBroker] = None,
     equipment_broker: Optional[EquipmentBroker[Any]] = None,
     use_simulating_core: bool = False,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,

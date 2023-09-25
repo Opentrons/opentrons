@@ -5,7 +5,7 @@ from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
 from opentrons.protocol_engine import (
@@ -29,9 +29,9 @@ from opentrons_shared_data.labware.dev_types import (
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
+def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mocked out LegacyProtocolContext dependency."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
@@ -60,7 +60,7 @@ def mock_action_dispatcher(decoy: Decoy) -> pe_actions.ActionDispatcher:
 
 @pytest.fixture
 def subject(
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_state_view: StateView,
@@ -78,7 +78,7 @@ def subject(
 
 async def test_broker_subscribe_unsubscribe(
     decoy: Decoy,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
     subject: LegacyContextPlugin,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_broker_subscribe_unsubscribe(
 
 async def test_command_broker_messages(
     decoy: Decoy,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
@@ -157,7 +157,7 @@ async def test_command_broker_messages(
 
 async def test_equipment_broker_messages(
     decoy: Decoy,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,

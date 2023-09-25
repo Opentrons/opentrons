@@ -3,7 +3,7 @@ import inspect
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules import TemperatureStatus
 from opentrons.protocols.api_support.types import APIVersion
@@ -41,9 +41,9 @@ def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
+def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
@@ -58,7 +58,7 @@ def subject(
     mock_core: ThermocyclerCore,
     mock_protocol_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
 ) -> ThermocyclerContext:
     """Get a thermocycler module context with its dependencies mocked out."""
     return ThermocyclerContext(
@@ -200,7 +200,7 @@ def test_get_current_step_index(
 def test_open_lid(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should open the lid via the core."""
@@ -231,7 +231,7 @@ def test_open_lid(
 def test_close_lid(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should close the lid via the core."""
@@ -262,7 +262,7 @@ def test_close_lid(
 def test_set_block_temperature(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should set the block temperature via the core."""
@@ -314,7 +314,7 @@ def test_set_block_temperature(
 def test_set_lid_temperature(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should close the lid via the core."""
@@ -342,7 +342,7 @@ def test_set_lid_temperature(
 def test_execute_profile(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should execute a thermocycler profile via the core."""
@@ -425,7 +425,7 @@ def test_execute_profile(
 def test_deactivate_lid(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should turn off the heated lid via the core."""
@@ -452,7 +452,7 @@ def test_deactivate_lid(
 def test_deactivate_block(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should turn off the well block temperature controller via the core."""
@@ -479,7 +479,7 @@ def test_deactivate_block(
 def test_deactivate(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
 ) -> None:
     """It should turn off the well block and heated lid via the core."""

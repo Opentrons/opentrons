@@ -14,11 +14,11 @@ class EquipmentBroker(Generic[_MessageT]):
     (pipette, labware, and module loads)
     on an APIv2 `ProtocolContext`.
 
-    This duplicates much of `opentrons.broker.Broker`,
+    This duplicates much of `opentrons.legacy_broker.LegacyBroker`,
     which covers most other APIv2 events, like aspirates and moves,
     but doesn't cover equipment loads.
     To cover equipment loads, we felt more comfortable
-    duplicating `opentrons.broker.Broker`'s responsibilities here
+    duplicating `opentrons.legacy_broker.LegacyBroker`'s responsibilities here
     than attempting to extend it without breaking anything.
     """
 

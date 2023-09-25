@@ -5,7 +5,7 @@ from asyncio import create_task, Task
 from contextlib import ExitStack
 from typing import Optional
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
@@ -36,7 +36,7 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def __init__(
         self,
-        broker: Broker,
+        broker: LegacyBroker,
         equipment_broker: EquipmentBroker[LegacyLoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
