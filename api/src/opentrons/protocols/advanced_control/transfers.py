@@ -534,6 +534,12 @@ class TransferPlan:
             ]
         return sources, targets
 
+    def _check_valid_disposal_volume(self):
+        if self._strategy.disposal_volume >= self._instr.max_volume:
+            raise ValueError(
+                "The disposal volume must be less than the maximum volume of the pipette"
+            )
+
     def _plan_distribute(self):
         """
         * **Source/ Dest:** One source to many destinations
@@ -572,10 +578,7 @@ class TransferPlan:
 
         """
 
-        if self._strategy.disposal_volume >= self._instr.max_volume:
-            raise ValueError(
-                "The Disposal Volume must be less than the Maximum Volume of the Instrument"
-            )
+        self._check_valid_disposal_volume()
 
         # TODO: decide whether default disposal vol for distribute should be
         # pipette min_vol or should we leave it to being 0 by default and
