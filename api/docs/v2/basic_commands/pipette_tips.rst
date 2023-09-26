@@ -111,4 +111,4 @@ Early API versions treated returned tips as unused items. They could be picked u
     pipette.return_tip()   # drops tip in rack location A1
     pipette.pick_up_tip()  # picks up tip from rack location A1
 
-.. versionchanged: 2.2
+.. versionchanged:: 2.2

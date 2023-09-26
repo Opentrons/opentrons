@@ -34,12 +34,12 @@ Now our pipette holds 300 µL.
 Aspirate by Well or Location
 ----------------------------
 
-The :py:meth:`~.InstrumentContext.aspirate` method includes a ``location`` parameter that accepts either a ``Well`` or a ``Location``. 
+The :py:meth:`~.InstrumentContext.aspirate` method includes a ``location`` parameter that accepts either a :py:class:`.Well` or a :py:class:`~.types.Location`. 
 
 If you specify a well, like ``plate['A1']``, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the ``aspirate`` attribute of :py:obj:`.well_bottom_clearance`:: 
 
     pipette.pick_up_tip
-    pipette.well_bottom_clearance.aspirate = 2 # tip is 2 mm above well bottom
+    pipette.well_bottom_clearance.aspirate = 2  # tip is 2 mm above well bottom
     pipette.aspirate(200, plate['A1'])
 
 You can also aspirate from a location along the center vertical axis within a well using the :py:meth:`.Well.top` and :py:meth:`.Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well::
@@ -130,7 +130,7 @@ You can also specify a particular well as the blowout location::
 
     pipette.blow_out(plate['B1'])
 
-Many protocols use trash bin for blowing out the pipette. You can specify the trash bin as the blowout location by using the :py:meth:`.ProtocolContext.fixed_trash` method::
+Many protocols use the trash bin for blowing out the pipette. You can specify the trash bin as the blowout location by using the :py:obj:`.ProtocolContext.fixed_trash` property::
 
     pipette.blow_out(protocol.fixed_trash['A1'])  
 
