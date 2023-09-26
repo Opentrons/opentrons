@@ -66,7 +66,11 @@ from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     MoveGroupSingleAxisStep,
 )
-from opentrons_hardware.hardware_control.types import PCBARevision
+from opentrons_hardware.hardware_control.types import (
+    PCBARevision,
+    MotorPositionStatus,
+    MoveCompleteAck,
+)
 from opentrons_hardware.hardware_control import current_settings
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
 from opentrons_hardware.hardware_control.tools.types import (
@@ -310,11 +314,11 @@ home_test_params = [
 
 def move_group_run_side_effect(
     controller: OT3Controller, axes_to_home: List[Axis]
-) -> Iterator[Dict[NodeId, Tuple[float, float, bool, bool]]]:
+) -> Iterator[Dict[NodeId, MotorPositionStatus]]:
     """Return homed position for axis that is present and was commanded to home."""
     motor_nodes = controller._motor_nodes()
     gantry_homes = {
-        axis_to_node(ax): (0.0, 0.0, True, True)
+        axis_to_node(ax): MotorPositionStatus(0.0, 0.0, True, True, MoveCompleteAck(1))
         for ax in Axis.gantry_axes()
         if ax in axes_to_home and axis_to_node(ax) in motor_nodes
     }
@@ -322,7 +326,7 @@ def move_group_run_side_effect(
         yield gantry_homes
 
     pipette_homes = {
-        axis_to_node(ax): (0.0, 0.0, True, True)
+        axis_to_node(ax): MotorPositionStatus(0.0, 0.0, True, True, MoveCompleteAck(1))
         for ax in Axis.pipette_axes()
         if ax in axes_to_home and axis_to_node(ax) in motor_nodes
     }
@@ -734,8 +738,10 @@ async def test_update_motor_status(
 ) -> None:
     async def fake_gmp(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
-        return {node: (0.223, 0.323, False, True) for node in nodes}
+    ) -> Dict[NodeId, MotorPositionStatus]:
+        return {
+            node: MotorPositionStatus(0.223, 0.323, False, True, None) for node in nodes
+        }
 
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.get_motor_position", fake_gmp
@@ -757,8 +763,10 @@ async def test_update_motor_estimation(
 ) -> None:
     async def fake_umpe(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
-        return {node: (0.223, 0.323, False, True) for node in nodes}
+    ) -> Dict[NodeId, MotorPositionStatus]:
+        return {
+            node: MotorPositionStatus(0.223, 0.323, False, True, None) for node in nodes
+        }
 
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",

@@ -7,7 +7,7 @@ from typing import Tuple, List, Dict, Any, Optional, Union
 import datetime
 import numpy as np
 from enum import Enum
-from math import floor, copysign, isclose
+from math import floor, copysign
 from logging import getLogger
 from opentrons.util.linal import solve_attitude, SolvePoints
 
@@ -112,18 +112,14 @@ MAX_SHIFT = {
 }
 
 
-def _deck_hit(
+def _verify_height(
     found_pos: float, expected_pos: float, settings: EdgeSenseSettings
-) -> bool:
+) -> None:
     """
-    Evaluate the height found by capacitive probe against search settings
-    to determine whether or not it had hit the deck.
+    Evaluate the height found by capacitive probe against search settings.
     """
     if found_pos > expected_pos + settings.early_sense_tolerance_mm:
         raise EarlyCapacitiveSenseTrigger(found_pos, expected_pos)
-    return (
-        True if found_pos >= (expected_pos - settings.overrun_tolerance_mm) else False
-    )
 
 
 async def _verify_edge_pos(
@@ -153,10 +149,10 @@ async def _verify_edge_pos(
         LOG.info(
             f"Checking {edge_name_str} in {dir} direction at {checking_pos}, stride_size: {check_stride}"
         )
-        height = await _probe_deck_at(
+        height, hit_deck = await _probe_deck_at(
             hcapi, mount, checking_pos, edge_settings.pass_settings, probe=probe
         )
-        hit_deck = _deck_hit(height, found_edge.z, edge_settings)
+        _verify_height(height, found_edge.z, edge_settings)
         LOG.info(f"Deck {'hit' if hit_deck else 'miss'} at check pos: {checking_pos}")
         if last_result is not None and hit_deck != last_result:
             LOG.info(
@@ -222,10 +218,10 @@ async def find_edge_binary(
     final_z_height_found = slot_edge_nominal.z
     for _ in range(edge_settings.search_iteration_limit):
         LOG.info(f"Checking position {checking_pos}")
-        interaction_pos = await _probe_deck_at(
+        interaction_pos, hit_deck = await _probe_deck_at(
             hcapi, mount, checking_pos, edge_settings.pass_settings, probe=probe
         )
-        hit_deck = _deck_hit(interaction_pos, checking_pos.z, edge_settings)
+        _verify_height(interaction_pos, checking_pos.z, edge_settings)
         if hit_deck:
             # In this block, we've hit the deck
             LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
@@ -358,11 +354,11 @@ async def find_calibration_structure_height(
     """
     z_pass_settings = hcapi.config.calibration.z_offset.pass_settings
     z_prep_point = nominal_center + PREP_OFFSET_DEPTH
-    structure_z = await _probe_deck_at(
+    z_limit = nominal_center.z - z_pass_settings.max_overrun_distance_mm
+    structure_z, hit_deck = await _probe_deck_at(
         hcapi, mount, z_prep_point, z_pass_settings, probe=probe
     )
-    z_limit = nominal_center.z - z_pass_settings.max_overrun_distance_mm
-    if (structure_z < z_limit) or isclose(z_limit, structure_z, abs_tol=0.001):
+    if not hit_deck:
         raise CalibrationStructureNotFoundError(structure_z, z_limit)
     LOG.info(f"autocalibration: found structure at {structure_z}")
     return structure_z
@@ -375,7 +371,7 @@ async def _probe_deck_at(
     settings: CapacitivePassSettings,
     speed: float = 50,
     probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
-) -> float:
+) -> Tuple[float, bool]:
     here = await api.gantry_position(mount)
     abs_transit_height = max(
         target.z + LINEAR_TRANSIT_HEIGHT, target.z + settings.prep_distance_mm
@@ -384,13 +380,13 @@ async def _probe_deck_at(
     await api.move_to(mount, here._replace(z=safe_height))
     await api.move_to(mount, target._replace(z=safe_height), speed=speed)
     await api.move_to(mount, target._replace(z=abs_transit_height))
-    _found_pos = await api.capacitive_probe(
+    _found_pos, contact = await api.capacitive_probe(
         mount, Axis.by_mount(mount), target.z, settings, probe=probe
     )
     # don't use found Z position to calculate an updated transit height
     # because the probe may have gone through the hole
     await api.move_to(mount, target._replace(z=abs_transit_height))
-    return _found_pos
+    return _found_pos, contact
 
 
 async def find_axis_center(

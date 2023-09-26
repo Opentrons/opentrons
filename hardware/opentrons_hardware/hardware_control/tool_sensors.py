@@ -161,7 +161,7 @@ async def capacitive_probe(
     sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
     log_sensor_values: bool = False,
-) -> Tuple[float, float]:
+) -> MotorPositionStatus:
     """Move the specified tool down until its capacitive sensor triggers.
 
     Moves down by the specified distance at the specified speed until the
@@ -198,7 +198,7 @@ async def capacitive_probe(
         do_log=log_sensor_values,
     ):
         position = await runner.run(can_messenger=messenger)
-        return position[mover].positions_only()
+        return position[mover]
 
 
 async def capacitive_pass(

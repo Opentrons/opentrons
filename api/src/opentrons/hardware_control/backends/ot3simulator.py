@@ -697,8 +697,9 @@ class OT3Simulator:
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-    ) -> None:
+    ) -> bool:
         self._position[axis_to_node(moving)] += distance_mm
+        return True
 
     @ensure_yield
     async def capacitive_pass(

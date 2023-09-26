@@ -702,7 +702,7 @@ async def test_capacitive_probe(
 ) -> None:
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(mount)
-    res = await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
+    res, _ = await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
     # in reality, this value would be the previous position + the value
     # updated in ot3controller.capacitive_probe, and it kind of is here, but that
     # previous position is always 0. This is a test of ot3api though and checking

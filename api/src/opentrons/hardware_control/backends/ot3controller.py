@@ -139,7 +139,11 @@ from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     MoveGroup,
 )
-from opentrons_hardware.hardware_control.types import NodeMap, MotorPositionStatus
+from opentrons_hardware.hardware_control.types import (
+    NodeMap,
+    MotorPositionStatus,
+    MoveCompleteAck,
+)
 from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
 
 from opentrons_hardware.hardware_control.tool_sensors import (
@@ -1181,8 +1185,8 @@ class OT3Controller:
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-    ) -> None:
-        pos, _ = await capacitive_probe(
+    ) -> bool:
+        status = await capacitive_probe(
             self._messenger,
             sensor_node_for_mount(mount),
             axis_to_node(moving),
@@ -1192,7 +1196,8 @@ class OT3Controller:
             relative_threshold_pf=sensor_threshold_pf,
         )
 
-        self._position[axis_to_node(moving)] = pos
+        self._position[axis_to_node(moving)] = status.motor_position
+        return status.move_ack == MoveCompleteAck.stopped_by_condition
 
     async def capacitive_pass(
         self,
