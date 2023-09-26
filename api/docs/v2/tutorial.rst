@@ -73,6 +73,8 @@ Everything else in the protocol file is required. Next, you’ll specify the ver
 
 For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on your robot can be a part of a protocol. 
 
+.. _tutorial-metadata:
+
 Metadata
 ^^^^^^^^
 
