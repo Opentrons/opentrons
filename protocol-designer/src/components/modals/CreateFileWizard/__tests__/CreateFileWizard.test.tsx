@@ -10,9 +10,9 @@ import {
 } from '../../../../labware-defs/selectors'
 import { toggleNewProtocolModal } from '../../../../navigation/actions'
 import { createNewProtocol } from '../../../../load-file/actions'
+import { createContainer } from '../../../../labware-ingred/actions'
 import { createCustomLabwareDefAction } from '../../../../labware-defs/actions'
 import { createModule, createPipettes } from '../../../../step-forms/actions'
-import { changeSavedStepForm } from '../../../../steplist/actions'
 import {
   toggleIsGripperRequired,
   createDeckFixture,
@@ -34,6 +34,7 @@ jest.mock('../../../../step-forms/actions')
 jest.mock('../../../../steplist/actions')
 jest.mock('../../../../step-forms/actions/additionalItems')
 jest.mock('../../../../feature-flags/selectors')
+jest.mock('../../../../labware-ingred/actions')
 jest.mock('../../utils')
 
 const mockGetNewProtocolModal = getNewProtocolModal as jest.MockedFunction<
@@ -54,8 +55,8 @@ const mockCreateCustomLabwareDefAction = createCustomLabwareDefAction as jest.Mo
 const mockCreatePipettes = createPipettes as jest.MockedFunction<
   typeof createPipettes
 >
-const mockChangeSavedStepForm = changeSavedStepForm as jest.MockedFunction<
-  typeof changeSavedStepForm
+const mockCreateContainer = createContainer as jest.MockedFunction<
+  typeof createContainer
 >
 const mockToggleIsGripperRequired = toggleIsGripperRequired as jest.MockedFunction<
   typeof toggleIsGripperRequired
@@ -141,19 +142,7 @@ describe('CreateFileWizard', () => {
     expect(mockCreateNewProtocol).toHaveBeenCalled()
     expect(mockCreatePipettes).toHaveBeenCalled()
     expect(mockCreateModule).not.toHaveBeenCalled()
-    expect(mockChangeSavedStepForm).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        stepId: '__INITIAL_DECK_SETUP_STEP__',
-        update: {
-          labwareLocationUpdate: {
-            fixedTrash: {
-              slotName: '12',
-            },
-          },
-        },
-      })
-    )
+    expect(mockCreateContainer).toHaveBeenCalled()
   })
   it('renders the wizard and clicking on the exit button calls correct selector', () => {
     const { getByText, getByRole } = render()
@@ -228,18 +217,5 @@ describe('CreateFileWizard', () => {
     expect(mockCreateCustomLabwareDefAction).toHaveBeenCalled()
     expect(mockToggleIsGripperRequired).toHaveBeenCalled()
     expect(mockCreateDeckFixture).toHaveBeenCalled()
-    expect(mockChangeSavedStepForm).toHaveBeenNthCalledWith(
-      4,
-      expect.objectContaining({
-        stepId: '__INITIAL_DECK_SETUP_STEP__',
-        update: {
-          labwareLocationUpdate: {
-            fixedTrash: {
-              slotName: 'A3',
-            },
-          },
-        },
-      })
-    )
   })
 })

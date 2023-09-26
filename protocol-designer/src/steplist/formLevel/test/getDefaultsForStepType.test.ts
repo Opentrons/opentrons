@@ -4,7 +4,6 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
-  FIXED_TRASH_ID,
 } from '../../../constants'
 import { getDefaultsForStepType } from '..'
 
@@ -49,7 +48,7 @@ describe('getDefaultsForStepType', () => {
         disposalVolume_volume: null,
 
         blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
+        blowout_location: null,
         preWetTip: false,
 
         aspirate_airGap_checkbox: false,
@@ -78,7 +77,7 @@ describe('getDefaultsForStepType', () => {
         mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
+        blowout_location: null,
         mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         mix_touchTip_mmFromBottom: null,
         mix_touchTip_checkbox: false,

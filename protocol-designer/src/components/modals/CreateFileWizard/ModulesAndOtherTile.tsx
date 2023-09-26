@@ -251,19 +251,34 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         showCheckbox
       />
       {enableDeckModification && isFlex ? (
-        <EquipmentOption
-          onClick={() => handleSetEquipmentOption('wasteChute')}
-          isSelected={values.additionalEquipment.includes('wasteChute')}
-          //  todo(jr, 9/14/23): update the asset
-          image={
-            <AdditionalItemImage
-              src={gripperImage}
-              alt="Opentrons Waste Chute"
-            />
-          }
-          text="Waste Chute"
-          showCheckbox
-        />
+        <>
+          <EquipmentOption
+            onClick={() => handleSetEquipmentOption('wasteChute')}
+            isSelected={values.additionalEquipment.includes('wasteChute')}
+            //  todo(jr, 9/14/23): update the asset
+            image={
+              <AdditionalItemImage
+                src={gripperImage}
+                alt="Opentrons Waste Chute"
+              />
+            }
+            text="Waste Chute"
+            showCheckbox
+          />
+          <EquipmentOption
+            onClick={() => handleSetEquipmentOption('trashBin')}
+            isSelected={values.additionalEquipment.includes('trashBin')}
+            //  todo(jr, 9/14/23): update the asset with trash bin
+            image={
+              <AdditionalItemImage
+                src={gripperImage}
+                alt="Opentrons Trash Bin"
+              />
+            }
+            text="Trash Bin"
+            showCheckbox
+          />
+        </>
       ) : null}
     </Flex>
   )
