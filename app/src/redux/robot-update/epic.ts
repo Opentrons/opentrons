@@ -97,10 +97,10 @@ const ROBOT_DID_NOT_RECONNECT = 'Robot did not successfully reconnect'
 const BUT_WE_EXPECTED = 'but we expected'
 const UNKNOWN = 'unknown'
 const CHECK_TO_VERIFY_UPDATE =
-  "Check your robot's settings page to verify whether or not the update was successful."
-const UNABLE_TO_FIND_SYSTEM_FILE = 'Unable to find system file for update.'
+  "Check your robot's settings page to verify whether or not the update was successful"
+const UNABLE_TO_FIND_SYSTEM_FILE = 'Unable to find system file for update'
 const ROBOT_REQUIRES_PREMIGRATION =
-  'This robot must be updated by the system before a custom update can occur.'
+  'This robot must be updated by the system before a custom update can occur'
 
 // listen for the kickoff action and:
 //   if not ready for buildroot, kickoff premigration

@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { useSelector } from 'react-redux'
+
 import {
   Box,
   Flex,
@@ -20,7 +22,11 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-import { LEFT } from '../../../redux/pipettes'
+
+import {
+  LEFT,
+  getAttachedPipetteSettingsFieldsById,
+} from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
@@ -34,6 +40,8 @@ import { useIsOT3 } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
+
+import type { State } from '../../../redux/types'
 import type {
   PipetteModelSpecs,
   PipetteMount,
@@ -47,13 +55,13 @@ import type {
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
-  pipetteId?: AttachedPipette['id'] | null
   isPipetteCalibrated: boolean
   mount: Mount
   robotName: string
   pipetteIs96Channel: boolean
   pipetteIsBad: boolean
   updatePipette: () => void
+  pipetteId?: AttachedPipette['id'] | null
 }
 const BANNER_LINK_CSS = css`
   text-decoration: underline;
@@ -102,6 +110,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       enabled: isOt3,
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
+  )
+  const settings = useSelector((state: State) =>
+    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId ?? '')
   )
 
   const [
@@ -173,15 +184,19 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           closeModal={() => setChangePipette(false)}
         />
       )}
-      {showSlideout && pipetteModelSpecs != null && pipetteId != null && (
-        <PipetteSettingsSlideout
-          robotName={robotName}
-          pipetteName={pipetteModelSpecs.displayName}
-          onCloseClick={() => setShowSlideout(false)}
-          isExpanded={true}
-          pipetteId={pipetteId}
-        />
-      )}
+      {showSlideout &&
+        pipetteModelSpecs != null &&
+        pipetteId != null &&
+        settings != null && (
+          <PipetteSettingsSlideout
+            robotName={robotName}
+            pipetteName={pipetteModelSpecs.displayName}
+            onCloseClick={() => setShowSlideout(false)}
+            isExpanded={true}
+            pipetteId={pipetteId}
+            settings={settings}
+          />
+        )}
       {showAboutSlideout && pipetteModelSpecs != null && pipetteId != null && (
         <AboutPipetteSlideout
           pipetteId={pipetteId}
@@ -323,6 +338,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               handleAboutSlideout={handleAboutSlideout}
               handleCalibrate={handleCalibrate}
               isPipetteCalibrated={isPipetteCalibrated}
+              pipetteSettings={settings}
             />
           </Box>
           {menuOverlay}
