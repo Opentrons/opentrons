@@ -1906,9 +1906,8 @@ class OT3API(
         checked_mount = OT3Mount.from_mount(mount)
         high_throughput = self._gantry_load == GantryLoad.HIGH_THROUGHPUT
         if high_throughput:
-            # instrument = self._pipette_handler.get_pipette(checked_mount)
-            # tip_presence_check_target = instrument.tip_presence_check_dist_mm
-            tip_presence_check_target = 6
+            instrument = self._pipette_handler.get_pipette(checked_mount)
+            tip_presence_check_target = instrument.tip_presence_check_dist_mm
 
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 Axis.of_main_tool_actuator(checked_mount)
