@@ -18,7 +18,7 @@ SPEEDS_TO_TEST: List[float] = [5, 15, 22]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
     0.6: SPEEDS_TO_TEST,
     0.7: SPEEDS_TO_TEST,
-    0.8: SPEEDS_TO_TEST
+    0.8: SPEEDS_TO_TEST,
 }
 
 
