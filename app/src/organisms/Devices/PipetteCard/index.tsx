@@ -194,7 +194,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {!pipetteIsBad && subsystemUpdateData == null && (
         <>
           <Box
-            padding={`${SPACING.spacing16} ${SPACING.spacing8}`}
+            padding={`${SPACING.spacing16} ${SPACING.spacing16}`}
             width="100%"
           >
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
@@ -205,8 +205,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     mount={mount}
                     //  pipette images for Flex are slightly smaller so need to be scaled accordingly
                     transform={isOt3 ? 'scale(0.4)' : 'scale(0.3)'}
-                    size="3.125rem"
-                    transformOrigin={isOt3 ? '-50% -10%' : '20% -10%'}
                   />
                 ) : null}
               </Flex>
