@@ -65,7 +65,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     {
       title: 'doItAllV7 Flex robot (schema 7, PD version 7.1.0)',
       importFixture: '../../fixtures/protocol/7/doItAllV7.json',
-      expectedExportFixture: '../../fixtures/protocol/7.1/doItAllV7.json',
+      expectedExportFixture: '../../fixtures/protocol/7/doItAllV7.json',
       migrationModal: null,
       unusedPipettes: false,
     },
