@@ -61,8 +61,10 @@ async function main() {
   if (!releasesPath || !project || !artifactDirPath || !urlBase) {
     throw new Error(USAGE)
   }
+  console.log(`Updating ${releasesPath} with artifacts from ${artifactDirPath}`)
   const releasesData = await readOrDefaultReleases(releasesPath)
   const version = await versionFinder.versionForProject(project)
+  console.log(`Adding data for ${version}`)
   releasesData.production[version] = {
     ...(await artifactsFromDir(
       artifactDirPath,
@@ -70,6 +72,9 @@ async function main() {
     )),
     revoked: false,
   }
+  console.log(
+    `Added ${Object.keys(releasesData.production[version]).length} artifacts`
+  )
   ;(await fs.open(releasesPath, 'w')).writeFile(JSON.stringify(releasesData))
 }
 
