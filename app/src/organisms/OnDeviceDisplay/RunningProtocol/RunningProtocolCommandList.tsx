@@ -196,9 +196,6 @@ export function RunningProtocolCommandList({
               lowestVisibleIndex,
               highestVisibleIndex,
             ]) => {
-              console.log('lowestVisibleIndex', lowestVisibleIndex)
-              console.log('highestVisibleIndex', highestVisibleIndex)
-              console.log('currentRunCommandIndex', currentRunCommandIndex)
               if (
                 currentRunCommandIndex != null &&
                 currentRunCommandIndex >= 0
