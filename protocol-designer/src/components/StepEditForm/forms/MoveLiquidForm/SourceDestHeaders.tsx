@@ -33,7 +33,8 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
   } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
-
+  console.log(formData)
+  console.log('labware', propsForFields)
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>
       <div className={styles.form_row}>

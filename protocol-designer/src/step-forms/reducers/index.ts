@@ -1357,13 +1357,14 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       state: NormalizedAdditionalEquipmentById,
       action: CreateDeckFixtureAction
     ): NormalizedAdditionalEquipmentById => {
-      const { location, id, name } = action.payload
+      const { location, id, name, defUri } = action.payload
       return {
         ...state,
         [id]: {
           name,
           id,
           location,
+          defUri,
         },
       }
     },

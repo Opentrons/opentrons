@@ -1,6 +1,6 @@
 import assert from 'assert'
 import zip from 'lodash/zip'
-import { getWellDepth } from '@opentrons/shared-data'
+import { getWellDepth, LabwareDefinition2 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
@@ -27,6 +27,8 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
+
+const TRASH_DEPTH = 86
 export const transfer: CommandCreator<TransferArgs> = (
   args,
   invariantContext,
@@ -138,11 +140,22 @@ export const transfer: CommandCreator<TransferArgs> = (
       const sourceLabwareDef =
         invariantContext.labwareEntities[args.sourceLabware].def
       const destLabwareDef =
-        invariantContext.labwareEntities[args.destLabware].def
+        invariantContext.additionalEquipmentEntities[args.destLabware].def !=
+        null
+          ? invariantContext.additionalEquipmentEntities[args.destLabware].def
+          : invariantContext.labwareEntities[args.destLabware].def
+      if (destLabwareDef == null)
+        [
+          console.warn(
+            `expected to find labware definition for ${args.destLabware} id but could not`
+          ),
+        ]
       const airGapOffsetSourceWell =
         getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
       const airGapOffsetDestWell =
-        getWellDepth(destLabwareDef, destWell) + AIR_GAP_OFFSET_FROM_TOP
+        getWellDepth(destLabwareDef as LabwareDefinition2, destWell) +
+        AIR_GAP_OFFSET_FROM_TOP
+
       const commands = subTransferVolumes.reduce(
         (
           innerAcc: CurriedCommandCreator[],

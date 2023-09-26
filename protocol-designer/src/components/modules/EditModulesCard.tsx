@@ -149,7 +149,11 @@ export function EditModulesCard(props: Props): JSX.Element {
                 dispatch(
                   wasteChute != null
                     ? deleteDeckFixture(wasteChute.id)
-                    : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
+                    : createDeckFixture(
+                        'wasteChute',
+                        WASTE_CHUTE_SLOT,
+                        FLEX_ROBOT_TYPE
+                      )
                 )
               }
               isEquipmentAdded={wasteChute != null}

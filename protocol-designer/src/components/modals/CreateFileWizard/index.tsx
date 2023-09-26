@@ -33,7 +33,11 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
+import {
+  FLEX_TRASH_DEF_URI,
+  INITIAL_DECK_SETUP_STEP_ID,
+  OT_2_TRASH_DEF_URI,
+} from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
@@ -215,7 +219,9 @@ export function CreateFileWizard(): JSX.Element | null {
         enableDeckModification &&
         values.additionalEquipment.includes('wasteChute')
       ) {
-        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+        dispatch(
+          createDeckFixture('wasteChute', WASTE_CHUTE_SLOT, FLEX_ROBOT_TYPE)
+        )
       }
       if (
         enableDeckModification &&
@@ -223,11 +229,7 @@ export function CreateFileWizard(): JSX.Element | null {
         values.additionalEquipment.includes('trashBin')
       ) {
         dispatch(
-          createDeckFixture(
-            'trashBin',
-
-            DEFAULT_TRASH_BIN_SLOT
-          )
+          createDeckFixture('trashBin', DEFAULT_TRASH_BIN_SLOT, FLEX_ROBOT_TYPE)
         )
       } else {
         dispatch(
@@ -235,7 +237,10 @@ export function CreateFileWizard(): JSX.Element | null {
             'trashBin',
             values.fields.robotType === FLEX_ROBOT_TYPE
               ? DEFAULT_TRASH_BIN_SLOT
-              : '12'
+              : '12',
+            values.fields.robotType === FLEX_ROBOT_TYPE
+              ? FLEX_ROBOT_TYPE
+              : OT2_ROBOT_TYPE
           )
         )
       }

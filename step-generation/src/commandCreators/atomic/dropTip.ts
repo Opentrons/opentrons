@@ -13,7 +13,7 @@ export const dropTip: CommandCreator<DropTipArgs> = (
   const { pipette } = args
   const additionalEquipment = Object.values(
     invariantContext.additionalEquipmentEntities
-  ).find(aE => aE.name === 'trashBin')?.location
+  ).find(aE => aE.name === 'trashBin')?.id
 
   // No-op if there is no tip
   if (!prevRobotState.tipState.pipettes[pipette]) {

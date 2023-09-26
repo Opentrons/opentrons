@@ -39,7 +39,14 @@ export function dispenseUpdateLiquidState(
     wellName,
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-  const labwareDef = invariantContext.labwareEntities[labwareId].def
+  console.log('labwareId', labwareId)
+  console.log(
+    'invariantContext.additionalEquipmentEntities',
+    invariantContext.additionalEquipmentEntities
+  )
+  const labwareDef =
+    invariantContext.additionalEquipmentEntities[labwareId].def ??
+    invariantContext.labwareEntities[labwareId].def
   assert(
     !(useFullVolume && typeof volume === 'number'),
     'dispenseUpdateLiquidState takes either `volume` or `useFullVolume`, but got both'

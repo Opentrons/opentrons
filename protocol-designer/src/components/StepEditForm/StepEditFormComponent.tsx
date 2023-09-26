@@ -76,7 +76,8 @@ export const StepEditFormComponent = (props: Props): JSX.Element => {
       </div>
     )
   }
-
+  console.log('props for fields', propsForFields)
+  console.log('can save', canSave)
   return (
     <>
       {showMoreOptionsModal && (

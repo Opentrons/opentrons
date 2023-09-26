@@ -82,12 +82,16 @@ export const moveLiquidFormToArgs = (
     fields.aspirate_wellOrder_first,
     fields.aspirate_wellOrder_second
   )
-  let destWells = getOrderedWells(
-    fields.dispense_wells,
-    destLabware.def,
-    fields.dispense_wellOrder_first,
-    fields.dispense_wellOrder_second
-  )
+  let destWells =
+    'def' in destLabware
+      ? getOrderedWells(
+          fields.dispense_wells,
+          destLabware.def,
+          fields.dispense_wellOrder_first,
+          fields.dispense_wellOrder_second
+          //  else assume it is a trash entity
+        )
+      : ['A1']
 
   // 1:many with single path: spread well array of length 1 to match other well array
   if (path === 'single' && sourceWells.length !== destWells.length) {
@@ -108,9 +112,11 @@ export const moveLiquidFormToArgs = (
       DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
   const touchTipAfterDispenseOffsetMmFromBottom =
-    fields.dispense_touchTip_mmFromBottom ||
-    getWellsDepth(fields.dispense_labware.def, destWells) +
-      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+    `def` in fields.dispense_labware
+      ? fields.dispense_touchTip_mmFromBottom ||
+        getWellsDepth(fields.dispense_labware.def, destWells) +
+          DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+      : 0
   const mixBeforeAspirate = getMixData(
     fields,
     'aspirate_mix_checkbox',

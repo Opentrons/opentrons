@@ -14,9 +14,11 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   PipetteName,
   MAGNETIC_BLOCK_TYPE,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import {
   AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
   NormalizedAdditionalEquipmentById,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
@@ -152,15 +154,6 @@ export const _getPipetteEntitiesRootState: (
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
-// Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
-export const _getAdditionalEquipmentEntitiesRootState: (
-  arg: RootState
-) => AdditionalEquipmentEntities = rs =>
-  rs.additionalEquipmentInvariantProperties
-export const getAdditionalEquipmentEntities: Selector<
-  BaseState,
-  AdditionalEquipmentEntities
-> = createSelector(rootSelector, _getAdditionalEquipmentEntitiesRootState)
 
 export const getPipetteEntities: Selector<
   BaseState,
@@ -176,6 +169,56 @@ export const getAdditionalEquipment: Selector<
   BaseState,
   NormalizedAdditionalEquipmentById
 > = createSelector(rootSelector, _getAdditionalEquipmentRootState)
+
+type NormalizedAdditionalEquipment = {
+  name: 'gripper' | 'wasteChute' | 'trashBin'
+  location?: string
+  defUri?: string
+  def?: LabwareDefinition2
+}
+
+function _hydrateAddiontalEquipmentEntity(
+  aE: NormalizedAdditionalEquipment,
+  additionalEquipmentId: string,
+  defsByURI: LabwareDefByDefURI
+): AdditionalEquipmentEntity {
+  const def = aE.defUri != null ? defsByURI[aE.defUri] : null
+  if (def == null) {
+    assert(
+      def,
+      `expected to find a labware definition for ${aE.name} could not`
+    )
+  }
+  assert(
+    def,
+    `could not hydrate labware ${additionalEquipmentId}, missing def for URI ${aE.defUri}`
+  )
+  return { ...aE, id: additionalEquipmentId, def }
+}
+
+// Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
+export const _getAdditionalEquipmentEntitiesRootState: (
+  arg: RootState
+) => AdditionalEquipmentEntities = rs =>
+  rs.additionalEquipmentInvariantProperties
+
+export const getAdditionalEquipmentEntities: Selector<
+  BaseState,
+  AdditionalEquipmentEntities
+> = createSelector(
+  getAdditionalEquipment,
+  labwareDefSelectors.getLabwareDefsByURI,
+  (additionalEquipmentById, labwareDefs) =>
+    mapValues(
+      additionalEquipmentById,
+      (aE: NormalizedAdditionalEquipment, id: string) =>
+        _hydrateAddiontalEquipmentEntity(
+          aE,
+          id,
+          labwareDefs
+        ) as AdditionalEquipmentEntity
+    )
+)
 
 const _getInitialDeckSetupStepFormRootState: (
   arg: RootState
@@ -573,7 +616,7 @@ export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
     } else {
       // TODO: fieldName includes id, stepType, etc... this is weird #3161
       const fieldErrors = getFieldErrors(fieldName, value)
-
+      console.log('fieldErrors', fieldErrors, value, fieldName)
       if (fieldErrors && fieldErrors.length > 0) {
         return true
       }

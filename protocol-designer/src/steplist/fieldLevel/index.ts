@@ -42,6 +42,7 @@ import {
   PipetteEntity,
   InvariantContext,
   LabwareEntities,
+  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import { StepFieldName } from '../../form-types'
 import type { LabwareLocation } from '@opentrons/shared-data'
@@ -53,6 +54,33 @@ const getLabwareEntity = (
   id: string
 ): LabwareEntity | null => {
   return state.labwareEntities[id] || null
+}
+
+const getAdditionalEquipmentEntity = (
+  state: InvariantContext,
+  id: string
+): AdditionalEquipmentEntity | null => {
+  return state.additionalEquipmentEntities[id] || null
+}
+
+const hydrateFromMultiple = (
+  state: InvariantContext,
+  id: string
+): LabwareEntity | AdditionalEquipmentEntity | null => {
+  const additionalEquipment = getAdditionalEquipmentEntity(state, id)
+  const hasTrash =
+    additionalEquipment?.name === 'trashBin' ||
+    additionalEquipment?.name === 'wasteChute'
+  if (hasTrash != null) {
+    return additionalEquipment
+  }
+
+  const labware = getLabwareEntity(state, id)
+  if (labware != null) {
+    return labware
+  }
+
+  return null
 }
 
 const getIsAdapterLocation = (
@@ -137,7 +165,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: hydrateFromMultiple,
   },
   dispense_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),

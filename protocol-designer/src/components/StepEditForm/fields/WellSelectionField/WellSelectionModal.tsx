@@ -29,6 +29,8 @@ import { StepFieldName } from '../../../../form-types'
 
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
+import { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+import { getAllDefinitions, getOnlyLatestDefs } from '../../../../labware-defs'
 
 interface WellSelectionModalProps {
   isOpen: boolean
@@ -38,6 +40,7 @@ interface WellSelectionModalProps {
   pipetteId?: string | null
   value: unknown
   updateValue: (val: unknown | null | undefined) => void
+  additionalEquipmentEntities: AdditionalEquipmentEntities
 }
 
 interface WellSelectionModalComponentProps {
@@ -121,20 +124,32 @@ const WellSelectionModalComponent = (
 export const WellSelectionModal = (
   props: WellSelectionModalProps
 ): JSX.Element | null => {
-  const { isOpen, labwareId, onCloseClick, pipetteId } = props
+  const {
+    isOpen,
+    labwareId,
+    onCloseClick,
+    pipetteId,
+    additionalEquipmentEntities,
+  } = props
   const wellFieldData = props.value
 
   // selector data
   const allWellContentsForStep = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
+  const latestDefinitions = getOnlyLatestDefs()
 
   const ingredNames = useSelector(selectors.getLiquidNamesById)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
-
   // selector-derived data
   const labwareDef = (labwareId && labwareEntities[labwareId]?.def) || null
+  const trashLabwareDefUri =
+    labwareId != null
+      ? additionalEquipmentEntities[labwareId]?.defUri ?? null
+      : null
+  const trashDef =
+    trashLabwareDefUri != null ? latestDefinitions[trashLabwareDefUri] : null
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
   const initialSelectedPrimaryWells = Array.isArray(wellFieldData)
@@ -161,6 +176,7 @@ export const WellSelectionModal = (
 
   const handleSave = (): void => {
     const sortedWells = Object.keys(selectedPrimaryWells).sort(sortWells)
+    console.log('sortedWells', sortedWells)
     props.updateValue(sortedWells)
     onCloseClick()
   }
@@ -174,7 +190,7 @@ export const WellSelectionModal = (
         handleSave,
         highlightedWells,
         ingredNames,
-        labwareDef,
+        labwareDef: labwareDef ?? trashDef,
         onCloseClick,
         pipetteSpec: pipette?.spec,
         selectWells,

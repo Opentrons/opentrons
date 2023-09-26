@@ -15,6 +15,7 @@ import { Dispatch } from 'redux'
 import { StepIdType } from '../../../../form-types'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
+import { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 
 export interface SP {
   stepId?: StepIdType | null
@@ -27,6 +28,7 @@ export interface DP {
 }
 
 export type OP = FieldProps & {
+  additionalEquipmentEntities: AdditionalEquipmentEntities
   primaryWellCount?: number
   isMulti?: boolean | null
   pipetteId?: string | null
@@ -86,6 +88,7 @@ export class WellSelectionInputComponent extends React.Component<Props> {
         />
         <Portal>
           <WellSelectionModal
+            additionalEquipmentEntities={this.props.additionalEquipmentEntities}
             isOpen={this.props.wellSelectionLabwareKey === modalKey}
             key={modalKey}
             labwareId={this.props.labwareId}

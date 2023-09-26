@@ -104,8 +104,8 @@ export const getLabwareOptions: Selector<Options> = createSelector(
     )
 
     const allOptions: Options =
-      trashBin != null && trashBin.location != null && !moveLabwarePresavedStep
-        ? [...options, { name: 'Trash bin', value: trashBin?.location }]
+      trashBin != null && !moveLabwarePresavedStep
+        ? [...options, { name: 'Trash bin', value: trashBin.id }]
         : options
 
     return _sortLabwareDropdownOptions(allOptions)
