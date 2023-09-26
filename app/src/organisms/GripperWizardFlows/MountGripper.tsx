@@ -140,7 +140,6 @@ export const MountGripper = (
       proceedButtonText={t('continue')}
       proceedIsDisabled={isPending}
       proceed={handleOnClick}
-      getHelp={'https://support.opentrons.com/s/opentrons-flex'}
     />
   )
 }
