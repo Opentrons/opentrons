@@ -128,7 +128,7 @@ export function CalibrationTaskList({
             alignItems={ALIGN_CENTER}
           >
             {wasExitBeforeCompletion ? (
-              <Icon name="ot-alert" size="3rem" color={COLORS.yellow2} />
+              <Icon name="ot-alert" size="3rem" color={COLORS.warningEnabled} />
             ) : (
               <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
             )}
