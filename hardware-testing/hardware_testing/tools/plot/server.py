@@ -57,7 +57,6 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
     def _list_file_paths_in_directory(
         self, directory: Path, includes: str = ""
     ) -> List[Path]:
-        _test_run_dirs = [Path(f) for f in directory.iterdir()]
         _ret: List[Path] = []
         for p in [Path(f) for f in directory.iterdir()]:
             if p.is_file() and includes in p.stem:
