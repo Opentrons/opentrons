@@ -8,7 +8,7 @@ from typing import Optional
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
-from opentrons.util.broker import Broker
+from opentrons.util.broker import ReadOnlyBroker
 
 from .legacy_wrappers import LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
@@ -37,7 +37,7 @@ class LegacyContextPlugin(AbstractPlugin):
     def __init__(
         self,
         broker: LegacyBroker,
-        equipment_broker: Broker[LegacyLoadInfo],
+        equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
         """Initialize the plugin with its dependencies."""
