@@ -35,7 +35,11 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
-import { OT_2_TRASH_DEF_URI, PSEUDO_DECK_SLOTS } from '../../constants'
+import {
+  FLEX_TRASH_DEF_URI,
+  OT_2_TRASH_DEF_URI,
+  PSEUDO_DECK_SLOTS,
+} from '../../constants'
 import { i18n } from '../../localization'
 import {
   getLabwareIsCompatible,
@@ -532,7 +536,7 @@ export const DeckSetup = (): JSX.Element => {
     Object.values(activeDeckSetup.labware).find(
       lw =>
         lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-        lw.labwareDefURI === FLEX_TRASH_SLOT
+        lw.labwareDefURI === FLEX_TRASH_DEF_URI
     )?.slot ?? null
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
