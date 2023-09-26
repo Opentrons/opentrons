@@ -1,6 +1,6 @@
 """Tests for the move scheduler."""
 import pytest
-from typing import List, Any, Tuple
+from typing import List, Any
 from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock, patch
 from opentrons_shared_data.errors.exceptions import (

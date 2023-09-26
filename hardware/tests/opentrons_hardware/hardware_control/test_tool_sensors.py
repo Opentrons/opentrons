@@ -281,11 +281,11 @@ async def test_capacitive_probe(
 
     message_send_loopback.add_responder(move_responder)
 
-    position, encoder_position = await capacitive_probe(
+    status = await capacitive_probe(
         mock_messenger, target_node, motor_node, distance, speed
     )
-    assert position == 10  # this comes from the current_position_um above
-    assert encoder_position == 10
+    assert status.motor_position == 10  # this comes from the current_position_um above
+    assert status.encoder_position == 10
     # this mock assert is annoying because something's __eq__ doesn't work
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
         sensor=sensor_info,

@@ -44,6 +44,7 @@ class MotorPositionStatus:
     move_ack: Optional[MoveCompleteAck] = None
 
     def positions_only(self) -> Tuple[float, float]:
+        """Returns motor and encoder positions as a tuple."""
         return (
             self.motor_position,
             self.encoder_position,

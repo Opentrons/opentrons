@@ -42,6 +42,7 @@ _MotorStatusMoves = Union[
 
 
 def extract_motor_status_info(msg: _MotorStatusMoves) -> MotorPositionStatus:
+    """Extract motor position status from CAN responses."""
     move_ack: Optional[MoveCompleteAck] = None
     if isinstance(msg, MoveCompleted) or isinstance(msg, TipActionResponse):
         move_ack = MoveCompleteAck(msg.payload.ack_id.value)
