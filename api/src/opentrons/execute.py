@@ -41,8 +41,6 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
-from opentrons.protocol_engine import command_monitor as pe_command_monitor
-from opentrons.protocol_engine.types import PostRunHardwareState
 
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
@@ -65,9 +63,11 @@ from opentrons.protocol_engine import (
     DeckType,
     EngineStatus,
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
+    command_monitor as pe_command_monitor,
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
+from opentrons.protocol_engine.types import PostRunHardwareState
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
@@ -424,7 +424,6 @@ def execute(  # noqa: C901
         )
 
 
-# TODO: This is printing an ever-deepening tree of commands. We need to emit $=after entries.
 def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
     level = 0
     last_dollar = None
@@ -737,22 +736,19 @@ def _adapt_protocol_source(
         yield protocol_source
 
 
-def _before_or_after(
-    event: pe_command_monitor.Event,
-) -> command_types.MessageSequenceId:
-    if isinstance(event, pe_command_monitor.RunningEvent):
-        return "before"
-    elif isinstance(event, pe_command_monitor.NoLongerRunningEvent):
-        return "after"
-
-
 def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMessage:
-    before_or_after = _before_or_after(event)
+    """Convert a Protocol Engine command event to an old-school command_types.CommandMesage."""
+    before_or_after = (
+        "before" if isinstance(event, pe_command_monitor.RunningEvent) else "after"
+    )
 
     message: command_types.CommentMessage = {
         "name": "command.COMMENT",
         "id": event.command.id,
         "$": before_or_after,
+        # TODO(mm, 2023-09-26): Convert this machine-readable JSON into a human-readable message
+        # to match behavior from before Protocol Engine.
+        # https://opentrons.atlassian.net/browse/RSS-320
         "payload": {"text": event.command.json()},
         "error": None,
     }
