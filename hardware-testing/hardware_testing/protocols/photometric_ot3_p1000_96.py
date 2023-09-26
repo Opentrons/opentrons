@@ -6,6 +6,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
     50: [5, 6, 8, 9, 11],
+    200: [5, 6, 8, 9, 11]  # NOTE: ignoring this tip-rack during run() method
 }
 SLOT_PLATE = 3
 SLOT_RESERVOIR = 2
@@ -23,6 +24,7 @@ def run(ctx: ProtocolContext) -> None:
         )
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
+        if size == 50  # only calibrate 50ul tips for 96ch test
     ]
     reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
     plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)

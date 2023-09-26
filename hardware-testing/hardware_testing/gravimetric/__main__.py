@@ -20,17 +20,13 @@ from hardware_testing.protocols import (
     gravimetric_ot3_p1000_multi_200ul_tip_increment,
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
     gravimetric_ot3_p1000_96,
-    gravimetric_ot3_p1000_96_50ul_tip,
-    gravimetric_ot3_p1000_96_200ul_tip,
-    gravimetric_ot3_p1000_96_1000ul_tip,
 )
 from hardware_testing.protocols import (
     photometric_ot3_p50_single,
     photometric_ot3_p50_multi,
     photometric_ot3_p1000_single,
     photometric_ot3_p1000_multi,
-    photometric_ot3_p1000_96_50ul,
-    photometric_ot3_p1000_96_200ul,
+    photometric_ot3_p1000_96,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -84,9 +80,9 @@ GRAVIMETRIC_CFG_INCREMENT = {
             1000: gravimetric_ot3_p1000_multi_1000ul_tip_increment,
         },
         96: {
-            50: gravimetric_ot3_p1000_96_50ul_tip,
-            200: gravimetric_ot3_p1000_96_200ul_tip,
-            1000: gravimetric_ot3_p1000_96_1000ul_tip,
+            50: gravimetric_ot3_p1000_96,
+            200: gravimetric_ot3_p1000_96,
+            1000: gravimetric_ot3_p1000_96,
         },
     },
 }
@@ -111,7 +107,7 @@ PHOTOMETRIC_CFG = {
             200: photometric_ot3_p1000_multi,
             1000: photometric_ot3_p1000_multi,
         },
-        96: {50: photometric_ot3_p1000_96_50ul, 200: photometric_ot3_p1000_96_200ul},
+        96: {50: photometric_ot3_p1000_96, 200: photometric_ot3_p1000_96},
     },
 }
 
@@ -282,7 +278,11 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][args.tip]
+            _tip_cfg = max(tip_volumes)
+            if len(tip_volumes) > 0:
+                ui.print_info(f"WARNING: using source Protocol for {_tip_cfg} tip, "
+                              f"but test includes multiple tips ({tip_volumes})")
+            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][_tip_cfg]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,
@@ -299,8 +299,11 @@ class RunArgs:
             )
         else:
             if args.increment:
+                assert len(tip_volumes) == 0, f"tip must be specified " \
+                                              f"when running --increment test " \
+                                              f"with {args.channels}ch P{args.pipette}"
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
-                    args.tip
+                    tip_volumes[0]
                 ]
             else:
                 protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
