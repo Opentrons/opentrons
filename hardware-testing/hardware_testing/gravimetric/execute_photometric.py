@@ -198,9 +198,8 @@ def _run_trial(trial: PhotometricTrial) -> None:
         dest_name = _get_photo_plate_dest(trial.cfg, trial.trial)
         dest_well = trial.dest[dest_name]
         affected_wells = get_list_of_wells_affected(dest_well, trial.pipette.channels)
-        for dest_well in affected_wells:
-            trial.liquid_tracker.set_start_volume(dest_well, photoplate_preped_vol)
-        trial.liquid_tracker.set_start_volume(dest_well, photoplate_preped_vol)
+        for _w in affected_wells:
+            trial.liquid_tracker.set_start_volume(_w, photoplate_preped_vol)
         trial.pipette.move_to(dest_well.top())
         ui.print_info(f"dispensing to {dest_well}")
         # RUN DISPENSE
