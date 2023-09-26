@@ -60,7 +60,7 @@ describe('BeforeBeginning', () => {
     getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
-    getByText('Gripper')
+    getByText('Flex Gripper')
 
     getByRole('button', { name: 'Move gantry to front' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
@@ -121,7 +121,7 @@ describe('BeforeBeginning', () => {
     )
     getByText('You will need:')
     getByText('Calibration Pin')
-    getByText('Gripper')
+    getByText('Flex Gripper')
     // getByText('mock need help link')
 
     getByRole('button', { name: 'Move gantry to front' }).click()

@@ -97,9 +97,17 @@ describe('MovePin', () => {
     await expect(mockProceed).toHaveBeenCalled()
   })
 
-  it('clicking go back calls back', () => {
+  it('clicking go back calls back on moving pin from front to rear jaw', () => {
     const { getByLabelText } = render({
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
+    })[0]
+    getByLabelText('back').click()
+    expect(mockGoBack).toHaveBeenCalled()
+  })
+
+  it('clicking go back calls back on removing pin from rear jaw', () => {
+    const { getByLabelText } = render({
+      movement: REMOVE_PIN_FROM_REAR_JAW,
     })[0]
     getByLabelText('back').click()
     expect(mockGoBack).toHaveBeenCalled()
