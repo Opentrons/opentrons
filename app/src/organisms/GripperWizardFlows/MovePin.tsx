@@ -244,12 +244,6 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       />
     )
 
-  // render help link but not back button for mounting to front jaw step
-  let back
-  if (movement !== MOVE_PIN_TO_FRONT_JAW) {
-    back = goBack
-  }
-
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
@@ -277,7 +271,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}
-      back={back}
+      back={movement !== MOVE_PIN_TO_FRONT_JAW ? goBack : undefined}
     />
   )
 }
