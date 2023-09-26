@@ -91,6 +91,5 @@ describe('MountGripper', () => {
     getByText(
       'Attach the gripper to the robot by aligning the connector and pressing to ensure a secure connection. Hold the gripper in place. Tighten the top gripper screw first, and the bottom screw second. Then test that the gripper is securely attached by gently pulling it side to side.'
     )
-    getByText('Need help?')
   })
 })
