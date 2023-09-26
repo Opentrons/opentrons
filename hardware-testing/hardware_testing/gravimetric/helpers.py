@@ -289,8 +289,6 @@ def _pick_up_tip(
             OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
         )
 
-    pipette.home_plunger()
-
 
 def _drop_tip(
     pipette: InstrumentContext, return_tip: bool, minimum_z_height: int = 0

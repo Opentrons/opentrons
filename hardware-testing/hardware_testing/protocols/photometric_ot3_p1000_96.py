@@ -6,7 +6,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
     50: [5, 6, 8, 9, 11],
-    200: [5, 6, 8, 9, 11]  # NOTE: ignoring this tip-rack during run() method
+    200: [5, 6, 8, 9, 11],  # NOTE: ignoring this tip-rack during run() method
 }
 SLOT_PLATE = 3
 SLOT_RESERVOIR = 2

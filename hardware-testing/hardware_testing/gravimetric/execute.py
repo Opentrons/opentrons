@@ -600,9 +600,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         _MEASUREMENTS = list()
     try:
         ui.print_title("FIND LIQUID HEIGHT")
-        ui.print_info("homing...")
-        resources.ctx.home()
-        resources.pipette.home_plunger()
         first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)

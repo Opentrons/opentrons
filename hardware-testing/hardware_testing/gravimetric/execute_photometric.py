@@ -316,10 +316,6 @@ def execute_trials(
     trials: Dict[float, List[PhotometricTrial]],
 ) -> None:
     """Execute a batch of pre-constructed trials."""
-    ui.print_info("homing...")
-    resources.ctx.home()
-    resources.pipette.home_plunger()
-
     trial_total = len(resources.test_volumes) * cfg.trials
     trial_count = 0
     for volume in trials.keys():
@@ -428,7 +424,6 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
     trial_total = len(resources.test_volumes) * cfg.trials
 
-    resources.ctx._core.get_hardware().home()
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)

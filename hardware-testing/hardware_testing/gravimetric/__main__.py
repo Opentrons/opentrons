@@ -280,8 +280,10 @@ class RunArgs:
         if args.photometric:
             _tip_cfg = max(tip_volumes)
             if len(tip_volumes) > 0:
-                ui.print_info(f"WARNING: using source Protocol for {_tip_cfg} tip, "
-                              f"but test includes multiple tips ({tip_volumes})")
+                ui.print_info(
+                    f"WARNING: using source Protocol for {_tip_cfg} tip, "
+                    f"but test includes multiple tips ({tip_volumes})"
+                )
             protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][_tip_cfg]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
@@ -299,9 +301,11 @@ class RunArgs:
             )
         else:
             if args.increment:
-                assert len(tip_volumes) == 0, f"tip must be specified " \
-                                              f"when running --increment test " \
-                                              f"with {args.channels}ch P{args.pipette}"
+                assert len(tip_volumes) == 0, (
+                    f"tip must be specified "
+                    f"when running --increment test "
+                    f"with {args.channels}ch P{args.pipette}"
+                )
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
                     tip_volumes[0]
                 ]
@@ -574,6 +578,8 @@ if __name__ == "__main__":
     try:
         if not run_args.ctx.is_simulating() and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
+        ui.print_info("homing...")
+        run_args.ctx.home()
         for tip, volumes in run_args.volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
                 delay = 0 if args.photometric else 30
