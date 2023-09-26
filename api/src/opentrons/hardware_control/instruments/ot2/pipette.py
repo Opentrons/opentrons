@@ -5,7 +5,7 @@ import functools
 """ Classes and functions for pipette state tracking
 """
 import logging
-from typing import Any, Dict, Optional, Set, Tuple, Union, cast, List
+from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
@@ -90,6 +90,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pipette_version = self._config.version
         self._max_channels = self._config.channels
         self._backlash_distance = config.backlash_distance
+        self._pick_up_configurations = config.pick_up_tip_configurations
 
         self._liquid_class_name = pip_types.LiquidClasses.default
         self._liquid_class = self._config.liquid_properties[self._liquid_class_name]
@@ -110,6 +111,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
                 self._config.nozzle_map,
+                self._pick_up_configurations.current,
                 self._config.partial_tip_configurations.per_tip_pickup_current,
             )
         )
@@ -201,8 +203,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._liquid_class_name
 
     @property
-    def nozzle_offset(self) -> List[float]:
-        return self._nozzle_offset
+    def nozzle_offset(self) -> Point:
+        return self._nozzle_manager.starting_nozzle_offset
+
+    @property
+    def nozzle_manager(self) -> nozzle_manager.NozzleConfigurationManager:
+        return self._nozzle_manager
 
     @property
     def pipette_offset(self) -> PipetteOffsetByPipetteMount:
@@ -289,6 +295,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
                 self._config.nozzle_map,
+                self._pick_up_configurations.current,
                 self._config.partial_tip_configurations.per_tip_pickup_current,
             )
         )
