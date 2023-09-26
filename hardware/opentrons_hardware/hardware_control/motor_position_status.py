@@ -1,6 +1,6 @@
 """Utilities for gathering motor position/status for an OT3 axis."""
 import asyncio
-from typing import Set, Tuple, Union
+from typing import Set, Union, Optional
 import logging
 
 from opentrons_shared_data.errors.exceptions import (
@@ -27,7 +27,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     MotorPositionFlags,
 )
 
-from .types import NodeMap, MotorPositionStatus
+from .types import NodeMap, MotorPositionStatus, MoveCompleteAck
 
 
 log = logging.getLogger(__name__)
@@ -42,6 +42,9 @@ _MotorStatusMoves = Union[
 
 
 def extract_motor_status_info(msg: _MotorStatusMoves) -> MotorPositionStatus:
+    move_ack: Optional[MoveCompleteAck] = None
+    if isinstance(msg, MoveCompleted) or isinstance(msg, TipActionResponse):
+        move_ack = MoveCompleteAck(msg.payload.ack_id.value)
     return MotorPositionStatus(
         motor_position=float(msg.payload.current_position_um.value / 1000.0),
         encoder_position=float(msg.payload.encoder_position_um.value) / 1000.0,
@@ -53,6 +56,7 @@ def extract_motor_status_info(msg: _MotorStatusMoves) -> MotorPositionStatus:
             msg.payload.position_flags.value
             & MotorPositionFlags.encoder_position_ok.value
         ),
+        move_ack=move_ack,
     )
 
 

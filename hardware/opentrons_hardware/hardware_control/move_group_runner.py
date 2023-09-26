@@ -19,7 +19,6 @@ from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     ErrorCode,
-    MotorPositionFlags,
     ErrorSeverity,
     GearMotorId,
     MoveAckId,
@@ -76,20 +75,13 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     extract_motor_status_info,
 )
 
-from .types import NodeDict, MotorPositionStatus, MoveStatus, MoveCompleteAck
+from .types import NodeDict, MotorPositionStatus
 
 log = logging.getLogger(__name__)
 
 _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
 _CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
 _Completions = List[_CompletionPacket]
-
-
-def extract_move_complete_info(msg: _AcceptableMoves) -> MoveStatus:
-    return MoveStatus(
-        position_status=extract_motor_status_info(msg),
-        move_ack=MoveCompleteAck(msg.payload.ack_id.value),
-    )
 
 
 class MoveGroupRunner:
@@ -135,7 +127,9 @@ class MoveGroupRunner:
         await self._send_groups(can_messenger)
         self._is_prepped = True
 
-    async def execute(self, can_messenger: CanMessenger) -> NodeDict[MoveStatus]:
+    async def execute(
+        self, can_messenger: CanMessenger
+    ) -> NodeDict[MotorPositionStatus]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
         prep() and execute() can be used to replace a single call to run() to
@@ -152,7 +146,7 @@ class MoveGroupRunner:
         move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
-    async def run(self, can_messenger: CanMessenger) -> NodeDict[MoveStatus]:
+    async def run(self, can_messenger: CanMessenger) -> NodeDict[MotorPositionStatus]:
         """Run the move group.
 
         Args:
@@ -176,10 +170,12 @@ class MoveGroupRunner:
     @staticmethod
     def _accumulate_move_completions(
         completions: _Completions,
-    ) -> NodeDict[MoveStatus]:
-        position: NodeDict[List[Tuple[Tuple[int, int], MoveStatus]]] = defaultdict(list)
+    ) -> NodeDict[MotorPositionStatus]:
+        position: NodeDict[
+            List[Tuple[Tuple[int, int], MotorPositionStatus]]
+        ] = defaultdict(list)
         gear_motor_position: NodeDict[
-            List[Tuple[Tuple[int, int], MoveStatus]]
+            List[Tuple[Tuple[int, int], MotorPositionStatus]]
         ] = defaultdict(list)
         for arbid, completion in completions:
             move_info = (
@@ -187,7 +183,7 @@ class MoveGroupRunner:
                     completion.payload.group_id.value,
                     completion.payload.seq_id.value,
                 ),
-                extract_move_complete_info(completion),
+                extract_motor_status_info(completion),
             )
             if isinstance(completion, TipActionResponse):
                 # if any completions are TipActionResponses, separate them from the 'positions'

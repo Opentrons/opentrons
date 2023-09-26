@@ -62,7 +62,6 @@ from opentrons_hardware.hardware_control.move_group_runner import (
 
 from opentrons_hardware.hardware_control.types import (
     NodeMap,
-    MoveStatus,
     MotorPositionStatus,
     MoveCompleteAck,
 )
@@ -1025,7 +1024,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
@@ -1038,7 +1037,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
@@ -1062,8 +1061,8 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                 ),
             ],
             {
-                NodeId.gantry_x: MoveStatus(
-                    MotorPositionStatus(10, 40, False, False), MoveCompleteAck(1)
+                NodeId.gantry_x: MotorPositionStatus(
+                    10, 40, False, False, MoveCompleteAck(1)
                 )
             },
         ),
@@ -1074,7 +1073,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
@@ -1111,11 +1110,11 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                 ),
             ],
             {
-                NodeId.gantry_x: MoveStatus(
-                    MotorPositionStatus(10, 40, False, False), MoveCompleteAck(1)
+                NodeId.gantry_x: MotorPositionStatus(
+                    10, 40, False, False, MoveCompleteAck(1)
                 ),
-                NodeId.gantry_y: MoveStatus(
-                    MotorPositionStatus(30, 40, False, False), MoveCompleteAck(1)
+                NodeId.gantry_y: MotorPositionStatus(
+                    30, 40, False, False, MoveCompleteAck(1)
                 ),
             },
         ),
@@ -1139,8 +1138,8 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                 ),
             ],
             {
-                NodeId.pipette_left: MoveStatus(
-                    MotorPositionStatus(10, 0, False, False), MoveCompleteAck(1)
+                NodeId.pipette_left: MotorPositionStatus(
+                    10, 0, False, False, MoveCompleteAck(1)
                 )
             },
         ),
@@ -1153,7 +1152,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
 )
 def test_accumulate_move_completions(
     completions: List[_CompletionPacket],
-    position_map: NodeMap[MoveStatus],
+    position_map: NodeMap[MotorPositionStatus],
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map

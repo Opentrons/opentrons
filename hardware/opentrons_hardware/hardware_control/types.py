@@ -41,15 +41,9 @@ class MotorPositionStatus:
     encoder_position: float
     motor_ok: bool
     encoder_ok: bool
+    move_ack: Optional[MoveCompleteAck] = None
 
-
-@dataclass
-class MoveStatus(MotorPositionStatus):
-    """Move status: same as MotorPositionStatus, but with an extra move_ack field."""
-
-    move_ack: MoveCompleteAck
-
-    def get_positions_only(self) -> Tuple[float, float]:
+    def positions_only(self) -> Tuple[float, float]:
         return (
             self.motor_position,
             self.encoder_position,
