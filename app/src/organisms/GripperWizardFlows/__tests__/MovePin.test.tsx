@@ -98,7 +98,9 @@ describe('MovePin', () => {
   })
 
   it('clicking go back calls back', () => {
-    const { getByLabelText } = render()[0]
+    const { getByLabelText } = render({
+      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
+    })[0]
     getByLabelText('back').click()
     expect(mockGoBack).toHaveBeenCalled()
   })
