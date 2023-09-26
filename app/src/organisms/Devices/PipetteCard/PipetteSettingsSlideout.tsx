@@ -20,6 +20,7 @@ import { ConfigurePipette } from '../../ConfigurePipette'
 import type {
   AttachedPipette,
   PipetteSettingsFieldsUpdate,
+  PipetteSettingsFieldsMap,
 } from '../../../redux/pipettes/types'
 import type { Dispatch, State } from '../../../redux/types'
 
@@ -31,12 +32,20 @@ interface PipetteSettingsSlideoutProps {
   onCloseClick: () => void
   isExpanded: boolean
   pipetteId: AttachedPipette['id']
+  settings: PipetteSettingsFieldsMap
 }
 
 export const PipetteSettingsSlideout = (
   props: PipetteSettingsSlideoutProps
 ): JSX.Element | null => {
-  const { pipetteName, robotName, isExpanded, pipetteId, onCloseClick } = props
+  const {
+    pipetteName,
+    robotName,
+    isExpanded,
+    pipetteId,
+    onCloseClick,
+    settings,
+  } = props
   const { t } = useTranslation('device_details')
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
@@ -73,11 +82,11 @@ export const PipetteSettingsSlideout = (
       <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
         <ConfigurePipette
           closeModal={onCloseClick}
-          pipetteId={pipetteId}
           updateRequest={updateRequest}
           updateSettings={updateSettings}
           robotName={robotName}
           formId={FORM_ID}
+          settings={settings}
         />
       </Flex>
     </Slideout>

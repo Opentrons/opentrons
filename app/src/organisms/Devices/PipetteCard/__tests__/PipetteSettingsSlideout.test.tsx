@@ -5,10 +5,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import * as RobotApi from '../../../../redux/robot-api'
-import {
-  getAttachedPipetteSettingsFieldsById,
-  updatePipetteSettings,
-} from '../../../../redux/pipettes'
+import { updatePipetteSettings } from '../../../../redux/pipettes'
 import { getConfig } from '../../../../redux/config'
 import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 
@@ -30,9 +27,6 @@ const mockUseDispatchApiRequest = RobotApi.useDispatchApiRequest as jest.MockedF
 >
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
->
-const mockGetAttachedPipetteSettingsFieldsById = getAttachedPipetteSettingsFieldsById as jest.MockedFunction<
-  typeof getAttachedPipetteSettingsFieldsById
 >
 const mockUpdatePipetteSettings = updatePipetteSettings as jest.MockedFunction<
   typeof updatePipetteSettings
@@ -56,6 +50,7 @@ describe('PipetteSettingsSlideout', () => {
   beforeEach(() => {
     props = {
       pipetteId: 'id',
+      settings: mockPipetteSettingsFieldsMap,
       robotName: mockRobotName,
       pipetteName: mockLeftSpecs.displayName,
       isExpanded: true,
@@ -71,9 +66,6 @@ describe('PipetteSettingsSlideout', () => {
       },
     })
     mockGetConfig.mockReturnValue({} as any)
-    mockGetAttachedPipetteSettingsFieldsById.mockReturnValue(
-      mockPipetteSettingsFieldsMap
-    )
     dispatchApiRequest = jest.fn()
     when(mockUseDispatchApiRequest)
       .calledWith()
