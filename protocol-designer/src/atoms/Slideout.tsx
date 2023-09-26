@@ -14,10 +14,8 @@ import {
   Overlay,
   POSITION_FIXED,
   TYPOGRAPHY,
+  Text,
 } from '@opentrons/components'
-
-import { Divider } from '../structure'
-import { StyledText } from '../text'
 
 export interface SlideoutProps {
   title: string | React.ReactElement
@@ -140,7 +138,9 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         css={`
           ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
-        backgroundColor={COLORS.darkBlackEnabled}
+        backgroundColor={COLORS.transparent}
+        height="92.5%"
+        marginTop={SPACING.spacing48}
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
@@ -150,11 +150,12 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         top="0"
         backgroundColor={COLORS.white}
         boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
-        height="100%"
+        height="92.5%"
+        marginTop={SPACING.spacing48}
       >
         <Flex
           paddingY={SPACING.spacing16}
-          width="19.5rem"
+          width="17.6rem"
           height="100%"
           flex="0 1 auto"
           flexDirection={DIRECTION_COLUMN}
@@ -168,14 +169,14 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               paddingX={SPACING.spacing16}
               marginBottom={SPACING.spacing16}
             >
-              <StyledText
-                as="h2"
+              <Text
+                as="h3"
                 overflowWrap="anywhere"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
                 {title}
-              </StyledText>
+              </Text>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
                   size="1.5rem"
@@ -190,7 +191,10 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Divider marginY={0} color={COLORS.medGreyEnabled} />
+          <Box
+            borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
+            marginY={0}
+          />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

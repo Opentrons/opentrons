@@ -96,6 +96,8 @@ export const duplicateLabware: (
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
+  const templateLabwareIdIsOffDeck =
+    initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
   const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
   if (!duplicateSlot)
     console.warn('no slots available, cannot duplicate labware')
@@ -113,7 +115,7 @@ export const duplicateLabware: (
         duplicateLabwareNickname,
         templateLabwareId,
         duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
-        slot: duplicateSlot,
+        slot: templateLabwareIdIsOffDeck ? 'offDeck' : duplicateSlot,
       },
     })
   }

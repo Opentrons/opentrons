@@ -145,7 +145,7 @@
         "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       },
       "LABWARE_OFF_DECK": {
-        "title": "Labware is off deck",
+        "title": "Labware is off-deck",
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
       },
       "HEATER_SHAKER_LATCH_CLOSED": {

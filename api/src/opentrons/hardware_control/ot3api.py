@@ -1,7 +1,7 @@
 import asyncio
 from concurrent.futures import Future
 import contextlib
-from functools import partial, lru_cache
+from functools import partial, lru_cache, wraps
 from dataclasses import replace
 import logging
 from copy import deepcopy
@@ -20,6 +20,7 @@ from typing import (
     TypeVar,
     Tuple,
     Mapping,
+    Awaitable,
 )
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
@@ -160,6 +161,24 @@ AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis
     Axis.G,
     Axis.Q,
 )
+
+Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
+
+
+def _adjust_high_throughput_z_current(func: Wrapped) -> Wrapped:
+    """
+    A decorator that temproarily and conditionally changes the active current (based on the axis input)
+    before a function is executed and the cleans up afterwards
+    """
+    # only home and retract should be wrappeed by this decorator
+    @wraps(func)
+    async def wrapper(self: Any, axis: Axis, *args: Any, **kwargs: Any) -> Any:
+        async with contextlib.AsyncExitStack() as stack:
+            if axis == Axis.Z_R and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+                await stack.enter_async_context(self._backend.restore_z_r_run_current())
+            return await func(self, axis, *args, **kwargs)
+
+    return cast(Wrapped, wrapper)
 
 
 class OT3API(
@@ -1335,6 +1354,7 @@ class OT3API(
         target_pos.update({axis: self._backend.home_position()[axis]})
         return origin, target_pos
 
+    @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:
         """
         Perform home; base on axis motor/encoder statuses, shorten homing time
@@ -1440,16 +1460,6 @@ class OT3API(
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(Axis.Q)
-            # NOTE: Z_R current is dropped very low when 96CH attached,
-            #       so trying to home it would cause timeout error
-            if not axes:
-                checked_axes.remove(Axis.Z_R)
-            elif Axis.Z_R in axes:
-                raise RuntimeError(
-                    f"unable to home {Axis.Z_R.name} axis"
-                    f"with {self.gantry_load.name} gantry load"
-                )
-
         if skip:
             checked_axes = [ax for ax in checked_axes if ax not in skip]
         self._log.info(f"Homing {axes}")
@@ -1491,6 +1501,7 @@ class OT3API(
         await self.retract_axis(Axis.by_mount(mount))
 
     @ExecutionManagerProvider.wait_for_running
+    @_adjust_high_throughput_z_current
     async def retract_axis(self, axis: Axis) -> None:
         """
         Move an axis to its home position, without engaging the limit switch,
@@ -1500,12 +1511,6 @@ class OT3API(
         the behaviors between the two robots similar, retract_axis on the FLEX
         will call home if the stepper position is inaccurate.
         """
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R:
-            raise RuntimeError(
-                f"unable to retract {Axis.Z_R.name} axis"
-                f"with {self.gantry_load.name} gantry load"
-            )
-
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
 
