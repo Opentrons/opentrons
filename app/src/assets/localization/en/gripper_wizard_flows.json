@@ -20,7 +20,7 @@
   "gripper_successfully_attached": "Gripper successfully attached",
   "gripper_successfully_calibrated": "Flex Gripper successfully calibrated",
   "gripper_successfully_detached": "Flex Gripper successfully detached",
-  "gripper": "Gripper",
+  "gripper": "Flex Gripper",
   "hex_screwdriver": "2.5 mm Hex Screwdriver",
   "hold_gripper_and_loosen_screws": "Hold the gripper in place and loosen the bottom gripper screw first. After that move onto the bottom screw. (The screws are captive and will not come apart from the gripper.) Then carefully remove the gripper.",
   "insert_pin_into_front_jaw": "Insert calibration pin in front jaw",
