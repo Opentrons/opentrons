@@ -273,6 +273,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     def _aspirate_on_submerge() -> None:
         # aspirate specified volume
         callbacks.on_aspirating()
+        ctx.delay(3)  # FIXME: delete this
         pipette.aspirate(aspirate)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
