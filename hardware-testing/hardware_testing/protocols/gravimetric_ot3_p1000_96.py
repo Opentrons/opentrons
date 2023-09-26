@@ -1,7 +1,7 @@
 """Photometric OT3 P1000."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"protocolName": "gravimetric-ot3-p1000-96-50ul-tip"}
+metadata = {"protocolName": "gravimetric-ot3-p1000-96"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
