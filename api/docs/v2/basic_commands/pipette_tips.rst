@@ -53,13 +53,14 @@ First, add another tip rack to the sample protocol::
         location="C3"
     )
 
-Next, revise the pipette's ``load_instrument()`` method to include the new tip rack in the ``tip_rack`` argument::
+Next, append the new tip rack to the pipette's ``tip_rack`` property::
 
     pipette = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
         tip_racks=[tiprack_1, tiprack_2],
-    ) 
+    )
+    pipette_1.tip_racks.append(tiprack_2)
 
 Finally, sum the tip count in the range::
 
