@@ -13,12 +13,14 @@ from hardware_testing.data.csv_report import (
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount
 
-from opentrons.hardware_control.backends.ot3utils import axis_convert
+# from opentrons.hardware_control.backends.ot3utils import axis_convert
 
 
-RETRACT_MM = 0.25 #0.25
+RETRACT_MM = 0.25  # 0.25
 MAX_TRAVEL = 29.8 - RETRACT_MM  # FIXME: what is the max travel?
-ENDSTOP_OVERRUN_MM = 0.25 # FIXME: upper position seems to be capped at 0, can't acually go past limit switch
+ENDSTOP_OVERRUN_MM = (
+    0.25  # FIXME: position cannot go negative, can't go past limit switch
+)
 ENDSTOP_OVERRUN_SPEED = 5
 SPEEDS_TO_TEST: List[float] = [8, 12]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
@@ -43,7 +45,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-async def _check_if_jaw_is_aligned_with_endstop(api: OT3API) -> Tuple[bool]:
+async def _check_if_jaw_is_aligned_with_endstop(api: OT3API) -> bool:
     if not api.is_simulator:
         pass_no_hit = ui.get_user_answer("are both endstop Lights OFF?")
     else:
@@ -69,7 +71,7 @@ async def _check_if_jaw_is_aligned_with_endstop(api: OT3API) -> Tuple[bool]:
 
 
 async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]:
-    """Check the LEDs work and jaws are aligned"""
+    """Check the LEDs work and jaws are aligned."""
     # HOME
     print("homing...")
     await api.home([ax])
@@ -86,7 +88,7 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
     await helpers_ot3.move_tip_motor_relative_ot3(api, RETRACT_MM, speed=speed)
     # Check Jaws are aligned
     if not api.is_simulator:
-       jaws_aligned = ui.get_user_answer("are both endstop Lights OFF?")
+        jaws_aligned = ui.get_user_answer("are both endstop Lights OFF?")
     else:
         jaws_aligned = True
 
@@ -94,9 +96,6 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
         ui.print_error("Jaws Misaligned")
 
     return led_check, jaws_aligned
-
-
-
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
@@ -152,7 +151,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
                     api, ax, run_current=default_current
                 )
-            passed = await _save_result(_get_test_tag(current, speed), led_check, jaws_aligned)
+            passed = await _save_result(
+                _get_test_tag(current, speed), led_check, jaws_aligned
+            )
 
             if not passed and not api.is_simulator:
                 print(f"current {current} failed")

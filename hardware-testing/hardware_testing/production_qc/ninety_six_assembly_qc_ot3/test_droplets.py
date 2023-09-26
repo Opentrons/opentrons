@@ -182,7 +182,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # GATHER NOMINAL POSITIONS
     trash_nominal = get_trash_nominal()
     tip_rack_96_a1_nominal = get_tiprack_96_nominal()
-    tip_rack_partial_a1_nominal = get_tiprack_partial_nominal()
+    # tip_rack_partial_a1_nominal = get_tiprack_partial_nominal()
     reservoir_a1_nominal = get_reservoir_nominal()
     reservoir_a1_actual: Optional[Point] = None
 
