@@ -125,6 +125,7 @@ export const OffDeckLabwareSlideout = (
               : null
           return definition != null ? (
             <RobotWorkSpace
+              key={labwareId}
               viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
               width="100%"
               height="8rem"
