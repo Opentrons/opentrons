@@ -137,7 +137,7 @@ export function CurrentOffsetsTable(
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
     >
-      <StyledText as="h6">{t('applied_offset_data')}</StyledText>
+      <StyledText as="label">{t('applied_offset_data')}</StyledText>
       {isLabwareOffsetCodeSnippetsOn ? (
         <LabwareOffsetTabs
           TableComponent={TableComponent}
