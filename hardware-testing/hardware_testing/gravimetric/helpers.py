@@ -163,17 +163,18 @@ def _sense_liquid_height(
     well: Well,
     cfg: config.VolumetricConfig,
 ) -> float:
-    if ctx.is_simulating():
-        return well.depth - 1
     hwapi = get_sync_hw_api(ctx)
     pipette.move_to(well.top())
     lps = config._get_liquid_probe_settings(cfg, well)
-    well_bottom_z = well.bottom().point.z
     # NOTE: very important that probing is done only 1x time,
     #       with a DRY tip, for reliability
-    liquid_z = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
-    liquid_depth = liquid_z - well_bottom_z
-    return liquid_depth
+    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    if ctx.is_simulating():
+        probed_z = well.top().point.z - 1
+    liq_height = probed_z - well.bottom().point.z
+    if abs(liq_height - lps.max_z_distance) < 0.01:
+        raise RuntimeError("unable to probe liquid, reach max travel distance")
+    return liq_height
 
 
 def _calculate_average(volume_list: List[float]) -> float:

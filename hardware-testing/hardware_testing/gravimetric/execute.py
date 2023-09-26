@@ -612,7 +612,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(
-            labware_on_scale["A1"], _liquid_height, name="Water"
+            well, _liquid_height, name="Water"
         )
         vial_volume = liquid_tracker.get_volume(well)
         ui.print_info(
