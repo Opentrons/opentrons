@@ -572,13 +572,13 @@ if __name__ == "__main__":
         )
         sleep(1)
     try:
-        if not run_args.ctx.is_simulating():
+        if not run_args.ctx.is_simulating() and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         for tip, volumes in run_args.volumes:
-            hw = run_args.ctx._core.get_hardware()
             if args.channels == 96 and not run_args.ctx.is_simulating():
                 delay = 0 if args.photometric else 30
-                ui.alert_user_ready(f"Load 9 {tip}ul tipracks", hw, delay)
+                hw = run_args.ctx._core.get_hardware()
+                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw, delay)
             _main(args, run_args, tip, volumes)
     finally:
         if run_args.recorder is not None:

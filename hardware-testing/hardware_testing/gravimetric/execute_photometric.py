@@ -272,7 +272,7 @@ def _display_dye_information(
                     dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
                         f"add {_ul_to_ml(reservoir_ul)} mL of DYE type {dye_msg} "
-                        "in well A{cfg.dye_well_column_offset}"
+                        f"in well A{cfg.dye_well_column_offset}"
                     )
 
 
