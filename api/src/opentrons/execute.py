@@ -738,7 +738,7 @@ def _adapt_protocol_source(
 
 def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMessage:
     """Convert a Protocol Engine command event to an old-school command_types.CommandMesage."""
-    before_or_after = (
+    before_or_after: command_types.MessageSequenceId = (
         "before" if isinstance(event, pe_command_monitor.RunningEvent) else "after"
     )
 
