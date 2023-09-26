@@ -571,6 +571,12 @@ class TransferPlan:
                .. Dispense air gap -> ...*
 
         """
+
+        if self._strategy.disposal_volume >= self._instr.max_volume:
+            raise ValueError(
+                "The Disposal Volume must be less than the Maximum Volume of the Instrument"
+            )
+
         # TODO: decide whether default disposal vol for distribute should be
         # pipette min_vol or should we leave it to being 0 by default and
         # recommend users to specify a disposal vol when using distribute.
