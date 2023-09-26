@@ -283,7 +283,7 @@ export function ProtocolDetails(
       : t('shared:no_data')
   const lastAnalyzed =
     mostRecentAnalysis?.createdAt != null
-      ? format(new Date(mostRecentAnalysis.createdAt), 'MMM dd yy HH:mm')
+      ? format(new Date(mostRecentAnalysis.createdAt), 'M/d/yy HH:mm')
       : t('shared:no_data')
   const robotType = mostRecentAnalysis?.robotType ?? null
 
@@ -426,7 +426,7 @@ export function ProtocolDetails(
                 <StyledText as="p">
                   {analysisStatus === 'loading'
                     ? t('shared:loading')
-                    : format(new Date(modified), 'MMM dd yy HH:mm')}
+                    : format(new Date(modified), 'M/d/yy HH:mm')}
                 </StyledText>
               </Flex>
               <Flex
