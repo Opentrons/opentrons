@@ -743,6 +743,9 @@ def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMess
     )
 
     message: command_types.CommentMessage = {
+        # TODO(mm, 2023-09-26): If we can without breaking the public API, remove the requirement
+        # to supply a "name" here. If we can't do that, consider adding a special name value
+        # so we don't have to lie and call every command a comment.
         "name": "command.COMMENT",
         "id": event.command.id,
         "$": before_or_after,
@@ -750,6 +753,10 @@ def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMess
         # to match behavior from before Protocol Engine.
         # https://opentrons.atlassian.net/browse/RSS-320
         "payload": {"text": event.command.json()},
+        # As far as I know, "error" is not part of the public-facing API, so it doesn't matter
+        # what we put here. Leaving it as `None` to avoid difficulties in converting between
+        # the Protocol Engine `ErrorOccurrence` model and the regular Python `Exception` type
+        # that this field expects.
         "error": None,
     }
     return message
