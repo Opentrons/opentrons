@@ -34,7 +34,8 @@ class Plot:
         self.offset_types = ["Pick-Up","Drop"]
         self.location_list = ["Deck","HeaterShaker","MagBlock","TempDeck","Thermocycler"]
         self.df_data = self.import_files(self.data)
-        self.df_location = self.location_df(self.df_data)
+        # self.df_location = self.location_df(self.df_data)
+        self.df_location = self.df_data
 
     def import_files(self, data):
         df = pd.read_csv(data)
@@ -141,7 +142,7 @@ class Plot:
             self.plot_param["x_title"] = f"{self.offset_types[i]} Location"
             self.plot_param["y_title"] = "Y-Axis Offset (mm)"
             self.plot_param["x_range"] = [x_start, x_end]
-            self.plot_param["y_range"] = [-2, 2]
+            self.plot_param["y_range"] = [-1.5, 1.5]
             self.plot_param["legend"] = "Data"
             self.plot_param["annotation"] = None
             self.write_plot(self.plot_param)
