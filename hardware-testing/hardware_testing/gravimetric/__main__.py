@@ -10,23 +10,23 @@ import subprocess
 from time import sleep
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.protocols import (
-    gravimetric_ot3_p50_single,
-    gravimetric_ot3_p50_multi,
-    gravimetric_ot3_p50_multi_50ul_tip_increment,
-    gravimetric_ot3_p1000_single,
+from hardware_testing.protocols.gravimetric_lpc.gravimetric import (
+    gravimetric_ot3_p1000_96,
     gravimetric_ot3_p1000_multi,
+    gravimetric_ot3_p1000_single,
+    gravimetric_ot3_p50_single,
     gravimetric_ot3_p1000_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_200ul_tip_increment,
+    gravimetric_ot3_p50_multi,
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
-    gravimetric_ot3_p1000_96,
+    gravimetric_ot3_p50_multi_50ul_tip_increment,
 )
-from hardware_testing.protocols import (
-    photometric_ot3_p50_single,
-    photometric_ot3_p50_multi,
-    photometric_ot3_p1000_single,
+from hardware_testing.protocols.gravimetric_lpc.photometric import (
     photometric_ot3_p1000_multi,
+    photometric_ot3_p1000_single,
+    photometric_ot3_p50_multi,
     photometric_ot3_p1000_96,
+    photometric_ot3_p50_single,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
