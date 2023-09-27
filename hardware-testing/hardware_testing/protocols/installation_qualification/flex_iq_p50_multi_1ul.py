@@ -92,7 +92,7 @@ MIN_VOL_SRC = {
 }
 
 
-class LiquidHeightInFlatBottomWell:
+class _LiquidHeightInFlatBottomWell:
     def __init__(
         self,
         bottom_diameter: float,
@@ -163,7 +163,7 @@ def _convert_ul_in_well_to_height_in_well(load_name: str, ul: float) -> float:
                 ul_scale = (ul - low[0]) / (high[0] - low[0])
                 return (ul_scale * (high[1] - low[1])) + low[1]
     elif load_name == "corning_96_wellplate_360ul_flat":
-        well = LiquidHeightInFlatBottomWell(
+        well = _LiquidHeightInFlatBottomWell(
             bottom_diameter=6.35, top_diameter=6.858, height=10.668
         )
         return well.height_from_volume(ul)
@@ -335,8 +335,8 @@ def _transfer_diluent(
             tips,
             reservoir,
             plate,
-            src,
-            destinations,
+            src,  # type: ignore[arg-type]
+            destinations,  # type: ignore[arg-type]
             same_tip=True,
             push_out=DILUENT_PUSH_OUT,
             touch_tip=False,
@@ -363,8 +363,8 @@ def _transfer_dye(
             tips,
             reservoir,
             plate,
-            test["source"],
-            test["destinations"],
+            test["source"],  # type: ignore[arg-type]
+            test["destinations"],  # type: ignore[arg-type]
             push_out=TEST_PUSH_OUT,
             touch_tip=True,
             volume_already_in_plate=_get_diluent_volume(),
@@ -372,6 +372,7 @@ def _transfer_dye(
 
 
 def run(ctx: ProtocolContext) -> None:
+    """Run."""
     # the target plate, handle with great care
     plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D2")
 
