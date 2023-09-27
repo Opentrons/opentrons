@@ -74,56 +74,39 @@ export function ProtocolRunSetup({
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
-  const [stepsKeysInOrder, setStepKeysInOrder] = React.useState<StepKey[]>([
-    ROBOT_CALIBRATION_STEP_KEY,
-    LPC_KEY,
-    LABWARE_SETUP_KEY,
-  ])
-  const [targetStepKeyInOrder, setTargetStepKeyInOrder] = React.useState<
-    StepKey[]
-  >(stepsKeysInOrder)
 
-  React.useEffect(() => {
-    let nextStepKeysInOrder = stepsKeysInOrder
+  const stepsKeysInOrder =
+    protocolData != null
+      ? [
+          ROBOT_CALIBRATION_STEP_KEY,
+          MODULE_SETUP_KEY,
+          LPC_KEY,
+          LABWARE_SETUP_KEY,
+          LIQUID_SETUP_KEY,
+        ]
+      : [ROBOT_CALIBRATION_STEP_KEY, LPC_KEY, LABWARE_SETUP_KEY]
 
-    if (protocolData != null) {
-      nextStepKeysInOrder = [
-        ROBOT_CALIBRATION_STEP_KEY,
-        MODULE_SETUP_KEY,
-        LPC_KEY,
-        LABWARE_SETUP_KEY,
-        LIQUID_SETUP_KEY,
-      ]
+  const targetStepKeyInOrder = stepsKeysInOrder.filter((stepKey: StepKey) => {
+    if (protocolData == null) {
+      return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
     }
-    setStepKeysInOrder(nextStepKeysInOrder)
-  }, [Boolean(protocolData), protocolData?.commands])
 
-  React.useEffect(() => {
-    const filteredStepKeysInOrder = stepsKeysInOrder.filter(
-      (stepKey: StepKey) => {
-        if (protocolData == null) {
-          return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
-        }
+    if (
+      protocolData.modules.length === 0 &&
+      protocolData.liquids.length === 0
+    ) {
+      return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
+    }
 
-        if (
-          protocolData.modules.length === 0 &&
-          protocolData.liquids.length === 0
-        ) {
-          return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
-        }
+    if (protocolData.modules.length === 0) {
+      return stepKey !== MODULE_SETUP_KEY
+    }
 
-        if (protocolData.modules.length === 0) {
-          return stepKey !== MODULE_SETUP_KEY
-        }
-
-        if (protocolData.liquids.length === 0) {
-          return stepKey !== LIQUID_SETUP_KEY
-        }
-        return true
-      }
-    )
-    setTargetStepKeyInOrder(filteredStepKeysInOrder)
-  }, [stepsKeysInOrder, protocolData])
+    if (protocolData.liquids.length === 0) {
+      return stepKey !== LIQUID_SETUP_KEY
+    }
+    return true
+  })
 
   if (robot == null) return null
   const hasLiquids = protocolData != null && protocolData.liquids?.length > 0
