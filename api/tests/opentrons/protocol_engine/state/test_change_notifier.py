@@ -56,9 +56,10 @@ async def test_multiple_subscribers(_test_repetition: int) -> None:
     assert results == [1, 2, 3]
 
 
-@pytest.mark.parametrize("notify_count", [0, 5])
-async def test_broker(notify_count: int) -> None:
+async def test_broker() -> None:
     """Test that notifications are available synchronously through `ChangeNotifier.broker`."""
+    notify_count = 5
+
     subject = ChangeNotifier()
     received = 0
 
@@ -67,7 +68,6 @@ async def test_broker(notify_count: int) -> None:
         received += 1
 
     with subject.broker.subscribed(callback):
-        for _ in range(notify_count):
+        for notify_number in range(notify_count):
             subject.notify()
-
-    assert received == notify_count
+            assert received == notify_number + 1
