@@ -1,9 +1,7 @@
 """Simple state change notification interface."""
 import asyncio
-from contextlib import contextmanager
-from typing import Callable, Generator
 
-from opentrons.util.broker import Broker
+from opentrons.util.broker import Broker, ReadOnlyBroker
 
 
 class ChangeNotifier:
@@ -24,18 +22,10 @@ class ChangeNotifier:
         self._event.clear()
         await self._event.wait()
 
-    @contextmanager
-    def on_change(self, callback: Callable[[], None]) -> Generator[None, None, None]:
-        def wrapped_callback(_: None) -> None:
-            # TODO: Exception safety?
-            # TODO: Is this a good approach or is there a way to use async generators?
-            # What does Seth's subsystem thing do?
-            # Maybe add a CM to EquipmentBroker?
-            # Maybe give EquipmentBroker a read-only interface?
-            callback()
+    @property
+    def broker(self) -> ReadOnlyBroker[None]:
+        """Return a broker that you can use to get notified of all changes.
 
-        unsubscribe = self._broker.subscribe(wrapped_callback)
-        try:
-            yield
-        finally:
-            unsubscribe()
+        This is an alternative interface to `wait()`.
+        """
+        return self._broker

@@ -1,13 +1,14 @@
 """Protocol engine state management."""
 from __future__ import annotations
-from contextlib import contextmanager
 
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Dict, Generator, List, Optional, Sequence, TypeVar
-from opentrons.protocol_engine.types import ModuleOffsetVector
+from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+
+from opentrons.protocol_engine.types import ModuleOffsetVector
+from opentrons.util.broker import ReadOnlyBroker
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
@@ -239,12 +240,16 @@ class StateStore(StateView, ActionHandler):
 
         return is_done
 
-    @contextmanager
-    def on_state_update(
-        self, callback: Callable[[], None]
-    ) -> Generator[None, None, None]:
-        with self._change_notifier.on_change(callback):
-            yield
+    # We return ReadOnlyBroker[None] instead of ReadOnlyBroker[StateView] in order to avoid
+    # confusion with state mutability. If a caller needs to know the new state, they can
+    # retrieve it explicitly with `ProtocolEngine.state_view`.
+    @property
+    def update_broker(self) -> ReadOnlyBroker[None]:
+        """Return a broker that you can use to get notified of all state updates.
+
+        This is an alternative interface to `wait_for()`.
+        """
+        return self._change_notifier.broker
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""

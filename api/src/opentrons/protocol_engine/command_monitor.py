@@ -43,7 +43,7 @@ def monitor_commands(
 
     last_running_id: typing.Optional[str] = None
 
-    def handle_state_update() -> None:
+    def handle_state_update(_message_from_broker: None) -> None:
         nonlocal last_running_id
 
         running_id = protocol_engine.state_view.commands.get_running()
@@ -61,5 +61,5 @@ def monitor_commands(
                 )
         last_running_id = running_id
 
-    with protocol_engine.on_state_update(handle_state_update):
+    with protocol_engine.state_update_broker.subscribed(handle_state_update):
         yield

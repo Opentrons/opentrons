@@ -4,7 +4,7 @@
 from datetime import datetime
 from typing import List
 
-from decoy import Decoy, matchers
+from decoy import Decoy
 
 from opentrons.protocol_engine import CommandStatus, ProtocolEngine, commands
 from opentrons.protocol_engine.command_monitor import (
@@ -13,6 +13,7 @@ from opentrons.protocol_engine.command_monitor import (
     RunningEvent,
     monitor_commands as subject,
 )
+from opentrons.util.broker import Broker
 
 
 def _make_dummy_command(id: str, completed: bool) -> commands.Command:
@@ -41,9 +42,9 @@ def test_monitor_commands(decoy: Decoy) -> None:
     """Test that it translates state updates into command running/no-longer-running events."""
     mock_protocol_engine = decoy.mock(cls=ProtocolEngine)
     mock_command_view = mock_protocol_engine.state_view.commands
-    callback_captor = matchers.Captor()
-    decoy.when(mock_protocol_engine.on_state_update(callback_captor)).then_enter_with(
-        None
+    state_update_broker = Broker[None]()
+    decoy.when(mock_protocol_engine.state_update_broker).then_return(
+        state_update_broker
     )
 
     command_1_running = _make_dummy_command(id="command-1", completed=False)
@@ -57,30 +58,29 @@ def test_monitor_commands(decoy: Decoy) -> None:
         received_events.append(event)
 
     with subject(mock_protocol_engine, callback):
-        trigger_callback = callback_captor.value
-
         # Feed the subject these states, in sequence:
-        #   1. No running command
+        #   1. No command running
         #   2. "command-1" running
         #   3. "command-2" running
         #   4. No command running
-        # Between each state, notify the subject by triggering its callback.
+        # Between each state, notify the subject by publishing a message to the broker that it's
+        # subscribed to.
 
         decoy.when(mock_command_view.get_running()).then_return(None)
-        trigger_callback()
+        state_update_broker.publish(message=None)
 
         decoy.when(mock_command_view.get_running()).then_return("command-1")
         decoy.when(mock_command_view.get("command-1")).then_return(command_1_running)
-        trigger_callback()
+        state_update_broker.publish(message=None)
 
         decoy.when(mock_command_view.get_running()).then_return("command-2")
         decoy.when(mock_command_view.get("command-1")).then_return(command_1_completed)
         decoy.when(mock_command_view.get("command-2")).then_return(command_2_running)
-        trigger_callback()
+        state_update_broker.publish(message=None)
 
         decoy.when(mock_command_view.get_running()).then_return(None)
         decoy.when(mock_command_view.get("command-2")).then_return(command_2_completed)
-        trigger_callback()
+        state_update_broker.publish(message=None)
 
     # Make sure the callback converted the sequence of state updates into the expected sequence
     # of events.
