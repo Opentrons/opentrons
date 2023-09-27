@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual'
-import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 
@@ -29,9 +28,5 @@ export function getLatestCurrentOffsets(
     []
   )
 
-  const nonIdentityOffsets = latestCurrentOffsets.filter(
-    currentOffset => !isEqual(currentOffset.vector, IDENTITY_VECTOR)
-  )
-
-  return nonIdentityOffsets
+  return latestCurrentOffsets
 }
