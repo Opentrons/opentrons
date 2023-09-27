@@ -101,7 +101,6 @@ export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10
 export const VIEWBOX_WIDTH = 520
 export const VIEWBOX_HEIGHT = 414
-const FLEX_TRASH_SLOT = 'A3'
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
 
@@ -532,7 +531,6 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  console.log(activeDeckSetup.labware)
   const trashSlot =
     Object.values(activeDeckSetup.labware).find(
       lw =>
@@ -555,7 +553,7 @@ export const DeckSetup = (): JSX.Element => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
     },
   })
-  console.log(trashSlot)
+
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}

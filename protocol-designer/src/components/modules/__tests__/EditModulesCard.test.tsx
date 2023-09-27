@@ -19,12 +19,16 @@ import {
 import { getRobotType } from '../../../file-data/selectors'
 import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { FormPipette } from '../../../step-forms/types'
-import { getAdditionalEquipment } from '../../../step-forms/selectors'
+import {
+  getAdditionalEquipment,
+  getLabwareEntities,
+} from '../../../step-forms/selectors'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
+import { FLEX_TRASH_DEF_URI } from '../../../constants'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
@@ -45,6 +49,9 @@ const mockGetAdditionalEquipment = getAdditionalEquipment as jest.MockedFunction
 >
 const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
   typeof getEnableDeckModification
+>
+const mockGetLabwareEntities = getLabwareEntities as jest.MockedFunction<
+  typeof getLabwareEntities
 >
 describe('EditModulesCard', () => {
   let store: any
@@ -94,6 +101,7 @@ describe('EditModulesCard', () => {
       },
     })
     mockGetEnableDeckModification.mockReturnValue(false)
+    mockGetLabwareEntities.mockReturnValue({})
 
     props = {
       modules: {},
@@ -266,9 +274,10 @@ describe('EditModulesCard', () => {
       true
     )
   })
-  it('displays gripper and waste chute row with both attached', () => {
-    const mockGripperId = 'gripeprId'
+  it('displays gripper waste chute and trash row with all are attached', () => {
+    const mockGripperId = 'gripperId'
     const mockWasteChuteId = 'wasteChuteId'
+    const mockTrashId = 'trashId'
     mockGetEnableDeckModification.mockReturnValue(true)
     mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     mockGetAdditionalEquipment.mockReturnValue({
@@ -279,8 +288,14 @@ describe('EditModulesCard', () => {
         location: 'D3',
       },
     })
+    mockGetLabwareEntities.mockReturnValue({
+      mockTrashId: {
+        id: mockTrashId,
+        labwareDefURI: FLEX_TRASH_DEF_URI,
+      } as any,
+    })
 
     const wrapper = render(props)
-    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(2)
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(3)
   })
 })

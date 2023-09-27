@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useField, useFormikContext } from 'formik'
-import some from 'lodash/some'
 import {
   FormGroup,
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
-  Tooltip,
-  useHoverTooltip,
   ModalShell,
   Flex,
   SPACING,
@@ -19,36 +16,23 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  DropdownOption,
 } from '@opentrons/components'
 import {
-  getAreSlotsAdjacent,
-  THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
-  ModuleModel,
-  OT2_STANDARD_MODEL,
-  THERMOCYCLER_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
-  RobotType,
   FLEX_ROBOT_TYPE,
-  THERMOCYCLER_MODULE_V2,
-  OT2_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
-import { Portal } from '../portals/TopPortal'
-import { SlotDropdown } from '../modals/EditModulesModal/SlotDropdown'
-import { MAG_TRASH_BLOCK_SLOTS_FLEX } from '../../modules'
+import { OUTER_SLOTS_FLEX } from '../../modules'
 import { createContainer } from '../../labware-ingred/actions'
 import { FLEX_TRASH_DEF_URI } from '../../constants'
 import { getSlotIsEmpty } from '../../step-forms'
-import { PDAlert } from '../alerts/PDAlert'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { SlotDropdown } from '../modals/EditModulesModal/SlotDropdown'
+import { PDAlert } from '../alerts/PDAlert'
+import { Portal } from '../portals/TopPortal'
 
 const ModalComponent = (props: TrashBinModalProps): JSX.Element => {
-  const { values, errors, isValid } = useFormikContext<TrashBinValues>()
+  const { values } = useFormikContext<TrashBinValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, values.selectedSlot)
 
@@ -67,7 +51,7 @@ const ModalComponent = (props: TrashBinModalProps): JSX.Element => {
               <Box width={'8rem'}>
                 <SlotDropdown
                   fieldName="selectedSlot"
-                  options={MAG_TRASH_BLOCK_SLOTS_FLEX}
+                  options={OUTER_SLOTS_FLEX}
                   disabled={false}
                   tabIndex={1}
                 />
@@ -109,12 +93,6 @@ const ModalComponent = (props: TrashBinModalProps): JSX.Element => {
       </Flex>
     </Form>
   )
-}
-
-export function getAllTrashSlots(): DropdownOption[] {
-  const slot = MAG_TRASH_BLOCK_SLOTS_FLEX
-
-  return slot
 }
 
 export interface TrashBinValues {

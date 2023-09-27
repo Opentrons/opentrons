@@ -117,7 +117,7 @@ export function ModuleRow(props: Props): JSX.Element {
   })
 
   return (
-    <div>
+    <div style={{ marginBottom: '1rem' }}>
       <h4 className={styles.row_title}>
         <ModuleIcon
           moduleType={type}

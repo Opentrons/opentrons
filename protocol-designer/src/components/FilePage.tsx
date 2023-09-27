@@ -58,6 +58,7 @@ export class FilePage extends React.Component<Props, State> {
     resetScrollElements()
     this.setState({ isEditPipetteModalOpen: true })
   }
+
   closeEditPipetteModal: () => void = () =>
     this.setState({ isEditPipetteModalOpen: false })
 
@@ -201,7 +202,7 @@ export class FilePage extends React.Component<Props, State> {
 
         <EditModulesCard
           modules={modules}
-          openEditModal={this.handleEditModule}
+          openEditModuleModal={this.handleEditModule}
         />
 
         <div className={modalStyles.button_row}>

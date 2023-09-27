@@ -139,7 +139,7 @@ const HEATER_SHAKER_SLOTS_OT2: DropdownOption[] = [
     value: '10',
   },
 ]
-const HS_AND_TEMP_SLOTS_FLEX: DropdownOption[] = [
+export const OUTER_SLOTS_FLEX: DropdownOption[] = [
   {
     name: 'Slot A1',
     value: 'A1',
@@ -174,7 +174,7 @@ const HS_AND_TEMP_SLOTS_FLEX: DropdownOption[] = [
   },
 ]
 
-export const MAG_TRASH_BLOCK_SLOTS_FLEX: DropdownOption[] = [
+const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
   {
     name: 'Slot A1',
     value: 'A1',
@@ -258,13 +258,11 @@ export function getAllModuleSlotsByType(
       moduleType === TEMPERATURE_MODULE_TYPE
     ) {
       slot = supportedSlotOption.concat(
-        HS_AND_TEMP_SLOTS_FLEX.filter(
-          s => s.value !== supportedSlotOption[0].value
-        )
+        OUTER_SLOTS_FLEX.filter(s => s.value !== supportedSlotOption[0].value)
       )
     } else {
       slot = supportedSlotOption.concat(
-        MAG_TRASH_BLOCK_SLOTS_FLEX.filter(
+        MAG_BLOCK_SLOTS_FLEX.filter(
           s => s.value !== supportedSlotOption[0].value
         )
       )

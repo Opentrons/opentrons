@@ -5,7 +5,6 @@ import {
   OutlineButton,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   LabeledValue,
   SPACING,
@@ -13,8 +12,8 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
-import styles from './styles.css'
 import { TrashBinModal } from './TrashBinModal'
+import styles from './styles.css'
 
 interface AdditionalItemsRowProps {
   handleAttachment: () => void
@@ -34,8 +33,7 @@ export function AdditionalItemsRow(
       {modal ? <TrashBinModal onCloseClick={() => openModal(false)} /> : null}
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing8}
-        height="6rem"
+        marginBottom={SPACING.spacing16}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <h4 className={styles.row_title}>
@@ -81,10 +79,15 @@ export function AdditionalItemsRow(
           </>
         ) : null}
 
-        <div
-          className={styles.modules_button_group}
-          style={{ alignSelf: ALIGN_CENTER }}
-        >
+        <div className={styles.modules_button_group}>
+          {name === 'trashBin' && isEquipmentAdded ? (
+            <OutlineButton
+              className={styles.module_button}
+              onClick={() => openModal(true)}
+            >
+              {i18n.t('shared.edit')}
+            </OutlineButton>
+          ) : null}
           <OutlineButton
             className={styles.module_button}
             onClick={addTrashBin ? () => openModal(true) : handleAttachment}

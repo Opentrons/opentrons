@@ -40,11 +40,11 @@ import { deleteContainer } from '../../labware-ingred/actions'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModal: (moduleType: ModuleType, moduleId?: string) => void
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => void
 }
 
 export function EditModulesCard(props: Props): JSX.Element {
-  const { modules, openEditModal } = props
+  const { modules, openEditModuleModal } = props
   const enableDeckModification = useSelector(getEnableDeckModification)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(getLabwareEntities)
@@ -132,7 +132,7 @@ export function EditModulesCard(props: Props): JSX.Element {
                 moduleOnDeck={moduleData}
                 showCollisionWarnings={warningsEnabled}
                 key={i}
-                openEditModuleModal={openEditModal}
+                openEditModuleModal={openEditModuleModal}
                 robotType={robotType}
               />
             )
@@ -141,7 +141,7 @@ export function EditModulesCard(props: Props): JSX.Element {
               <ModuleRow
                 type={moduleType}
                 key={i}
-                openEditModuleModal={openEditModal}
+                openEditModuleModal={openEditModuleModal}
               />
             )
           }
