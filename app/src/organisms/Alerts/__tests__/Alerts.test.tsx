@@ -1,12 +1,16 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 
 import { mountWithStore } from '@opentrons/components'
 import * as AppAlerts from '../../../redux/alerts'
+import { getAvailableShellUpdate } from '../../../redux/shell'
+import { getHasJustUpdated } from '../../../redux/config'
 import { TOAST_ANIMATION_DURATION } from '../../../atoms/Toast'
-import { Alerts } from '..'
+import { AlertsModal } from '../AlertsModal'
 import { AnalyticsSettingsModal } from '../../AnalyticsSettingsModal'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 import { UpdateAppModal } from '../../UpdateAppModal'
+import { useRemoveActiveAppUpdateToast } from '..'
 
 import type { State } from '../../../redux/types'
 import type { AlertId } from '../../../redux/alerts/types'
@@ -14,28 +18,43 @@ import type { AlertId } from '../../../redux/alerts/types'
 jest.mock('../../AnalyticsSettingsModal', () => ({
   AnalyticsSettingsModal: () => <></>,
 }))
-
 jest.mock('../U2EDriverOutdatedAlert', () => ({
   U2EDriverOutdatedAlert: () => <></>,
 }))
-
 jest.mock('../../UpdateAppModal', () => ({
   UpdateAppModal: () => <></>,
 }))
-
 jest.mock('../../../redux/alerts/selectors')
+jest.mock('../../../redux/shell')
+jest.mock('../../../redux/config')
+jest.mock('..')
 
 const getActiveAlerts = AppAlerts.getActiveAlerts as jest.MockedFunction<
   typeof AppAlerts.getActiveAlerts
+>
+const mockGetAvailableShellUpdate = getAvailableShellUpdate as jest.MockedFunction<
+  typeof getAvailableShellUpdate
+>
+const mockGetHasJustUpdated = getHasJustUpdated as jest.MockedFunction<
+  typeof getHasJustUpdated
+>
+const mockUseRemoveActiveAppUpdateToast = useRemoveActiveAppUpdateToast as jest.MockedFunction<
+  typeof useRemoveActiveAppUpdateToast
 >
 
 const MOCK_STATE: State = { mockState: true } as any
 
 describe('app-wide Alerts component', () => {
+  let props: React.ComponentProps<typeof AlertsModal>
+  const mockUseRef = { current: null }
+
   const render = () => {
-    return mountWithStore<React.ComponentProps<typeof Alerts>>(<Alerts />, {
-      initialState: MOCK_STATE,
-    })
+    return mountWithStore<React.ComponentProps<typeof AlertsModal>>(
+      <AlertsModal {...props} />,
+      {
+        initialState: MOCK_STATE,
+      }
+    )
   }
 
   const stubActiveAlerts = (alertIds: AlertId[]): void => {
@@ -47,6 +66,14 @@ describe('app-wide Alerts component', () => {
 
   beforeEach(() => {
     stubActiveAlerts([])
+    when(mockGetAvailableShellUpdate).mockReturnValue('true')
+    when(mockGetHasJustUpdated).mockReturnValue(false)
+    when(mockUseRemoveActiveAppUpdateToast).calledWith().mockReturnValue({
+      removeActiveAppUpdateToast: jest.fn(),
+    })
+    props = {
+      toastIdRef: mockUseRef,
+    }
   })
 
   afterEach(() => {
@@ -112,13 +139,18 @@ describe('app-wide Alerts component', () => {
   })
   it('should render a success toast if the software update was successful', () => {
     const { wrapper } = render()
-    const updatedState = {
-      hasJustUpdated: true,
-    }
+    when(mockGetHasJustUpdated).mockReturnValue(true)
 
-    wrapper.setProps({ initialState: updatedState })
     setTimeout(() => {
       expect(wrapper.contains('successfully updated')).toBe(true)
+    }, TOAST_ANIMATION_DURATION)
+  })
+  it('should not render an app update toast if a software update is no longer available', () => {
+    when(mockGetAvailableShellUpdate).mockReturnValue('false')
+    const { wrapper } = render()
+    setTimeout(() => {
+      expect(wrapper.contains('View Update')).toBe(false)
+      expect(mockUseRemoveActiveAppUpdateToast).toHaveBeenCalled()
     }, TOAST_ANIMATION_DURATION)
   })
 })

@@ -45,6 +45,7 @@ from .ot3utils import (
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
     moving_axes_in_move_group,
+    gripper_jaw_state_from_fw,
 )
 
 try:
@@ -126,6 +127,7 @@ from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
     EstopState,
+    GripperJawState,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -150,6 +152,9 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
     set_deck_light,
     get_deck_light_state,
+)
+from opentrons_hardware.hardware_control.gripper_settings import (
+    get_gripper_jaw_state,
 )
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
@@ -377,10 +382,13 @@ class OT3Controller:
         async for update in self._subsystem_manager.update_firmware(subsystems, force):
             yield update
 
+    def get_current_settings(
+        self, gantry_load: GantryLoad
+    ) -> OT3AxisMap[CurrentConfig]:
+        return get_current_settings(self._configuration.current_settings, gantry_load)
+
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
-        self._current_settings = get_current_settings(
-            self._configuration.current_settings, gantry_load
-        )
+        self._current_settings = self.get_current_settings(gantry_load)
         await self.set_default_currents()
 
     async def update_motor_status(self) -> None:
@@ -736,6 +744,10 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
+    async def get_jaw_state(self) -> GripperJawState:
+        res = await get_gripper_jaw_state(self._messenger)
+        return gripper_jaw_state_from_fw(res)
+
     @staticmethod
     def _lookup_serial_key(pipette_name: FirmwarePipetteName) -> str:
         lookup_name = {
@@ -929,6 +941,25 @@ class OT3Controller:
             self._current_settings = old_current_settings
             await self.set_default_currents()
 
+    @asynccontextmanager
+    async def restore_z_r_run_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily restore the active current ONLY when homing or
+        retracting the Z_R axis while the 96-channel is attached.
+        """
+        assert self._current_settings
+        high_throughput_settings = deepcopy(self._current_settings)
+        conf = self.get_current_settings(GantryLoad.LOW_THROUGHPUT)[Axis.Z_R]
+        # outside of homing and retracting, Z_R run current should
+        # be reduced to its hold current
+        await self.set_active_current({Axis.Z_R: conf.run_current})
+        try:
+            yield
+        finally:
+            await self.set_active_current(
+                {Axis.Z_R: high_throughput_settings[Axis.Z_R].run_current}
+            )
+
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
         watcher = aionotify.Watcher()
@@ -1104,9 +1135,8 @@ class OT3Controller:
                     q_msg = _pop_queue()
                     if q_msg:
                         mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
-                        raise OverPressureDetected(
-                            f"The pressure sensor on the {mount} mount has exceeded operational limits."
-                        )
+                        raise OverPressureDetected(mount.name)
+
         else:
             yield
 

@@ -19,10 +19,13 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
+import { Banner } from '../../../atoms/Banner'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
+import { InstrumentCard } from '../../../molecules/InstrumentCard'
 import { ChangePipette } from '../../ChangePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
@@ -41,26 +44,37 @@ import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
-import { Banner } from '../../../atoms/Banner'
 
 interface PipetteCardProps {
-  pipetteInfo: PipetteModelSpecs | null
+  pipetteModelSpecs: PipetteModelSpecs | null
   pipetteId?: AttachedPipette['id'] | null
   isPipetteCalibrated: boolean
   mount: Mount
   robotName: string
-  is96ChannelAttached: boolean
+  pipetteIs96Channel: boolean
+  pipetteIsBad: boolean
+  updatePipette: () => void
+  isRunActive: boolean
 }
+const BANNER_LINK_CSS = css`
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: ${SPACING.spacing8};
+`
+const SUBSYSTEM_UPDATE_POLL_MS = 5000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
-  const { t } = useTranslation(['device_details', 'protocol_setup'])
+  const { t, i18n } = useTranslation(['device_details', 'protocol_setup'])
   const {
-    pipetteInfo,
+    pipetteModelSpecs,
     isPipetteCalibrated,
     mount,
     robotName,
     pipetteId,
-    is96ChannelAttached,
+    pipetteIs96Channel,
+    pipetteIsBad,
+    updatePipette,
+    isRunActive,
   } = props
   const {
     menuOverlay,
@@ -69,9 +83,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const isOt3 = useIsOT3(robotName)
-  const pipetteName = pipetteInfo?.name
+  const pipetteName = pipetteModelSpecs?.name
   const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
-  const pipetteDisplayName = pipetteInfo?.displayName
+  const pipetteDisplayName = pipetteModelSpecs?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
@@ -83,6 +97,14 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   ] = React.useState<PipetteWizardFlow | null>(null)
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
+  const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
+  const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
+    subsystem,
+    {
+      enabled: isOt3,
+      refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
+    }
+  )
 
   const [
     selectedPipette,
@@ -153,98 +175,139 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           closeModal={() => setChangePipette(false)}
         />
       )}
-      {showSlideout && pipetteInfo != null && pipetteId != null && (
+      {showSlideout && pipetteModelSpecs != null && pipetteId != null && (
         <PipetteSettingsSlideout
           robotName={robotName}
-          pipetteName={pipetteInfo.displayName}
+          pipetteName={pipetteModelSpecs.displayName}
           onCloseClick={() => setShowSlideout(false)}
           isExpanded={true}
           pipetteId={pipetteId}
         />
       )}
-      {showAboutSlideout && pipetteInfo != null && pipetteId != null && (
+      {showAboutSlideout && pipetteModelSpecs != null && pipetteId != null && (
         <AboutPipetteSlideout
           pipetteId={pipetteId}
-          pipetteName={pipetteInfo.displayName}
+          pipetteName={pipetteModelSpecs.displayName}
           mount={mount}
           onCloseClick={() => setShowAboutSlideout(false)}
           isExpanded={true}
         />
       )}
-      <Box padding={`${SPACING.spacing16} ${SPACING.spacing8}`} width="100%">
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
-          <Flex alignItems={ALIGN_START}>
-            {pipetteInfo === null ? null : (
-              <InstrumentDiagram
-                pipetteSpecs={pipetteInfo}
-                mount={mount}
-                //  pipette images for Flex are slightly smaller so need to be scaled accordingly
-                transform={isOt3 ? 'scale(0.4)' : 'scale(0.3)'}
-                size="3.125rem"
-                transformOrigin={isOt3 ? '-50% -10%' : '20% -10%'}
-              />
-            )}
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            flex="100%"
-            paddingLeft={SPACING.spacing8}
+      {!pipetteIsBad && subsystemUpdateData == null && (
+        <>
+          <Box
+            padding={`${SPACING.spacing16} ${SPACING.spacing8}`}
+            width="100%"
           >
-            {isOT3PipetteAttached && !isPipetteCalibrated ? (
-              <Banner type="error" marginBottom={SPACING.spacing4}>
-                <Trans
-                  t={t}
-                  i18nKey="calibration_needed"
-                  components={{
-                    calLink: (
-                      <StyledText
-                        as="p"
-                        css={css`
-                          text-decoration: underline;
-                          cursor: pointer;
-                          margin-left: 0.5rem;
-                        `}
-                        onClick={handleCalibrate}
-                      />
-                    ),
-                  }}
-                />
-              </Banner>
-            ) : null}
-            <StyledText
-              textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              fontSize={TYPOGRAPHY.fontSizeH6}
-              paddingBottom={SPACING.spacing4}
-              data-testid={`PipetteCard_mount_${String(pipetteDisplayName)}`}
-            >
-              {is96ChannelAttached
-                ? t('both_mounts')
-                : t('mount', {
-                    side: mount === LEFT ? t('left') : t('right'),
-                  })}
-            </StyledText>
-            <Flex
-              paddingBottom={SPACING.spacing4}
-              data-testid={`PipetteCard_display_name_${String(
-                pipetteDisplayName
-              )}`}
-            >
-              <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
-                {pipetteDisplayName ?? t('empty')}
-              </StyledText>
+            <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
+              <Flex alignItems={ALIGN_START}>
+                {pipetteModelSpecs !== null ? (
+                  <InstrumentDiagram
+                    pipetteSpecs={pipetteModelSpecs}
+                    mount={mount}
+                    //  pipette images for Flex are slightly smaller so need to be scaled accordingly
+                    transform={isOt3 ? 'scale(0.4)' : 'scale(0.3)'}
+                    size="3.125rem"
+                    transformOrigin={isOt3 ? '-50% -10%' : '20% -10%'}
+                  />
+                ) : null}
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                flex="100%"
+                paddingLeft={SPACING.spacing8}
+              >
+                {isOT3PipetteAttached && !isPipetteCalibrated ? (
+                  <Banner type="error" marginBottom={SPACING.spacing4}>
+                    <Trans
+                      t={t}
+                      i18nKey="calibration_needed"
+                      components={{
+                        calLink: (
+                          <StyledText
+                            as="p"
+                            css={css`
+                              text-decoration: underline;
+                              cursor: pointer;
+                              margin-left: 0.5rem;
+                            `}
+                            onClick={handleCalibrate}
+                          />
+                        ),
+                      }}
+                    />
+                  </Banner>
+                ) : null}
+                <StyledText
+                  textTransform={TYPOGRAPHY.textTransformUppercase}
+                  color={COLORS.darkGreyEnabled}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  fontSize={TYPOGRAPHY.fontSizeH6}
+                  paddingBottom={SPACING.spacing4}
+                  data-testid={`PipetteCard_mount_${String(
+                    pipetteDisplayName
+                  )}`}
+                >
+                  {pipetteIs96Channel
+                    ? t('both_mounts')
+                    : t('mount', {
+                        side: mount === LEFT ? t('left') : t('right'),
+                      })}
+                </StyledText>
+                <Flex
+                  paddingBottom={SPACING.spacing4}
+                  data-testid={`PipetteCard_display_name_${String(
+                    pipetteDisplayName
+                  )}`}
+                >
+                  <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+                    {pipetteDisplayName ?? t('empty')}
+                  </StyledText>
+                </Flex>
+              </Flex>
             </Flex>
-          </Flex>
-        </Flex>
-      </Box>
-      <Box
-        alignSelf={ALIGN_START}
-        padding={SPACING.spacing4}
-        data-testid={`PipetteCard_overflow_btn_${String(pipetteDisplayName)}`}
-      >
-        <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
-      </Box>
+          </Box>
+          <Box
+            alignSelf={ALIGN_START}
+            padding={SPACING.spacing4}
+            data-testid={`PipetteCard_overflow_btn_${String(
+              pipetteDisplayName
+            )}`}
+          >
+            <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+          </Box>
+        </>
+      )}
+      {(pipetteIsBad || subsystemUpdateData != null) && (
+        <InstrumentCard
+          label={i18n.format(t('mount', { side: mount }), 'capitalize')}
+          description={t('instrument_attached')}
+          banner={
+            <Banner
+              type={subsystemUpdateData != null ? 'warning' : 'error'}
+              marginBottom={SPACING.spacing4}
+            >
+              <Trans
+                t={t}
+                i18nKey={
+                  subsystemUpdateData != null
+                    ? 'firmware_update_occurring'
+                    : 'firmware_update_available_now'
+                }
+                components={{
+                  updateLink: (
+                    <StyledText
+                      as="p"
+                      css={BANNER_LINK_CSS}
+                      onClick={updatePipette}
+                    />
+                  ),
+                }}
+              />
+            </Banner>
+          }
+        />
+      )}
       {showOverflowMenu && (
         <>
           <Box
@@ -255,13 +318,14 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             onClick={() => setShowOverflowMenu(false)}
           >
             <PipetteOverflowMenu
-              pipetteSpecs={pipetteInfo}
+              pipetteSpecs={pipetteModelSpecs}
               mount={mount}
               handleChangePipette={handleChangePipette}
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
               handleCalibrate={handleCalibrate}
               isPipetteCalibrated={isPipetteCalibrated}
+              isRunActive={isRunActive}
             />
           </Box>
           {menuOverlay}

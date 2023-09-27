@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from typing_extensions import Literal
-from typing import Optional, TypeVar, Union, Generic
+from typing import Optional, TypeVar, Union, Generic, Dict, List
 from datetime import datetime
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
@@ -24,6 +24,21 @@ InstrumentModelT = TypeVar(
 InstrumentDataT = TypeVar("InstrumentDataT", bound=BaseModel)
 
 InstrumentType = Literal["pipette", "gripper"]
+
+
+class InconsistentCalibrationFailure(BaseModel):
+    """Pipette offsets are very different from each other.
+
+    This indicates that one of the pipettes (though we can't tell which one)
+    was likely calibrated with its calibration probe not fully attached, and
+    should be redone. However, it's possible that the pipettes are in fact
+    calibrated correctly and their offsets look strange, so this should be
+    taken as an advisory.
+    """
+
+    kind: Literal["inconsistent-pipette-offset"] = "inconsistent-pipette-offset"
+    offsets: Dict[str, Vec3f]
+    limit: float
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
@@ -54,6 +69,7 @@ class InstrumentCalibrationData(BaseModel):
     offset: Vec3f
     source: SourceType
     last_modified: Optional[datetime] = None
+    reasonability_check_failures: List[Union[InconsistentCalibrationFailure]]
 
 
 class GripperData(BaseModel):

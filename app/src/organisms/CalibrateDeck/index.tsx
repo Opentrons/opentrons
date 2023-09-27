@@ -65,6 +65,7 @@ export function CalibrateDeck(
     dispatchRequests,
     showSpinner,
     isJogging,
+    wasExitBeforeCompletion,
     offsetInvalidationHandler,
   } = props
   const { currentStep, instrument, labware, supportedCommands } =
@@ -96,6 +97,9 @@ export function CalibrateDeck(
   }
 
   function cleanUpAndExit(): void {
+    if (wasExitBeforeCompletion) {
+      wasExitBeforeCompletion.current = true
+    }
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {

@@ -1,21 +1,26 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import type { MatcherFunction } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useProtocolMetadata } from '../../Devices/hooks'
+import { getIsOnDevice } from '../../../redux/config'
 import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import type { CommandData } from '@opentrons/api-client'
+import type { MatcherFunction } from '@testing-library/react'
 
 jest.mock('../../Devices/hooks')
+jest.mock('../../../redux/config')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 
 const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
   typeof useProtocolMetadata
+>
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
 >
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
@@ -41,6 +46,7 @@ describe('PickUpTip', () => {
 
   beforeEach(() => {
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
+    mockGetIsOnDevice.mockReturnValue(false)
     props = {
       section: SECTIONS.PICK_UP_TIP,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -72,7 +78,7 @@ describe('PickUpTip', () => {
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
   })
-  it('renders correct copy when confirming position', () => {
+  it('renders correct copy when confirming position on desktop', () => {
     const { getByText, getByRole } = render({
       ...props,
       workingOffsets: [
@@ -89,6 +95,26 @@ describe('PickUpTip', () => {
       "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
     )
     getByRole('link', { name: 'Need help?' })
+  })
+  it('renders correct copy when confirming position on touchscreen', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText, getByRole } = render({
+      ...props,
+      workingOffsets: [
+        {
+          location: { slotName: 'D1' },
+          labwareId: 'labwareId1',
+          initialPosition: { x: 1, y: 2, z: 3 },
+          finalPosition: null,
+        },
+      ],
+    })
+    getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
+    getByText(
+      nestedTextMatcher(
+        "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
+      )
+    )
   })
   it('executes correct chained commands when confirm placement CTA is clicked', async () => {
     when(mockChainRunCommands)

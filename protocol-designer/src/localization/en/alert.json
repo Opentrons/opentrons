@@ -84,6 +84,10 @@
 
       "body4a": "To batch edit Transfer or Mix advanced settings:",
       "body4b": "Only include Transfer or Mix steps in your selection."
+    },
+    "waste_chute_warning": {
+      "title": "Disposing labware",
+      "body1": "Moving labware to the Waste Chute permanently discards it. You can't use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable."
     }
   },
   "timeline": {
@@ -141,7 +145,7 @@
         "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       },
       "LABWARE_OFF_DECK": {
-        "title": "Labware is off deck",
+        "title": "Labware is off-deck",
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
       },
       "HEATER_SHAKER_LATCH_CLOSED": {
@@ -157,6 +161,14 @@
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
         "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
+      },
+      "LABWARE_IN_WASTE_CHUTE_HAS_LIQUID": {
+        "title": "Moving labware into waste chute",
+        "body": "This labware has remaining liquid, be advised that once you dispose of it, there is no way to get it back later in the protocol."
+      },
+      "TIPRACK_IN_WASTE_CHUTE_HAS_TIPS": {
+        "title": "Moving tiprack into waste chute",
+        "body": "This tiprack has remaining tips, be advised that once you dispose of it, there is no way to get it back later in the protocol. "
       }
     }
   },
@@ -169,7 +181,7 @@
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
-      "body": "Slot {{selectedSlot}} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue."
+      "body": "Slot {{selectedSlot}} is occupied. Clear the slot to continue."
     },
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",

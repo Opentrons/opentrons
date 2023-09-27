@@ -1,4 +1,7 @@
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  WASTE_CHUTE_SLOT,
+} from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
@@ -7,10 +10,13 @@ import {
   getErrorResult,
   getStateAndContextTempTCModules,
   SOURCE_LABWARE,
+  TIPRACK_1,
 } from '../fixtures'
 import { moveLabware, MoveLabwareArgs } from '..'
 
 import type { InvariantContext, RobotState } from '../types'
+
+const mockWasteChuteId = 'mockWasteChuteId'
 
 describe('moveLabware', () => {
   let robotState: RobotState
@@ -235,5 +241,82 @@ describe('moveLabware', () => {
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_IS_SHAKING',
     })
+  })
+  it('should return a warning for if you try to move a tiprack with tips into the waste chute', () => {
+    const wasteChuteInvariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        mockWasteChuteId: {
+          name: 'wasteChute',
+          id: mockWasteChuteId,
+          location: WASTE_CHUTE_SLOT,
+        },
+      },
+    } as InvariantContext
+
+    const robotStateWithTip = ({
+      ...robotState,
+      tipState: {
+        tipracks: {
+          tiprack1Id: { A1: true },
+        },
+      },
+    } as any) as RobotState
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: TIPRACK_1,
+      useGripper: true,
+      newLocation: { slotName: WASTE_CHUTE_SLOT },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(
+      params,
+      wasteChuteInvariantContext,
+      robotStateWithTip
+    )
+    expect(result.warnings).toEqual([
+      {
+        message: 'Disposing of a tiprack with tips',
+        type: 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS',
+      },
+    ])
+  })
+  it('should return a warning for if you try to move a labware with liquids into the waste chute', () => {
+    const wasteChuteInvariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        mockWasteChuteId: {
+          name: 'wasteChute',
+          id: mockWasteChuteId,
+          location: WASTE_CHUTE_SLOT,
+        },
+      },
+    } as InvariantContext
+    const robotStateWithLiquid = ({
+      ...robotState,
+      liquidState: {
+        labware: {
+          sourcePlateId: { A1: { ingredGroup: { volume: 10 } } },
+        },
+      },
+    } as any) as RobotState
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: WASTE_CHUTE_SLOT },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(
+      params,
+      wasteChuteInvariantContext,
+      robotStateWithLiquid
+    )
+    expect(result.warnings).toEqual([
+      {
+        message: 'Disposing of a labware with liquid',
+        type: 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID',
+      },
+    ])
   })
 })

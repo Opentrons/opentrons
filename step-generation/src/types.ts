@@ -112,9 +112,15 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper'
+    name: 'gripper' | 'wasteChute'
     id: string
+    location?: string
   }
+}
+
+export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export interface AdditionalEquipmentEntities {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
@@ -439,6 +445,7 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
+  additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }
 
@@ -511,6 +518,8 @@ export interface CommandCreatorError {
 export type WarningType =
   | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
   | 'ASPIRATE_FROM_PRISTINE_WELL'
+  | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
+  | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
 
 export interface CommandCreatorWarning {
   message: string

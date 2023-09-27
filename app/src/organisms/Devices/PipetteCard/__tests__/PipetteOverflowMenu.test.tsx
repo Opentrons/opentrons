@@ -41,6 +41,7 @@ describe('PipetteOverflowMenu', () => {
       handleAboutSlideout: jest.fn(),
       handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: false,
+      isRunActive: false,
     }
   })
   afterEach(() => {
@@ -69,6 +70,7 @@ describe('PipetteOverflowMenu', () => {
       handleAboutSlideout: jest.fn(),
       handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: false,
+      isRunActive: false,
     }
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Attach pipette' })
@@ -87,6 +89,7 @@ describe('PipetteOverflowMenu', () => {
       handleAboutSlideout: jest.fn(),
       handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: true,
+      isRunActive: false,
     }
     const { getByRole } = render(props)
     const recalibrate = getByRole('button', {

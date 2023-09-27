@@ -16,8 +16,9 @@ def run(protocol: ProtocolContext) -> None:
     tiprack_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "D2")
     p50 = protocol.load_instrument("flex_1channel_50", "right", tip_racks=[tiprack_1])
 
-    # TODO (spp, 2023-07-13): replace 'p1000_single_gen3' with the newer name once '.._gen3' is discontinued
-    p1000 = protocol.load_instrument("p1000_single_gen3", "left", tip_racks=[tiprack_1])
+    p1000 = protocol.load_instrument(
+        "flex_1channel_1000", "left", tip_racks=[tiprack_1]
+    )
 
     p50.pick_up_tip()
     p50.aspirate(40, plate["A1"])

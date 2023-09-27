@@ -228,5 +228,13 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     ) -> None:
         ...
 
+    def configure_for_volume(self, volume: float) -> None:
+        """Configure the pipette for a specific volume.
+
+        Args:
+            volume: The volume to preppare to handle.
+        """
+        ...
+
 
 InstrumentCoreType = TypeVar("InstrumentCoreType", bound=AbstractInstrument[Any])

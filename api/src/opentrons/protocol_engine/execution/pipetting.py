@@ -10,6 +10,7 @@ from ..errors.exceptions import (
     TipNotAttachedError,
     InvalidPipettingVolumeError,
     InvalidPushOutVolumeError,
+    InvalidDispenseVolumeError,
 )
 
 
@@ -216,6 +217,7 @@ class VirtualPipettingHandler(PipettingHandler):
                 "push out value cannot have a negative value."
             )
         self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
+        self._validate_dispense_volume(pipette_id=pipette_id, dispense_volume=volume)
         return volume
 
     async def blow_out_in_place(
@@ -232,6 +234,20 @@ class VirtualPipettingHandler(PipettingHandler):
         if not tip_geometry:
             raise TipNotAttachedError(
                 f"Cannot perform {command_name} without a tip attached"
+            )
+
+    def _validate_dispense_volume(
+        self, pipette_id: str, dispense_volume: float
+    ) -> None:
+        """Validate dispense volume."""
+        aspirate_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id)
+        if aspirate_volume is None:
+            raise InvalidDispenseVolumeError(
+                "Cannot perform a dispense if there is no volume in attached tip."
+            )
+        elif dispense_volume > aspirate_volume:
+            raise InvalidDispenseVolumeError(
+                f"Cannot dispense {dispense_volume} µL when only {aspirate_volume} µL has been aspirated."
             )
 
 

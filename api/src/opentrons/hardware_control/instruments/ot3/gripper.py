@@ -122,6 +122,10 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         return self.grip_force_profile.default_grip_force
 
     @property
+    def default_idle_force(self) -> float:
+        return self.grip_force_profile.default_idle_force
+
+    @property
     def default_home_force(self) -> float:
         return self.grip_force_profile.default_home_force
 

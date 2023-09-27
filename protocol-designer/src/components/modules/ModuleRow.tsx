@@ -74,10 +74,11 @@ export function ModuleRow(props: Props): JSX.Element {
   // If this Module is a TC deck slot and spanning
   // populate all 4 slots individually
   if (slot === SPAN7_8_10_11_SLOT) {
-    slotDisplayName = 'Slot 7'
+    slotDisplayName = 'Slot 7,8,10,11'
     occupiedSlotsForMap = ['7', '8', '10', '11']
     //  TC on Flex
   } else if (isFlex && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
+    slotDisplayName = 'Slot A1+B1'
     occupiedSlotsForMap = ['A1', 'B1']
   }
   // If collisionSlots are populated, check which slot is occupied

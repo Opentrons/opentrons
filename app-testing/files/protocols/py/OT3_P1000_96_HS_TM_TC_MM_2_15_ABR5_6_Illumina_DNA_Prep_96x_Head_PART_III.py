@@ -61,7 +61,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # pipette
     if USE_8xMULTI == "YES":
-        p1000 = protocol.load_instrument("p1000_multi_gen3", "right")
+        p1000 = protocol.load_instrument("flex_1channel_1000", "right")
     else:
         p1000 = protocol.load_instrument("p1000_96", "left")
 

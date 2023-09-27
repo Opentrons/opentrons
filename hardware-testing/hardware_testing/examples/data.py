@@ -12,12 +12,14 @@ def _main() -> None:
     # write
     data.dump_data_to_file(
         test_name,
+        run_id,
         file_name,
         "some,data,to,record\ncan,be,entire,file,at,once\n",
     )
     # append
     data.append_data_to_file(
         test_name,
+        run_id,
         file_name,
         "or,you,can,continue,appending,new,data\n",
     )

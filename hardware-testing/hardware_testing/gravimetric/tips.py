@@ -150,10 +150,11 @@ def get_tips_for_individual_channel_on_multi(
     return tips
 
 
-def get_tips_for_all_channels_on_multi(ctx: ProtocolContext) -> List[Well]:
+def get_tips_for_all_channels_on_multi(ctx: ProtocolContext, tip: int) -> List[Well]:
     """Get tips for all the multi's channels."""
-    racks = _get_racks(ctx)
-    return [rack[f"A{col + 1}"] for _, rack in racks.items() for col in range(12)]
+    racks = [rack for _, rack in _get_racks(ctx).items() if f"{tip}ul" in rack.name]
+    assert racks, f"no {tip}ul racks found"
+    return [rack[f"A{col + 1}"] for rack in racks for col in range(12)]
 
 
 def get_tips_for_96_channel(ctx: ProtocolContext) -> List[Well]:
@@ -173,7 +174,7 @@ def get_tips(
         return {0: get_tips_for_single(ctx, tip_volume)}
     elif pipette.channels == 8:
         if all_channels:
-            return {0: get_tips_for_all_channels_on_multi(ctx)}
+            return {0: get_tips_for_all_channels_on_multi(ctx, tip_volume)}
         else:
             return {
                 channel: get_tips_for_individual_channel_on_multi(

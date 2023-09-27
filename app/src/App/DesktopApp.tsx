@@ -107,28 +107,29 @@ export const DesktopApp = (): JSX.Element => {
           }}
         >
           <Box width="100%">
-            <Switch>
-              {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
-                return (
-                  <Route key={path} exact={exact} path={path}>
-                    <Breadcrumbs />
-                    <Box
-                      position={POSITION_RELATIVE}
-                      width="100%"
-                      height="100%"
-                      backgroundColor={COLORS.fundamentalsBackground}
-                      overflow={OVERFLOW_AUTO}
-                    >
-                      <ModalPortalRoot />
-                      <Component />
-                    </Box>
-                  </Route>
-                )
-              })}
-              <Redirect exact from="/" to="/protocols" />
-            </Switch>
-            <RobotControlTakeover />
-            <Alerts />
+            <Alerts>
+              <Switch>
+                {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Breadcrumbs />
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.fundamentalsBackground}
+                        overflow={OVERFLOW_AUTO}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                })}
+                <Redirect exact from="/" to="/protocols" />
+              </Switch>
+              <RobotControlTakeover />
+            </Alerts>
           </Box>
         </EmergencyStopContext.Provider>
       </ToasterOven>

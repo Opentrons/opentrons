@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import isEmpty from 'lodash/isEmpty'
 import { css } from 'styled-components'
 
 import {
@@ -98,11 +97,6 @@ export function RunFailedModal({
               <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
                 {highestPriorityError.detail}
               </StyledText>
-              {!isEmpty(highestPriorityError.errorInfo) && (
-                <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-                  {JSON.stringify(highestPriorityError.errorInfo)}
-                </StyledText>
-              )}
             </Flex>
           </Flex>
           <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
