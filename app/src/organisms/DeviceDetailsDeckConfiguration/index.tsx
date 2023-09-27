@@ -34,6 +34,7 @@ export function DeviceDetailsDeckConfiguration({
   const { data: deckConfig } = useDeckConfigurationQuery()
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
+  // TODO(bh, 2023-09-27): this is all temp POC of the api stubs, to be built out in follow on work
   const handleClickAdd = (): void => {
     updateDeckConfiguration({
       fixtureLocation: 'B3',
