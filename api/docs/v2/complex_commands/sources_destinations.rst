@@ -175,7 +175,7 @@ When the source and destination both contain the same number of wells, the mappi
       - B11
       - B12
 
-There's no requirement that the source and destination lists be mutually exclusive. In fact, this command adapted from the :ref:`tutorial` deliberately uses slices of the same list, saved to the variable ``row``, with the effect that each aspiration happens in the same location as the previous dispense::
+There's no requirement that the source and destination lists be mutually exclusive. In fact, this command adapted from the :ref:`tutorial <tutorial>` deliberately uses slices of the same list, saved to the variable ``row``, with the effect that each aspiration happens in the same location as the previous dispense::
 
     row = plate.rows()[0]
     pipette.transfer(
