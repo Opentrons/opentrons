@@ -162,12 +162,12 @@ class TipHandlingConfigurations(PlungerHomingConfigurations):
         default=0.0, description="The distance to begin a pick up tip from."
     )
     prep_move_distance: float = Field(
-        default=0.0, description="The distance to move downward before tip pickup or drop-off."
+        default=0.0,
+        description="The distance to move downward before tip pickup or drop-off.",
     )
     prep_move_speed: float = Field(
         default=0.0, description="The speed for the optional preparatory move."
     )
-
 
 
 class AvailableSensorDefinition(BaseModel):
