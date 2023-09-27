@@ -11,6 +11,7 @@ import { useChainRunCommands } from '../../../resources/runs/hooks'
 import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { getIsOnDevice } from '../../../redux/config'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { useSelector } from 'react-redux'
@@ -144,6 +145,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
   const { existingOffsets, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
   const [showOffsetsTable, setShowOffsetsModal] = React.useState(false)
+  const latestCurrentOffsets = getLatestCurrentOffsets(existingOffsets)
   return existingOffsets.length > 0 ? (
     <>
       <Btn
@@ -184,7 +186,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
           >
             <Box overflowY="scroll" marginBottom={SPACING.spacing16}>
               <TerseOffsetTable
-                offsets={existingOffsets}
+                offsets={latestCurrentOffsets}
                 labwareDefinitions={labwareDefinitions}
               />
             </Box>
