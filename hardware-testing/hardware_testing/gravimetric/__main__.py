@@ -301,7 +301,7 @@ class RunArgs:
             )
         else:
             if args.increment:
-                assert len(tip_volumes) == 0, (
+                assert len(tip_volumes) == 1, (
                     f"tip must be specified "
                     f"when running --increment test "
                     f"with {args.channels}ch P{args.pipette}"
