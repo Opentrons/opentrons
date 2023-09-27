@@ -106,7 +106,7 @@ class LiquidHeightInFlatBottomWell:
     def height_from_volume(self, volume: float) -> float:
         """Given the volume, compute the height of the liquid in the well."""
         _rad_diff = self._top_radius - self._bottom_radius
-        low, high = 0, self._height
+        low, high = 0.0, self._height
         while high - low > self._resolution_mm:
             mid = (low + high) / 2
             r_mid = self._bottom_radius + (mid / self._height) * _rad_diff
@@ -124,7 +124,7 @@ class LiquidHeightInFlatBottomWell:
         return self._volume_of_frustum(height, surface_radius)
 
 
-LIQUID_HEIGHT_LOOKUP = {
+LIQUID_HEIGHT_LOOKUP: Dict[str, List[Tuple[float, float]]] = {
     "nest_1_reservoir_195ml": [(0, 0), (195000, 25)],
     "nest_12_reservoir_15ml": [
         (0, 0),
@@ -220,7 +220,7 @@ def _assign_starting_volumes_dye(
             reservoir.load_name, pipette.channels, len(test["destinations"])
         )
         first_trial_ul = src_ul_per_trial[0]
-        reservoir[test["source"]].load_liquid(dye, first_trial_ul)
+        reservoir[str(test["source"])].load_liquid(dye, first_trial_ul)
 
 
 def _assign_starting_volumes_diluent(
