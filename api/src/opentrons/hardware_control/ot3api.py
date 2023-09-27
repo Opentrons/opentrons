@@ -1957,7 +1957,7 @@ class OT3API(
             await self._move(target_up)
 
     async def _motor_pick_up_tip(
-        self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
+        self, mount: OT3Mount, pipette_spec: List[TipMotorPickUpTipSpec]
     ) -> None:
         async with self._backend.motor_current(
             run_currents={
@@ -1995,6 +1995,27 @@ class OT3API(
                 await self._backend.tip_action(moves=moves[0])
 
             await self.home_gear_motors()
+        pipette_axis = Axis.of_main_tool_actuator(mount)
+        gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+            pipette_axis
+        ]
+
+        move_targets = []
+        for move_segment in pipette_spec:
+            move_targets.append(
+                MoveTarget.build(
+                    position={Axis.Q: move_segment.distance},
+                    max_speed=move_segment.speed,
+                )
+            )
+
+        _, moves = self._move_manager.plan_motion(
+            origin={Axis.Q: gear_origin_float}, target_list=move_targets
+        )
+
+        await self._backend.tip_action(moves=moves[0])
+
+        await self.home_gear_motors()
 
     async def pick_up_tip(
         self,
@@ -2012,7 +2033,20 @@ class OT3API(
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
         if spec.pick_up_motor_actions:
-            await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
+            async with self._backend.restore_current():
+                await self._backend.set_active_current(
+                    {axis: current for axis, current in spec.currents.items()}
+                )
+                # Move to pickup position
+                assert spec.tiprack_down
+                target_down = target_position_from_relative(
+                    mount,
+                    spec.tiprack_down,
+                    self._current_position,
+                )
+                await self._move(target_down)
+
+                await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
             await self._force_pick_up_tip(realmount, spec)
 

@@ -1403,19 +1403,23 @@ async def test_pick_up_tip_full_tiprack(
         pipette_handler.plan_check_pick_up_tip.return_value = (
             PickUpTipSpec(
                 plunger_prep_pos=0,
-                plunger_currents={
+                currents={
                     Axis.of_main_tool_actuator(Mount.LEFT): 0,
+                    Axis.Q: 0,
                 },
                 presses=[],
                 shake_off_list=[],
                 retract_target=0,
-                pick_up_motor_actions=TipMotorPickUpTipSpec(
-                    # Move onto the posts
-                    tiprack_down=Point(0, 0, 0),
-                    tiprack_up=Point(0, 0, 0),
-                    tip_motor_moves=[{"distance": 10, "speed": 0}],
-                    currents={Axis.Q: 0},
-                ),
+                tiprack_down=Point(0, 0, 0),
+                tiprack_up=Point(0, 0, 0),
+                pick_up_motor_actions=[
+                    TipMotorPickUpTipSpec(
+                        # Move onto the posts
+                        distance=10,
+                        speed=0,
+                        home_buffer=0,
+                    )
+                ],
             ),
             _fake_function,
         )

@@ -86,10 +86,8 @@ class PickUpTipPressSpec:
 
 @dataclass(frozen=True)
 class TipMotorPickUpTipSpec:
-    tiprack_down: top_types.Point
-    tiprack_up: top_types.Point
-    tip_motor_moves: List[Dict[str, float]]
-    currents: Dict[Axis, float]
+    distance: float
+    speed: float
     # FIXME we should throw this in a config
     # file of some sort
     home_buffer: float = 0
@@ -98,11 +96,13 @@ class TipMotorPickUpTipSpec:
 @dataclass(frozen=True)
 class PickUpTipSpec:
     plunger_prep_pos: float
-    plunger_currents: Dict[Axis, float]
+    currents: Dict[Axis, float]
     presses: List[PickUpTipPressSpec]
     shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
     retract_target: float
-    pick_up_motor_actions: Optional[TipMotorPickUpTipSpec]
+    pick_up_motor_actions: Optional[List[TipMotorPickUpTipSpec]] = None
+    tiprack_down: Optional[top_types.Point] = None
+    tiprack_up: Optional[top_types.Point] = None
 
 
 @dataclass(frozen=True)
@@ -766,41 +766,39 @@ class OT3PipetteHandler:
 
         if instrument.channels == 96:
             tip_motor_moves = [
-                {
-                    "distance": instrument.pick_up_configurations.prep_move_distance,
-                    "speed": instrument.pick_up_configurations.prep_move_speed,
-                },
-                {
-                    "distance": instrument.pick_up_configurations.distance,
-                    "speed": instrument.pick_up_configurations.speed,
-                },
+                TipMotorPickUpTipSpec(
+                    distance=instrument.pick_up_configurations.prep_move_distance,
+                    speed=instrument.pick_up_configurations.prep_move_speed,
+                    home_buffer=10,
+                ),
+                TipMotorPickUpTipSpec(
+                    distance=instrument.pick_up_configurations.distance,
+                    speed=instrument.pick_up_configurations.speed,
+                    home_buffer=10,
+                ),
             ]
             return (
                 PickUpTipSpec(
                     plunger_prep_pos=instrument.plunger_positions.bottom,
-                    plunger_currents={
+                    currents={
                         Axis.of_main_tool_actuator(
                             mount
                         ): instrument.plunger_motor_current.run,
+                        Axis.Q: instrument.pick_up_configurations.current,
                     },
                     presses=[],
                     shake_off_list=[],
                     retract_target=instrument.pick_up_configurations.distance,
-                    pick_up_motor_actions=TipMotorPickUpTipSpec(
-                        # Move onto the posts
-                        tiprack_down=top_types.Point(0, 0, -7),
-                        tiprack_up=top_types.Point(0, 0, 2),
-                        tip_motor_moves=tip_motor_moves,
-                        currents={Axis.Q: instrument.pick_up_configurations.current},
-                        home_buffer=10,
-                    ),
+                    tiprack_down=top_types.Point(0, 0, -7),
+                    tiprack_up=top_types.Point(0, 0, 2),
+                    pick_up_motor_actions=tip_motor_moves,
                 ),
                 add_tip_to_instr,
             )
         return (
             PickUpTipSpec(
                 plunger_prep_pos=instrument.plunger_positions.bottom,
-                plunger_currents={
+                currents={
                     Axis.of_main_tool_actuator(
                         mount
                     ): instrument.plunger_motor_current.run
@@ -822,7 +820,6 @@ class OT3PipetteHandler:
                 retract_target=instrument.pick_up_configurations.distance
                 + check_incr * checked_presses
                 + 2,
-                pick_up_motor_actions=None,
             ),
             add_tip_to_instr,
         )
