@@ -10,6 +10,7 @@ import {
   Flex,
   Icon,
   useHoverTooltip,
+  useInterval,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -41,9 +42,11 @@ type RobotStatusHeaderProps = StyleProps &
     robotModel: string | null
   }
 
+const STATUS_REFRESH_MS = 5000
+
 export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const { name, local, robotModel, ...styleProps } = props
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     'devices_landing',
     'device_settings',
     'run_details',
@@ -72,8 +75,9 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing8}
           overflowWrap="anywhere"
         >
-          {`${truncateString(displayName, 80, 65)}; ${t(
-            `run_details:status_${currentRunStatus}`
+          {`${truncateString(displayName, 80, 65)}; ${i18n.format(
+            t(`run_details:status_${currentRunStatus}`),
+            'lowerCase'
           )}`}
         </StyledText>
         <Link
@@ -125,10 +129,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     tooltipTranslationKey = 'device_settings:wired_usb'
   }
 
-  React.useEffect(() => {
-    dispatch(fetchStatus(name))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  useInterval(() => dispatch(fetchStatus(name)), STATUS_REFRESH_MS, true)
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>

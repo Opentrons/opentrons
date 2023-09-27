@@ -94,6 +94,10 @@ export function DeviceResetSlideout({
     options != null ? options.filter(opt => opt.id.includes('bootScript')) : []
   const runHistoryOption =
     options != null ? options.filter(opt => opt.id.includes('runsHistory')) : []
+  const sshKeyOption =
+    options != null
+      ? options.filter(opt => opt.id.includes('authorizedKeys'))
+      : []
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -312,6 +316,28 @@ export function DeviceResetSlideout({
                 {t('boot_scripts')}
               </StyledText>
               {bootScriptOption.map(opt => (
+                <CheckboxField
+                  key={opt.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [opt.id]: !(resetOptions[opt.id] ?? false),
+                    })
+                  }
+                  value={resetOptions[opt.id]}
+                  label={t(`clear_option_${snakeCase(opt.id)}`)}
+                />
+              ))}
+            </Box>
+            <Box>
+              <StyledText
+                as="p"
+                css={TYPOGRAPHY.pSemiBold}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('ssh_public_keys')}
+              </StyledText>
+              {sshKeyOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
                   onChange={() =>
