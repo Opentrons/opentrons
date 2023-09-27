@@ -796,6 +796,17 @@ def test_all_options(_instr_labware):
     assert xfer_plan_list == exp1
 
 
+def test_invalid_disposal_volume_distribute(_instr_labware):
+    _instr_labware["ctx"].home()
+    # Supply the disposal volume assessment with the instrument followed by a disposal value equal to the max volume
+    with pytest.raises(ValueError):
+        tx.TransferPlan._check_valid_disposal_volume(
+            _instr_labware,
+            _instr_labware["instr"].hw_pipette["max_volume"],
+            _instr_labware["instr"].hw_pipette["max_volume"],
+        )
+
+
 def test_oversized_distribute(_instr_labware):
     _instr_labware["ctx"].home()
     lw1 = _instr_labware["lw1"]
