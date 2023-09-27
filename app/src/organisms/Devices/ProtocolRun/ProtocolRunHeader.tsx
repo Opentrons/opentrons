@@ -276,7 +276,7 @@ export function ProtocolRunHeader({
         {analysisErrors != null && analysisErrors.length > 0 && (
           <ProtocolAnalysisErrorBanner errors={analysisErrors} />
         )}
-        {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+        {isDoorOpen && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
           <Banner type="warning">{t('close_door_to_resume')}</Banner>
         ) : null}
         {runStatus === RUN_STATUS_STOPPED ? (
@@ -501,6 +501,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
+  // console.log('runStatus', runStatus)
+  // console.log('isRunControlButtonDisabled', isRunControlButtonDisabled)
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
     play()
