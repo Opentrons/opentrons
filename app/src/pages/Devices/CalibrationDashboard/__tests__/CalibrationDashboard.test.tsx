@@ -55,7 +55,7 @@ describe('CalibrationDashboard', () => {
     mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
     mockUseDashboardCalibratePipOffset.mockReturnValue([() => {}, null])
     mockUseDashboardCalibrateTipLength.mockReturnValue([() => {}, null])
-    mockUseDashboardCalibrateDeck.mockReturnValue([() => {}, null])
+    mockUseDashboardCalibrateDeck.mockReturnValue([() => {}, null, false])
     mockUseAttachedPipettes.mockReturnValue({
       left: mockLeftProtoPipette,
       right: null,
