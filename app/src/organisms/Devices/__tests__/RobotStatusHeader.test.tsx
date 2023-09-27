@@ -172,7 +172,7 @@ describe('RobotStatusHeader', () => {
 
     const [{ getByRole, getByText }] = render(props)
 
-    getByText('fake protocol name; Running')
+    getByText('fake protocol name; running')
 
     const runLink = getByRole('link', { name: 'Go to Run' })
     expect(runLink.getAttribute('href')).toEqual(
