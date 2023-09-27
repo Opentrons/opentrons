@@ -1,19 +1,8 @@
-"""Photometric OT3 P50."""
+"""Check by Eye dot Py."""
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {"protocolName": "check-by-eye-dot-py"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
-
-TEST_VOLUMES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-
-ASPIRATE_DEPTH = -3.0
-DISPENSE_DEPTH = -1.5
-
-ASPIRATE_FLOW_RATE = 35  # default for P50S and P50M is 35ul/sec
-DISPENSE_FLOW_RATE = 57  # default for P50S and P50M is 57ul/sec
-
-ASPIRATE_DELAY = 1.0
-DISPENSE_DELAY = 0.5
 
 PIP_CHANNELS = 8
 PIP_VOLUME = 50
@@ -21,6 +10,24 @@ PIP_MOUNT = "left"
 PIP_PUSH_OUT = 6
 
 TIP_VOLUME = 50
+
+# NOTE: pipette will loop through volumes
+#       circling back to the first, regardless of which well it is at
+#       so number of volumes can be any length you like (example: [1])
+TEST_VOLUMES = [1, 2, 3, 4]
+
+# FIXME: operator must LPC to liquid-surface in reservoir in order for this to work
+#        need to get liquid-probing working ASAP to fix this hack
+ASPIRATE_DEPTH = -3.0
+DISPENSE_DEPTH = -1.5
+
+ASPIRATE_FLOW_RATE = 35  # default for P50S and P50M is 35ul/sec
+DISPENSE_FLOW_RATE = 57  # default for P50S and P50M is 57ul/sec
+
+ASPIRATE_PRE_DELAY = 1.0
+ASPIRATE_POST_DELAY = 1.0
+DISPENSE_PRE_DELAY = 0.0
+DISPENSE_POST_DELAY = 0.5
 
 RESERVOIR_SLOT = "D1"
 RESERVOIR_NAME = "nest_1_reservoir_195ml"
@@ -36,7 +43,7 @@ RACK_AND_PLATE_SLOTS = [  # [rack, plate]
     # ["A2", "D3"]
 ]
 
-ROWS = "ABCDEFGH"
+HEIGHT_OF_200UL_IN_PLATE_MM = 6.04  # height of 200ul in a Corning 96-well flat-bottom
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -62,21 +69,38 @@ def run(ctx: ProtocolContext) -> None:
         rack = combo["rack"]
         num_trials = 12 if PIP_CHANNELS == 8 else 96
         for trial in range(num_trials):
+            # CHOOSE VOLUME
             volume = TEST_VOLUMES[vol_cnt % len(TEST_VOLUMES)]
             vol_cnt += 1
+
+            # CHOOSE WELL
             column = (trial % 12) + 1
-            row = ROWS[int(trial / 12)]
+            row = "ABCDEFGH"[int(trial / 12)]
             well_name = f"{row}{column}"
+
+            # PICK-UP TIP
             pipette.configure_for_volume(volume)
             pipette.pick_up_tip(rack[well_name])
-            pipette.aspirate(volume, reservoir[RESERVOIR_WELL].top(ASPIRATE_DEPTH))
-            ctx.delay(seconds=ASPIRATE_DELAY)
+
+            # ASPIRATE
+            aspirate_pos = reservoir[RESERVOIR_WELL].top(ASPIRATE_DEPTH)
+            pipette.move_to(aspirate_pos)
+            ctx.delay(seconds=ASPIRATE_PRE_DELAY)
+            pipette.aspirate(volume, aspirate_pos)
+            ctx.delay(seconds=ASPIRATE_POST_DELAY)
             pipette.move_to(plate[well_name].top(5))
-            ctx.delay(seconds=1)  # visual check
-            pipette.dispense(
-                volume, plate[well_name].top(DISPENSE_DEPTH), push_out=PIP_PUSH_OUT
+            ctx.pause()  # visual check
+
+            # DISPENSE
+            dispense_pos = plate[well_name].bottom(
+                HEIGHT_OF_200UL_IN_PLATE_MM + DISPENSE_DEPTH
             )
-            ctx.delay(seconds=ASPIRATE_DELAY)
+            pipette.move_to(dispense_pos)
+            ctx.delay(seconds=DISPENSE_PRE_DELAY)
+            pipette.dispense(volume, dispense_pos, push_out=PIP_PUSH_OUT)
+            ctx.delay(seconds=DISPENSE_POST_DELAY)
             pipette.move_to(plate[well_name].top(5))
-            ctx.delay(seconds=1)  # visual check
+            ctx.pause()  # visual check
+
+            # DROP TIP
             pipette.drop_tip(home_after=False)
