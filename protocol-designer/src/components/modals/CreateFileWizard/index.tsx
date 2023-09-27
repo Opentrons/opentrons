@@ -203,7 +203,9 @@ export function CreateFileWizard(): JSX.Element | null {
             slot: 'A3',
           })
         )
-      } else {
+      }
+
+      if (!enableDeckModification) {
         dispatch(
           labwareIngredActions.createContainer({
             labwareDefURI: FLEX_TRASH_DEF_URI,

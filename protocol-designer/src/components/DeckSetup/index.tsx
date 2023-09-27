@@ -532,6 +532,7 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  console.log(activeDeckSetup.labware)
   const trashSlot =
     Object.values(activeDeckSetup.labware).find(
       lw =>
@@ -554,7 +555,7 @@ export const DeckSetup = (): JSX.Element => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
     },
   })
-
+  console.log(trashSlot)
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}

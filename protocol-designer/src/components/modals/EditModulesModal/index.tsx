@@ -67,7 +67,7 @@ import { ModelModuleInfo } from '../../EditModules'
 import { getRobotType } from '../../../file-data/selectors'
 
 export interface EditModulesModalProps {
-  moduleType: ModuleType | 'trashBin'
+  moduleType: ModuleType
   moduleOnDeck: ModuleOnDeck | null
   onCloseClick: () => unknown
   editModuleModel: (model: ModuleModel) => unknown
@@ -94,11 +94,11 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     moduleOnDeck,
   } = props
   const robotType = useSelector(getRobotType)
-  const type = moduleType typeof ModuleType
   const supportedModuleSlot =
     robotType === OT2_STANDARD_MODEL
       ? SUPPORTED_MODULE_SLOTS_OT2[moduleType][0].value
       : SUPPORTED_MODULE_SLOTS_FLEX[moduleType][0].value
+
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
 

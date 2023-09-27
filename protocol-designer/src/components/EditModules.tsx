@@ -13,7 +13,7 @@ import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 export interface EditModulesProps {
   moduleToEdit: {
     moduleId?: string | null
-    moduleType: ModuleType | 'trashBin'
+    moduleType: ModuleType
   }
   onCloseClick: () => unknown
 }

@@ -81,6 +81,7 @@ export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
     },
   ],
 }
+
 const ALL_MODULE_SLOTS_OT2: DropdownOption[] = [
   {
     name: 'Slot 1',
@@ -173,7 +174,7 @@ const HS_AND_TEMP_SLOTS_FLEX: DropdownOption[] = [
   },
 ]
 
-const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
+export const MAG_TRASH_BLOCK_SLOTS_FLEX: DropdownOption[] = [
   {
     name: 'Slot A1',
     value: 'A1',
@@ -263,7 +264,7 @@ export function getAllModuleSlotsByType(
       )
     } else {
       slot = supportedSlotOption.concat(
-        MAG_BLOCK_SLOTS_FLEX.filter(
+        MAG_TRASH_BLOCK_SLOTS_FLEX.filter(
           s => s.value !== supportedSlotOption[0].value
         )
       )

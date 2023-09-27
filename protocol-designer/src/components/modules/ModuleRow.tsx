@@ -33,7 +33,7 @@ interface Props {
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
   type: ModuleType
-  openEditModuleModal: (type: ModuleType | 'trashBin', id?: string) => unknown
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
 }
 
 export function ModuleRow(props: Props): JSX.Element {

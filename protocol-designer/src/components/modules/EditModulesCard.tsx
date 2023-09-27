@@ -21,6 +21,7 @@ import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { getEnableDeckModification } from '../../feature-flags/selectors'
 import {
   getAdditionalEquipment,
+  getInitialDeckSetup,
   getLabwareEntities,
 } from '../../step-forms/selectors'
 import {
@@ -39,17 +40,20 @@ import { deleteContainer } from '../../labware-ingred/actions'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModal: (type: ModuleType | 'trashBin', id?: string) => unknown
+  openEditModal: (moduleType: ModuleType, moduleId?: string) => void
 }
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModal } = props
   const enableDeckModification = useSelector(getEnableDeckModification)
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(getLabwareEntities)
   //  trash bin can only  be altered for the flex
   const trashBin = Object.values(labwareEntities).find(
     lw => lw.labwareDefURI === FLEX_TRASH_DEF_URI
   )
+  const trashSlot =
+    trashBin != null ? initialDeckSetup.labware[trashBin?.id].slot : null
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
@@ -148,10 +152,11 @@ export function EditModulesCard(props: Props): JSX.Element {
               handleAttachment={() =>
                 trashBin != null
                   ? dispatch(deleteContainer({ labwareId: trashBin.id }))
-                  : openEditModal('trashBin')
+                  : null
               }
-              isEquipmentAdded={wasteChute != null}
-              name="wasteChute"
+              isEquipmentAdded={trashBin != null}
+              name="trashBin"
+              trashBinSlot={trashSlot != null ? trashSlot : undefined}
             />
             <AdditionalItemsRow
               handleAttachment={() =>

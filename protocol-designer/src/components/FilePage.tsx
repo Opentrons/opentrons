@@ -38,7 +38,7 @@ export interface Props {
 interface State {
   isEditPipetteModalOpen: boolean
   moduleToEdit: {
-    moduleType: ModuleType | 'trashBin'
+    moduleType: ModuleType
     moduleId?: string | null
   } | null
 }
@@ -58,11 +58,10 @@ export class FilePage extends React.Component<Props, State> {
     resetScrollElements()
     this.setState({ isEditPipetteModalOpen: true })
   }
-
   closeEditPipetteModal: () => void = () =>
     this.setState({ isEditPipetteModalOpen: false })
 
-  handleEditModule: (type: ModuleType | 'trashBin', id?: string) => void = (
+  handleEditModule: (moduleType: ModuleType, moduleId?: string) => void = (
     type,
     id
   ) => {
