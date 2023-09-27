@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import { FLEX_ROBOT_TYPE, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import {
   OutlineButton,
@@ -18,14 +19,13 @@ import styles from './styles.css'
 interface AdditionalItemsRowProps {
   handleAttachment: () => void
   isEquipmentAdded: boolean
-  name: 'gripper' | 'wasteChute'
+  name: 'gripper' | 'wasteChute' | 'trashBin'
 }
 
 export function AdditionalItemsRow(
   props: AdditionalItemsRowProps
 ): JSX.Element {
   const { handleAttachment, isEquipmentAdded, name } = props
-
   return (
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -34,14 +34,12 @@ export function AdditionalItemsRow(
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>
-          {name === 'gripper'
-            ? i18n.t('modules.additional_equipment_display_names.gripper')
-            : i18n.t('modules.additional_equipment_display_names.wasteChute')}
+          {i18n.t(`modules.additional_equipment_display_names.${name}`)}
         </h4>
         <AdditionalItemImage
           //  TODO(jr, 9/13/23): update this image to the waste chute asset
           src={gripperImage}
-          alt={name === 'gripper' ? 'Flex Gripper' : 'Waste Chute'}
+          alt={i18n.t(`modules.additional_equipment_display_names.${name}`)}
         />
       </Flex>
       <div

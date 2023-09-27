@@ -35,7 +35,7 @@ export function useDeckLocationSelect(
 interface DeckLocationSelectProps {
   deckDef: DeckDefinition
   selectedLocation: ModuleLocation
-  setSelectedLocation: (loc: ModuleLocation) => void
+  setSelectedLocation?: (loc: ModuleLocation) => void
   disabledLocations?: ModuleLocation[]
 }
 export function DeckLocationSelect({
@@ -66,8 +66,16 @@ export function DeckLocationSelect({
               slotName={slot.id}
               slotBaseColor={fill}
               slotClipColor={COLORS.white}
-              onClick={() => !isDisabled && setSelectedLocation(slotLocation)}
-              cursor={isDisabled || isSelected ? 'default' : 'pointer'}
+              onClick={() =>
+                !isDisabled &&
+                setSelectedLocation != null &&
+                setSelectedLocation(slotLocation)
+              }
+              cursor={
+                setSelectedLocation == null || isDisabled || isSelected
+                  ? 'default'
+                  : 'pointer'
+              }
               deckDefinition={deckDef}
             />
             {isSelected ? (

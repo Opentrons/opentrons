@@ -19,7 +19,10 @@ import {
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { getEnableDeckModification } from '../../feature-flags/selectors'
-import { getAdditionalEquipment } from '../../step-forms/selectors'
+import {
+  getAdditionalEquipment,
+  getLabwareEntities,
+} from '../../step-forms/selectors'
 import {
   createDeckFixture,
   deleteDeckFixture,
@@ -31,15 +34,22 @@ import { ModuleRow } from './ModuleRow'
 import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
+import { FLEX_TRASH_DEF_URI } from '../../constants'
+import { deleteContainer } from '../../labware-ingred/actions'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
+  openEditModal: (type: ModuleType | 'trashBin', id?: string) => unknown
 }
 
 export function EditModulesCard(props: Props): JSX.Element {
-  const { modules, openEditModuleModal } = props
+  const { modules, openEditModal } = props
   const enableDeckModification = useSelector(getEnableDeckModification)
+  const labwareEntities = useSelector(getLabwareEntities)
+  //  trash bin can only  be altered for the flex
+  const trashBin = Object.values(labwareEntities).find(
+    lw => lw.labwareDefURI === FLEX_TRASH_DEF_URI
+  )
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
@@ -118,7 +128,7 @@ export function EditModulesCard(props: Props): JSX.Element {
                 moduleOnDeck={moduleData}
                 showCollisionWarnings={warningsEnabled}
                 key={i}
-                openEditModuleModal={openEditModuleModal}
+                openEditModuleModal={openEditModal}
                 robotType={robotType}
               />
             )
@@ -127,29 +137,40 @@ export function EditModulesCard(props: Props): JSX.Element {
               <ModuleRow
                 type={moduleType}
                 key={i}
-                openEditModuleModal={openEditModuleModal}
+                openEditModuleModal={openEditModal}
               />
             )
           }
         })}
+        {enableDeckModification && isFlex ? (
+          <>
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                trashBin != null
+                  ? dispatch(deleteContainer({ labwareId: trashBin.id }))
+                  : openEditModal('trashBin')
+              }
+              isEquipmentAdded={wasteChute != null}
+              name="wasteChute"
+            />
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                dispatch(
+                  wasteChute != null
+                    ? deleteDeckFixture(wasteChute.id)
+                    : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
+                )
+              }
+              isEquipmentAdded={wasteChute != null}
+              name="wasteChute"
+            />
+          </>
+        ) : null}
         {isFlex ? (
           <AdditionalItemsRow
             handleAttachment={() => dispatch(toggleIsGripperRequired())}
             isEquipmentAdded={isGripperAttached}
             name="gripper"
-          />
-        ) : null}
-        {enableDeckModification && isFlex ? (
-          <AdditionalItemsRow
-            handleAttachment={() =>
-              dispatch(
-                wasteChute != null
-                  ? deleteDeckFixture(wasteChute.id)
-                  : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
-              )
-            }
-            isEquipmentAdded={wasteChute != null}
-            name="wasteChute"
           />
         ) : null}
       </div>

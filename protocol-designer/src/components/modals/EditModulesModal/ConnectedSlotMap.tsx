@@ -7,15 +7,20 @@ import styles from './EditModules.css'
 interface ConnectedSlotMapProps {
   fieldName: string
   robotType: RobotType
+  modal?: boolean
 }
 
 export const ConnectedSlotMap = (
   props: ConnectedSlotMapProps
 ): JSX.Element | null => {
-  const { fieldName, robotType } = props
+  const { fieldName, robotType, modal } = props
   const [field, meta] = useField(fieldName)
   return field.value ? (
-    <div className={styles.slot_map_container}>
+    <div
+      className={
+        modal ? styles.slot_map_container_modal : styles.slot_map_container
+      }
+    >
       <SlotMap
         occupiedSlots={[`${field.value}`]}
         isError={Boolean(meta.error)}

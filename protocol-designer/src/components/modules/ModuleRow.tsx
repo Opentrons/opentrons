@@ -33,7 +33,7 @@ interface Props {
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
   type: ModuleType
-  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
+  openEditModuleModal: (type: ModuleType | 'trashBin', id?: string) => unknown
 }
 
 export function ModuleRow(props: Props): JSX.Element {
@@ -45,7 +45,6 @@ export function ModuleRow(props: Props): JSX.Element {
   } = props
   const type: ModuleType = moduleOnDeck?.type || props.type
   const isFlex = robotType === FLEX_ROBOT_TYPE
-
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
   /*

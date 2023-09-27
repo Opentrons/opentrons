@@ -52,13 +52,13 @@ export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
 export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
   [MAGNETIC_MODULE_TYPE]: [
     {
-      name: 'Slot D1 (supported)',
+      name: 'Slot D1',
       value: 'D1',
     },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
-      name: 'Slot D3 (supported)',
+      name: 'Slot D3',
       value: 'D3',
     },
   ],
@@ -70,13 +70,13 @@ export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     {
-      name: 'Slot D1 (supported)',
+      name: 'Slot D1',
       value: 'D1',
     },
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     {
-      name: 'Slot D2 (supported)',
+      name: 'Slot D2',
       value: 'D2',
     },
   ],
@@ -144,6 +144,10 @@ const HS_AND_TEMP_SLOTS_FLEX: DropdownOption[] = [
     value: 'A1',
   },
   {
+    name: 'Slot A3',
+    value: 'A3',
+  },
+  {
     name: 'Slot B1',
     value: 'B1',
   },
@@ -177,6 +181,10 @@ const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
   {
     name: 'Slot A2',
     value: 'A2',
+  },
+  {
+    name: 'Slot A3',
+    value: 'A3',
   },
   {
     name: 'Slot B1',
