@@ -225,7 +225,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         else:
             print("skipping deck-pf")
 
-        await api.home_z()
+        await api.home_z(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready("REMOVE probe")
         await api.remove_tip(OT3Mount.LEFT)
