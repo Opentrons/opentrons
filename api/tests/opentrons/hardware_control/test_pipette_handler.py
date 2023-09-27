@@ -89,8 +89,10 @@ def test_plan_check_pick_up_tip_with_presses_argument(
             TipMotorPickUpTipSpec(
                 tiprack_down=types.Point(0, 0, -7),
                 tiprack_up=types.Point(0, 0, 2),
-                pick_up_distance=0,
-                speed=10,
+                tip_motor_moves=[
+                    {"distance": 19.0, "speed": 10},
+                    {"distance": 10, "speed": 5.5},
+                ],
                 currents={Axis.Q: 1},
                 home_buffer=10,
             ),
@@ -117,11 +119,15 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.has_tip).then_return(False)
     decoy.when(mock_pipette_ot3.pick_up_configurations.presses).then_return(3)
     decoy.when(mock_pipette_ot3.pick_up_configurations.increment).then_return(increment)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.speed).then_return(10)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(0)
+    decoy.when(mock_pipette_ot3.pick_up_configurations.speed).then_return(5.5)
+    decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(10)
     decoy.when(mock_pipette_ot3.pick_up_configurations.current).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)
+    decoy.when(mock_pipette_ot3.pick_up_configurations.prep_move_distance).then_return(
+        19.0
+    )
+    decoy.when(mock_pipette_ot3.pick_up_configurations.prep_move_speed).then_return(10)
 
     if presses_input is None:
         decoy.when(mock_pipette_ot3.config.pick_up_presses).then_return(

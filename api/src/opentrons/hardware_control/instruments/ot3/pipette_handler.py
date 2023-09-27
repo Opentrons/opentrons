@@ -88,8 +88,7 @@ class PickUpTipPressSpec:
 class TipMotorPickUpTipSpec:
     tiprack_down: top_types.Point
     tiprack_up: top_types.Point
-    pick_up_distance: float
-    speed: float
+    tip_motor_moves: List[Dict[str, float]]
     currents: Dict[Axis, float]
     # FIXME we should throw this in a config
     # file of some sort
@@ -766,6 +765,16 @@ class OT3PipetteHandler:
                 yield (press_dist, backup_dist)
 
         if instrument.channels == 96:
+            tip_motor_moves = [
+                {
+                    "distance": instrument.pick_up_configurations.prep_move_distance,
+                    "speed": instrument.pick_up_configurations.prep_move_speed,
+                },
+                {
+                    "distance": instrument.pick_up_configurations.distance,
+                    "speed": instrument.pick_up_configurations.speed,
+                },
+            ]
             return (
                 PickUpTipSpec(
                     plunger_prep_pos=instrument.plunger_positions.bottom,
@@ -781,8 +790,7 @@ class OT3PipetteHandler:
                         # Move onto the posts
                         tiprack_down=top_types.Point(0, 0, -7),
                         tiprack_up=top_types.Point(0, 0, 2),
-                        pick_up_distance=instrument.pick_up_configurations.distance,
-                        speed=instrument.pick_up_configurations.speed,
+                        tip_motor_moves=tip_motor_moves,
                         currents={Axis.Q: instrument.pick_up_configurations.current},
                         home_buffer=10,
                     ),
@@ -842,10 +850,9 @@ class OT3PipetteHandler:
     def _droptip_sequence_builder(
         self,
         bottom_pos: float,
-        droptip_pos: float,
+        droptip_seq: List[Dict[str, float]],
         plunger_currents: Dict[Axis, float],
         drop_tip_currents: Dict[Axis, float],
-        speed: float,
         home_after: bool,
         home_axes: Sequence[Axis],
         is_ht_pipette: bool = False,
@@ -855,20 +862,22 @@ class OT3PipetteHandler:
                 DropTipMove(
                     target_position=bottom_pos, current=plunger_currents, speed=None
                 ),
-                DropTipMove(
-                    target_position=droptip_pos,
-                    current=drop_tip_currents,
-                    speed=speed,
-                    home_after=home_after,
-                    home_after_safety_margin=abs(bottom_pos - droptip_pos),
-                    home_axes=home_axes,
-                    is_ht_tip_action=is_ht_pipette,
-                    home_buffer=10 if is_ht_pipette else 0,
-                ),
                 DropTipMove(  # always finish drop-tip at a known safe plunger position
                     target_position=bottom_pos, current=plunger_currents, speed=None
                 ),
             ]
+            for move_seg in droptip_seq:
+                drop_move = DropTipMove(
+                    target_position=move_seg["distance"],
+                    current=drop_tip_currents,
+                    speed=move_seg["speed"],
+                    home_after=home_after,
+                    home_after_safety_margin=abs(bottom_pos - move_seg["distance"]),
+                    home_axes=home_axes,
+                    is_ht_tip_action=is_ht_pipette,
+                    home_buffer=10 if is_ht_pipette else 0,
+                )
+                base.insert(-1, drop_move)
             return base
 
         return build
@@ -883,12 +892,26 @@ class OT3PipetteHandler:
         is_96_chan = instrument.channels == 96
 
         bottom = instrument.plunger_positions.bottom
-        droptip = (
-            instrument.drop_configurations.distance
-            if is_96_chan
-            else instrument.plunger_positions.drop_tip
-        )
-        speed = instrument.drop_configurations.speed
+
+        if is_96_chan:
+            drop_seq = [
+                {
+                    "distance": instrument.drop_configurations.prep_move_distance,
+                    "speed": instrument.drop_configurations.prep_move_speed,
+                },
+                {
+                    "distance": instrument.drop_configurations.distance,
+                    "speed": instrument.drop_configurations.speed,
+                },
+            ]
+        else:
+            drop_seq = [
+                {
+                    "distance": instrument.plunger_positions.drop_tip,
+                    "speed": instrument.drop_configurations.speed,
+                }
+            ]
+
         shakes: List[Tuple[top_types.Point, Optional[float]]] = []
 
         def _remove_tips() -> None:
@@ -901,10 +924,9 @@ class OT3PipetteHandler:
         )
         seq_builder_ot3 = self._droptip_sequence_builder(
             bottom,
-            droptip,
+            drop_seq,
             {Axis.of_main_tool_actuator(mount): instrument.plunger_motor_current.run},
             {drop_tip_current_axis: instrument.drop_configurations.current},
-            speed,
             home_after,
             (Axis.of_main_tool_actuator(mount),),
             is_96_chan,

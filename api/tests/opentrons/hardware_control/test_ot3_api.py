@@ -1413,8 +1413,7 @@ async def test_pick_up_tip_full_tiprack(
                     # Move onto the posts
                     tiprack_down=Point(0, 0, 0),
                     tiprack_up=Point(0, 0, 0),
-                    pick_up_distance=10,
-                    speed=0,
+                    tip_motor_moves=[{"distance": 10, "speed": 0}],
                     currents={Axis.Q: 0},
                 ),
             ),
