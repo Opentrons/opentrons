@@ -22,9 +22,7 @@ TEST_TIPS = "opentrons_flex_96_tiprack_50uL"
 TEST_SOURCES = [
     {
         "source": "A4",
-        "destinations": [
-            "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"
-        ],
+        "destinations": ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
     },
 ]
 
