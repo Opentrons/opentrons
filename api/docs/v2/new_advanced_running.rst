@@ -133,7 +133,7 @@ If you have custom labware definitions you want to use with Jupyter, make a new 
 Using Modules
 -------------
 
-If your protocol uses :ref:`new_modules`, you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
+If your protocol uses :ref:`modules <new_modules>`, you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
 
 To disable the robot server, open a Jupyter terminal session by going to **New > Terminal** and run ``systemctl stop opentrons-robot-server``. Then you can run code from cells in your notebook as usual. When you are done using Jupyter Notebook, you should restart the robot server with ``systemctl start opentrons-robot-server``.
 
