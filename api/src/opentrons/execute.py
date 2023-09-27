@@ -58,7 +58,6 @@ from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
 
 from opentrons.protocol_engine import (
-    Command as ProtocolEngineCommand,
     Config,
     DeckType,
     EngineStatus,
