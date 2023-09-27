@@ -63,12 +63,12 @@ export class FilePage extends React.Component<Props, State> {
     this.setState({ isEditPipetteModalOpen: false })
 
   handleEditModule: (moduleType: ModuleType, moduleId?: string) => void = (
-    type,
-    id
+    moduleType,
+    moduleId
   ) => {
     resetScrollElements()
     this.setState({
-      moduleToEdit: { moduleType: type, moduleId: id },
+      moduleToEdit: { moduleType: moduleType, moduleId: moduleId },
     })
   }
 

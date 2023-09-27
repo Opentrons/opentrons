@@ -564,8 +564,9 @@ export const DeckSetup = (): JSX.Element => {
           viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
           width="100%"
           height="100%"
-          //  change this once we support no trash
-          trashSlotName={(trashSlot ?? 'A3') as TrashSlotName}
+          trashSlotName={
+            trashSlot != null ? (trashSlot as TrashSlotName) : undefined
+          }
           trashColor={COLORS.darkGreyEnabled}
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (

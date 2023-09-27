@@ -21,6 +21,7 @@ import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { FormPipette } from '../../../step-forms/types'
 import {
   getAdditionalEquipment,
+  getInitialDeckSetup,
   getLabwareEntities,
 } from '../../../step-forms/selectors'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
@@ -53,6 +54,11 @@ const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFu
 const mockGetLabwareEntities = getLabwareEntities as jest.MockedFunction<
   typeof getLabwareEntities
 >
+const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
+  typeof getInitialDeckSetup
+>
+const mockTrashId = 'trashId'
+
 describe('EditModulesCard', () => {
   let store: any
   let crashableMagneticModule: ModuleOnDeck | undefined
@@ -102,6 +108,16 @@ describe('EditModulesCard', () => {
     })
     mockGetEnableDeckModification.mockReturnValue(false)
     mockGetLabwareEntities.mockReturnValue({})
+    mockGetInitialDeckSetup.mockReturnValue({
+      labware: {
+        [mockTrashId]: {
+          slot: 'A1',
+        } as any,
+      },
+      modules: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+    })
 
     props = {
       modules: {},
@@ -277,7 +293,6 @@ describe('EditModulesCard', () => {
   it('displays gripper waste chute and trash row with all are attached', () => {
     const mockGripperId = 'gripperId'
     const mockWasteChuteId = 'wasteChuteId'
-    const mockTrashId = 'trashId'
     mockGetEnableDeckModification.mockReturnValue(true)
     mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     mockGetAdditionalEquipment.mockReturnValue({
@@ -295,6 +310,10 @@ describe('EditModulesCard', () => {
       } as any,
     })
 
+    props = {
+      modules: {},
+      openEditModuleModal: jest.fn(),
+    }
     const wrapper = render(props)
     expect(wrapper.find(AdditionalItemsRow)).toHaveLength(3)
   })
