@@ -269,7 +269,7 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, PROTOCOL_NAME)
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,

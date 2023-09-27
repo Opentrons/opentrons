@@ -10,9 +10,11 @@ import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 
 export function useLaunchLPC(
-  runId: string
+  runId: string,
+  protocolName?: string
 ): { launchLPC: () => void; LPCWizard: JSX.Element | null } {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+
   const {
     createTargetedMaintenanceRun,
   } = useCreateTargetedMaintenanceRunMutation()
@@ -70,6 +72,7 @@ export function useLaunchLPC(
           mostRecentAnalysis={mostRecentAnalysis}
           existingOffsets={runRecord?.data?.labwareOffsets ?? []}
           maintenanceRunId={maintenanceRunId}
+          protocolName={protocolName ?? ''}
         />
       ) : null,
   }
