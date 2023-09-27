@@ -6,7 +6,6 @@ import {
   getLabwareDisplayName,
   getLabwareHasQuirk,
 } from '@opentrons/shared-data'
-import { FIXED_TRASH_ID } from '../../constants'
 import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
@@ -16,6 +15,8 @@ import { getLabwareOffDeck } from './utils'
 import type { Options } from '@opentrons/components'
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
+
+const TRASH = 'Trash Bin'
 
 export const getLabwareNicknamesById: Selector<
   Record<string, string>
@@ -31,15 +32,15 @@ export const getLabwareNicknamesById: Selector<
 )
 export const _sortLabwareDropdownOptions = (options: Options): Options =>
   options.sort((a, b) => {
-    // special case for fixed trash (always at the bottom of the list)
-    if (a.value === FIXED_TRASH_ID) return 1
-    if (b.value === FIXED_TRASH_ID) return -1
+    // special case for trash (always at the bottom of the list)
+    if (a.name === TRASH) return 1
+    if (b.name === TRASH) return -1
     // sort by name everything else by name
     return a.name.localeCompare(b.name)
   })
 
 /** Returns options for labware dropdowns.
- * Ordered by display name / nickname, but with fixed trash at the bottom.
+ * Ordered by display name / nickname, but with trash at the bottom.
  */
 export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
@@ -88,6 +89,8 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           nickName = `${nicknamesById[labwareId]} in ${module}`
         } else if (isOffDeck) {
           nickName = `Off-deck - ${nicknamesById[labwareId]}`
+        } else if (nickName === 'Opentrons Fixed Trash') {
+          nickName = TRASH
         }
 
         if (!moveLabwarePresavedStep) {
@@ -101,9 +104,8 @@ export const getLabwareOptions: Selector<Options> = createSelector(
                 },
               ]
         } else {
-          //  TODO(jr, 7/17/23): filter out moving trash for now in MoveLabware step type
-          //  remove this when we support other slots for trash
-          return nickName === 'Trash' || isAdapterOrAluminumBlock
+          //  filter out moving trash for now in MoveLabware step type
+          return nickName === TRASH || isAdapterOrAluminumBlock
             ? acc
             : [
                 ...acc,
@@ -120,11 +122,10 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   }
 )
 
-/** Returns options for disposal (e.g. fixed trash and trash box) */
+/** Returns options for disposal (e.g. trash) */
 export const getDisposalLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
-  getLabwareNicknamesById,
-  (labwareEntities, names) =>
+  labwareEntities =>
     reduce(
       labwareEntities,
       (acc: Options, labware: LabwareEntity, labwareId): Options =>
@@ -132,7 +133,7 @@ export const getDisposalLabwareOptions: Selector<Options> = createSelector(
           ? [
               ...acc,
               {
-                name: names[labwareId],
+                name: TRASH,
                 value: labwareId,
               },
             ]

@@ -23,11 +23,7 @@ import {
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { uuid } from '../../utils'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  FIXED_TRASH_ID,
-  SPAN7_8_10_11_SLOT,
-} from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
@@ -1103,11 +1099,7 @@ export const batchEditFormChanges = (
     }
   }
 }
-const initialLabwareState: NormalizedLabwareById = {
-  [FIXED_TRASH_ID]: {
-    labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
-  },
-}
+const initialLabwareState: NormalizedLabwareById = {}
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
 export const labwareInvariantProperties: Reducer<
   NormalizedLabwareById,
@@ -1153,7 +1145,6 @@ export const labwareInvariantProperties: Reducer<
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
-      const FIXED_TRASH_ID = 'fixedTrash'
       const labware = {
         ...loadLabwareCommands.reduce(
           (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
@@ -1169,9 +1160,6 @@ export const labwareInvariantProperties: Reducer<
           },
           {}
         ),
-        [FIXED_TRASH_ID]: {
-          labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
-        },
       }
 
       return Object.keys(labware).length > 0 ? labware : state
