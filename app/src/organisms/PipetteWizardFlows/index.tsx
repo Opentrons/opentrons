@@ -27,7 +27,8 @@ import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
-import { useFilteredPipetteWizardSteps } from './useFilteredPipetteWizardSteps'
+import { getPipetteWizardSteps } from './getPipetteWizardSteps'
+import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProtocol'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
@@ -63,20 +64,29 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipetteMount = mount === LEFT ? 'pipette_left' : 'pipette_right'
+  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
+  const requiresFirmwareUpdate = !attachedPipette?.ok
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
-
-  const pipetteWizardSteps = useFilteredPipetteWizardSteps({
-    memoizedPipetteInfo,
-    flowType,
-    mount,
-    selectedPipette,
-    isGantryEmpty,
-    attachedPipettes,
-    subsystem: attachedPipetteMount,
-  })
+  const pipetteWizardSteps = React.useMemo(
+    () =>
+      memoizedPipetteInfo == null
+        ? getPipetteWizardSteps(
+            flowType,
+            mount,
+            selectedPipette,
+            isGantryEmpty,
+            requiresFirmwareUpdate
+          )
+        : getPipetteWizardStepsForProtocol(
+            attachedPipettes,
+            memoizedPipetteInfo,
+            mount,
+            requiresFirmwareUpdate
+          ),
+    []
+  )
   const requiredPipette = memoizedPipetteInfo?.find(
     pipette => pipette.mount === mount
   )
@@ -338,7 +348,7 @@ export const PipetteWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={attachedPipetteMount}
+        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
         description={t('firmware_updating')}
       />
     )

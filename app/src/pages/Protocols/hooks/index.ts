@@ -6,6 +6,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { getLabwareSetupItemGroups } from '../utils'
+import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -13,8 +14,7 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
-import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
-import { AttachedModule } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ProtocolPipette {
   hardwareType: 'pipette'

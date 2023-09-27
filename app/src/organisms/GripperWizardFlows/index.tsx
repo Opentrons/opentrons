@@ -24,7 +24,7 @@ import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
 } from '../../resources/runs/hooks'
-import { useFilteredGripperWizardSteps } from './useFilteredGripperWizardSteps'
+import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { MovePin } from './MovePin'
@@ -209,7 +209,11 @@ export const GripperWizard = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
-  const gripperWizardSteps = useFilteredGripperWizardSteps(flowType, 'gripper')
+  const requiresFirmwareUpdate = !attachedGripper?.ok
+  const gripperWizardSteps = getGripperWizardSteps(
+    flowType,
+    requiresFirmwareUpdate
+  )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [
     frontJawOffset,

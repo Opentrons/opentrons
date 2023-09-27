@@ -23,7 +23,7 @@ import {
 } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { useFilteredModuleCalibrationSteps } from './useFilteredModuleCalibrationSteps'
+import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
@@ -61,11 +61,12 @@ export const ModuleWizardFlows = (
   const { t } = useTranslation('module_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
+  const requiresFirmwareUpdate = !attachedPipette?.ok
   const attachedPipetteMount =
     attachedPipette?.mount === LEFT ? 'pipette_left' : 'pipette_right'
 
-  const moduleCalibrationSteps = useFilteredModuleCalibrationSteps(
-    attachedPipetteMount
+  const moduleCalibrationSteps = getModuleCalibrationSteps(
+    requiresFirmwareUpdate
   )
 
   const availableSlotNames =
