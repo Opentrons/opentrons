@@ -146,27 +146,30 @@ class Plot:
 
     def gripper_sensor_history_plot(self):
         df = self.df_sensor
+        grippers = df["Gripper"].unique().tolist()
         x_axis = "Period"
         y_axis = "Capacitance"
-        subfig = make_subplots()
-        for i, probe in enumerate(self.probes):
-            df_probe = df[df["Probe"] == probe]
-            for j, contact in enumerate(self.contacts):
-                df_contact = df_probe[df_probe["Contact"] == contact]
-                fig = px.line(df_contact, x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[i:], line_dash_sequence=self.list_dash[j:])
-                self.set_legend(fig, [f"{probe} ({contact})"])
-                subfig.add_traces(fig.data)
-        self.add_years(subfig)
-        self.plot_param["figure"] = subfig
-        self.plot_param["filename"] = "plot_sensor_history"
-        self.plot_param["title"] = "Gripper Lifetime Sensor History (DVT-03)"
-        self.plot_param["x_title"] = "Lifetime Period"
-        self.plot_param["y_title"] = "Average Capacitance (pF)"
-        self.plot_param["x_range"] = None
-        self.plot_param["y_range"] = [0, 14]
-        self.plot_param["legend"] = "Probes"
-        self.plot_param["annotation"] = None
-        self.write_plot(self.plot_param)
+        for gripper in grippers:
+            df_gripper = df[df["Gripper"] == gripper]
+            subfig = make_subplots()
+            for i, probe in enumerate(self.probes):
+                df_probe = df_gripper[df_gripper["Probe"] == probe]
+                for j, contact in enumerate(self.contacts):
+                    df_contact = df_probe[df_probe["Contact"] == contact]
+                    fig = px.line(df_contact, x=x_axis, y=[y_axis], markers=True, color_discrete_sequence=self.list_colors[i:], line_dash_sequence=self.list_dash[j:])
+                    self.set_legend(fig, [f"{probe} ({contact})"])
+                    subfig.add_traces(fig.data)
+            self.add_years(subfig)
+            self.plot_param["figure"] = subfig
+            self.plot_param["filename"] = f"plot_sensor_history_{gripper.lower()}"
+            self.plot_param["title"] = f"Gripper Lifetime Sensor History ({gripper})"
+            self.plot_param["x_title"] = "Lifetime Period"
+            self.plot_param["y_title"] = "Average Capacitance (pF)"
+            self.plot_param["x_range"] = None
+            self.plot_param["y_range"] = [0, 14]
+            self.plot_param["legend"] = "Probes"
+            self.plot_param["annotation"] = None
+            self.write_plot(self.plot_param)
 
 if __name__ == '__main__':
     print("\nPlot Gripper Lifetime Force History\n")
