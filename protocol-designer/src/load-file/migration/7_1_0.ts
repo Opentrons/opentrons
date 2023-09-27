@@ -30,7 +30,7 @@ export const migrateFile = (
   const allLatestDefs = getOnlyLatestDefs()
 
   const robotType = robot.model
-  const trashSlot = robot.model === FLEX_ROBOT_TYPE ? 'A3' : '12'
+  const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
   const trashDefUri =
     robotType === FLEX_ROBOT_TYPE ? FLEX_TRASH_DEF_URI : OT_2_TRASH_DEF_URI
 
@@ -89,12 +89,14 @@ export const migrateFile = (
     })
   }
 
-  const filteredavedStepForms = Object.fromEntries(
+  const filteredSavedStepForms = Object.fromEntries(
     Object.entries(
       appData.designerApplication?.data?.savedStepForms ?? {}
     ).filter(([key, value]) => key !== INITIAL_DECK_SETUP_STEP_ID)
   )
-  const newFilteredSavedStepForms = migrateSavedStepForms(filteredavedStepForms)
+  const newFilteredSavedStepForms = migrateSavedStepForms(
+    filteredSavedStepForms
+  )
 
   return {
     ...appData,

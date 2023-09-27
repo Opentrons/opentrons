@@ -90,6 +90,7 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
   robotType: RobotType
+  trashSlot: string | null
 }
 
 export const VIEWBOX_MIN_X = -64
@@ -153,12 +154,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     showGen1MultichannelCollisionWarnings,
     deckDef,
     robotType,
+    trashSlot,
   } = props
-  const trashSlot = Object.values(activeDeckSetup.labware).find(
-    lw =>
-      lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-      lw.labwareDefURI === FLEX_TRASH_SLOT
-  )?.slot
 
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
@@ -531,11 +528,12 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const trashSlot = Object.values(activeDeckSetup.labware).find(
-    lw =>
-      lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-      lw.labwareDefURI === FLEX_TRASH_SLOT
-  )?.slot
+  const trashSlot =
+    Object.values(activeDeckSetup.labware).find(
+      lw =>
+        lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
+        lw.labwareDefURI === FLEX_TRASH_SLOT
+    )?.slot ?? null
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
@@ -570,6 +568,7 @@ export const DeckSetup = (): JSX.Element => {
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
             <>
               <DeckSetupContents
+                trashSlot={trashSlot}
                 robotType={robotType}
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}
