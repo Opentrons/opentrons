@@ -21,6 +21,8 @@ Default Labware
 
 Default labware is everything listed in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. When used in a protocol, your Flex or OT-2 knows how to work with default labware. However, you must first inform the API about the labware you will place on the robot’s deck. Search the library when you’re looking for the API load names of the labware you want to use. You can copy the load names from the library and pass them to the :py:meth:`~.ProtocolContext.load_labware` method in your protocol.
 
+.. _v2-custom-labware:
+
 Custom Labware
 ==============
 
@@ -316,7 +318,7 @@ The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). Thi
 Well Dimensions
 ***************
 
-The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
+The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position relative to the well <position-relative-labware>`.
 
 Depth
 =====

@@ -408,6 +408,8 @@ The following table provides data on the default aspirate, dispense, and blow-ou
 
 Additionally, all Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
 
+.. _ot2-flow-rates:
+
 OT-2 Pipette Flow Rates
 -----------------------
 

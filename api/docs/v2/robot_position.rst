@@ -129,6 +129,7 @@ Independent Movement
 
 For convenience, many methods have location arguments and incorporate movement automatically. This section will focus on moving the pipette independently, without performing other actions like ``aspirate()`` or ``dispense()``.
 
+.. _move-to:
 
 Move To
 -------

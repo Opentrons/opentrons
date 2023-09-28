@@ -6,7 +6,7 @@
 Protocol Examples
 *****************
 
-This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
+This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial <tutorial>`. Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
 
 Using These Protocols
 =====================
@@ -131,7 +131,7 @@ These protocols demonstrate how to move 100 µL of liquid from one well to anoth
 Basic Method
 ------------
 
-This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, and :py:meth:`~.InstrumentContext.dispense` methods.
+This protocol uses some :ref:`building block commands <v2-atomic-commands>` to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, and :py:meth:`~.InstrumentContext.dispense` methods.
 
 .. tabs::
 

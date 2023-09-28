@@ -6,7 +6,6 @@ import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import {
-  FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
@@ -253,7 +252,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ): LoadLabwareCreateCommand[] => {
         const { def } = labwareEntities[labwareId]
         const isAdapter = def.allowedRoles?.includes('adapter')
-        if (labwareId === FIXED_TRASH_ID || isAdapter) return acc
+        if (isAdapter) return acc
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const isOnAdapter =
           loadAdapterCommands.find(

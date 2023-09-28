@@ -1,5 +1,4 @@
 import { uuid } from '../../utils'
-import { FIXED_TRASH_ID } from '../../constants'
 import type { CommandCreator } from '../../types'
 interface DropTipArgs {
   pipette: string
@@ -12,7 +11,10 @@ export const dropTip: CommandCreator<DropTipArgs> = (
   prevRobotState
 ) => {
   const { pipette } = args
-
+  const { labwareEntities } = invariantContext
+  const trashId = Object.values(labwareEntities).find(lw =>
+    lw.def.parameters.quirks?.includes('fixedTrash')
+  )?.id
   // No-op if there is no tip
   if (!prevRobotState.tipState.pipettes[pipette]) {
     return {
@@ -26,7 +28,8 @@ export const dropTip: CommandCreator<DropTipArgs> = (
       key: uuid(),
       params: {
         pipetteId: pipette,
-        labwareId: FIXED_TRASH_ID,
+        //  TODO(jr, 9/26/23): support no trash, return tip and waste chute
+        labwareId: trashId != null ? trashId : '',
         wellName: 'A1',
       },
       //  TODO(jr, 7/17/23): add WellLocation params!

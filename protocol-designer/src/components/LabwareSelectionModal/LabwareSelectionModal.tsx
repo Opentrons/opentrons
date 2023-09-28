@@ -352,7 +352,11 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         />
       </Portal>
       {blockingCustomLabwareHint}
-      <div ref={wrapperRef} className={styles.labware_dropdown}>
+      <div
+        ref={wrapperRef}
+        className={styles.labware_dropdown}
+        style={{ zIndex: 5 }}
+      >
         <div className={styles.title}>{getTitleText()}</div>
         {getFilterCheckbox()}
         <ul>
