@@ -7,7 +7,7 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
@@ -34,9 +34,9 @@ def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
+def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def subject(
     mock_core: ModuleCore,
     mock_core_map: LoadedCoreMap,
     mock_protocol_core: ProtocolCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     api_version: APIVersion,
 ) -> ModuleContext:
     """Get a generic module context with its dependencies mocked out."""

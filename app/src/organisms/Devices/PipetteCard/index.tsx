@@ -62,12 +62,24 @@ interface PipetteCardProps {
   pipetteIsBad: boolean
   updatePipette: () => void
   pipetteId?: AttachedPipette['id'] | null
+  isRunActive: boolean
 }
-const BANNER_LINK_CSS = css`
+const BANNER_LINK_STYLE = css`
   text-decoration: underline;
   cursor: pointer;
   margin-left: ${SPACING.spacing8};
 `
+
+const INSTRUMENT_CARD_STYLE = css`
+  p {
+    text-transform: lowercase;
+  }
+
+  p::first-letter {
+    text-transform: uppercase;
+  }
+`
+
 const SUBSYSTEM_UPDATE_POLL_MS = 5000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
@@ -81,6 +93,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteIs96Channel,
     pipetteIsBad,
     updatePipette,
+    isRunActive,
   } = props
   const {
     menuOverlay,
@@ -294,6 +307,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {(pipetteIsBad || subsystemUpdateData != null) && (
         <InstrumentCard
           label={i18n.format(t('mount', { side: mount }), 'capitalize')}
+          css={INSTRUMENT_CARD_STYLE}
           description={t('instrument_attached')}
           banner={
             <Banner
@@ -311,7 +325,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                   updateLink: (
                     <StyledText
                       as="p"
-                      css={BANNER_LINK_CSS}
+                      css={BANNER_LINK_STYLE}
                       onClick={updatePipette}
                     />
                   ),
@@ -339,6 +353,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               handleCalibrate={handleCalibrate}
               isPipetteCalibrated={isPipetteCalibrated}
               pipetteSettings={settings}
+              isRunActive={isRunActive}
             />
           </Box>
           {menuOverlay}

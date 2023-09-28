@@ -359,7 +359,7 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, protocolName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)

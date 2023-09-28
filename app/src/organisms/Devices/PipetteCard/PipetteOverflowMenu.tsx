@@ -32,6 +32,7 @@ interface PipetteOverflowMenuProps {
   handleAboutSlideout: () => void
   handleSettingsSlideout: () => void
   isPipetteCalibrated: boolean
+  isRunActive: boolean
 }
 
 export const PipetteOverflowMenu = (
@@ -47,6 +48,7 @@ export const PipetteOverflowMenu = (
     handleAboutSlideout,
     handleSettingsSlideout,
     isPipetteCalibrated,
+    isRunActive,
   } = props
 
   const pipetteName =
@@ -72,6 +74,7 @@ export const PipetteOverflowMenu = (
           <MenuItem
             key={`${String(pipetteDisplayName)}_${mount}_attach_pipette`}
             onClick={() => handleChangePipette()}
+            disabled={isRunActive}
             data-testid={`pipetteOverflowMenu_attach_pipette_btn_${String(
               pipetteDisplayName
             )}_${mount}`}
@@ -84,6 +87,7 @@ export const PipetteOverflowMenu = (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
                 onClick={() => handleCalibrate()}
+                disabled={isRunActive}
                 data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
               >
                 {t(
@@ -96,6 +100,7 @@ export const PipetteOverflowMenu = (
             <MenuItem
               key={`${String(pipetteDisplayName)}_${mount}_detach`}
               onClick={() => handleChangePipette()}
+              disabled={isRunActive}
               data-testid={`pipetteOverflowMenu_detach_pipette_btn_${String(
                 pipetteDisplayName
               )}_${mount}`}

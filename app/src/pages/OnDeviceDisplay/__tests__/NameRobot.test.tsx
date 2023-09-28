@@ -90,7 +90,7 @@ describe('NameRobot', () => {
     const [{ findByText, getByLabelText }] = render()
     getByLabelText('SmallButton_primary').click()
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(error).toBeInTheDocument()
