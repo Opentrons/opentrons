@@ -238,6 +238,38 @@ class Protocols:
         robot_analysis_error="?",
     )
 
+    OT2_P300M_P20S_TC_HS_TM_6_13_SmokeTestV3: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_6_13_SmokeTestV3",
+        file_extension="py",
+        protocol_name="🛠️ 2.13 Smoke Test V3 🪄",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["cpx_4_tuberack_100ul"],
+    )
+
+
+    OT2_P300M_P20S_TC_HS_TM_6_14_SmokeTestV3: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_6_14_SmokeTestV3",
+        file_extension="py",
+        protocol_name="🛠️ 2.14 Smoke Test V3 🪄",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["cpx_4_tuberack_100ul"],
+    )
+
+
+    OT2_P300M_P20S_TC_HS_TM_6_15_SmokeTestV3: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_6_15_SmokeTestV3",
+        file_extension="py",
+        protocol_name="🛠️ 2.15 Smoke Test V3 🪄",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["cpx_4_tuberack_100ul"],
+    )
+
     OT3_P1000_96_HS_TM_MM_2_15_MagMaxRNACells96Ch: Protocol = Protocol(
         file_name="OT3_P1000_96_HS_TM_MM_2_15_MagMaxRNACells96Ch",
         file_extension="py",
@@ -333,3 +365,4 @@ class Protocols:
         robot_error=False,
         custom_labware=["opentrons_ot3_96_tiprack_1000ul_rss"],
     )
+
