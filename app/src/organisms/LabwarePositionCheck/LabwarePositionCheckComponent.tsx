@@ -46,6 +46,7 @@ interface LabwarePositionCheckModalProps {
   maintenanceRunId: string
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
+  protocolName: string
   caughtError?: Error
   setMaintenanceRunId: (id: string | null) => void
 }
@@ -60,6 +61,7 @@ export const LabwarePositionCheckComponent = (
     runId,
     maintenanceRunId,
     setMaintenanceRunId,
+    protocolName,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -323,7 +325,11 @@ export const LabwarePositionCheckComponent = (
     )
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
     modalContent = (
-      <IntroScreen {...movementStepProps} {...{ existingOffsets }} />
+      <IntroScreen
+        {...movementStepProps}
+        {...{ existingOffsets }}
+        protocolName={protocolName}
+      />
     )
   } else if (
     currentStep.section === 'CHECK_POSITIONS' ||
