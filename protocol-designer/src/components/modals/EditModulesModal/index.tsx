@@ -363,7 +363,7 @@ const EditModulesModalComponent = (
           {robotType === OT2_ROBOT_TYPE ? (
             moduleType === THERMOCYCLER_MODULE_TYPE ? (
               <Flex
-                height="20rem"
+                height="16rem"
                 justifyContent={JUSTIFY_CENTER}
                 paddingY={SPACING.spacing16}
               >
@@ -381,6 +381,7 @@ const EditModulesModalComponent = (
               <DeckLocationSelect
                 deckDef={flexDeck}
                 selectedLocation={{ slotName: field.value }}
+                theme="grey"
               />
             </Flex>
           )}

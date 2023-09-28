@@ -11,9 +11,12 @@ import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { DeckSlotLocation } from '../../hardware-sim/DeckSlotLocation'
 
+export type DeckLocationSelectThemes = 'default' | 'grey'
+
 const X_CROP_MM = 60
 export function useDeckLocationSelect(
-  robotType: RobotType
+  robotType: RobotType,
+  theme?: DeckLocationSelectThemes
 ): { DeckLocationSelect: JSX.Element; selectedLocation: ModuleLocation } {
   const deckDef = getDeckDefFromRobotType(robotType)
   const [
@@ -25,7 +28,7 @@ export function useDeckLocationSelect(
   return {
     DeckLocationSelect: (
       <DeckLocationSelect
-        {...{ deckDef, selectedLocation, setSelectedLocation }}
+        {...{ deckDef, selectedLocation, setSelectedLocation, theme }}
       />
     ),
     selectedLocation,
@@ -35,6 +38,7 @@ export function useDeckLocationSelect(
 interface DeckLocationSelectProps {
   deckDef: DeckDefinition
   selectedLocation: ModuleLocation
+  theme?: DeckLocationSelectThemes
   setSelectedLocation?: (loc: ModuleLocation) => void
   disabledLocations?: ModuleLocation[]
 }
@@ -43,6 +47,7 @@ export function DeckLocationSelect({
   selectedLocation,
   setSelectedLocation,
   disabledLocations = [],
+  theme = 'default',
 }: DeckLocationSelectProps): JSX.Element {
   return (
     <RobotCoordinateSpace
@@ -57,8 +62,15 @@ export function DeckLocationSelect({
             typeof l === 'object' && 'slotName' in l && l.slotName === slot.id
         )
         const isSelected = isEqual(selectedLocation, slotLocation)
-        let fill = COLORS.highlightPurple2
-        if (isSelected) fill = COLORS.highlightPurple1
+        let fill =
+          theme === 'default'
+            ? COLORS.highlightPurple2
+            : COLORS.lightGreyPressed
+        if (isSelected)
+          fill =
+            theme === 'default'
+              ? COLORS.highlightPurple1
+              : COLORS.darkGreyEnabled
         if (isDisabled) fill = COLORS.darkGreyDisabled
         return (
           <React.Fragment key={slot.id}>

@@ -85,6 +85,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
           <DeckLocationSelect
             deckDef={flexDeck}
             selectedLocation={{ slotName: field.value }}
+            theme="grey"
           />
         </Flex>
       </Box>
