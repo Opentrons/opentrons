@@ -46,6 +46,7 @@ import {
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { getRobotSettings } from '../../../redux/robot-settings'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
@@ -83,6 +84,7 @@ import {
   useIsRobotViewable,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
+  useIsOT3,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
@@ -140,12 +142,25 @@ export function ProtocolRunHeader({
     runRecord?.data.errors?.[0] != null
       ? getHighestPriorityError(runRecord?.data?.errors)
       : null
+
+  const robotSettings = useSelector((state: State) =>
+    getRobotSettings(state, robotName)
+  )
+  const doorSafetySetting = robotSettings.find(
+    setting => setting.id === 'enableDoorSafetySwitch'
+  )
+  const isOT3 = useIsOT3(robotName)
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
-  const isDoorOpen =
-    doorStatus?.data.status === 'open' &&
-    doorStatus?.data.doorRequiredClosedForProtocol
+  let isDoorOpen = false
+  if (isOT3) {
+    isDoorOpen = doorStatus?.data.status === 'open'
+  } else if (!isOT3 && Boolean(doorSafetySetting?.value)) {
+    isDoorOpen = doorStatus?.data.status === 'open'
+  } else {
+    isDoorOpen = false
+  }
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -241,7 +256,6 @@ export function ProtocolRunHeader({
               robotName={robotName}
             />
           )}
-
         <Flex>
           {protocolKey != null ? (
             <Link to={`/protocols/${protocolKey}`}>
@@ -268,7 +282,11 @@ export function ProtocolRunHeader({
         {runStatus === RUN_STATUS_STOPPED ? (
           <Banner type="warning">{t('run_canceled')}</Banner>
         ) : null}
-        {isDoorOpen ? (
+        {/* Note: This banner is for before running a protocol */}
+        {isDoorOpen &&
+        runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+        runStatus != null &&
+        CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
         {isRunCurrent ? (
@@ -479,7 +497,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolAnalyzing ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
-    isDoorOpen
+    (isDoorOpen &&
+      runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+      runStatus != null &&
+      CANCELLABLE_STATUSES.includes(runStatus))
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
     play()

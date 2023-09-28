@@ -29,7 +29,7 @@ export function useLaunchLPC(
   const handleCloseLPC = (): void => {
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {
-        onSuccess: () => {
+        onSettled: () => {
           setMaintenanceRunId(null)
         },
       })
@@ -70,6 +70,7 @@ export function useLaunchLPC(
           mostRecentAnalysis={mostRecentAnalysis}
           existingOffsets={runRecord?.data?.labwareOffsets ?? []}
           maintenanceRunId={maintenanceRunId}
+          setMaintenanceRunId={setMaintenanceRunId}
         />
       ) : null,
   }

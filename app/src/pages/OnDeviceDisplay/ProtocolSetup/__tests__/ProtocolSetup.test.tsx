@@ -384,10 +384,9 @@ describe('ProtocolSetup', () => {
     }
     mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
     const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
+    getByRole('button', { name: 'play' }).click()
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
-      'Close the robot door before starting the run.',
-      7000
+      'Close the robot door before starting the run.'
     )
-    expect(getByRole('button', { name: 'play' })).toBeDisabled()
   })
 })
