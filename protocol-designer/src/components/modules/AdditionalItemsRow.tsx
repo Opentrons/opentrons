@@ -13,7 +13,7 @@ import {
 import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
 import { Portal } from '../portals/TopPortal'
-import { TrashBinModal } from './TrashBinModal'
+import { TrashModal } from './TrashModal'
 import styles from './styles.css'
 
 interface AdditionalItemsRowProps {
@@ -21,19 +21,32 @@ interface AdditionalItemsRowProps {
   isEquipmentAdded: boolean
   name: 'gripper' | 'wasteChute' | 'trashBin'
   trashBinSlot?: string
+  trashBinId?: string
 }
 
 export function AdditionalItemsRow(
   props: AdditionalItemsRowProps
 ): JSX.Element {
-  const { handleAttachment, isEquipmentAdded, name, trashBinSlot } = props
+  const {
+    handleAttachment,
+    isEquipmentAdded,
+    name,
+    trashBinSlot,
+    trashBinId,
+  } = props
   const [trashModal, openTrashModal] = React.useState<boolean>(false)
-  const addTrashBin = name === 'trashBin' && !isEquipmentAdded
+  const addTrash = name !== 'gripper' && !isEquipmentAdded
+
   return (
     <>
-      {trashModal ? (
+      {trashModal && name !== 'gripper' ? (
         <Portal>
-          <TrashBinModal onCloseClick={() => openTrashModal(false)} />
+          <TrashModal
+            onCloseClick={() => openTrashModal(false)}
+            trashName={name}
+            trashBinSlot={trashBinSlot ?? null}
+            trashBinId={trashBinId}
+          />
         </Portal>
       ) : null}
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} height="7rem">
@@ -94,9 +107,7 @@ export function AdditionalItemsRow(
           ) : null}
           <OutlineButton
             className={styles.module_button}
-            onClick={
-              addTrashBin ? () => openTrashModal(true) : handleAttachment
-            }
+            onClick={addTrash ? () => openTrashModal(true) : handleAttachment}
           >
             {isEquipmentAdded ? i18n.t('shared.remove') : i18n.t('shared.add')}
           </OutlineButton>

@@ -9,7 +9,6 @@ import {
   PipetteName,
   getPipetteNameSpecs,
   FLEX_ROBOT_TYPE,
-  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -25,7 +24,6 @@ import {
   getLabwareEntities,
 } from '../../step-forms/selectors'
 import {
-  createDeckFixture,
   deleteDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
@@ -156,14 +154,13 @@ export function EditModulesCard(props: Props): JSX.Element {
               }
               isEquipmentAdded={trashBin != null}
               name="trashBin"
-              trashBinSlot={trashSlot != null ? trashSlot : undefined}
+              trashBinSlot={trashSlot ?? undefined}
+              trashBinId={trashBin?.id}
             />
             <AdditionalItemsRow
               handleAttachment={() =>
                 dispatch(
-                  wasteChute != null
-                    ? deleteDeckFixture(wasteChute.id)
-                    : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
+                  wasteChute != null ? deleteDeckFixture(wasteChute.id) : null
                 )
               }
               isEquipmentAdded={wasteChute != null}

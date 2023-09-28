@@ -3,16 +3,14 @@ import i18n from 'i18next'
 import { renderWithProviders, SlotMap } from '@opentrons/components'
 import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 
+import { Portal } from '../../portals/TopPortal'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
-import { TrashBinModal } from '../TrashBinModal'
 
 jest.mock('@opentrons/components/src/slotmap/SlotMap')
-jest.mock('../TrashBinModal')
+jest.mock('../../portals/TopPortal')
 
 const mockSlotMap = SlotMap as jest.MockedFunction<typeof SlotMap>
-const mockTrashBinModal = TrashBinModal as jest.MockedFunction<
-  typeof TrashBinModal
->
+const mockPortal = Portal as jest.MockedFunction<typeof Portal>
 
 const render = (props: React.ComponentProps<typeof AdditionalItemsRow>) => {
   return renderWithProviders(<AdditionalItemsRow {...props} />, {
@@ -29,7 +27,7 @@ describe('AdditionalItemsRow', () => {
       name: 'gripper',
     }
     mockSlotMap.mockReturnValue(<div>mock slot map</div>)
-    mockTrashBinModal.mockReturnValue(<div>mock trash bin modal</div>)
+    mockPortal.mockReturnValue(<div>mock portal</div>)
   })
   it('renders no gripper', () => {
     const { getByRole, getByText } = render(props)
@@ -58,7 +56,7 @@ describe('AdditionalItemsRow', () => {
     const { getByRole, getByText } = render(props)
     getByText('Waste Chute')
     getByRole('button', { name: 'add' }).click()
-    expect(props.handleAttachment).toHaveBeenCalled()
+    getByText('mock portal')
   })
   it('renders a waste chute', () => {
     props = {
@@ -83,7 +81,7 @@ describe('AdditionalItemsRow', () => {
     const { getByRole, getByText } = render(props)
     getByText('Trash Bin')
     getByRole('button', { name: 'add' }).click()
-    getByText('mock trash bin modal')
+    getByText('mock portal')
   })
   it('renders a trash', () => {
     props = {
@@ -96,6 +94,6 @@ describe('AdditionalItemsRow', () => {
     getByRole('button', { name: 'remove' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
     getByRole('button', { name: 'edit' }).click()
-    getByText('mock trash bin modal')
+    getByText('mock portal')
   })
 })
