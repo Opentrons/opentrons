@@ -4,11 +4,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
-from opentrons.protocol_engine.types import ModuleOffsetData
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
-from opentrons.protocol_engine.types import ModuleOffsetVector
+from opentrons.protocol_engine.types import ModuleOffsetData
 from opentrons.util.broker import ReadOnlyBroker
 
 from ..resources import DeckFixedLabware
