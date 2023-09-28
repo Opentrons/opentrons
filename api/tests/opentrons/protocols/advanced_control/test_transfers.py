@@ -796,15 +796,81 @@ def test_all_options(_instr_labware):
     assert xfer_plan_list == exp1
 
 
+def test_invalid_air_gap_disposal_sum_distribute(_instr_labware):
+    _instr_labware["ctx"].home()
+    lw1 = _instr_labware["lw1"]
+    lw2 = _instr_labware["lw2"]
+    # Supply the disposal volume assessment with the instrument followed by a disposal value equal to the max volume
+
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            disposal_volume=_instr_labware["instr"].max_volume / 2,
+            air_gap=_instr_labware["instr"].max_volume / 2,
+        )
+    )
+    with pytest.raises(ValueError):
+        plan = tx.TransferPlan(
+            700,
+            lw1.columns()[0][0],
+            lw2.rows()[0][1:3],
+            _instr_labware["instr"],
+            max_volume=_instr_labware["instr"].hw_pipette["max_volume"],
+            api_version=_instr_labware["ctx"].api_version,
+            mode="distribute",
+            options=options,
+        )
+        list(plan)
+
+
+def test_invalid_air_gap_distribute(_instr_labware):
+    _instr_labware["ctx"].home()
+    lw1 = _instr_labware["lw1"]
+    lw2 = _instr_labware["lw2"]
+    # Supply the disposal volume assessment with the instrument followed by a disposal value equal to the max volume
+
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(air_gap=_instr_labware["instr"].max_volume)
+    )
+    with pytest.raises(ValueError):
+        plan = tx.TransferPlan(
+            700,
+            lw1.columns()[0][0],
+            lw2.rows()[0][1:3],
+            _instr_labware["instr"],
+            max_volume=_instr_labware["instr"].hw_pipette["max_volume"],
+            api_version=_instr_labware["ctx"].api_version,
+            mode="distribute",
+            options=options,
+        )
+        list(plan)
+
+
 def test_invalid_disposal_volume_distribute(_instr_labware):
     _instr_labware["ctx"].home()
+    lw1 = _instr_labware["lw1"]
+    lw2 = _instr_labware["lw2"]
     # Supply the disposal volume assessment with the instrument followed by a disposal value equal to the max volume
-    with pytest.raises(ValueError):
-        tx.TransferPlan._check_valid_disposal_volume(
-            _instr_labware,
-            _instr_labware["instr"].hw_pipette["max_volume"],
-            _instr_labware["instr"].hw_pipette["max_volume"],
+
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            disposal_volume=_instr_labware["instr"].max_volume
         )
+    )
+    with pytest.raises(ValueError):
+        plan = tx.TransferPlan(
+            700,
+            lw1.columns()[0][0],
+            lw2.rows()[0][1:3],
+            _instr_labware["instr"],
+            max_volume=_instr_labware["instr"].hw_pipette["max_volume"],
+            api_version=_instr_labware["ctx"].api_version,
+            mode="distribute",
+            options=options,
+        )
+        list(plan)
 
 
 def test_oversized_distribute(_instr_labware):
