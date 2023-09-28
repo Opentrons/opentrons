@@ -9,12 +9,14 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { DeviceDetailsDeckConfiguration } from '../../../organisms/DeviceDetailsDeckConfiguration'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
 import { useIsOT3 } from '../../../organisms/Devices/hooks'
+import { useFeatureFlag } from '../../../redux/config'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -28,6 +30,7 @@ export function DeviceDetailsComponent({
     enabled: isOT3,
   })
   const { isEmergencyStopModalDismissed } = useEstopContext()
+  const enableDeckConfiguration = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <Box
@@ -59,6 +62,9 @@ export function DeviceDetailsComponent({
         <RobotOverview robotName={robotName} />
         <InstrumentsAndModules robotName={robotName} />
       </Flex>
+      {isOT3 && enableDeckConfiguration ? (
+        <DeviceDetailsDeckConfiguration robotName={robotName} />
+      ) : null}
       <RecentProtocolRuns robotName={robotName} />
     </Box>
   )
