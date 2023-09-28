@@ -540,7 +540,11 @@ class OT3Simulator:
         return None
 
     @asynccontextmanager
-    async def restore_current(self) -> AsyncIterator[None]:
+    async def restore_current(
+        self,
+        run_currents: OT3AxisMap[float] = {},
+        hold_currents: OT3AxisMap[float] = {},
+    ) -> AsyncIterator[None]:
         """Save the current."""
         yield
 

@@ -52,6 +52,7 @@ from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
     EstopState,
+    CurrentConfig,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -1110,3 +1111,47 @@ async def test_requires_estop(
 
     with expectation:
         await controller.home([Axis.X, Axis.Y], gantry_load=GantryLoad.LOW_THROUGHPUT)
+
+
+@pytest.mark.parametrize(
+    "run_currents, hold_currents",
+    [
+        [{Axis.X: 1.0}, {}],
+        [{}, {Axis.X: 1.0}],
+        [{Axis.X: 1.0}, {Axis.X: 1.0}],
+        [{}, {}],
+    ],
+)
+async def test_restore_current(
+    controller: OT3Controller,
+    run_currents: OT3AxisMap[float],
+    hold_currents: OT3AxisMap[float],
+) -> None:
+    """Test that restore current actually works."""
+    controller._current_settings = {Axis.X: CurrentConfig(0.0, 0.0)}
+
+    with mock.patch.object(controller, "set_active_current") as mock_run_currents:
+        with mock.patch.object(controller, "set_hold_current") as mock_hold_currents:
+            with mock.patch.object(controller, "set_default_currents") as mock_default:
+
+                async with controller.restore_current(run_currents, hold_currents):
+                    await controller.update_position()
+
+                if not run_currents and not hold_currents:
+                    mock_default.assert_called_once()
+                    mock_run_currents.assert_not_called()
+                    mock_hold_currents.assert_not_called()
+                elif run_currents:
+                    mock_run_currents.assert_has_calls(
+                        [
+                            mock.call({Axis.X: 1.0}),
+                            mock.call({Axis.X: 0.0}),
+                        ],
+                    )
+                elif hold_currents:
+                    mock_hold_currents.assert_has_calls(
+                        [
+                            mock.call({Axis.X: 1.0}),
+                            mock.call({Axis.X: 0.0}),
+                        ],
+                    )
