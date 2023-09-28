@@ -520,3 +520,14 @@ export type StatusBarAnimation =
   | 'off'
 
 export type StatusBarAnimations = StatusBarAnimation[]
+
+// TODO(bh, 2023-09-28): refine types when settled
+export type FixtureLoadName = 'extensionSlot' | 'standardSlot' | 'trashChute'
+
+export interface Fixture {
+  fixtureId: string
+  fixtureLocation: string
+  loadName: FixtureLoadName
+}
+
+export type DeckConfiguration = Fixture[]

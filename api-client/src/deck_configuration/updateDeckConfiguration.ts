@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from 'uuid'
 // import { PATCH, request } from '../request'
 import { DECK_CONFIG_STUB } from './__stubs__'
 
+import type { Fixture } from '@opentrons/shared-data'
 // import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { Fixture } from './types'
 
 // TODO(bh, 2023-09-26): uncomment and remove deck config stub when backend api is ready
 // export function updateDeckConfiguration(

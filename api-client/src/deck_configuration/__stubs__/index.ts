@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import type { Fixture } from '../types'
+import type { Fixture } from '@opentrons/shared-data'
 
 export const DECK_CONFIG_STUB: { [fixtureLocation: string]: Fixture } = {
   B3: { fixtureLocation: 'B3', loadName: 'standardSlot', fixtureId: uuidv4() },

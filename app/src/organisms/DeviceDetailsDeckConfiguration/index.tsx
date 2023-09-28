@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  DeckConfigurator,
   Flex,
-  ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  SIZE_4,
   SPACING,
   TYPOGRAPHY,
+  SIZE_5,
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
@@ -18,9 +18,8 @@ import {
 } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
 
-import type { FixtureLocation } from '@opentrons/api-client'
+import type { FixtureLoadName } from '@opentrons/shared-data'
 
 interface DeviceDetailsDeckConfigurationProps {
   robotName: string
@@ -31,19 +30,29 @@ export function DeviceDetailsDeckConfiguration({
 }: DeviceDetailsDeckConfigurationProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
 
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
-  // TODO(bh, 2023-09-27): this is all temp POC of the api stubs, to be built out in follow on work
-  const handleClickAdd = (): void => {
+  const handleClickAdd = (fixtureLocation: string): void => {
+    console.log('TODO: open add fixture modal for location', fixtureLocation)
     updateDeckConfiguration({
-      fixtureLocation: 'B3',
+      fixtureLocation,
       loadName: 'extensionSlot',
     })
   }
 
-  const handleClickRemove = (fixtureLocation: FixtureLocation): void => {
-    updateDeckConfiguration({ fixtureLocation, loadName: 'standardSlot' })
+  const handleClickRemove = (fixtureLocation: string): void => {
+    updateDeckConfiguration({
+      fixtureLocation,
+      loadName: 'standardSlot',
+    })
+  }
+
+  const fixtureDisplayNameDictionary: Record<FixtureLoadName, string | null> = {
+    extensionSlot: t('staging_area_slot'),
+    // do not display standard slot
+    standardSlot: null,
+    trashChute: t('waste_chute'),
   }
 
   return (
@@ -54,7 +63,6 @@ export function DeviceDetailsDeckConfiguration({
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing16}
-      padding={`0 0 ${SPACING.spacing8}`}
       width="100%"
       marginBottom="6rem"
     >
@@ -69,25 +77,54 @@ export function DeviceDetailsDeckConfiguration({
         {`${robotName} ${t('deck_configuration')}`}
       </StyledText>
       <Flex
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        minHeight={SIZE_4}
+        gridGap={SPACING.spacing40}
         paddingX={SPACING.spacing16}
+        paddingY={SPACING.spacing32}
         width="100%"
       >
-        {deckConfig?.map(fixture => (
-          <StyledText key={fixture.fixtureId}>
-            {`${fixture.fixtureLocation} ${fixture.loadName}`}
-            <TertiaryButton
-              marginLeft={SPACING.spacing16}
-              onClick={() => handleClickRemove(fixture.fixtureLocation)}
-            >
-              remove
-            </TertiaryButton>
-          </StyledText>
-        ))}
-        <TertiaryButton onClick={handleClickAdd}>{t('add')}</TertiaryButton>
+        <Flex
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          marginLeft={`-${SPACING.spacing32}`}
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          marginTop={`-${SPACING.spacing60}`}
+        >
+          <DeckConfigurator
+            deckConfig={deckConfig}
+            handleClickAdd={handleClickAdd}
+            handleClickRemove={handleClickRemove}
+          />
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+          width="32rem"
+        >
+          <Flex
+            gridGap={SPACING.spacing32}
+            paddingLeft={SPACING.spacing8}
+            css={TYPOGRAPHY.labelSemiBold}
+          >
+            <StyledText>{t('location')}</StyledText>
+            <StyledText>{t('fixture')}</StyledText>
+          </Flex>
+          {deckConfig.map(fixture => {
+            const fixtureDisplayName =
+              fixtureDisplayNameDictionary[fixture.loadName]
+            return fixtureDisplayName != null ? (
+              <Flex
+                key={fixture.fixtureId}
+                backgroundColor={COLORS.fundamentalsBackground}
+                gridGap={SPACING.spacing60}
+                padding={SPACING.spacing8}
+                width={SIZE_5}
+                css={TYPOGRAPHY.labelRegular}
+              >
+                <StyledText>{fixture.fixtureLocation}</StyledText>
+                <StyledText>{fixtureDisplayName}</StyledText>
+              </Flex>
+            ) : null
+          })}
+        </Flex>
       </Flex>
     </Flex>
   )

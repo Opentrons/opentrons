@@ -11,7 +11,8 @@ import { updateDeckConfiguration } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
-import type { ErrorResponse, Fixture, HostConfig } from '@opentrons/api-client'
+import type { ErrorResponse, HostConfig } from '@opentrons/api-client'
+import type { Fixture } from '@opentrons/shared-data'
 
 export type UseUpdateDeckConfigurationMutationResult = UseMutationResult<
   Omit<Fixture, 'fixtureId'>,
