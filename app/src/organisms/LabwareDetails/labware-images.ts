@@ -221,7 +221,7 @@ export const labwareImages: Record<string, string[]> = {
     require('./images/universal_flat_adapter.jpg'),
   ],
   opentrons_aluminum_flat_bottom_plate: [
-    require('./images/flat_bottom_aluminum.jpg'),
+    require('./images/flat_bottom_aluminum.png'),
   ],
   opentrons_96_well_aluminum_block: [
     require('./images/opentrons_96_aluminumblock_side_view.jpg'),
