@@ -19,6 +19,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
+  SlotMap,
 } from '@opentrons/components'
 import {
   getAreSlotsAdjacent,
@@ -54,17 +55,17 @@ import {
 } from '../../../modules/moduleData'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
+import { getRobotType } from '../../../file-data/selectors'
 import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
-import styles from './EditModules.css'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
 import { ConnectedSlotMap } from './ConnectedSlotMap'
 import { useResetSlotOnModelChange } from './form-state'
+import styles from './EditModules.css'
 
-import { ModuleOnDeck } from '../../../step-forms/types'
-import { ModelModuleInfo } from '../../EditModules'
-import { getRobotType } from '../../../file-data/selectors'
+import type { ModuleOnDeck } from '../../../step-forms/types'
+import type { ModelModuleInfo } from '../../EditModules'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType
@@ -331,9 +332,7 @@ const EditModulesModalComponent = (
                   <Box {...targetProps} height="3.125rem">
                     <FormGroup label="Position">
                       <Box
-                        width={
-                          robotType === FLEX_ROBOT_TYPE ? '8rem' : 'max-content'
-                        }
+                        width={robotType === FLEX_ROBOT_TYPE ? '8rem' : '18rem'}
                       >
                         <SlotDropdown
                           fieldName="selectedSlot"
@@ -361,12 +360,22 @@ const EditModulesModalComponent = (
             </Box>
           </Flex>
 
-          {robotType === OT2_ROBOT_TYPE && showSlotOption ? (
-            <ConnectedSlotMap
-              fieldName="selectedSlot"
-              robotType={OT2_ROBOT_TYPE}
-              modal
-            />
+          {robotType === OT2_ROBOT_TYPE ? (
+            moduleType === THERMOCYCLER_MODULE_TYPE ? (
+              <Flex
+                height="20rem"
+                justifyContent={JUSTIFY_CENTER}
+                paddingY={SPACING.spacing16}
+              >
+                <SlotMap occupiedSlots={['7', '8', '10', '11']} />
+              </Flex>
+            ) : (
+              <ConnectedSlotMap
+                fieldName="selectedSlot"
+                robotType={OT2_ROBOT_TYPE}
+                modal
+              />
+            )
           ) : (
             <Flex height="20rem" justifyContent={JUSTIFY_CENTER}>
               <DeckLocationSelect

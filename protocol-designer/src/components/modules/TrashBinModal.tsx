@@ -29,15 +29,19 @@ import { getSlotIsEmpty } from '../../step-forms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { SlotDropdown } from '../modals/EditModulesModal/SlotDropdown'
 import { PDAlert } from '../alerts/PDAlert'
-import { Portal } from '../portals/TopPortal'
 
-const ModalComponent = (props: TrashBinModalProps): JSX.Element => {
+export interface TrashBinValues {
+  selectedSlot: string
+}
+
+const TrashBinModalComponent = (props: TrashBinModalProps): JSX.Element => {
+  const { onCloseClick } = props
   const { values } = useFormikContext<TrashBinValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, values.selectedSlot)
-
   const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const [field] = useField('selectedSlot')
+
   return (
     <Form>
       <Box paddingX={SPACING.spacing32} paddingTop={SPACING.spacing16}>
@@ -84,7 +88,7 @@ const ModalComponent = (props: TrashBinModalProps): JSX.Element => {
         paddingBottom={SPACING.spacing32}
         gridGap={SPACING.spacing8}
       >
-        <OutlineButton onClick={props.onCloseClick}>
+        <OutlineButton onClick={onCloseClick}>
           {i18n.t('button.cancel')}
         </OutlineButton>
         <OutlineButton disabled={!isSlotEmpty} type={BUTTON_TYPE_SUBMIT}>
@@ -95,15 +99,12 @@ const ModalComponent = (props: TrashBinModalProps): JSX.Element => {
   )
 }
 
-export interface TrashBinValues {
-  selectedSlot: string
-}
-
 export interface TrashBinModalProps {
   onCloseClick: () => void
 }
 
 export const TrashBinModal = (props: TrashBinModalProps): JSX.Element => {
+  const { onCloseClick } = props
   const dispatch = useDispatch()
 
   const onSaveClick = (values: TrashBinValues): void => {
@@ -113,21 +114,19 @@ export const TrashBinModal = (props: TrashBinModalProps): JSX.Element => {
         slot: values.selectedSlot,
       })
     )
-    props.onCloseClick()
+    onCloseClick()
   }
 
   return (
-    <Portal>
-      <Formik onSubmit={onSaveClick} initialValues={{ selectedSlot: 'A3' }}>
-        <ModalShell width="48rem">
-          <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
-            <Text as="h2">
-              {i18n.t(`modules.additional_equipment_display_names.trashBin`)}
-            </Text>
-          </Box>
-          <ModalComponent onCloseClick={props.onCloseClick} />
-        </ModalShell>
-      </Formik>
-    </Portal>
+    <Formik onSubmit={onSaveClick} initialValues={{ selectedSlot: 'A3' }}>
+      <ModalShell width="48rem">
+        <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
+          <Text as="h2">
+            {i18n.t(`modules.additional_equipment_display_names.trashBin`)}
+          </Text>
+        </Box>
+        <TrashBinModalComponent onCloseClick={onCloseClick} />
+      </ModalShell>
+    </Formik>
   )
 }

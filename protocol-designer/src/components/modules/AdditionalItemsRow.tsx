@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
+import { Portal } from '../portals/TopPortal'
 import { TrashBinModal } from './TrashBinModal'
 import styles from './styles.css'
 
@@ -26,21 +27,22 @@ export function AdditionalItemsRow(
   props: AdditionalItemsRowProps
 ): JSX.Element {
   const { handleAttachment, isEquipmentAdded, name, trashBinSlot } = props
-  const [modal, openModal] = React.useState<boolean>(false)
+  const [trashModal, openTrashModal] = React.useState<boolean>(false)
   const addTrashBin = name === 'trashBin' && !isEquipmentAdded
   return (
     <>
-      {modal ? <TrashBinModal onCloseClick={() => openModal(false)} /> : null}
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing16}
-      >
+      {trashModal ? (
+        <Portal>
+          <TrashBinModal onCloseClick={() => openTrashModal(false)} />
+        </Portal>
+      ) : null}
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} height="7rem">
         <Flex flexDirection={DIRECTION_COLUMN}>
           <h4 className={styles.row_title}>
             {i18n.t(`modules.additional_equipment_display_names.${name}`)}
           </h4>
           <AdditionalItemImage
-            //  TODO(jr, 9/13/23): update this image to the waste chute asset
+            //  TODO(jr, 9/13/23): update this image to the waste chute and trash asset
             src={gripperImage}
             alt={i18n.t(`modules.additional_equipment_display_names.${name}`)}
           />
@@ -62,7 +64,9 @@ export function AdditionalItemsRow(
             <div className={styles.module_col}>
               <LabeledValue
                 label="Position"
-                value={`Slot ${WASTE_CHUTE_SLOT}`}
+                value={`Slot ${
+                  name === 'trashBin' ? trashBinSlot : WASTE_CHUTE_SLOT
+                }`}
               />
             </div>
             <div className={styles.slot_map}>
@@ -83,14 +87,16 @@ export function AdditionalItemsRow(
           {name === 'trashBin' && isEquipmentAdded ? (
             <OutlineButton
               className={styles.module_button}
-              onClick={() => openModal(true)}
+              onClick={() => openTrashModal(true)}
             >
               {i18n.t('shared.edit')}
             </OutlineButton>
           ) : null}
           <OutlineButton
             className={styles.module_button}
-            onClick={addTrashBin ? () => openModal(true) : handleAttachment}
+            onClick={
+              addTrashBin ? () => openTrashModal(true) : handleAttachment
+            }
           >
             {isEquipmentAdded ? i18n.t('shared.remove') : i18n.t('shared.add')}
           </OutlineButton>
