@@ -7,7 +7,7 @@ from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
 )
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
@@ -75,13 +75,12 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         core: InstrumentCore,
         protocol_core: ProtocolCore,
-        broker: Broker,
+        broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
         trash: labware.Labware,
         requested_as: str,
     ) -> None:
-
         super().__init__(broker)
         self._api_version = api_version
         self._core = core

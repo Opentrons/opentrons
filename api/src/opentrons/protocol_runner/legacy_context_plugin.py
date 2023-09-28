@@ -5,10 +5,10 @@ from asyncio import create_task, Task
 from contextlib import ExitStack
 from typing import Optional
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.commands.types import CommandMessage as LegacyCommand
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
+from opentrons.util.broker import Broker
 
 from .legacy_wrappers import LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
@@ -36,8 +36,8 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def __init__(
         self,
-        broker: Broker,
-        equipment_broker: EquipmentBroker[LegacyLoadInfo],
+        broker: LegacyBroker,
+        equipment_broker: Broker[LegacyLoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
         """Initialize the plugin with its dependencies."""
