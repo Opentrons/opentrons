@@ -17,6 +17,7 @@ from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleOffsetVector,
+    ModuleOffsetData,
 )
 
 from opentrons.hardware_control.types import OT3Mount
@@ -60,8 +61,13 @@ async def test_calibrate_module_implementation(
         location
     )
     decoy.when(
-        subject._state_view.modules.get_module_offset_vector(module_id)
-    ).then_return(ModuleOffsetVector(x=0, y=0, z=0))
+        subject._state_view.modules.get_calibration_module_offset(module_id)
+    ).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
+            location=location,
+        )
+    )
     decoy.when(
         subject._state_view.geometry.get_nominal_well_position(
             labware_id=labware_id, well_name="B1"

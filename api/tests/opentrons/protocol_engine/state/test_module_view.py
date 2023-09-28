@@ -325,7 +325,8 @@ def test_get_module_offset_for_ot2_standard(
         },
     )
     assert (
-        subject.get_module_offset("module-id", DeckType.OT2_STANDARD) == expected_offset
+        subject.get_nominal_module_offset("module-id", DeckType.OT2_STANDARD)
+        == expected_offset
     )
 
 
@@ -379,7 +380,9 @@ def test_get_module_offset_for_ot3_standard(
             )
         },
     )
-    result_offset = subject.get_module_offset("module-id", DeckType.OT3_STANDARD)
+    result_offset = subject.get_nominal_module_offset(
+        "module-id", DeckType.OT3_STANDARD
+    )
     assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
         (expected_offset.x, expected_offset.y, expected_offset.z)
     )

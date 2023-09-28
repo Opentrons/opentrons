@@ -1,5 +1,6 @@
 """Geometry state getters."""
 import enum
+from numpy import array, dot
 from typing import Optional, List, Set, Tuple, Union, cast
 
 from opentrons.types import Point, DeckSlotName, MountType
@@ -20,6 +21,8 @@ from ..types import (
     OnLabwareLocation,
     LabwareLocation,
     LabwareOffsetVector,
+    ModuleOffsetVector,
+    ModuleOffsetData,
     DeckType,
     CurrentWell,
     TipGeometry,
@@ -185,16 +188,45 @@ class GeometryView:
                 f"Either it has been loaded off-deck or its been moved off-deck."
             )
 
+    def _normalize_module_calibration_offset(
+        self,
+        module_location: DeckSlotLocation,
+        offset_data: Optional[ModuleOffsetData],
+    ) -> ModuleOffsetVector:
+        """Normalize the module calibration offset depending on the module location."""
+        offset = ModuleOffsetVector(x=0, y=0, z=0)
+        if offset_data:
+            offset = offset_data.moduleOffsetVector
+            calibrated_slot_column = self.get_slot_column(offset_data.location.slotName)
+            current_slot_column = self.get_slot_column(module_location.slotName)
+            # make sure that we have valid colums since we cant have modules in the middle of the deck
+            assert set([calibrated_slot_column, current_slot_column]).issubset(
+                {1, 3}
+            ), f"Module is an invalid slot {module_location}"
+            if calibrated_slot_column != current_slot_column:
+                # The module has moved from one side of the deck to the other
+                # Since the module was rotated, the calibration offset vector needs to be rotated by 180 degrees along the z axis
+                saved_offset = array([offset.x, offset.y, offset.z])
+                rotation_matrix = array([[-1, 0, 1], [0, -1, 1], [0, 0, 1]])
+                new_offset = dot(saved_offset, rotation_matrix)  # type: ignore[no-untyped-call]
+                offset = ModuleOffsetVector(
+                    x=new_offset[0], y=new_offset[1], z=new_offset[2]
+                )
+        return offset
+
     def _get_calibrated_module_offset(
         self, location: LabwareLocation
-    ) -> LabwareOffsetVector:
+    ) -> ModuleOffsetVector:
         """Get a labware location's underlying calibrated module offset, if it is on a module."""
         if isinstance(location, ModuleLocation):
             module_id = location.moduleId
-            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            return self._modules.get_module_offset(module_id, deck_type)
+            module_location = self._modules.get_location(module_id)
+            offset_data = self._modules.get_calibration_module_offset(module_id)
+            return self._normalize_module_calibration_offset(
+                module_location, offset_data
+            )
         elif isinstance(location, DeckSlotLocation):
-            return LabwareOffsetVector(x=0, y=0, z=0)
+            return ModuleOffsetVector(x=0, y=0, z=0)
         elif isinstance(location, OnLabwareLocation):
             labware_data = self._labware.get(location.labwareId)
             return self._get_calibrated_module_offset(labware_data.location)

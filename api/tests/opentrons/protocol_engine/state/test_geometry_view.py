@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     ModuleOffsetVector,
+    ModuleOffsetData,
     LoadedLabware,
     LoadedModule,
     ModuleModel,
@@ -161,8 +162,11 @@ def test_get_labware_parent_position_on_module(
             "labware-id", ModuleModel.THERMOCYCLER_MODULE_V2
         )
     ).then_return(OverlapOffset(x=1, y=2, z=3))
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
-        ModuleOffsetVector(x=2, y=3, z=4)
+    decoy.when(module_view.get_calibration_module_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=2, y=3, z=4),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
 
     result = subject.get_labware_parent_position("labware-id")
@@ -226,8 +230,11 @@ def test_get_labware_parent_position_on_labware(
         )
     ).then_return(OverlapOffset(x=-3, y=-2, z=-1))
 
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
-        ModuleOffsetVector(x=3, y=4, z=5)
+    decoy.when(module_view.get_calibration_module_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=3, y=4, z=5),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
 
     result = subject.get_labware_parent_position("labware-id")
@@ -337,8 +344,11 @@ def test_get_module_labware_highest_z(
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
-        ModuleOffsetVector(x=0, y=0, z=0)
+    decoy.when(module_view.get_calibration_module_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2
@@ -641,8 +651,11 @@ def test_get_module_labware_well_position(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
-        ModuleOffsetVector(x=0, y=0, z=0)
+    decoy.when(module_view.get_calibration_module_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2
@@ -1173,8 +1186,11 @@ def test_get_labware_grip_point_for_labware_on_module(
             "labware-id", ModuleModel.MAGNETIC_MODULE_V2
         )
     ).then_return(OverlapOffset(x=10, y=20, z=30))
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
-        ModuleOffsetVector(x=100, y=200, z=300)
+    decoy.when(module_view.get_calibration_module_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=100, y=200, z=300),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
     )
     decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_4)).then_return(
         Point(100, 200, 300)
