@@ -111,9 +111,9 @@ Loading Together
 Use the ``adapter`` argument of ``load_labware()`` to load an adapter at the same time as labware. For example, to load the same 96-well plate and adapter from the previous section at once::
     
     hs_plate = hs_mod.load_labware(
-        load_name='nest_96_wellplate_200ul_flat',
-        location='D1',
-        adapter='opentrons_96_flat_bottom_adapter')
+        name='nest_96_wellplate_200ul_flat',
+        adapter='opentrons_96_flat_bottom_adapter'
+    )
 
 .. versionadded:: 2.15
     The ``adapter`` parameter.
