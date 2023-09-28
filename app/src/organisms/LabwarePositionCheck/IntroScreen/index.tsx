@@ -51,6 +51,7 @@ export const IntroScreen = (props: {
   setFatalError: (errorMessage: string) => void
   isRobotMoving: boolean
   existingOffsets: LabwareOffset[]
+  protocolName: string
 }): JSX.Element | null => {
   const {
     proceed,
@@ -59,6 +60,7 @@ export const IntroScreen = (props: {
     isRobotMoving,
     setFatalError,
     existingOffsets,
+    protocolName,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -92,8 +94,12 @@ export const IntroScreen = (props: {
         <WizardRequiredEquipmentList
           equipmentList={[
             {
-              loadName: t('all_modules_and_labware_from_protocol'),
-              displayName: t('all_modules_and_labware_from_protocol'),
+              loadName: t('all_modules_and_labware_from_protocol', {
+                protocol_name: protocolName,
+              }),
+              displayName: t('all_modules_and_labware_from_protocol', {
+                protocol_name: protocolName,
+              }),
             },
           ]}
         />

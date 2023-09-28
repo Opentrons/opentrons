@@ -164,7 +164,7 @@
   "name_love_it": "{{name}}, love it!",
   "name_rule_description": "Enter up to 17 characters (letters and numbers only)",
   "name_rule_error_exist": "Oops! Name is already in use. Choose a different name.",
-  "name_rule_error_name_length": "Oops! Robot name must follow the character count and limitations",
+  "name_rule_error_name_length": "Oops! Robot name must follow the character count and limitations.",
   "name_rule_error_too_short": "Oops! Too short. Robot name must be at least 1 character.",
   "name_your_robot_description": "Don’t worry, you can always change this in your settings.",
   "name_your_robot": "Name your robot",

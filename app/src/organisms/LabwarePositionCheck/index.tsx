@@ -12,6 +12,7 @@ interface LabwarePositionCheckModalProps {
   maintenanceRunId: string
   existingOffsets: LabwareOffset[]
   mostRecentAnalysis: CompletedProtocolAnalysis | null
+  protocolName: string
   caughtError?: Error
   setMaintenanceRunId: (id: string | null) => void
 }
@@ -24,7 +25,6 @@ export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element => {
   const logger = useLogger(__filename)
-
   return (
     <ErrorBoundary
       logger={logger}
