@@ -765,14 +765,16 @@ class OT3PipetteHandler:
                 yield (press_dist, backup_dist)
 
         if instrument.channels == 96:
+            prep_move_dist = instrument.pick_up_configurations.prep_move_distance
+            clamp_move_dist = instrument.pick_up_configurations.distance
             tip_motor_moves = [
                 TipMotorPickUpTipSpec(
-                    distance=instrument.pick_up_configurations.prep_move_distance,
+                    distance=prep_move_dist,
                     speed=instrument.pick_up_configurations.prep_move_speed,
                     home_buffer=10,
                 ),
                 TipMotorPickUpTipSpec(
-                    distance=instrument.pick_up_configurations.distance,
+                    distance=prep_move_dist + clamp_move_dist,
                     speed=instrument.pick_up_configurations.speed,
                     home_buffer=10,
                 ),

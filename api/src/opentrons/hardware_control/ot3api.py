@@ -1999,7 +1999,6 @@ class OT3API(
         gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
             pipette_axis
         ]
-
         move_targets = []
         for move_segment in pipette_spec:
             move_targets.append(
@@ -2012,7 +2011,6 @@ class OT3API(
         _, moves = self._move_manager.plan_motion(
             origin={Axis.Q: gear_origin_float}, target_list=move_targets
         )
-
         await self._backend.tip_action(moves=moves[0])
 
         await self.home_gear_motors()
@@ -2058,7 +2056,7 @@ class OT3API(
 
         # fixme: really only need this during labware position check so user
         # can verify if a tip is properly attached
-        await self.move_rel(realmount, top_types.Point(z=spec.retract_target))
+        await self.move_rel(realmount, spec.tiprack_up)
 
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
@@ -2100,7 +2098,6 @@ class OT3API(
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
-
         for move in spec.drop_moves:
             await self._backend.set_active_current(move.current)
 
@@ -2119,8 +2116,6 @@ class OT3API(
                 )
                 await self._backend.tip_action(moves=drop_moves[0])
 
-                await self.home_gear_motors()
-
             else:
                 target_pos = target_position_from_plunger(
                     realmount, move.target_position, self._current_position
@@ -2132,6 +2127,9 @@ class OT3API(
                 )
             if move.home_after:
                 await self._home(move.home_axes)
+
+        if any([move.is_ht_tip_action for move in spec.drop_moves]):
+            await self.home_gear_motors()
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
