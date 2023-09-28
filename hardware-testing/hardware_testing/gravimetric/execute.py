@@ -544,7 +544,6 @@ def _get_liquid_height(
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
                 resources.ctx._core.get_hardware(),
-                30,
             )
         _tip_counter[0] = 0
     if cfg.jog:
