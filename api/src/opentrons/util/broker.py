@@ -1,26 +1,63 @@
 """A simple pub/sub message broker."""
 
 
-from typing import Callable, Generic, Set, TypeVar
+from abc import ABC, abstractmethod
+from contextlib import contextmanager
+from typing import Callable, ContextManager, Generator, Generic, Set, TypeVar
 
 
 _MessageT = TypeVar("_MessageT")
+_CallbackT = Callable[[_MessageT], None]
 
 
-class Broker(Generic[_MessageT]):
+class ReadOnlyBroker(ABC, Generic[_MessageT]):
+    """The read-only subset of `Broker`.
+
+    Useful for typing if you want people to be able to subscribe to your `Broker`,
+    but don't want them to be able to publish their own messages to it.
+    """
+
+    @abstractmethod
+    def subscribed(self, callback: _CallbackT[_MessageT]) -> ContextManager[None]:
+        """See `Broker.subscribed()`."""  # noqa: D402
+        pass
+
+    @abstractmethod
+    def subscribe(self, callback: _CallbackT[_MessageT]) -> Callable[[], None]:
+        """See `Broker.subscribe()`."""  # noqa: D402
+        pass
+
+
+class Broker(Generic[_MessageT], ReadOnlyBroker[_MessageT]):
     """A simple pub/sub message broker.
 
     Subscribers can listen to events. Publishers can push events to all subscribers.
     """
 
     def __init__(self) -> None:
-        self._callbacks: Set[Callable[[_MessageT], None]] = set()
+        self._callbacks: Set[_CallbackT[_MessageT]] = set()
 
-    def subscribe(self, callback: Callable[[_MessageT], None]) -> Callable[[], None]:
-        """Register ``callback`` to be called by a subsequent `publish`.
+    @contextmanager
+    def subscribed(
+        self, callback: _CallbackT[_MessageT]
+    ) -> Generator[None, None, None]:
+        """Register a callback to be called on each message.
 
-        You must not subscribe the same callback again
-        unless you first unsubscribe it.
+        The callback is subscribed when this context manager is entered,
+        and unsubscribed when it's exited.
+
+        You must not subscribe the same callback again unless you first usubscribe it.
+        """
+        unsubscribe = self.subscribe(callback)
+        try:
+            yield
+        finally:
+            unsubscribe()
+
+    def subscribe(self, callback: _CallbackT[_MessageT]) -> Callable[[], None]:
+        """Register a callback to be called on each message.
+
+        You must not subscribe the same callback again unless you first unsubscribe it.
 
         Returns:
             A function that you can call to unsubscribe ``callback``.
