@@ -7006,7 +7006,7 @@ smoothie: M92 B768.0 C768.0 -> Setting the following axes steps per mm: B-Axis: 
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G90 -> Switching to Absolute Coordinate Mode ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.5 B Axis: -8.5 C Axis: -14.5 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: -14.5 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
 smoothie: M400 -> Waiting for motors to stop moving ->
