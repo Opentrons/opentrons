@@ -802,9 +802,8 @@ def test_invalid_air_gap_disposal_sum_distribute(_instr_labware):
     lw2 = _instr_labware["lw2"]
     # Supply the disposal volume assessment with the instrument followed by a disposal value equal to the max volume
 
-    options = tx.TransferOptions()
-    options = options._replace(
-        transfer=options.transfer._replace(
+    options = tx.TransferOptions(
+        transfer=tx.Transfer(
             disposal_volume=_instr_labware["instr"].max_volume / 2,
             air_gap=_instr_labware["instr"].max_volume / 2,
         )
@@ -820,6 +819,7 @@ def test_invalid_air_gap_disposal_sum_distribute(_instr_labware):
             mode="distribute",
             options=options,
         )
+        # Exhaust the iterator in case it raises the expected exception lazily.
         list(plan)
 
 
@@ -829,9 +829,8 @@ def test_invalid_air_gap_distribute(_instr_labware):
     lw2 = _instr_labware["lw2"]
     # Supply the disposal volume assessment with the instrument followed by a disposal value equal to the max volume
 
-    options = tx.TransferOptions()
-    options = options._replace(
-        transfer=options.transfer._replace(air_gap=_instr_labware["instr"].max_volume)
+    options = tx.TransferOptions(
+        transfer=tx.Transfer(air_gap=_instr_labware["instr"].max_volume)
     )
     with pytest.raises(ValueError):
         plan = tx.TransferPlan(
@@ -844,6 +843,7 @@ def test_invalid_air_gap_distribute(_instr_labware):
             mode="distribute",
             options=options,
         )
+        # Exhaust the iterator in case it raises the expected exception lazily.
         list(plan)
 
 
@@ -853,11 +853,8 @@ def test_invalid_disposal_volume_distribute(_instr_labware):
     lw2 = _instr_labware["lw2"]
     # Supply the disposal volume assessment with the instrument followed by a disposal value equal to the max volume
 
-    options = tx.TransferOptions()
-    options = options._replace(
-        transfer=options.transfer._replace(
-            disposal_volume=_instr_labware["instr"].max_volume
-        )
+    options = tx.TransferOptions(
+        transfer=tx.Transfer(disposal_volume=_instr_labware["instr"].max_volume)
     )
     with pytest.raises(ValueError):
         plan = tx.TransferPlan(
@@ -870,6 +867,7 @@ def test_invalid_disposal_volume_distribute(_instr_labware):
             mode="distribute",
             options=options,
         )
+        # Exhaust the iterator in case it raises the expected exception lazily.
         list(plan)
 
 

@@ -484,12 +484,12 @@ class TransferPlan:
             -> Blow out -> Touch tip -> Drop tip*
         """
         # reform source target lists
-        self._check_valid_volume_parameters(
-            self._strategy.disposal_volume,
-            self._strategy.air_gap,
-            self._instr._core.get_working_volume(),
-        )
         sources, dests = self._extend_source_target_lists(self._sources, self._dests)
+        self._check_valid_volume_parameters(
+            disposal_volume=self._strategy.disposal_volume,
+            air_gap=self._strategy.air_gap,
+            max_volume=self._instr.max_volume,
+        )
         plan_iter = self._expand_for_volume_constraints(
             self._volumes,
             zip(sources, dests),
@@ -578,9 +578,9 @@ class TransferPlan:
         """
 
         self._check_valid_volume_parameters(
-            self._strategy.disposal_volume,
-            self._strategy.air_gap,
-            self._instr._core.get_working_volume(),
+            disposal_volume=self._strategy.disposal_volume,
+            air_gap=self._strategy.air_gap,
+            max_volume=self._instr.max_volume,
         )
 
         # TODO: decide whether default disposal vol for distribute should be
@@ -645,6 +645,9 @@ class TransferPlan:
         """Split a sequence of proposed transfers if necessary to keep each
         transfer under the given max volume.
         """
+        # A final defense against an infinite loop.
+        # Raising a proper exception with a helpful message is left to calling code,
+        # because it has more context about what the user is trying to do.
         assert max_volume > 0
         for volume, target in zip(volumes, targets):
             while volume > max_volume * 2:
@@ -694,9 +697,9 @@ class TransferPlan:
                .. Aspirate -> .....*
         """
         self._check_valid_volume_parameters(
-            self._strategy.disposal_volume,
-            self._strategy.air_gap,
-            self._instr._core.get_working_volume(),
+            disposal_volume=self._strategy.disposal_volume,
+            air_gap=self._strategy.air_gap,
+            max_volume=self._instr.max_volume,
         )
         plan_iter = self._expand_for_volume_constraints(
             # todo(mm, 2021-03-09): Is it right to use _instr.max_volume here?
@@ -861,16 +864,18 @@ class TransferPlan:
 
         return [_map_volume(i) for i in range(total)]
 
-    def _check_valid_volume_parameters(self, disposal_volume, air_gap, working_volume):
-        if air_gap >= working_volume:
+    def _check_valid_volume_parameters(
+        self, disposal_volume: float, air_gap: float, max_volume: float
+    ):
+        if air_gap >= max_volume:
             raise ValueError(
                 "The air gap must be less than the working volume of the pipette"
             )
-        elif disposal_volume >= working_volume:
+        elif disposal_volume >= max_volume:
             raise ValueError(
                 "The disposal volume must be less than the working volume of the pipette"
             )
-        elif disposal_volume + air_gap >= working_volume:
+        elif disposal_volume + air_gap >= max_volume:
             raise ValueError(
                 "The sum of the air gap and disposal volume must be less than the working volume of the pipette"
             )
