@@ -13,6 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
@@ -36,8 +37,8 @@ interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
   extensionInstrumentName: string | null
-  requiredModuleDetails: LoadModuleRunTimeCommand[] | null
-  requiredFixtureDetails: LoadFixtureRunTimeCommand[] | null
+  requiredModuleDetails: LoadModuleRunTimeCommand[]
+  requiredFixtureDetails: LoadFixtureRunTimeCommand[]
   isLoading: boolean
   robotType: RobotType | null
 }
@@ -50,6 +51,7 @@ export const RobotConfigurationDetails = (
     rightMountPipetteName,
     extensionInstrumentName,
     requiredModuleDetails,
+    requiredFixtureDetails,
     isLoading,
     robotType,
   } = props
@@ -143,41 +145,50 @@ export const RobotConfigurationDetails = (
           />
         </>
       ) : null}
-      {requiredModuleDetails != null
-        ? requiredModuleDetails.map((module, index) => {
-            return (
-              <React.Fragment key={index}>
-                <Divider marginY={SPACING.spacing12} width="100%" />
-                <RobotConfigurationDetailsItem
-                  label={t('run_details:module_slot_number', {
-                    slot_number:
-                      getModuleType(module.params.model) ===
-                      THERMOCYCLER_MODULE_TYPE
-                        ? getSlotsForThermocycler(robotType)
-                        : module.params.location.slotName,
-                  })}
-                  item={
-                    <>
-                      <ModuleIcon
-                        key={index}
-                        moduleType={getModuleType(module.params.model)}
-                        marginRight={SPACING.spacing4}
-                        alignSelf={ALIGN_CENTER}
-                        color={COLORS.darkGreyEnabled}
-                        height={SIZE_1}
-                        minWidth={SIZE_1}
-                        minHeight={SIZE_1}
-                      />
-                      <StyledText as="p">
-                        {getModuleDisplayName(module.params.model)}
-                      </StyledText>
-                    </>
-                  }
-                />
-              </React.Fragment>
-            )
-          })
-        : null}
+      {requiredModuleDetails.map((module, index) => {
+        return (
+          <React.Fragment key={`module_${index}`}>
+            <Divider marginY={SPACING.spacing12} width="100%" />
+            <RobotConfigurationDetailsItem
+              label={
+                getModuleType(module.params.model) === THERMOCYCLER_MODULE_TYPE
+                  ? getSlotsForThermocycler(robotType)
+                  : module.params.location.slotName,
+              }
+              item={
+                <>
+                  <ModuleIcon
+                    key={index}
+                    moduleType={getModuleType(module.params.model)}
+                    marginRight={SPACING.spacing4}
+                    alignSelf={ALIGN_CENTER}
+                    color={COLORS.darkGreyEnabled}
+                    height={SIZE_1}
+                    minWidth={SIZE_1}
+                    minHeight={SIZE_1}
+                  />
+                  <StyledText as="p">
+                    {getModuleDisplayName(module.params.model)}
+                  </StyledText>
+                </>
+              }
+            />
+          </React.Fragment>
+        )
+      })
+      }
+      {requiredFixtureDetails.map((fixture, index) => {
+        return (
+          <React.Fragment key={`fixture_${index}`}>
+            <Divider marginY={SPACING.spacing12} width="100%" />
+            <RobotConfigurationDetailsItem
+              label={fixture.params.location.cutout}
+              item={getFixtureDisplayName(fixture.params.loadName)}
+            />
+          </React.Fragment>
+        )
+      })
+      }
     </Flex>
   )
 }

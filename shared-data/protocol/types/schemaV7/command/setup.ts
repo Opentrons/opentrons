@@ -5,6 +5,7 @@ import type {
   LabwareOffset,
   PipetteName,
   ModuleModel,
+  FixtureLoadName,
 } from '../../../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -155,5 +156,5 @@ export type Cutout =
   | 'D3' 
 interface LoadFixtureParams {
   location: {cutout: Cutout}
-  loadName: string
+  loadName: FixtureLoadName 
 }

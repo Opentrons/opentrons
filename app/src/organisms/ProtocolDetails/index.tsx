@@ -226,9 +226,10 @@ export function ProtocolDetails(
       ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
       : []
 
+  // TODO: IMMEDIATELY remove stubbed fixture as soon as PE supports loadFixture
   const requiredFixtureDetails =
     mostRecentAnalysis?.commands != null
-      ? map(parseInitialLoadedFixturesByCutout( mostRecentAnalysis.commands))
+      ? map(parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands))
       : []
 
   const requiredLabwareDetails =
