@@ -68,10 +68,14 @@ export function ProtocolWithLastRun({
   const {
     missingProtocolHardware,
     isLoading: isLookingForHardware,
+    conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useMissingHardwareText(missingProtocolHardware)
+  const chipText = useMissingHardwareText(
+    missingProtocolHardware,
+    conflictedSlots
+  )
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)

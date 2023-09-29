@@ -125,6 +125,7 @@ describe('ODDProtocolDetails', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseProtocolQuery.mockReturnValue({
       data: MOCK_DATA,

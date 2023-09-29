@@ -126,6 +126,7 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
@@ -165,16 +166,29 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: mockMissingPipette,
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseMissingHardwareText.mockReturnValue('Missing 1 pipette')
     const [{ getByText }] = render(props)
     getByText('Missing 1 pipette')
   })
 
+  it('should render missing chip when conflicted fixture', () => {
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: [],
+      isLoading: false,
+      conflictedSlots: ['D3'],
+    })
+    mockUseMissingHardwareText.mockReturnValue('Location conflicts')
+    const [{ getByText }] = render(props)
+    getByText('Location conflicts')
+  })
+
   it('should render missing chip when missing a module', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: mockMissingModule,
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseMissingHardwareText.mockReturnValue('Missing 1 module')
     const [{ getByText }] = render(props)
@@ -185,6 +199,7 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: missingBoth,
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseMissingHardwareText.mockReturnValue('Missing hardware')
     const [{ getByText }] = render(props)

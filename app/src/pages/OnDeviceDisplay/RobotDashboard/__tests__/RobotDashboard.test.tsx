@@ -103,6 +103,7 @@ describe('RobotDashboard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
     mockRecentRunProtocolCarousel.mockReturnValue(
       <div>mock RecentRunProtocolCarousel</div>

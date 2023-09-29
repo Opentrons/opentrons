@@ -4,6 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useRequiredProtocolHardware } from '../../../Protocols/hooks'
 import { Hardware } from '../Hardware'
+import { WASTE_CHUTE_LOAD_NAME, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 
 jest.mock('../../../Protocols/hooks')
 
@@ -45,13 +46,25 @@ describe('Hardware', () => {
             hardwareType: 'module',
             moduleModel: 'heaterShakerModuleV1',
             slot: '1',
+            hasSlotConflict: false,
             connected: true,
           },
           {
             hardwareType: 'module',
             moduleModel: 'temperatureModuleV2',
             slot: '3',
+            hasSlotConflict: false,
             connected: false,
+          },
+          {
+            hardwareType: 'fixture',
+            fixtureName: WASTE_CHUTE_LOAD_NAME,
+            location: { cutout: WASTE_CHUTE_SLOT },
+          },
+          {
+            hardwareType: 'fixture',
+            fixtureName: 'extensionSlot',
+            location: { cutout: 'B3' },
           },
         ],
         isLoading: false,
@@ -74,5 +87,7 @@ describe('Hardware', () => {
     })
     getByRole('row', { name: '1 Heater-Shaker Module GEN1' })
     getByRole('row', { name: '3 Temperature Module GEN2' })
+    getByRole('row', { name: 'D3 Waste Chute' })
+    getByRole('row', { name: 'B3 Staging Area Slot' })
   })
 })

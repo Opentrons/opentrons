@@ -12,7 +12,7 @@ describe('useMissingHardwareText', () => {
     )
   })
   it('should return string for ready', () => {
-    const { result } = renderHook(() => useMissingHardwareText([]), {
+    const { result } = renderHook(() => useMissingHardwareText([], []), {
       wrapper,
     })
     expect(result.current).toEqual('Ready to run')
@@ -20,14 +20,18 @@ describe('useMissingHardwareText', () => {
   it('should return missing 1 module', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText([
-          {
-            hardwareType: 'module',
-            moduleModel: 'temperatureModuleV2',
-            slot: '1',
-            connected: false,
-          },
-        ]),
+        useMissingHardwareText(
+          [
+            {
+              hardwareType: 'module',
+              moduleModel: 'temperatureModuleV2',
+              slot: '1',
+              connected: false,
+              hasSlotConflict: false,
+            },
+          ],
+          []
+        ),
       {
         wrapper,
       }
@@ -37,20 +41,25 @@ describe('useMissingHardwareText', () => {
   it('should return missing 2 modules', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText([
-          {
-            hardwareType: 'module',
-            moduleModel: 'temperatureModuleV2',
-            slot: '1',
-            connected: false,
-          },
-          {
-            hardwareType: 'module',
-            moduleModel: 'heaterShakerModuleV1',
-            slot: '5',
-            connected: false,
-          },
-        ]),
+        useMissingHardwareText(
+          [
+            {
+              hardwareType: 'module',
+              moduleModel: 'temperatureModuleV2',
+              slot: '1',
+              connected: false,
+              hasSlotConflict: false,
+            },
+            {
+              hardwareType: 'module',
+              moduleModel: 'heaterShakerModuleV1',
+              slot: '5',
+              connected: false,
+              hasSlotConflict: false,
+            },
+          ],
+          []
+        ),
       {
         wrapper,
       }
@@ -60,14 +69,17 @@ describe('useMissingHardwareText', () => {
   it('should return missing 1 pipette', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText([
-          {
-            hardwareType: 'pipette',
-            pipetteName: 'p1000_96',
-            mount: 'left',
-            connected: false,
-          },
-        ]),
+        useMissingHardwareText(
+          [
+            {
+              hardwareType: 'pipette',
+              pipetteName: 'p1000_96',
+              mount: 'left',
+              connected: false,
+            },
+          ],
+          []
+        ),
       {
         wrapper,
       }
@@ -77,20 +89,23 @@ describe('useMissingHardwareText', () => {
   it('should return missing 2 pipettes', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText([
-          {
-            hardwareType: 'pipette',
-            pipetteName: 'p50_multi_flex',
-            mount: 'left',
-            connected: false,
-          },
-          {
-            hardwareType: 'pipette',
-            pipetteName: 'p1000_multi_flex',
-            mount: 'right',
-            connected: false,
-          },
-        ]),
+        useMissingHardwareText(
+          [
+            {
+              hardwareType: 'pipette',
+              pipetteName: 'p50_multi_flex',
+              mount: 'left',
+              connected: false,
+            },
+            {
+              hardwareType: 'pipette',
+              pipetteName: 'p1000_multi_flex',
+              mount: 'right',
+              connected: false,
+            },
+          ],
+          []
+        ),
       {
         wrapper,
       }
@@ -100,24 +115,49 @@ describe('useMissingHardwareText', () => {
   it('should return missing hardware', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText([
-          {
-            hardwareType: 'pipette',
-            pipetteName: 'p50_multi_flex',
-            mount: 'left',
-            connected: false,
-          },
-          {
-            hardwareType: 'module',
-            moduleModel: 'heaterShakerModuleV1',
-            slot: '5',
-            connected: false,
-          },
-        ]),
+        useMissingHardwareText(
+          [
+            {
+              hardwareType: 'pipette',
+              pipetteName: 'p50_multi_flex',
+              mount: 'left',
+              connected: false,
+            },
+            {
+              hardwareType: 'module',
+              moduleModel: 'heaterShakerModuleV1',
+              slot: '5',
+              connected: false,
+              hasSlotConflict: false,
+            },
+          ],
+          []
+        ),
       {
         wrapper,
       }
     )
     expect(result.current).toEqual('Missing hardware')
+  })
+  it('should return location conflict', () => {
+    const { result } = renderHook(
+      () =>
+        useMissingHardwareText(
+          [
+            {
+              hardwareType: 'module',
+              moduleModel: 'heaterShakerModuleV1',
+              slot: '5',
+              connected: false,
+              hasSlotConflict: true,
+            },
+          ],
+          ['1']
+        ),
+      {
+        wrapper,
+      }
+    )
+    expect(result.current).toEqual('Location conflicts')
   })
 })
