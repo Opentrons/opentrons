@@ -398,6 +398,19 @@ class OT3PipetteHandler:
             k: None for k in self._attached_instruments.keys()
         }
 
+    async def update_nozzle_configuration(
+        self,
+        mount: MountType,
+        back_left_nozzle: str,
+        front_right_nozzle: str,
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        instr = self._attached_instruments[OT3Mount.from_mount(mount)]
+        if instr:
+            instr.update_nozzle_configuration(
+                back_left_nozzle, front_right_nozzle, starting_nozzle
+            )
+
     async def add_tip(self, mount: OT3Mount, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
