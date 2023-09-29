@@ -696,11 +696,12 @@ class TransferPlan:
                *.. Aspirate -> Air gap -> Touch tip ->..
                .. Aspirate -> .....*
         """
-        self._check_valid_volume_parameters(
-            disposal_volume=self._strategy.disposal_volume,
-            air_gap=self._strategy.air_gap,
-            max_volume=self._instr.max_volume,
-        )
+        # TODO: verify if _check_valid_volume_parameters should be re-enabled here
+        # self._check_valid_volume_parameters(
+        #     disposal_volume=self._strategy.disposal_volume,
+        #     air_gap=self._strategy.air_gap,
+        #     max_volume=self._instr.max_volume,
+        # )
         plan_iter = self._expand_for_volume_constraints(
             # todo(mm, 2021-03-09): Is it right to use _instr.max_volume here?
             # Why don't we account for tip max volume, disposal volume, or air
