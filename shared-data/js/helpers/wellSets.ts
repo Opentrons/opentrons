@@ -14,7 +14,12 @@
 import uniq from 'lodash/uniq'
 
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
-import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
+import {
+  get96Channel384WellPlateWells,
+  getLabwareDefURI,
+  getTiprackVolume,
+  orderWells,
+} from '.'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
 
 type WellSetByPrimaryWell = string[][]
@@ -56,7 +61,8 @@ export interface WellSetHelpers {
 
   canPipetteUseLabware: (
     pipetteSpec: PipetteNameSpecs,
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition2,
+    tiprackDef: LabwareDefinition2
   ) => boolean
 }
 
@@ -131,10 +137,24 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
   const canPipetteUseLabware = (
     pipetteSpec: PipetteNameSpecs,
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition2,
+    tiprackDef: LabwareDefinition2
   ): boolean => {
+    // 384 well plates are only compatible with p50s or p20/p10s
+    const tiprackVolume = getTiprackVolume(tiprackDef)
+    const is384WellPlate = Object.keys(labwareDef.wells).length === 384
+    if (
+      (tiprackVolume === 200 ||
+        tiprackVolume === 300 ||
+        tiprackVolume === 1000) &&
+      is384WellPlate
+    ) {
+      return false
+    }
+
     if (pipetteSpec.channels === 1) {
-      // assume all labware can be used by single-channel
+      // assume all labware except for the 384 well plate with certain volumes
+      // can be used by single-channel
       return true
     }
 

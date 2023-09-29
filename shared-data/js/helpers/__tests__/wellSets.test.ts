@@ -2,6 +2,8 @@ import pipetteNameSpecsFixtures from '../../../pipette/fixtures/name/pipetteName
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
+import fixture_tiprack_10_ul from '../../../labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '../../../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
 import { makeWellSetHelpers } from '../wellSets'
 import { findWellAt } from '../getWellNamePerMultiTip'
@@ -17,6 +19,8 @@ const fixture12Trough = fixture_12_trough as LabwareDefinition2
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixture384Plate = fixture_384_plate as LabwareDefinition2
 const fixtureOverlappyWellplate = fixture_overlappy_wellplate as LabwareDefinition2
+const fixtureTipRack10ul = fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTipRack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 const EIGHT_CHANNEL = 8
 const NINETY_SIX_CHANNEL = 96
 const wellsForReservoir = [
@@ -201,15 +205,33 @@ describe('canPipetteUseLabware', () => {
     const pipette = fixtureP10Multi
     const pipette96 = fixtureP100096
 
-    expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
-    expect(canPipetteUseLabware(pipette96, labwareDef)).toBe(false)
+    expect(canPipetteUseLabware(pipette, labwareDef, fixtureTipRack10ul)).toBe(
+      false
+    )
+    expect(
+      canPipetteUseLabware(pipette96, labwareDef, fixtureTipRack10ul)
+    ).toBe(false)
   })
 
   it('returns true when pipette is single channel', () => {
     const labwareDef = fixtureOverlappyWellplate
     const pipette = fixtureP10Single
 
-    expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
+    expect(canPipetteUseLabware(pipette, labwareDef, fixtureTipRack10ul)).toBe(
+      true
+    )
+  })
+  it('returns false when the tip volume is too high with the 384 well plate', () => {
+    const labwareDef = fixture384Plate
+    const pipette = fixtureP10Multi
+    const pipette96 = fixtureP100096
+
+    expect(canPipetteUseLabware(pipette, labwareDef, fixtureTipRack300ul)).toBe(
+      false
+    )
+    expect(
+      canPipetteUseLabware(pipette96, labwareDef, fixtureTipRack300ul)
+    ).toBe(false)
   })
 })
 

@@ -141,7 +141,11 @@ export const incompatibleLabware = (
 ): FormError | null => {
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.spec, labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec,
+    labware.def,
+    pipette.tiprackLabwareDef
+  )
     ? INCOMPATIBLE_LABWARE
     : null
 }
@@ -150,7 +154,11 @@ export const incompatibleDispenseLabware = (
 ): FormError | null => {
   const { dispense_labware, pipette } = fields
   if (!dispense_labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.spec, dispense_labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec,
+    dispense_labware.def,
+    pipette.tiprackLabwareDef
+  )
     ? INCOMPATIBLE_DISPENSE_LABWARE
     : null
 }
@@ -159,7 +167,11 @@ export const incompatibleAspirateLabware = (
 ): FormError | null => {
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.spec, aspirate_labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec,
+    aspirate_labware.def,
+    pipette.tiprackLabwareDef
+  )
     ? INCOMPATIBLE_ASPIRATE_LABWARE
     : null
 }
