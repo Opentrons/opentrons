@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
-import styles from '../StepEditForm.css'
 import { StepFieldName } from '../../../steplist/fieldLevel'
-import { FieldProps } from '../types'
+import styles from '../StepEditForm.css'
+import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+import type { FieldProps } from '../types'
 
 export interface StepFormDropdownProps extends FieldProps {
   options: Options
+  additionalEquipment: AdditionalEquipmentEntities
   name: StepFieldName
   className?: string
 }
@@ -15,6 +17,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
   const {
     options,
     name,
+    additionalEquipment,
     className,
     onFieldBlur,
     onFieldFocus,
@@ -22,9 +25,21 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
     updateValue,
     errorToShow,
   } = props
+  const wasteChuteEntity = Object.values(additionalEquipment).find(
+    aE => aE.name === 'wasteChute'
+  )
+  const wasteChuteOption =
+    wasteChuteEntity != null
+      ? { name: 'Waste Chute', value: wasteChuteEntity.id }
+      : null
+  const fullOptions =
+    wasteChuteOption != null && name === 'dispense_labware'
+      ? [...options, wasteChuteOption]
+      : options
+
   // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: unknown) => {}
   // blank out the dropdown if labware id does not exist
-  const availableOptionIds = options.map(opt => opt.value)
+  const availableOptionIds = fullOptions.map(opt => opt.value)
   // @ts-expect-error (ce, 2021-06-21) unknown not assignable to string
   const fieldValue = availableOptionIds.includes(value) ? String(value) : null
 
@@ -33,7 +48,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
       name={name}
       error={errorToShow}
       className={cx(styles.large_field, className)}
-      options={options}
+      options={fullOptions}
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={fieldValue}
