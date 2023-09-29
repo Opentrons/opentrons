@@ -68,8 +68,20 @@ describe('getLatestCurrentOffsets', () => {
         vector: { x: 0, y: 0, z: 0 },
       },
     ]
+    const mockLatestCurrentOffsets = [
+      {
+        createdAt: '2022-12-20T14:06:23.562878+00:00',
+        definitionUri:
+          'opentrons/opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1',
+        id: '70ae2e31-716b-4e1f-a90c-9b0dfd4d7feb',
+        location: { slotName: '1', moduleModel: 'heaterShakerModuleV1' },
+        vector: { x: 0, y: 0, z: 0 },
+      },
+    ]
 
-    expect(getLatestCurrentOffsets(mockCurrentOffsets)).toStrictEqual([])
+    expect(getLatestCurrentOffsets(mockCurrentOffsets)).toStrictEqual(
+      mockLatestCurrentOffsets
+    )
   })
   it('should return the correct offsets when there are multiples in random order and modules in the same slot as labware', () => {
     const mockCurrentOffsets: LabwareOffset[] = [

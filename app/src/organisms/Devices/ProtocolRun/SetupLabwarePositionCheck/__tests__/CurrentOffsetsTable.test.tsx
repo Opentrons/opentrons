@@ -141,7 +141,7 @@ describe('CurrentOffsetsTable', () => {
   })
   it('renders the correct text', () => {
     const { getByText } = render(props)
-    getByText('Applied Labware Offset data')
+    getByText('APPLIED LABWARE OFFSET DATA')
     getByText('location')
     getByText('labware')
     getByText('labware offset data')
