@@ -88,6 +88,21 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             </StyledText>
           </Flex>
         </MenuItem>
+        <MenuItem
+          key="deck-configuration"
+          onClick={() => console.log('deck-configuration')}
+        >
+          <Flex alignItems={ALIGN_CENTER}>
+            <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
+            <StyledText
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginLeft={SPACING.spacing12}
+            >
+              {t('deck_configuration')}
+            </StyledText>
+          </Flex>
+        </MenuItem>
         <MenuItem key="light" onClick={toggleLights}>
           <Flex alignItems={ALIGN_CENTER}>
             <Icon
