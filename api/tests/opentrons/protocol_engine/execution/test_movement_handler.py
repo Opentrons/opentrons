@@ -6,7 +6,6 @@ from typing import NamedTuple
 from opentrons.types import MountType, Point, DeckSlotName, Mount
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.hardware_control.errors import MustHomeError
 from opentrons.motion_planning import Waypoint
 
 from opentrons.protocol_engine.types import (
@@ -31,6 +30,7 @@ from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     HeaterShakerMovementFlagger,
 )
 from opentrons.protocol_engine.execution.gantry_mover import GantryMover
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 
 @pytest.fixture
@@ -445,7 +445,7 @@ async def test_check_valid_position(
     ).then_return(Point(0, 0, 0))
     decoy.when(
         await hardware_api.gantry_position(mount=Mount.RIGHT, fail_on_not_homed=True)
-    ).then_raise(MustHomeError())
+    ).then_raise(PositionUnknownError())
 
     assert await subject.check_for_valid_position(MountType.LEFT)
     assert not await subject.check_for_valid_position(MountType.RIGHT)

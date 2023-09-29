@@ -54,7 +54,6 @@ from opentrons.hardware_control.types import (
     EstopState,
 )
 from opentrons.hardware_control.errors import (
-    FirmwareUpdateRequired,
     InvalidPipetteName,
     InvalidPipetteModel,
 )
@@ -84,6 +83,7 @@ from opentrons.hardware_control.estop_state import EstopStateMachine
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
+    FirmwareUpdateRequiredError,
 )
 
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -915,7 +915,7 @@ async def test_update_required_flag(
     axes = [Axis.X, Axis.Y]
     decoy.when(mock_subsystem_manager.update_required).then_return(True)
     controller._initialized = True
-    with pytest.raises(FirmwareUpdateRequired):
+    with pytest.raises(FirmwareUpdateRequiredError):
         await controller.home(axes, gantry_load=GantryLoad.LOW_THROUGHPUT)
 
 
@@ -938,7 +938,7 @@ async def test_update_required_bypass_firmware_update(
         pass
     # raise FirmwareUpdateRequired if the _update_required flag is set
     controller._initialized = True
-    with pytest.raises(FirmwareUpdateRequired):
+    with pytest.raises(FirmwareUpdateRequiredError):
         await controller.home([Axis.X], gantry_load=GantryLoad.LOW_THROUGHPUT)
 
 

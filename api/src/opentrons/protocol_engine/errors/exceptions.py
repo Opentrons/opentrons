@@ -398,7 +398,7 @@ class MustHomeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a MustHomeError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(ErrorCodes.POSITION_UNKNOWN, message, details, wrapping)
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):
@@ -738,7 +738,9 @@ class FirmwareUpdateRequired(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LocationIsOccupiedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, details, wrapping
+        )
 
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):

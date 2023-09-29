@@ -132,8 +132,6 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
     InvalidPipetteModel,
-    FirmwareUpdateRequired,
-    OverPressureDetected,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -173,6 +171,8 @@ from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
     UnmatchedTipPresenceStates,
+    PipetteOverpressureError,
+    FirmwareUpdateRequiredError,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -191,12 +191,15 @@ Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
 
 
 def requires_update(func: Wrapped) -> Wrapped:
-    """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
+    """Decorator that raises FirmwareUpdateRequiredError if the update_required flag is set."""
 
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         if self.update_required and self.initialized:
-            raise FirmwareUpdateRequired()
+            raise FirmwareUpdateRequiredError(
+                func.__name__,
+                self.subsystems_to_update,
+            )
         return await func(self, *args, **kwargs)
 
     return cast(Wrapped, wrapper)
@@ -346,6 +349,10 @@ class OT3Controller:
     @property
     def update_required(self) -> bool:
         return self._subsystem_manager.update_required and self._check_updates
+
+    @property
+    def subsystems_to_update(self) -> List[SubSystem]:
+        return self._subsystem_manager.subsystems_to_update
 
     @staticmethod
     def _build_system_hardware(
@@ -776,7 +783,7 @@ class OT3Controller:
         attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
     ) -> AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
-            raise InvalidPipetteName(name=attached.name_int, mount=mount)
+            raise InvalidPipetteName(name=attached.name_int, mount=mount.name)
         try:
             # TODO (lc 12-8-2022) We should return model as an int rather than
             # a string.
@@ -797,7 +804,7 @@ class OT3Controller:
             }
         except KeyError:
             raise InvalidPipetteModel(
-                name=attached.name.name, model=attached.model, mount=mount
+                name=attached.name.name, model=attached.model, mount=mount.name
             )
 
     @staticmethod
@@ -1115,6 +1122,7 @@ class OT3Controller:
 
     @asynccontextmanager
     async def _monitor_overpressure(self, mounts: List[NodeId]) -> AsyncIterator[None]:
+        msg = "The pressure sensor on the {} mount has exceeded operational limits."
         if ff.overpressure_detection_enabled() and mounts:
             tools_with_id = map_pipette_type_to_sensor_id(
                 mounts, self._subsystem_manager.device_info
@@ -1140,8 +1148,10 @@ class OT3Controller:
                     q_msg = _pop_queue()
                     if q_msg:
                         mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
-                        raise OverPressureDetected(mount.name)
-
+                        raise PipetteOverpressureError(
+                            message=msg.format(str(mount)),
+                            detail={"mount": mount},
+                        )
         else:
             yield
 
