@@ -58,10 +58,20 @@ export interface LoadLiquidRunTimeCommand
     LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
+export interface LoadFixtureCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'loadFixture'
+  params: LoadFixtureParams
+}
+export interface LoadFixtureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadFixtureCreateCommand {
+  result?: LoadLabwareResult
+}
 
 export type SetupRunTimeCommand =
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
+  | LoadFixtureRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
@@ -69,6 +79,7 @@ export type SetupRunTimeCommand =
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
+  | LoadFixtureCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
@@ -137,4 +148,12 @@ interface LoadLiquidParams {
 }
 interface LoadLiquidResult {
   liquidId: string
+}
+export type Cutout =
+  | 'B3' 
+  | 'C3' 
+  | 'D3' 
+interface LoadFixtureParams {
+  location: {cutout: Cutout}
+  loadName: string
 }

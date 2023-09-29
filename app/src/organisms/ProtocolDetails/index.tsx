@@ -36,6 +36,7 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
+  parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
 import { getGripperDisplayName } from '@opentrons/shared-data'
 
@@ -221,14 +222,13 @@ export function ProtocolDetails(
       : null
 
   const requiredModuleDetails =
-    mostRecentAnalysis != null
-      ? map(
-          parseInitialLoadedModulesBySlot(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          )
-        )
+    mostRecentAnalysis?.commands != null
+      ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
+      : []
+
+  const requiredFixtureDetails =
+    mostRecentAnalysis?.commands != null
+      ? map(parseInitialLoadedFixturesByCutout( mostRecentAnalysis.commands))
       : []
 
   const requiredLabwareDetails =
@@ -297,6 +297,7 @@ export function ProtocolDetails(
         rightMountPipetteName={rightMountPipetteName}
         extensionInstrumentName={requiredExtensionInstrumentName}
         requiredModuleDetails={requiredModuleDetails}
+        requiredFixtureDetails={requiredFixtureDetails}
         isLoading={analysisStatus === 'loading'}
         robotType={robotType}
       />
