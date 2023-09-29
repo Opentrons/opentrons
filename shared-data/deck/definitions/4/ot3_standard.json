@@ -279,6 +279,55 @@
         },
         "displayName": "Slot D4",
         "compatibleModuleTypes": []
+      },
+      {
+        "id": "movableTrash",
+        "position": [0, 164, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Movable Trash"
+      },
+      {
+        "id": "1/8cTrashChute",
+        "position": [0, 164, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "1/8 Channel Trash Chute",
+        "ableToDropLabware": false,
+        "ableToDropTips": true,
+        "dropTipsOffset": [64, 64, 144.5]
+      },
+      {
+        "id": "gripperTrashChute",
+        "position": [0, 164, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Gripper Trash Chute",
+        "ableToDropLabware": true,
+        "ableToDropTips": false,
+        "dropTipsOffset": [64, 57, 136.5]
+      },
+      {
+        "id": "96cTrashChute",
+        "position": [0, 164, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "96 Channel Trash Chute",
+        "ableToDropLabware": false,
+        "ableToDropTips": true,
+        "dropLabwareOffset": [14.445, 43.915, 115]
       }
     ],
     "cutOutLocations": [
@@ -382,8 +431,108 @@
         ]
       }
     ],
-    "calibrationPoints": [],
+    "calibrationPoints": []
   },
+  "fixtures": [
+    {
+      "id": "standardSlot",
+      "cutoutLocation": ["D1", "C1", "B1", "A1", "D3", "C3", "B3", "A3"],
+      "type": "standardSlot",
+      "displayName": "Standard Slot",
+      "onFixtureItems": {
+        "D1": ["D1"],
+        "C1": ["C1"],
+        "B1": ["B1"],
+        "A1": ["A1"],
+        "D3": ["D3"],
+        "C3": ["C3"],
+        "B3": ["B3"],
+        "A3": ["A3"]
+      }
+    },
+    {
+      "id": "middleSlot",
+      "cutoutLocation": ["D2", "C2", "B2", "A2"],
+      "type": "middleSlot",
+      "displayName": "Middle Slot",
+      "onFixtureItems": {
+        "D2": ["D2"],
+        "C2": ["C2"],
+        "B2": ["B2"],
+        "A2": ["A2"]
+      }
+    },
+    {
+      "id": "extensionSlot",
+      "cutoutLocation": ["D3", "C3", "B3", "A3"],
+      "type": "extensionSlot",
+      "displayName": "Extension Slot",
+      "onFixtureItems": {
+        "D3": ["D3", "D4"],
+        "D3": ["D3", "D4"],
+        "B3": ["B3", "B4"],
+        "A3": ["A3", "A4"]
+      }
+    },
+    {
+      "id": "slotWithMovableTrash",
+      "cutoutLocation": [
+        "D1",
+        "C1",
+        "B1",
+        "A1",
+        "D3",
+        "C3",
+        "B3",
+        "A3"
+      ],
+      "type": "slotWithMovableTrash",
+      "displayName": "Slot With Movable Trash",
+      "onFixtureItems": {
+        "D1": [
+          "D1",
+          "movableTrash"
+        ],
+        "C1": [
+          "C1",
+          "movableTrash"
+        ],
+        "B1": [
+          "B1",
+          "movableTrash"
+        ],
+        "A1": [
+          "A1",
+          "movableTrash"
+        ],
+        "D3": [
+          "D3",
+          "movableTrash"
+        ],
+        "C3": [
+          "C3",
+          "movableTrash"
+        ],
+        "B3": [
+          "B3",
+          "movableTrash"
+        ],
+        "A3": [
+          "A3",
+          "movableTrash"
+        ]
+      }
+    },
+    {
+      "id": "slotWithTrashChuteAdapter",
+      "cutoutLocation": ["D3"],
+      "type": "slotWithTrashChuteAdapter",
+      "displayName": "Slot With Trash Chute Adapter",
+      "onFixtureItems": {
+        "D3": ["trashChute"]
+      }
+    }
+  ],
   "layers": [
     {
       "name": "style",
