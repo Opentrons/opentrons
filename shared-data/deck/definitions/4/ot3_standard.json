@@ -529,7 +529,7 @@
       "type": "slotWithTrashChuteAdapter",
       "displayName": "Slot With Trash Chute Adapter",
       "onFixtureItems": {
-        "D3": ["trashChute"]
+        "D3": ["1/8cTrashChute", "96cTrashChute", "gripperTrashChute"]
       }
     }
   ],
