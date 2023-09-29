@@ -63,11 +63,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     thermocycler_module = ctx.load_module("thermocyclerModuleV1")
 
     # module labware
+    _ = temperature_module.load_adapter("opentrons_96_well_aluminum_block")
     temp_plate = temperature_module.load_labware(
-        "opentrons_96_aluminumblock_nest_wellplate_100ul",
+        "nest_96_wellplate_100ul_pcr_full_skirt",
         label="Temperature-Controlled plate",
     )
-    hs_plate = hs_module.load_labware("opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt")
+    hs_plate = hs_module.load_labware(
+        name="nest_96_wellplate_100ul_pcr_full_skirt",
+        adapter="opentrons_96_pcr_adapter"
+    )
     tc_plate = thermocycler_module.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
 
     # A 2.14 difference, no params specified, still should find it.
