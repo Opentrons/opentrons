@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  BORDERS,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
