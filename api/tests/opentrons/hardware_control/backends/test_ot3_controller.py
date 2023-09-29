@@ -1122,7 +1122,7 @@ async def test_requires_estop(
         [{}, {}],
     ],
 )
-async def test_restore_current(
+async def test_motor_current(
     controller: OT3Controller,
     run_currents: OT3AxisMap[float],
     hold_currents: OT3AxisMap[float],
@@ -1134,7 +1134,7 @@ async def test_restore_current(
         with mock.patch.object(controller, "set_hold_current") as mock_hold_currents:
             with mock.patch.object(controller, "set_default_currents") as mock_default:
 
-                async with controller.restore_current(run_currents, hold_currents):
+                async with controller.motor_current(run_currents, hold_currents):
                     await controller.update_position()
 
                 if not run_currents and not hold_currents:

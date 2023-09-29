@@ -932,7 +932,7 @@ class OT3Controller:
             self._current_settings[axis].hold_current = current
 
     @asynccontextmanager
-    async def restore_current(
+    async def motor_current(
         self,
         run_currents: OT3AxisMap[float] = {},
         hold_currents: OT3AxisMap[float] = {},

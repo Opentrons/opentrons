@@ -1329,7 +1329,7 @@ class OT3API(
                 moves = self._build_moves(
                     origin, target_pos, instr.config.plunger_homing_configurations.speed
                 )
-                async with self._backend.restore_current(
+                async with self._backend.motor_current(
                     run_currents={
                         axis: instr.config.plunger_homing_configurations.current
                     }
@@ -1341,7 +1341,7 @@ class OT3API(
                     )
                     await self._backend.home([axis], self.gantry_load)
         else:
-            async with self._backend.restore_current(
+            async with self._backend.motor_current(
                 run_currents={axis: instr.config.plunger_homing_configurations.current}
             ):
                 await self._backend.home([axis], self.gantry_load)
@@ -1695,7 +1695,7 @@ class OT3API(
         # NOTE: plunger position (mm) decreases up towards homing switch
         # NOTE: if already at BOTTOM, we still need to run backlash-compensation movement,
         #       because we do not know if we arrived at BOTTOM from above or below.
-        async with self._backend.restore_current(
+        async with self._backend.motor_current(
             run_currents={
                 pip_ax: instrument.config.plunger_homing_configurations.current
             }
@@ -1881,7 +1881,7 @@ class OT3API(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
     ) -> None:
         for press in pipette_spec.presses:
-            async with self._backend.restore_current(
+            async with self._backend.motor_current(
                 run_currents={axis: current for axis, current in press.current.items()}
             ):
                 target_down = target_position_from_relative(
@@ -1899,7 +1899,7 @@ class OT3API(
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
     ) -> None:
-        async with self._backend.restore_current(
+        async with self._backend.motor_current(
             run_currents={
                 axis: current for axis, current in pipette_spec.currents.items()
             }

@@ -581,7 +581,7 @@ async def move_plunger_absolute_ot3(
     if motor_current is None:
         await _move_coro
     else:
-        async with api._backend.restore_current():
+        async with api._backend.motor_current():
             await api._backend.set_active_current(
                 {Axis.of_main_tool_actuator(mount): motor_current}  # type: ignore[dict-item]
             )
@@ -613,7 +613,7 @@ async def move_tip_motor_relative_ot3(
     if motor_current is None:
         await _move_coro
     else:
-        async with api._backend.restore_current():
+        async with api._backend.motor_current():
             await api._backend.set_active_current(
                 {Axis.Q: motor_current}  # type: ignore[dict-item]
             )

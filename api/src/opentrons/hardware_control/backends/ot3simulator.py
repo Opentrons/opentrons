@@ -540,7 +540,7 @@ class OT3Simulator:
         return None
 
     @asynccontextmanager
-    async def restore_current(
+    async def motor_current(
         self,
         run_currents: OT3AxisMap[float] = {},
         hold_currents: OT3AxisMap[float] = {},
