@@ -14,6 +14,7 @@
     "deckItems": [
       {
         "id": "D1",
+        "type": "slot",
         "matingSurfaceUnitVector": [-1, 1, -1],
         "position": [3.0, 0.0, 0.0],
         "boundingBox": {
@@ -30,6 +31,7 @@
       },
       {
         "id": "D2",
+        "type": "slot",
         "matingSurfaceUnitVector": [-1, 1, -1],
         "position": [3.0, 0.0, 0.0],
         "boundingBox": {
@@ -42,6 +44,7 @@
       },
       {
         "id": "D3",
+        "type": "slot",
         "position": [3.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -58,6 +61,7 @@
       },
       {
         "id": "extensionSlotD3",
+        "type": "slot",
         "position": [3.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -70,6 +74,7 @@
       },
       {
         "id": "C1",
+        "type": "slot",
         "position": [0.0, 3, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -86,6 +91,7 @@
       },
       {
         "id": "C2",
+        "type": "slot",
         "position": [0, 3, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -98,6 +104,7 @@
       },
       {
         "id": "C3",
+        "type": "slot",
         "position": [328.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -114,6 +121,7 @@
       },
       {
         "id": "extensionSlotC3",
+        "type": "slot",
         "position": [0, 3, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -126,6 +134,7 @@
       },
       {
         "id": "B1",
+        "type": "slot",
         "position": [0.0, 0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -143,6 +152,7 @@
       },
       {
         "id": "B2",
+        "type": "slot",
         "position": [0, 3, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -155,6 +165,7 @@
       },
       {
         "id": "B3",
+        "type": "slot",
         "position": [328.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -171,6 +182,7 @@
       },
       {
         "id": "extensionSlotB3",
+        "type": "slot",
         "position": [0, 0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -183,6 +195,7 @@
       },
       {
         "id": "A1",
+        "type": "slot",
         "position": [0.0, 0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -200,6 +213,7 @@
       },
       {
         "id": "A2",
+        "type": "slot",
         "position": [0, 0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -212,6 +226,7 @@
       },
       {
         "id": "A3",
+        "type": "slot",
         "position": [0, 0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
@@ -227,6 +242,7 @@
       },
       {
         "id": "extensionSlotA3",
+        "type": "slot",
         "position": [0, 0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
@@ -238,6 +254,7 @@
       },
       {
         "id": "A4",
+        "type": "slot",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -249,6 +266,7 @@
       },
       {
         "id": "B4",
+        "type": "slot",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -260,6 +278,7 @@
       },
       {
         "id": "C4",
+        "type": "slot",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -271,6 +290,7 @@
       },
       {
         "id": "D4",
+        "type": "slot",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -282,6 +302,7 @@
       },
       {
         "id": "movableTrash",
+        "type": "movableTrash",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -292,6 +313,7 @@
       },
       {
         "id": "1/8cTrashChute",
+        "type": "trashChute",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -305,6 +327,7 @@
       },
       {
         "id": "gripperTrashChute",
+        "type": "trashChute",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -318,6 +341,7 @@
       },
       {
         "id": "96cTrashChute",
+        "type": "trashChute",
         "position": [0, 164, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
@@ -490,35 +514,27 @@
       "displayName": "Slot With Movable Trash",
       "onFixtureItems": {
         "D1": [
-          "D1",
           "movableTrash"
         ],
         "C1": [
-          "C1",
           "movableTrash"
         ],
         "B1": [
-          "B1",
           "movableTrash"
         ],
         "A1": [
-          "A1",
           "movableTrash"
         ],
         "D3": [
-          "D3",
           "movableTrash"
         ],
         "C3": [
-          "C3",
           "movableTrash"
         ],
         "B3": [
-          "B3",
           "movableTrash"
         ],
         "A3": [
-          "A3",
           "movableTrash"
         ]
       }
