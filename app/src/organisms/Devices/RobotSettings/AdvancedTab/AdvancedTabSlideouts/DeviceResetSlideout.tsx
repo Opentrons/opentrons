@@ -142,7 +142,8 @@ export function DeviceResetSlideout({
   ).length
 
   // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-  const allOptionsWithoutODD = options.filter(o => o.id !== 'onDeviceDisplay')
+  const allOptionsWithoutODD =
+    options != null ? options.filter(o => o.id !== 'onDeviceDisplay') : []
 
   const isEveryOptionSelected =
     totalOptionsSelected > 0 &&
