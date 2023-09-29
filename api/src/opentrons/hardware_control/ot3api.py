@@ -2357,7 +2357,7 @@ class OT3API(
         pass_settings: CapacitivePassSettings,
         retract_after: bool = True,
         probe: Optional[InstrumentProbeType] = None,
-    ) -> float:
+    ) -> Tuple[float, bool]:
         """Determine the position of something using the capacitive sensor.
 
         This function orchestrates detecting the position of a collision between the
@@ -2418,7 +2418,7 @@ class OT3API(
             else:
                 # default to primary (rear) probe
                 probe = InstrumentProbeType.PRIMARY
-        await self._backend.capacitive_probe(
+        contact = await self._backend.capacitive_probe(
             mount,
             moving_axis,
             machine_pass_distance,
@@ -2429,7 +2429,7 @@ class OT3API(
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:
             await self.move_to(mount, pass_start_pos)
-        return moving_axis.of_point(end_pos)
+        return moving_axis.of_point(end_pos), contact
 
     async def capacitive_sweep(
         self,

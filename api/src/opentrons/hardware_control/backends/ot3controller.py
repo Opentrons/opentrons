@@ -139,7 +139,11 @@ from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     MoveGroup,
 )
-from opentrons_hardware.hardware_control.types import NodeMap
+from opentrons_hardware.hardware_control.types import (
+    NodeMap,
+    MotorPositionStatus,
+    MoveCompleteAck,
+)
 from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
 
 from opentrons_hardware.hardware_control.tool_sensors import (
@@ -487,11 +491,11 @@ class OT3Controller:
 
     def _handle_motor_status_response(
         self,
-        response: NodeMap[Tuple[float, float, bool, bool]],
+        response: NodeMap[MotorPositionStatus],
     ) -> None:
         for axis, pos in response.items():
-            self._position.update({axis: pos[0]})
-            self._encoder_position.update({axis: pos[1]})
+            self._position.update({axis: pos.motor_position})
+            self._encoder_position.update({axis: pos.encoder_position})
             # TODO (FPS 6-01-2023): Remove this once the Feature Flag to ignore stall detection is removed.
             # This check will latch the motor status for an axis at "true" if it was ever set to true.
             # To account for the case where a motor axis has its power reset, we also depend on the
@@ -505,7 +509,8 @@ class OT3Controller:
             self._motor_status.update(
                 {
                     axis: MotorStatus(
-                        motor_ok=(pos[2] or motor_ok_latch), encoder_ok=pos[3]
+                        motor_ok=(pos.motor_ok or motor_ok_latch),
+                        encoder_ok=pos.encoder_ok,
                     )
                 }
             )
@@ -687,7 +692,7 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
             self._gear_motor_position = {
-                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+                NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
             }
         else:
             log.debug("no position returned from NodeId.pipette_left")
@@ -705,7 +710,7 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
             self._gear_motor_position = {
-                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+                NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
             }
         else:
             log.debug("no position returned from NodeId.pipette_left")
@@ -1168,8 +1173,8 @@ class OT3Controller:
             sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
-            self._position.update({node: point[0]})
-            self._encoder_position.update({node: point[1]})
+            self._position.update({node: point.motor_position})
+            self._encoder_position.update({node: point.encoder_position})
         return self._position
 
     async def capacitive_probe(
@@ -1180,8 +1185,8 @@ class OT3Controller:
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-    ) -> None:
-        pos, _ = await capacitive_probe(
+    ) -> bool:
+        status = await capacitive_probe(
             self._messenger,
             sensor_node_for_mount(mount),
             axis_to_node(moving),
@@ -1191,7 +1196,8 @@ class OT3Controller:
             relative_threshold_pf=sensor_threshold_pf,
         )
 
-        self._position[axis_to_node(moving)] = pos
+        self._position[axis_to_node(moving)] = status.motor_position
+        return status.move_ack == MoveCompleteAck.stopped_by_condition
 
     async def capacitive_pass(
         self,
