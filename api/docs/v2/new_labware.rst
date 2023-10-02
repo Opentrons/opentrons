@@ -249,6 +249,9 @@ Equivalently, using ``rows_by_name``::
 
 .. versionadded:: 2.0
 
+
+.. _labeling-liquids:
+
 *************************
 Labeling Liquids in Wells
 *************************
