@@ -61,13 +61,6 @@ const mockCurrentOffsets: LabwareOffset[] = [
     vector: { x: 0, y: 0, z: 0 },
   },
   {
-    createdAt: '2022-12-20T14:09:08.688756+00:00',
-    definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
-    id: '494ec3d1-224f-4f9a-a83b-3dd3060ea332',
-    location: { slotName: '2' },
-    vector: { x: 0, y: -0.09999999999999432, z: -0.09999999999999432 },
-  },
-  {
     createdAt: '2022-12-20T14:09:08.689813+00:00',
     definitionUri:
       'opentrons/opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1',
