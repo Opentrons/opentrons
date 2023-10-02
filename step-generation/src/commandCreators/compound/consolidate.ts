@@ -57,6 +57,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }
   }
 
+  if (
+    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
   // to the action of aspiration of dispensing in a given command, they are actually values bound
   // to a given labware associated with a command (e.g. Source, Destination). For this reason we
@@ -74,6 +81,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     dispenseOffsetFromBottomMm,
     mixFirstAspirate,
     mixInDestination,
+    dropTipLocation,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const maxWellsPerChunk = Math.floor(
@@ -182,6 +190,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
+            dropTipLocation,
           }),
         ]
       }
@@ -297,6 +306,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? [
               curryCommandCreator(dropTip, {
                 pipette: args.pipette,
+                dropTipLocation: dropTipLocation,
               }),
             ]
           : []

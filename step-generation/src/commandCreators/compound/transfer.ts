@@ -79,6 +79,13 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
   }
 
+  if (
+    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    errors.push(errorCreators.dropTipLocationDoesNotExist())
+  }
+
   if (errors.length > 0)
     return {
       errors,
@@ -181,6 +188,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette: args.pipette,
+                  dropTipLocation: args.dropTipLocation,
                 }),
               ]
             : []
@@ -402,6 +410,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               ? [
                   curryCommandCreator(dropTip, {
                     pipette: args.pipette,
+                    dropTipLocation: args.dropTipLocation,
                   }),
                 ]
               : []

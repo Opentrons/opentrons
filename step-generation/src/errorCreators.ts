@@ -188,3 +188,10 @@ export const labwareOffDeck = (): CommandCreatorError => {
     message: 'Attempted to interact with labware off deck',
   }
 }
+
+export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
+  return {
+    type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',
+    message: 'The destination for dropping tip does not exist',
+  }
+}

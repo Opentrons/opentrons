@@ -38,6 +38,11 @@ export function dispenseUpdateLiquidState(
     volume,
     wellName,
   } = args
+  console.log(
+    'invariantContext.labwareEntities',
+    invariantContext.labwareEntities
+  )
+  console.log('labwareId for dispense', labwareId)
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
   assert(
