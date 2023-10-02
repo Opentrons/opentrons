@@ -182,8 +182,8 @@ class Well:
     def bottom(self, z: float = 0.0) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
-            negative offsets are lower. 
-        
+            negative offsets are lower.
+
         :return: A :py:class:`~opentrons.types.Location` corresponding to the
             absolute position of the bottom-center of the well, plus the ``z`` offset
             (if specified).
@@ -211,10 +211,10 @@ class Well:
 
         :param x: The fraction of the distance from the well's center to its edge
             along the x-axis. Negative values are to the left, and positive values
-            are to the right. 
+            are to the right.
         :param y: The fraction of the distance from the well's center to its edge
             along the y-axis. Negative values are to the front, and positive values
-            are to the back. 
+            are to the back.
         :param z: The fraction of the distance from the well's center to its edge
             along the x-axis. Negative values are down, and positive values are up.
 
