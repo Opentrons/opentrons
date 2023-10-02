@@ -1,6 +1,7 @@
 import isEqual from 'lodash/isEqual'
 import {
   getLabwareDisplayName,
+  IDENTITY_VECTOR,
   getLoadedLabwareDefinitionsByUri,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
@@ -33,6 +34,7 @@ export function useOffsetCandidatesForAnalysis(
     (acc, { location, definitionUri }) => {
       const offsetMatch = allHistoricOffsets.find(
         historicOffset =>
+          !isEqual(historicOffset.vector, IDENTITY_VECTOR) &&
           isEqual(historicOffset.location, location) &&
           historicOffset.definitionUri === definitionUri
       )
