@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { DropdownField, DropdownOption, FormGroup } from '@opentrons/components'
-import { FLEX_TRASH_DEF_URI } from '../../../../constants'
+import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../../../constants'
 import { i18n } from '../../../../localization'
 import {
   getAdditionalEquipmentEntities,
@@ -20,13 +20,18 @@ export function DropTipField(
     aE => aE.name === 'wasteChute'
   )
   const trash = Object.values(labware).find(
-    lw => lw.labwareDefURI === FLEX_TRASH_DEF_URI
+    lw =>
+      lw.labwareDefURI === FLEX_TRASH_DEF_URI ||
+      lw.labwareDefURI === OT_2_TRASH_DEF_URI
   )
-  const wasteChuteOption = {
+  const wasteChuteOption: DropdownOption = {
     name: 'Waste Chute',
-    value: wasteChute?.id,
-  } as DropdownOption
-  const trashOption = { name: 'Trash Bin', value: trash?.id } as DropdownOption
+    value: wasteChute?.id ?? '',
+  }
+  const trashOption: DropdownOption = {
+    name: 'Trash Bin',
+    value: trash?.id ?? '',
+  }
 
   const options = []
   if (wasteChute) options.push(wasteChuteOption)
