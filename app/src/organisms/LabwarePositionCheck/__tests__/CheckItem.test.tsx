@@ -2,7 +2,9 @@ import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
+  OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -65,9 +67,9 @@ describe('CheckItem', () => {
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
+      robotType: OT2_ROBOT_TYPE
     }
-    mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
-    when(mockUseFeatureFlag).calledWith('lpcWithProbe').mockReturnValue(false)
+    mockUseProtocolMetaData.mockReturnValue({ robotType: OT2_ROBOT_TYPE })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -530,7 +532,11 @@ describe('CheckItem', () => {
     )
   })
   it('executes correct chained commands when confirm placement CTA is clicked when using probe for LPC', async () => {
-    when(mockUseFeatureFlag).calledWith('lpcWithProbe').mockReturnValue(true)
+    props = {
+      ...props,
+      robotType: FLEX_ROBOT_TYPE
+    }
+    mockUseProtocolMetaData.mockReturnValue({ robotType: FLEX_ROBOT_TYPE })
     when(mockChainRunCommands)
       .calledWith(
         [

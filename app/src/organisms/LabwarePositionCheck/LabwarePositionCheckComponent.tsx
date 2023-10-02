@@ -330,7 +330,7 @@ export const LabwarePositionCheckComponent = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = <CheckItem {...currentStep} {...movementStepProps} />
+    modalContent = <CheckItem {...currentStep} {...movementStepProps} {...{robotType}} />
   } else if (currentStep.section === 'ATTACH_PROBE') {
     modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'DETACH_PROBE') {
