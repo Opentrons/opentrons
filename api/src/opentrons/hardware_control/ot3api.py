@@ -1898,7 +1898,7 @@ class OT3API(
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
 
-    async def get_tip_presence_status(self, mount) -> bool:
+    async def get_tip_presence_status(self, mount: OT3Mount) -> bool:
         """
         Check tip presence status. If a high throughput pipette is present,
         move the tip motors down before checking the sensor status.
