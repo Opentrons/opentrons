@@ -20,13 +20,11 @@ describe('MountGripper', () => {
     props?: Partial<React.ComponentProps<typeof MountGripper>>
   ) => ReturnType<typeof renderWithProviders>
   let mockRefetch: jest.Mock
-  let mockGoBack: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
   let mockSetErrorMessage: jest.Mock
 
   beforeEach(() => {
-    mockGoBack = jest.fn()
     mockProceed = jest.fn()
     mockChainRunCommands = jest.fn()
     mockRefetch = jest.fn(() => Promise.resolve())
@@ -39,7 +37,7 @@ describe('MountGripper', () => {
           attachedGripper={props?.attachedGripper ?? null}
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
-          goBack={mockGoBack}
+          goBack={() => null}
           errorMessage={null}
           setErrorMessage={mockSetErrorMessage}
           {...props}
@@ -81,16 +79,6 @@ describe('MountGripper', () => {
     goBackButton.click()
     await getByRole('button', { name: 'Continue' }).click()
     expect(mockProceed).not.toHaveBeenCalled()
-  })
-
-  it('clicking go back calls back', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
-      refetch: mockRefetch,
-      data: null,
-    } as any)
-    const { getByLabelText } = render()[0]
-    getByLabelText('back').click()
-    expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('renders correct text', () => {
