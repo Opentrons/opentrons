@@ -196,7 +196,7 @@ def get_protocol_api(
         context = _create_live_context_pe(
             api_version=checked_version,
             robot_type=robot_type,
-            deck_type=guess_deck_type_from_global_config(),
+            deck_type=deck_type,
             hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
             bundled_data=bundled_data,
             extra_labware=extra_labware,
