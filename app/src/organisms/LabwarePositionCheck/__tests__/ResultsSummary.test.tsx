@@ -33,6 +33,7 @@ describe('ResultsSummary', () => {
       protocolData: mockCompletedAnalysis,
       workingOffsets: mockWorkingOffsets,
       existingOffsets: mockExistingOffsets,
+      isApplyingOffsets: false,
       handleApplyOffsets: jest.fn(),
     }
   })

@@ -30,8 +30,8 @@ interface SmallButtonProps extends StyleProps {
   onClick: React.MouseEventHandler
   buttonType?: SmallButtonTypes
   buttonText: React.ReactNode
-  iconPlacement?: IconPlacement
-  iconName?: IconName
+  iconPlacement?: IconPlacement | null
+  iconName?: IconName | null
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
 }

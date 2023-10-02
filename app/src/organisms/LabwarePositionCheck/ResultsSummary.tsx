@@ -28,6 +28,7 @@ import {
   MODULE_ICON_NAME_BY_TYPE,
   BORDERS,
   ALIGN_FLEX_END,
+  Icon,
   LocationIcon,
 } from '@opentrons/components'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
@@ -55,6 +56,8 @@ interface ResultsSummaryProps extends ResultsSummaryStep {
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleApplyOffsets: (offsets: LabwareOffsetCreateData[]) => void
+  isApplyingOffsets: boolean
+  isDeletingMaintenanceRun: boolean
 }
 export const ResultsSummary = (
   props: ResultsSummaryProps
@@ -65,10 +68,13 @@ export const ResultsSummary = (
     workingOffsets,
     handleApplyOffsets,
     existingOffsets,
+    isApplyingOffsets,
+    isDeletingMaintenanceRun,
   } = props
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )
+  const isSubmittingAndClosing = isApplyingOffsets || isDeletingMaintenanceRun
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
@@ -168,6 +174,9 @@ export const ResultsSummary = (
           alignSelf={ALIGN_FLEX_END}
           onClick={() => handleApplyOffsets(offsetsToApply)}
           buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
+          iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
+          iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
+          disabled={isSubmittingAndClosing}
         />
       ) : (
         <Flex
@@ -177,8 +186,23 @@ export const ResultsSummary = (
           alignItems={ALIGN_CENTER}
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
-          <PrimaryButton onClick={() => handleApplyOffsets(offsetsToApply)}>
-            {i18n.format(t('apply_offsets'), 'capitalize')}
+          <PrimaryButton
+            onClick={() => handleApplyOffsets(offsetsToApply)}
+            disabled={isSubmittingAndClosing}
+          >
+            <Flex>
+              {isSubmittingAndClosing ? (
+                <Icon
+                  size="1rem"
+                  spin
+                  name="ot-spinner"
+                  marginRight={SPACING.spacing8}
+                />
+              ) : null}
+              <StyledText>
+                {i18n.format(t('apply_offsets'), 'capitalize')}
+              </StyledText>
+            </Flex>
           </PrimaryButton>
         </Flex>
       )}

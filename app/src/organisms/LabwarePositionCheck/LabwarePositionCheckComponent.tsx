@@ -49,6 +49,7 @@ interface LabwarePositionCheckModalProps {
   protocolName: string
   caughtError?: Error
   setMaintenanceRunId: (id: string | null) => void
+  isDeletingMaintenanceRun: boolean
 }
 
 export const LabwarePositionCheckComponent = (
@@ -62,6 +63,7 @@ export const LabwarePositionCheckComponent = (
     maintenanceRunId,
     setMaintenanceRunId,
     protocolName,
+    isDeletingMaintenanceRun,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -102,6 +104,9 @@ export const LabwarePositionCheckComponent = (
   ])
 
   const [fatalError, setFatalError] = React.useState<string | null>(null)
+  const [isApplyingOffsets, setIsApplyingOffsets] = React.useState<boolean>(
+    false
+  )
   const [
     { workingOffsets, tipPickUpOffset },
     registerPosition,
@@ -295,12 +300,15 @@ export const LabwarePositionCheckComponent = (
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
+    setIsApplyingOffsets(true)
     Promise.all(offsets.map(data => createLabwareOffset({ runId, data })))
       .then(() => {
         onCloseClick()
+        setIsApplyingOffsets(false)
       })
       .catch((e: Error) => {
         setFatalError(`error applying labware offsets: ${e.message}`)
+        setIsApplyingOffsets(false)
       })
   }
 
@@ -356,7 +364,13 @@ export const LabwarePositionCheckComponent = (
       <ResultsSummary
         {...currentStep}
         protocolData={protocolData}
-        {...{ workingOffsets, existingOffsets, handleApplyOffsets }}
+        {...{
+          workingOffsets,
+          existingOffsets,
+          handleApplyOffsets,
+          isApplyingOffsets,
+          isDeletingMaintenanceRun,
+        }}
       />
     )
   }
