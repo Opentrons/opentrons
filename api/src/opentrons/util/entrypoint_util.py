@@ -6,15 +6,18 @@ import logging
 from json import JSONDecodeError
 import pathlib
 import shutil
-from typing import BinaryIO, Dict, Sequence, TextIO, Union, TYPE_CHECKING
+from typing import BinaryIO, Dict, Sequence, TextIO, Optional, Union, TYPE_CHECKING
 
 from jsonschema import ValidationError  # type: ignore
 
+from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import labware
 from opentrons.calibration_storage import helpers
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+
 log = logging.getLogger(__name__)
 
 
@@ -62,6 +65,24 @@ def labware_from_paths(
             else:
                 log.info(f"ignoring {child} in labware path")
     return labware_defs
+
+
+def find_jupyter_labware() -> Optional[Dict[str, FoundLabware]]:
+    """Return labware files in this robot's Jupyter Notebook directory.
+
+    Returns:
+        If we're running on an Opentrons robot:
+        A dict, keyed by labware URI, where each value has the file path and the parsed def.
+
+        Otherwise: None.
+    """
+    if IS_ROBOT:
+        # JUPYTER_NOTEBOOK_LABWARE_DIR should never be None when IS_ROBOT == True.
+        assert JUPYTER_NOTEBOOK_LABWARE_DIR is not None
+        if JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():
+            return labware_from_paths([JUPYTER_NOTEBOOK_LABWARE_DIR])
+
+    return None
 
 
 def datafiles_from_paths(paths: Sequence[Union[str, pathlib.Path]]) -> Dict[str, bytes]:

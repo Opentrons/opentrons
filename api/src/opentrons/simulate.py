@@ -48,7 +48,11 @@ from opentrons.protocols.api_support.deck_type import (
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
+from .util.entrypoint_util import (
+    find_jupyter_labware,
+    labware_from_paths,
+    datafiles_from_paths,
+)
 
 
 # See Jira RCORE-535.
@@ -208,16 +212,11 @@ def get_protocol_api(
         raise TypeError("version must be either a string or an APIVersion")
     else:
         checked_version = version
-    if (
-        extra_labware is None
-        and IS_ROBOT
-        and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir()  # type: ignore[union-attr]
-    ):
+
+    if extra_labware is None:
         extra_labware = {
             uri: details.definition
-            for uri, details in labware_from_paths(
-                [str(JUPYTER_NOTEBOOK_LABWARE_DIR)]
-            ).items()
+            for uri, details in (find_jupyter_labware() or {}).items()
         }
 
     checked_hardware = _check_hardware_simulator(hardware_simulator, machine)
@@ -385,12 +384,9 @@ def simulate(  # noqa: C901
 
     contents = protocol_file.read()
     if custom_labware_paths:
-        extra_labware = {
-            uri: details.definition
-            for uri, details in labware_from_paths(custom_labware_paths).items()
-        }
+        extra_labware = labware_from_paths(custom_labware_paths)
     else:
-        extra_labware = {}
+        extra_labware = find_jupyter_labware() or {}
 
     if custom_data_paths:
         extra_data = datafiles_from_paths(custom_data_paths)
@@ -407,7 +403,12 @@ def simulate(  # noqa: C901
 
     try:
         protocol = parse.parse(
-            contents, file_name, extra_labware=extra_labware, extra_data=extra_data
+            contents,
+            file_name,
+            extra_labware={
+                uri: details.definition for uri, details in extra_labware.items()
+            },
+            extra_data=extra_data,
         )
     except parse.JSONSchemaVersionTooNewError as e:
         if e.attempted_schema_version == 6:
