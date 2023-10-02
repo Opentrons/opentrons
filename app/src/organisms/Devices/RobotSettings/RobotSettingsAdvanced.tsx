@@ -124,9 +124,7 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
+      {showSoftwareUpdateModal ? (
         <UpdateBuildroot
           robot={robot}
           close={() => setShowSoftwareUpdateModal(false)}

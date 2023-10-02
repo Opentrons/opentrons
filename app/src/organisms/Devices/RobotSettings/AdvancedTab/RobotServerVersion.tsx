@@ -15,7 +15,7 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { Portal } from '../../../../App/portal'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
+import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { useIsOT3, useRobot } from '../../hooks'
@@ -46,7 +46,7 @@ export function RobotServerVersion({
 
   return (
     <>
-      {showVersionInfoModal && robot != null && robot.status !== UNREACHABLE ? (
+      {showVersionInfoModal ? (
         <Portal level="top">
           <UpdateBuildroot
             robot={robot}
