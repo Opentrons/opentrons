@@ -6,14 +6,13 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+import { useFeatureFlag } from '../../../redux/config'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 import { getLabwareSetupItemGroups } from '../utils'
-
 import type {
   CompletedProtocolAnalysis,
   Cutout,
   FixtureLoadName,
-  LoadFixtureRunTimeCommand,
   ModuleModel,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -80,6 +79,9 @@ export const useRequiredProtocolHardware = (
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   const { data: deckConfig } = useDeckConfigurationQuery()
+  const enableDeckConfigurationFeatureFlag = useFeatureFlag(
+    'enableDeckConfiguration'
+  )
 
   if (analysis == null || analysis?.status !== 'completed') {
     return { requiredProtocolHardware: [], isLoading: true }
@@ -125,26 +127,52 @@ export const useRequiredProtocolHardware = (
     })
   )
 
-  const requiredFixture: ProtocolFixture[] = analysis.commands
-    .filter(
-      (command): command is LoadFixtureRunTimeCommand =>
-        command.commandType === 'loadFixture'
-    )
-    .map(({ params }) => {
-      return {
-        hardwareType: 'fixture',
-        fixtureName: params.loadName,
-        location: params.location,
-      }
-    })
-
+  //  TODO(jr, 10/2/23): IMMEDIATELY delete the stubs when api supports
+  //  loadFixture
+  // const requiredFixture: ProtocolFixture[] = analysis.commands
+  //   .filter(
+  //     (command): command is LoadFixtureRunTimeCommand =>
+  //       command.commandType === 'loadFixture'
+  //   )
+  //   .map(({ params }) => {
+  //     return {
+  //       hardwareType: 'fixture',
+  //       fixtureName: params.loadName,
+  //       location: params.location,
+  //     }
+  //   })
+  const STUBBED_FIXTURES: ProtocolFixture[] = [
+    {
+      hardwareType: 'fixture',
+      fixtureName: 'wasteChute',
+      location: { cutout: 'D3' },
+    },
+    {
+      hardwareType: 'fixture',
+      fixtureName: 'standardSlot',
+      location: { cutout: 'C3' },
+    },
+    {
+      hardwareType: 'fixture',
+      fixtureName: 'extensionSlot',
+      location: { cutout: 'B3' },
+    },
+  ]
   return {
-    requiredProtocolHardware: [
-      ...requiredPipettes,
-      ...requiredModules,
-      ...requiredGripper,
-      ...requiredFixture,
-    ],
+    requiredProtocolHardware: enableDeckConfigurationFeatureFlag
+      ? [
+          ...requiredPipettes,
+          ...requiredModules,
+          ...requiredGripper,
+          // ...requiredFixture,
+          ...STUBBED_FIXTURES,
+        ]
+      : [
+          ...requiredPipettes,
+          ...requiredModules,
+          ...requiredGripper,
+          // ...requiredFixture,
+        ],
     isLoading: isLoadingInstruments || isLoadingModules,
   }
 }

@@ -14,7 +14,9 @@ import {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
   WASTE_CHUTE_LOAD_NAME,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
+import { useFeatureFlag } from '../../../../redux/config'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
@@ -23,6 +25,7 @@ import type { DeckConfiguration, Protocol } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')
+jest.mock('../../../../redux/config')
 
 const PROTOCOL_ID = 'fake_protocol_id'
 
@@ -40,6 +43,9 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
 >
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 const PROTOCOL_ANALYSIS = {
@@ -174,6 +180,7 @@ describe('useMissingProtocolHardware', () => {
     mockUseDeckConfigurationQuery.mockReturnValue({
       data: [{}],
     } as UseQueryResult<DeckConfiguration>)
+    mockUseFeatureFlag.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -205,15 +212,15 @@ describe('useMissingProtocolHardware', () => {
     })
   })
   it('should return 1 conflicted slot', () => {
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    mockUseDeckConfigurationQuery.mockReturnValue(({
       data: [
         {
           fixtureId: 'mockFixtureId',
-          fixtureLocation: 'D3',
+          fixtureLocation: WASTE_CHUTE_SLOT,
           loadName: WASTE_CHUTE_LOAD_NAME,
         },
       ],
-    } as UseQueryResult<DeckConfiguration>)
+    } as any) as UseQueryResult<DeckConfiguration>)
 
     const { result } = renderHook(
       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),

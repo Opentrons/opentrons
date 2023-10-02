@@ -1,17 +1,21 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import {
+  EXTENSION_SLOT_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
+  WASTE_CHUTE_SLOT,
+} from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useRequiredProtocolHardware } from '../../../Protocols/hooks'
 import { Hardware } from '../Hardware'
-import { WASTE_CHUTE_LOAD_NAME, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 
 jest.mock('../../../Protocols/hooks')
+jest.mock('../../../../redux/config')
 
 const mockUseRequiredProtocolHardware = useRequiredProtocolHardware as jest.MockedFunction<
   typeof useRequiredProtocolHardware
 >
-
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 
 const render = (props: React.ComponentProps<typeof Hardware>) => {
@@ -63,7 +67,7 @@ describe('Hardware', () => {
           },
           {
             hardwareType: 'fixture',
-            fixtureName: 'extensionSlot',
+            fixtureName: EXTENSION_SLOT_LOAD_NAME,
             location: { cutout: 'B3' },
           },
         ],

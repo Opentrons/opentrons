@@ -122,6 +122,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
       </thead>
       <tbody>
         {requiredProtocolHardware.map((hardware, id) => {
+          console.log(hardware)
           let location: JSX.Element = (
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
