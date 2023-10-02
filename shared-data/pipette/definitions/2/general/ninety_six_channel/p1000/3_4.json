@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 96-Channel 1000 \u03bcL",
+  "displayName": "Flex 96-Channel 1000 μL",
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
@@ -28,11 +28,7 @@
     }
   },
   "availableSensors": {
-    "sensors": [
-      "pressure",
-      "capacitive",
-      "environment"
-    ],
+    "sensors": ["pressure", "capacitive", "environment"],
     "pressure": {
       "count": 2
     },
@@ -45,12 +41,7 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
-    "availableConfigurations": [
-      1,
-      8,
-      12,
-      96
-    ]
+    "availableConfigurations": [1, 8, 12, 96]
   },
   "backCompatNames": [],
   "channels": 96,

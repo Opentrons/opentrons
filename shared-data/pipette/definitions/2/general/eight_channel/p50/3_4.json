@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 8-Channel 50 \u03bcL",
+  "displayName": "Flex 8-Channel 50 μL",
   "model": "p50",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
@@ -33,11 +33,7 @@
     }
   },
   "availableSensors": {
-    "sensors": [
-      "pressure",
-      "capacitive",
-      "environment"
-    ],
+    "sensors": ["pressure", "capacitive", "environment"],
     "pressure": {
       "count": 2
     },
@@ -50,16 +46,7 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
-    "availableConfigurations": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8
-    ]
+    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
   },
   "backCompatNames": [],
   "channels": 8,

@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 1-Channel 1000 \u03bcL",
+  "displayName": "Flex 1-Channel 1000 μL",
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
@@ -27,11 +27,7 @@
     }
   },
   "availableSensors": {
-    "sensors": [
-      "pressure",
-      "capacitive",
-      "environment"
-    ],
+    "sensors": ["pressure", "capacitive", "environment"],
     "pressure": {
       "count": 1
     },
