@@ -170,9 +170,11 @@ class Well:
     def top(self, z: float = 0.0) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
-        negative offsets are lower. :return: A :py:class:`~opentrons.types.Point`
-        corresponding to the absolute position of the top-center of the well, plus the
-        ``z`` offset (if specified).
+            negative offsets are lower.
+
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the top-center of the well, plus the ``z`` offset
+            (if specified).
         """
         return Location(self._core.get_top(z_offset=z), self)
 
@@ -180,16 +182,19 @@ class Well:
     def bottom(self, z: float = 0.0) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
-        negative offsets are lower. :return: A :py:class:`~opentrons.types.Point`
-        corresponding to the absolute position of the bottom-center of the well, plus
-        the ``z`` offset (if specified)."""
+            negative offsets are lower. 
+        
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the bottom-center of the well, plus the ``z`` offset
+            (if specified).
+        """
         return Location(self._core.get_bottom(z_offset=z), self)
 
     @requires_version(2, 0)
     def center(self) -> Location:
         """
-        :return: A :py:class:`~opentrons.types.Point` corresponding to the absolute
-        position of the center of the well (in all three dimensions).
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the center of the well (in all three dimensions).
         """
         return Location(self._core.get_center(), self)
 
@@ -200,25 +205,27 @@ class Well:
         distance from the center of the well to the edge along each axis.
 
         For example, ``from_center_cartesian(0, 0, 0.5)`` specifies a point with no
-        change in the x- or y-axis, and half of the distance from the center of the well
-        to its top along the z-axis. Use :py:meth:`.move` to construct a
+        change in the x- or y-axis, and half of the distance from the center of
+        the well to its top along the z-axis. Use :py:meth:`.move` to construct a
         :py:class:`~opentrons.types.Location` that a pipette can move to.
 
-        :param x: The fraction of the distance from the well's center to its edge along
-        the x-axis. Negative values are to the left, and positive values are to the
-        right. :param y: The fraction of the distance from the well's center to its edge
-        along the y-axis. Negative values are to the front, and positive values are to
-        the back. :param z: The fraction of the distance from the well's center to its
-        edge along the x-axis. Negative values are down, and positive values are up.
+        :param x: The fraction of the distance from the well's center to its edge
+            along the x-axis. Negative values are to the left, and positive values
+            are to the right. 
+        :param y: The fraction of the distance from the well's center to its edge
+            along the y-axis. Negative values are to the front, and positive values
+            are to the back. 
+        :param z: The fraction of the distance from the well's center to its edge
+            along the x-axis. Negative values are down, and positive values are up.
 
         :return: A :py:class:`~opentrons.types.Point` representing the specified
-        distances in mm.
+            distances in mm.
 
         .. note:: Even if the absolute values of ``x``, ``y``, and ``z`` are all less
-        than 1, applying the result of ``from_center_cartesian`` to the well's center
-        may produce a location outside the physical well. For example,
-        ``from_center_cartesian(0.9, 0.9, 0)`` would be outside of a cylindrical well,
-        but inside a square well.
+            than 1, applying the result of ``from_center_cartesian`` to the well's
+            center may produce a location outside the physical well. For example,
+            ``from_center_cartesian(0.9, 0.9, 0)`` would be outside of a cylindrical
+            well, but inside a square well.
 
         """
         return self._core.from_center_cartesian(x, y, z)
