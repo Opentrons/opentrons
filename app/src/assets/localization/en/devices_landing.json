@@ -42,5 +42,5 @@
   "use_usb_cable_for_new_robot": "When setting up a new robot, use the included USB cable to connect for the first time.",
   "wait_after_connecting": "Wait for a minute after connecting the robot to the computer",
   "why_is_this_robot_unavailable": "Why is this robot unavailable?",
-  "deck_configuration":"Deck configuration"
+  "deck_configuration": "Deck configuration"
 }
