@@ -41,24 +41,26 @@ export function AddDeckConfigurationModal({
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <StyledText as="p">{t('add_to_slot_description')}</StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <FixtureButton fixtureLocation={t('staging_area_slot')} />
-          <FixtureButton fixtureLocation={t('trash')} />
-          <FixtureButton fixtureLocation={t('waste_chute')} />
+          <CutOutButton cutOut={t('staging_area_slot')} />
+          <CutOutButton cutOut={t('trash')} />
+          <CutOutButton cutOut={t('waste_chute')} />
         </Flex>
       </Flex>
     </Modal>
   )
 }
 
-interface FixtureButtonProps {
-  fixtureLocation: string
+interface CutOutButtonProps {
+  cutOut: string
 }
-function FixtureButton({ fixtureLocation }: FixtureButtonProps): JSX.Element {
+function CutOutButton({ cutOut }: CutOutButtonProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
+  // ToDo (kk:10/02/2023)
+  // Need to update a function for onClick
   return (
     <Btn
-      onClick={() => console.log('setSlotName')}
+      onClick={() => {}}
       display="flex"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       flexDirection={DIRECTION_ROW}
@@ -67,7 +69,7 @@ function FixtureButton({ fixtureLocation }: FixtureButtonProps): JSX.Element {
       css={FIXTIRE_BUTTON_STYLE}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {fixtureLocation}
+        {cutOut}
       </StyledText>
       <StyledText as="p">{t('add')}</StyledText>
     </Btn>

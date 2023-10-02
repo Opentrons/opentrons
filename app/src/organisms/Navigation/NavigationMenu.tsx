@@ -44,6 +44,8 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowNavMenu(false)
   }
 
+  // ToDo (kk:10/02/2023)
+  // Need to update a function for onClick
   return (
     <>
       {showRestartRobotConfirmationModal ? (
@@ -88,10 +90,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             </StyledText>
           </Flex>
         </MenuItem>
-        <MenuItem
-          key="deck-configuration"
-          onClick={() => console.log('deck-configuration')}
-        >
+        <MenuItem key="deck-configuration" onClick={() => {}}>
           <Flex alignItems={ALIGN_CENTER}>
             <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
             <StyledText
