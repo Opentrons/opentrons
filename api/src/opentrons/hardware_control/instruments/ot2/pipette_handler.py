@@ -263,6 +263,14 @@ class PipetteHandlerProvider(Generic[MountType]):
         return self.get_attached_instruments()
 
     @property
+    def attached_pipettes(self) -> Dict[MountType, PipetteDict]:
+        return self.get_attached_instruments()
+
+    @property
+    def get_attached_pipettes(self) -> Dict[MountType, PipetteDict]:
+        return self.get_attached_instruments()
+
+    @property
     def hardware_instruments(self) -> InstrumentsByMount[MountType]:
         """Do not write new code that uses this."""
         return self._attached_instruments
