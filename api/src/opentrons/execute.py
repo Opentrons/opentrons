@@ -363,6 +363,9 @@ def execute(  # noqa: C901
 
     contents = protocol_file.read()
 
+    # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
+    # to match documented behavior.
+    # See notes in https://github.com/Opentrons/opentrons/pull/13107
     if custom_labware_paths:
         extra_labware = labware_from_paths(custom_labware_paths)
     else:
