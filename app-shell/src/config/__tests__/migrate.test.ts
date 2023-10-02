@@ -20,10 +20,11 @@ import {
   MOCK_CONFIG_V17,
   MOCK_CONFIG_V18,
   MOCK_CONFIG_V19,
+  MOCK_CONFIG_V20,
 } from '../__fixtures__'
 import { migrate } from '../migrate'
 
-const NEWEST_VERSION = 19
+const NEWEST_VERSION = 20
 
 describe('config migration', () => {
   it('should migrate version 0 to latest', () => {
@@ -176,11 +177,17 @@ describe('config migration', () => {
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(MOCK_CONFIG_V19)
   })
-  it('should keep version 19', () => {
+  it('should keep migrate version 19 to latest', () => {
     const v19Config = MOCK_CONFIG_V19
     const result = migrate(v19Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(v19Config)
+    expect(result).toEqual(MOCK_CONFIG_V20)
+  })
+  it('should keep version 20', () => {
+    const v20Config = MOCK_CONFIG_V20
+    const result = migrate(v20Config)
+    expect(result.version).toBe(NEWEST_VERSION)
+    expect(result).toEqual(v20Config)
   })
 })
