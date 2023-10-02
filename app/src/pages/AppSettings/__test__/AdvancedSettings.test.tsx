@@ -123,9 +123,6 @@ describe('AdvancedSettings', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -273,10 +270,7 @@ describe('AdvancedSettings', () => {
     ).toBeNull()
   })
 
-  it('renders the allow sending all protocols to ot-3 section when feature flag is on', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(true)
+  it('renders the allow sending all protocols to ot-3 section', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Allow Sending All Protocols to Opentrons Flex')
     getByText(

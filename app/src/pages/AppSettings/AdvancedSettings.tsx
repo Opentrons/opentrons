@@ -85,7 +85,6 @@ export function AdvancedSettings(): JSX.Element {
     Config.getIsHeaterShakerAttached
   )
   const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
-  const enableExtendedHardware = Config.useFeatureFlag('enableExtendedHardware')
 
   const dispatch = useDispatch<Dispatch>()
   const { makeToast } = useToaster()
@@ -431,34 +430,32 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        {enableExtendedHardware ? (
-          <>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-            >
-              <Box width="70%">
-                <StyledText
-                  css={TYPOGRAPHY.h3SemiBold}
-                  paddingBottom={SPACING.spacing8}
-                  id="AdvancedSettings_showLink"
-                >
-                  {t('allow_sending_all_protocols_to_ot3')}
-                </StyledText>
-                <StyledText as="p">
-                  {t('allow_sending_all_protocols_to_ot3_description')}
-                </StyledText>
-              </Box>
-              <ToggleButton
-                label="allow_sending_all_protocols_to_ot3"
-                toggledOn={sendAllProtocolsToOT3}
-                onClick={toggleSendAllProtocolsToOT3}
-                id="AdvancedSettings_sendAllProtocolsToggleButton"
-              />
-            </Flex>
-            <Divider marginY={SPACING.spacing24} />
-          </>
-        ) : null}
+        <>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <Box width="70%">
+              <StyledText
+                css={TYPOGRAPHY.h3SemiBold}
+                paddingBottom={SPACING.spacing8}
+                id="AdvancedSettings_showLink"
+              >
+                {t('allow_sending_all_protocols_to_ot3')}
+              </StyledText>
+              <StyledText as="p">
+                {t('allow_sending_all_protocols_to_ot3_description')}
+              </StyledText>
+            </Box>
+            <ToggleButton
+              label="allow_sending_all_protocols_to_ot3"
+              toggledOn={sendAllProtocolsToOT3}
+              onClick={toggleSendAllProtocolsToOT3}
+              id="AdvancedSettings_sendAllProtocolsToggleButton"
+            />
+          </Flex>
+          <Divider marginY={SPACING.spacing24} />
+        </>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
@@ -565,8 +562,8 @@ export function AdvancedSettings(): JSX.Element {
               useTrashSurfaceForTipCal === true
                 ? ALWAYS_TRASH
                 : useTrashSurfaceForTipCal === false
-                ? ALWAYS_BLOCK
-                : ALWAYS_PROMPT
+                  ? ALWAYS_BLOCK
+                  : ALWAYS_PROMPT
             }
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               // you know this is a limited-selection field whose values are only
