@@ -182,7 +182,8 @@ export const RobotConfigurationDetails = (
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
               label={fixture.params.location.cutout}
-              item={getFixtureDisplayName(fixture.params.loadName)}
+              item={   <StyledText as="p">
+ getFixtureDisplayName(fixture.params.loadName)  </StyledText> }
             />
           </React.Fragment>
         )
