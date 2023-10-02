@@ -184,3 +184,7 @@ export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
 export const WASTE_CHUTE_SLOT: 'D3' = 'D3'
+
+export const STAGING_AREA_LOAD_NAME = 'stagingArea'
+export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
+export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'

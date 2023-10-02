@@ -154,4 +154,5 @@ export type Cutout = 'B3' | 'C3' | 'D3'
 interface LoadFixtureParams {
   location: { cutout: Cutout }
   loadName: FixtureLoadName
+  fixtureId?: string
 }

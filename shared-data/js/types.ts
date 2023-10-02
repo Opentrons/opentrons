@@ -24,6 +24,9 @@ import {
   GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
@@ -228,12 +231,8 @@ export type ModuleModelWithLegacy =
   | typeof MAGDECK
   | typeof TEMPDECK
 
-export const EXTENSION_SLOT_LOAD_NAME = 'extensionSlot'
-export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
-export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'
-
 export type FixtureLoadName =
-  | typeof EXTENSION_SLOT_LOAD_NAME
+  | typeof STAGING_AREA_LOAD_NAME
   | typeof STANDARD_SLOT_LOAD_NAME
   | typeof WASTE_CHUTE_LOAD_NAME
 
