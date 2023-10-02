@@ -150,11 +150,8 @@ interface LoadLiquidParams {
 interface LoadLiquidResult {
   liquidId: string
 }
-export type Cutout =
-  | 'B3' 
-  | 'C3' 
-  | 'D3' 
+export type Cutout = 'B3' | 'C3' | 'D3'
 interface LoadFixtureParams {
-  location: {cutout: Cutout}
-  loadName: FixtureLoadName 
+  location: { cutout: Cutout }
+  loadName: FixtureLoadName
 }

@@ -228,14 +228,14 @@ export type ModuleModelWithLegacy =
   | typeof MAGDECK
   | typeof TEMPDECK
 
-export const EXTENSION_SLOT_LOAD_NAME = 'extensionSlot' 
-export const STANDARD_SLOT_LOAD_NAME = 'standardSlot' 
-export const WASTE_CHUTE_LOAD_NAME= 'trashChute'
+export const EXTENSION_SLOT_LOAD_NAME = 'extensionSlot'
+export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
+export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'
 
 export type FixtureLoadName =
-  | typeof EXTENSION_SLOT_LOAD_NAME 
-  | typeof STANDARD_SLOT_LOAD_NAME 
-  | typeof WASTE_CHUTE_LOAD_NAME 
+  | typeof EXTENSION_SLOT_LOAD_NAME
+  | typeof STANDARD_SLOT_LOAD_NAME
+  | typeof WASTE_CHUTE_LOAD_NAME
 
 export interface DeckOffset {
   x: number

@@ -30,7 +30,7 @@ import type {
   LoadModuleRunTimeCommand,
   LoadFixtureRunTimeCommand,
   PipetteName,
-  RobotType
+  RobotType,
 } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
@@ -153,7 +153,7 @@ export const RobotConfigurationDetails = (
               label={
                 getModuleType(module.params.model) === THERMOCYCLER_MODULE_TYPE
                   ? getSlotsForThermocycler(robotType)
-                  : module.params.location.slotName,
+                  : module.params.location.slotName
               }
               item={
                 <>
@@ -175,8 +175,7 @@ export const RobotConfigurationDetails = (
             />
           </React.Fragment>
         )
-      })
-      }
+      })}
       {requiredFixtureDetails.map((fixture, index) => {
         return (
           <React.Fragment key={`fixture_${index}`}>
@@ -187,8 +186,7 @@ export const RobotConfigurationDetails = (
             />
           </React.Fragment>
         )
-      })
-      }
+      })}
     </Flex>
   )
 }

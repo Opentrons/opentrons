@@ -176,7 +176,7 @@ export function parseInitialLoadedLabwareByModuleId(
     loadLabwareCommandsReversed,
     (acc, command) =>
       typeof command.params.location === 'object' &&
-        'moduleId' in command.params.location
+      'moduleId' in command.params.location
         ? { ...acc, [command.params.location.moduleId]: command }
         : acc,
     {}
@@ -241,8 +241,7 @@ export function parseInitialLoadedFixturesByCutout(
     .reverse()
   return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
     loadFixtureCommandsReversed,
-    (acc, command) =>
-      ({ ...acc, [command.params.location.cutout]: command }),
+    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
     {}
   )
 }
@@ -306,9 +305,9 @@ export function parseLabwareInfoByLiquidId(
   const loadLiquidCommands =
     commands.length !== 0
       ? commands.filter(
-        (command): command is LoadLiquidRunTimeCommand =>
-          command.commandType === 'loadLiquid'
-      )
+          (command): command is LoadLiquidRunTimeCommand =>
+            command.commandType === 'loadLiquid'
+        )
       : []
 
   return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
