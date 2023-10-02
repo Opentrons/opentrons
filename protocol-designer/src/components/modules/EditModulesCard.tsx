@@ -154,6 +154,7 @@ export function EditModulesCard(props: Props): JSX.Element {
               }
               isEquipmentAdded={trashBin != null}
               name="trashBin"
+              hasWasteChute={wasteChute != null}
               trashBinSlot={trashSlot ?? undefined}
               trashBinId={trashBin?.id}
             />
@@ -165,6 +166,8 @@ export function EditModulesCard(props: Props): JSX.Element {
               }
               isEquipmentAdded={wasteChute != null}
               name="wasteChute"
+              hasWasteChute={wasteChute != null}
+              trashBinId={trashBin?.id}
             />
           </>
         ) : null}

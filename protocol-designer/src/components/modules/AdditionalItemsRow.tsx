@@ -9,6 +9,11 @@ import {
   LabeledValue,
   SPACING,
   SlotMap,
+  Tooltip,
+  useHoverTooltip,
+  Box,
+  TYPOGRAPHY,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
@@ -20,6 +25,7 @@ interface AdditionalItemsRowProps {
   handleAttachment: () => void
   isEquipmentAdded: boolean
   name: 'gripper' | 'wasteChute' | 'trashBin'
+  hasWasteChute?: boolean
   trashBinSlot?: string
   trashBinId?: string
 }
@@ -33,9 +39,14 @@ export function AdditionalItemsRow(
     name,
     trashBinSlot,
     trashBinId,
+    hasWasteChute,
   } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [trashModal, openTrashModal] = React.useState<boolean>(false)
   const addTrash = name !== 'gripper' && !isEquipmentAdded
+  const disabledRemoveButton =
+    (name === 'trashBin' && isEquipmentAdded && !hasWasteChute) ||
+    (name === 'wasteChute' && isEquipmentAdded && trashBinId == null)
 
   return (
     <>
@@ -96,22 +107,45 @@ export function AdditionalItemsRow(
           </>
         ) : null}
 
-        <div className={styles.modules_button_group}>
+        <Box
+          flexDirection={DIRECTION_ROW}
+          flex="1 0 40%"
+          textAlign={TYPOGRAPHY.textAlignRight}
+        >
           {name === 'trashBin' && isEquipmentAdded ? (
             <OutlineButton
-              className={styles.module_button}
               onClick={() => openTrashModal(true)}
+              className={styles.module_button}
             >
               {i18n.t('shared.edit')}
             </OutlineButton>
           ) : null}
-          <OutlineButton
-            className={styles.module_button}
-            onClick={addTrash ? () => openTrashModal(true) : handleAttachment}
+          <Box
+            {...targetProps}
+            width="6.75rem"
+            display="inline-block"
+            marginRight={SPACING.spacing16}
           >
-            {isEquipmentAdded ? i18n.t('shared.remove') : i18n.t('shared.add')}
-          </OutlineButton>
-        </div>
+            <OutlineButton
+              className={styles.module_button}
+              disabled={disabledRemoveButton}
+              onClick={addTrash ? () => openTrashModal(true) : handleAttachment}
+            >
+              {isEquipmentAdded
+                ? i18n.t('shared.remove')
+                : i18n.t('shared.add')}
+            </OutlineButton>
+          </Box>
+          {disabledRemoveButton ? (
+            <Tooltip
+              {...tooltipProps}
+              width="10rem"
+              textAlign={TYPOGRAPHY.textAlignCenter}
+            >
+              {i18n.t(`tooltip.disabled_cannot_delete_trash`)}
+            </Tooltip>
+          ) : null}
+        </Box>
       </Flex>
     </>
   )

@@ -15,7 +15,7 @@
     "temperatureModuleType": "Temperature module",
     "magneticModuleType": "Magnetic module",
     "thermocyclerModuleType": "Thermocycler module",
-    "heaterShakerModuleType": "Heater-shaker module",
+    "heaterShakerModuleType": "Heater-Shaker module",
     "magneticBlockType": "Magnetic block"
   },
   "model_display_name": {

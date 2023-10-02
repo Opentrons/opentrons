@@ -63,6 +63,7 @@ describe('AdditionalItemsRow', () => {
       ...props,
       name: 'wasteChute',
       isEquipmentAdded: true,
+      trashBinId: 'mockId',
     }
     const { getByRole, getByText, getByAltText } = render(props)
     getByText('Waste Chute')
@@ -72,6 +73,15 @@ describe('AdditionalItemsRow', () => {
     getByText(`Slot ${WASTE_CHUTE_SLOT}`)
     getByRole('button', { name: 'remove' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
+  })
+  it('renders a disabled remove button for waste chute when there is no trash bin', () => {
+    props = {
+      ...props,
+      name: 'wasteChute',
+      isEquipmentAdded: true,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'remove' })).toBeDisabled()
   })
   it('renders no trash', () => {
     props = {
@@ -88,6 +98,9 @@ describe('AdditionalItemsRow', () => {
       ...props,
       name: 'trashBin',
       isEquipmentAdded: true,
+      hasWasteChute: true,
+      trashBinId: 'mockId',
+      trashBinSlot: 'A3',
     }
     const { getByRole, getByText } = render(props)
     getByText('Trash Bin')
@@ -95,5 +108,16 @@ describe('AdditionalItemsRow', () => {
     expect(props.handleAttachment).toHaveBeenCalled()
     getByRole('button', { name: 'edit' }).click()
     getByText('mock portal')
+  })
+  it('renders a disabled remove button for trash when theres no waste chute', () => {
+    props = {
+      ...props,
+      name: 'trashBin',
+      isEquipmentAdded: true,
+      hasWasteChute: false,
+    }
+    const { getByRole, getByText } = render(props)
+    getByText('Trash Bin')
+    expect(getByRole('button', { name: 'remove' })).toBeDisabled()
   })
 })
