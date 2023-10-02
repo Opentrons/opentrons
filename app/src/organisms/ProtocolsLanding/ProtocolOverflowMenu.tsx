@@ -140,17 +140,14 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
-
-          {sendAllProtocolsToOT3 || isOT3Protocol ? (
-            <MenuItem
-              onClick={handleClickSendToOT3}
-              data-testid="ProtocolOverflowMenu_sendToOT3"
-            >
-              {t('protocol_list:send_to_ot3_overflow', {
-                robot_display_name: FLEX_DISPLAY_NAME,
-              })}
-            </MenuItem>
-          ) : null}
+          <MenuItem
+            onClick={handleClickSendToOT3}
+            data-testid="ProtocolOverflowMenu_sendToOT3"
+          >
+            {t('protocol_list:send_to_robot_overflow', {
+              robot_display_name: FLEX_DISPLAY_NAME,
+            })}
+          </MenuItem>
           <MenuItem
             onClick={handleClickShowInFolder}
             data-testid="ProtocolOverflowMenu_showInFolder"

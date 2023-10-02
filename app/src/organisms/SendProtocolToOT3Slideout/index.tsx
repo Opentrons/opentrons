@@ -143,7 +143,7 @@ export function SendProtocolToOT3Slideout(
     <ChooseRobotSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}
-      title={t('protocol_list:send_to_ot3', {
+      title={t('protocol_list:send_to_robot', {
         robot_display_name: FLEX_DISPLAY_NAME,
       })}
       footer={

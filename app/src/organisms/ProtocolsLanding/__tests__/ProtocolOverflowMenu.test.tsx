@@ -8,7 +8,6 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
-import { getSendAllProtocolsToOT3 } from '../../../redux/config'
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import {
   analyzeProtocol,
@@ -19,7 +18,6 @@ import {
 import { ProtocolOverflowMenu } from '../ProtocolOverflowMenu'
 
 jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/config')
 jest.mock('../../../redux/protocol-storage')
 
 const mockHandleRunProtocol = jest.fn()
@@ -33,9 +31,6 @@ const mockRemoveProtocol = removeProtocol as jest.MockedFunction<
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
->
-const mockGetSendAllProtocolsToOT3 = getSendAllProtocolsToOT3 as jest.MockedFunction<
-  typeof getSendAllProtocolsToOT3
 >
 
 const render = () => {
@@ -57,7 +52,6 @@ describe('ProtocolOverflowMenu', () => {
   beforeEach(() => {
     mockTrackEvent = jest.fn()
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockGetSendAllProtocolsToOT3.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -96,17 +90,6 @@ describe('ProtocolOverflowMenu', () => {
     expect(store.dispatch).toHaveBeenCalledWith(
       analyzeProtocol(storedProtocolData.protocolKey)
     )
-  })
-
-  it('should call callback when clicking send to OT-3', () => {
-    mockGetSendAllProtocolsToOT3.mockReturnValue(true)
-
-    const [{ getByTestId, getByText }] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
-    fireEvent.click(button)
-    const sendToOT3Button = getByText('Send to Opentrons Flex')
-    fireEvent.click(sendToOT3Button)
-    expect(mockHandleSendProtocolToOT3).toHaveBeenCalledWith(storedProtocolData)
   })
 
   it('should call folder open function when clicking show in folder', () => {

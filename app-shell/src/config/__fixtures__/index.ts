@@ -19,7 +19,9 @@ import type {
   ConfigV17,
   ConfigV18,
   ConfigV19,
+  ConfigV20,
 } from '@opentrons/app/src/redux/config/types'
+import { omit } from 'lodash'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
   version: 0, // Default key added on boot if missing in configs
@@ -249,4 +251,10 @@ export const MOCK_CONFIG_V19: ConfigV19 = {
     ...MOCK_CONFIG_V18.update,
     hasJustUpdated: false,
   },
+}
+
+export const MOCK_CONFIG_V20: ConfigV20 = {
+  ...MOCK_CONFIG_V19,
+  version: 20,
+  protocols: omit(MOCK_CONFIG_V19.protocols, ['sendAllProtocolsToOT3'])
 }

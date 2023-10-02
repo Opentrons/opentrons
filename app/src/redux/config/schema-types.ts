@@ -227,4 +227,9 @@ export type ConfigV19 = Omit<ConfigV18, 'version' | 'update'> & {
   }
 }
 
-export type Config = ConfigV19
+export type ConfigV20 = Omit<ConfigV19, 'version' | 'protocols'> & {
+  version: 20
+  protocols: Omit<ConfigV19['protocols'], 'sendAllProtocolsToOT3'>
+}
+
+export type Config = ConfigV20
