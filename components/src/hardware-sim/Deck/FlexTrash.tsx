@@ -2,8 +2,14 @@ import * as React from 'react'
 
 import { Icon } from '../../icons'
 import { Btn, Flex } from '../../primitives'
-import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS } from '../../ui-style-constants'
+import {
+  ALIGN_CENTER,
+  DISPLAY_FLEX,
+  JUSTIFY_CENTER,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+} from '../../styles'
+import { BORDERS, COLORS, SPACING } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
@@ -89,27 +95,21 @@ export const FlexTrash = ({
           justifyContent={JUSTIFY_CENTER}
           width="100%"
         >
-          {handleClickRemove != null && rotateDegrees === '180' ? (
-            <Btn
-              display={DISPLAY_FLEX}
-              justifyContent={JUSTIFY_CENTER}
-              onClick={() => handleClickRemove(trashSlotName)}
-            >
-              <Icon name="remove" color={COLORS.white} height="2.25rem" />
-            </Btn>
-          ) : null}
           <Icon
             name="trash"
             color={trashIconColor}
             height="3.5rem"
+            position={POSITION_RELATIVE}
             // rotate icon back 180 degrees
             transform={`rotate(${rotateDegrees}deg)`}
             transformOrigin="center"
           />
-          {handleClickRemove != null && rotateDegrees === '0' ? (
+          {handleClickRemove != null ? (
             <Btn
               display={DISPLAY_FLEX}
               justifyContent={JUSTIFY_CENTER}
+              left={rotateDegrees === '180' ? SPACING.spacing60 : '9.375rem'}
+              position={POSITION_ABSOLUTE}
               onClick={() => handleClickRemove(trashSlotName)}
             >
               <Icon name="remove" color={COLORS.white} height="2.25rem" />
