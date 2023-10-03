@@ -5,6 +5,7 @@
 include ./scripts/python.mk
 
 API_DIR := api
+API_CLIENT_DIR := api-client
 APP_SHELL_DIR := app-shell
 APP_SHELL_ODD_DIR := app-shell-odd
 COMPONENTS_DIR := components
@@ -15,6 +16,7 @@ NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
+REACT_API_CLIENT_DIR := react-api-client
 ROBOT_SERVER_DIR := robot-server
 SERVER_UTILS_DIR := server-utils
 STEP_GENERATION_DIR := step-generation
@@ -197,11 +199,17 @@ test-py: test-py-windows
 
 .PHONY: test-js
 test-js:
-	yarn jest \
-		--coverage=$(cover) \
-		--watch=$(watch) \
-		--updateSnapshot=$(updateSnapshot) \
-		--ci=$(if $(CI),true,false)
+	$(MAKE) -C $(API_CLIENT_DIR) test
+	$(MAKE) -C $(APP_SHELL_DIR) test
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) test
+	$(MAKE) -C $(COMPONENTS_DIR) test
+	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) test
+	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test
+	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test
+	$(MAKE) -C $(REACT_API_CLIENT_DIR) test
+	$(MAKE) -C $(SHARED_DATA_DIR) test
+	$(MAKE) -C $(STEP_GENERATION_DIR) test
+	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test
 
 # lints and typechecks
 .PHONY: lint
