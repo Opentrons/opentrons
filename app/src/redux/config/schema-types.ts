@@ -226,7 +226,7 @@ export type ConfigV19 = Omit<ConfigV18, 'version' | 'update'> & {
   }
 }
 
-export type ConfigV20 = ConfigV19 & {
+export type ConfigV20 = Omit<ConfigV19, 'version'> & {
   version: 20
   robotSystemUpdate: {
     manifestUrls: {
