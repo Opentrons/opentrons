@@ -1,7 +1,7 @@
 // general constants
 
-// 5 minute restart timeout
-export const RESTART_TIMEOUT_SEC = 300
+// 15 minute restart timeout
+export const RESTART_TIMEOUT_SEC = 900
 
 // restart statuses
 export const RESTART_PENDING_STATUS: 'restart-pending' = 'restart-pending'
