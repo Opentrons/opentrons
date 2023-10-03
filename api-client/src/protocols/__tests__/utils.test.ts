@@ -14,9 +14,12 @@ import {
 } from '../utils'
 import { simpleAnalysisFileFixture } from '../__fixtures__'
 
-import type {
+import {
   LoadFixtureRunTimeCommand,
   RunTimeCommand,
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 
 const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
@@ -369,7 +372,10 @@ describe('parseInitialLoadedFixturesByCutout', () => {
       {
         id: 'fakeId1',
         commandType: 'loadFixture',
-        params: { loadName: 'extensionSlot', location: { cutout: 'B3' } },
+        params: {
+          loadName: STAGING_AREA_LOAD_NAME,
+          location: { cutout: 'B3' },
+        },
         createdAt: 'fake_timestamp',
         startedAt: 'fake_timestamp',
         completedAt: 'fake_timestamp',
@@ -378,7 +384,7 @@ describe('parseInitialLoadedFixturesByCutout', () => {
       {
         id: 'fakeId2',
         commandType: 'loadFixture',
-        params: { loadName: 'wasteChute', location: { cutout: 'D3' } },
+        params: { loadName: WASTE_CHUTE_LOAD_NAME, location: { cutout: 'D3' } },
         createdAt: 'fake_timestamp',
         startedAt: 'fake_timestamp',
         completedAt: 'fake_timestamp',
@@ -387,7 +393,10 @@ describe('parseInitialLoadedFixturesByCutout', () => {
       {
         id: 'fakeId3',
         commandType: 'loadFixture',
-        params: { loadName: 'standardSlot', location: { cutout: 'C3' } },
+        params: {
+          loadName: STANDARD_SLOT_LOAD_NAME,
+          location: { cutout: 'C3' },
+        },
         createdAt: 'fake_timestamp',
         startedAt: 'fake_timestamp',
         completedAt: 'fake_timestamp',
