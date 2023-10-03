@@ -154,6 +154,7 @@
   "this_robot_will_restart_with_update": "<block>This robot has to restart to update its software. Restarting will immediately stop the current run or calibration.</block><block>Do you want to update now anyway?</block>",
   "tip_pickup_drop": "Tip Pickup / Drop",
   "to_run_protocol_go_to_protocols_page": "To run a protocol on this robot, import a protocol on the <navlink>Protocols page</navlink>",
+  "trash": "Trash",
   "update_now": "Update now",
   "updating_firmware": "Updating firmware...",
   "usb_port": "usb-{{port}}",

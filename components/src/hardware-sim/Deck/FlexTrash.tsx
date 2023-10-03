@@ -1,9 +1,9 @@
 import * as React from 'react'
 
 import { Icon } from '../../icons'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS } from '../../ui-style-constants'
+import { Btn, Flex } from '../../primitives'
+import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
+import { BORDERS, COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
@@ -26,6 +26,7 @@ interface FlexTrashProps {
   robotType: RobotType
   trashIconColor: string
   backgroundColor: string
+  handleClickRemove?: (trashSlotName: string) => void
   trashSlotName?: TrashSlotName
 }
 
@@ -37,6 +38,7 @@ export const FlexTrash = ({
   robotType,
   trashIconColor,
   backgroundColor,
+  handleClickRemove,
   // default Flex trash slot position A3
   trashSlotName = 'A3',
 }: FlexTrashProps): JSX.Element | null => {
@@ -87,6 +89,15 @@ export const FlexTrash = ({
           justifyContent={JUSTIFY_CENTER}
           width="100%"
         >
+          {handleClickRemove != null && rotateDegrees === '180' ? (
+            <Btn
+              display={DISPLAY_FLEX}
+              justifyContent={JUSTIFY_CENTER}
+              onClick={() => handleClickRemove(trashSlotName)}
+            >
+              <Icon name="remove" color={COLORS.white} height="2.25rem" />
+            </Btn>
+          ) : null}
           <Icon
             name="trash"
             color={trashIconColor}
@@ -95,6 +106,15 @@ export const FlexTrash = ({
             transform={`rotate(${rotateDegrees}deg)`}
             transformOrigin="center"
           />
+          {handleClickRemove != null && rotateDegrees === '0' ? (
+            <Btn
+              display={DISPLAY_FLEX}
+              justifyContent={JUSTIFY_CENTER}
+              onClick={() => handleClickRemove(trashSlotName)}
+            >
+              <Icon name="remove" color={COLORS.white} height="2.25rem" />
+            </Btn>
+          ) : null}
         </Flex>
       </RobotCoordsForeignObject>
     </g>

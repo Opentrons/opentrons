@@ -3,6 +3,10 @@ import * as React from 'react'
 import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../ui-style-constants'
@@ -13,7 +17,8 @@ import { EmptyFixture } from './EmptyFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 
-import type { DeckConfiguration, DeckSlot } from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { TrashSlotName } from '../Deck'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
@@ -21,7 +26,6 @@ interface DeckConfiguratorProps {
   handleClickRemove: (fixtureLocation: string) => void
   lightFill?: string
   darkFill?: string
-  trashSlotName?: DeckSlot['id']
   children?: React.ReactNode
 }
 
@@ -30,7 +34,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     handleClickAdd,
     handleClickRemove,
-    trashSlotName = 'A3',
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
     children,
@@ -38,19 +41,31 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   // restrict configuration to certain locations
-  const configurableFixtureLocations = ['B3', 'C3', 'D3']
+  const configurableFixtureLocations = [
+    'A1',
+    'B1',
+    'C1',
+    'D1',
+    'A3',
+    'B3',
+    'C3',
+    'D3',
+  ]
   const configurableDeckConfig = deckConfig.filter(fixture =>
     configurableFixtureLocations.includes(fixture.fixtureLocation)
   )
 
   const stagingAreaFixtures = configurableDeckConfig.filter(
-    fixture => fixture.loadName === 'extensionSlot'
+    fixture => fixture.loadName === STAGING_AREA_LOAD_NAME
   )
   const wasteChuteFixtures = configurableDeckConfig.filter(
-    fixture => fixture.loadName === 'trashChute'
+    fixture => fixture.loadName === WASTE_CHUTE_LOAD_NAME
   )
   const emptyFixtures = configurableDeckConfig.filter(
-    fixture => fixture.loadName === 'standardSlot'
+    fixture => fixture.loadName === STANDARD_SLOT_LOAD_NAME
+  )
+  const trashBinFixtures = configurableDeckConfig.filter(
+    fixture => fixture.loadName === TRASH_BIN_LOAD_NAME
   )
 
   return (
@@ -67,13 +82,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             slotClipColor={COLORS.transparent}
             slotBaseColor={lightFill}
           />
-          {slotDef.id === trashSlotName ? (
-            <FlexTrash
-              robotType={FLEX_ROBOT_TYPE}
-              trashIconColor={lightFill}
-              backgroundColor={darkFill}
-            />
-          ) : null}
         </>
       ))}
       {stagingAreaFixtures.map(fixture => (
@@ -95,6 +103,16 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           key={fixture.fixtureId}
           handleClickRemove={handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
+        />
+      ))}
+      {trashBinFixtures.map(fixture => (
+        <FlexTrash
+          key={fixture.fixtureId}
+          backgroundColor={darkFill}
+          handleClickRemove={handleClickRemove}
+          robotType={FLEX_ROBOT_TYPE}
+          trashIconColor={lightFill}
+          trashSlotName={fixture.fixtureLocation as TrashSlotName}
         />
       ))}
       <SlotLabels robotType={FLEX_ROBOT_TYPE} color={darkFill} />

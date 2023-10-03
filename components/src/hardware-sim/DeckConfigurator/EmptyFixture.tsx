@@ -43,8 +43,15 @@ export function EmptyFixture(props: EmptyFixtureProps): JSX.Element {
     slot => slot.id === fixtureLocation
   )
   const [xSlotPosition = 0, ySlotPosition = 0] = standardSlot?.position ?? []
+
   // TODO: remove adjustment when reading from fixture position
-  const xAdjustment = -17
+  // adjust x differently for right side/left side
+  const isLeftSideofDeck =
+    fixtureLocation === 'A1' ||
+    fixtureLocation === 'B1' ||
+    fixtureLocation === 'C1' ||
+    fixtureLocation === 'D1'
+  const xAdjustment = isLeftSideofDeck ? -101.5 : -17
   const x = xSlotPosition + xAdjustment
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment

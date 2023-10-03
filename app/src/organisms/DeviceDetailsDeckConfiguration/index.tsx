@@ -16,6 +16,12 @@ import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+import {
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
+} from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
 
@@ -35,24 +41,39 @@ export function DeviceDetailsDeckConfiguration({
 
   const handleClickAdd = (fixtureLocation: string): void => {
     console.log('TODO: open add fixture modal for location', fixtureLocation)
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: 'extensionSlot',
-    })
+    // temp: until modal built, just add a staging area or a trash
+    if (
+      fixtureLocation === 'A1' ||
+      fixtureLocation === 'B1' ||
+      fixtureLocation === 'C1' ||
+      fixtureLocation === 'D1'
+    ) {
+      updateDeckConfiguration({
+        fixtureLocation,
+        loadName: TRASH_BIN_LOAD_NAME,
+      })
+    } else {
+      updateDeckConfiguration({
+        fixtureLocation,
+        loadName: STAGING_AREA_LOAD_NAME,
+      })
+    }
   }
 
   const handleClickRemove = (fixtureLocation: string): void => {
     updateDeckConfiguration({
       fixtureLocation,
-      loadName: 'standardSlot',
+      loadName: STANDARD_SLOT_LOAD_NAME,
     })
   }
 
+  // TODO: replace with getFixtureDisplayName
   const fixtureDisplayNameDictionary: Record<FixtureLoadName, string | null> = {
-    extensionSlot: t('staging_area_slot'),
+    [STAGING_AREA_LOAD_NAME]: t('staging_area_slot'),
     // do not display standard slot
-    standardSlot: null,
-    trashChute: t('waste_chute'),
+    [STANDARD_SLOT_LOAD_NAME]: null,
+    [TRASH_BIN_LOAD_NAME]: t('trash'),
+    [WASTE_CHUTE_LOAD_NAME]: t('waste_chute'),
   }
 
   return (
