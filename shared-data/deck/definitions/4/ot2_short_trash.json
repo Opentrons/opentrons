@@ -1,6 +1,6 @@
 {
   "otId": "ot2_short_trash",
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "cornerOffsetFromOrigin": [-115.65, -68.03, 0],
   "dimensions": [624.3, 565.2, 0],
   "metadata": {
@@ -11,9 +11,10 @@
     "model": "OT-2 Standard"
   },
   "locations": {
-    "orderedSlots": [
+    "addressableAreas": [
       {
         "id": "1",
+        "areaType": "slot",
         "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -30,7 +31,8 @@
       },
       {
         "id": "2",
-        "position": [132.5, 0.0, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -46,7 +48,8 @@
       },
       {
         "id": "3",
-        "position": [265.0, 0.0, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -62,7 +65,8 @@
       },
       {
         "id": "4",
-        "position": [0.0, 90.5, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -78,7 +82,8 @@
       },
       {
         "id": "5",
-        "position": [132.5, 90.5, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -94,7 +99,8 @@
       },
       {
         "id": "6",
-        "position": [265.0, 90.5, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -110,7 +116,8 @@
       },
       {
         "id": "7",
-        "position": [0.0, 181.0, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -127,7 +134,8 @@
       },
       {
         "id": "8",
-        "position": [132.5, 181.0, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -143,7 +151,8 @@
       },
       {
         "id": "9",
-        "position": [265.0, 181.0, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -159,7 +168,8 @@
       },
       {
         "id": "10",
-        "position": [0.0, 271.5, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -175,7 +185,8 @@
       },
       {
         "id": "11",
-        "position": [132.5, 271.5, 0.0],
+        "areaType": "slot",
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -190,15 +201,90 @@
         ]
       },
       {
+        "id": "shortFixedTrash",
+        "areaType": "fixedTrash",
+        "position": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 172.86,
+          "yDimension": 165.86,
+          "zDimension": 58
+        },
+        "displayName": "Slot 12/Short Fixed Trash",
+        "compatibleModuleTypes": []
+      }
+    ],
+    "cutouts": [
+      {
+        "id": "1",
+        "position": [0.0, 0.0, 0.0],
+        "displayName": "Cutout 1",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "2",
+        "position": [132.5, 0.0, 0.0],
+        "displayName": "Cutout 2",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "3",
+        "position": [265.0, 0.0, 0.0],
+        "displayName": "Cutout 3",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "4",
+        "position": [0.0, 90.5, 0.0],
+        "displayName": "Cutout 4",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "5",
+        "position": [132.5, 90.5, 0.0],
+        "displayName": "Cutout 5",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "6",
+        "position": [265.0, 90.5, 0.0],
+        "displayName": "Cutout 6",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "7",
+        "position": [0.0, 181.0, 0.0],
+        "displayName": "Cutout 7",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "8",
+        "position": [132.5, 181.0, 0.0],
+        "displayName": "Cutout 8",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "9",
+        "position": [265.0, 181.0, 0.0],
+        "displayName": "Cutout 9",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "10",
+        "position": [0.0, 271.5, 0.0],
+        "displayName": "Slot 10",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
+        "id": "11",
+        "position": [132.5, 271.5, 0.0],
+        "displayName": "Cutout 11",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
+      },
+      {
         "id": "12",
         "position": [265.0, 271.5, 0.0],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
-        "displayName": "Slot 12",
-        "compatibleModuleTypes": []
+        "displayName": "Cutout 12",
+        "compatibleFixtureTypes": ["fixedTrashSlot"]
       }
     ],
     "calibrationPoints": [
@@ -262,16 +348,50 @@
         "position": [248.37, 351.5, 0.0],
         "displayName": "Slot 11 Top Right Dot"
       }
-    ],
-    "fixtures": [
-      {
-        "id": "fixedTrash",
-        "slot": "12",
-        "labware": "opentrons_1_trash_850ml_fixed",
-        "displayName": "Fixed Trash"
-      }
     ]
   },
+  "cutoutFixtures": [
+    {
+      "id": "singleStandardSlot",
+      "cutoutLocation": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11"
+      ],
+      "fixtureType": "singleStandardSlot",
+      "displayName": "Standard Slot",
+      "onFixtureItems": {
+        "1": ["1"],
+        "2": ["2"],
+        "3": ["3"],
+        "4": ["4"],
+        "5": ["5"],
+        "6": ["6"],
+        "7": ["7"],
+        "8": ["8"],
+        "9": ["9"],
+        "10": ["10"],
+        "11": ["11"]
+      }
+    },
+    {
+      "id": "fixedTrashSlot",
+      "cutoutLocation": ["12"],
+      "fixtureType": "fixedTrashSlot",
+      "displayName": "Fixed Trash",
+      "onFixtureItems": {
+        "12": ["shortFixedTrash"]
+      }
+    }
+  ],
   "layers": [
     {
       "name": "g",

@@ -89,7 +89,33 @@
         "C3",
         "D1",
         "D2",
-        "D3"
+        "D3",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "cutoutFixtureType": {
+      "type": "string",
+      "enum": [
+        "singleStandardSlot",
+        "singleLeftSlot",
+        "singleCenterSlot",
+        "singleRightSlot",
+        "stagingAreaRightSlot",
+        "fixedTrashSlot",
+        "trashBinAdapter",
+        "wasteChuteRightAdapter",
+        "wasteChuteRightAdapterWithStagingAreaSlot"
       ]
     }
   },
@@ -176,7 +202,7 @@
               "areaType": {
                 "description": "The type of deck item, defining allowed behavior.",
                 "type": "string",
-                "enum": ["slot", "movableTrash", "wasteChute"]
+                "enum": ["slot", "movableTrash", "fixedTrash", "wasteChute"]
               },
               "position": {
                 "$ref": "#/definitions/xyzArray",
@@ -275,16 +301,7 @@
                 "description": "Cutout fixtures that can be loaded onto this cutout.",
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "enum": [
-                    "singleLeftSlot",
-                    "singleCenterSlot",
-                    "singleRightSlot",
-                    "stagingAreaRightSlot",
-                    "trashBinAdapter",
-                    "wasteChuteRightAdapter",
-                    "wasteChuteRightAdapterWithStagingAreaSlot"
-                  ]
+                  "$ref": "#/definitions/cutoutFixtureType"
                 }
               }
             }
@@ -317,16 +334,7 @@
           },
           "fixtureType": {
             "description": "The type of cutout fixture.",
-            "type": "string",
-            "enum": [
-              "singleLeftSlot",
-              "singleCenterSlot",
-              "singleRightSlot",
-              "stagingAreaRightSlot",
-              "trashBinAdapter",
-              "wasteChuteRightAdapter",
-              "wasteChuteRightAdapterWithStagingAreaSlot"
-            ]
+            "$ref": "#/definitions/cutoutFixtureType"
           },
           "displayName": {
             "description": "A human-readable nickname for this area e.g. \"Standard Right Slot\" or \"Slot With Movable Trash\"",
@@ -359,10 +367,24 @@
                   "D2",
                   "D3",
                   "D4",
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12",
                   "movableTrash",
                   "1/8cWasteChute",
                   "96cWasteChute",
-                  "gripperWasteChute"
+                  "gripperWasteChute",
+                  "fixedTrash",
+                  "shortFixedTrash"
                 ]
               }
             }
