@@ -17,8 +17,6 @@ import {
 } from '@opentrons/components'
 import {
   PipetteName,
-  GEN1,
-  GEN2,
   OT2_PIPETTES,
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
@@ -140,7 +138,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
     const noneOption = allowNoPipette ? [{ name: 'None', value: '' }] : []
     return allow96Channel && display96Channel
       ? [...allPipetteOptions, ...noneOption]
-      : [...allPipetteOptions.filter(o => o.value != 'p1000_96'), ...noneOption]
+      : [...allPipetteOptions.filter(o => o.value !== 'p1000_96'), ...noneOption]
   }, [robotType])
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName
