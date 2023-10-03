@@ -7,11 +7,11 @@ import {
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import * as warningCreators from '../../warningCreators'
-import { uuid } from '../../utils'
 import {
   getHasWasteChute,
   getTiprackHasTips,
   getLabwareHasLiquid,
+  uuid,
 } from '../../utils'
 import type {
   CommandCreator,
