@@ -4,12 +4,14 @@ This module has functions that provide a console entrypoint for simulating
 a protocol from the command line.
 """
 import argparse
+from contextlib import ExitStack, contextmanager
 import sys
 import logging
 import os
 import pathlib
 import queue
 from typing import (
+    Generator,
     Any,
     Dict,
     List,
@@ -101,70 +103,79 @@ class _AccumulatingHandler(logging.Handler):
 
 
 class _CommandScraper:
-    """An object that handles scraping the broker for commands
-
-    This should be instantiated with the logger to integrate
-    messages from (e.g. ``logging.getLogger('opentrons')``), the
-    level to scrape, and the opentrons broker object to subscribe to.
-
-    The :py:attr:`commands` property contains the list of commands
-    and log messages integrated together. Each element of the list is
-    a dict following the pattern in the docs of :py:obj:`simulate`.
-    """
-
     def __init__(
         self, logger: logging.Logger, level: str, broker: LegacyBroker
     ) -> None:
-        """Build the scraper.
+        """An object that handles scraping the broker for commands and integrating log messages
+        with them.
 
-        :param logger: The :py:class:`logging.logger` to scrape
-        :param level: The log level to scrape
-        :param broker: Which broker to subscribe to
+        Params:
+            logger: The logger to integrate messages from, e.g. ``logging.getLogger("opentrons")``.
+            level: The log level to scrape.
+            broker: The broker to subscribe to for commands.
         """
         self._logger = logger
+        self._level = level
         self._broker = broker
-        self._queue: "queue.Queue[object]" = queue.Queue()
-        if level != "none":
-            level = getattr(logging, level.upper(), logging.WARNING)
-            self._logger.setLevel(level)
-            self._handler: Optional[_AccumulatingHandler] = _AccumulatingHandler(
-                level, self._queue
-            )
-            logger.addHandler(self._handler)
-        else:
-            self._handler = None
-        self._depth = 0
         self._commands: List[Mapping[str, Any]] = []
-        self._unsub = self._broker.subscribe(
-            command_types.COMMAND, self._command_callback
-        )
 
     @property
     def commands(self) -> List[Mapping[str, Mapping[str, Any]]]:
-        """The list of commands. See :py:obj:`simulate`"""
+        """The list of commands scraped while `.scrape()` was open, integrated with log messages.
+
+        See :py:obj:`simulate` for the return type.
+        """
         return self._commands
 
-    def __del__(self) -> None:
-        if getattr(self, "_handler", None):
-            try:
-                self._logger.removeHandler(self._handler)  # type: ignore
-            except Exception:
-                pass
-        if hasattr(self, "_unsub"):
-            self._unsub()
+    @contextmanager
+    def scrape(self) -> Generator[None, None, None]:
+        """While this context manager is open, scrape the broker for commands and integrate log
+        messages with them. The accumulated commands will be accessible through `.commands`.
+        """
+        log_queue: "queue.Queue[object]" = queue.Queue()
 
-    def _command_callback(self, message: command_types.CommandMessage) -> None:
-        """The callback subscribed to the broker"""
-        payload = message["payload"]
-        if message["$"] == "before":
-            self._commands.append(
-                {"level": self._depth, "payload": payload, "logs": []}
+        depth = 0
+
+        def handle_command(message: command_types.CommandMessage) -> None:
+            """The callback that we will subscribe to the broker."""
+            nonlocal depth
+            payload = message["payload"]
+            if message["$"] == "before":
+                self._commands.append({"level": depth, "payload": payload, "logs": []})
+                depth += 1
+            else:
+                while not log_queue.empty():
+                    self._commands[-1]["logs"].append(log_queue.get())
+                depth = max(depth - 1, 0)
+
+        if self._level != "none":
+            # The simulation entry points probably leave logging unconfigured, so the level will be
+            # Python's default. Set it to what the user asked to make sure we see the expected
+            # records.
+            #
+            # TODO(mm, 2023-10-03): This is a bit too intrusive for something whose job is just to
+            # "scrape." The entry point function should be responsible for setting the underlying
+            # logger's level.
+            level = getattr(logging, self._level.upper(), logging.WARNING)
+            self._logger.setLevel(level)
+
+            log_handler: Optional[_AccumulatingHandler] = _AccumulatingHandler(
+                level, log_queue
             )
-            self._depth += 1
         else:
-            while not self._queue.empty():
-                self._commands[-1]["logs"].append(self._queue.get())
-            self._depth = max(self._depth - 1, 0)
+            log_handler = None
+
+        with ExitStack() as exit_stack:
+            if log_handler is not None:
+                self._logger.addHandler(log_handler)
+                exit_stack.callback(self._logger.removeHandler, log_handler)
+
+            unsubscribe_from_broker = self._broker.subscribe(
+                command_types.COMMAND, handle_command
+            )
+            exit_stack.callback(unsubscribe_from_broker)
+
+            yield
 
 
 def get_protocol_api(
@@ -486,17 +497,18 @@ def simulate(  # noqa: C901
     if duration_estimator:
         broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
 
-    try:
-        execute.run_protocol(protocol, context)
-        if (
-            isinstance(protocol, PythonProtocol)
-            and protocol.api_level >= APIVersion(2, 0)
-            and protocol.bundled_labware is None
-            and allow_bundle()
-        ):
-            bundle_contents = bundle_from_sim(protocol, context)
-    finally:
-        context.cleanup()
+    with scraper.scrape():
+        try:
+            execute.run_protocol(protocol, context)
+            if (
+                isinstance(protocol, PythonProtocol)
+                and protocol.api_level >= APIVersion(2, 0)
+                and protocol.bundled_labware is None
+                and allow_bundle()
+            ):
+                bundle_contents = bundle_from_sim(protocol, context)
+        finally:
+            context.cleanup()
 
     return scraper.commands, bundle_contents
 
