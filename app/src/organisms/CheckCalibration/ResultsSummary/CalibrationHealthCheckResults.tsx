@@ -13,11 +13,11 @@ import { StyledText } from '../../../atoms/text'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
 interface CalibrationHealthCheckResultsProps {
-  isCalibrationCompleted: boolean
+  isCalibrationRecommended: boolean
 }
 
 export const CalibrationHealthCheckResults = ({
-  isCalibrationCompleted,
+  isCalibrationRecommended,
 }: CalibrationHealthCheckResultsProps): JSX.Element => {
   const { t } = useTranslation('robot_calibration')
   return (
@@ -25,17 +25,19 @@ export const CalibrationHealthCheckResults = ({
       <StyledText as="h1">{t('calibration_health_check_results')}</StyledText>
       <StatusLabel
         status={
-          isCalibrationCompleted
-            ? t('calibration_complete')
-            : t('calibration_recommended')
+          isCalibrationRecommended
+            ? t('calibration_recommended')
+            : t('calibration_complete')
         }
         backgroundColor={
-          isCalibrationCompleted
-            ? COLORS.successBackgroundLight
-            : COLORS.warningBackgroundLight
+          isCalibrationRecommended
+            ? COLORS.warningBackgroundLight
+            : COLORS.successBackgroundLight
         }
         iconColor={
-          isCalibrationCompleted ? COLORS.successEnabled : COLORS.warningEnabled
+          isCalibrationRecommended
+            ? COLORS.warningEnabled
+            : COLORS.successEnabled
         }
         textColor={COLORS.darkBlackEnabled}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
