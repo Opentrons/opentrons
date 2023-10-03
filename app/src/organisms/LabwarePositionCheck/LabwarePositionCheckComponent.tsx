@@ -14,7 +14,7 @@ import {
   Coordinates,
   FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
-  RobotType,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
@@ -46,7 +46,6 @@ interface LabwarePositionCheckModalProps {
   maintenanceRunId: string
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
-  robotType: RobotType
   onCloseClick: () => unknown
   setMaintenanceRunId: (id: string | null) => void
   caughtError?: Error
@@ -60,13 +59,13 @@ export const LabwarePositionCheckComponent = (
     existingOffsets,
     runId,
     maintenanceRunId,
-    robotType,
     onCloseClick,
     setMaintenanceRunId,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
+  const robotType = mostRecentAnalysis?.robotType ?? OT2_ROBOT_TYPE
 
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
@@ -187,17 +186,18 @@ export const LabwarePositionCheckComponent = (
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    const dropTipToBeSafeCommands: DropTipCreateCommand[] = robotType === FLEX_ROBOT_TYPE
-      ? []
-      : (protocolData?.pipettes ?? []).map(pip => ({
-          commandType: 'dropTip' as const,
-          params: {
-            pipetteId: pip.id,
-            labwareId: FIXED_TRASH_ID,
-            wellName: 'A1',
-            wellLocation: { origin: 'default' as const },
-          },
-        }))
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] =
+      robotType === FLEX_ROBOT_TYPE
+        ? []
+        : (protocolData?.pipettes ?? []).map(pip => ({
+            commandType: 'dropTip' as const,
+            params: {
+              pipetteId: pip.id,
+              labwareId: FIXED_TRASH_ID,
+              wellName: 'A1',
+              wellLocation: { origin: 'default' as const },
+            },
+          }))
     chainRunCommands(
       maintenanceRunId,
       [
@@ -330,7 +330,9 @@ export const LabwarePositionCheckComponent = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = <CheckItem {...currentStep} {...movementStepProps} {...{robotType}} />
+    modalContent = (
+      <CheckItem {...currentStep} {...movementStepProps} {...{ robotType }} />
+    )
   } else if (currentStep.section === 'ATTACH_PROBE') {
     modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'DETACH_PROBE') {

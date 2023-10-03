@@ -8,7 +8,6 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import { useFeatureFlag } from '../../../redux/config'
 import { useProtocolMetadata } from '../../Devices/hooks'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
@@ -23,9 +22,6 @@ const mockEndPosition = { x: 9, y: 19, z: 29 }
 
 const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
   typeof useProtocolMetadata
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
@@ -67,7 +63,7 @@ describe('CheckItem', () => {
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
-      robotType: OT2_ROBOT_TYPE
+      robotType: OT2_ROBOT_TYPE,
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: OT2_ROBOT_TYPE })
   })
@@ -534,7 +530,7 @@ describe('CheckItem', () => {
   it('executes correct chained commands when confirm placement CTA is clicked when using probe for LPC', async () => {
     props = {
       ...props,
-      robotType: FLEX_ROBOT_TYPE
+      robotType: FLEX_ROBOT_TYPE,
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: FLEX_ROBOT_TYPE })
     when(mockChainRunCommands)

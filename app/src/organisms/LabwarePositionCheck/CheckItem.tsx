@@ -72,7 +72,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     isRobotMoving,
     existingOffsets,
     setFatalError,
-    robotType
+    robotType,
   } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -262,9 +262,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             wellName: 'A1',
             wellLocation: {
               origin: 'top' as const,
-              offset: robotType === FLEX_ROBOT_TYPE 
-                ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
-                : IDENTITY_VECTOR,
+              offset:
+                robotType === FLEX_ROBOT_TYPE
+                  ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
+                  : IDENTITY_VECTOR,
             },
           },
         },
