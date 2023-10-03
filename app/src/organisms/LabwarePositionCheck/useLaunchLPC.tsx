@@ -18,7 +18,10 @@ export function useLaunchLPC(
   const {
     createTargetedMaintenanceRun,
   } = useCreateTargetedMaintenanceRunMutation()
-  const { deleteMaintenanceRun, isLoading: isDeletingMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const {
+    deleteMaintenanceRun,
+    isLoading: isDeletingMaintenanceRun,
+  } = useDeleteMaintenanceRunMutation()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(
     null

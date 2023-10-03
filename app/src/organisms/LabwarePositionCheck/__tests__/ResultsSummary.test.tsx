@@ -34,6 +34,7 @@ describe('ResultsSummary', () => {
       workingOffsets: mockWorkingOffsets,
       existingOffsets: mockExistingOffsets,
       isApplyingOffsets: false,
+      isDeletingMaintenanceRun: false,
       handleApplyOffsets: jest.fn(),
     }
   })
