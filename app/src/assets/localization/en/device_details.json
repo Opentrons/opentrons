@@ -5,6 +5,7 @@
   "about_pipette_name": "About {{name}} Pipette",
   "about_pipette": "About pipette",
   "add_to_slot_description": "Choose a fixture below to add to your deck configuration. It will be referenced during protocol analysis.",
+  "add_to_slot": "Add to slot {{slotName}}",
   "add": "Add",
   "an_error_occurred_while_updating_module": "An error occurred while updating your {{moduleName}}. Please try again.",
   "an_error_occurred_while_updating_please_try_again": "An error occurred while updating your pipette's settings. Please try again.",
