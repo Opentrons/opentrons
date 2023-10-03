@@ -26,3 +26,7 @@ dist:
 .PHONY: dev
 dev:
 	yarn --cwd .. start-storybook --port $(port)
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-components

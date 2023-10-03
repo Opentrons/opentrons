@@ -77,3 +77,7 @@ dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd:
 	wait-on http-get://localhost:$(PORT)
 	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-app

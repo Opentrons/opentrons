@@ -17,3 +17,7 @@ clean:
 .PHONY: build
 build:
 	rollup --config rollup.config.js
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-api-client

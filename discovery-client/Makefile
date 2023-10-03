@@ -27,3 +27,7 @@ lib: $(main_out) $(cli_out)
 
 $(main_out) $(cli_out):
 	yarn webpack
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-discovery-client

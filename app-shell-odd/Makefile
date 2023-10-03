@@ -85,3 +85,7 @@ dev: export NODE_ENV := development
 dev:
 	webpack
 	$(electron)
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-app-shell-odd

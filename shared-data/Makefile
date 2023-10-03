@@ -83,3 +83,7 @@ deploy-py:
 .PHONY: test-py
 test-py:
 	$(MAKE) -C python test
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-shared-data

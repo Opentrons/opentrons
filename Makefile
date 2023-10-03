@@ -17,6 +17,7 @@ SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 SERVER_UTILS_DIR := server-utils
+STEP_GENERATION_DIR := step-generation
 SYSTEM_SERVER_DIR := system-server
 HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
@@ -261,3 +262,7 @@ circular-dependencies-js:
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
+
+.PHONY: test-js-%
+test-js-%:
+	yarn jest $*

@@ -173,3 +173,7 @@ dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
 	webpack
 	$(electron)
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-app-shell

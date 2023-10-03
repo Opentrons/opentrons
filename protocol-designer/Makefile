@@ -57,3 +57,8 @@ test-e2e:
 	concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
 	"$(MAKE) dev CYPRESS=1" \
 	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
+
+# unit tests
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-protocol-designer
