@@ -2056,7 +2056,8 @@ class OT3API(
 
         # fixme: really only need this during labware position check so user
         # can verify if a tip is properly attached
-        await self.move_rel(realmount, spec.tiprack_up)
+        if spec.tiprack_up:
+            await self.move_rel(realmount, spec.tiprack_up)
 
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
