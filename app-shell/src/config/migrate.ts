@@ -359,7 +359,7 @@ const toVersion19 = (prevConfig: ConfigV18): ConfigV19 => {
   return nextConfig
 }
 
-const toVersion20 = (prevConfig: ConfigV20) => {
+const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
   const nextConfig = {
     ...prevConfig,
     version: 20 as const,
@@ -394,7 +394,7 @@ const MIGRATIONS: [
   (prevConfig: ConfigV16) => ConfigV17,
   (prevConfig: ConfigV17) => ConfigV18,
   (prevConfig: ConfigV18) => ConfigV19,
-  (prevConfig: ConfigV20) => ConfigV20
+  (prevConfig: ConfigV19) => ConfigV20
 ] = [
   toVersion1,
   toVersion2,
