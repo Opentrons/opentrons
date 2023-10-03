@@ -7,7 +7,7 @@ import type {
   ConfigV17,
   ConfigV18,
   ConfigV19,
-  ConfigV20
+  ConfigV20,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V12: ConfigV12 = {
@@ -125,7 +125,7 @@ export const MOCK_CONFIG_V20: ConfigV20 = {
   version: 20,
   robotSystemUpdate: {
     manifestUrls: {
-      OT2: 'not-used-on-ODD'
-    }
-  }
+      OT2: 'not-used-on-ODD',
+    },
+  },
 }
