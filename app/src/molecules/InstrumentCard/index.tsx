@@ -69,12 +69,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       {...styleProps}
     >
       {isGripperAttached ? (
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          size="3.75rem"
-          width={'60px'}
-          height={'54px'}
-        >
+        <Flex justifyContent={JUSTIFY_CENTER} width="3.75rem" height="3.35rem">
           <img
             src={flexGripper}
             alt="flex gripper"
