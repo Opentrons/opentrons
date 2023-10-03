@@ -248,7 +248,7 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back')} />
+    modalContent = <InProgressModal description={t('stand_back_exiting')} />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
       <BeforeBeginning

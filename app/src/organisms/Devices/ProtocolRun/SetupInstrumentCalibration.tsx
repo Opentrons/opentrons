@@ -8,9 +8,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
+import { getShowPipetteCalibrationWarning } from '../utils'
+import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import {
   useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
@@ -27,6 +28,7 @@ import type { GripperData } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
 const EQUIPMENT_POLL_MS = 5000
+
 interface SetupInstrumentCalibrationProps {
   robotName: string
   runId: string
@@ -54,8 +56,12 @@ export function SetupInstrumentCalibration({
         (i): i is GripperData => i.instrumentType === 'gripper'
       ) ?? null
     : null
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
+        <PipetteRecalibrationWarning />
+      )}
       <StyledText
         color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}

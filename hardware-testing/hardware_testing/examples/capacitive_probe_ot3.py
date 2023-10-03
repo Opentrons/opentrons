@@ -66,7 +66,7 @@ async def _probe_sequence(
         await helpers_ot3.wait_for_stable_capacitance_ot3(
             api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
         )
-    found_z = await api.capacitive_probe(
+    found_z, _ = await api.capacitive_probe(
         mount, z_ax, ASSUMED_Z_LOCATION.z, PROBE_SETTINGS_Z_AXIS
     )
     print(f"Found deck Z location = {found_z} mm")
@@ -85,7 +85,7 @@ async def _probe_sequence(
         await helpers_ot3.wait_for_stable_capacitance_ot3(
             api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
         )
-    found_x_left = await api.capacitive_probe(
+    found_x_left, _ = await api.capacitive_probe(
         mount,
         types.Axis.X,
         ASSUMED_XY_LOCATION.x - half_cutout,
@@ -95,7 +95,7 @@ async def _probe_sequence(
         await helpers_ot3.wait_for_stable_capacitance_ot3(
             api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
         )
-    found_x_right = await api.capacitive_probe(
+    found_x_right, _ = await api.capacitive_probe(
         mount,
         types.Axis.X,
         ASSUMED_XY_LOCATION.x + half_cutout,
@@ -106,7 +106,7 @@ async def _probe_sequence(
         await helpers_ot3.wait_for_stable_capacitance_ot3(
             api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
         )
-    found_y_front = await api.capacitive_probe(
+    found_y_front, _ = await api.capacitive_probe(
         mount,
         types.Axis.Y,
         ASSUMED_XY_LOCATION.y - half_cutout,
@@ -116,7 +116,7 @@ async def _probe_sequence(
         await helpers_ot3.wait_for_stable_capacitance_ot3(
             api, mount, threshold_pf=STABLE_CAP_PF, duration=1.0
         )
-    found_y_back = await api.capacitive_probe(
+    found_y_back, _ = await api.capacitive_probe(
         mount,
         types.Axis.Y,
         ASSUMED_XY_LOCATION.y + half_cutout,

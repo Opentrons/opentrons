@@ -123,7 +123,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset == null
+  const requireModuleCalibration = module.moduleOffset?.last_modified == null
   const isPipetteReady =
     (!attachPipetteRequired ?? false) && (!updatePipetteFWRequired ?? false)
   const latestRequestId = last(requestIds)

@@ -54,6 +54,14 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    PythonException,
+    PositionUnknownError,
+    GripperNotPresentError,
+    InvalidActuator,
+    FirmwareUpdateFailedError,
+)
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
@@ -104,11 +112,7 @@ from .types import (
     EstopState,
 )
 from .errors import (
-    MustHomeError,
-    GripperNotAttachedError,
-    AxisNotPresentError,
     UpdateOngoingError,
-    FirmwareUpdateFailed,
 )
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
@@ -494,9 +498,14 @@ class OT3API(
                 yield update_status
         except SubsystemUpdating as e:
             raise UpdateOngoingError(e.msg) from e
-        except Exception as e:
+        except EnumeratedError:
+            raise
+        except BaseException as e:
             mod_log.exception("Firmware update failed")
-            raise FirmwareUpdateFailed() from e
+            raise FirmwareUpdateFailedError(
+                message="Update failed because of uncaught error",
+                wrapping=[PythonException(e)],
+            ) from e
 
     # Incidentals (i.e. not motion) API
 
@@ -818,7 +827,7 @@ class OT3API(
                 gripper.default_home_force
             )
             await self._ungrip(duty_cycle=dc)
-        except GripperNotAttachedError:
+        except GripperNotPresentError:
             pass
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
@@ -896,17 +905,20 @@ class OT3API(
         specified mount.
         """
         if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
-            raise GripperNotAttachedError(
-                f"Cannot return position for {mount} if no gripper is attached"
+            raise GripperNotPresentError(
+                message=f"Cannot return position for {mount} if no gripper is attached",
+                detail={"mount": str(mount)},
             )
-
+        mount_axes = [Axis.X, Axis.Y, Axis.by_mount(mount)]
         if refresh:
             await self.refresh_positions()
         elif not self._current_position:
-            raise MustHomeError(
-                f"Motor positions for {str(mount)} are missing; must first home motors."
+            raise PositionUnknownError(
+                message=f"Motor positions for {str(mount)} mount are missing ("
+                f"{mount_axes}); must first home motors.",
+                detail={"mount": str(mount), "missing_axes": mount_axes},
             )
-        self._assert_motor_ok([Axis.X, Axis.Y, Axis.by_mount(mount)])
+        self._assert_motor_ok(mount_axes)
 
         return self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), self._current_position, critical_point
@@ -924,7 +936,7 @@ class OT3API(
         try:
             gripper = self._gripper_handler.get_gripper()
             gripper.state = await self._backend.get_jaw_state()
-        except GripperNotAttachedError:
+        except GripperNotPresentError:
             pass
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
@@ -947,16 +959,18 @@ class OT3API(
         invalid_axes = self._backend.get_invalid_motor_axes(axes)
         if invalid_axes:
             axes_str = ",".join([ax.name for ax in invalid_axes])
-            raise MustHomeError(
-                f"Motor position of axes ({axes_str}) is invalid; please home motors."
+            raise PositionUnknownError(
+                message=f"Motor position of axes ({axes_str}) is invalid; please home motors.",
+                detail={"axes": axes_str},
             )
 
     def _assert_encoder_ok(self, axes: Sequence[Axis]) -> None:
         invalid_axes = self._backend.get_invalid_motor_axes(axes)
         if invalid_axes:
             axes_str = ",".join([ax.name for ax in invalid_axes])
-            raise MustHomeError(
-                f"Encoder position of axes ({axes_str}) is invalid; please home motors."
+            raise PositionUnknownError(
+                message=f"Encoder position of axes ({axes_str}) is invalid; please home motors.",
+                detail={"axes": axes_str},
             )
 
     async def encoder_current_position(
@@ -982,13 +996,15 @@ class OT3API(
         if refresh:
             await self.refresh_positions()
         elif not self._encoder_position:
-            raise MustHomeError(
-                f"Encoder positions for {str(mount)} are missing; must first home motors."
+            raise PositionUnknownError(
+                message=f"Encoder positions for {str(mount)} are missing; must first home motors.",
+                detail={"mount": str(mount)},
             )
 
         if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
-            raise GripperNotAttachedError(
-                f"Cannot return encoder position for {mount} if no gripper is attached"
+            raise GripperNotPresentError(
+                message=f"Cannot return encoder position for {mount} if no gripper is attached",
+                detail={"mount": str(mount)},
             )
 
         self._assert_encoder_ok([Axis.X, Axis.Y, Axis.by_mount(mount)])
@@ -1118,7 +1134,9 @@ class OT3API(
 
         for axis in position.keys():
             if not self._backend.axis_is_present(axis):
-                raise AxisNotPresentError(f"{axis} is not present")
+                raise InvalidActuator(
+                    message=f"{axis} is not present", detail={"axis": str(axis)}
+                )
 
         if not self._backend.check_encoder_status(list(position.keys())):
             await self.home()
@@ -1236,7 +1254,7 @@ class OT3API(
                     force_newtons=gripper.default_idle_force,
                     stay_engaged=False,
                 )
-        except GripperNotAttachedError:
+        except GripperNotPresentError:
             pass
 
     def _build_moves(
@@ -1610,7 +1628,7 @@ class OT3API(
     async def grip(
         self, force_newtons: Optional[float] = None, stay_engaged: bool = True
     ) -> None:
-        self._gripper_handler.check_ready_for_jaw_move()
+        self._gripper_handler.check_ready_for_jaw_move("grip")
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
         )
@@ -1623,7 +1641,7 @@ class OT3API(
         To simply open the jaw, use `home_gripper_jaw` instead.
         """
         # get default grip force for release if not provided
-        self._gripper_handler.check_ready_for_jaw_move()
+        self._gripper_handler.check_ready_for_jaw_move("ungrip")
         # TODO: check jaw width to make sure it is actually gripping something
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_home_force
@@ -1631,7 +1649,7 @@ class OT3API(
         await self._ungrip(duty_cycle=dc)
 
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:
-        self._gripper_handler.check_ready_for_jaw_move()
+        self._gripper_handler.check_ready_for_jaw_move("hold_jaw_width")
         await self._hold_jaw_width(jaw_width_mm)
 
     async def _move_to_plunger_bottom(
@@ -1735,7 +1753,7 @@ class OT3API(
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
         self._pipette_handler.ready_for_tip_action(
-            instrument, HardwareAction.PREPARE_ASPIRATE
+            instrument, HardwareAction.PREPARE_ASPIRATE, checked_mount
         )
         if instrument.current_volume == 0:
             await self._move_to_plunger_bottom(checked_mount, rate)
@@ -2309,7 +2327,7 @@ class OT3API(
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
         self._pipette_handler.ready_for_tip_action(
-            instrument, HardwareAction.LIQUID_PROBE
+            instrument, HardwareAction.LIQUID_PROBE, checked_mount
         )
 
         if not probe_settings:
@@ -2357,7 +2375,7 @@ class OT3API(
         pass_settings: CapacitivePassSettings,
         retract_after: bool = True,
         probe: Optional[InstrumentProbeType] = None,
-    ) -> float:
+    ) -> Tuple[float, bool]:
         """Determine the position of something using the capacitive sensor.
 
         This function orchestrates detecting the position of a collision between the
@@ -2418,7 +2436,7 @@ class OT3API(
             else:
                 # default to primary (rear) probe
                 probe = InstrumentProbeType.PRIMARY
-        await self._backend.capacitive_probe(
+        contact = await self._backend.capacitive_probe(
             mount,
             moving_axis,
             machine_pass_distance,
@@ -2429,7 +2447,7 @@ class OT3API(
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:
             await self.move_to(mount, pass_start_pos)
-        return moving_axis.of_point(end_pos)
+        return moving_axis.of_point(end_pos), contact
 
     async def capacitive_sweep(
         self,

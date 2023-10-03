@@ -9,7 +9,7 @@ from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
-from opentrons.hardware_control import ExecutionCancelledError
+from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
 

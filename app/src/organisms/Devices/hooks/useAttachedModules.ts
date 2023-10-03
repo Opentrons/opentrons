@@ -1,8 +1,11 @@
 import { useModulesQuery } from '@opentrons/react-api-client'
-import type { AttachedModule } from '@opentrons/api-client'
+import type { UseQueryOptions } from 'react-query'
+import type { AttachedModule, Modules } from '@opentrons/api-client'
 
-export function useAttachedModules(): AttachedModule[] {
-  const attachedModulesResponse = useModulesQuery()
+export function useAttachedModules(
+  options: UseQueryOptions<Modules> = {}
+): AttachedModule[] {
+  const attachedModulesResponse = useModulesQuery({ ...options })
 
   return attachedModulesResponse.data?.data || []
 }

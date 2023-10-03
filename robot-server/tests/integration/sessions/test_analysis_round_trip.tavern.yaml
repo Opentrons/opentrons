@@ -1,0 +1,60 @@
+# When the Opentrons App creates a tip length calibration session, it sends the server a tip rack
+# definition from protocol analysis, such as the analyses available from GET /protocols/:id/analyses.
+#
+# Protocol analysis currently uses pydantic to parse and serialize labware definitions,
+# whereas tip length calibration uses jsonschema and TypedDicts. Accidental mismatches between those
+# can cause errors like https://opentrons.atlassian.net/browse/RSS-349. This test attempts to catch
+# them.
+test_name: Create a tip length calibration session with a labware definition from a protocol analysis
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload a protocol
+    request:
+      method: POST
+      url: '{ot2_server_base_url}/protocols'
+      files:
+        files:
+          tests/integration/protocols/load_opentrons_96_filtertiprack_20ul.py
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+
+  - name: Wait for analysis to complete and extract the tip rack's labware definition from it
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          status: completed
+          result: ok
+      save:
+        $ext: # Save the tip rack definition to {labware_definition}.
+          function: tests.integration.utils:find_labware_definition
+          extra_kwargs:
+            load_name: opentrons_96_filtertiprack_20ul
+
+  - name: Start a tip length calibration session
+    request:
+      url: "{ot2_server_base_url}/sessions"
+      method: POST
+      json:
+        data:
+          sessionType: tipLengthCalibration
+          createParams:
+            mount: right
+            hasCalibrationBlock: true
+            tipRackDefinition: !force_format_include '{labware_definition}'
+    response:
+      status_code: 201
