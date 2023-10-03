@@ -300,12 +300,12 @@ def test_get_properties_by_id(
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-0.125, y=1.125, z=68.275),
+            LabwareOffsetVector(x=-0.125, y=1.125, z=68.525),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=0.125, y=-1.125, z=68.275),
+            LabwareOffsetVector(x=0.125, y=-1.125, z=68.525),
         ),
     ],
 )
@@ -350,12 +350,12 @@ def test_get_module_offset_for_ot2_standard(
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_1.to_ot3_equivalent(),
-            LabwareOffsetVector(x=0, y=0, z=18.95),
+            LabwareOffsetVector(x=0, y=0, z=18.35),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_3.to_ot3_equivalent(),
-            LabwareOffsetVector(x=0, y=0, z=18.95),
+            LabwareOffsetVector(x=0, y=0, z=18.35),
         ),
         (
             lazy_fixture("mag_block_v1_def"),
