@@ -1,15 +1,20 @@
 import last from 'lodash/last'
 import {
+  useDeckConfigurationQuery,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
+import { useFeatureFlag } from '../../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
+  Cutout,
+  FixtureLoadName,
   ModuleModel,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -23,14 +28,12 @@ interface ProtocolPipette {
   connected: boolean
 }
 
-// TODO: change this to new slot naming system with an imported type from shared data
-type Slot = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11'
-
 interface ProtocolModule {
   hardwareType: 'module'
   moduleModel: ModuleModel
-  slot: Slot
+  slot: string
   connected: boolean
+  hasSlotConflict: boolean
 }
 
 interface ProtocolGripper {
@@ -38,10 +41,17 @@ interface ProtocolGripper {
   connected: boolean
 }
 
+interface ProtocolFixture {
+  hardwareType: 'fixture'
+  fixtureName: FixtureLoadName
+  location: { cutout: Cutout }
+}
+
 export type ProtocolHardware =
   | ProtocolPipette
   | ProtocolModule
   | ProtocolGripper
+  | ProtocolFixture
 
 /**
  * Returns an array of ProtocolHardware objects that are required by the given protocol ID.
@@ -70,6 +80,11 @@ export const useRequiredProtocolHardware = (
     isLoading: isLoadingInstruments,
   } = useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
+
+  const { data: deckConfig } = useDeckConfigurationQuery()
+  const enableDeckConfigurationFeatureFlag = useFeatureFlag(
+    'enableDeckConfiguration'
+  )
 
   if (analysis == null || analysis?.status !== 'completed') {
     return { requiredProtocolHardware: [], isLoading: true }
@@ -104,6 +119,11 @@ export const useRequiredProtocolHardware = (
         moduleModel: model,
         slot: location.slotName as Slot,
         connected: handleModuleConnectionCheckFor(attachedModules, model),
+        hasSlotConflict: !!deckConfig?.find(
+          fixture =>
+            fixture.fixtureLocation === location.slotName &&
+            fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+        ),
       }
     }
   )
@@ -124,12 +144,52 @@ export const useRequiredProtocolHardware = (
     })
   )
 
+  //  TODO(jr, 10/2/23): IMMEDIATELY delete the stubs when api supports
+  //  loadFixture
+  // const requiredFixture: ProtocolFixture[] = analysis.commands
+  //   .filter(
+  //     (command): command is LoadFixtureRunTimeCommand =>
+  //       command.commandType === 'loadFixture'
+  //   )
+  //   .map(({ params }) => {
+  //     return {
+  //       hardwareType: 'fixture',
+  //       fixtureName: params.loadName,
+  //       location: params.location,
+  //     }
+  //   })
+  const STUBBED_FIXTURES: ProtocolFixture[] = [
+    {
+      hardwareType: 'fixture',
+      fixtureName: 'wasteChute',
+      location: { cutout: 'D3' },
+    },
+    {
+      hardwareType: 'fixture',
+      fixtureName: 'standardSlot',
+      location: { cutout: 'C3' },
+    },
+    {
+      hardwareType: 'fixture',
+      fixtureName: 'stagingArea',
+      location: { cutout: 'B3' },
+    },
+  ]
   return {
-    requiredProtocolHardware: [
-      ...requiredPipettes,
-      ...requiredModules,
-      ...requiredGripper,
-    ],
+    requiredProtocolHardware: enableDeckConfigurationFeatureFlag
+      ? [
+          ...requiredPipettes,
+          ...requiredModules,
+          ...requiredGripper,
+          // ...requiredFixture,
+          ...STUBBED_FIXTURES,
+        ]
+      : [
+          ...requiredPipettes,
+          ...requiredModules,
+          ...requiredGripper,
+          // ...requiredFixture,
+        ],
     isLoading: isLoadingInstruments || isLoadingModules,
   }
 }
@@ -169,6 +229,7 @@ export const useMissingProtocolHardware = (
   protocolId: string
 ): {
   missingProtocolHardware: ProtocolHardware[]
+  conflictedSlots: string[]
   isLoading: boolean
 } => {
   const { requiredProtocolHardware, isLoading } = useRequiredProtocolHardware(
@@ -176,8 +237,14 @@ export const useMissingProtocolHardware = (
   )
   return {
     missingProtocolHardware: requiredProtocolHardware.filter(
-      hardware => !hardware.connected
+      hardware => 'connected' in hardware && !hardware.connected
     ),
+    conflictedSlots: requiredProtocolHardware
+      .filter(
+        (hardware): hardware is ProtocolModule =>
+          hardware.hardwareType === 'module' && hardware.hasSlotConflict
+      )
+      .map(mod => mod.slot),
     isLoading,
   }
 }
