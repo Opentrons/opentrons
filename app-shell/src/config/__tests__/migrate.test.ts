@@ -32,7 +32,7 @@ describe('config migration', () => {
     const result = migrate(v0Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 1 to latest', () => {
@@ -40,7 +40,7 @@ describe('config migration', () => {
     const result = migrate(v1Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 2 to latest', () => {
@@ -48,7 +48,7 @@ describe('config migration', () => {
     const result = migrate(v2Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 3 to latest', () => {
@@ -56,7 +56,7 @@ describe('config migration', () => {
     const result = migrate(v3Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 4 to latest', () => {
@@ -64,7 +64,7 @@ describe('config migration', () => {
     const result = migrate(v4Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 5 to latest', () => {
@@ -72,7 +72,7 @@ describe('config migration', () => {
     const result = migrate(v5Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 6 to latest', () => {
@@ -80,7 +80,7 @@ describe('config migration', () => {
     const result = migrate(v6Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 7 to latest', () => {
@@ -88,7 +88,7 @@ describe('config migration', () => {
     const result = migrate(v7Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 8 to latest', () => {
@@ -96,7 +96,7 @@ describe('config migration', () => {
     const result = migrate(v8Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 9 to latest', () => {
@@ -104,7 +104,7 @@ describe('config migration', () => {
     const result = migrate(v9Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 10 to latest', () => {
@@ -112,7 +112,7 @@ describe('config migration', () => {
     const result = migrate(v10Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 11 to latest', () => {
@@ -120,7 +120,7 @@ describe('config migration', () => {
     const result = migrate(v11Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 12 to latest', () => {
@@ -128,7 +128,7 @@ describe('config migration', () => {
     const result = migrate(v12Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 13 to latest', () => {
@@ -136,7 +136,7 @@ describe('config migration', () => {
     const result = migrate(v13Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 14 to latest', () => {
@@ -144,7 +144,7 @@ describe('config migration', () => {
     const result = migrate(v14Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 15 to latest', () => {
@@ -152,7 +152,7 @@ describe('config migration', () => {
     const result = migrate(v15Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 16 to latest', () => {
@@ -160,7 +160,7 @@ describe('config migration', () => {
     const result = migrate(v16Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
 
   it('should migrate version 17 to latest', () => {
@@ -168,14 +168,14 @@ describe('config migration', () => {
     const result = migrate(v17Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
   it('should migrate version 18 to latest', () => {
     const v18Config = MOCK_CONFIG_V18
     const result = migrate(v18Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
-    expect(result).toEqual(MOCK_CONFIG_V19)
+    expect(result).toEqual(MOCK_CONFIG_V20)
   })
   it('should keep migrate version 19 to latest', () => {
     const v19Config = MOCK_CONFIG_V19
