@@ -252,8 +252,9 @@ async def _force_gauge(
             force_output = []
             TH.start()
             try:
-                async with api._backend.motor_current():
-                    await api._backend.set_active_current({z_ax: test_current})
+                async with api._backend.motor_current(
+                    run_currents={z_ax: test_current}
+                ):
                     await api.move_to(
                         mount=mount,
                         abs_position=press_pos,
