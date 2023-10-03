@@ -56,7 +56,7 @@ const getCrashableModuleSelected = (
 ): boolean => {
   const formModule = modules[moduleType]
   const crashableModuleOnDeck =
-    formModule?.onDeck && formModule?.model
+    formModule?.onDeck && formModule?.model != null
       ? isModuleWithCollisionIssue(formModule.model)
       : false
 
