@@ -36,8 +36,13 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
+  parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
-import { getGripperDisplayName } from '@opentrons/shared-data'
+import {
+  LoadFixtureRunTimeCommand,
+  WASTE_CHUTE_LOAD_NAME,
+  getGripperDisplayName,
+} from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -68,6 +73,7 @@ import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
+import { useFeatureFlag } from '../../redux/config'
 
 const GRID_STYLE = css`
   display: grid;
@@ -185,6 +191,7 @@ export function ProtocolDetails(
   const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids'
   >('robot_config')
@@ -221,14 +228,32 @@ export function ProtocolDetails(
       : null
 
   const requiredModuleDetails =
-    mostRecentAnalysis != null
-      ? map(
-          parseInitialLoadedModulesBySlot(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          )
-        )
+    mostRecentAnalysis?.commands != null
+      ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
+      : []
+
+  // TODO: IMMEDIATELY remove stubbed fixture as soon as PE supports loadFixture
+  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
+    id: 'stubbed_load_fixture',
+    commandType: 'loadFixture',
+    params: {
+      fixtureId: 'stubbedFixtureId',
+      loadName: WASTE_CHUTE_LOAD_NAME,
+      location: { cutout: 'D3' },
+    },
+    createdAt: 'fakeTimestamp',
+    startedAt: 'fakeTimestamp',
+    completedAt: 'fakeTimestamp',
+    status: 'succeeded',
+  }
+  const requiredFixtureDetails =
+    enableDeckConfig && mostRecentAnalysis?.commands != null
+      ? [
+          ...map(
+            parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands)
+          ),
+          STUBBED_LOAD_FIXTURE,
+        ]
       : []
 
   const requiredLabwareDetails =
@@ -297,6 +322,7 @@ export function ProtocolDetails(
         rightMountPipetteName={rightMountPipetteName}
         extensionInstrumentName={requiredExtensionInstrumentName}
         requiredModuleDetails={requiredModuleDetails}
+        requiredFixtureDetails={requiredFixtureDetails}
         isLoading={analysisStatus === 'loading'}
         robotType={robotType}
       />
