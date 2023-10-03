@@ -117,7 +117,7 @@ export const useRequiredProtocolHardware = (
       return {
         hardwareType: 'module',
         moduleModel: model,
-        slot: location.slotName as Slot,
+        slot: location.slotName,
         connected: handleModuleConnectionCheckFor(attachedModules, model),
         hasSlotConflict: !!deckConfig?.find(
           fixture =>
