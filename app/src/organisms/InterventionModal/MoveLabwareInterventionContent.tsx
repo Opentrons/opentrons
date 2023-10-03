@@ -144,7 +144,6 @@ export function MoveLabwareInterventionContent({
     movedLabwareDefUri != null
       ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
       : null
-
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
     <Flex
