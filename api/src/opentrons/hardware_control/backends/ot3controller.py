@@ -944,14 +944,32 @@ class OT3Controller:
             self._current_settings[axis].hold_current = current
 
     @asynccontextmanager
-    async def restore_current(self) -> AsyncIterator[None]:
-        """Save the current."""
-        old_current_settings = deepcopy(self._current_settings)
+    async def motor_current(
+        self,
+        run_currents: OT3AxisMap[float] = {},
+        hold_currents: OT3AxisMap[float] = {},
+    ) -> AsyncIterator[None]:
+        """Update and restore current."""
+        assert self._current_settings
+        old_settings = deepcopy(self._current_settings)
+        if run_currents:
+            await self.set_active_current(run_currents)
+        if hold_currents:
+            await self.set_hold_current(hold_currents)
         try:
             yield
         finally:
-            self._current_settings = old_current_settings
-            await self.set_default_currents()
+            if run_currents:
+                await self.set_active_current(
+                    {ax: old_settings[ax].run_current for ax in run_currents.keys()}
+                )
+            if hold_currents:
+                await self.set_hold_current(
+                    {ax: old_settings[ax].hold_current for ax in hold_currents.keys()}
+                )
+            if not run_currents and not hold_currents:
+                self._current_settings = old_settings
+                await self.set_default_currents()
 
     @asynccontextmanager
     async def restore_z_r_run_current(self) -> AsyncIterator[None]:
