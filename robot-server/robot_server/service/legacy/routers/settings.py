@@ -292,13 +292,15 @@ async def get_pipette_settings(
         get_opentrons_path("pipette_config_overrides_dir")
     ):
         # Have to convert to dict using by_alias due to bug in fastapi
-        res[pipette_id] = _pipette_settings_from_id(
+        res[pipette_id] = _pipette_settings_from_known_id(
             pipette_id,
         )
     for dct in attached_pipettes.values():
         if "pipette_id" not in dct:
             continue
-        res[dct["pipette_id"]] = _pipette_settings_from_pipette_dict(dct)
+        res[dct["pipette_id"]] = _pipette_settings_with_defaults_from_attached_pipette(
+            dct
+        )
     return res
 
 
@@ -320,10 +322,10 @@ async def get_pipette_setting(
         get_opentrons_path("pipette_config_overrides_dir")
     )
     if pipette_id in known_ids:
-        return _pipette_settings_from_id(pipette_id)
+        return _pipette_settings_from_known_id(pipette_id)
     for dct in attached_pipettes.values():
         if dct.get("pipette_id") == pipette_id:
-            return _pipette_settings_from_pipette_dict(dct)
+            return _pipette_settings_with_defaults_from_attached_pipette(dct)
     raise LegacyErrorResponse(
         message=f"{pipette_id} is not a valid pipette id",
         errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
@@ -359,7 +361,7 @@ async def patch_pipette_setting(
             raise LegacyErrorResponse(
                 message=str(e), errorCode=ErrorCodes.GENERAL_ERROR.value.code
             ).as_error(status.HTTP_412_PRECONDITION_FAILED)
-    r = _pipette_settings_from_id(pipette_id)
+    r = _pipette_settings_from_known_id(pipette_id)
     return r
 
 
@@ -389,7 +391,7 @@ def _pipette_settings_from_mutable_configs(
     )
 
 
-def _pipette_settings_from_id(pipette_id: str) -> PipetteSettings:
+def _pipette_settings_from_known_id(pipette_id: str) -> PipetteSettings:
     """
     Create a PipetteSettings object from pipette config for single pipette
 
@@ -404,7 +406,7 @@ def _pipette_settings_from_id(pipette_id: str) -> PipetteSettings:
     return _pipette_settings_from_mutable_configs(mutable_configs)
 
 
-def _pipette_settings_from_pipette_dict(
+def _pipette_settings_with_defaults_from_attached_pipette(
     pipette_dict: hardware_dev_types.PipetteDict,
 ) -> PipetteSettings:
     """
