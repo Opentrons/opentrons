@@ -20,10 +20,7 @@ from opentrons.hardware_control.dev_types import (
     GripperDict,
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
-from opentrons.hardware_control.instruments.ot3.gripper_handler import (
-    GripError,
-    GripperHandler,
-)
+from opentrons.hardware_control.instruments.ot3.gripper_handler import GripperHandler
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
@@ -48,10 +45,7 @@ from opentrons.hardware_control.types import (
     EstopState,
     EstopStateNotification,
 )
-from opentrons.hardware_control.errors import (
-    GripperNotAttachedError,
-    InvalidMoveError,
-)
+from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import (
@@ -64,6 +58,11 @@ from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.types import Move
 
 from opentrons.config import gripper_config as gc
+from opentrons_shared_data.errors.exceptions import (
+    GripperNotPresentError,
+    CommandPreconditionViolated,
+    CommandParameterLimitViolated,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.types import (
     PipetteModelType,
@@ -74,7 +73,6 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
 )
-from opentrons_shared_data.errors.exceptions import CommandParameterLimitViolated
 from opentrons.hardware_control.modules import (
     Thermocycler,
     TempDeck,
@@ -702,7 +700,7 @@ async def test_capacitive_probe(
 ) -> None:
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(mount)
-    res = await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
+    res, _ = await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
     # in reality, this value would be the previous position + the value
     # updated in ot3controller.capacitive_probe, and it kind of is here, but that
     # previous position is always 0. This is a test of ot3api though and checking
@@ -924,13 +922,13 @@ async def test_gripper_action_fails_with_no_gripper(
     mock_ungrip: AsyncMock,
 ) -> None:
     with pytest.raises(
-        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+        GripperNotPresentError, match="Cannot perform action without gripper attached"
     ):
         await ot3_hardware.grip(5.0)
     mock_grip.assert_not_called()
 
     with pytest.raises(
-        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+        GripperNotPresentError, match="Cannot perform action without gripper attached"
     ):
         await ot3_hardware.ungrip()
     mock_ungrip.assert_not_called()
@@ -952,7 +950,9 @@ async def test_gripper_action_works_with_gripper(
     }
     await ot3_hardware.cache_gripper(instr_data)
 
-    with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
+    with pytest.raises(
+        CommandPreconditionViolated, match="Cannot grip gripper jaw before homing"
+    ):
         await ot3_hardware.grip(5.0)
     await ot3_hardware.home_gripper_jaw()
     mock_ungrip.assert_called_once()
@@ -981,7 +981,7 @@ async def test_gripper_move_fails_with_no_gripper(
     ot3_hardware: ThreadManager[OT3API],
 ) -> None:
     assert not ot3_hardware._gripper_handler.gripper
-    with pytest.raises(GripperNotAttachedError):
+    with pytest.raises(GripperNotPresentError):
         await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
 
 
@@ -992,7 +992,7 @@ async def test_gripper_mount_not_movable(
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
     assert ot3_hardware._gripper_handler.gripper
-    with pytest.raises(InvalidMoveError):
+    with pytest.raises(InvalidCriticalPoint):
         await ot3_hardware.move_to(
             OT3Mount.GRIPPER, Point(0, 0, 0), critical_point=CriticalPoint.MOUNT
         )
@@ -1013,7 +1013,7 @@ async def test_gripper_fails_for_pipette_cps(
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
     assert ot3_hardware._gripper_handler.gripper
-    with pytest.raises(InvalidMoveError):
+    with pytest.raises(InvalidCriticalPoint):
         await ot3_hardware.move_to(
             OT3Mount.GRIPPER, Point(0, 0, 0), critical_point=critical_point
         )

@@ -21,6 +21,7 @@ from opentrons_hardware.firmware_bindings.arbitration_id import (
 )
 
 from opentrons_hardware.hardware_control import motor_position_status
+from opentrons_hardware.hardware_control.types import MotorPositionStatus
 
 NODE_TO_POS = {NodeId.gantry_x: 1000, NodeId.gantry_y: 2000, NodeId.head: 3000}
 
@@ -93,7 +94,7 @@ async def test_parse_estimation_response(
             ),
             1,
         )
-        assert data == (NODE_TO_POS[node] / 1000, 0.123, True, False)
+        assert data == MotorPositionStatus(NODE_TO_POS[node] / 1000, 0.123, True, False)
     else:
         with pytest.raises(StopAsyncIteration):
             await asyncio.wait_for(

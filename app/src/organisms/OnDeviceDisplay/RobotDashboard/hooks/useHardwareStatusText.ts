@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
-export function useMissingHardwareText(
-  missingProtocolHardware: ProtocolHardware[]
+export function useHardwareStatusText(
+  missingProtocolHardware: ProtocolHardware[],
+  conflictedSlots: string[]
 ): string {
   const { t, i18n } = useTranslation('device_details')
   const missingProtocolHardwareType = missingProtocolHardware.map(
@@ -16,7 +17,9 @@ export function useMissingHardwareText(
   const countMissingPipettes = countMissingHardwareType('pipette')
   const countMissingModules = countMissingHardwareType('module')
   let chipText: string = t('ready_to_run')
-  if (countMissingPipettes === 0 && countMissingModules > 0) {
+  if (conflictedSlots.length > 0) {
+    chipText = t('location_conflicts')
+  } else if (countMissingPipettes === 0 && countMissingModules > 0) {
     if (countMissingModules === 1) {
       chipText = t('missing_module', {
         num: countMissingModules,

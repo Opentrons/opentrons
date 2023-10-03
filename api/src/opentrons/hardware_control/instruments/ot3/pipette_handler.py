@@ -20,6 +20,8 @@ from opentrons_shared_data.pipette.dev_types import UlPerMmAction
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    UnexpectedTipRemovalError,
+    UnexpectedTipAttachError,
 )
 from opentrons_shared_data.pipette.pipette_definition import (
     liquid_class_for_volume_between_default_and_defaultlowvolume,
@@ -31,10 +33,6 @@ from opentrons.hardware_control.types import (
     HardwareAction,
     Axis,
     OT3Mount,
-)
-from opentrons.hardware_control.errors import (
-    TipAttachedError,
-    NoTipAttachedError,
 )
 from opentrons.hardware_control.constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -487,9 +485,11 @@ class OT3PipetteHandler:
         else:
             return top_types.Point(0, 0, 0)
 
-    def ready_for_tip_action(self, target: Pipette, action: HardwareAction) -> None:
+    def ready_for_tip_action(
+        self, target: Pipette, action: HardwareAction, mount: OT3Mount
+    ) -> None:
         if not target.has_tip:
-            raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
+            raise UnexpectedTipRemovalError(str(action), target.name, mount.name)
         if (
             action == HardwareAction.ASPIRATE
             and target.current_volume == 0
@@ -545,7 +545,7 @@ class OT3PipetteHandler:
         - Plunger distances (possibly calling an overridden plunger_volume)
         """
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.ASPIRATE)
+        self.ready_for_tip_action(instrument, HardwareAction.ASPIRATE, mount)
         if volume is None:
             self._ihp_log.debug(
                 "No aspirate volume defined. Aspirating up to "
@@ -606,7 +606,7 @@ class OT3PipetteHandler:
         """
 
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DISPENSE)
+        self.ready_for_tip_action(instrument, HardwareAction.DISPENSE, mount)
 
         if volume is None:
             disp_vol = instrument.current_volume
@@ -674,7 +674,7 @@ class OT3PipetteHandler:
     ) -> LiquidActionSpec:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
+        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT, mount)
         speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
         acceleration = self.plunger_acceleration(
             instrument, instrument.flow_acceleration
@@ -734,7 +734,7 @@ class OT3PipetteHandler:
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
-            raise TipAttachedError("Cannot pick up tip with a tip attached")
+            raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
         def add_tip_to_instr() -> None:
@@ -880,7 +880,7 @@ class OT3PipetteHandler:
         home_after: bool,
     ) -> Tuple[DropTipSpec, Callable[[], None]]:
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
+        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP, mount)
 
         is_96_chan = instrument.channels == 96
 

@@ -67,6 +67,7 @@
   "left": "left",
   "lights": "Lights",
   "link_firmware_update": "View Firmware Update",
+  "location_conflicts": "Location conflicts",
   "magdeck_gen1_height": "Height: {{height}}",
   "magdeck_gen2_height": "Height: {{height}} mm",
   "max_engage_height": "Max Engage Height",
