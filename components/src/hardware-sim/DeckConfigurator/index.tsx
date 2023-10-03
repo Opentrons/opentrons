@@ -11,14 +11,14 @@ import {
 
 import { COLORS } from '../../ui-style-constants'
 import { DeckSlotLocation } from '../DeckSlotLocation'
-import { FlexTrash, SlotLabels } from '../Deck'
+import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { EmptyFixture } from './EmptyFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
+import { TrashBinFixture } from './TrashBinFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import type { TrashSlotName } from '../Deck'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
@@ -106,13 +106,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         />
       ))}
       {trashBinFixtures.map(fixture => (
-        <FlexTrash
+        <TrashBinFixture
           key={fixture.fixtureId}
-          backgroundColor={darkFill}
           handleClickRemove={handleClickRemove}
-          robotType={FLEX_ROBOT_TYPE}
-          trashIconColor={lightFill}
-          trashSlotName={fixture.fixtureLocation as TrashSlotName}
+          fixtureLocation={fixture.fixtureLocation}
         />
       ))}
       <SlotLabels robotType={FLEX_ROBOT_TYPE} color={darkFill} />
