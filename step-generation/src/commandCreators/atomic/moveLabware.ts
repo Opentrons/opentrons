@@ -12,12 +12,12 @@ import {
   getHasWasteChute,
   getTiprackHasTips,
   getLabwareHasLiquid,
-  CommandCreatorWarning,
-} from '../..'
+} from '../../utils'
 import type {
   CommandCreator,
   CommandCreatorError,
   MoveLabwareArgs,
+  CommandCreatorWarning,
 } from '../../types'
 
 /** Move labware from one location to another, manually or via a gripper. */
@@ -28,9 +28,14 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
 ) => {
   const { labware, useGripper, newLocation } = args
   const { additionalEquipmentEntities } = invariantContext
-  const { tipState, liquidState } = prevRobotState
-  const tiprackHasTip = getTiprackHasTips(tipState, labware)
-  const labwareHasLiquid = getLabwareHasLiquid(liquidState, labware)
+  const tiprackHasTip =
+    prevRobotState.tipState != null
+      ? getTiprackHasTips(prevRobotState.tipState, labware)
+      : false
+  const labwareHasLiquid =
+    prevRobotState.liquidState != null
+      ? getLabwareHasLiquid(prevRobotState.liquidState, labware)
+      : false
 
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
