@@ -870,15 +870,15 @@ class TransferPlan:
     ):
         if air_gap >= max_volume:
             raise ValueError(
-                "The air gap must be less than the working volume of the pipette"
+                "The air gap must be less than the maximum volume of the pipette"
             )
         elif disposal_volume >= max_volume:
             raise ValueError(
-                "The disposal volume must be less than the working volume of the pipette"
+                "The disposal volume must be less than the maximum volume of the pipette"
             )
         elif disposal_volume + air_gap >= max_volume:
             raise ValueError(
-                "The sum of the air gap and disposal volume must be less than the working volume of the pipette"
+                "The sum of the air gap and disposal volume must be less than the maximum volume of the pipette"
             )
 
     def _check_valid_well_list(self, well_list, id, old_well_list):
