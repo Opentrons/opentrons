@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
-export function useMissingHardwareText(
+export function useHardwareStatusText(
   missingProtocolHardware: ProtocolHardware[],
   conflictedSlots: string[]
 ): string {

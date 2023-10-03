@@ -2,9 +2,9 @@ import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
 import { i18n } from '../../../../../i18n'
-import { useMissingHardwareText } from '..'
+import { useHardwareStatusText } from '..'
 
-describe('useMissingHardwareText', () => {
+describe('useHardwareStatusText', () => {
   let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
     wrapper = ({ children }) => (
@@ -12,7 +12,7 @@ describe('useMissingHardwareText', () => {
     )
   })
   it('should return string for ready', () => {
-    const { result } = renderHook(() => useMissingHardwareText([], []), {
+    const { result } = renderHook(() => useHardwareStatusText([], []), {
       wrapper,
     })
     expect(result.current).toEqual('Ready to run')
@@ -20,7 +20,7 @@ describe('useMissingHardwareText', () => {
   it('should return missing 1 module', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText(
+        useHardwareStatusText(
           [
             {
               hardwareType: 'module',
@@ -41,7 +41,7 @@ describe('useMissingHardwareText', () => {
   it('should return missing 2 modules', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText(
+        useHardwareStatusText(
           [
             {
               hardwareType: 'module',
@@ -69,7 +69,7 @@ describe('useMissingHardwareText', () => {
   it('should return missing 1 pipette', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText(
+        useHardwareStatusText(
           [
             {
               hardwareType: 'pipette',
@@ -89,7 +89,7 @@ describe('useMissingHardwareText', () => {
   it('should return missing 2 pipettes', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText(
+        useHardwareStatusText(
           [
             {
               hardwareType: 'pipette',
@@ -115,7 +115,7 @@ describe('useMissingHardwareText', () => {
   it('should return missing hardware', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText(
+        useHardwareStatusText(
           [
             {
               hardwareType: 'pipette',
@@ -142,7 +142,7 @@ describe('useMissingHardwareText', () => {
   it('should return location conflict', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareText(
+        useHardwareStatusText(
           [
             {
               hardwareType: 'module',

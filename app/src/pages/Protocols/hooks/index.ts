@@ -6,16 +6,17 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { useFeatureFlag } from '../../../redux/config'
-import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
-import { getLabwareSetupItemGroups } from '../utils'
-import type {
+import {
   CompletedProtocolAnalysis,
   Cutout,
   FixtureLoadName,
   ModuleModel,
   PipetteName,
+  STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
+import { useFeatureFlag } from '../../../redux/config'
+import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
+import { getLabwareSetupItemGroups } from '../utils'
 import type { LabwareSetupItem } from '../utils'
 
 interface ProtocolPipette {
@@ -106,7 +107,9 @@ export const useRequiredProtocolHardware = (
       // TODO: check module compatability using brent's changes when they're in edge
       connected: attachedModules.some(m => m.moduleModel === model),
       hasSlotConflict: !!deckConfig?.find(
-        fixture => fixture.fixtureLocation === location.slotName
+        fixture =>
+          fixture.fixtureLocation === location.slotName &&
+          fixture.loadName !== STANDARD_SLOT_LOAD_NAME
       ),
     })
   )

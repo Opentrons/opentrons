@@ -35,7 +35,7 @@ import {
   ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
 } from '../../../organisms/OnDeviceDisplay/ProtocolDetails'
-import { useMissingHardwareText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { Modal, SmallModalChildren } from '../../../molecules/Modal'
 import { useToaster } from '../../../organisms/ToasterOven'
 import {
@@ -281,7 +281,7 @@ export function ProtocolDetails(): JSX.Element | null {
     missingProtocolHardware,
     conflictedSlots,
   } = useMissingProtocolHardware(protocolId)
-  const chipText = useMissingHardwareText(
+  const chipText = useHardwareStatusText(
     missingProtocolHardware,
     conflictedSlots
   )

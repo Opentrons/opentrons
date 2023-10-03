@@ -14,7 +14,7 @@ import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
-import { useMissingHardwareText } from '../hooks'
+import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
@@ -90,8 +90,8 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
-const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
-  typeof useMissingHardwareText
+const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
+  typeof useHardwareStatusText
 >
 const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
 
@@ -121,7 +121,7 @@ describe('RecentRunProtocolCard', () => {
       () => new Promise(resolve => resolve({}))
     )
     mockSkeleton.mockReturnValue(<div>mock Skeleton</div>)
-    mockUseMissingHardwareText.mockReturnValue('Ready to run')
+    mockUseHardwareStatusText.mockReturnValue('Ready to run')
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
@@ -168,7 +168,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseMissingHardwareText.mockReturnValue('Missing 1 pipette')
+    mockUseHardwareStatusText.mockReturnValue('Missing 1 pipette')
     const [{ getByText }] = render(props)
     getByText('Missing 1 pipette')
   })
@@ -179,7 +179,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: ['D3'],
     })
-    mockUseMissingHardwareText.mockReturnValue('Location conflicts')
+    mockUseHardwareStatusText.mockReturnValue('Location conflicts')
     const [{ getByText }] = render(props)
     getByText('Location conflicts')
   })
@@ -190,7 +190,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseMissingHardwareText.mockReturnValue('Missing 1 module')
+    mockUseHardwareStatusText.mockReturnValue('Missing 1 module')
     const [{ getByText }] = render(props)
     getByText('Missing 1 module')
   })
@@ -201,7 +201,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseMissingHardwareText.mockReturnValue('Missing hardware')
+    mockUseHardwareStatusText.mockReturnValue('Missing hardware')
     const [{ getByText }] = render(props)
     getByText('Missing hardware')
   })

@@ -23,7 +23,7 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useMissingHardwareText } from './hooks'
+import { useHardwareStatusText } from './hooks'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
@@ -72,7 +72,7 @@ export function ProtocolWithLastRun({
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useMissingHardwareText(
+  const chipText = useHardwareStatusText(
     missingProtocolHardware,
     conflictedSlots
   )
