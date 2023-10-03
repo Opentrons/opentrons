@@ -1,5 +1,6 @@
 from opentrons.config import advanced_settings as advs
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.dev_types import RobotType
 
 
 def short_fixed_trash() -> bool:
@@ -20,10 +21,17 @@ def use_old_aspiration_functions() -> bool:
     )
 
 
-def enable_door_safety_switch() -> bool:
-    return advs.get_setting_with_env_overload(
-        "enableDoorSafetySwitch", RobotTypeEnum.FLEX
-    )
+def enable_door_safety_switch(robot_type: RobotType) -> bool:
+    if robot_type == "OT-2 Standard":
+        return advs.get_setting_with_env_overload(
+            "enableDoorSafetySwitch", RobotTypeEnum.OT2
+        )
+    elif robot_type == "OT-3 Standard":
+        return advs.get_setting_with_env_overload(
+            "enableDoorSafetySwitch", RobotTypeEnum.FLEX
+        )
+    else:
+        raise KeyError("Invalid Robot Type during Door Saftey switch check")
 
 
 def disable_fast_protocol_upload() -> bool:

@@ -139,7 +139,9 @@ class MaintenanceEngineStore:
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,
-                block_on_door_open=feature_flags.enable_door_safety_switch(),
+                block_on_door_open=feature_flags.enable_door_safety_switch(
+                    self._robot_type
+                ),
             ),
         )
 
