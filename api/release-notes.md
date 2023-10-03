@@ -32,6 +32,7 @@ Python API features
 - Manually move labware around, off of, or onto the deck without ending your protocol.
 - Load adapters separately from labware (to allow moving labware onto or off of the adapter).
 - Use coordinate or numeric deck slot names interchangeably.
+- Set 50 µL pipettes to a low-volume mode for handling very small quantities of liquid.
 
 ### Improved Features
 
