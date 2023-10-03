@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
-  EXTENSION_SLOT_LOAD_NAME,
+  STAGING_AREA_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
   WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
@@ -67,7 +67,7 @@ describe('Hardware', () => {
           },
           {
             hardwareType: 'fixture',
-            fixtureName: EXTENSION_SLOT_LOAD_NAME,
+            fixtureName: STAGING_AREA_LOAD_NAME,
             location: { cutout: 'B3' },
           },
         ],

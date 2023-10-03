@@ -157,7 +157,7 @@ export const useRequiredProtocolHardware = (
     },
     {
       hardwareType: 'fixture',
-      fixtureName: 'extensionSlot',
+      fixtureName: 'stagingArea',
       location: { cutout: 'B3' },
     },
   ]
