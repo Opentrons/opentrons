@@ -17,7 +17,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useHardwareStatusText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { formatTimeWithUtcLabel } from '../../../../resources/runs/utils'
@@ -77,8 +77,8 @@ const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jes
   typeof useOffsetCandidatesForAnalysis
 >
 
-const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
-  typeof useMissingHardwareText
+const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
+  typeof useHardwareStatusText
 >
 
 const MOCK_DATA = {
@@ -118,13 +118,12 @@ describe('ODDProtocolDetails', () => {
     mockUseCreateRunMutation.mockReturnValue({
       createRun: mockCreateRun,
     } as any)
-    mockUseMissingHardwareText.mockReturnValue(
-      'mock missing hardware chip text'
-    )
+    mockUseHardwareStatusText.mockReturnValue('mock missing hardware chip text')
     mockUseOffsetCandidatesForAnalysis.mockReturnValue([])
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseProtocolQuery.mockReturnValue({
       data: MOCK_DATA,
