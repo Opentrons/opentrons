@@ -93,7 +93,7 @@ def test_plan_check_pick_up_tip_with_presses_argument(
                     home_buffer=10,
                 ),
                 TipMotorPickUpTipSpec(
-                    distance=10,
+                    distance=29,
                     speed=5.5,
                     home_buffer=10,
                 ),
