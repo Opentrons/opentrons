@@ -23,7 +23,7 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useMissingHardwareText } from './hooks'
+import { useHardwareStatusText } from './hooks'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
@@ -68,10 +68,14 @@ export function ProtocolWithLastRun({
   const {
     missingProtocolHardware,
     isLoading: isLookingForHardware,
+    conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useMissingHardwareText(missingProtocolHardware)
+  const chipText = useHardwareStatusText(
+    missingProtocolHardware,
+    conflictedSlots
+  )
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
