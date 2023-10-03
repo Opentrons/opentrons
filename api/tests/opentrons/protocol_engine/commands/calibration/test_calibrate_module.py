@@ -61,7 +61,7 @@ async def test_calibrate_module_implementation(
         location
     )
     decoy.when(
-        subject._state_view.modules.get_calibration_module_offset(module_id)
+        subject._state_view.modules.get_module_calibration_offset(module_id)
     ).then_return(
         ModuleOffsetData(
             moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),

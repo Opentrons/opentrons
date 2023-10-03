@@ -36,25 +36,24 @@ def load_module_calibration_offset(
     module_id: str,
 ) -> Optional[ModuleCalibrationOffset]:
     """Loads the calibration offset for a module."""
-    module_offset: Optional[ModuleCalibrationOffset] = None
     module_offset_data = get_module_offset(module_type, module_id)
-    if module_offset_data:
-        module_offset = ModuleCalibrationOffset(
-            module=module_type,
-            module_id=module_id,
-            slot=module_offset_data.slot,
-            mount=module_offset_data.mount,
-            offset=module_offset_data.offset,
-            last_modified=module_offset_data.lastModified,
-            instrument_id=module_offset_data.instrument_id,
-            source=module_offset_data.source,
-            status=CalibrationStatus(
-                markedAt=module_offset_data.status.markedAt,
-                markedBad=module_offset_data.status.markedBad,
-                source=module_offset_data.status.source,
-            ),
-        )
-    return module_offset
+    if not module_offset_data:
+        return None
+    return ModuleCalibrationOffset(
+        module=module_type,
+        module_id=module_id,
+        slot=module_offset_data.slot,
+        mount=module_offset_data.mount,
+        offset=module_offset_data.offset,
+        last_modified=module_offset_data.lastModified,
+        instrument_id=module_offset_data.instrument_id,
+        source=module_offset_data.source,
+        status=CalibrationStatus(
+            markedAt=module_offset_data.status.markedAt,
+            markedBad=module_offset_data.status.markedBad,
+            source=module_offset_data.status.source,
+        ),
+    )
 
 
 def save_module_calibration_offset(

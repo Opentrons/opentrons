@@ -688,7 +688,7 @@ class ModuleView(HasState[ModuleState]):
             z=xformed[2],
         )
 
-    def get_calibration_module_offset(
+    def get_module_calibration_offset(
         self, module_id: str
     ) -> Optional[ModuleOffsetData]:
         """Get the calibration module offset."""
