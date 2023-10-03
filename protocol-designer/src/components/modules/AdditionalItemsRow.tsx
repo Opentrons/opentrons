@@ -55,7 +55,6 @@ export function AdditionalItemsRow(
           <TrashModal
             onCloseClick={() => openTrashModal(false)}
             trashName={name}
-            trashBinSlot={trashBinSlot ?? null}
             trashBinId={trashBinId}
           />
         </Portal>

@@ -46,7 +46,6 @@ describe('TrashModal ', () => {
     props = {
       onCloseClick: jest.fn(),
       trashName: 'trashBin',
-      trashBinSlot: null,
     }
     mockGetInitialDeckSetup.mockReturnValue({
       pipettes: {},
@@ -82,7 +81,6 @@ describe('TrashModal ', () => {
     const mockId = 'mockTrashId'
     props = {
       ...props,
-      trashBinSlot: 'B3',
       trashBinId: mockId,
     }
     const { getByRole, getByText } = render(props)

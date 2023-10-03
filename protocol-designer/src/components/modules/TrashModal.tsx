@@ -110,12 +110,11 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
 export interface TrashModalProps {
   onCloseClick: () => void
   trashName: 'wasteChute' | 'trashBin'
-  trashBinSlot: string | null
   trashBinId?: string
 }
 
 export const TrashModal = (props: TrashModalProps): JSX.Element => {
-  const { onCloseClick, trashName, trashBinSlot, trashBinId } = props
+  const { onCloseClick, trashName, trashBinId } = props
   const dispatch = useDispatch()
 
   const onSaveClick = (values: TrashValues): void => {
@@ -161,7 +160,6 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
         <TrashModalComponent
           onCloseClick={onCloseClick}
           trashName={trashName}
-          trashBinSlot={trashBinSlot}
         />
       </ModalShell>
     </Formik>

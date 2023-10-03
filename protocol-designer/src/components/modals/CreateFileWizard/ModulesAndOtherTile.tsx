@@ -89,8 +89,6 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         values.additionalEquipment.includes('trashBin')
       : true
 
-  const buttonDisabled = !hasATrash
-
   const { left, right } = values.pipettesByMount
 
   const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
@@ -186,12 +184,12 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           />
           <PrimaryButton
             onClick={() => proceed()}
-            disabled={buttonDisabled}
+            disabled={!hasATrash}
             {...targetProps}
           >
             {i18n.t('modal.create_file_wizard.review_file_details')}
           </PrimaryButton>
-          {buttonDisabled ? (
+          {!hasATrash ? (
             <Tooltip {...tooltipProps}>
               {i18n.t(`tooltip.disabled_no_trash`)}
             </Tooltip>

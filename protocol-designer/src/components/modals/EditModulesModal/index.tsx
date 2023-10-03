@@ -299,8 +299,8 @@ const EditModulesModalComponent = (
   const [field] = useField('selectedSlot')
 
   return (
-    <ModalShell width="48rem">
-      <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
+    <ModalShell width="48rem" paddingTop={SPACING.spacing32}>
+      <Box paddingX={SPACING.spacing32}>
         <Text as="h2">{i18n.t(`modules.module_long_names.${moduleType}`)}</Text>
       </Box>
       <Form>
@@ -373,7 +373,7 @@ const EditModulesModalComponent = (
               <ConnectedSlotMap
                 fieldName="selectedSlot"
                 robotType={OT2_ROBOT_TYPE}
-                modal
+                isModal
               />
             )
           ) : (
