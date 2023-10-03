@@ -82,11 +82,11 @@ This should match what `opentrons.protocols.parse()` accepts in a protocol's `re
 """
 
 
-class AccumulatingHandler(logging.Handler):
+class _AccumulatingHandler(logging.Handler):
     def __init__(
         self,
         level: str,
-        command_queue: "queue.Queue[Any]",
+        command_queue: "queue.Queue[object]",
     ) -> None:
         """Create the handler
 
@@ -96,11 +96,11 @@ class AccumulatingHandler(logging.Handler):
         self._command_queue = command_queue
         super().__init__(level)
 
-    def emit(self, record: Any) -> None:
+    def emit(self, record: object) -> None:
         self._command_queue.put(record)
 
 
-class CommandScraper:
+class _CommandScraper:
     """An object that handles scraping the broker for commands
 
     This should be instantiated with the logger to integrate
@@ -123,11 +123,11 @@ class CommandScraper:
         """
         self._logger = logger
         self._broker = broker
-        self._queue = queue.Queue()  # type: ignore
+        self._queue: "queue.Queue[object]" = queue.Queue()
         if level != "none":
             level = getattr(logging, level.upper(), logging.WARNING)
             self._logger.setLevel(level)
-            self._handler: Optional[AccumulatingHandler] = AccumulatingHandler(
+            self._handler: Optional[_AccumulatingHandler] = _AccumulatingHandler(
                 level, self._queue
             )
             logger.addHandler(self._handler)
@@ -422,6 +422,7 @@ def simulate(  # noqa: C901
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
+    # _CommandScraper will set the level of this logger.
 
     contents = protocol_file.read()
 
@@ -481,7 +482,7 @@ def simulate(  # noqa: C901
         raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
 
     broker = context.broker
-    scraper = CommandScraper(stack_logger, log_level, broker)
+    scraper = _CommandScraper(stack_logger, log_level, broker)
     if duration_estimator:
         broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
 
