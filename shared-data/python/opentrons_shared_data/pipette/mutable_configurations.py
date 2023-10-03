@@ -189,6 +189,28 @@ def known_pipettes(pipette_override_path: Path) -> List[str]:
     ]
 
 
+def _load_full_mutable_configs(
+    pipette_model: PipetteModelVersionType, overrides: OverrideType
+) -> OverrideType:
+    base_configs = load_definition(
+        pipette_model.pipette_type,
+        pipette_model.pipette_channels,
+        pipette_model.pipette_version,
+    )
+    base_configs_dict = base_configs.dict(by_alias=True)
+    full_mutable_configs = _list_all_mutable_configs(overrides, base_configs_dict)
+
+    if not full_mutable_configs.get("name"):
+        full_mutable_configs["name"] = str(
+            convert_to_pipette_name_type(cast(PipetteName, str(pipette_model)))
+        )
+
+    if not full_mutable_configs.get("model"):
+        full_mutable_configs["model"] = str(pipette_model)
+
+    return full_mutable_configs
+
+
 def list_mutable_configs(
     pipette_serial_number: str, pipette_override_path: Path
 ) -> OverrideType:
@@ -207,36 +229,36 @@ def list_mutable_configs(
         # This is mimicing behavior from the original file
         # which returned an empty dict if no on disk value was found.
         return mutable_configs
+
+    serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
+
+    if serial_key_match:
+        serial_key = serial_key_match.group(0)
     else:
-        serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
+        serial_key = ""
+    pipette_model = convert_pipette_model(
+        cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
+    )
+    return _load_full_mutable_configs(pipette_model, mutable_configs)
 
-        if serial_key_match:
-            serial_key = serial_key_match.group(0)
-        else:
-            serial_key = ""
-        pipette_model = convert_pipette_model(
-            cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
-        )
 
-        base_configs = load_definition(
-            pipette_model.pipette_type,
-            pipette_model.pipette_channels,
-            pipette_model.pipette_version,
-        )
-        base_configs_dict = base_configs.dict(by_alias=True)
-        full_mutable_configs = _list_all_mutable_configs(
-            mutable_configs, base_configs_dict
-        )
-
-        if not full_mutable_configs.get("name"):
-            full_mutable_configs["name"] = str(
-                convert_to_pipette_name_type(cast(PipetteName, str(pipette_model)))
+def list_mutable_configs_with_defaults(
+    pipette_model: PipetteModelVersionType,
+    pipette_serial_number: Optional[str],
+    pipette_override_path: Path,
+) -> OverrideType:
+    """
+    Returns dict of mutable configs only, with their defaults.
+    """
+    mutable_configs: OverrideType = {}
+    if pipette_serial_number:
+        try:
+            mutable_configs = _load_available_overrides(
+                pipette_serial_number, pipette_override_path
             )
-
-        if not full_mutable_configs.get("model"):
-            full_mutable_configs["model"] = str(pipette_model)
-
-        return full_mutable_configs
+        except FileNotFoundError:
+            pass
+    return _load_full_mutable_configs(pipette_model, mutable_configs)
 
 
 def load_with_mutable_configurations(
