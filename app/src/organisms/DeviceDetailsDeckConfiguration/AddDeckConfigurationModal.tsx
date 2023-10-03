@@ -26,6 +26,7 @@ interface AddDeckConfigurationModalProps {
 
 // ToDo (kk:09/29/2023)
 // update this component when Deck configuration component is ready
+// Need to use getFixtureDisplayName
 export function AddDeckConfigurationModal({
   slotName,
 }: AddDeckConfigurationModalProps): JSX.Element {
@@ -41,19 +42,21 @@ export function AddDeckConfigurationModal({
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <StyledText as="p">{t('add_to_slot_description')}</StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <CutOutButton cutOut={t('staging_area_slot')} />
-          <CutOutButton cutOut={t('trash')} />
-          <CutOutButton cutOut={t('waste_chute')} />
+          <AddFixtureButton fixtureLoadName={t('staging_area_slot')} />
+          <AddFixtureButton fixtureLoadName={t('trash')} />
+          <AddFixtureButton fixtureLoadName={t('waste_chute')} />
         </Flex>
       </Flex>
     </Modal>
   )
 }
 
-interface CutOutButtonProps {
-  cutOut: string
+interface AddFixtureButtonProps {
+  fixtureLoadName: string
 }
-function CutOutButton({ cutOut }: CutOutButtonProps): JSX.Element {
+function AddFixtureButton({
+  fixtureLoadName,
+}: AddFixtureButtonProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
   // ToDo (kk:10/02/2023)
@@ -69,7 +72,7 @@ function CutOutButton({ cutOut }: CutOutButtonProps): JSX.Element {
       css={FIXTIRE_BUTTON_STYLE}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {cutOut}
+        {fixtureLoadName}
       </StyledText>
       <StyledText as="p">{t('add')}</StyledText>
     </Btn>

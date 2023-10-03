@@ -26,7 +26,7 @@ describe('AddDeckConfigurationModal', () => {
     const [{ getByText, getAllByText }] = render(props)
     getByText('Add to slot D3')
     getByText(
-      'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose a fixture below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     getByText('Staging area slot')
     getByText('Trash')
