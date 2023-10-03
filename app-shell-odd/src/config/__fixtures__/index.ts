@@ -1,4 +1,3 @@
-import omit from 'lodash/omit'
 import type {
   ConfigV12,
   ConfigV13,
@@ -8,7 +7,6 @@ import type {
   ConfigV17,
   ConfigV18,
   ConfigV19,
-  ConfigV20,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V12: ConfigV12 = {
@@ -119,10 +117,4 @@ export const MOCK_CONFIG_V19: ConfigV19 = {
     ...MOCK_CONFIG_V18.update,
     hasJustUpdated: false,
   },
-}
-
-export const MOCK_CONFIG_V20: ConfigV20 = {
-  ...MOCK_CONFIG_V19,
-  version: 20,
-  protocols: omit(MOCK_CONFIG_V19.protocols, ['sendAllProtocolsToOT3'])
 }

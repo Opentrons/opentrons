@@ -8,6 +8,8 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 export type DiscoveryCandidates = string[]
 
 export type DevInternalFlag =
+  | 'enableExtendedHardware'
+  | 'lpcWithProbe'
   | 'enableDeckConfiguration'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
@@ -227,9 +229,4 @@ export type ConfigV19 = Omit<ConfigV18, 'version' | 'update'> & {
   }
 }
 
-export type ConfigV20 = Omit<ConfigV19, 'version' | 'protocols'> & {
-  version: 20
-  protocols: Omit<ConfigV19['protocols'], 'sendAllProtocolsToOT3'>
-}
-
-export type Config = ConfigV20
+export type Config = ConfigV19

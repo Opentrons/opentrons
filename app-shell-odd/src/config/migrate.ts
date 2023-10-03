@@ -1,7 +1,6 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import omit from 'lodash/omit'
 import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import type {
@@ -14,7 +13,6 @@ import type {
   ConfigV17,
   ConfigV18,
   ConfigV19,
-  ConfigV20,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
@@ -158,18 +156,6 @@ const toVersion19 = (prevConfig: ConfigV18): ConfigV19 => {
   return nextConfig
 }
 
-
-// config version 20 migration and defaults
-const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
-  const nextConfig = {
-    ...prevConfig,
-    version: 20 as const,
-    protocols: omit(prevConfig.protocols, ['sendAllProtocolsToOT3'])
-  }
-
-  return nextConfig
-}
-
 const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
   (prevConfig: ConfigV13) => ConfigV14,
@@ -177,8 +163,7 @@ const MIGRATIONS: [
   (prevConfig: ConfigV15) => ConfigV16,
   (prevConfig: ConfigV16) => ConfigV17,
   (prevConfig: ConfigV17) => ConfigV18,
-  (prevConfig: ConfigV18) => ConfigV19,
-  (prevConfig: ConfigV19) => ConfigV20
+  (prevConfig: ConfigV18) => ConfigV19
 ] = [
   toVersion13,
   toVersion14,
@@ -187,7 +172,6 @@ const MIGRATIONS: [
   toVersion17,
   toVersion18,
   toVersion19,
-  toVersion20,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
@@ -202,7 +186,6 @@ export function migrate(
     | ConfigV17
     | ConfigV18
     | ConfigV19
-    | ConfigV20
 ): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary
