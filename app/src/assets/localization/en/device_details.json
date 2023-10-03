@@ -140,7 +140,6 @@
   "set_temperature": "Set temperature",
   "shake_speed": "shake speed",
   "shaker": "Shaker",
-  "staging_area_slot": "Staging area slot",
   "status": "Status",
   "target_speed": "Target: {{speed}} rpm",
   "target_temp": "Target: {{temp}} °C",
@@ -155,7 +154,6 @@
   "this_robot_will_restart_with_update": "<block>This robot has to restart to update its software. Restarting will immediately stop the current run or calibration.</block><block>Do you want to update now anyway?</block>",
   "tip_pickup_drop": "Tip Pickup / Drop",
   "to_run_protocol_go_to_protocols_page": "To run a protocol on this robot, import a protocol on the <navlink>Protocols page</navlink>",
-  "trash": "Trash",
   "update_now": "Update now",
   "updating_firmware": "Updating firmware...",
   "usb_port_not_connected": "usb not connected",
@@ -164,7 +162,6 @@
   "view_pipette_setting": "Pipette Settings",
   "view_run_record": "View protocol run record",
   "view": "View",
-  "waste_chute": "Waste chute",
   "welcome_modal_description": "A place to run protocols, manage your instruments, and view robot status.",
   "welcome_to_your_dashboard": "Welcome to your dashboard!",
   "yes_update_now": "Yes, update now"

@@ -8,24 +8,22 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  SIZE_5,
   SPACING,
   TYPOGRAPHY,
-  SIZE_5,
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  getFixtureDisplayName,
   STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
   TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
-
-import type { FixtureLoadName } from '@opentrons/shared-data'
 
 interface DeviceDetailsDeckConfigurationProps {
   robotName: string
@@ -67,14 +65,10 @@ export function DeviceDetailsDeckConfiguration({
     })
   }
 
-  // TODO: replace with getFixtureDisplayName
-  const fixtureDisplayNameDictionary: Record<FixtureLoadName, string | null> = {
-    [STAGING_AREA_LOAD_NAME]: t('staging_area_slot'),
-    // do not display standard slot
-    [STANDARD_SLOT_LOAD_NAME]: null,
-    [TRASH_BIN_LOAD_NAME]: t('trash'),
-    [WASTE_CHUTE_LOAD_NAME]: t('waste_chute'),
-  }
+  // do not show standard slot in fixture display list
+  const fixtureDisplayList = deckConfig.filter(
+    fixture => fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+  )
 
   return (
     <Flex
@@ -128,10 +122,8 @@ export function DeviceDetailsDeckConfiguration({
             <StyledText>{t('location')}</StyledText>
             <StyledText>{t('fixture')}</StyledText>
           </Flex>
-          {deckConfig.map(fixture => {
-            const fixtureDisplayName =
-              fixtureDisplayNameDictionary[fixture.loadName]
-            return fixtureDisplayName != null ? (
+          {fixtureDisplayList.map(fixture => {
+            return (
               <Flex
                 key={fixture.fixtureId}
                 backgroundColor={COLORS.fundamentalsBackground}
@@ -141,9 +133,11 @@ export function DeviceDetailsDeckConfiguration({
                 css={TYPOGRAPHY.labelRegular}
               >
                 <StyledText>{fixture.fixtureLocation}</StyledText>
-                <StyledText>{fixtureDisplayName}</StyledText>
+                <StyledText>
+                  {getFixtureDisplayName(fixture.loadName)}
+                </StyledText>
               </Flex>
-            ) : null
+            )
           })}
         </Flex>
       </Flex>
