@@ -1,7 +1,7 @@
 {
   "warning": {
     "gen1multichannel": "No GEN1 8-Channel access",
-    "cancelForSure": "Are you sure you want to permanently delete this adapter?"
+    "cancelForSure": "Are you sure you want to remove this {{adapterName}}?"
   },
   "blocked_slot": {
     "MODULE_INCOMPATIBLE_SINGLE_LABWARE": "Labware incompatible with this module",
@@ -10,6 +10,10 @@
   },
   "header": {
     "end": "Click on labware to inspect the result of your protocol"
+  },
+  "off_deck": {
+    "slideout_title": "Off-deck labware",
+    "slideout_empty_state": "There is currently no off-deck labware in this step of the protocol"
   },
   "overlay": {
     "name_labware": {
@@ -29,7 +33,8 @@
       "add_labware": "Add Labware",
       "drag_to_new_slot": "Drag To New Slot",
       "place_here": "Place Here",
-      "add_adapter": "Add Adapter"
+      "add_adapter_or_labware": "Add Labware or Adapter",
+      "add_adapter": "Add adapter"
     }
   },
   "inactive_deck": "hover on a step to see deck state"

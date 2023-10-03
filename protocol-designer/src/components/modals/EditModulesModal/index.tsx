@@ -23,6 +23,7 @@ import {
   TEMPERATURE_MODULE_V1,
   RobotType,
   FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -155,7 +156,13 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
           { selectedSlot }
         )
       }
-    } else if (hasSlotIssue(selectedSlot)) {
+    } else if (
+      //  TODO(jr, 8/31/23): this is a bit hacky since the TCGEN2 slot is only B1 instead of B1 and A1
+      //  so we have to manually check if slot A1 has issues as well as looking at selectedSlot
+      //  this probably deserves a more elegant refactor
+      (selectedModel === THERMOCYCLER_MODULE_V2 && hasSlotIssue('A1')) ||
+      hasSlotIssue(selectedSlot)
+    ) {
       errors.selectedSlot = i18n.t(
         'alert.module_placement.SLOT_OCCUPIED.body',
         { selectedSlot }

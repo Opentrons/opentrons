@@ -181,9 +181,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
                   size="1.5rem"
                   onClick={handleClose}
                   aria-label="exit"
-                  data-testid={`Slideout_icon_close_${
-                    typeof title === 'string' ? title : ''
-                  }`}
+                  data-testid={`Slideout_icon_close_${title}`}
                 >
                   <Icon name="close" css={CLOSE_ICON_STYLE} />
                 </Btn>

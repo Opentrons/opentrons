@@ -308,7 +308,7 @@ class OT3Simulator:
         log_pressure: bool = True,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
-        sensor_id: SensorId = SensorId.S0,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> Dict[NodeId, float]:
 
         head_node = axis_to_node(Axis.by_mount(mount))
@@ -388,11 +388,18 @@ class OT3Simulator:
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
         self._sim_jaw_state = GripperJawState.HOLDING
 
-    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+    async def check_for_tip_presence(
+        self,
+        mount: OT3Mount,
+        tip_state: TipStateType,
+        expect_multiple_responses: bool = False,
+    ) -> None:
         """Raise an error if the given state doesn't match the physical state."""
         pass
 
-    async def get_tip_present_state(self, mount: OT3Mount) -> int:
+    async def get_tip_present_state(
+        self, mount: OT3Mount, expect_multiple_responses: bool = False
+    ) -> bool:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 
@@ -402,11 +409,15 @@ class OT3Simulator:
 
     async def tip_action(
         self,
-        moves: Optional[List[Move[Axis]]] = None,
-        distance: Optional[float] = None,
-        velocity: Optional[float] = None,
-        tip_action: str = "home",
-        back_off: Optional[bool] = False,
+        moves: List[Move[Axis]],
+    ) -> None:
+        pass
+
+    async def home_tip_motors(
+        self,
+        distance: float,
+        velocity: float,
+        back_off: bool = True,
     ) -> None:
         pass
 
@@ -531,6 +542,14 @@ class OT3Simulator:
     @asynccontextmanager
     async def restore_current(self) -> AsyncIterator[None]:
         """Save the current."""
+        yield
+
+    @asynccontextmanager
+    async def restore_z_r_run_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily restore the active current ONLY when homing or
+        retracting the Z_R axis while the 96-channel is attached.
+        """
         yield
 
     @ensure_yield
@@ -678,8 +697,9 @@ class OT3Simulator:
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-    ) -> None:
+    ) -> bool:
         self._position[axis_to_node(moving)] += distance_mm
+        return True
 
     @ensure_yield
     async def capacitive_pass(

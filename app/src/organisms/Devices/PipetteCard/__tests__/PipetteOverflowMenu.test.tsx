@@ -81,6 +81,7 @@ describe('PipetteOverflowMenu', () => {
     props = {
       ...props,
       isPipetteCalibrated: true,
+      isRunActive: false,
     }
     const { getByRole } = render(props)
     const recalibrate = getByRole('button', {

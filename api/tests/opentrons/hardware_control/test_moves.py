@@ -17,8 +17,7 @@ from opentrons.hardware_control.types import (
     MotionChecks,
 )
 from opentrons.hardware_control.errors import (
-    MustHomeError,
-    InvalidMoveError,
+    InvalidCriticalPoint,
     OutOfBoundsMove,
 )
 from opentrons.hardware_control.robot_calibration import (
@@ -26,7 +25,10 @@ from opentrons.hardware_control.robot_calibration import (
     DeckCalibration,
 )
 
-from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
+from opentrons_shared_data.errors.exceptions import (
+    MoveConditionNotMetError,
+    PositionUnknownError,
+)
 
 
 async def test_controller_must_home(hardware_api):
@@ -196,7 +198,7 @@ async def test_gripper_critical_points_fail_on_pipettes(
         types.Mount.RIGHT: {"model": "p10_single_v1", "id": "testyness"},
     }
     await hardware_api.cache_instruments()
-    with pytest.raises(InvalidMoveError):
+    with pytest.raises(InvalidCriticalPoint):
         await hardware_api.move_to(
             types.Mount.RIGHT, types.Point(0, 0, 0), critical_point=critical_point
         )
@@ -494,7 +496,7 @@ async def test_move_rel_homing_failures(hardware_api):
         "C": False,
     }
     # If one axis being used isn't homed, we must get an exception
-    with pytest.raises(MustHomeError):
+    with pytest.raises(PositionUnknownError):
         await hardware_api.move_rel(
             types.Mount.LEFT, types.Point(0, 0, 2000), fail_on_not_homed=True
         )
@@ -517,13 +519,13 @@ async def test_current_position_homing_failures(hardware_api):
     }
 
     # If one axis being used isn't homed, we must get an exception
-    with pytest.raises(MustHomeError):
+    with pytest.raises(PositionUnknownError):
         await hardware_api.current_position(
             mount=types.Mount.LEFT,
             fail_on_not_homed=True,
         )
 
-    with pytest.raises(MustHomeError):
+    with pytest.raises(PositionUnknownError):
         await hardware_api.gantry_position(
             mount=types.Mount.LEFT,
             fail_on_not_homed=True,

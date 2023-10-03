@@ -68,7 +68,7 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
@@ -182,6 +182,8 @@ Finally, let's tell the robot to dispense 100 µL into the well plate at locatio
     right.dispense(volume=100, location=plate['B1'])
 
 The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1.
+
+.. _pipette-tip-racks:
 
 Adding Tip Racks
 ================
@@ -405,6 +407,8 @@ The following table provides data on the default aspirate, dispense, and blow-ou
 +-------------------------------+-----------------+-----------------+-----------------+
 
 Additionally, all Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
+
+.. _ot2-flow-rates:
 
 OT-2 Pipette Flow Rates
 -----------------------

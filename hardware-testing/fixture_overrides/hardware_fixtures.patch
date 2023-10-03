@@ -1,0 +1,62 @@
+diff --git a/api/src/opentrons/config/feature_flags.py b/api/src/opentrons/config/feature_flags.py
+index f46674fb5..f59f3826d 100644
+--- a/api/src/opentrons/config/feature_flags.py
++++ b/api/src/opentrons/config/feature_flags.py
+@@ -76,6 +76,4 @@ def tip_presence_detection_enabled() -> bool:
+ 
+ def require_estop() -> bool:
+     """Whether the OT3 should allow gantry movements with no Estop plugged in."""
+-    return not advs.get_setting_with_env_overload(
+-        "estopNotRequired", RobotTypeEnum.FLEX
+-    )
++    return False
+diff --git a/api/src/opentrons/hardware_control/backends/ot3controller.py b/api/src/opentrons/hardware_control/backends/ot3controller.py
+index 8a82c2ad9..24b43028a 100644
+--- a/api/src/opentrons/hardware_control/backends/ot3controller.py
++++ b/api/src/opentrons/hardware_control/backends/ot3controller.py
+@@ -198,19 +198,19 @@ def requires_estop(func: Wrapped) -> Wrapped:
+ 
+     @wraps(func)
+     async def wrapper(self: OT3Controller, *args: Any, **kwargs: Any) -> Any:
+-        state = self._estop_state_machine.state
+-        if state == EstopState.NOT_PRESENT and ff.require_estop():
+-            raise EStopNotPresentError(
+-                message="An Estop must be plugged in to move the robot."
+-            )
+-        if state == EstopState.LOGICALLY_ENGAGED:
+-            raise EStopActivatedError(
+-                message="Estop must be acknowledged and cleared to move the robot."
+-            )
+-        if state == EstopState.PHYSICALLY_ENGAGED:
+-            raise EStopActivatedError(
+-                message="Estop is currently engaged, robot cannot move."
+-            )
++        # state = self._estop_state_machine.state
++        # if state == EstopState.NOT_PRESENT and ff.require_estop():
++        #     raise EStopNotPresentError(
++        #         message="An Estop must be plugged in to move the robot."
++        #     )
++        # if state == EstopState.LOGICALLY_ENGAGED:
++        #     raise EStopActivatedError(
++        #         message="Estop must be acknowledged and cleared to move the robot."
++        #     )
++        # if state == EstopState.PHYSICALLY_ENGAGED:
++        #     raise EStopActivatedError(
++        #         message="Estop is currently engaged, robot cannot move."
++        #     )
+         return await func(self, *args, **kwargs)
+ 
+     return cast(Wrapped, wrapper)
+diff --git a/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py b/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
+index 318deea52..8d351e4a7 100644
+--- a/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
++++ b/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
+@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
+ 
+ FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
+ 
+-MINIMUM_DISPLACEMENT = 0.05
++MINIMUM_DISPLACEMENT = 0.01
+ 
+ 
+ def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:

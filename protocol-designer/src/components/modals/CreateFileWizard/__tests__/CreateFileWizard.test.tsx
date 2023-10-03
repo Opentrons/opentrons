@@ -10,11 +10,17 @@ import {
 } from '../../../../labware-defs/selectors'
 import { toggleNewProtocolModal } from '../../../../navigation/actions'
 import { createNewProtocol } from '../../../../load-file/actions'
+import { createContainer } from '../../../../labware-ingred/actions'
 import { createCustomLabwareDefAction } from '../../../../labware-defs/actions'
 import { createModule, createPipettes } from '../../../../step-forms/actions'
-import { changeSavedStepForm } from '../../../../steplist/actions'
-import { toggleIsGripperRequired } from '../../../../step-forms/actions/additionalItems'
-import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
+import {
+  toggleIsGripperRequired,
+  createDeckFixture,
+} from '../../../../step-forms/actions/additionalItems'
+import {
+  getAllowAllTipracks,
+  getEnableDeckModification,
+} from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
 import { CreateFileWizard } from '..'
 
@@ -28,6 +34,7 @@ jest.mock('../../../../step-forms/actions')
 jest.mock('../../../../steplist/actions')
 jest.mock('../../../../step-forms/actions/additionalItems')
 jest.mock('../../../../feature-flags/selectors')
+jest.mock('../../../../labware-ingred/actions')
 jest.mock('../../utils')
 
 const mockGetNewProtocolModal = getNewProtocolModal as jest.MockedFunction<
@@ -48,8 +55,8 @@ const mockCreateCustomLabwareDefAction = createCustomLabwareDefAction as jest.Mo
 const mockCreatePipettes = createPipettes as jest.MockedFunction<
   typeof createPipettes
 >
-const mockChangeSavedStepForm = changeSavedStepForm as jest.MockedFunction<
-  typeof changeSavedStepForm
+const mockCreateContainer = createContainer as jest.MockedFunction<
+  typeof createContainer
 >
 const mockToggleIsGripperRequired = toggleIsGripperRequired as jest.MockedFunction<
   typeof toggleIsGripperRequired
@@ -66,6 +73,12 @@ const mockGetTiprackOptions = getTiprackOptions as jest.MockedFunction<
 const mockCreateModule = createModule as jest.MockedFunction<
   typeof createModule
 >
+const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
+  typeof createDeckFixture
+>
+const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
+  typeof getEnableDeckModification
+>
 const render = () => {
   return renderWithProviders(<CreateFileWizard />)[0]
 }
@@ -78,6 +91,7 @@ const ten = '10uL'
 
 describe('CreateFileWizard', () => {
   beforeEach(() => {
+    mockGetEnableDeckModification.mockReturnValue(false)
     mockGetNewProtocolModal.mockReturnValue(true)
     mockGetAllowAllTipracks.mockReturnValue(false)
     mockGetLabwareDefsByURI.mockReturnValue({
@@ -128,19 +142,7 @@ describe('CreateFileWizard', () => {
     expect(mockCreateNewProtocol).toHaveBeenCalled()
     expect(mockCreatePipettes).toHaveBeenCalled()
     expect(mockCreateModule).not.toHaveBeenCalled()
-    expect(mockChangeSavedStepForm).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        stepId: '__INITIAL_DECK_SETUP_STEP__',
-        update: {
-          labwareLocationUpdate: {
-            fixedTrash: {
-              slotName: '12',
-            },
-          },
-        },
-      })
-    )
+    expect(mockCreateContainer).toHaveBeenCalled()
   })
   it('renders the wizard and clicking on the exit button calls correct selector', () => {
     const { getByText, getByRole } = render()
@@ -153,6 +155,7 @@ describe('CreateFileWizard', () => {
     expect(mockToggleNewProtocolModal).toHaveBeenCalled()
   })
   it('renders the wizard for a Flex with custom tiprack', () => {
+    mockGetEnableDeckModification.mockReturnValue(true)
     const Custom = 'custom'
     mockGetCustomLabwareDefsByURI.mockReturnValue({
       [Custom]: fixtureTipRack10ul,
@@ -205,25 +208,14 @@ describe('CreateFileWizard', () => {
     next = getByRole('button', { name: 'Next' })
     next.click()
     getByText('Step 6 / 6')
-    //  select gripper
+    //  select gripper and waste chute
     getByLabelText('EquipmentOption_flex_Gripper').click()
+    getByLabelText('EquipmentOption_flex_Waste Chute').click()
     getByRole('button', { name: 'Review file details' }).click()
     expect(mockCreateNewProtocol).toHaveBeenCalled()
     expect(mockCreatePipettes).toHaveBeenCalled()
     expect(mockCreateCustomLabwareDefAction).toHaveBeenCalled()
     expect(mockToggleIsGripperRequired).toHaveBeenCalled()
-    expect(mockChangeSavedStepForm).toHaveBeenNthCalledWith(
-      4,
-      expect.objectContaining({
-        stepId: '__INITIAL_DECK_SETUP_STEP__',
-        update: {
-          labwareLocationUpdate: {
-            fixedTrash: {
-              slotName: 'A3',
-            },
-          },
-        },
-      })
-    )
+    expect(mockCreateDeckFixture).toHaveBeenCalled()
   })
 })

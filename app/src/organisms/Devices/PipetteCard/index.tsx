@@ -55,13 +55,13 @@ import type {
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
+  pipetteId?: AttachedPipette['id'] | null
   isPipetteCalibrated: boolean
   mount: Mount
   robotName: string
   pipetteIs96Channel: boolean
   pipetteIsBad: boolean
   updatePipette: () => void
-  pipetteId?: AttachedPipette['id'] | null
   isRunActive: boolean
 }
 const BANNER_LINK_STYLE = css`

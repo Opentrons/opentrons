@@ -682,7 +682,7 @@ async def test_load_pipette_96_channels(
     )
 
     result = await subject.load_pipette(
-        pipette_name="p1000_96",
+        pipette_name=PipetteNameType.P1000_96,
         mount=MountType.LEFT,
         pipette_id=None,
     )

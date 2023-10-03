@@ -1,5 +1,4 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing_extensions import Literal
 from typing import Dict, Optional, Type, Union, List, Tuple
 
 from opentrons.protocol_engine.commands import LoadModuleResult
@@ -404,10 +403,8 @@ class ProtocolCore(
                 load_module_result=load_module_result, model=model
             )
 
-    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
-    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_instrument(
-        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
+        self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 

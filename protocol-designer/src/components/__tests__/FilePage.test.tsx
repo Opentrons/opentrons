@@ -11,8 +11,8 @@ import { getAdditionalEquipment } from '../../step-forms/selectors'
 jest.mock('../EditModules')
 jest.mock('../../step-forms/utils')
 jest.mock('../../step-forms/selectors')
-jest.mock('../../feature-flags')
 jest.mock('../../file-data/selectors')
+jest.mock('../../feature-flags/selectors')
 
 const editModulesMock: jest.MockedFunction<any> = EditModules
 const editGetAdditionalEquipment: jest.MockedFunction<any> = getAdditionalEquipment

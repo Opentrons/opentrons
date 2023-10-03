@@ -398,7 +398,7 @@ class MustHomeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a MustHomeError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(ErrorCodes.POSITION_UNKNOWN, message, details, wrapping)
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):
@@ -702,6 +702,19 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwareIsNotAllowedInLocationError(ProtocolEngineError):
+    """Raised when attempting an illegal labware load into slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsNotAllowedInLocationError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LocationIsOccupiedError(ProtocolEngineError):
     """Raised when attempting to place labware in a non-empty location."""
 
@@ -725,7 +738,9 @@ class FirmwareUpdateRequired(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LocationIsOccupiedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, details, wrapping
+        )
 
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
@@ -764,6 +779,19 @@ class InvalidPushOutVolumeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InvalidPushOutVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidDispenseVolumeError(ProtocolEngineError):
+    """Raised when attempting to dispense a volume that was not aspirated."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidDispenseVolumeError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

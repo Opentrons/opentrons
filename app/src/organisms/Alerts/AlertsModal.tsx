@@ -11,16 +11,22 @@ import { useToaster } from '../ToasterOven'
 import { AnalyticsSettingsModal } from '../AnalyticsSettingsModal'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
+import { useRemoveActiveAppUpdateToast } from '.'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { AlertId } from '../../redux/alerts/types'
+import type { MutableRefObject } from 'react'
 
-export function Alerts(): JSX.Element {
+interface AlertsModalProps {
+  toastIdRef: MutableRefObject<string | null>
+}
+
+export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
   const { t } = useTranslation('app_settings')
-  const { makeToast, eatToast } = useToaster()
-  const toastRef = React.useRef<string | null>(null)
+  const { makeToast } = useToaster()
+  const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
 
   // TODO(mc, 2020-05-07): move head logic to selector with alert priorities
   const activeAlertId: AlertId | null = useSelector((state: State) => {
@@ -42,6 +48,8 @@ export function Alerts(): JSX.Element {
 
   const hasJustUpdated = useSelector(getHasJustUpdated)
   const removeToast = !isAppUpdateAvailable || isAppUpdateIgnored
+  const createAppUpdateAvailableToast =
+    isAppUpdateAvailable && !isAppUpdateIgnored
 
   // Only run this hook on app startup
   React.useEffect(() => {
@@ -55,8 +63,8 @@ export function Alerts(): JSX.Element {
   }, [])
 
   React.useEffect(() => {
-    if (isAppUpdateAvailable && !isAppUpdateIgnored) {
-      toastRef.current = makeToast(
+    if (createAppUpdateAvailableToast) {
+      toastIdRef.current = makeToast(
         t('opentrons_app_update_available_variation'),
         WARNING_TOAST,
         {
@@ -66,16 +74,15 @@ export function Alerts(): JSX.Element {
           onLinkClick: () => setShowUpdateModal(true),
         }
       )
-    } else if (removeToast && toastRef.current) {
-      eatToast(toastRef.current)
-      toastRef.current = null
+    } else if (removeToast && toastIdRef.current) {
+      removeActiveAppUpdateToast()
     }
   }, [isAppUpdateAvailable, isAppUpdateIgnored])
 
   return (
     <>
       {/* TODO(mc, 2020-05-07): AnalyticsSettingsModal currently controls its
-          own render; move its logic into `state.alerts` */}
+            own render; move its logic into `state.alerts` */}
       <AnalyticsSettingsModal />
 
       {activeAlertId === AppAlerts.ALERT_U2E_DRIVER_OUTDATED ? (

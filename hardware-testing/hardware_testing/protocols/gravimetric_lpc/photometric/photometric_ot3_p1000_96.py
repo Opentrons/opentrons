@@ -1,11 +1,12 @@
 """Photometric OT3 P1000."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"protocolName": "photometric-ot3-p1000-96-50ul-tip"}
+metadata = {"protocolName": "photometric-ot3-p1000-96"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
     50: [5, 6, 8, 9, 11],
+    200: [5, 6, 8, 9, 11],  # NOTE: ignoring this tip-rack during run() method
 }
 SLOT_PLATE = 3
 SLOT_RESERVOIR = 2
@@ -23,10 +24,11 @@ def run(ctx: ProtocolContext) -> None:
         )
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
+        if size == 50  # only calibrate 50ul tips for 96ch test
     ]
     reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
     plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
-    pipette = ctx.load_instrument("p1000_96", "left")
+    pipette = ctx.load_instrument("flex_96channel_1000", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
         pipette.aspirate(10, reservoir["A1"].top())

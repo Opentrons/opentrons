@@ -45,7 +45,7 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,
 )
-from opentrons.hardware_control.errors import InvalidMoveError
+from opentrons.hardware_control.errors import InvalidCriticalPoint
 
 
 from opentrons_shared_data.pipette.dev_types import (
@@ -331,9 +331,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
             CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
-            raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a pipette"
-            )
+            raise InvalidCriticalPoint(cp_override.name, "pipette")
 
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE

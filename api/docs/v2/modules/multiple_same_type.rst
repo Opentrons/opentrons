@@ -1,3 +1,5 @@
+:og:description: How to load and control multiple modules of the same type in a Python protocol.
+
 .. _moam:
 
 *********************************

@@ -1,7 +1,6 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload, Union
-from typing_extensions import Literal
+from typing import Optional, overload
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -175,7 +174,7 @@ class EquipmentHandler:
 
     async def load_pipette(
         self,
-        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
+        pipette_name: PipetteNameType,
         mount: MountType,
         pipette_id: Optional[str],
     ) -> LoadedPipetteData:

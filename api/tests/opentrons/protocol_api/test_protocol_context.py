@@ -233,6 +233,51 @@ def test_96_channel_pipette_always_loads_on_the_left_mount(
     assert result == subject.loaded_instruments["left"]
 
 
+def test_96_channel_pipette_raises_if_another_pipette_attached(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should always raise when loading a 96-channel pipette when another pipette is attached."""
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("ada")).then_return("ada")
+    decoy.when(mock_validation.ensure_pipette_name("ada")).then_return(
+        PipetteNameType.P300_SINGLE
+    )
+    decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
+        Mount.RIGHT
+    )
+
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P300_SINGLE,
+            mount=Mount.RIGHT,
+        )
+    ).then_return(mock_instrument_core)
+
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("ada")
+
+    pipette_1 = subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
+    assert subject.loaded_instruments["right"] is pipette_1
+
+    decoy.when(mock_validation.ensure_lowercase_name("A 96 Channel Name")).then_return(
+        "a 96 channel name"
+    )
+    decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
+        PipetteNameType.P1000_96
+    )
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P1000_96,
+            mount=Mount.LEFT,
+        )
+    ).then_return(mock_instrument_core)
+
+    with pytest.raises(RuntimeError):
+        subject.load_instrument(instrument_name="A 96 Channel Name", mount="shadowfax")
+
+
 def test_load_labware(
     decoy: Decoy,
     mock_core: ProtocolCore,

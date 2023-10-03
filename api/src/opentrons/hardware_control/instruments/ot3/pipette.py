@@ -13,6 +13,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     MotorConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
+    PlungerHomingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
     PipetteLiquidPropertiesDefinition,
@@ -44,7 +45,7 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons.hardware_control.types import CriticalPoint, OT3Mount
-from opentrons.hardware_control.errors import InvalidMoveError
+from opentrons.hardware_control.errors import InvalidCriticalPoint
 
 mod_log = logging.getLogger(__name__)
 
@@ -72,6 +73,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._config_as_dict = config.dict()
         self._plunger_motor_current = config.plunger_motor_configurations
         self._pick_up_configurations = config.pick_up_tip_configurations
+        self._plunger_homing_configurations = config.plunger_homing_configurations
         self._drop_configurations = config.drop_tip_configurations
         self._pipette_offset = pipette_offset_cal
         self._pipette_type = self._config.pipette_type
@@ -184,6 +186,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self, pick_up_configs: TipHandlingConfigurations
     ) -> None:
         self._pick_up_configurations = pick_up_configs
+
+    @property
+    def plunger_homing_configurations(self) -> PlungerHomingConfigurations:
+        return self._plunger_homing_configurations
 
     @property
     def drop_configurations(self) -> TipHandlingConfigurations:
@@ -315,9 +321,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
             CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
-            raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a pipette"
-            )
+            raise InvalidCriticalPoint(cp_override.name, "pipette")
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0

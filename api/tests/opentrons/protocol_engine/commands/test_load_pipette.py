@@ -74,7 +74,7 @@ async def test_load_pipette_implementation_96_channel(
     subject = LoadPipetteImplementation(equipment=equipment)
 
     data = LoadPipetteParams(
-        pipetteName="p1000_96",
+        pipetteName=PipetteNameType.P1000_96,
         mount=MountType.LEFT,
         pipetteId="some id",
     )
@@ -95,7 +95,7 @@ async def test_load_pipette_implementation_96_channel(
 
     decoy.when(
         await equipment.load_pipette(
-            pipette_name="p1000_96",
+            pipette_name=PipetteNameType.P1000_96,
             mount=MountType.LEFT,
             pipette_id="some id",
         )

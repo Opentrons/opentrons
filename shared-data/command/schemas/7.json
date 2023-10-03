@@ -1307,15 +1307,10 @@
       "type": "object",
       "properties": {
         "pipetteName": {
-          "title": "Pipettename",
           "description": "The load name of the pipette to be required.",
-          "anyOf": [
+          "allOf": [
             {
               "$ref": "#/definitions/PipetteNameType"
-            },
-            {
-              "enum": ["p1000_96"],
-              "type": "string"
             }
           ]
         },

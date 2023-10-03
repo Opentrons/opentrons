@@ -5,15 +5,16 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
+import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
-import { Numpad } from '.'
-import '../../../styles.global.css'
+import { Numpad } from './'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/SoftwareKeyboard/Numpad',
   component: Numpad,
+  parameters: touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Numpad>> = args => {
