@@ -56,7 +56,7 @@ interface Props {
 
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
-  const { t } = useTranslation('change_pipette')
+  const { t } = useTranslation(['change_pipette', 'shared'])
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
@@ -184,7 +184,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           marginTop={SPACING.spacing24}
           marginBottom={SPACING.spacing8}
         >
-          {t('moving_gantry')}
+          {t('shared:stand_back_robot_is_in_motion')}
         </StyledText>
       </InProgressModal>
     )
