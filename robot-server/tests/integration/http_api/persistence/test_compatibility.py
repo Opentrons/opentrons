@@ -200,7 +200,7 @@ async def test_rerun_flex_dev_compat() -> None:
 async def _poll_until_not_running(robot_client: RobotClient, run_id: str) -> str:
     while True:
         latest_status = (await robot_client.get_run(run_id)).json()["data"]["status"]
-        if latest_status != "running":
+        if latest_status not in {"running", "finishing"}:
             return latest_status  # type: ignore[no-any-return]
         else:
             # Sleep, then poll again.
