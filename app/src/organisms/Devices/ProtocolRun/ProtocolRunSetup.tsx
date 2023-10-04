@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   LoadedFixturesBySlot,
   parseAllRequiredModuleModels,
-  parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -18,6 +17,10 @@ import {
   TYPOGRAPHY,
   Link,
 } from '@opentrons/components'
+import {
+  STAGING_AREA_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
+} from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
@@ -41,10 +44,6 @@ import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
 import { HowLPCWorksModal } from './SetupLabwarePositionCheck/HowLPCWorksModal'
-import {
-  STAGING_AREA_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
-} from '@opentrons/shared-data'
 
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const

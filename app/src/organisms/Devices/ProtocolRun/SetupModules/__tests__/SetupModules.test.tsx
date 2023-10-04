@@ -16,7 +16,7 @@ import { SetupFixtureList } from '../SetupFixtureList'
 import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 import { LoadedFixturesBySlot } from '@opentrons/api-client'
 
-export const mockLoadedFixturesBySlot: LoadedFixturesBySlot = {
+const mockLoadedFixturesBySlot: LoadedFixturesBySlot = {
   D3: {
     id: 'stubbed_load_fixture',
     commandType: 'loadFixture',

@@ -28,7 +28,7 @@ export function getModuleImage(model: ModuleModel): string {
   }
 }
 
-//  TODO(jr, 10/4/23): add correct assets for wasteChute and standardSlot
+//  TODO(jr, 10/4/23): add correct assets for wasteChute, trashBin, standardSlot
 export function getFixtureImage(fixture: FixtureLoadName): string {
   switch (fixture) {
     case 'stagingArea': {
@@ -38,6 +38,9 @@ export function getFixtureImage(fixture: FixtureLoadName): string {
       return stagingArea
     }
     case 'standardSlot': {
+      return stagingArea
+    }
+    case 'trashBin': {
       return stagingArea
     }
     default:

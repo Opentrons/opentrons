@@ -1,9 +1,25 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_LOAD_NAME, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import { SetupFixtureList } from '../SetupFixtureList'
-import { mockLoadedFixturesBySlot } from './SetupModules.test'
+import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+
+const mockLoadedFixturesBySlot: LoadedFixturesBySlot = {
+  D3: {
+    id: 'stubbed_load_fixture',
+    commandType: 'loadFixture',
+    params: {
+      fixtureId: 'stubbedFixtureId',
+      loadName: WASTE_CHUTE_LOAD_NAME,
+      location: { cutout: 'D3' },
+    },
+    createdAt: 'fakeTimestamp',
+    startedAt: 'fakeTimestamp',
+    completedAt: 'fakeTimestamp',
+    status: 'succeeded',
+  },
+}
 
 const render = (props: React.ComponentProps<typeof SetupFixtureList>) => {
   return renderWithProviders(<SetupFixtureList {...props} />, {
