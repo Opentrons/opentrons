@@ -52,6 +52,7 @@
   "extra_attention_warning_title": "Secure labware and modules before proceeding to run",
   "extra_module_attached": "Extra module attached",
   "feedback_form_link": "Let us know!",
+  "fixture_name": "fixture",
   "get_labware_offset_data": "Get Labware Offset Data",
   "heater_shaker_extra_attention": "Use latch controls for easy placement of labware.",
   "heater_shaker_labware_list_view": "To add labware, use the toggle to control the latch",
@@ -111,7 +112,6 @@
   "module_instructions_link": "{{moduleName}} setup instructions",
   "module_mismatch_body": "Check that the modules connected to this robot are of the right type and generation",
   "module_name": "Module",
-  "fixture_name": "fixture",
   "module_not_connected": "Not connected",
   "module_setup_step_description_plural": "Install the required modules and power them on.",
   "module_setup_step_description": "Install the required modules and power them on.",
@@ -135,6 +135,7 @@
   "n_a": "N/A",
   "no_data": "no data",
   "no_labware_offset_data": "no labware offset data yet",
+  "no_modules_or_fixtures": "No modules or fixtures are specified for this protocol.",
   "no_modules_specified": "no modules are specified for this protocol.",
   "no_modules_used_in_this_protocol": "No modules used in this protocol",
   "no_tiprack_loaded": "Protocol must load a tip rack",
@@ -220,6 +221,5 @@
   "view_setup_instructions": "View setup instructions",
   "volume": "Volume",
   "what_labware_offset_is": "A Labware Offset is a type of positional adjustment that accounts for small, real-world variances in the overall position of the labware on a robot’s deck. Labware Offset data is unique to a specific combination of labware definition, deck slot, and robot.",
-  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration.",
-  "no_modules_or_fixtures": "No modules or fixtures are specified for this protocol."
+  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration."
 }
