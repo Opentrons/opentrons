@@ -54,7 +54,7 @@ export const generateRobotStateTimeline = (
         'dropTipLocation' in args ? args.dropTipLocation : null
 
       //  assume that whenever we have a pipetteId we also have a dropTipLocation
-      if (pipetteId && dropTipLocation) {
+      if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
           // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator

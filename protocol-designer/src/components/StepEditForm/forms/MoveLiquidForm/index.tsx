@@ -28,7 +28,6 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const { propsForFields, formData } = props
   const { stepType, path } = formData
 
-  console.log(propsForFields.dropTip_location)
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>

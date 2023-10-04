@@ -13,7 +13,13 @@ import styles from '../../StepEditForm.css'
 export function DropTipField(
   props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'>
 ): JSX.Element {
-  const { value } = props
+  const {
+    value: dropdownItem,
+    name,
+    onFieldBlur,
+    onFieldFocus,
+    updateValue,
+  } = props
   const labware = useSelector(getLabwareEntities)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const wasteChute = Object.values(additionalEquipment).find(
@@ -33,12 +39,12 @@ export function DropTipField(
     value: trash?.id ?? '',
   }
 
-  const options = []
-  if (wasteChute) options.push(wasteChuteOption)
-  if (trash) options.push(trashOption)
+  const options: DropdownOption[] = []
+  if (wasteChute != null) options.push(wasteChuteOption)
+  if (trash != null) options.push(trashOption)
 
   const [selectedValue, setSelectedValue] = React.useState(
-    value || (options[0] && options[0].value)
+    dropdownItem || (options[0] && options[0].value)
   )
   React.useEffect(() => {
     props.updateValue(selectedValue)
@@ -51,14 +57,14 @@ export function DropTipField(
     >
       <DropdownField
         options={options}
-        name={props.name}
-        value={value ? String(value) : options[0].value}
-        onBlur={props.onFieldBlur}
-        onFocus={props.onFieldFocus}
+        name={name}
+        value={dropdownItem ? String(dropdownItem) : options[0].value}
+        onBlur={onFieldBlur}
+        onFocus={onFieldFocus}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           const newValue = e.currentTarget.value
           setSelectedValue(newValue)
-          props.updateValue(newValue)
+          updateValue(newValue)
         }}
       />
     </FormGroup>

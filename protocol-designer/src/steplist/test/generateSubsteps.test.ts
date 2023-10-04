@@ -1,4 +1,3 @@
-import { generateSubstepItem } from '../generateSubstepItem'
 import {
   makeInitialRobotState,
   makeContext,
@@ -8,13 +7,16 @@ import {
   DisengageMagnetArgs,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import { THERMOCYCLER_STATE } from '../../constants'
-import { LabwareNamesByModuleId, StepArgsAndErrors } from '../types'
 import {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,
 } from '../../../../step-generation/lib/types.d'
-import { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
+import { THERMOCYCLER_STATE } from '../../constants'
+import { StepArgsAndErrors } from '../types'
+import { generateSubstepItem } from '../generateSubstepItem'
+
+import type { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
+import type { LabwareNamesByModuleId } from '../types'
 
 describe('generateSubstepItem', () => {
   const stepId = 'step123'
