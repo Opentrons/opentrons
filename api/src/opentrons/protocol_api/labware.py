@@ -229,8 +229,8 @@ class Well:
             position in absolute deck coordinates.
 
         .. note:: Even if the absolute values of ``x``, ``y``, and ``z`` are all less
-            than 1, applying the result of ``from_center_cartesian`` to the well's
-            center may produce a location outside the physical well. For example,
+            than 1, a location constructed from the well and the result of
+            ``from_center_cartesian`` may be outside of the physical well. For example,
             ``from_center_cartesian(0.9, 0.9, 0)`` would be outside of a cylindrical
             well, but inside a square well.
 
