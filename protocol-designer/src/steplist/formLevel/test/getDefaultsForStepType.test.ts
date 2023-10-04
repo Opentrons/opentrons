@@ -18,6 +18,7 @@ describe('getDefaultsForStepType', () => {
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
+        dropTip_location: null,
         aspirate_wells_grouped: false,
 
         aspirate_flowRate: null,
@@ -70,6 +71,7 @@ describe('getDefaultsForStepType', () => {
       expect(getDefaultsForStepType('mix')).toEqual({
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         labware: null,
+        dropTip_location: null,
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_checkbox: false,

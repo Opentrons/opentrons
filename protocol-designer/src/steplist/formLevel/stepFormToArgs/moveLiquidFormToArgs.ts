@@ -74,6 +74,7 @@ export const moveLiquidFormToArgs = (
     dispense_labware: destLabware,
     aspirate_wells: sourceWellsUnordered,
     dispense_wells: destWellsUnordered,
+    dropTip_location: dropTipLocation,
     path,
   } = fields
   let sourceWells = getOrderedWells(
@@ -176,6 +177,7 @@ export const moveLiquidFormToArgs = (
     touchTipAfterDispenseOffsetMmFromBottom,
     description: hydratedFormData.description,
     name: hydratedFormData.stepName,
+    dropTipLocation,
   }
   assert(
     sourceWellsUnordered.length > 0,

@@ -14,6 +14,7 @@ import type {
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration updates fixed trash by treating it as an entity
+// additionally, drop tip location is now selectable
 const PD_VERSION = '7.1.0'
 
 interface LabwareLocationUpdate {
@@ -74,6 +75,7 @@ export const migrateFile = (
             stepForm.blowout_location === 'fixedTrash'
               ? trashId
               : stepForm.blowout_location,
+          dropTip_location: trashId,
         }
       } else if (stepForm.stepType === 'mix') {
         return {
@@ -82,6 +84,7 @@ export const migrateFile = (
             stepForm.blowout_location === 'fixedTrash'
               ? trashId
               : stepForm.blowout_location,
+          dropTip_location: trashId,
         }
       }
 

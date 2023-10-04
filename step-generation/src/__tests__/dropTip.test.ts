@@ -5,9 +5,10 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '../constants'
 import { dropTip } from '../commandCreators/atomic/dropTip'
 import type { InvariantContext, RobotState } from '../types'
+
+const mockDropTipLocation = 'mockLocation'
 describe('dropTip', () => {
   let invariantContext: InvariantContext
   beforeEach(() => {
@@ -37,6 +38,7 @@ describe('dropTip', () => {
       const result = dropTip(
         {
           pipette: DEFAULT_PIPETTE,
+          dropTipLocation: mockDropTipLocation,
         },
         invariantContext,
         makeRobotState({
@@ -51,7 +53,7 @@ describe('dropTip', () => {
           key: expect.any(String),
           params: {
             pipetteId: DEFAULT_PIPETTE,
-            labwareId: FIXED_TRASH_ID,
+            labwareId: 'mockLocation',
             wellName: 'A1',
           },
         },
@@ -65,6 +67,7 @@ describe('dropTip', () => {
       const result = dropTip(
         {
           pipette: DEFAULT_PIPETTE,
+          dropTipLocation: mockDropTipLocation,
         },
         invariantContext,
         initialRobotState
@@ -78,6 +81,7 @@ describe('dropTip', () => {
       const result = dropTip(
         {
           pipette: 'p300MultiId',
+          dropTipLocation: mockDropTipLocation,
         },
         invariantContext,
         makeRobotState({
@@ -92,7 +96,7 @@ describe('dropTip', () => {
           key: expect.any(String),
           params: {
             pipetteId: 'p300MultiId',
-            labwareId: FIXED_TRASH_ID,
+            labwareId: 'mockLocation',
             wellName: 'A1',
           },
         },
@@ -106,6 +110,7 @@ describe('dropTip', () => {
       const result = dropTip(
         {
           pipette: 'p300MultiId',
+          dropTipLocation: mockDropTipLocation,
         },
         invariantContext,
         initialRobotState

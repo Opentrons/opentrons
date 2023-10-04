@@ -97,6 +97,7 @@ beforeEach(() => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
+    dropTipLocation: FIXED_TRASH_ID,
   }
 })
 
@@ -3092,7 +3093,7 @@ describe('consolidate multi-channel', () => {
     destWell: 'A12',
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
-
+    dropTipLocation: FIXED_TRASH_ID,
     // volume and changeTip should be explicit in tests
 
     preWetTip: false,
