@@ -13,7 +13,7 @@ import {
   PrimaryButton,
   COLORS,
 } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
+import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
@@ -36,6 +36,16 @@ export function SetupLabwarePositionCheck(
   const { t, i18n } = useTranslation('protocol_setup')
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: protocolRecord } = useProtocolQuery(
+    runRecord?.data.protocolId ?? null,
+    {
+      staleTime: Infinity,
+    }
+  )
+  const protocolName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name ??
+    ''
   const currentOffsets = runRecord?.data?.labwareOffsets ?? []
   const sortedOffsets: LabwareOffset[] =
     currentOffsets.length > 0
@@ -62,7 +72,7 @@ export function SetupLabwarePositionCheck(
 
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, protocolName)
 
   return (
     <Flex

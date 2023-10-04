@@ -6,18 +6,20 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import {
+import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
+import { getLabwareSetupItemGroups } from '../utils'
+import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
+import { useFeatureFlag } from '../../../redux/config'
+
+import type {
   CompletedProtocolAnalysis,
   Cutout,
   FixtureLoadName,
   ModuleModel,
   PipetteName,
-  STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
-import { useFeatureFlag } from '../../../redux/config'
-import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
-import { getLabwareSetupItemGroups } from '../utils'
 import type { LabwareSetupItem } from '../utils'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ProtocolPipette {
   hardwareType: 'pipette'
@@ -99,19 +101,31 @@ export const useRequiredProtocolHardware = (
       ]
     : []
 
+  const handleModuleConnectionCheckFor = (
+    attachedModules: AttachedModule[],
+    model: ModuleModel
+  ): boolean => {
+    const ASSUME_ALWAYS_CONNECTED_MODULES = ['magneticBlockV1']
+
+    return !ASSUME_ALWAYS_CONNECTED_MODULES.includes(model)
+      ? attachedModules.some(m => m.moduleModel === model)
+      : true
+  }
+
   const requiredModules: ProtocolModule[] = analysis.modules.map(
-    ({ location, model }) => ({
-      hardwareType: 'module',
-      moduleModel: model,
-      slot: location.slotName,
-      // TODO: check module compatability using brent's changes when they're in edge
-      connected: attachedModules.some(m => m.moduleModel === model),
-      hasSlotConflict: !!deckConfig?.find(
-        fixture =>
-          fixture.fixtureLocation === location.slotName &&
-          fixture.loadName !== STANDARD_SLOT_LOAD_NAME
-      ),
-    })
+    ({ location, model }) => {
+      return {
+        hardwareType: 'module',
+        moduleModel: model,
+        slot: location.slotName,
+        connected: handleModuleConnectionCheckFor(attachedModules, model),
+        hasSlotConflict: !!deckConfig?.find(
+          fixture =>
+            fixture.fixtureLocation === location.slotName &&
+            fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+        ),
+      }
+    }
   )
 
   const requiredPipettes: ProtocolPipette[] = analysis.pipettes.map(

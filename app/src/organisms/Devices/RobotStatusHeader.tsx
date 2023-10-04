@@ -46,7 +46,7 @@ const STATUS_REFRESH_MS = 5000
 
 export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const { name, local, robotModel, ...styleProps } = props
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     'devices_landing',
     'device_settings',
     'run_details',
@@ -75,8 +75,9 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing8}
           overflowWrap="anywhere"
         >
-          {`${truncateString(displayName, 80, 65)}; ${t(
-            `run_details:status_${currentRunStatus}`
+          {`${truncateString(displayName, 80, 65)}; ${i18n.format(
+            t(`run_details:status_${currentRunStatus}`),
+            'lowerCase'
           )}`}
         </StyledText>
         <Link

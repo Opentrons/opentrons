@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   POSITION_RELATIVE,
@@ -8,18 +9,23 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { Divider } from '../../../atoms/structure'
-
 import {
   isOT3Pipette,
   PipetteModelSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../../redux/pipettes/types'
+
+import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { Divider } from '../../../atoms/structure'
+
+import type {
+  Mount,
+  PipetteSettingsFieldsMap,
+} from '../../../redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null
+  pipetteSettings: PipetteSettingsFieldsMap | null
   mount: Mount
   handleChangePipette: () => void
   handleCalibrate: () => void
@@ -36,6 +42,7 @@ export const PipetteOverflowMenu = (
   const {
     mount,
     pipetteSpecs,
+    pipetteSettings,
     handleChangePipette,
     handleCalibrate,
     handleAboutSlideout,
@@ -108,7 +115,7 @@ export const PipetteOverflowMenu = (
               {t('about_pipette')}
             </MenuItem>
             <Divider marginY="0" />
-            {!isOT3PipetteAttached ? (
+            {!isOT3PipetteAttached && pipetteSettings != null ? (
               <MenuItem
                 key={`${String(pipetteDisplayName)}_${mount}_view_settings`}
                 onClick={() => handleSettingsSlideout()}

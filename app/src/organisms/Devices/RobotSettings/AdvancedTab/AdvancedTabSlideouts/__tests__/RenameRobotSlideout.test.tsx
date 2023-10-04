@@ -127,7 +127,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('mockInput@@@')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
@@ -144,7 +144,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('aaaaaaaaaaaaaaaaaa')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
@@ -161,7 +161,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('Hello world123')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
@@ -178,7 +178,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue(' ')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()

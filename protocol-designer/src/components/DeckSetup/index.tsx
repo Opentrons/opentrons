@@ -35,7 +35,11 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
-import { OT_2_TRASH_DEF_URI, PSEUDO_DECK_SLOTS } from '../../constants'
+import {
+  FLEX_TRASH_DEF_URI,
+  OT_2_TRASH_DEF_URI,
+  PSEUDO_DECK_SLOTS,
+} from '../../constants'
 import { i18n } from '../../localization'
 import {
   getLabwareIsCompatible,
@@ -97,7 +101,6 @@ export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10
 export const VIEWBOX_WIDTH = 520
 export const VIEWBOX_HEIGHT = 414
-const FLEX_TRASH_SLOT = 'A3'
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
 
@@ -532,7 +535,7 @@ export const DeckSetup = (): JSX.Element => {
     Object.values(activeDeckSetup.labware).find(
       lw =>
         lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-        lw.labwareDefURI === FLEX_TRASH_SLOT
+        lw.labwareDefURI === FLEX_TRASH_DEF_URI
     )?.slot ?? null
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
@@ -561,8 +564,9 @@ export const DeckSetup = (): JSX.Element => {
           viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
           width="100%"
           height="100%"
-          //  change this once we support no trash
-          trashSlotName={(trashSlot ?? 'A3') as TrashSlotName}
+          trashSlotName={
+            trashSlot != null ? (trashSlot as TrashSlotName) : undefined
+          }
           trashColor={COLORS.darkGreyEnabled}
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (

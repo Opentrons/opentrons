@@ -6,7 +6,7 @@ from typing import List, Optional, Union, cast
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
@@ -55,7 +55,7 @@ class ModuleContext(CommandPublisher):
         protocol_core: ProtocolCore,
         core_map: LoadedCoreMap,
         api_version: APIVersion,
-        broker: Broker,
+        broker: LegacyBroker,
     ) -> None:
         super().__init__(broker=broker)
         self._core = core
