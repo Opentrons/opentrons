@@ -3,6 +3,7 @@ from typing import List, NamedTuple, Optional
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -164,7 +165,7 @@ class EngineStore:
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,
                 block_on_door_open=feature_flags.enable_door_safety_switch(
-                    self._robot_type
+                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
         )
