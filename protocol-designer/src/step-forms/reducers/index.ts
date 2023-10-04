@@ -22,6 +22,7 @@ import {
   LoadFixtureCreateCommand,
   STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
@@ -1332,7 +1333,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           //  until it is supported
           if (
             loadName === STAGING_AREA_LOAD_NAME ||
-            loadName === STANDARD_SLOT_LOAD_NAME
+            loadName === STANDARD_SLOT_LOAD_NAME ||
+            loadName === TRASH_BIN_LOAD_NAME
           ) {
             return acc
           }
