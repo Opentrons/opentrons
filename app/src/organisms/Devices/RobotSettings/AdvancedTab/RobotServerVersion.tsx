@@ -13,7 +13,6 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { Portal } from '../../../../App/portal'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
@@ -47,12 +46,10 @@ export function RobotServerVersion({
   return (
     <>
       {showVersionInfoModal ? (
-        <Portal level="top">
-          <UpdateBuildroot
-            robot={robot}
-            close={() => setShowVersionInfoModal(false)}
-          />
-        </Portal>
+        <UpdateBuildroot
+          robot={robot}
+          close={() => setShowVersionInfoModal(false)}
+        />
       ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null ? (
         <Box marginBottom={SPACING.spacing16} width="100%">
