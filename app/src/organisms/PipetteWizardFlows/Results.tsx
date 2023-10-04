@@ -14,6 +14,7 @@ import {
 import {
   getPipetteNameSpecs,
   LEFT,
+  RIGHT,
   LoadedPipette,
   MotorAxes,
   NINETY_SIX_CHANNEL,
@@ -131,9 +132,45 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
   }
 
+  // if gantry is empty and 96 channel is required, proceed to attach 96
+  // home Z anytime we proceed to next thing
+
   const handleProceed = (): void => {
     if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
+    } else if (
+      isSuccess &&
+      attachedPipettes[LEFT] == null &&
+      attachedPipettes[RIGHT] == null &&
+      (requiredPipette?.pipetteName === 'p1000_96' ||
+        selectedPipette === NINETY_SIX_CHANNEL)
+    ) {
+      console.log('proceeding to 96 attach')
+      // empty gantry and proceeding to attach 96-channel
+      chainRunCommands?.(
+        [
+          {
+            commandType: 'home' as const,
+            params: {
+              axes: ['leftZ', 'rightZ'],
+            },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: {
+              mount: RIGHT,
+              maintenancePosition: 'attachPlate',
+            },
+          },
+        ],
+        false
+      )
+        .then(() => {
+          proceed()
+        })
+        .catch(error => {
+          setShowErrorMessage(error.message)
+        })
     } else if (
       isSuccess &&
       flowType === FLOWS.ATTACH &&

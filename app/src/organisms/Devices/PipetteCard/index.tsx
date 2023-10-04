@@ -175,12 +175,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {pipetteWizardFlow != null ? (
         <PipetteWizardFlows
           flowType={pipetteWizardFlow}
-          mount={
-            //  hardcoding in LEFT mount for whenever a 96 channel is selected
-            selectedPipette === NINETY_SIX_CHANNEL
-              ? LEFT
-              : (mount as PipetteMount)
-          }
+          mount={mount}
           closeFlow={() => {
             setSelectedPipette(SINGLE_MOUNT_PIPETTES)
             setPipetteWizardFlow(null)
