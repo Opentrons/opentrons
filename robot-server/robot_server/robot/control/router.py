@@ -2,6 +2,10 @@
 from fastapi import APIRouter, status, Depends
 from typing import TYPE_CHECKING
 
+from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from robot_server.hardware import get_robot_type
+
 from robot_server.errors import ErrorBody
 from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.service.json_api import (
@@ -67,8 +71,8 @@ async def put_acknowledge_estop_disengage(
     return await _get_estop_status_response(estop_handler)
 
 
-def get_door_switch_required() -> bool:
-    return ff.enable_door_safety_switch()
+def get_door_switch_required(robot_type: RobotType = Depends(get_robot_type)) -> bool:
+    return ff.enable_door_safety_switch(RobotTypeEnum.robot_literal_to_enum(robot_type))
 
 
 @control_router.get(

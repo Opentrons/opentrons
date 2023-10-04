@@ -202,9 +202,17 @@ export function MoveLabwareInterventionContent({
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(
-                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                    ({
+                      x,
+                      y,
+                      moduleId,
+                      moduleDef,
+                      nestedLabwareDef,
+                      nestedLabwareId,
+                    }) => (
                       <Module key={moduleId} def={moduleDef} x={x} y={y}>
-                        {nestedLabwareDef != null ? (
+                        {nestedLabwareDef != null &&
+                        nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />
                         ) : null}
                       </Module>
