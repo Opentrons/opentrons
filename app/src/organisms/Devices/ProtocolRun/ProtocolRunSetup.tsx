@@ -108,7 +108,6 @@ export function ProtocolRunSetup({
       status: 'succeeded',
     },
   }
-
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const isOT3 = useIsOT3(robotName)
@@ -117,26 +116,39 @@ export function ProtocolRunSetup({
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
-  const [stepsKeysInOrder, setStepKeysInOrder] = React.useState<StepKey[]>([
-    ROBOT_CALIBRATION_STEP_KEY,
-    LPC_KEY,
-    LABWARE_SETUP_KEY,
-  ])
 
-  React.useEffect(() => {
-    let nextStepKeysInOrder = stepsKeysInOrder
+  const stepsKeysInOrder =
+    protocolData != null
+      ? [
+          ROBOT_CALIBRATION_STEP_KEY,
+          MODULE_SETUP_KEY,
+          LPC_KEY,
+          LABWARE_SETUP_KEY,
+          LIQUID_SETUP_KEY,
+        ]
+      : [ROBOT_CALIBRATION_STEP_KEY, LPC_KEY, LABWARE_SETUP_KEY]
 
-    if (protocolData != null) {
-      nextStepKeysInOrder = [
-        ROBOT_CALIBRATION_STEP_KEY,
-        MODULE_SETUP_KEY,
-        LPC_KEY,
-        LABWARE_SETUP_KEY,
-        LIQUID_SETUP_KEY,
-      ]
+  const targetStepKeyInOrder = stepsKeysInOrder.filter((stepKey: StepKey) => {
+    if (protocolData == null) {
+      return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
     }
-    setStepKeysInOrder(nextStepKeysInOrder)
-  }, [Boolean(protocolData), protocolData?.commands])
+
+    if (
+      protocolData.modules.length === 0 &&
+      protocolData.liquids.length === 0
+    ) {
+      return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
+    }
+
+    if (protocolData.modules.length === 0) {
+      return stepKey !== MODULE_SETUP_KEY
+    }
+
+    if (protocolData.liquids.length === 0) {
+      return stepKey !== LIQUID_SETUP_KEY
+    }
+    return true
+  })
 
   if (robot == null) return null
   const hasLiquids = protocolData != null && protocolData.liquids?.length > 0
@@ -165,8 +177,8 @@ export function ProtocolRunSetup({
           robotName={robotName}
           runId={runId}
           nextStep={
-            stepsKeysInOrder[
-              stepsKeysInOrder.findIndex(
+            targetStepKeyInOrder[
+              targetStepKeyInOrder.findIndex(
                 v => v === ROBOT_CALIBRATION_STEP_KEY
               ) + 1
             ]
@@ -175,6 +187,7 @@ export function ProtocolRunSetup({
           calibrationStatus={calibrationStatus}
         />
       ),
+      // change description for OT-3
       description: isOT3
         ? t(`${ROBOT_CALIBRATION_STEP_KEY}_description_pipettes_only`)
         : t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
@@ -207,8 +220,8 @@ export function ProtocolRunSetup({
           robotName={robotName}
           runId={runId}
           nextStep={
-            stepsKeysInOrder.findIndex(v => v === LABWARE_SETUP_KEY) ===
-            stepsKeysInOrder.length - 1
+            targetStepKeyInOrder.findIndex(v => v === LABWARE_SETUP_KEY) ===
+            targetStepKeyInOrder.length - 1
               ? null
               : LIQUID_SETUP_KEY
           }
