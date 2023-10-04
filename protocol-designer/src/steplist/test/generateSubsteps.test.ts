@@ -12,11 +12,10 @@ import {
   DeactivateTemperatureArgs,
 } from '../../../../step-generation/lib/types.d'
 import { THERMOCYCLER_STATE } from '../../constants'
-import { StepArgsAndErrors } from '../types'
 import { generateSubstepItem } from '../generateSubstepItem'
 
 import type { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
-import type { LabwareNamesByModuleId } from '../types'
+import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
 
 describe('generateSubstepItem', () => {
   const stepId = 'step123'

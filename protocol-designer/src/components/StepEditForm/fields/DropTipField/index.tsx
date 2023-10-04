@@ -47,7 +47,7 @@ export function DropTipField(
     dropdownItem || (options[0] && options[0].value)
   )
   React.useEffect(() => {
-    props.updateValue(selectedValue)
+    updateValue(selectedValue)
   }, [selectedValue])
 
   return (
