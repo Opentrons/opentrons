@@ -59,6 +59,21 @@ class AbstractRunner(ABC):
 
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
+        self._broker = LegacyBroker()
+
+    # TODO(mm, 2023-10-03): `LegacyBroker` is specific to Python protocols and JSON protocols ≤v5.
+    # We'll need to extend this in order to report progress from newer JSON protocols.
+    #
+    # TODO(mm, 2023-10-04): When we switch this to return a new `Broker` instead of a
+    # `LegacyBroker`, we should annotate the return type as a `ReadOnlyBroker`.
+    @property
+    def broker(self) -> LegacyBroker:
+        """Return a broker that you can subscribe to in order to monitor protocol progress.
+
+        Currently, this only returns messages for `PythonAndLegacyRunner`.
+        Otherwise, it's a no-op.
+        """
+        return self._broker
 
     def was_started(self) -> bool:
         """Whether the run has been started.
@@ -136,20 +151,20 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._legacy_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
-        broker = None
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            broker = LegacyBroker()
             equipment_broker = Broker[LegacyLoadInfo]()
 
             self._protocol_engine.add_plugin(
-                LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
+                LegacyContextPlugin(
+                    broker=self._broker, equipment_broker=equipment_broker
+                )
             )
 
         context = self._legacy_context_creator.create(
             protocol=protocol,
-            broker=broker,
+            broker=self._broker,
             equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
