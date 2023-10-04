@@ -207,7 +207,6 @@ class GeometryView:
 
         # Check if the module has moved from one side of the deck to the other
         if calibrated_slot_column != current_slot_column:
-            print(f"ROTATE: {calibrated_slot_column} != {current_slot_column}")
             # Since the module was rotated, the calibration offset vector needs to be rotated by 180 degrees along the z axis
             saved_offset = array([offset.x, offset.y, offset.z])
             rotation_matrix = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
@@ -215,7 +214,6 @@ class GeometryView:
             offset = ModuleOffsetVector(
                 x=new_offset[0], y=new_offset[1], z=new_offset[2]
             )
-        print(f"OFFSET: {offset}")
         return offset
 
     def _get_calibrated_module_offset(
