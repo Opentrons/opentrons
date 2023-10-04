@@ -166,6 +166,8 @@ Small, direct movements can be useful for working inside of a well, without havi
 .. versionadded:: 2.0
 
 
+.. _points-locations:
+
 Points and Locations
 --------------------
 

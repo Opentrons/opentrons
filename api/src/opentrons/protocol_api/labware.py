@@ -204,10 +204,17 @@ class Well:
         Specifies a :py:class:`~opentrons.types.Point` based on fractions of the
         distance from the center of the well to the edge along each axis.
 
-        For example, ``from_center_cartesian(0, 0, 0.5)`` specifies a point with no
-        change in the x- or y-axis, and half of the distance from the center of
-        the well to its top along the z-axis. Use :py:meth:`.move` to construct a
-        :py:class:`~opentrons.types.Location` that a pipette can move to.
+        For example, ``from_center_cartesian(0, 0, 0.5)`` specifies a point at the
+        well's center on the x- and y-axis, and half of the distance from the center of
+        the well to its top along the z-axis. To move the pipette to that location,
+        construct a :py:class:`~opentrons.types.Location` relative to the same well::
+
+            location = Location(
+                plate["A1"], plate["A1"].from_center_cartesian(0, 0, 0.5)
+            )
+            pipette.move_to(location)
+
+        See :ref:`points-locations` for more information.
 
         :param x: The fraction of the distance from the well's center to its edge
             along the x-axis. Negative values are to the left, and positive values
@@ -219,7 +226,7 @@ class Well:
             along the x-axis. Negative values are down, and positive values are up.
 
         :return: A :py:class:`~opentrons.types.Point` representing the specified
-            distances in mm.
+            position in absolute deck coordinates.
 
         .. note:: Even if the absolute values of ``x``, ``y``, and ``z`` are all less
             than 1, applying the result of ``from_center_cartesian`` to the well's
