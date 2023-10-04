@@ -147,26 +147,11 @@ def test_execute_function_apiv2_14(
 
     execute.execute(protocol.filelike, protocol.filename, emit_runlog=emit_runlog)
 
-    # https://opentrons.atlassian.net/browse/RSS-320:
-    # PAPIv≥2.14 protocols currently emit JSON run log text, not human-readable text.
-    # Their exact contents can't be tested here because they're too verbose and they have
-    # unpredictable fields like `createdAt` and `id`. So as an approximation, we just test
-    # the command types.
-    command_types = [
-        json.loads(item["payload"]["text"])["commandType"]
-        for item in entries
-        if item["$"] == "before"
-    ]
-    assert command_types == [
-        "home",
-        "home",
-        "loadLabware",
-        "loadPipette",
-        "loadLabware",
-        "pickUpTip",
-        "aspirate",
-        "dispense",
-        "dropTip",
+    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
+        "Picking up tip from A1 of None",
+        "Aspirating 100.0 uL from A1 of None at 500.0 uL/sec",
+        "Dispensing 100.0 uL into B1 of None at 1000.0 uL/sec",
+        "Dropping tip into H12 of None",
     ]
 
 
