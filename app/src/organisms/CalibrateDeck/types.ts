@@ -7,6 +7,6 @@ export interface CalibrateDeckParentProps {
   dispatchRequests: DispatchRequestsType
   showSpinner: boolean
   isJogging: boolean
-  wasExitBeforeCompletion?: MutableRefObject<boolean>
+  exitBeforeDeckConfigCompletion?: MutableRefObject<boolean>
   offsetInvalidationHandler?: () => void
 }
