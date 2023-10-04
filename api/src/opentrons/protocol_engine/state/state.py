@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
-from opentrons.protocol_engine.types import ModuleOffsetVector
+from opentrons.protocol_engine.types import ModuleOffsetData
 from opentrons.util.broker import ReadOnlyBroker
 
 from ..resources import DeckFixedLabware
@@ -131,7 +131,7 @@ class StateStore(StateView, ActionHandler):
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
-        module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None,
+        module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
