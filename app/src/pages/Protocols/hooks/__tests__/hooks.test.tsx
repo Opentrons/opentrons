@@ -21,7 +21,8 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
 
-import type { DeckConfiguration, Protocol } from '@opentrons/api-client'
+import type { Protocol } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')

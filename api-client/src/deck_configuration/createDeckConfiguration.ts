@@ -1,9 +1,9 @@
 // import { POST, request } from '../request'
 import { DECK_CONFIG_STUB } from './__stubs__'
 
+import type { DeckConfiguration } from '@opentrons/shared-data'
 // import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { DeckConfiguration } from './types'
 
 // TODO(bh, 2023-09-26): uncomment and remove deck config stub when backend api is ready
 // export function createDeckConfiguration(
