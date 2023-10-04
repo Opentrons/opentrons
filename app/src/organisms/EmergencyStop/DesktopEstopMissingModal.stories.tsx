@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 import { configReducer } from '../../redux/config/reducer'
-import { EstopMissingModal } from '.'
+import { EstopMissingModal } from './EstopMissingModal'
 
 import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
@@ -32,4 +32,7 @@ const Template: Story<
 export const EstopMissing = Template.bind({})
 EstopMissing.args = {
   robotName: 'Flexy',
+  closeModal: () => {},
+  isDismissedModal: false,
+  setIsDismissedModal: () => {},
 }

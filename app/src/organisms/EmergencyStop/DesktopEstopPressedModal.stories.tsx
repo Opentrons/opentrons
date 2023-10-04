@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 import { configReducer } from '../../redux/config/reducer'
-import { EstopPressedModal } from '.'
+import { EstopPressedModal } from './EstopPressedModal'
 
 import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'

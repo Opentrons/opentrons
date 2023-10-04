@@ -36,7 +36,6 @@ export function EstopMissingModal({
   setIsDismissedModal,
 }: EstopMissingModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
-
   return (
     <Portal level="top">
       {isOnDevice ? (
@@ -65,6 +64,7 @@ interface EstopMissingTouchscreenModalProps
 function TouchscreenModal({
   robotName,
 }: EstopMissingTouchscreenModalProps): JSX.Element {
+  console.log('here')
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
