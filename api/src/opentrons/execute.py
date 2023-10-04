@@ -640,10 +640,6 @@ def _run_file_pe(
 ) -> None:
     """Run a protocol file with Protocol Engine."""
 
-    def send_command_to_emit_runlog(event: pe_command_monitor.Event) -> None:
-        if emit_runlog is not None:
-            emit_runlog(_adapt_command(event))
-
     async def run(protocol_source: ProtocolSource) -> None:
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api,
@@ -656,12 +652,15 @@ def _run_file_pe(
             hardware_api=hardware_api,
         )
 
-        with pe_command_monitor.monitor_commands(
-            protocol_engine, callback=send_command_to_emit_runlog
-        ):
+        unsubscribe = protocol_runner.broker.subscribe(
+            "command", lambda event: emit_runlog(event) if emit_runlog else None
+        )
+        try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
             result = await protocol_runner.run(protocol_source)
+        finally:
+            unsubscribe()
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
             raise _ProtocolEngineExecuteError(result.state_summary.errors)
