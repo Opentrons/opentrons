@@ -6,6 +6,25 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.0.1
+
+Welcome to the v7.0.1 release of the Opentrons robot software! This release builds on the major release that added support for Opentrons Flex.
+
+This update may take longer than usual if you are updating from v6.x. Allow **approximately 15 minutes** for your robot to restart. This delay will only happen once.
+
+### New Features
+
+### Bug Fixes
+
+### Known Issues
+
+Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
+
+- JSON protocols created or modified with Protocol Designer v6.0.0 or higher.
+- Python protocols specifying an `apiLevel` of 2.14 or higher.
+
+---
+
 ## Opentrons Robot Software Changes in 7.0.0
 
 Welcome to the v7.0.0 release of the Opentrons robot software! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
