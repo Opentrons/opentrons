@@ -62,7 +62,6 @@ from opentrons.protocol_engine import (
     DeckType,
     EngineStatus,
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
-    command_monitor as pe_command_monitor,
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
@@ -733,32 +732,6 @@ def _adapt_protocol_source(
         )
 
         yield protocol_source
-
-
-def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMessage:
-    """Convert a Protocol Engine command event to an old-school command_types.CommandMesage."""
-    before_or_after: command_types.MessageSequenceId = (
-        "before" if isinstance(event, pe_command_monitor.RunningEvent) else "after"
-    )
-
-    message: command_types.CommentMessage = {
-        # TODO(mm, 2023-09-26): If we can without breaking the public API, remove the requirement
-        # to supply a "name" here. If we can't do that, consider adding a special name value
-        # so we don't have to lie and call every command a comment.
-        "name": "command.COMMENT",
-        "id": event.command.id,
-        "$": before_or_after,
-        # TODO(mm, 2023-09-26): Convert this machine-readable JSON into a human-readable message
-        # to match behavior from before Protocol Engine.
-        # https://opentrons.atlassian.net/browse/RSS-320
-        "payload": {"text": event.command.json()},
-        # As far as I know, "error" is not part of the public-facing API, so it doesn't matter
-        # what we put here. Leaving it as `None` to avoid difficulties in converting between
-        # the Protocol Engine `ErrorOccurrence` model and the regular Python `Exception` type
-        # that this field expects.
-        "error": None,
-    }
-    return message
 
 
 def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:

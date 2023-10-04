@@ -660,15 +660,6 @@ def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None
     assert subject.get_is_okay_to_clear() is expected_is_okay
 
 
-def test_get_running() -> None:
-    """It should return the command that's currently running."""
-    subject = get_command_view(running_command_id=None)
-    assert subject.get_running() is None
-
-    subject = get_command_view(running_command_id="command-id")
-    assert subject.get_running() == "command-id"
-
-
 def test_get_current() -> None:
     """It should return the "current" command."""
     subject = get_command_view(

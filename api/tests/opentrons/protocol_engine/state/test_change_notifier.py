@@ -54,20 +54,3 @@ async def test_multiple_subscribers(_test_repetition: int) -> None:
     await asyncio.gather(task_1, task_2, task_3)
 
     assert results == [1, 2, 3]
-
-
-async def test_broker() -> None:
-    """Test that notifications are available synchronously through `ChangeNotifier.broker`."""
-    notify_count = 5
-
-    subject = ChangeNotifier()
-    received = 0
-
-    def callback(_message_from_broker: None) -> None:
-        nonlocal received
-        received += 1
-
-    with subject.broker.subscribed(callback):
-        for notify_number in range(notify_count):
-            subject.notify()
-            assert received == notify_number + 1
