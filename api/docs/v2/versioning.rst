@@ -146,7 +146,7 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - The new :py:meth:`.configure_for_volume` method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See :ref:`pipette-volume-modes`. 
   
-  - The new ``push_out`` parameter of :py:meth:`.dispense` can also help ensure that the pipette dispenses all of its liquid when working with very small volumes.
+  - The new ``push_out`` parameter of the :py:meth:`.dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
   
 - Flex and OT-2 features
 
