@@ -17,7 +17,7 @@ const trashBinDef = {
   version: 1,
   namespace: 'opentrons',
   metadata: {
-    displayName: 'Trash bin',
+    displayName: 'Trash',
   },
   parameters: {
     loadName: 'trash_bin',
