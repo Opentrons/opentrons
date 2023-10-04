@@ -24,7 +24,6 @@ import { ProgressBar } from '../../../../atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
   startRobotUpdate,
-  clearRobotUpdateSession,
   getRobotSessionIsManualFile,
 } from '../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
@@ -79,13 +78,12 @@ export function RobotUpdateProgressModal({
     if (closeUpdateBuildroot != null) closeUpdateBuildroot()
   }
   const reinstallUpdate = React.useCallback(() => {
-    dispatch(startRobotUpdate(robotName))
+    dispatch(dispatchStartRobotUpdate(robotName))
   }, [robotName])
 
   const { error } = session || { error: null }
   const { updateStep, progressPercent } = useRobotUpdateInfo(session)
   useStatusBarAnimation(error != null)
-  useCleanupRobotUpdateSessionOnDismount()
 
   const handleFileSelect: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
@@ -325,13 +323,4 @@ function useStatusBarAnimation(isError: boolean): void {
 
   React.useEffect(startUpdatingAnimation, [])
   React.useEffect(startIdleAnimationIfFailed, [isError])
-}
-
-function useCleanupRobotUpdateSessionOnDismount(): void {
-  const dispatch = useDispatch()
-  React.useEffect(() => {
-    return () => {
-      dispatch(clearRobotUpdateSession())
-    }
-  }, [])
 }
