@@ -36,7 +36,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
     errors?.fields?.name != null
 
   return (
-    <HandleEnter onEnter={proceed}>
+    <HandleEnter onEnter={proceed} disabled={disableProceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}

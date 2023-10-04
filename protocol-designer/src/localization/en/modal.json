@@ -88,7 +88,8 @@
     "review_file_details": "Review file details",
     "robot_type": "Robot Type",
     "upload_tiprack": "Upload a custom tiprack to select its definition",
-    "upload": "Upload"
+    "upload": "Upload",
+    "staging_areas": "Staging areas"
   },
   "well_order": {
     "title": "Well Order",
