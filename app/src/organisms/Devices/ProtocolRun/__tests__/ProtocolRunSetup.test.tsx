@@ -14,6 +14,7 @@ import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simple
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
+import { useFeatureFlag } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -40,6 +41,7 @@ jest.mock('../SetupLiquids')
 jest.mock('../EmptySetupStep')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
+jest.mock('../../../../redux/config')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
@@ -79,7 +81,9 @@ const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
 const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
   typeof EmptySetupStep
 >
-
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
@@ -142,6 +146,9 @@ describe('ProtocolRunSetup', () => {
     when(mockSetupModules).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -332,6 +339,37 @@ describe('ProtocolRunSetup', () => {
         'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
       )
     })
+
+    it('renders correct text contents for modules and fixtures', () => {
+      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseFeatureFlag)
+        .calledWith('enableDeckConfiguration')
+        .mockReturnValue(true)
+      when(mockUseMostRecentCompletedAnalysis)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          ...withModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+          modules: [
+            {
+              id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
+              location: { slot: '1' },
+              model: 'magneticModuleV1',
+            },
+          ],
+        } as any)
+      when(mockParseAllRequiredModuleModels).mockReturnValue([
+        'magneticModuleV1',
+      ])
+      const { getByText } = render()
+
+      getByText('STEP 2')
+      getByText('Modules & deck')
+      getByText(
+        'Install the required modules and power them on. Install the required fixtures and review the deck configuration.'
+      )
+    })
+
     it('renders view-only info message if run has started', async () => {
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 

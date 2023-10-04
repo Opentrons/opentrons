@@ -244,10 +244,10 @@ export function ModulesListItem({
       <Btn
         marginLeft={SPACING.spacing20}
         css={css`
-          color: ${COLORS.darkGreyEnabled};
+          color: ${COLORS.blueEnabled};
 
           &:hover {
-            color: ${COLORS.darkBlackEnabled};
+            color: ${COLORS.blueHover};
           }
         `}
         marginTop={SPACING.spacing4}
@@ -259,12 +259,8 @@ export function ModulesListItem({
             size="0.75rem"
             marginTop={SPACING.spacing4}
           />
-          <StyledText
-            marginLeft={SPACING.spacing4}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-            as="p"
-          >
-            {t('view_module_setup_instructions')}
+          <StyledText marginLeft={SPACING.spacing4} as="p">
+            {t('view_setup_instructions')}
           </StyledText>
         </Flex>
       </Btn>
@@ -380,14 +376,11 @@ export function ModulesListItem({
             </Flex>
           </Flex>
           <StyledText as="p" width="15%">
-            {t('slot_location', {
-              slotName:
-                getModuleType(moduleModel) === 'thermocyclerModuleType'
-                  ? isOT3
-                    ? TC_MODULE_LOCATION_OT3
-                    : TC_MODULE_LOCATION_OT2
-                  : slotName,
-            })}
+            {getModuleType(moduleModel) === 'thermocyclerModuleType'
+              ? isOT3
+                ? TC_MODULE_LOCATION_OT3
+                : TC_MODULE_LOCATION_OT2
+              : slotName}
           </StyledText>
           <Flex width="15%">
             {moduleModel === MAGNETIC_BLOCK_V1 ? (
