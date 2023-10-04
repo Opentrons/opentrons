@@ -39,7 +39,7 @@ import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMo
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
-import { SetupModules } from './SetupModules'
+import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
@@ -194,7 +194,7 @@ export function ProtocolRunSetup({
     },
     [MODULE_SETUP_KEY]: {
       stepInternals: (
-        <SetupModules
+        <SetupModuleAndDeck
           expandLabwarePositionCheckStep={() => setExpandedStepKey(LPC_KEY)}
           robotName={robotName}
           runId={runId}

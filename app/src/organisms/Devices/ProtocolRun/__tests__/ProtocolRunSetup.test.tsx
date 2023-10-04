@@ -29,14 +29,14 @@ import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
-import { SetupModules } from '../SetupModules'
+import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
 jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
-jest.mock('../SetupModules')
+jest.mock('../SetupModuleAndDeck')
 jest.mock('../SetupLiquids')
 jest.mock('../EmptySetupStep')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
@@ -69,8 +69,8 @@ const mockSetupLabware = SetupLabware as jest.MockedFunction<
 const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
   typeof SetupRobotCalibration
 >
-const mockSetupModules = SetupModules as jest.MockedFunction<
-  typeof SetupModules
+const mockSetupModuleAndDeck = SetupModuleAndDeck as jest.MockedFunction<
+  typeof SetupModuleAndDeck
 >
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
@@ -143,7 +143,7 @@ describe('ProtocolRunSetup', () => {
         })
       )
       .mockReturnValue(<span>Mock SetupLabware</span>)
-    when(mockSetupModules).mockReturnValue(<div>Mock SetupModules</div>)
+    when(mockSetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
     when(mockUseFeatureFlag)

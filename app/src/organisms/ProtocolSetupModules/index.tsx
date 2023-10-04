@@ -41,7 +41,7 @@ import {
   useRunCalibrationStatus,
 } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
-import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
+import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/MultipleModulesModal'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'

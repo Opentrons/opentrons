@@ -17,7 +17,7 @@ import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
 
-interface SetupModulesProps {
+interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
@@ -25,13 +25,13 @@ interface SetupModulesProps {
   hasModules: boolean
 }
 
-export const SetupModules = ({
+export const SetupModuleAndDeck = ({
   expandLabwarePositionCheckStep,
   robotName,
   runId,
   loadedFixturesBySlot,
   hasModules,
-}: SetupModulesProps): JSX.Element => {
+}: SetupModuleAndDeckProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),

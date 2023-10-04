@@ -9,7 +9,7 @@ import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
-import { SetupModules } from '../index'
+import { SetupModuleAndDeck } from '../index'
 import { SetupModulesList } from '../SetupModulesList'
 import { SetupModulesMap } from '../SetupModulesMap'
 import { SetupFixtureList } from '../SetupFixtureList'
@@ -59,14 +59,14 @@ const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'
 
-const render = (props: React.ComponentProps<typeof SetupModules>) => {
-  return renderWithProviders(<SetupModules {...props} />, {
+const render = (props: React.ComponentProps<typeof SetupModuleAndDeck>) => {
+  return renderWithProviders(<SetupModuleAndDeck {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('SetupModules', () => {
-  let props: React.ComponentProps<typeof SetupModules>
+describe('SetupModuleAndDeck', () => {
+  let props: React.ComponentProps<typeof SetupModuleAndDeck>
   beforeEach(() => {
     props = {
       robotName: MOCK_ROBOT_NAME,
