@@ -2,14 +2,24 @@ import { renderHook } from '@testing-library/react-hooks'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import { RobotUpdateSession } from '../../../../../redux/robot-update/types'
 
+import {
+  GET_TOKEN,
+  RESTART,
+  FINISHED,
+  DONE,
+  VALIDATING,
+  UPLOAD_FILE,
+  WRITING,
+} from '../../../../../redux/robot-update'
+
 describe('useRobotUpdateInfo', () => {
   const mockRobotUpdateSession: RobotUpdateSession | null = {
     robotName: 'testRobot',
     fileInfo: { isManualFile: true, systemFile: 'testFile', version: '1.0.0' },
     token: null,
     pathPrefix: null,
-    step: 'getToken',
-    stage: 'validating',
+    step: GET_TOKEN,
+    stage: VALIDATING,
     progress: 50,
     error: null,
   }
@@ -21,6 +31,32 @@ describe('useRobotUpdateInfo', () => {
     expect(result.current.progressPercent).toBe(0)
   })
 
+  it('should return initial values when there is no session step and stage', () => {
+    const { result } = renderHook(session => useRobotUpdateInfo(session), {
+      initialProps: {
+        ...mockRobotUpdateSession,
+        step: null,
+        stage: null,
+      },
+    })
+
+    expect(result.current.updateStep).toBe('initial')
+    expect(result.current.progressPercent).toBe(0)
+  })
+
+  it('should return finished values when the update is finished', () => {
+    const { result } = renderHook(session => useRobotUpdateInfo(session), {
+      initialProps: {
+        ...mockRobotUpdateSession,
+        step: FINISHED,
+        stage: DONE,
+      },
+    })
+
+    expect(result.current.updateStep).toBe('finished')
+    expect(result.current.progressPercent).toBe(100)
+  })
+
   it('should update updateStep and progressPercent when session is provided', () => {
     const { result, rerender } = renderHook(
       session => useRobotUpdateInfo(session),
@@ -29,12 +65,12 @@ describe('useRobotUpdateInfo', () => {
       }
     )
 
-    expect(result.current.updateStep).toBe('install')
+    expect(result.current.updateStep).toBe('initial')
     expect(result.current.progressPercent).toBe(25)
 
     rerender({
       ...mockRobotUpdateSession,
-      step: 'restart',
+      step: RESTART,
       stage: 'ready-for-restart',
       progress: 100,
       error: null,
@@ -52,7 +88,7 @@ describe('useRobotUpdateInfo', () => {
       }
     )
 
-    expect(result.current.updateStep).toBe('install')
+    expect(result.current.updateStep).toBe('initial')
     expect(result.current.progressPercent).toBe(25)
 
     rerender({
@@ -76,7 +112,7 @@ describe('useRobotUpdateInfo', () => {
       },
     })
 
-    expect(result.current.updateStep).toBe('install')
+    expect(result.current.updateStep).toBe('initial')
     expect(result.current.progressPercent).toBe(25)
   })
 })

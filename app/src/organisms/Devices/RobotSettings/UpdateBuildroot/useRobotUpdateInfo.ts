@@ -1,9 +1,10 @@
 import * as React from 'react'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 
-export function useRobotUpdateInfo(
-  session: RobotUpdateSession | null
-): { updateStep: UpdateStep; progressPercent: number } {
+export function useRobotUpdateInfo(session: RobotUpdateSession | null): {
+  updateStep: UpdateStep
+  progressPercent: number
+} {
   const shellReportedUpdateStep = React.useMemo(
     () => getShellReportedUpdateStep(session),
     [session]
@@ -101,9 +102,11 @@ function useFindProgressPercentFrom(
 
   const TOTAL_STEPS_WITH_PROGRESS = filePathUsedForUpdate ? 2 : 2
 
-  if (updateStep === 'initial' && progressPercent !== 0) {
-    setProgressPercent(0)
-    prevSeenStepProgress.current = 0
+  if (updateStep === 'initial') {
+    if (progressPercent !== 0) {
+      setProgressPercent(0)
+      prevSeenStepProgress.current = 0
+    }
   } else if (updateStep === 'restart' || updateStep === 'finished') {
     if (progressPercent !== 100) {
       setProgressPercent(100)
