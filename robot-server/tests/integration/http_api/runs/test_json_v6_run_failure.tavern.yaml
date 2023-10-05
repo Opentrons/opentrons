@@ -109,7 +109,7 @@ stages:
               pipetteId: pipetteId
           - id: !anystr
             key: !anystr
-            commandType: dropTip
+            commandType: aspirate 
             createdAt: !anystr
             startedAt: !anystr
             completedAt: !anystr
@@ -127,11 +127,11 @@ stages:
               labwareId: tipRackId
               wellName: A1
               wellLocation:
-                origin: default
+                origin: bottom 
                 offset:
                   x: 0
                   y: 0
-                  z: 0
+                  z: 1
               flowRate: 3.78
               volume: 100
           - id: !anystr
