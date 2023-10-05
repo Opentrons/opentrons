@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { FLEX_ROBOT_TYPE, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import {
   OutlineButton,
   Flex,
@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   LabeledValue,
   SPACING,
-  SlotMap,
   Tooltip,
   useHoverTooltip,
   Box,
@@ -19,6 +18,8 @@ import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
 import { Portal } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
+import { FlexSlotMap } from './FlexSlotMap'
+
 import styles from './styles.css'
 
 interface AdditionalItemsRowProps {
@@ -92,17 +93,11 @@ export function AdditionalItemsRow(
                 }`}
               />
             </div>
-            <div className={styles.slot_map}>
-              <SlotMap
-                occupiedSlots={
-                  name === 'trashBin' && trashBinSlot != null
-                    ? [trashBinSlot]
-                    : [WASTE_CHUTE_SLOT]
-                }
-                collisionSlots={[]}
-                robotType={FLEX_ROBOT_TYPE}
-              />
-            </div>
+            <FlexSlotMap
+              selectedSlot={
+                name === 'trashBin' ? trashBinSlot ?? '' : WASTE_CHUTE_SLOT
+              }
+            />
           </>
         ) : null}
 
