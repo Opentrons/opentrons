@@ -103,3 +103,8 @@ export const POST_WIFI_DISCONNECT_SUCCESS: 'networking:POST_WIFI_DISCONNECT_SUCC
 
 export const POST_WIFI_DISCONNECT_FAILURE: 'networking:POST_WIFI_DISCONNECT_FAILURE' =
   'networking:POST_WIFI_DISCONNECT_FAILURE'
+
+// clear wifi status
+
+export const CLEAR_WIFI_STATUS: 'networking:CLEAR_WIFI_STATUS' =
+  'networking:CLEAR_WIFI_STATUS'

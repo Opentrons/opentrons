@@ -22,6 +22,7 @@ import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import {
+  clearWifiStatus,
   getNetworkInterfaces,
   postWifiDisconnect,
 } from '../../../../redux/networking'
@@ -105,6 +106,8 @@ export const DisconnectModal = ({
     wifi?.ipAddress == null
 
   if (isDisconnected) {
+    // as a fallback, when in a disconnected state clear redux wifi status data to ensure no stale data
+    dispatch(clearWifiStatus(robotName))
     disconnectModalBody = t('disconnect_from_wifi_network_success')
   } else if (isRequestPending) {
     disconnectModalBody = t('disconnecting_from_wifi_network', { ssid })

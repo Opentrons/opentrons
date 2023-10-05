@@ -149,6 +149,11 @@ export interface PostWifiDisconnectFailureAction {
   meta: RobotApiRequestMeta
 }
 
+export interface ClearWifiStatusAction {
+  type: 'networking:CLEAR_WIFI_STATUS'
+  payload: { robotName: string }
+}
+
 export interface NetworkingDisconnectResponse {
   ssid: string
 }
@@ -174,6 +179,7 @@ export type NetworkingAction =
   | PostWifiDisconnectAction
   | PostWifiDisconnectSuccessAction
   | PostWifiDisconnectFailureAction
+  | ClearWifiStatusAction
 
 // state types
 
