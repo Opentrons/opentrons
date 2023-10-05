@@ -52,6 +52,7 @@ import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
+import { DropTipWizard } from '../../DropTipWizard'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
@@ -109,6 +110,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     onClickOutside: () => setShowOverflowMenu(false),
   })
   const [showChangePipette, setChangePipette] = React.useState(false)
+  const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [
     pipetteWizardFlow,
@@ -142,6 +144,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       setChangePipette(true)
     }
   }
+  const handleDropTip = (): void => { setShowDropTipWizard(true) }
   const handleCalibrate = (): void => {
     if (isFlexPipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
   }
@@ -193,6 +196,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {showChangePipette && (
         <ChangePipette
           robotName={robotName}
+          mount={mount}
+          closeModal={() => setChangePipette(false)}
+        />
+      )}
+      {showDropTipWizard && (
+        <DropTipWizard
+          instrumentModel={pipetteModelSpecs?.model}
           mount={mount}
           closeModal={() => setChangePipette(false)}
         />
@@ -345,6 +355,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteSpecs={pipetteModelSpecs}
               mount={mount}
               handleChangePipette={handleChangePipette}
+              handleDropTip={handleDropTip}
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
               handleCalibrate={handleCalibrate}

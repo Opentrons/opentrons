@@ -29,20 +29,22 @@ import type {
   CreateMaintenanceRunData,
   InstrumentData,
   MaintenanceRun,
+  PipetteData,
 } from '@opentrons/api-client'
 import { ExitConfirmation } from './ExitConfirmation'
 
 const RUN_REFETCH_INTERVAL = 5000
 
 interface MaintenanceRunManagerProps {
-  attachedInstrument: InstrumentData | null
+  mount: PipetteData['mount'] 
   closeFlow: () => void
   onComplete?: () => void
+  instrumentModel?: PipetteData['instrumentModel']
 }
-export function DropTipWizardFlows(
+export function DropTipWizard(
   props: MaintenanceRunManagerProps
-): JSX.Element {
-  const { closeFlow, attachedInstrument } = props
+): JSX.Element | null {
+  const { closeFlow, mount, instrumentModel} = props
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
@@ -131,11 +133,12 @@ export function DropTipWizardFlows(
     }
   }
 
-  return (
-    <DropTipWizard
+  return instrumentModel != null ? (
+    <DropTipWizardComponent
       createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
-      attachedInstrument={attachedInstrument}
+      mount={mount}
+      instrumentModel={instrumentModel}
       createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
@@ -148,13 +151,12 @@ export function DropTipWizardFlows(
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}
     />
-  )
+  ) : null
 }
 
 interface DropTipWizardProps {
-  maintenanceRunId?: string
+  mount: PipetteData['mount'] 
   createdMaintenanceRunId: string | null
-  attachedInstrument: InstrumentData | null
   createMaintenanceRun: UseMutateFunction<
     MaintenanceRun,
     AxiosError<any>,
@@ -173,9 +175,11 @@ interface DropTipWizardProps {
   createRunCommand: ReturnType<
     typeof useCreateMaintenanceCommandMutation
   >['createMaintenanceCommand']
+  instrumentModel: PipetteData['instrumentModel']
+  maintenanceRunId?: string
 }
 
-export const DropTipWizard = (
+export const DropTipWizardComponent = (
   props: DropTipWizardProps
 ): JSX.Element | null => {
   const {

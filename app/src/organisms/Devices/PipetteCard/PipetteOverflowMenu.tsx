@@ -28,6 +28,7 @@ interface PipetteOverflowMenuProps {
   pipetteSettings: PipetteSettingsFieldsMap | null
   mount: Mount
   handleChangePipette: () => void
+  handleDropTip: () => void
   handleCalibrate: () => void
   handleAboutSlideout: () => void
   handleSettingsSlideout: () => void
@@ -44,6 +45,7 @@ export const PipetteOverflowMenu = (
     pipetteSpecs,
     pipetteSettings,
     handleChangePipette,
+    handleDropTip,
     handleCalibrate,
     handleAboutSlideout,
     handleSettingsSlideout,
