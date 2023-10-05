@@ -51,7 +51,7 @@ describe('AboutModuleSlideout', () => {
     getByText('def456')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
     const button = getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
@@ -65,7 +65,7 @@ describe('AboutModuleSlideout', () => {
     getByText('def456')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
   })
 
   it('renders no banner when run is finishing', () => {
@@ -76,7 +76,7 @@ describe('AboutModuleSlideout', () => {
     getByText('def456')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
   })
 
   it('renders correct info when module is a magnetic module GEN2', () => {
@@ -92,7 +92,7 @@ describe('AboutModuleSlideout', () => {
     getByText('def456')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
   })
 
   it('renders correct info when module is a temperature module GEN2', () => {
@@ -108,7 +108,7 @@ describe('AboutModuleSlideout', () => {
     getByText('abc123')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
   })
 
   it('renders correct info when module is a temperature module GEN1', () => {
@@ -124,7 +124,7 @@ describe('AboutModuleSlideout', () => {
     getByText('abc123')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
   })
 
   it('renders correct info when module is a thermocycler module with an update available', () => {
@@ -140,7 +140,7 @@ describe('AboutModuleSlideout', () => {
     getByText('ghi789')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
     getByText('Firmware update available.')
     const viewUpdate = getByRole('button', { name: 'Update now' })
     fireEvent.click(viewUpdate)
@@ -165,7 +165,7 @@ describe('AboutModuleSlideout', () => {
     getByText('abc123')
     getByText('SERIAL NUMBER')
     getByText('CURRENT VERSION')
-    getByText(/v[0-9].[0-9].[0-9]$/)
+    getByText('v2.0.0')
     const button = getByRole('button', { name: 'close' })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
