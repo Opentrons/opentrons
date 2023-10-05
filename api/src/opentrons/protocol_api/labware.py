@@ -209,8 +209,8 @@ class Well:
         the well to its top along the z-axis. To move the pipette to that location,
         construct a :py:class:`~opentrons.types.Location` relative to the same well::
 
-            location = Location(
-                plate["A1"], plate["A1"].from_center_cartesian(0, 0, 0.5)
+            location = types.Location(
+                plate["A1"].from_center_cartesian(0, 0, 0.5), plate["A1"]
             )
             pipette.move_to(location)
 
