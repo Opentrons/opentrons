@@ -7,6 +7,7 @@ import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
+import { getAttachedPipetteSettingsFieldsById } from '../../../../redux/pipettes'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { useDeckCalibrationData, useIsOT3 } from '../../hooks'
@@ -17,9 +18,11 @@ import { PipetteCard } from '..'
 import {
   mockLeftSpecs,
   mockRightSpecs,
+  mockPipetteSettingsFieldsMap,
 } from '../../../../redux/pipettes/__fixtures__'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 
+import type { State } from '../../../../redux/types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 jest.mock('../PipetteOverflowMenu')
@@ -30,6 +33,7 @@ jest.mock('../../hooks')
 jest.mock('../AboutPipetteSlideout')
 jest.mock('../../../../redux/robot-api')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../redux/pipettes')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -55,6 +59,9 @@ const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jest.MockedFunction<
   typeof useCurrentSubsystemUpdateQuery
+>
+const mockGetAttachedPipetteSettingsFieldsById = getAttachedPipetteSettingsFieldsById as jest.MockedFunction<
+  typeof getAttachedPipetteSettingsFieldsById
 >
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
@@ -106,6 +113,9 @@ describe('PipetteCard', () => {
     mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
       data: undefined,
     } as any)
+    when(mockGetAttachedPipetteSettingsFieldsById)
+      .calledWith({} as State, mockRobotName, 'id')
+      .mockReturnValue(mockPipetteSettingsFieldsMap)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -284,5 +294,16 @@ describe('PipetteCard', () => {
     getByText('Right mount')
     getByText('Instrument attached')
     getByText('Firmware update in progress...')
+  })
+  it('does not render a pipette settings slideout card if the pipette has no settings', () => {
+    when(mockGetAttachedPipetteSettingsFieldsById)
+      .calledWith({} as State, mockRobotName, 'id')
+      .mockReturnValue(null)
+    const { queryByTestId } = render(props)
+    expect(
+      queryByTestId(
+        `PipetteSettingsSlideout_${mockRobotName}_${props.pipetteId}`
+      )
+    ).not.toBeInTheDocument()
   })
 })

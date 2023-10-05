@@ -209,7 +209,11 @@ export const GripperWizard = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
-  const gripperWizardSteps = getGripperWizardSteps(flowType)
+  const requiresFirmwareUpdate = !attachedGripper?.ok
+  const gripperWizardSteps = getGripperWizardSteps(
+    flowType,
+    requiresFirmwareUpdate
+  )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [
     frontJawOffset,

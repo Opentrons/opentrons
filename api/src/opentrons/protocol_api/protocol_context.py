@@ -17,7 +17,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -101,7 +101,7 @@ class ProtocolContext(CommandPublisher):
         self,
         api_version: APIVersion,
         core: ProtocolCore,
-        broker: Optional[Broker] = None,
+        broker: Optional[LegacyBroker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
         bundled_data: Optional[Dict[str, bytes]] = None,
@@ -1026,7 +1026,7 @@ def _create_module_context(
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,
-    broker: Broker,
+    broker: LegacyBroker,
 ) -> ModuleTypes:
     module_cls: Optional[Type[ModuleTypes]] = None
     if isinstance(module_core, AbstractTemperatureModuleCore):

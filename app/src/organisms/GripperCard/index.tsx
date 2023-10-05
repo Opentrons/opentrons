@@ -24,6 +24,17 @@ const BANNER_LINK_CSS = css`
   cursor: pointer;
   margin-left: ${SPACING.spacing8};
 `
+
+const INSTRUMENT_CARD_STYLE = css`
+  p {
+    text-transform: lowercase;
+  }
+
+  p::first-letter {
+    text-transform: uppercase;
+  }
+`
+
 const SUBSYSTEM_UPDATE_POLL_MS = 5000
 
 export function GripperCard({
@@ -127,6 +138,7 @@ export function GripperCard({
       {attachedGripper?.ok === false || subsystemUpdateData != null ? (
         <InstrumentCard
           label={i18n.format(t('mount', { side: 'extension' }), 'capitalize')}
+          css={INSTRUMENT_CARD_STYLE}
           description={t('instrument_attached')}
           banner={
             <Banner

@@ -108,6 +108,7 @@ export const mix: CommandCreator<MixArgs> = (
     dispenseFlowRateUlSec,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dropTipLocation,
   } = data
 
   // Errors
@@ -137,6 +138,13 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
+  if (
+    !invariantContext.labwareEntities[dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
   const configureForVolumeCommand: CurriedCommandCreator[] =
     invariantContext.pipetteEntities[pipette].name === 'p50_single_flex' ||
     invariantContext.pipetteEntities[pipette].name === 'p50_multi_flex'
@@ -158,6 +166,7 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            dropTipLocation,
           }),
         ]
       }

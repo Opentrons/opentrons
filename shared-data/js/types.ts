@@ -24,6 +24,10 @@ import {
   GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
@@ -227,6 +231,12 @@ export type ModuleModelWithLegacy =
   | typeof THERMOCYCLER
   | typeof MAGDECK
   | typeof TEMPDECK
+
+export type FixtureLoadName =
+  | typeof STAGING_AREA_LOAD_NAME
+  | typeof STANDARD_SLOT_LOAD_NAME
+  | typeof TRASH_BIN_LOAD_NAME
+  | typeof WASTE_CHUTE_LOAD_NAME
 
 export interface DeckOffset {
   x: number
@@ -520,3 +530,12 @@ export type StatusBarAnimation =
   | 'off'
 
 export type StatusBarAnimations = StatusBarAnimation[]
+
+// TODO(bh, 2023-09-28): refine types when settled
+export interface Fixture {
+  fixtureId: string
+  fixtureLocation: string
+  loadName: FixtureLoadName
+}
+
+export type DeckConfiguration = Fixture[]

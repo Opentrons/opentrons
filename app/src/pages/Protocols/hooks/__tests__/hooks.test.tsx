@@ -8,19 +8,25 @@ import {
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-
-import type { Protocol } from '@opentrons/api-client'
-import type {
+import {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
+  WASTE_CHUTE_LOAD_NAME,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
+import { useFeatureFlag } from '../../../../redux/config'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
+
+import type { Protocol } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')
+jest.mock('../../../../redux/config')
 
 const PROTOCOL_ID = 'fake_protocol_id'
 
@@ -36,7 +42,12 @@ const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
-
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
@@ -47,7 +58,7 @@ const PROTOCOL_ANALYSIS = {
     {
       id: 'modId',
       model: 'heaterShakerModuleV1',
-      location: { slotName: '1' },
+      location: { slotName: 'D3' },
       serialNumber: 'serialNum',
     },
   ],
@@ -57,7 +68,7 @@ const PROTOCOL_ANALYSIS = {
       commandType: 'loadLabware',
       params: {
         labwareId: 'firstLabwareId',
-        location: { slotName: '1' },
+        location: { slotName: 'D3' },
         displayName: 'first labware nickname',
       },
       result: {
@@ -167,6 +178,10 @@ describe('useMissingProtocolHardware', () => {
     mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
       data: PROTOCOL_ANALYSIS,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [{}],
+    } as UseQueryResult<DeckConfiguration>)
+    mockUseFeatureFlag.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -189,10 +204,47 @@ describe('useMissingProtocolHardware', () => {
         {
           hardwareType: 'module',
           moduleModel: 'heaterShakerModuleV1',
-          slot: '1',
+          slot: 'D3',
           connected: false,
+          hasSlotConflict: false,
         },
       ],
+      conflictedSlots: [],
+    })
+  })
+  it('should return 1 conflicted slot', () => {
+    mockUseDeckConfigurationQuery.mockReturnValue(({
+      data: [
+        {
+          fixtureId: 'mockFixtureId',
+          fixtureLocation: WASTE_CHUTE_SLOT,
+          loadName: WASTE_CHUTE_LOAD_NAME,
+        },
+      ],
+    } as any) as UseQueryResult<DeckConfiguration>)
+
+    const { result } = renderHook(
+      () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
+      { wrapper }
+    )
+    expect(result.current).toEqual({
+      isLoading: false,
+      missingProtocolHardware: [
+        {
+          hardwareType: 'pipette',
+          pipetteName: 'p1000_multi_flex',
+          mount: 'left',
+          connected: false,
+        },
+        {
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: 'D3',
+          connected: false,
+          hasSlotConflict: true,
+        },
+      ],
+      conflictedSlots: ['D3'],
     })
   })
   it('should return empty array when the correct modules and pipettes are attached', () => {
@@ -221,6 +273,7 @@ describe('useMissingProtocolHardware', () => {
     expect(result.current).toEqual({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
   })
 })

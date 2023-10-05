@@ -10,10 +10,11 @@ import {
   DisposalVolumeField,
   PathField,
 } from '../../fields'
+import { DropTipField } from '../../fields/DropTipField'
 import styles from '../../StepEditForm.css'
-import { StepFormProps } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
+import type { StepFormProps } from '../../types'
 
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
@@ -122,6 +123,14 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
             />
           )}
         </div>
+      </div>
+      <div className={styles.section_header}>
+        <span className={styles.section_header_text}>
+          {i18n.t('form.step_edit_form.section.dropTip')}
+        </span>
+      </div>
+      <div className={cx(styles.form_row, styles.section_column)}>
+        <DropTipField {...propsForFields.dropTip_location} />
       </div>
     </div>
   )
