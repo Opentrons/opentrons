@@ -13,6 +13,8 @@ from httpx import Response
 STARTUP_WAIT = 20
 SHUTDOWN_WAIT = 20
 
+_RUN_POLL_INTERVAL = 0.1
+
 
 class RobotClient:
     """Client for the robot's HTTP API.
@@ -132,9 +134,7 @@ class RobotClient:
         multipart_upload_name = "files"
 
         with contextlib.ExitStack() as file_exit_stack:
-            opened_files: List[
-                Union[BinaryIO, Tuple[str, bytes]],
-            ] = []
+            opened_files: List[Union[BinaryIO, Tuple[str, bytes]],] = []
 
             for file in files:
                 if isinstance(file, Path):
@@ -317,3 +317,26 @@ class RobotClient:
         )
         response.raise_for_status()
         return response
+
+
+async def poll_until_run_completes(
+    robot_client: RobotClient, run_id: str, poll_interval: float = _RUN_POLL_INTERVAL
+) -> Any:
+    """Wait until a run completes.
+
+    You probably want to wrap this in an `anyio.fail_after()` timeout in case something causes
+    the run to hang forever.
+
+    Returns:
+        The completed run response. You can inspect its `status` to see whether it
+        succeeded, failed, or was stopped.
+    """
+    completed_run_statuses = {"stopped", "failed", "succeeded"}
+    while True:
+        run = (await robot_client.get_run(run_id=run_id)).json()
+        status = run["data"]["status"]
+        if status in completed_run_statuses:
+            return run
+        else:
+            # The run is still ongoing. Wait a beat, then poll again.
+            await asyncio.sleep(poll_interval)
