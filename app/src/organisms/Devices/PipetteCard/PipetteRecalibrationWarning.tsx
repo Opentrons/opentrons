@@ -16,7 +16,7 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
   if (!showBanner) return null
 
   return (
-    <Box marginTop={SPACING.spacing8}>
+    <Box marginTop={SPACING.spacing8} width="100%">
       <Banner
         iconMarginRight={SPACING.spacing16}
         iconMarginLeft={SPACING.spacing8}
