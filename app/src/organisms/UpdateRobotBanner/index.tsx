@@ -8,10 +8,8 @@ import {
   Btn,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { UNREACHABLE } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { UpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
@@ -59,15 +57,11 @@ export function UpdateRobotBanner(
           {t('view_update')}
         </Btn>
       </Banner>
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
-        <Portal level="top">
-          <UpdateBuildroot
-            robot={robot}
-            close={() => setShowSoftwareUpdateModal(false)}
-          />
-        </Portal>
+      {showSoftwareUpdateModal ? (
+        <UpdateBuildroot
+          robot={robot}
+          close={() => setShowSoftwareUpdateModal(false)}
+        />
       ) : null}
     </Flex>
   ) : null

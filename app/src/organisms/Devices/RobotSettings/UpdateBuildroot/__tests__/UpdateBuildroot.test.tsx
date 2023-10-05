@@ -65,11 +65,9 @@ describe('UpdateBuildroot', () => {
     const viewUpdate = wrapper.find(ViewUpdateModal)
 
     expect(viewUpdate.prop('robotName')).toBe(mockRobot.name)
-    expect(viewUpdate.prop('robotUpdateType')).toBe(RobotUpdate.UPGRADE)
+    expect(viewUpdate.prop('robot')).toBe(mockRobot)
 
-    expect(getRobotUpdateAvailable).toHaveBeenCalledWith(MOCK_STATE, mockRobot)
     expect(closeModal).not.toHaveBeenCalled()
-
     viewUpdate.invoke('closeModal')?.()
     expect(closeModal).toHaveBeenCalled()
   })
@@ -91,8 +89,5 @@ describe('UpdateBuildroot', () => {
     const progressModal = wrapper.find(RobotUpdateProgressModal)
 
     expect(progressModal.prop('robotName')).toBe(mockRobot.name)
-    expect(progressModal.prop('updateStep')).toBe('download')
-    expect(progressModal.prop('error')).toBe(mockSession.error)
-    expect(progressModal.prop('stepProgress')).toBe(mockSession.progress)
   })
 })
