@@ -10,8 +10,8 @@ import httpx
 from httpx import Response
 
 
-STARTUP_WAIT = 20
-SHUTDOWN_WAIT = 20
+_STARTUP_WAIT = 20
+_SHUTDOWN_WAIT = 20
 
 _RUN_POLL_INTERVAL = 0.1
 
@@ -87,14 +87,14 @@ class RobotClient:
             # returns some kind of "not ready."
             await asyncio.sleep(0.1)
 
-    async def wait_until_alive(self, timeout_sec: float = STARTUP_WAIT) -> bool:
+    async def wait_until_alive(self, timeout_sec: float = _STARTUP_WAIT) -> bool:
         try:
             await asyncio.wait_for(self._poll_for_alive(), timeout=timeout_sec)
             return True
         except asyncio.TimeoutError:
             return False
 
-    async def wait_until_dead(self, timeout_sec: float = SHUTDOWN_WAIT) -> bool:
+    async def wait_until_dead(self, timeout_sec: float = _SHUTDOWN_WAIT) -> bool:
         """Retry GET /health and until unreachable."""
         try:
             await asyncio.wait_for(self._poll_for_dead(), timeout=timeout_sec)
