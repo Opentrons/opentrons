@@ -134,7 +134,9 @@ class RobotClient:
         multipart_upload_name = "files"
 
         with contextlib.ExitStack() as file_exit_stack:
-            opened_files: List[Union[BinaryIO, Tuple[str, bytes]],] = []
+            opened_files: List[
+                Union[BinaryIO, Tuple[str, bytes]],
+            ] = []
 
             for file in files:
                 if isinstance(file, Path):
