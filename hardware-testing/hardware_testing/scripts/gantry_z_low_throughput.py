@@ -216,7 +216,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
-    parser.add_argument("--cycles", type=int, default=5)
+    parser.add_argument("--cycles", type=int, default=25000)
     args = parser.parse_args()
     mount = mount_options[args.mount]
 
