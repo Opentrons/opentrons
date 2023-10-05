@@ -60,86 +60,92 @@ export function AdditionalItemsRow(
           />
         </Portal>
       ) : null}
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} height="7rem">
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <h4 className={styles.row_title}>
-            {i18n.t(`modules.additional_equipment_display_names.${name}`)}
-          </h4>
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <h4 className={styles.row_title}>
+          {i18n.t(`modules.additional_equipment_display_names.${name}`)}
+        </h4>
+
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <AdditionalItemImage
             //  TODO(jr, 9/13/23): update this image to the waste chute and trash asset
             src={gripperImage}
             alt={i18n.t(`modules.additional_equipment_display_names.${name}`)}
           />
-        </Flex>
-        <div
-          className={styles.module_col}
-          style={{ marginLeft: SPACING.spacing32 }}
-        >
-          {isEquipmentAdded && name === 'gripper' ? (
-            <LabeledValue
-              label="Model"
-              value={i18n.t(`modules.model_display_name.gripperV1`)}
-            />
-          ) : null}
-        </div>
 
-        {isEquipmentAdded && name !== 'gripper' ? (
-          <>
-            <div className={styles.module_col}>
-              <LabeledValue
-                label="Position"
-                value={`Slot ${
-                  name === 'trashBin' ? trashBinSlot : WASTE_CHUTE_SLOT
-                }`}
-              />
-            </div>
-            <FlexSlotMap
-              selectedSlot={
-                name === 'trashBin' ? trashBinSlot ?? '' : WASTE_CHUTE_SLOT
-              }
-            />
-          </>
-        ) : null}
-
-        <Box
-          flexDirection={DIRECTION_ROW}
-          flex="1 0 40%"
-          textAlign={TYPOGRAPHY.textAlignRight}
-        >
-          {name === 'trashBin' && isEquipmentAdded ? (
-            <OutlineButton
-              onClick={() => openTrashModal(true)}
-              className={styles.module_button}
-            >
-              {i18n.t('shared.edit')}
-            </OutlineButton>
-          ) : null}
-          <Box
-            {...targetProps}
-            width="6.75rem"
-            display="inline-block"
-            marginRight={SPACING.spacing16}
+          <div
+            className={styles.module_col}
+            style={{ marginLeft: SPACING.spacing32 }}
           >
-            <OutlineButton
-              className={styles.module_button}
-              disabled={disabledRemoveButton}
-              onClick={addTrash ? () => openTrashModal(true) : handleAttachment}
-            >
-              {isEquipmentAdded
-                ? i18n.t('shared.remove')
-                : i18n.t('shared.add')}
-            </OutlineButton>
-          </Box>
-          {disabledRemoveButton ? (
-            <Tooltip
-              {...tooltipProps}
-              width="10rem"
-              textAlign={TYPOGRAPHY.textAlignCenter}
-            >
-              {i18n.t(`tooltip.disabled_cannot_delete_trash`)}
-            </Tooltip>
+            {isEquipmentAdded && name === 'gripper' ? (
+              <LabeledValue
+                label="Model"
+                value={i18n.t(`modules.model_display_name.gripperV1`)}
+              />
+            ) : null}
+          </div>
+
+          {isEquipmentAdded && name !== 'gripper' ? (
+            <>
+              <div className={styles.module_col}>
+                <LabeledValue
+                  label="Position"
+                  value={`Slot ${
+                    name === 'trashBin' ? trashBinSlot : WASTE_CHUTE_SLOT
+                  }`}
+                />
+              </div>
+              <div className={styles.slot_map}>
+                <FlexSlotMap
+                  selectedSlot={
+                    name === 'trashBin' ? trashBinSlot ?? '' : WASTE_CHUTE_SLOT
+                  }
+                />
+              </div>
+            </>
           ) : null}
-        </Box>
+
+          <Box
+            flexDirection={DIRECTION_ROW}
+            flex="1 0 40%"
+            textAlign={TYPOGRAPHY.textAlignRight}
+          >
+            {name === 'trashBin' && isEquipmentAdded ? (
+              <OutlineButton
+                onClick={() => openTrashModal(true)}
+                className={styles.module_button}
+              >
+                {i18n.t('shared.edit')}
+              </OutlineButton>
+            ) : null}
+            <Box
+              {...targetProps}
+              width="6.75rem"
+              display="inline-block"
+              marginRight={SPACING.spacing16}
+            >
+              <OutlineButton
+                className={styles.module_button}
+                disabled={disabledRemoveButton}
+                onClick={
+                  addTrash ? () => openTrashModal(true) : handleAttachment
+                }
+              >
+                {isEquipmentAdded
+                  ? i18n.t('shared.remove')
+                  : i18n.t('shared.add')}
+              </OutlineButton>
+            </Box>
+            {disabledRemoveButton ? (
+              <Tooltip
+                {...tooltipProps}
+                width="10rem"
+                textAlign={TYPOGRAPHY.textAlignCenter}
+              >
+                {i18n.t(`tooltip.disabled_cannot_delete_trash`)}
+              </Tooltip>
+            ) : null}
+          </Box>
+        </Flex>
       </Flex>
     </>
   )

@@ -2,6 +2,8 @@ import * as React from 'react'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  ModuleType,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { RobotCoordinateSpace } from '@opentrons/components/src/hardware-sim/RobotCoordinateSpace'
 import { DeckSlotLocation } from '@opentrons/components/src/hardware-sim/DeckSlotLocation'
@@ -17,14 +19,18 @@ import {
 
 interface FlexSlotMapProps {
   selectedSlot: string
+  //    need to special case the TC GEN2 to select 2 slots
+  moduleType?: ModuleType
 }
 export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
-  const { selectedSlot } = props
+  const { selectedSlot, moduleType } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const slot = deckDef.locations.orderedSlots.find(
     slot => slot.id === selectedSlot
   )
+  const aOneSlot = deckDef.locations.orderedSlots.find(slot => slot.id === 'A1')
   const [xSlotPosition = 0, ySlotPosition = 0] = slot?.position ?? []
+  const [xSlotPosition2 = 0, ySlotPosition2 = 0] = aOneSlot?.position ?? []
 
   const isLeftSideofDeck =
     selectedSlot === 'A1' ||
@@ -36,8 +42,26 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const xDimension = 246.5
+  const isMiddleOfDeck =
+    selectedSlot === 'A2' ||
+    selectedSlot === 'B2' ||
+    selectedSlot === 'C2' ||
+    selectedSlot === 'D2'
+
+  const xDimension = isMiddleOfDeck ? 160.3 : 246.5
   const yDimension = 106.0
+
+  const slotFill = (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      backgroundColor={COLORS.grey2}
+      borderRadius={BORDERS.radiusSoftCorners}
+      color={COLORS.white}
+      gridGap={SPACING.spacing8}
+      justifyContent={JUSTIFY_CENTER}
+      width="100%"
+    />
+  )
 
   return (
     <RobotCoordinateSpace
@@ -62,16 +86,20 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
         flexProps={{ flex: '1' }}
         foreignObjectProps={{ flex: '1' }}
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.grey2}
-          borderRadius={BORDERS.radiusSoftCorners}
-          color={COLORS.white}
-          gridGap={SPACING.spacing8}
-          justifyContent={JUSTIFY_CENTER}
-          width="100%"
-        />
+        {slotFill}
       </RobotCoordsForeignObject>
+      {moduleType === THERMOCYCLER_MODULE_TYPE ? (
+        <RobotCoordsForeignObject
+          width={xDimension}
+          height={yDimension}
+          x={xAdjustment}
+          y={ySlotPosition2 + yAdjustment}
+          flexProps={{ flex: '1' }}
+          foreignObjectProps={{ flex: '1' }}
+        >
+          {slotFill}
+        </RobotCoordsForeignObject>
+      ) : null}
     </RobotCoordinateSpace>
   )
 }
