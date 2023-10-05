@@ -6,11 +6,17 @@ import { PipetteTypeTile } from '../PipetteTypeTile'
 import { EquipmentOption } from '../EquipmentOption'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
+import { getAllow96Channel } from '../../../../feature-flags/selectors'
 
 jest.mock('../EquipmentOption')
+jest.mock('../../../../feature-flags/selectors')
 
 const mockEquipmentOption = EquipmentOption as jest.MockedFunction<
   typeof EquipmentOption
+>
+
+const mockGetAllow96Channel = getAllow96Channel as jest.MockedFunction<
+  typeof getAllow96Channel
 >
 
 const render = (props: React.ComponentProps<typeof PipetteTypeTile>) => {
@@ -56,8 +62,10 @@ describe('PipetteTypeTile', () => {
       mount: 'left',
       allowNoPipette: false,
       tileHeader: 'header',
+      display96Channel: true,
     }
     mockEquipmentOption.mockReturnValue(<div>mock EquipmentOption</div>)
+    mockGetAllow96Channel.mockReturnValue(true)
   })
   it('renders the correct pipettes for flex with no empty pip allowed and btn ctas work', () => {
     const { getByText, getAllByText, getByRole } = render(props)
@@ -73,6 +81,7 @@ describe('PipetteTypeTile', () => {
     props = {
       ...props,
       allowNoPipette: true,
+      display96Channel: false,
     }
     const { getAllByText } = render(props)
     expect(getAllByText('mock EquipmentOption')).toHaveLength(5)
