@@ -1,13 +1,12 @@
 import pytest
 
 from opentrons_shared_data.deck import load as load_deck_definition
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, DeckDefinitionV4
 
 from . import list_deck_def_paths
 
 
 @pytest.mark.parametrize("definition_name", list_deck_def_paths(version=4))
-def test_v3_and_v4_positional_equivalence(definition_name: str):
+def test_v3_and_v4_positional_equivalence(definition_name: str) -> None:
     deck_v3 = load_deck_definition(name=definition_name, version=3)
     deck_v4 = load_deck_definition(name=definition_name, version=4)
 
