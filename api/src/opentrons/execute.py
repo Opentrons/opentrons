@@ -397,6 +397,8 @@ def execute(  # noqa: C901
 
     # Guard against trying to run protocols for the wrong robot type.
     # This matches what robot-server does.
+    # FIXME: This exposes the internal strings "OT-2 Standard" and "OT-3 Standard".
+    # https://opentrons.atlassian.net/browse/RSS-370
     if protocol.robot_type != _get_robot_type():
         raise RuntimeError(
             f'This robot is of type "{_get_robot_type()}",'
