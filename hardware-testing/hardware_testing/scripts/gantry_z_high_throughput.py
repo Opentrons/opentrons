@@ -31,10 +31,10 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
     pos_max_right = homed_position_right - types.Point(x=1, y=21, z=1)
     pos_min_right = types.Point(x=0, y=75, z=pos_max_right.z - 150)  # stay above deck to be safe
 
-    print(f"pos_max_left: {pos_max_left}\n")
-    print(f"pos_min_left: {pos_min_left}\n")
-    print(f"pos_max_right: {pos_max_right}\n")
-    print(f"pos_min_right: {pos_min_right}\n")
+    # print(f"pos_max_left: {pos_max_left}\n")
+    # print(f"pos_min_left: {pos_min_left}\n")
+    # print(f"pos_max_right: {pos_max_right}\n")
+    # print(f"pos_min_right: {pos_min_right}\n")
 
     stall_count = xy_count = y_count = z_l_count = z_r_count = 0
     x_pt = -54
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
-    parser.add_argument("--cycles", type=int, default=5)
+    parser.add_argument("--cycles", type=int, default=25000)
     args = parser.parse_args()
     mount = mount_options[args.mount]
 
