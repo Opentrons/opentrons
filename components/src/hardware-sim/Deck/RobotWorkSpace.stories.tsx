@@ -2,7 +2,7 @@ import * as React from 'react'
 import { RobotWorkSpace } from './RobotWorkSpace'
 import { SlotLabels } from './SlotLabels'
 import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
-import { getModuleDef2, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
+import { getModuleDef2, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import { getDeckDefinitions } from './getDeckDefinitions'
 import type { INode } from 'svgson'
 
@@ -115,7 +115,7 @@ const SlotLabelTemplate: Story<
               y={moduleSlot.position[1]}
             />
             {hasSlotLabels ? (
-              <SlotLabels robotType={OT3_STANDARD_MODEL} />
+              <SlotLabels robotType={FLEX_STANDARD_MODEL} />
             ) : null}
           </>
         )

@@ -20,5 +20,7 @@ const Template: Story<
 > = args => <AddDeckConfigurationModal {...args} />
 export const Default = Template.bind({})
 Default.args = {
-  slotName: 'D3',
+  fixtureLocation: 'D3',
+  setShowAddFixtureModal: () => {},
+  isOnDevice: true,
 }
