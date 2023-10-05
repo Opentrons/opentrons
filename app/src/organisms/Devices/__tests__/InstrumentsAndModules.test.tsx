@@ -184,9 +184,6 @@ describe('InstrumentsAndModules', () => {
     getByText('Mock PipetteCard')
   })
   it('renders pipette recalibration recommendation banner when offsets fail reasonability checks', () => {
-    mockPipetteRecalibrationWarning.mockReturnValue(
-      <div>Mock PipetteRecalibrationWarning</div>
-    )
     mockGetShowPipetteCalibrationWarning.mockReturnValue(true)
     mockUseIsRobotViewable.mockReturnValue(true)
     const [{ getByText }] = render()
