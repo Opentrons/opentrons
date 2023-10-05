@@ -7,9 +7,9 @@ from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
 )
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons import types, hardware_control as hc
+from opentrons import types
 from opentrons.commands import commands as cmds
 
 from opentrons.commands import publisher
@@ -25,6 +25,7 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
+from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -75,13 +76,12 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         core: InstrumentCore,
         protocol_core: ProtocolCore,
-        broker: Broker,
+        broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
         trash: labware.Labware,
         requested_as: str,
     ) -> None:
-
         super().__init__(broker)
         self._api_version = api_version
         self._core = core
@@ -394,7 +394,7 @@ class InstrumentContext(publisher.CommandPublisher):
                      `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`,
                      and when dispensing, it will be
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
-        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
+        :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette.
         :returns: This instance
 
         .. note::
@@ -418,7 +418,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
         if not self._core.has_tip():
-            raise hc.NoTipAttachedError("Pipette has no tip. Aborting mix()")
+            raise UnexpectedTipRemovalError("mix", self.name, self.mount)
 
         c_vol = self._core.get_available_volume() if not volume else volume
 
@@ -539,7 +539,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param speed: The speed for touch tip motion, in mm/s.
                       Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
         :type speed: float
-        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
+        :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
         :raises RuntimeError: If no location is specified and location cache is
                               None. This should happen if `touch_tip` is called
                               without first calling a method that takes a
@@ -554,7 +554,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         """
         if not self._core.has_tip():
-            raise hc.NoTipAttachedError("Pipette has no tip to touch_tip()")
+            raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
 
         checked_speed = self._determine_speed(speed)
 
@@ -612,7 +612,7 @@ class InstrumentContext(publisher.CommandPublisher):
                        to air-gap aspirate. (Default: 5mm above current Well)
         :type height: float
 
-        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
+        :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
 
         :raises RuntimeError: If location cache is None.
                               This should happen if `touch_tip` is called
@@ -633,7 +633,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         """
         if not self._core.has_tip():
-            raise hc.NoTipAttachedError("Pipette has no tip. Aborting air_gap")
+            raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
 
         if height is None:
             height = 5

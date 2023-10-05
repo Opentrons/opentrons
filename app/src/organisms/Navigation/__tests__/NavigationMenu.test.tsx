@@ -77,4 +77,11 @@ describe('NavigationMenu', () => {
     const { getByText } = render(props)
     getByText('Lights off')
   })
+
+  // ToDo (kk:09/29/2023) menu item clicking test will be added
+  it('should render the deck configuration menu item', () => {
+    const { getByText, getByLabelText } = render(props)
+    getByText('Deck configuration')
+    getByLabelText('deck-map_icon')
+  })
 })

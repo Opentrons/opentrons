@@ -21,6 +21,7 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
   FIXED_TRASH_ID,
+  OT_2_TRASH_DEF_URI,
 } from '../constants'
 import {
   DEFAULT_PIPETTE,
@@ -80,7 +81,7 @@ export function makeContext(): InvariantContext {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
 
-      labwareDefURI: getLabwareDefURI(fixtureTrash),
+      labwareDefURI: OT_2_TRASH_DEF_URI,
       def: fixtureTrash,
     },
     [SOURCE_LABWARE]: {

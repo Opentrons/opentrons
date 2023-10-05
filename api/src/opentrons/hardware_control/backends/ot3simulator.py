@@ -540,7 +540,11 @@ class OT3Simulator:
         return None
 
     @asynccontextmanager
-    async def restore_current(self) -> AsyncIterator[None]:
+    async def motor_current(
+        self,
+        run_currents: OT3AxisMap[float] = {},
+        hold_currents: OT3AxisMap[float] = {},
+    ) -> AsyncIterator[None]:
         """Save the current."""
         yield
 
@@ -697,8 +701,9 @@ class OT3Simulator:
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-    ) -> None:
+    ) -> bool:
         self._position[axis_to_node(moving)] += distance_mm
+        return True
 
     @ensure_yield
     async def capacitive_pass(

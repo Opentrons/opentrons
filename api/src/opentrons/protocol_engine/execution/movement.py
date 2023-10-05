@@ -6,7 +6,7 @@ from typing import Optional, List
 
 from opentrons.types import Point, MountType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.errors import MustHomeError
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from ..types import (
     WellLocation,
@@ -217,6 +217,6 @@ class MovementHandler:
             await self._hardware_api.gantry_position(
                 mount=mount.to_hw_mount(), fail_on_not_homed=True
             )
-        except MustHomeError:
+        except PositionUnknownError:
             return False
         return True

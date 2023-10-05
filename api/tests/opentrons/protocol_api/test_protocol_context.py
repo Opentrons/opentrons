@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 
 from opentrons.types import Mount, DeckSlotName
 from opentrons.protocol_api import OFF_DECK
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -605,7 +605,7 @@ def test_move_labware_to_module(
     """It should move labware to new module location."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_module_core = decoy.mock(cls=TemperatureModuleCore)
-    mock_broker = decoy.mock(cls=Broker)
+    mock_broker = decoy.mock(cls=LegacyBroker)
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 

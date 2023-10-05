@@ -61,7 +61,13 @@ export const ModuleWizardFlows = (
   const { t } = useTranslation('module_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const requiresFirmwareUpdate = !attachedPipette?.ok
+  const attachedPipetteMount =
+    attachedPipette?.mount === LEFT ? 'pipette_left' : 'pipette_right'
+
+  const moduleCalibrationSteps = getModuleCalibrationSteps(
+    requiresFirmwareUpdate
+  )
 
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
@@ -248,7 +254,7 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back')} />
+    modalContent = <InProgressModal description={t('stand_back_exiting')} />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
       <BeforeBeginning
@@ -263,9 +269,7 @@ export const ModuleWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={
-          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
-        }
+        subsystem={attachedPipetteMount}
         description={t('firmware_update')}
       />
     )

@@ -88,8 +88,8 @@ export function SetupLabwareMap({
                       labwareInAdapterInMod?.result?.labwareId ??
                       nestedLabwareId
                     const topLabwareDisplayName =
-                      labwareInAdapterInMod?.result?.definition.metadata
-                        .displayName ?? nestedLabwareDisplayName
+                      labwareInAdapterInMod?.params.displayName ??
+                      nestedLabwareDisplayName
 
                     return (
                       <Module
@@ -134,8 +134,7 @@ export function SetupLabwareMap({
                     const topLabwareId =
                       labwareInAdapter?.result?.labwareId ?? labwareId
                     const topLabwareDisplayName =
-                      labwareInAdapter?.result?.definition.metadata
-                        .displayName ?? displayName
+                      labwareInAdapter?.params.displayName ?? displayName
 
                     return (
                       <React.Fragment

@@ -1,4 +1,5 @@
 export * from './Deck'
+export * from './DeckConfigurator'
 export * from './Labware'
 export * from './Module'
 export * from './Pipette'

@@ -144,6 +144,8 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.
   
+  - The new :py:meth:`.configure_for_volume` method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See :ref:`pipette-volume-modes`. 
+  
 - Flex and OT-2 features
 
   - Optionally specify ``apiLevel`` in the new ``requirements`` dictionary (otherwise, specify it in ``metadata``). 
@@ -158,7 +160,9 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - Manual labware moves support moving to or from the new :py:obj:`~.protocol_api.OFF_DECK` location (outside of the robot).
   
-  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
+  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.  
+  
+  - The new ``push_out`` parameter of the :py:meth:`.dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
   
   - By default, repeated calls to :py:meth:`.drop_tip` cycle through multiple locations above the trash bin to prevent tips from stacking up.
   

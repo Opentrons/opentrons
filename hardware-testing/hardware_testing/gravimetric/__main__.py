@@ -582,9 +582,8 @@ if __name__ == "__main__":
         run_args.ctx.home()
         for tip, volumes in run_args.volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
-                delay = 0 if args.photometric else 30
                 hw = run_args.ctx._core.get_hardware()
-                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw, delay)
+                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             _main(args, run_args, tip, volumes)
     finally:
         if run_args.recorder is not None:

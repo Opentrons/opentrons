@@ -1,10 +1,12 @@
+"""Tests for `LegacyBroker`."""
+
 from typing import List, NamedTuple, cast
 
 from opentrons.commands.types import CommandMessage
 from opentrons.commands.publisher import CommandPublisher, publish
 
 
-def my_command(arg1: int, arg2: str = "", arg3: str = "") -> CommandMessage:
+def _my_command(arg1: int, arg2: str = "", arg3: str = "") -> CommandMessage:
     return cast(
         CommandMessage,
         {
@@ -19,29 +21,30 @@ class _Call(NamedTuple):
     description: str
 
 
-class FakeClass(CommandPublisher):
+class _FakeClass(CommandPublisher):
     def __init__(self) -> None:
         super().__init__(None)
 
-    @publish(command=my_command)
+    @publish(command=_my_command)
     def method_a(self, arg1: int, arg2: str, arg3: str = "foo") -> int:
         self.method_b(0)
         return 100
 
-    @publish(command=my_command)
+    @publish(command=_my_command)
     def method_b(self, arg1: int) -> None:
         return None
 
-    @publish(command=my_command)
+    @publish(command=_my_command)
     def method_c(self, arg1: int, arg2: str, arg3: str = "bar") -> int:
         self.method_b(0)
         return 100
 
 
-def test_add_listener() -> None:
+def test_legacy_broker() -> None:
+    """Test subscribing, emitting, receiving, and unsubscribing."""
     stack: List[CommandMessage] = []
     calls: List[_Call] = []
-    fake_obj = FakeClass()
+    fake_obj = _FakeClass()
 
     def on_notify(message: CommandMessage) -> None:
         assert message["name"] == "command"  # type: ignore[comparison-overlap]

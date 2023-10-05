@@ -21,6 +21,8 @@ import detach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_96
 import detachPlate96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Plate_96.webm'
 import zAxisAttach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
 import zAxisDetach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
+import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import detachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
 import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import type { PipetteWizardFlow, PipetteWizardStep } from './types'
@@ -69,6 +71,10 @@ export function getPipetteAnimations(
     sourceProbe = attachProbe8
   } else if (section === SECTIONS.DETACH_PROBE && channel === 8) {
     sourceProbe = detachProbe8
+  } else if (section === SECTIONS.ATTACH_PROBE && channel === 96) {
+    sourceProbe = attachProbe96
+  } else if (section === SECTIONS.DETACH_PROBE && channel === 96) {
+    sourceProbe = detachProbe96
   }
 
   return (
@@ -117,15 +123,9 @@ export function getPipetteAnimations96(
     src = flowType === FLOWS.ATTACH ? attachPlate96 : detachPlate96
   } else if (section === SECTIONS.DETACH_PIPETTE) {
     src = detach96
-  } else if (section === SECTIONS.CARRIAGE)
+  } else if (section === SECTIONS.CARRIAGE) {
     src = flowType === FLOWS.ATTACH ? zAxisAttach96 : zAxisDetach96
-  //  todo(jr, 5/30/23):add the detach/attach probe assets when they're final!
-  // } else if (section === SECTIONS.ATTACH_PROBE) {
-  //   src =
-  // } else if (section === SECTIONS.DETACH_PROBE) {
-  //   src =
-  // }
-
+  }
   return (
     <video
       css={css`

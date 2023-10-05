@@ -57,7 +57,7 @@ const ALIGN_BUTTONS = css`
 export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
-  const { proceed, isRobotMoving, goBack } = props
+  const { proceed, isRobotMoving } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
@@ -140,7 +140,6 @@ export const MountGripper = (
       proceedButtonText={t('continue')}
       proceedIsDisabled={isPending}
       proceed={handleOnClick}
-      back={goBack}
     />
   )
 }
