@@ -36,7 +36,6 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
-    UnmatchedTipPresenceStates,
 )
 
 from opentrons import types as top_types
@@ -1906,16 +1905,25 @@ class OT3API(
         checked_mount = OT3Mount.from_mount(mount)
         high_throughput = self._gantry_load == GantryLoad.HIGH_THROUGHPUT
         if high_throughput:
+            # check if we're already at the tip_presence_check position, if we are dont move
+
             instrument = self._pipette_handler.get_pipette(checked_mount)
             tip_presence_check_target = instrument.tip_presence_check_dist_mm
 
-            gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+            # if position is not known, home gear motors before any potential movement
+            if self._backend.gear_motor_position is None:
+                await self.home_gear_motors()
+
+            tip_motor_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 Axis.of_main_tool_actuator(checked_mount)
             ]
-            clamp_moves = self._build_moves(
-                {Axis.Q: gear_origin_float}, {Axis.Q: tip_presence_check_target}
-            )
-            await self._backend.tip_action(moves=clamp_moves[0])
+
+            # only move tip motors if they are not already below the sensor
+            if tip_motor_pos_float < tip_presence_check_target:
+                clamp_moves = self._build_moves(
+                    {Axis.Q: tip_motor_pos_float}, {Axis.Q: tip_presence_check_target}
+                )
+                await self._backend.tip_action(moves=clamp_moves[0])
         try:
             tip_status = await self._backend.get_tip_present_state(
                 mount=checked_mount, expect_multiple_responses=high_throughput
@@ -1923,8 +1931,11 @@ class OT3API(
             # FIXME: tip presence responses from the 96 channel hardware need to be inverted
             if high_throughput:
                 tip_status = not tip_status
-        except UnmatchedTipPresenceStates:
+        except Exception:
             raise
+
+        # return tip motors to neutral position
+        await self.home_gear_motors()
         return tip_status
 
     async def _force_pick_up_tip(
