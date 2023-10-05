@@ -119,7 +119,7 @@ stages:
               errorType: TipNotAttachedError
               createdAt: !anystr
               detail: Pipette should have a tip attached, but does not.
-              errorCode: '4000'
+              errorCode: '3005'
               errorInfo: !anydict
               wrappedErrors: !anylist
             params:
