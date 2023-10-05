@@ -1928,9 +1928,6 @@ class OT3API(
             tip_status = await self._backend.get_tip_present_state(
                 mount=checked_mount, expect_multiple_responses=high_throughput
             )
-            # FIXME: tip presence responses from the 96 channel hardware need to be inverted
-            if high_throughput:
-                tip_status = not tip_status
         except Exception:
             raise
 
