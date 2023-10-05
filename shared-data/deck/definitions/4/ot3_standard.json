@@ -265,7 +265,7 @@
       {
         "id": "1/8cWasteChute",
         "areaType": "wasteChute",
-        "position": [-13.50, 0, 0],
+        "position": [-13.5, 0, 0],
         "boundingBox": {
           "xDimension": 155.0,
           "yDimension": 86.0,
@@ -278,7 +278,7 @@
       {
         "id": "96cWasteChute",
         "areaType": "wasteChute",
-        "position": [-13.50, 0, 0],
+        "position": [-13.5, 0, 0],
         "boundingBox": {
           "xDimension": 155.0,
           "yDimension": 86.0,
@@ -291,7 +291,7 @@
       {
         "id": "gripperWasteChute",
         "areaType": "wasteChute",
-        "position": [-13.50, 0, 0],
+        "position": [-13.5, 0, 0],
         "boundingBox": {
           "xDimension": 155.0,
           "yDimension": 86.0,

@@ -13,7 +13,8 @@ def test_v3_and_v4_positional_equivalence(definition_name: str):
 
     # Get a mapping of v3 slot names (ids) to the position
     deck_v3_locations = {
-        orderedSlot["id"]: orderedSlot["position"] for orderedSlot in deck_v3["locations"]["orderedSlots"]
+        orderedSlot["id"]: orderedSlot["position"]
+        for orderedSlot in deck_v3["locations"]["orderedSlots"]
     }
 
     # Get the base cutout locations (id is also slot name)
