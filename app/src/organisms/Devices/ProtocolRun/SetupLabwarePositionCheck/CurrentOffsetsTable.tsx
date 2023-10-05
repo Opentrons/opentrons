@@ -22,7 +22,6 @@ import { StyledText } from '../../../../atoms/text'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { getLatestCurrentOffsets } from './utils'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   RunTimeCommand,
@@ -71,7 +70,6 @@ export function CurrentOffsetsTable(
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
-  const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
 
   const TableComponent = (
     <OffsetTable>
@@ -83,7 +81,7 @@ export function CurrentOffsetsTable(
         </tr>
       </thead>
       <tbody>
-        {latestCurrentOffsets.map(offset => {
+        {currentOffsets.map(offset => {
           const labwareDisplayName =
             offset.definitionUri in defsByURI
               ? getLabwareDisplayName(defsByURI[offset.definitionUri])
@@ -112,7 +110,7 @@ export function CurrentOffsetsTable(
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={latestCurrentOffsets.map(o =>
+      labwareOffsets={currentOffsets.map(o =>
         pick(o, ['definitionUri', 'location', 'vector'])
       )}
       commands={commands ?? []}
@@ -123,7 +121,7 @@ export function CurrentOffsetsTable(
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={latestCurrentOffsets.map(o =>
+      labwareOffsets={currentOffsets.map(o =>
         pick(o, ['definitionUri', 'location', 'vector'])
       )}
       commands={commands ?? []}
@@ -137,7 +135,9 @@ export function CurrentOffsetsTable(
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
     >
-      <StyledText as="label">{t('applied_offset_data')}</StyledText>
+      <StyledText as="label">
+        {i18n.format(t('applied_offset_data'), 'upperCase')}
+      </StyledText>
       {isLabwareOffsetCodeSnippetsOn ? (
         <LabwareOffsetTabs
           TableComponent={TableComponent}
