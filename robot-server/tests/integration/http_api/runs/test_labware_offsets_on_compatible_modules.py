@@ -1,11 +1,10 @@
-import asyncio
 from textwrap import dedent
 from typing import Any, AsyncGenerator
 
 import anyio
 import pytest
 
-from tests.integration.robot_client import RobotClient
+from tests.integration.robot_client import RobotClient, poll_until_run_completes
 
 
 # An arbitrary choice of labware.
@@ -37,16 +36,11 @@ async def poll_until_run_succeeds(robot_client: RobotClient, run_id: str) -> Any
 
     Return the completed run response.
     """
-    completed_run_statuses = {"stopped", "failed", "succeeded"}
-    while True:
-        run = (await robot_client.get_run(run_id=run_id)).json()
-        status = run["data"]["status"]
-        if status in completed_run_statuses:
-            assert status == "succeeded"
-            return run
-        else:
-            # The run is still ongoing. Wait a beat, then poll again.
-            await asyncio.sleep(RUN_POLL_INTERVAL)
+    with anyio.fail_after(RUN_POLL_TIMEOUT):
+        final_status = (
+            await poll_until_run_completes(robot_client=robot_client, run_id=run_id)
+        )["data"]["status"]
+    assert final_status == "succeeded"
 
 
 @pytest.fixture
@@ -144,8 +138,7 @@ async def test_labware_offsets_on_compatible_modules(
     await robot_client.post_run_action(
         run_id=run_id, req_body={"data": {"actionType": "play"}}
     )
-    with anyio.fail_after(RUN_POLL_TIMEOUT):
-        await poll_until_run_succeeds(robot_client=robot_client, run_id=run_id)
+    await poll_until_run_succeeds(robot_client=robot_client, run_id=run_id)
 
     # Retrieve details about the protocol's completed commands.
     commands = (await robot_client.get_run_commands(run_id=run_id)).json()

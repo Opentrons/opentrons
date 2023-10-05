@@ -1,4 +1,3 @@
-import asyncio
 from dataclasses import dataclass, field
 from pathlib import Path
 from shutil import copytree
@@ -9,14 +8,13 @@ import anyio
 import pytest
 
 from tests.integration.dev_server import DevServer
-from tests.integration.robot_client import RobotClient
+from tests.integration.robot_client import RobotClient, poll_until_run_completes
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 
 # Allow plenty of time for database migrations, which can take a while in our CI runners.
 _STARTUP_TIMEOUT = 60
 
-_POLL_INTERVAL = 0.1
 _RUN_TIMEOUT = 5
 
 # Our Tavern tests have servers that stay up for the duration of the test session.
@@ -193,15 +191,9 @@ async def test_rerun_flex_dev_compat() -> None:
             )
 
             with anyio.fail_after(_RUN_TIMEOUT):
-                final_status = await _poll_until_not_running(client, new_run["id"])
+                final_status = (
+                    await poll_until_run_completes(
+                        robot_client=client, run_id=new_run["id"]
+                    )
+                )["data"]["status"]
             assert final_status == "succeeded"
-
-
-async def _poll_until_not_running(robot_client: RobotClient, run_id: str) -> str:
-    while True:
-        latest_status = (await robot_client.get_run(run_id)).json()["data"]["status"]
-        if latest_status != "running":
-            return latest_status  # type: ignore[no-any-return]
-        else:
-            # Sleep, then poll again.
-            await asyncio.sleep(_POLL_INTERVAL)
