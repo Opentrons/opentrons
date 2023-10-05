@@ -125,9 +125,10 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
     """Create CSV and get callback functions."""
     run_id = data.create_run_id()
     test_name = data.create_test_name_from_file(__file__)
-    folder_path = data.create_folder_for_test_data(test_name)
+    test_path = data.create_folder_for_test_data(test_name)
+    run_path = data.create_folder_for_test_data(test_path / run_id)
     file_name = data.create_file_name(test_name=test_name, run_id=run_id, tag=sn)
-    csv_display_name = os.path.join(folder_path, file_name)
+    csv_display_name = os.path.join(run_path, file_name)
     print(f"CSV: {csv_display_name}")
     start_time = time.time()
 
@@ -144,9 +145,11 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
-            data.append_data_to_file(test_name, file_name, data_str + "\n")
+            data.append_data_to_file(test_name, run_id, file_name, data_str + "\n")
         else:
-            data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
+            data.insert_data_to_file(
+                test_name, run_id, file_name, data_str + "\n", line_number
+            )
 
     return (
         CSVProperties(id=run_id, name=test_name, path=csv_display_name),
@@ -648,6 +651,7 @@ async def _run_xy_motion(
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     LOG.info(XY_AXIS_SETTINGS)
     for setting in XY_AXIS_SETTINGS:
+        await api.home()
         print_motion_settings(
             "X",
             setting[Axis.X].max_speed,
@@ -796,7 +800,7 @@ async def get_test_metadata(
 ) -> Tuple[str, str]:
     """Get the operator name and robot serial number."""
     if arguments.no_input:
-        _operator = "None"
+        _operator = args.operator if isinstance(args.operator, str) else "None"
         _robot_id = api._backend.eeprom_data.serial_number
         if not _robot_id:
             ui.print_error("no serial number saved on this robot")
@@ -810,7 +814,10 @@ async def get_test_metadata(
             if not _robot_id:
                 ui.print_error("no serial number saved on this robot")
                 _robot_id = input("enter ROBOT SERIAL number: ").strip()
-            _operator = input("enter OPERATOR name: ")
+            if isinstance(args.operator, str):
+                _operator = args.operator
+            else:
+                _operator = input("enter OPERATOR name: ")
 
     return (_operator, _robot_id)
 
@@ -927,6 +934,7 @@ async def _main(arguments: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--operator", type=str, default=None)
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--cycles", type=int, default=20)
     parser.add_argument("--skip_bowtie", action="store_true")

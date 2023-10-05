@@ -69,15 +69,15 @@ def run(protocol: protocol_api.ProtocolContext):
     reagent_plate = temp_block.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT = 4
-    tiprack_200_1 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "5")
-    tiprack_50_1 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul", "6")
+    tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "5")
+    tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "6")
     # ========== THIRD ROW ===========
     thermocycler = protocol.load_module("thermocycler module gen2")
     sample_plate_1 = thermocycler.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
-    tiprack_200_2 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "8")
-    tiprack_50_2 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul", "9")
+    tiprack_200_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "8")
+    tiprack_50_2 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "9")
     # ========== FOURTH ROW ==========
-    tiprack_200_3 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "11")
+    tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "11")
 
     # reagent
     AMPure = reservoir["A1"]
@@ -105,9 +105,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # pipette
     p1000 = protocol.load_instrument(
-        "p1000_multi_gen3", "left", tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3]
+        "flex_8channel_1000", "left", tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3]
     )
-    p50 = protocol.load_instrument("p50_multi_gen3", "right", tip_racks=[tiprack_50_1, tiprack_50_2])
+    p50 = protocol.load_instrument("flex_8channel_50", "right", tip_racks=[tiprack_50_1, tiprack_50_2])
 
     # tip and sample tracking
     if COLUMNS == 1:

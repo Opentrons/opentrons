@@ -4,14 +4,14 @@ from typing import Any, Dict, Optional, Union, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.config import feature_flags
 from opentrons.hardware_control import (
     HardwareControlAPI,
     ThreadManager,
     SynchronousAdapter,
 )
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.util.broker import Broker
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
 from opentrons.protocols.api_support.types import APIVersion
@@ -46,8 +46,8 @@ def create_protocol_context(
     deck_type: str,
     protocol_engine: Optional[ProtocolEngine] = None,
     protocol_engine_loop: Optional[asyncio.AbstractEventLoop] = None,
-    broker: Optional[Broker] = None,
-    equipment_broker: Optional[EquipmentBroker[Any]] = None,
+    broker: Optional[LegacyBroker] = None,
+    equipment_broker: Optional[Broker[Any]] = None,
     use_simulating_core: bool = False,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,

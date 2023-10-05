@@ -78,6 +78,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
+    'opentrons_aluminum_flat_bottom_plate',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',
@@ -238,10 +239,13 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       defs,
       (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
-        // filter out non-permitted tipracks
+        //  filter out non-permitted tipracks +
+        //  temporarily filtering out 96-channel adapter until we support
+        //  96-channel
         if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
+          (category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))) ||
+          def.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
         ) {
           return acc
         }
@@ -348,7 +352,11 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         />
       </Portal>
       {blockingCustomLabwareHint}
-      <div ref={wrapperRef} className={styles.labware_dropdown}>
+      <div
+        ref={wrapperRef}
+        className={styles.labware_dropdown}
+        style={{ zIndex: 5 }}
+      >
         <div className={styles.title}>{getTitleText()}</div>
         {getFilterCheckbox()}
         <ul>

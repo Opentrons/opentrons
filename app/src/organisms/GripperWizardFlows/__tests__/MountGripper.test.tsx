@@ -20,13 +20,11 @@ describe('MountGripper', () => {
     props?: Partial<React.ComponentProps<typeof MountGripper>>
   ) => ReturnType<typeof renderWithProviders>
   let mockRefetch: jest.Mock
-  let mockGoBack: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
   let mockSetErrorMessage: jest.Mock
 
   beforeEach(() => {
-    mockGoBack = jest.fn()
     mockProceed = jest.fn()
     mockChainRunCommands = jest.fn()
     mockRefetch = jest.fn(() => Promise.resolve())
@@ -39,7 +37,7 @@ describe('MountGripper', () => {
           attachedGripper={props?.attachedGripper ?? null}
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
-          goBack={mockGoBack}
+          goBack={() => null}
           errorMessage={null}
           setErrorMessage={mockSetErrorMessage}
           {...props}
@@ -83,25 +81,15 @@ describe('MountGripper', () => {
     expect(mockProceed).not.toHaveBeenCalled()
   })
 
-  it('clicking go back calls back', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
-      refetch: mockRefetch,
-      data: null,
-    } as any)
-    const { getByLabelText } = render()[0]
-    getByLabelText('back').click()
-    expect(mockGoBack).toHaveBeenCalled()
-  })
-
   it('renders correct text', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       refetch: mockRefetch,
       data: null,
     } as any)
     const { getByText } = render()[0]
-    getByText('Connect and Screw In Gripper')
+    getByText('Connect and secure Flex Gripper')
     getByText(
-      'Attach the gripper to the robot by aligning the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.'
+      'Attach the gripper to the robot by aligning the connector and pressing to ensure a secure connection. Hold the gripper in place. Tighten the top gripper screw first, and the bottom screw second. Then test that the gripper is securely attached by gently pulling it side to side.'
     )
   })
 })

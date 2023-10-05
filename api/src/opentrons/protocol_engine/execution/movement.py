@@ -4,10 +4,17 @@ from __future__ import annotations
 import logging
 from typing import Optional, List
 
-from opentrons.types import Point
+from opentrons.types import Point, MountType
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis, CurrentWell
+from ..types import (
+    WellLocation,
+    DeckPoint,
+    MovementAxis,
+    MotorAxis,
+    CurrentWell,
+)
 from ..state import StateStore
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
@@ -49,6 +56,7 @@ class MovementHandler:
                 state_store=self._state_store, hardware_api=hardware_api
             )
         )
+        self._hardware_api = hardware_api
 
         self._gantry_mover = gantry_mover
 
@@ -199,3 +207,16 @@ class MovementHandler:
         For the OT3, the axis will retract to its known home position.
         """
         await self._gantry_mover.retract_axis(axis)
+
+    async def check_for_valid_position(self, mount: MountType) -> bool:
+        """Check if any axes have an unknown position.
+
+        Returns `True` if the mount position is known, or `False` if it is not known.
+        """
+        try:
+            await self._hardware_api.gantry_position(
+                mount=mount.to_hw_mount(), fail_on_not_homed=True
+            )
+        except PositionUnknownError:
+            return False
+        return True

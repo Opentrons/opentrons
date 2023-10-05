@@ -531,3 +531,52 @@ async def test_move_labware_with_gripper_raises_on_ot2(
     )
     with pytest.raises(errors.NotSupportedOnRobotType):
         await subject.execute(data)
+
+
+async def test_move_labware_raises_when_moving_fixed_trash_labware(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+    run_control: RunControlHandler,
+) -> None:
+    """It should raise an error when trying to move a fixed trash."""
+    subject = MoveLabwareImplementation(
+        state_view=state_view,
+        equipment=equipment,
+        labware_movement=labware_movement,
+        run_control=run_control,
+    )
+
+    data = MoveLabwareParams(
+        labwareId="my-cool-labware-id",
+        newLocation=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+
+    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
+        parameters=Parameters.construct(loadName="My cool labware", quirks=["fixedTrash"]),  # type: ignore[call-arg]
+    )
+
+    decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
+        LoadedLabware(
+            id="my-cool-labware-id",
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            offsetId=None,
+        )
+    )
+    decoy.when(
+        state_view.labware.get_definition(labware_id="my-cool-labware-id")
+    ).then_return(definition)
+
+    decoy.when(state_view.labware.is_fixed_trash("my-cool-labware-id")).then_return(
+        True
+    )
+
+    with pytest.raises(
+        errors.LabwareMovementNotAllowedError,
+        match="Cannot move fixed trash labware 'My cool labware'.",
+    ):
+        await subject.execute(data)

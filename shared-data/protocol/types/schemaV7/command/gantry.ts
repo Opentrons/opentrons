@@ -1,5 +1,10 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { Coordinates, MotorAxes, MotorAxis } from '../../../../js/types'
+import type {
+  Coordinates,
+  MotorAxes,
+  MotorAxis,
+  GantryMount,
+} from '../../../../js/types'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
@@ -141,6 +146,7 @@ interface SavePositionParams {
 
 interface HomeParams {
   axes?: MotorAxes
+  skipIfMountPositionOk?: GantryMount // If specified, only home if position invalid
 }
 
 interface RetractAxisParams {

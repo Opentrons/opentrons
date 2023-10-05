@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   POSITION_RELATIVE,
@@ -8,24 +9,30 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { Divider } from '../../../atoms/structure'
-
 import {
   isOT3Pipette,
   PipetteModelSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../../redux/pipettes/types'
+
+import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { Divider } from '../../../atoms/structure'
+
+import type {
+  Mount,
+  PipetteSettingsFieldsMap,
+} from '../../../redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null
+  pipetteSettings: PipetteSettingsFieldsMap | null
   mount: Mount
   handleChangePipette: () => void
   handleCalibrate: () => void
   handleAboutSlideout: () => void
   handleSettingsSlideout: () => void
   isPipetteCalibrated: boolean
+  isRunActive: boolean
 }
 
 export const PipetteOverflowMenu = (
@@ -35,11 +42,13 @@ export const PipetteOverflowMenu = (
   const {
     mount,
     pipetteSpecs,
+    pipetteSettings,
     handleChangePipette,
     handleCalibrate,
     handleAboutSlideout,
     handleSettingsSlideout,
     isPipetteCalibrated,
+    isRunActive,
   } = props
 
   const pipetteName =
@@ -65,6 +74,7 @@ export const PipetteOverflowMenu = (
           <MenuItem
             key={`${String(pipetteDisplayName)}_${mount}_attach_pipette`}
             onClick={() => handleChangePipette()}
+            disabled={isRunActive}
             data-testid={`pipetteOverflowMenu_attach_pipette_btn_${String(
               pipetteDisplayName
             )}_${mount}`}
@@ -77,6 +87,7 @@ export const PipetteOverflowMenu = (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
                 onClick={() => handleCalibrate()}
+                disabled={isRunActive}
                 data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
               >
                 {t(
@@ -89,6 +100,7 @@ export const PipetteOverflowMenu = (
             <MenuItem
               key={`${String(pipetteDisplayName)}_${mount}_detach`}
               onClick={() => handleChangePipette()}
+              disabled={isRunActive}
               data-testid={`pipetteOverflowMenu_detach_pipette_btn_${String(
                 pipetteDisplayName
               )}_${mount}`}
@@ -103,7 +115,7 @@ export const PipetteOverflowMenu = (
               {t('about_pipette')}
             </MenuItem>
             <Divider marginY="0" />
-            {!isOT3PipetteAttached ? (
+            {!isOT3PipetteAttached && pipetteSettings != null ? (
               <MenuItem
                 key={`${String(pipetteDisplayName)}_${mount}_view_settings`}
                 onClick={() => handleSettingsSlideout()}

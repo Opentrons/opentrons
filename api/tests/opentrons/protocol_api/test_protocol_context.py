@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 
 from opentrons.types import Mount, DeckSlotName
 from opentrons.protocol_api import OFF_DECK
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -231,6 +231,51 @@ def test_96_channel_pipette_always_loads_on_the_left_mount(
         instrument_name="A 96 Channel Name", mount="shadowfax"
     )
     assert result == subject.loaded_instruments["left"]
+
+
+def test_96_channel_pipette_raises_if_another_pipette_attached(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should always raise when loading a 96-channel pipette when another pipette is attached."""
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("ada")).then_return("ada")
+    decoy.when(mock_validation.ensure_pipette_name("ada")).then_return(
+        PipetteNameType.P300_SINGLE
+    )
+    decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
+        Mount.RIGHT
+    )
+
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P300_SINGLE,
+            mount=Mount.RIGHT,
+        )
+    ).then_return(mock_instrument_core)
+
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("ada")
+
+    pipette_1 = subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
+    assert subject.loaded_instruments["right"] is pipette_1
+
+    decoy.when(mock_validation.ensure_lowercase_name("A 96 Channel Name")).then_return(
+        "a 96 channel name"
+    )
+    decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
+        PipetteNameType.P1000_96
+    )
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P1000_96,
+            mount=Mount.LEFT,
+        )
+    ).then_return(mock_instrument_core)
+
+    with pytest.raises(RuntimeError):
+        subject.load_instrument(instrument_name="A 96 Channel Name", mount="shadowfax")
 
 
 def test_load_labware(
@@ -560,7 +605,7 @@ def test_move_labware_to_module(
     """It should move labware to new module location."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_module_core = decoy.mock(cls=TemperatureModuleCore)
-    mock_broker = decoy.mock(cls=Broker)
+    mock_broker = decoy.mock(cls=LegacyBroker)
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 

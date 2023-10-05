@@ -6,13 +6,13 @@ import {
   reduceCommandCreators,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
+import { configureForVolume } from '../atomic/configureForVolume'
+import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
 import type {
   MixArgs,
   CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
-import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
-
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {
   pipette: string
@@ -108,6 +108,7 @@ export const mix: CommandCreator<MixArgs> = (
     dispenseFlowRateUlSec,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dropTipLocation,
   } = data
 
   // Errors
@@ -137,6 +138,24 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
+  if (
+    !invariantContext.labwareEntities[dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
+  const configureForVolumeCommand: CurriedCommandCreator[] =
+    invariantContext.pipetteEntities[pipette].name === 'p50_single_flex' ||
+    invariantContext.pipetteEntities[pipette].name === 'p50_multi_flex'
+      ? [
+          curryCommandCreator(configureForVolume, {
+            pipetteId: pipette,
+            volume: volume,
+          }),
+        ]
+      : []
+
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -147,6 +166,7 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            dropTipLocation,
           }),
         ]
       }
@@ -187,6 +207,7 @@ export const mix: CommandCreator<MixArgs> = (
       })
       return [
         ...tipCommands,
+        ...configureForVolumeCommand,
         ...mixCommands,
         ...blowoutCommand,
         ...touchTipCommands,

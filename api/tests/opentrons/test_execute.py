@@ -58,24 +58,10 @@ def mock_get_attached_instr(  # noqa: D103
     return gai_mock
 
 
-@pytest.mark.parametrize(
-    ("protocol_file", "expect_run_log"),
-    [
-        ("testosaur_v2.py", True),
-        ("testosaur_v2_14.py", False),
-        # FIXME(mm, 2023-07-20): Support printing the run log when executing new protocols.
-        # Then, remove this expect_run_log parametrization (it should always be True).
-        pytest.param(
-            "testosaur_v2_14.py",
-            True,
-            marks=pytest.mark.xfail(strict=True, raises=NotImplementedError),
-        ),
-    ],
-)
+@pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
 def test_execute_function_apiv2(
     protocol: Protocol,
     protocol_file: str,
-    expect_run_log: bool,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
@@ -109,21 +95,79 @@ def test_execute_function_apiv2(
         nonlocal entries
         entries.append(entry)
 
-    execute.execute(
-        protocol.filelike,
-        protocol.filename,
-        emit_runlog=(emit_runlog if expect_run_log else None),
+    execute.execute(protocol.filelike, protocol.filename, emit_runlog=emit_runlog)
+
+    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
+        "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
+        "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
+        "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
+        "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
+    ]
+
+
+# TODO(mm, 2023-09-26): Merge this with the above test_execute_apiv2_14() function when
+# we resolve https://opentrons.atlassian.net/browse/RSS-320 and PAPIv≥2.14 protocols emit
+# human-readable run log text.
+@pytest.mark.parametrize("protocol_file", ["testosaur_v2_14.py"])
+def test_execute_function_apiv2_14(
+    protocol: Protocol,
+    protocol_file: str,
+    virtual_smoothie_env: None,
+    mock_get_attached_instr: mock.AsyncMock,
+) -> None:
+    """Test `execute()` with a Python file."""
+    converted_model_v15 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p10_single_v1.5")
+    )
+    converted_model_v1 = pipette_load_name.convert_pipette_model(
+        cast(PipetteModel, "p1000_single_v1")
     )
 
-    if expect_run_log:
-        assert [
-            item["payload"]["text"] for item in entries if item["$"] == "before"
-        ] == [
-            "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
-            "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
-            "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
-            "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
-        ]
+    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
+        "config": load_pipette_data.load_definition(
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
+        "id": "testid",
+    }
+    mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
+        "config": load_pipette_data.load_definition(
+            converted_model_v1.pipette_type,
+            converted_model_v1.pipette_channels,
+            converted_model_v1.pipette_version,
+        ),
+        "id": "testid2",
+    }
+    entries = []
+
+    def emit_runlog(entry: Any) -> None:
+        nonlocal entries
+        entries.append(entry)
+
+    execute.execute(protocol.filelike, protocol.filename, emit_runlog=emit_runlog)
+
+    # https://opentrons.atlassian.net/browse/RSS-320:
+    # PAPIv≥2.14 protocols currently emit JSON run log text, not human-readable text.
+    # Their exact contents can't be tested here because they're too verbose and they have
+    # unpredictable fields like `createdAt` and `id`. So as an approximation, we just test
+    # the command types.
+    command_types = [
+        json.loads(item["payload"]["text"])["commandType"]
+        for item in entries
+        if item["$"] == "before"
+    ]
+    assert command_types == [
+        "home",
+        "home",
+        "loadLabware",
+        "loadPipette",
+        "loadLabware",
+        "pickUpTip",
+        "aspirate",
+        "dispense",
+        "dropTip",
+    ]
 
 
 def test_execute_function_json_v3(

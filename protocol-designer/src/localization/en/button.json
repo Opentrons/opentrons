@@ -1,5 +1,6 @@
 {
   "add_step": "+ Add Step",
+  "add_off_deck": "+ Off-deck labware",
   "cancel": "cancel",
   "close": "close",
   "continue": "continue",
@@ -9,6 +10,7 @@
   "discard_changes": "discard changes",
   "done": "done",
   "edit": "edit",
+  "edit_off_deck": "Edit off-deck labware",
   "new_liquid": "New Liquid",
   "no": "no",
   "notes": "notes",

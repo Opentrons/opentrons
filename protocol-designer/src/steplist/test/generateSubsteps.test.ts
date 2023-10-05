@@ -1,4 +1,3 @@
-import { generateSubstepItem } from '../generateSubstepItem'
 import {
   makeInitialRobotState,
   makeContext,
@@ -6,14 +5,17 @@ import {
   RobotState,
   EngageMagnetArgs,
   DisengageMagnetArgs,
+  FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import { THERMOCYCLER_STATE } from '../../constants'
-import { LabwareNamesByModuleId, StepArgsAndErrors } from '../types'
 import {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,
 } from '../../../../step-generation/lib/types.d'
-import { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
+import { THERMOCYCLER_STATE } from '../../constants'
+import { generateSubstepItem } from '../generateSubstepItem'
+
+import type { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
+import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
 
 describe('generateSubstepItem', () => {
   const stepId = 'step123'
@@ -157,6 +159,7 @@ describe('generateSubstepItem', () => {
       touchTipAfterDispenseOffsetMmFromBottom: number
       dispenseFlowRateUlSec: number
       dispenseOffsetFromBottomMm: number
+      dropTipLocation: string
     }
     beforeEach(() => {
       sharedArgs = {
@@ -175,6 +178,7 @@ describe('generateSubstepItem', () => {
         touchTipAfterDispenseOffsetMmFromBottom: 10,
         dispenseFlowRateUlSec: 5,
         dispenseOffsetFromBottomMm: 10,
+        dropTipLocation: FIXED_TRASH_ID,
       }
     })
     ;[
@@ -189,6 +193,7 @@ describe('generateSubstepItem', () => {
           blowoutOffsetFromTopMm: 5,
           mixFirstAspirate: null,
           mixInDestination: null,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         expected: {
           substepType: 'sourceDest',
@@ -239,6 +244,7 @@ describe('generateSubstepItem', () => {
           blowoutFlowRateUlSec: 10,
           blowoutOffsetFromTopMm: 5,
           mixBeforeAspirate: null,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         expected: {
           commandCreatorFnName: 'distribute',
@@ -300,6 +306,7 @@ describe('generateSubstepItem', () => {
           blowoutOffsetFromTopMm: 5,
           mixBeforeAspirate: null,
           mixInDestination: null,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         expected: {
           substepType: 'sourceDest',
@@ -389,6 +396,7 @@ describe('generateSubstepItem', () => {
         dispenseOffsetFromBottomMm: 10,
         aspirateFlowRateUlSec: 5,
         dispenseFlowRateUlSec: 5,
+        dropTipLocation: FIXED_TRASH_ID,
       },
       // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},

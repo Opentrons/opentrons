@@ -90,7 +90,7 @@ class MotionController(Protocol):
         specified mount but `CriticalPoint.TIP` was specified, the position of
         the nozzle will be returned.
 
-        If `fail_on_not_homed` is `True`, this method will raise a `MustHomeError`
+        If `fail_on_not_homed` is `True`, this method will raise a `PositionUnknownError`
         if any of the relavent axes are not homed, regardless of `refresh`.
         """
         ...
@@ -186,7 +186,7 @@ class MotionController(Protocol):
         axes are to be moved, they will do so at the same speed.
 
         If fail_on_not_homed is True (default False), if an axis that is not
-        homed moves it will raise a MustHomeError. Otherwise, it will home the axis.
+        homed moves it will raise a PositionUnknownError. Otherwise, it will home the axis.
         """
         ...
 

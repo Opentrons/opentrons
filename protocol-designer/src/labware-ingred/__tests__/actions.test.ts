@@ -115,7 +115,12 @@ describe('createContainer', () => {
     mockGetRobotType.mockReturnValue('OT-2 Standard')
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
-      return { labware: {}, pipettes: {}, modules: {} }
+      return {
+        labware: {},
+        pipettes: {},
+        modules: {},
+        additionalEquipmentOnDeck: {},
+      }
     })
 
     mockGetLabwareDefsByURI.mockImplementation(state => {
@@ -145,7 +150,12 @@ describe('createContainer', () => {
   it('should dispatch CREATE_CONTAINER with slot from getNextAvailableDeckSlot if no slot is specified', () => {
     const store: any = mockStore({})
     mockGetRobotType.mockReturnValue('OT-2 Standard')
-    const initialDeckSetup = { labware: {}, pipettes: {}, modules: {} }
+    const initialDeckSetup = {
+      labware: {},
+      pipettes: {},
+      modules: {},
+      additionalEquipmentOnDeck: {},
+    }
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
       return initialDeckSetup
@@ -181,7 +191,12 @@ describe('createContainer', () => {
   it('should do nothing if no slot is specified and getNextAvailableDeckSlot returns falsey', () => {
     const store: any = mockStore({})
     mockGetRobotType.mockReturnValue('OT-3 Standard')
-    const initialDeckSetup = { labware: {}, pipettes: {}, modules: {} }
+    const initialDeckSetup = {
+      labware: {},
+      pipettes: {},
+      modules: {},
+      additionalEquipmentOnDeck: {},
+    }
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
       return initialDeckSetup
@@ -230,7 +245,12 @@ describe('createContainer', () => {
 
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
-      return { labware: {}, pipettes: {}, modules: {} }
+      return {
+        labware: {},
+        pipettes: {},
+        modules: {},
+        additionalEquipmentOnDeck: {},
+      }
     })
 
     mockGetLabwareDefsByURI.mockImplementation(state => {

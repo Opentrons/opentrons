@@ -1,12 +1,13 @@
 """Tests for the move scheduler."""
 import pytest
-from typing import List, Any, Tuple
+from typing import List, Any
 from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock, patch
 from opentrons_shared_data.errors.exceptions import (
     MoveConditionNotMetError,
     EnumeratedError,
     MotionFailedError,
+    EStopActivatedError,
 )
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
@@ -59,7 +60,11 @@ from opentrons_hardware.hardware_control.move_group_runner import (
     _CompletionPacket,
 )
 
-from opentrons_hardware.hardware_control.types import NodeMap
+from opentrons_hardware.hardware_control.types import (
+    NodeMap,
+    MotorPositionStatus,
+    MoveCompleteAck,
+)
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
     MessageDefinition,
@@ -1019,7 +1024,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
@@ -1032,7 +1037,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
@@ -1045,7 +1050,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
@@ -1055,7 +1060,11 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.gantry_x: (10, 40, False, False)},
+            {
+                NodeId.gantry_x: MotorPositionStatus(
+                    10, 40, False, False, MoveCompleteAck(1)
+                )
+            },
         ),
         (
             # multiple axes with different numbers of completions
@@ -1064,7 +1073,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
@@ -1077,7 +1086,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_x),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
@@ -1090,7 +1099,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.gantry_y),
                     MoveCompleted(
                         payload=MoveCompletedPayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
@@ -1101,8 +1110,12 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                 ),
             ],
             {
-                NodeId.gantry_x: (10, 40, False, False),
-                NodeId.gantry_y: (30, 40, False, False),
+                NodeId.gantry_x: MotorPositionStatus(
+                    10, 40, False, False, MoveCompleteAck(1)
+                ),
+                NodeId.gantry_y: MotorPositionStatus(
+                    30, 40, False, False, MoveCompleteAck(1)
+                ),
             },
         ),
         (
@@ -1111,7 +1124,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     _build_arb(NodeId.pipette_left),
                     md.TipActionResponse(
                         payload=TipActionResponsePayload(
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
@@ -1124,7 +1137,11 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.pipette_left: (10, 0, False, False)},
+            {
+                NodeId.pipette_left: MotorPositionStatus(
+                    10, 0, False, False, MoveCompleteAck(1)
+                )
+            },
         ),
         (
             # empty base case
@@ -1135,7 +1152,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
 )
 def test_accumulate_move_completions(
     completions: List[_CompletionPacket],
-    position_map: NodeMap[Tuple[float, float, bool, bool]],
+    position_map: NodeMap[MotorPositionStatus],
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
@@ -1231,11 +1248,13 @@ class MockSendMoveErrorCompleter:
         move_groups: MoveGroups,
         listener: MessageListenerCallback,
         start_at_index: int = 0,
+        estop_errors_to_send: int = 0,
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
         self._start_at_index = start_at_index
+        self._estop_errors_to_send = estop_errors_to_send
         self.call_count = 0
 
     @property
@@ -1263,9 +1282,13 @@ class MockSendMoveErrorCompleter:
             ):
                 for node, move in moves.items():
                     assert isinstance(move, MoveGroupSingleAxisStep)
+                    code = ErrorCode.collision_detected
+                    if self._estop_errors_to_send > 0:
+                        self._estop_errors_to_send -= 1
+                        code = ErrorCode.estop_detected
                     payload = ErrorMessagePayload(
                         severity=ErrorSeverityField(ErrorSeverity.unrecoverable),
-                        error_code=ErrorCodeField(ErrorCode.collision_detected),
+                        error_code=ErrorCodeField(code),
                     )
                     payload.message_index = message.payload.message_index
                     arbitration_id = ArbitrationId(
@@ -1334,6 +1357,21 @@ async def test_multiple_move_error(
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     with pytest.raises(EnumeratedError):
+        await subject.run(can_messenger=mock_can_messenger)
+    assert mock_sender.call_count == 2
+
+
+async def test_multiple_move_error_estop_filtering(
+    mock_can_messenger: AsyncMock, move_group_multiple_axes: MoveGroups
+) -> None:
+    """It should receive all of the errors but only report the Estop one."""
+    subject = MoveScheduler(move_groups=move_group_multiple_axes)
+    mock_sender = MockSendMoveErrorCompleter(
+        move_group_multiple_axes, subject, estop_errors_to_send=1
+    )
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(EStopActivatedError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 2
 

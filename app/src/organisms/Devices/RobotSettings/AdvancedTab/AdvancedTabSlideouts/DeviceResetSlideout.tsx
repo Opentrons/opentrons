@@ -21,10 +21,10 @@ import {
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
-import { UNREACHABLE } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
+import { UNREACHABLE } from '../../../../../redux/discovery'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
@@ -51,6 +51,7 @@ interface DeviceResetSlideoutProps {
   updateResetStatus: (connected: boolean, rOptions?: ResetConfigRequest) => void
 }
 
+// Note (kk:08/30/2023) lines that are related to module calibration will be activated when the be is ready
 export function DeviceResetSlideout({
   isExpanded,
   onCloseClick,
@@ -80,7 +81,8 @@ export function DeviceResetSlideout({
       ? options.filter(
           opt =>
             opt.id === 'pipetteOffsetCalibrations' ||
-            opt.id === 'gripperOffsetCalibrations'
+            opt.id === 'gripperOffsetCalibrations' ||
+            opt.id === 'moduleCalibration'
         )
       : []
 
@@ -92,6 +94,10 @@ export function DeviceResetSlideout({
     options != null ? options.filter(opt => opt.id.includes('bootScript')) : []
   const runHistoryOption =
     options != null ? options.filter(opt => opt.id.includes('runsHistory')) : []
+  const sshKeyOption =
+    options != null
+      ? options.filter(opt => opt.id.includes('authorizedKeys'))
+      : []
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -136,7 +142,8 @@ export function DeviceResetSlideout({
   ).length
 
   // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-  const allOptionsWithoutODD = options.filter(o => o.id !== 'onDeviceDisplay')
+  const allOptionsWithoutODD =
+    options != null ? options.filter(o => o.id !== 'onDeviceDisplay') : []
 
   const isEveryOptionSelected =
     totalOptionsSelected > 0 &&
@@ -310,6 +317,28 @@ export function DeviceResetSlideout({
                 {t('boot_scripts')}
               </StyledText>
               {bootScriptOption.map(opt => (
+                <CheckboxField
+                  key={opt.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [opt.id]: !(resetOptions[opt.id] ?? false),
+                    })
+                  }
+                  value={resetOptions[opt.id]}
+                  label={t(`clear_option_${snakeCase(opt.id)}`)}
+                />
+              ))}
+            </Box>
+            <Box>
+              <StyledText
+                as="p"
+                css={TYPOGRAPHY.pSemiBold}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('ssh_public_keys')}
+              </StyledText>
+              {sshKeyOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
                   onChange={() =>

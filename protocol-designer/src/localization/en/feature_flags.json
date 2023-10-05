@@ -8,20 +8,20 @@
     "description_1": "Turn off all restrictions on module placement and related pipette crash guidance.",
     "description_2": "NOT recommended! Switching from default positions may cause crashes and the Protocol Designer cannot yet give guidance on what to expect. Use at your own discretion. "
   },
-  "OT_PD_ENABLE_BATCH_EDIT_MIX": {
-    "title": "Enable mix batch edit",
-    "description": "Allow users to batch edit mix forms"
-  },
-  "OT_PD_ENABLE_SCHEMA_V6": {
-    "title": "Enable schema v6 support",
-    "description": "Allow users to migrate older protocols to schema v6"
-  },
-  "OT_PD_ENABLE_OT_3": {
-    "title": "Enable OT-3 support",
-    "description": "Allow users to enable OT-3 support in protocol designer"
-  },
   "OT_PD_ALLOW_ALL_TIPRACKS": {
     "title": "Allow all tip rack options",
     "description": "Enable selection of all tip racks for each pipette."
+  },
+  "OT_PD_ALLOW_96_CHANNEL": {
+    "title": "Enable 96-channel pipette",
+    "description": "Allow users to select 96-channel pipette"
+  },
+  "OT_PD_ENABLE_FLEX_DECK_MODIFICATION": {
+    "title": "Enable Flex deck modification",
+    "description": "Allow users to select waste chute, Flex staging, and modify trash slot"
+  },
+  "OT_PD_ENABLE_OFF_DECK_VIS_AND_MULTI_TIP": {
+    "title": "Enable off-deck visuals and multi tiprack support",
+    "description": "Allow users to see off-deck labware visualizations and multi tiprack support"
   }
 }

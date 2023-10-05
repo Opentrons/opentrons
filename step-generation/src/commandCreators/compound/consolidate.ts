@@ -4,16 +4,12 @@ import { getWellDepth } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import type {
-  ConsolidateArgs,
-  CommandCreator,
-  CurriedCommandCreator,
-} from '../../types'
 import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
 } from '../../utils'
+import { configureForVolume } from '../atomic/configureForVolume'
 import {
   aspirate,
   delay,
@@ -24,6 +20,11 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
+import type {
+  ConsolidateArgs,
+  CommandCreator,
+  CurriedCommandCreator,
+} from '../../types'
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
   invariantContext,
@@ -56,6 +57,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }
   }
 
+  if (
+    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
   // to the action of aspiration of dispensing in a given command, they are actually values bound
   // to a given labware associated with a command (e.g. Source, Destination). For this reason we
@@ -73,6 +81,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     dispenseOffsetFromBottomMm,
     mixFirstAspirate,
     mixInDestination,
+    dropTipLocation,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const maxWellsPerChunk = Math.floor(
@@ -84,7 +93,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const destLabwareDef = invariantContext.labwareEntities[args.destLabware].def
   const airGapOffsetDestWell =
     getWellDepth(destLabwareDef, args.destWell) + AIR_GAP_OFFSET_FROM_TOP
+
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
+
   const commandCreators = flatMap(
     sourceWellChunks,
     (
@@ -179,6 +190,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
+            dropTipLocation,
           }),
         ]
       }
@@ -294,6 +306,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? [
               curryCommandCreator(dropTip, {
                 pipette: args.pipette,
+                dropTipLocation: dropTipLocation,
               }),
             ]
           : []
@@ -308,10 +321,26 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
       })
+
+      const configureForVolumeCommand: CurriedCommandCreator[] =
+        invariantContext.pipetteEntities[args.pipette].name ===
+          'p50_single_flex' ||
+        invariantContext.pipetteEntities[args.pipette].name === 'p50_multi_flex'
+          ? [
+              curryCommandCreator(configureForVolume, {
+                pipetteId: args.pipette,
+                volume:
+                  args.volume * sourceWellChunk.length +
+                  aspirateAirGapVolume * sourceWellChunk.length,
+              }),
+            ]
+          : []
+
       return [
         ...tipCommands,
         ...mixBeforeCommands,
         ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
+        ...configureForVolumeCommand,
         ...aspirateCommands,
         curryCommandCreator(dispense, {
           pipette: args.pipette,

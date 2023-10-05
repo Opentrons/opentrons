@@ -2,8 +2,8 @@ import * as React from 'react'
 import { renderHook } from '@testing-library/react-hooks'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
-  pipetteDataLeftFixture,
-  pipetteResponseRightFixture,
+  instrumentsResponseLeftPipetteFixture,
+  instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
 import { useAttachedPipettesFromInstrumentsQuery } from '..'
 
@@ -17,7 +17,10 @@ describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
   it('returns attached pipettes', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: {
-        data: [pipetteDataLeftFixture, pipetteResponseRightFixture],
+        data: [
+          instrumentsResponseLeftPipetteFixture,
+          instrumentsResponseRightPipetteFixture,
+        ],
       },
     } as any)
 
@@ -30,11 +33,11 @@ describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
 
     expect(result.current).toEqual({
       left: {
-        ...pipetteDataLeftFixture,
+        ...instrumentsResponseLeftPipetteFixture,
         displayName: 'Flex 1-Channel 1000 μL',
       },
       right: {
-        ...pipetteResponseRightFixture,
+        ...instrumentsResponseRightPipetteFixture,
         displayName: 'Flex 1-Channel 1000 μL',
       },
     })

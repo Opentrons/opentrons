@@ -10,6 +10,7 @@
       [2, 0.0135956]
     ],
     "defaultGripForce": 15.0,
+    "defaultIdleForce": 10.0,
     "defaultHomeForce": 12.0,
     "min": 2.0,
     "max": 30.0

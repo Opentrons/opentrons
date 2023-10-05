@@ -1047,5 +1047,17 @@
   },
   "namespace": "opentrons",
   "version": 2,
-  "schemaVersion": 2
+  "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "opentrons_universal_flat_adapter": {
+      "x": 0,
+      "y": 0,
+      "z": 10.22
+    },
+    "opentrons_aluminum_flat_bottom_plate": {
+      "x": 0,
+      "y": 0,
+      "z": 5.45
+    }
+  }
 }

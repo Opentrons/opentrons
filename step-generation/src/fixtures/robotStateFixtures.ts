@@ -21,6 +21,7 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
   FIXED_TRASH_ID,
+  OT_2_TRASH_DEF_URI,
 } from '../constants'
 import {
   DEFAULT_PIPETTE,
@@ -32,6 +33,7 @@ import {
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { AdditionalEquipmentEntities } from '../types'
 import type {
   Config,
   InvariantContext,
@@ -79,7 +81,7 @@ export function makeContext(): InvariantContext {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
 
-      labwareDefURI: getLabwareDefURI(fixtureTrash),
+      labwareDefURI: OT_2_TRASH_DEF_URI,
       def: fixtureTrash,
     },
     [SOURCE_LABWARE]: {
@@ -120,6 +122,7 @@ export function makeContext(): InvariantContext {
     },
   }
   const moduleEntities: ModuleEntities = {}
+  const additionalEquipmentEntities: AdditionalEquipmentEntities = {}
   const pipetteEntities: PipetteEntities = {
     p10SingleId: {
       name: 'p10_single',
@@ -158,6 +161,7 @@ export function makeContext(): InvariantContext {
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     config: DEFAULT_CONFIG,
   }
 }

@@ -7,6 +7,7 @@ import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
@@ -37,6 +38,7 @@ import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 import { getGoldenCheckSteps } from './utils/getGoldenCheckSteps'
 
+const RUN_REFETCH_INTERVAL = 5000
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
@@ -44,7 +46,9 @@ interface LabwarePositionCheckModalProps {
   maintenanceRunId: string
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
+  protocolName: string
   caughtError?: Error
+  setMaintenanceRunId: (id: string | null) => void
 }
 
 export const LabwarePositionCheckComponent = (
@@ -56,10 +60,47 @@ export const LabwarePositionCheckComponent = (
     existingOffsets,
     runId,
     maintenanceRunId,
+    setMaintenanceRunId,
+    protocolName,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
+
+  // we should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = React.useState<boolean>(false)
+
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: maintenanceRunId != null,
+  })
+
+  // this will close the modal in case the run was deleted by the terminate
+  // activity modal on the ODD
+  React.useEffect(() => {
+    if (
+      maintenanceRunId !== null &&
+      maintenanceRunData?.data.id === maintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    }
+    if (
+      maintenanceRunData?.data.id !== maintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
+      setMaintenanceRunId(null)
+    }
+  }, [
+    maintenanceRunData?.data.id,
+    maintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    setMaintenanceRunId,
+  ])
+
   const [fatalError, setFatalError] = React.useState<string | null>(null)
   const [
     { workingOffsets, tipPickUpOffset },
@@ -160,6 +201,26 @@ export const LabwarePositionCheckComponent = (
     chainRunCommands(
       maintenanceRunId,
       [
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'leftZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'rightZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'x' },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'y' },
+        },
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
       ],
@@ -263,7 +324,13 @@ export const LabwarePositionCheckComponent = (
       />
     )
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
-    modalContent = <IntroScreen {...movementStepProps} />
+    modalContent = (
+      <IntroScreen
+        {...movementStepProps}
+        {...{ existingOffsets }}
+        protocolName={protocolName}
+      />
+    )
   } else if (
     currentStep.section === 'CHECK_POSITIONS' ||
     currentStep.section === 'CHECK_TIP_RACKS' ||

@@ -5,10 +5,10 @@ from asyncio import create_task, Task
 from contextlib import ExitStack
 from typing import Optional
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.commands.types import CommandMessage as LegacyCommand
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
+from opentrons.util.broker import ReadOnlyBroker
 
 from .legacy_wrappers import LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
@@ -36,8 +36,8 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def __init__(
         self,
-        broker: Broker,
-        equipment_broker: EquipmentBroker[LegacyLoadInfo],
+        broker: LegacyBroker,
+        equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
         """Initialize the plugin with its dependencies."""
@@ -78,10 +78,11 @@ class LegacyContextPlugin(AbstractPlugin):
             )
             exit_stack.callback(command_broker_unsubscribe)
 
-            equipment_broker_unsubscribe = self._equipment_broker.subscribe(
-                callback=self._handle_equipment_loaded
+            exit_stack.enter_context(
+                self._equipment_broker.subscribed(
+                    callback=self._handle_equipment_loaded
+                )
             )
-            exit_stack.callback(equipment_broker_unsubscribe)
 
             # All subscriptions succeeded.
             # Save the exit stack so our teardown method can use it later
@@ -124,14 +125,13 @@ class LegacyContextPlugin(AbstractPlugin):
     def _handle_equipment_loaded(self, load_info: LegacyLoadInfo) -> None:
         (
             pe_command,
-            pipette_config_action,
+            pe_private_result,
         ) = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
 
-        if pipette_config_action:
-            self._actions_to_dispatch.put(pipette_config_action)
-
         self._actions_to_dispatch.put(
-            pe_actions.UpdateCommandAction(command=pe_command)
+            pe_actions.UpdateCommandAction(
+                command=pe_command, private_result=pe_private_result
+            )
         )
 
     async def _dispatch_all_actions(self) -> None:

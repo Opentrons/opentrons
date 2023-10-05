@@ -350,7 +350,7 @@ class MotionFailedError(RoboticsControlError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a FirmwareUpdateFailedError."""
+        """Build a MotionFailedError."""
         super().__init__(ErrorCodes.MOTION_FAILED, message, detail, wrapping)
 
 
@@ -363,7 +363,7 @@ class HomingFailedError(RoboticsControlError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a FirmwareUpdateFailedError."""
+        """Build a HomingFailedError."""
         super().__init__(ErrorCodes.HOMING_FAILED, message, detail, wrapping)
 
 
@@ -528,6 +528,60 @@ class MisalignedGantryError(RoboticsControlError):
         )
 
 
+class UnmatchedTipPresenceStates(RoboticsControlError):
+    """An error indicating that a tip presence check resulted in two differing responses."""
+
+    def __init__(
+        self,
+        states: Dict[int, int],
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an UnmatchedTipPresenceStatesError."""
+        format_tip_state = {0: "not detected", 1: "detected"}
+        msg = (
+            "Received two differing tip presence statuses:"
+            "\nRear Sensor tips"
+            + format_tip_state[states[0]]
+            + "\nFront Sensor tips"
+            + format_tip_state[states[1]]
+        )
+        if detail:
+            msg += str(detail)
+        super().__init__(
+            ErrorCodes.UNMATCHED_TIP_PRESENCE_STATES,
+            msg,
+            detail,
+            wrapping,
+        )
+
+
+class PositionUnknownError(RoboticsControlError):
+    """An error indicating that the robot's position is unknown."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PositionUnknownError."""
+        super().__init__(ErrorCodes.POSITION_UNKNOWN, message, detail, wrapping)
+
+
+class ExecutionCancelledError(RoboticsControlError):
+    """An error indicating that the robot's execution manager has been cancelled."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ExecutionCancelledError."""
+        super().__init__(ErrorCodes.EXECUTION_CANCELLED, message, detail, wrapping)
+
+
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 
@@ -572,12 +626,20 @@ class UnexpectedTipRemovalError(RoboticsInteractionError):
 
     def __init__(
         self,
-        message: Optional[str] = None,
+        action: str,
+        pipette_name: str,
+        mount: str,
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an UnexpectedTipRemovalError."""
-        super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, detail, wrapping)
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["pipette_name"] = pipette_name
+        checked_detail["mount"] = mount
+        message = f"Cannot perform {action} without a tip attached."
+        super().__init__(
+            ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, checked_detail, wrapping
+        )
 
 
 class UnexpectedTipAttachError(RoboticsInteractionError):
@@ -585,11 +647,18 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
 
     def __init__(
         self,
+        action: str,
+        pipette_name: str,
+        mount: str,
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an UnexpectedTipAttachError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["pipette_name"] = pipette_name
+        checked_detail["mount"] = mount
+        message = f"Cannot perform {action} with a tip already attached."
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
 
 
@@ -598,11 +667,17 @@ class FirmwareUpdateRequiredError(RoboticsInteractionError):
 
     def __init__(
         self,
+        action: str,
+        subsystems_to_update: List[Any],
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FirmwareUpdateRequiredError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["identifier"] = action
+        checked_detail["subsystems_to_update"] = subsystems_to_update
+        message = f"Cannot perform {action} until {subsystems_to_update} are updated."
         super().__init__(ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, detail, wrapping)
 
 
@@ -680,7 +755,7 @@ class InvalidActuator(RoboticsInteractionError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an GripperNotPresentError."""
+        """Build an InvalidActuator."""
         super().__init__(ErrorCodes.INVALID_ACTUATOR, message, detail, wrapping)
 
 
@@ -712,8 +787,23 @@ class InvalidInstrumentData(RoboticsInteractionError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an GripperNotPresentError."""
+        """Build an InvalidInstrumentData."""
         super().__init__(ErrorCodes.INVALID_INSTRUMENT_DATA, message, detail, wrapping)
+
+
+class InvalidLiquidClassName(RoboticsInteractionError):
+    """An error indicating that a liquid class name does not exist on a pipette."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidLiquidClassName."""
+        super().__init__(
+            ErrorCodes.INVALID_LIQUID_CLASS_NAME, message, detail, wrapping
+        )
 
 
 class APIRemoved(GeneralError):
@@ -737,4 +827,63 @@ class APIRemoved(GeneralError):
         )
         super().__init__(
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
+        )
+
+
+class CommandPreconditionViolated(GeneralError):
+    """An error indicating that a command was issued in a robot state incompatible with it."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandPreconditionViolated instance."""
+        super().__init__(
+            ErrorCodes.COMMAND_PRECONDITION_VIOLATED, message, detail, wrapping
+        )
+
+
+class CommandParameterLimitViolated(GeneralError):
+    """An error indicating that a command's parameter limit was violated."""
+
+    def __init__(
+        self,
+        command_name: str,
+        parameter_name: str,
+        limit_statement: str,
+        actual_value: str,
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
+    ) -> None:
+        """Build a CommandParameterLimitViolated error."""
+        wrapping_checked = wrapping or []
+        super().__init__(
+            ErrorCodes.COMMAND_PARAMETER_LIMIT_VIOLATED,
+            f"The parameter {parameter_name} of {command_name} must be {limit_statement} but is {actual_value}",
+            detail={
+                "command": command_name,
+                "argument": parameter_name,
+                "limit": limit_statement,
+                "value": actual_value,
+            },
+            wrapping=[
+                PythonException(e) if isinstance(e, BaseException) else e
+                for e in wrapping_checked
+            ],
+        )
+
+
+class UnsupportedHardwareCommand(GeneralError):
+    """An error indicating that a command being executed is not supported by the hardware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an UnsupportedHardwareCommand."""
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, detail, wrapping
         )

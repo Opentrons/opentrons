@@ -244,7 +244,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
             aria-label="Results_errorExit"
             marginRight={SPACING.spacing4}
           >
-            {i18n.format(t('cancel_attachment'), 'capitalize')}
+            {flowType === FLOWS.DETACH
+              ? i18n.format(t('cancel_detachment'))
+              : i18n.format(t('cancel_attachment'))}
           </SecondaryButton>
         )}
         <CheckPipetteButton

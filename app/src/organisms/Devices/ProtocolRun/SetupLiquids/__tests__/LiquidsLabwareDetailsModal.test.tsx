@@ -142,7 +142,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     const [{ getByText, getAllByText, getByRole }] = render(props)
     getByRole('heading', { name: 'Slot Number' })
     getByText('5')
-    getByRole('heading', { name: 'Labware Name' })
+    getByRole('heading', { name: 'Labware name' })
     getAllByText('mock labware name')
   })
   it('should render LiquidDetailCard when correct props are passed', () => {

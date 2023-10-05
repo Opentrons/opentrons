@@ -6,10 +6,9 @@ from abc import ABC, abstractmethod
 
 import anyio
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -22,6 +21,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.util.broker import Broker
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -140,8 +140,8 @@ class PythonAndLegacyRunner(AbstractRunner):
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            broker = Broker()
-            equipment_broker = EquipmentBroker[LegacyLoadInfo]()
+            broker = LegacyBroker()
+            equipment_broker = Broker[LegacyLoadInfo]()
 
             self._protocol_engine.add_plugin(
                 LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
@@ -155,6 +155,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         self._task_queue.set_run_func(
@@ -248,6 +249,7 @@ class JsonRunner(AbstractRunner):
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         for command in commands:

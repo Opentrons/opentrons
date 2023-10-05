@@ -748,11 +748,23 @@ class LabwareView(HasState[LabwareState]):
         labware_id: str,
         slot_name: Optional[DeckSlotName],
     ) -> Optional[LabwareMovementOffsetData]:
-        """Get the labware's gripper offsets of the specified type."""
+        """Get the labware's gripper offsets of the specified type.
+
+        Returns:
+            If `slot_name` is provided, returns the gripper offsets that the labware definition
+            specifies just for that slot, or `None` if the labware definition doesn't have an
+            exact match.
+
+            If `slot_name` is `None`, returns the gripper offsets that the labware
+            definition designates as "default," or `None` if it doesn't designate any as such.
+        """
         parsed_offsets = self.get_definition(labware_id).gripperOffsets
-        offset_key = slot_name.name if slot_name else "default"
-        return (
-            LabwareMovementOffsetData(
+        offset_key = slot_name.id if slot_name else "default"
+
+        if parsed_offsets is None or offset_key not in parsed_offsets:
+            return None
+        else:
+            return LabwareMovementOffsetData(
                 pickUpOffset=cast(
                     LabwareOffsetVector, parsed_offsets[offset_key].pickUpOffset
                 ),
@@ -760,9 +772,6 @@ class LabwareView(HasState[LabwareState]):
                     LabwareOffsetVector, parsed_offsets[offset_key].dropOffset
                 ),
             )
-            if parsed_offsets
-            else None
-        )
 
     def get_grip_force(self, labware_id: str) -> float:
         """Get the recommended grip force for gripping labware using gripper."""

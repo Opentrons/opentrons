@@ -1,3 +1,5 @@
+:og:description: How to use the Magnetic Block with the Flex Gripper in a Python protocol.
+
 .. _magnetic-block:
 
 **************
@@ -5,7 +7,7 @@ Magnetic Block
 **************
 
 .. note::
-   The Magnetic Block is compatible with Opentrons Flex only. If you have an OT-2, use the :ref:`magnetic-module`.
+   The Magnetic Block is compatible with Opentrons Flex only. If you have an OT-2, use the :ref:`Magnetic Module <magnetic-module>`.
 
 The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. This module is suitable for many magnetic bead-based protocols, but does not move beads up or down in solution.
 

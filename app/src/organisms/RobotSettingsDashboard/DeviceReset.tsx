@@ -52,6 +52,8 @@ interface DeviceResetProps {
   setCurrentOption: SetSettingOption
 }
 
+// ToDo (kk:08/30/2023) lines that are related to module calibration will be activated when the be is ready.
+// The tests for that will be added.
 export function DeviceReset({
   robotName,
   setCurrentOption,
@@ -66,8 +68,10 @@ export function DeviceReset({
   const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
     'gripperOffsetCalibrations',
+    'moduleCalibration',
     'runsHistory',
   ]
+
   const availableOptions = options
     // filtering out ODD setting because this gets implicitly cleared if all settings are selected
     // filtering out boot scripts since product doesn't want this exposed to ODD users
@@ -77,6 +81,10 @@ export function DeviceReset({
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
     )
   const dispatch = useDispatch<Dispatch>()
+
+  const availableOptionsToDisplay = availableOptions.filter(
+    ({ id }) => !['authorizedKeys'].includes(id)
+  )
 
   const handleClick = (): void => {
     if (resetOptions != null) {
@@ -112,6 +120,9 @@ export function DeviceReset({
         break
       case 'gripperOffsetCalibrations':
         optionText = t('clear_option_gripper_calibration')
+        break
+      case 'moduleCalibration':
+        optionText = t('clear_option_module_calibration')
         break
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
@@ -157,7 +168,7 @@ export function DeviceReset({
         marginTop="7.75rem"
       >
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          {availableOptions.map(option => {
+          {availableOptionsToDisplay.map(option => {
             const { optionText, subText } = renderText(option.id)
             return (
               <React.Fragment key={option.id}>
@@ -187,7 +198,7 @@ export function DeviceReset({
                       <StyledText
                         as="p"
                         color={
-                          resetOptions[option.id]
+                          resetOptions[option.id] ?? false
                             ? COLORS.white
                             : COLORS.darkBlack70
                         }

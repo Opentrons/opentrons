@@ -2,18 +2,27 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
-
+import { COLORS } from '@opentrons/components'
+import {
+  CreateCommand,
+  LEFT,
+  getModuleType,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import {
+  useChainMaintenanceCommands,
+  useCreateTargetedMaintenanceRunMutation,
+} from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'
 import { FLEX_SLOT_NAMES_BY_MOD_TYPE, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -21,16 +30,18 @@ import { AttachProbe } from './AttachProbe'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
+import { DetachProbe } from './DetachProbe'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import { CreateCommand, getModuleType } from '@opentrons/shared-data'
-import { FirmwareUpdate } from './FirmwareUpdate'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
+  isPrepCommandLoading: boolean
   initialSlotName?: string
   onComplete?: () => void
+  prepCommandErrorMessage?: string
 }
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -38,13 +49,25 @@ const RUN_REFETCH_INTERVAL = 5000
 export const ModuleWizardFlows = (
   props: ModuleWizardFlowsProps
 ): JSX.Element | null => {
-  const { attachedModule, initialSlotName, closeFlow, onComplete } = props
+  const {
+    attachedModule,
+    initialSlotName,
+    isPrepCommandLoading,
+    closeFlow,
+    onComplete,
+    prepCommandErrorMessage,
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
-
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const requiresFirmwareUpdate = !attachedPipette?.ok
+  const attachedPipetteMount =
+    attachedPipette?.mount === LEFT ? 'pipette_left' : 'pipette_right'
+
+  const moduleCalibrationSteps = getModuleCalibrationSteps(
+    requiresFirmwareUpdate
+  )
 
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
@@ -57,12 +80,15 @@ export const ModuleWizardFlows = (
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
+      currentStepIndex === 0 ? currentStepIndex : currentStepIndex - 1
     )
   }
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
   >(null)
+  const [createdAdapterId, setCreatedAdapterId] = React.useState<string | null>(
+    null
+  )
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
   const [
@@ -80,9 +106,9 @@ export const ModuleWizardFlows = (
   } = useChainMaintenanceCommands()
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({
+  } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
       setCreatedMaintenanceRunId(response.data.id)
     },
@@ -195,21 +221,58 @@ export const ModuleWizardFlows = (
     slotName,
     isExiting,
   }
+
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back')} />
-  }
-  if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
+  if (isPrepCommandLoading) {
+    modalContent = (
+      <InProgressModal
+        description={t('prepping_module', {
+          module: getModuleDisplayName(attachedModule.moduleModel),
+        })}
+      />
+    )
+  } else if (prepCommandErrorMessage != null || errorMessage != null) {
+    modalContent = (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.errorEnabled}
+        header={t(
+          prepCommandErrorMessage != null
+            ? 'error_prepping_module'
+            : 'error_during_calibration'
+        )}
+        subHeader={
+          prepCommandErrorMessage != null ? (
+            prepCommandErrorMessage
+          ) : (
+            <>
+              {t('module_calibration_failed')}
+              {errorMessage}
+            </>
+          )
+        }
+      />
+    )
+  } else if (isExiting) {
+    modalContent = <InProgressModal description={t('stand_back_exiting')} />
+  } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createMaintenanceRun={createMaintenanceRun}
+        createMaintenanceRun={createTargetedMaintenanceRun}
         isCreateLoading={isCreateLoading}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = <FirmwareUpdate {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <FirmwareUpdateModal
+        proceed={proceed}
+        subsystem={attachedPipetteMount}
+        description={t('firmware_update')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
       <SelectLocation
@@ -220,9 +283,23 @@ export const ModuleWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
-    modalContent = <PlaceAdapter {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <PlaceAdapter
+        {...currentStep}
+        {...calibrateBaseProps}
+        setCreatedAdapterId={setCreatedAdapterId}
+      />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
-    modalContent = <AttachProbe {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <AttachProbe
+        {...currentStep}
+        {...calibrateBaseProps}
+        adapterId={createdAdapterId}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
+    modalContent = <DetachProbe {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     modalContent = (
       <Success

@@ -17,7 +17,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -101,7 +101,7 @@ class ProtocolContext(CommandPublisher):
         self,
         api_version: APIVersion,
         core: ProtocolCore,
-        broker: Optional[Broker] = None,
+        broker: Optional[LegacyBroker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
         bundled_data: Optional[Dict[str, bytes]] = None,
@@ -232,6 +232,14 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def commands(self) -> List[str]:
+        """Return the run log.
+
+        This is a list of human-readable strings representing what's been done in the protocol so
+        far. For example, "Aspirating 123 µL from well A1 of 96 well plate in slot 1."
+
+        The exact format of these entries is not guaranteed. The format here may differ from other
+        places that show the run log, such as the Opentrons App.
+        """
         return self._commands
 
     @requires_version(2, 0)
@@ -765,6 +773,14 @@ class ProtocolContext(CommandPublisher):
 
         tip_racks = tip_racks or []
 
+        # TODO (tz, 9-12-23): move validation into PE
+        on_right_mount = self._instruments[Mount.RIGHT]
+        if is_96_channel and on_right_mount is not None:
+            raise RuntimeError(
+                f"Instrument already present on right:"
+                f" {on_right_mount.name}. In order to load a 96 channel pipette both mounts need to be available."
+            )
+
         existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
             # TODO(mc, 2022-08-25): create specific exception type
@@ -777,8 +793,6 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
-        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._core.load_instrument(
             instrument_name=checked_instrument_name,
             mount=checked_mount,
@@ -916,6 +930,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def deck(self) -> Deck:
         """An interface to provide information about what's currently loaded on the deck.
+        This object is useful for determining if a slot in the deck is free.
 
         This object behaves like a dictionary whose keys are the deck slot names.
         For instance, ``protocol.deck[1]``, ``protocol.deck["1"]``, and ``protocol.deck["D1"]``
@@ -925,14 +940,23 @@ class ProtocolContext(CommandPublisher):
         labware, a :py:obj:`~opentrons.protocol_api.ModuleContext` if the slot contains a hardware
         module, or ``None`` if the slot doesn't contain anything.
 
-        This object is useful for determining if a slot in the deck is free.
-
         Rather than filtering the objects in the deck map yourself,
-        you can also use :py:attr:`loaded_labwares` to see a dict of labwares
-        and :py:attr:`loaded_modules` to see a dict of modules.
+        you can also use :py:attr:`loaded_labwares` to get a dict of labwares
+        and :py:attr:`loaded_modules` to get a dict of modules.
 
-        For advanced control, you can delete an item of labware from the deck
-        with e.g. ``del protocol.deck['1']`` to free a slot for new labware.
+        For :ref:`advanced-control` *only*, you can delete an element of the ``deck`` dict.
+        This only works for deck slots that contain labware objects. For example, if slot
+        1 contains a labware, ``del protocol.deck['1']`` will free the slot so you can
+        load another labware there.
+
+        .. warning::
+            Deleting labware from a deck slot does not pause the protocol. Subsequent
+            commands continue immediately. If you need to physically move the labware to
+            reflect the new deck state, add a :py:meth:`.pause` or use
+            :py:meth:`.move_labware` instead.
+
+        .. versionchanged:: 2.15
+           ``del`` sets the corresponding labware's location to ``OFF_DECK``.
         """
         return self._deck
 
@@ -1002,7 +1026,7 @@ def _create_module_context(
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,
-    broker: Broker,
+    broker: LegacyBroker,
 ) -> ModuleTypes:
     module_cls: Optional[Type[ModuleTypes]] = None
     if isinstance(module_core, AbstractTemperatureModuleCore):

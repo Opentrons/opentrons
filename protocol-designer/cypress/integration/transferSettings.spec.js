@@ -14,7 +14,7 @@ function importProtocol() {
       cy.get('[data-test="ComputingSpinner"]').should('exist')
       cy.get('div')
         .contains(
-          'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior'
+          'Your protocol will be automatically updated to the latest version.'
         )
         .should('exist')
       cy.get('button').contains('ok', { matchCase: false }).click()
@@ -384,19 +384,21 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that fixedTrash is selected
-    cy.get('[id=BlowoutLocationField_dropdown]').should(
-      'have.value',
-      'fixedTrash'
-    )
+    // Verify that trash is selected
+    cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
+      const value = $input.val()
+      const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+      expect(value).to.include(expectedSubstring)
+    })
     // Click on step 3 to verify the batch editing
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
     // Verify that trash is selected for the blowout option
-    cy.get('[id=BlowoutLocationField_dropdown]').should(
-      'have.value',
-      'fixedTrash'
-    )
+    cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
+      const value = $input.val()
+      const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+      expect(value).to.include(expectedSubstring)
+    })
   })
 })

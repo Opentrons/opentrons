@@ -74,8 +74,12 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     return id
   }
 
-  function makeSnackbar(message: string, options?: MakeSnackbarOptions): void {
-    setSnackbar({ message, ...options })
+  function makeSnackbar(
+    message: string,
+    duration?: number,
+    options?: MakeSnackbarOptions
+  ): void {
+    setSnackbar({ message, duration, ...options })
   }
 
   // This function is needed to actually make the snackbar auto-close in the context of the

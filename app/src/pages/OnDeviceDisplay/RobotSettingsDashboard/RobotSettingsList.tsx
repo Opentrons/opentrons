@@ -44,7 +44,6 @@ import { RobotSettingButton } from './RobotSettingButton'
 import type { Dispatch, State } from '../../../redux/types'
 import type { SetSettingOption } from './'
 
-const ROBOT_ANALYTICS_SETTING_ID = 'disableLogAggregation'
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
@@ -65,11 +64,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     getRobotSettings(state, robotName)
   )
 
-  const isRobotAnalyticsOn =
-    allRobotSettings.find(({ id }) => id === ROBOT_ANALYTICS_SETTING_ID)
-      ?.value ?? false
-
-  const isHomeGantryIsOn =
+  const isHomeGantryOn =
     allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??
     false
 
@@ -148,6 +143,13 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="brightness"
         />
         <RobotSettingButton
+          settingName={t('app_settings:privacy')}
+          dataTestId="RobotSettingButton_privacy"
+          settingInfo={t('app_settings:choose_what_data_to_share')}
+          onClick={() => setCurrentOption('Privacy')}
+          iconName="privacy"
+        />
+        <RobotSettingButton
           settingName={t('apply_historic_offsets')}
           dataTestId="RobotSettingButton_apply_historic_offsets"
           settingInfo={t('historic_offsets_description')}
@@ -162,36 +164,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="reset"
         />
         <RobotSettingButton
-          settingName={i18n.format(
-            t('app_settings:share_analytics_short'),
-            'titleCase'
-          )}
-          dataTestId="RobotSettingButton_share_analytics"
-          rightElement={<OnOffToggle isOn={isRobotAnalyticsOn} />}
-          onClick={() =>
-            dispatch(
-              updateSetting(
-                robotName,
-                ROBOT_ANALYTICS_SETTING_ID,
-                !isRobotAnalyticsOn
-              )
-            )
-          }
-          iconName="analytics"
-        />
-        <RobotSettingButton
-          settingName={t('home_gantry_on_restart')}
+          settingName={t('gantry_homing')}
           dataTestId="RobotSettingButton_home_gantry_on_restart"
-          settingInfo={t('home_gantry_subtext')}
+          settingInfo={t('gantry_homing_description')}
           iconName="gantry-homing"
-          rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
+          rightElement={<OnOffToggle isOn={!isHomeGantryOn} />}
           onClick={() =>
             dispatch(
-              updateSetting(
-                robotName,
-                HOME_GANTRY_SETTING_ID,
-                !isHomeGantryIsOn
-              )
+              updateSetting(robotName, HOME_GANTRY_SETTING_ID, !isHomeGantryOn)
             )
           }
         />
@@ -263,7 +243,7 @@ function FeatureFlags(): JSX.Element {
   )
 }
 
-function OnOffToggle(props: { isOn: boolean }): JSX.Element {
+export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
   const { t } = useTranslation('shared')
   return (
     <Flex

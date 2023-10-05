@@ -4,24 +4,15 @@
     "t1000": {
       "defaultAspirateFlowRate": {
         "default": 274.7,
-        "valuesByApiLevel": {
-          "2.0": 137.35,
-          "2.6": 274.7
-        }
+        "valuesByApiLevel": { "2.0": 137.35, "2.6": 274.7 }
       },
       "defaultDispenseFlowRate": {
         "default": 274.7,
-        "valuesByApiLevel": {
-          "2.0": 137.35,
-          "2.6": 274.7
-        }
+        "valuesByApiLevel": { "2.0": 137.35, "2.6": 274.7 }
       },
       "defaultBlowOutFlowRate": {
         "default": 274.7,
-        "valuesByApiLevel": {
-          "2.0": 137.35,
-          "2.6": 274.7
-        }
+        "valuesByApiLevel": { "2.0": 137.35, "2.6": 274.7 }
       },
       "defaultTipLength": 78.3,
       "defaultReturnTipHeight": 0.83,
@@ -97,7 +88,6 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 127.235,
       "defaultPushOutVolume": 0
     }
   },

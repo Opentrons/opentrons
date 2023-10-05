@@ -4,7 +4,6 @@ import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
-import { useMaintenanceRunTakeover } from '../../TakeoverModal'
 import { ProtocolInstrumentMountItem } from '..'
 
 jest.mock('../../PipetteWizardFlows')
@@ -16,9 +15,6 @@ const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
 >
 const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
   typeof GripperWizardFlows
->
-const mockUseMaintenanceRunTakeover = useMaintenanceRunTakeover as jest.MockedFunction<
-  typeof useMaintenanceRunTakeover
 >
 
 const mockGripperData = {
@@ -70,19 +66,14 @@ const render = (
 
 describe('ProtocolInstrumentMountItem', () => {
   let props: React.ComponentProps<typeof ProtocolInstrumentMountItem>
-  const mockSetODDMaintenanceFlowInProgress = jest.fn()
   beforeEach(() => {
     props = {
       mount: LEFT,
       attachedInstrument: null,
-      attachedCalibrationData: null,
       speccedName: 'p1000_multi_flex',
     }
     mockPipetteWizardFlows.mockReturnValue(<div>pipette wizard flow</div>)
     mockGripperWizardFlows.mockReturnValue(<div>gripper wizard flow</div>)
-    mockUseMaintenanceRunTakeover.mockReturnValue({
-      setODDMaintenanceFlowInProgress: mockSetODDMaintenanceFlowInProgress,
-    })
   })
 
   it('renders the correct information when there is no pipette attached', () => {
@@ -116,7 +107,7 @@ describe('ProtocolInstrumentMountItem', () => {
     getByText('Calibrated')
     getByText('Flex 8-Channel 1000 μL')
   })
-  it('renders the pipette with no cal data and the calibration button and clicking on it launches the correct flow ', () => {
+  it('renders the pipette with no cal data and the calibration button and clicking on it launches the correct flow', () => {
     props = {
       ...props,
       mount: LEFT,
@@ -134,9 +125,8 @@ describe('ProtocolInstrumentMountItem', () => {
     const button = getByText('Calibrate')
     fireEvent.click(button)
     getByText('pipette wizard flow')
-    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
-  it('renders the attach button and clicking on it launches the correct flow ', () => {
+  it('renders the attach button and clicking on it launches the correct flow', () => {
     props = {
       ...props,
       mount: LEFT,
@@ -148,7 +138,6 @@ describe('ProtocolInstrumentMountItem', () => {
     const button = getByText('Attach')
     fireEvent.click(button)
     getByText('pipette wizard flow')
-    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
   it('renders the correct information when gripper needs to be atached', () => {
     props = {
@@ -163,7 +152,6 @@ describe('ProtocolInstrumentMountItem', () => {
     const button = getByText('Attach')
     fireEvent.click(button)
     getByText('gripper wizard flow')
-    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
   it('renders the correct information when gripper is attached but not calibrated', () => {
     props = {
@@ -178,6 +166,5 @@ describe('ProtocolInstrumentMountItem', () => {
     const button = getByText('Calibrate')
     fireEvent.click(button)
     getByText('gripper wizard flow')
-    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
 })

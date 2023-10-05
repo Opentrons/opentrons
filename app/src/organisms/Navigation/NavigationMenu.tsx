@@ -22,10 +22,11 @@ import type { Dispatch } from '../../redux/types'
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler
   robotName: string
+  setShowNavMenu: (showNavMenu: boolean) => void
 }
 
 export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
-  const { onClick, robotName } = props
+  const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
   const dispatch = useDispatch<Dispatch>()
@@ -38,6 +39,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowRestartRobotConfirmationModal(true)
   }
 
+  const handleHomeGantry = (): void => {
+    dispatch(home(robotName, ROBOT))
+    setShowNavMenu(false)
+  }
+
+  // ToDo (kk:10/02/2023)
+  // Need to update a function for onClick
   return (
     <>
       {showRestartRobotConfirmationModal ? (
@@ -49,10 +57,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem
-          key="home-gantry"
-          onClick={() => dispatch(home(robotName, ROBOT))}
-        >
+        <MenuItem key="home-gantry" onClick={handleHomeGantry}>
           <Flex alignItems={ALIGN_CENTER}>
             <Icon
               name="home-gantry"
@@ -82,6 +87,18 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               marginLeft={SPACING.spacing12}
             >
               {t('robot_controls:restart_label')}
+            </StyledText>
+          </Flex>
+        </MenuItem>
+        <MenuItem key="deck-configuration" onClick={() => {}}>
+          <Flex alignItems={ALIGN_CENTER}>
+            <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
+            <StyledText
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginLeft={SPACING.spacing12}
+            >
+              {t('deck_configuration')}
             </StyledText>
           </Flex>
         </MenuItem>

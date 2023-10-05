@@ -52,6 +52,16 @@ const mockResetConfigOptions = [
     name: 'tip length FooBar',
     description: 'tip length fooBar description',
   },
+  {
+    id: 'moduleCalibration',
+    name: 'module calibration FooBar',
+    description: 'moduleCalibration fooBar description',
+  },
+  {
+    id: 'authorizedKeys',
+    name: 'SSH Keys Foo',
+    description: 'SSH Keys foo description',
+  },
 ]
 
 const render = () => {
@@ -92,6 +102,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByText('Clear protocol run history')
     getByText('Boot scripts')
     getByText('Clear custom boot scripts')
+    getByText('Clear SSH public keys')
     const downloads = getAllByText('Download')
     expect(downloads.length).toBe(2)
     getByRole('checkbox', { name: 'Clear deck calibration' })
@@ -99,6 +110,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByRole('checkbox', { name: 'Clear tip length calibrations' })
     getByRole('checkbox', { name: 'Clear protocol run history' })
     getByRole('checkbox', { name: 'Clear custom boot scripts' })
+    getByRole('checkbox', { name: 'Clear SSH public keys' })
     getByRole('button', { name: 'Clear data and restart robot' })
     getByTestId('Slideout_icon_close_Device Reset')
   })
@@ -111,11 +123,12 @@ describe('RobotSettings DeviceResetSlideout', () => {
       'Resets all settings. You’ll have to redo initial setup before using the robot again.'
     )
     expect(queryByText('Clear deck calibration')).toBeNull()
-    getByText('Clear pipette calibration(s)')
+    getByText('Clear pipette calibration')
     expect(queryByText('Clear tip length calibrations')).toBeNull()
     getByText('Clear gripper calibration')
-    getByRole('checkbox', { name: 'Clear pipette calibration(s)' })
+    getByRole('checkbox', { name: 'Clear pipette calibration' })
     getByRole('checkbox', { name: 'Clear gripper calibration' })
+    getByRole('checkbox', { name: 'Clear module calibration' })
     expect(
       queryByRole('checkbox', { name: 'Clear deck calibration' })
     ).toBeNull()

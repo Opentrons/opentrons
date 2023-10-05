@@ -60,6 +60,7 @@ stages:
               createdAt: !anystr
               detail: 'NoTipAttachedError [line 9]: Cannot perform PREPARE_ASPIRATE without a tip attached'
               errorCode: '4000'
+              wrappedErrors: !anylist
 
   - name: Verify commands contain the expected results
     request:

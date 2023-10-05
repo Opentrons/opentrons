@@ -15,11 +15,19 @@ export const getDisableModuleRestrictions: Selector<
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-export const getEnabledOT3: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_OT_3 ?? false
-)
 export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
+)
+export const getAllow96Channel: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ALLOW_96_CHANNEL ?? false
+)
+export const getEnableDeckModification: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_FLEX_DECK_MODIFICATION ?? false
+)
+export const getEnableOffDeckVisAndMultiTip: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_OFF_DECK_VIS_AND_MULTI_TIP ?? false
 )
