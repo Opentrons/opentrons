@@ -258,7 +258,9 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Movable Trash"
+        "displayName": "Movable Trash",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
       },
       {
         "id": "1/8cWasteChute",
@@ -270,9 +272,8 @@
           "zDimension": 154.0
         },
         "displayName": "1/8 Channel Waste Chute",
-        "ableToDropLabware": false,
         "ableToDropTips": true,
-        "dropTipsOffset": [64, 21.91, 144.0]
+        "dropTipsOffset": [64.0, 21.91, 144.0]
       },
       {
         "id": "96cWasteChute",
@@ -284,7 +285,6 @@
           "zDimension": 154.0
         },
         "displayName": "96 Channel Waste Chute",
-        "ableToDropLabware": false,
         "ableToDropTips": true,
         "dropTipsOffset": [14.445, 42.085, 115]
       },
@@ -299,7 +299,6 @@
         },
         "displayName": "Gripper Waste Chute",
         "ableToDropLabware": true,
-        "ableToDropTips": false,
         "dropLabwareOffset": [64, 29, 136.5]
       }
     ],
