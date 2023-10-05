@@ -130,7 +130,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const settings = usePipetteSettingsQuery({
     refetchInterval: 5000,
     enabled: pipetteId != null,
-  }).data?.[pipetteId ?? '']?.fields
+  })?.data?.[pipetteId ?? '']?.fields
 
   const [
     selectedPipette,
