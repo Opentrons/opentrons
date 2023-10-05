@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+// import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -21,6 +21,7 @@ import { GantryControlModal } from './GantryControlModal'
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler
   robotName: string
+  setShowNavMenu: (showNavMenu: boolean) => void
 }
 
 export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
@@ -40,6 +41,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowRestartRobotConfirmationModal(true)
   }
 
+  // const handleHomeGantry = (): void => {
+  //   dispatch(home(robotName, ROBOT))
+  //   setShowNavMenu(false)
+  // }
+
+  // ToDo (kk:10/02/2023)
+  // Need to update a function for onClick
   return (
     <>
       {showRestartRobotConfirmationModal ? (
@@ -57,7 +65,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem onClick={() => setShowGantryControlModal(true)} >
+        <MenuItem 
+          key="home-gantry" 
+          onClick={() => {
+            // handleHomeGantry
+            setShowGantryControlModal(true)
+          }}
+        >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon
               name="home-gantry"
@@ -87,6 +101,18 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               marginLeft={SPACING.spacing12}
             >
               {t('robot_controls:restart_label')}
+            </StyledText>
+          </Flex>
+        </MenuItem>
+        <MenuItem key="deck-configuration" onClick={() => {}}>
+          <Flex alignItems={ALIGN_CENTER}>
+            <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
+            <StyledText
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginLeft={SPACING.spacing12}
+            >
+              {t('deck_configuration')}
             </StyledText>
           </Flex>
         </MenuItem>

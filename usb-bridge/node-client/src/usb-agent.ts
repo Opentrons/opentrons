@@ -2,7 +2,7 @@ import * as http from 'http'
 import agent from 'agent-base'
 import type { Duplex } from 'stream'
 
-import { ReadlineParser, SerialPort } from 'serialport'
+import { SerialPort } from 'serialport'
 
 import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
@@ -256,13 +256,6 @@ function installListeners(
   }
   s.on('timeout', onTimeout)
 
-  function onLineParserData(line: string): void {
-    agent.log('info', line)
-  }
-  // TODO(bh, 2023-05-05): determine delimiter for end of response body or use different parser
-  const parser = s.pipe(new ReadlineParser())
-  parser.on('data', onLineParserData)
-
   function onFinish(): void {
     agent.log('info', 'socket finishing: closing serialport')
     s.close()
@@ -283,7 +276,6 @@ function installListeners(
     s.removeListener('close', onClose)
     s.removeListener('free', onFree)
     s.removeListener('timeout', onTimeout)
-    parser.removeListener('data', onLineParserData)
     s.removeListener('finish', onFinish)
     s.removeListener('agentRemove', onRemove)
     if (agent[kOnKeylog] != null) {

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { format, formatDistance } from 'date-fns'
-import styled from 'styled-components'
+import { formatDistance } from 'date-fns'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_START,
@@ -19,6 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -63,8 +64,15 @@ export function PinnedProtocol(props: {
   cardSize?: CardSizeType
   lastRun?: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
 }): JSX.Element {
-  const { lastRun, protocol, longPress, setShowDeleteConfirmationModal } = props
+  const {
+    lastRun,
+    protocol,
+    longPress,
+    setShowDeleteConfirmationModal,
+    setTargetProtocolId,
+  } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
@@ -85,11 +93,18 @@ export function PinnedProtocol(props: {
     }
   }, [longpress.isLongPressed, longPress])
 
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${longpress.isLongPressed ? '' : COLORS.darkBlack40};
+    }
+  `
+
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
+      css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing24}
       height={cardStyleBySize[cardSize].height}
@@ -124,13 +139,14 @@ export function PinnedProtocol(props: {
             : t('no_history')}
         </StyledText>
         <StyledText as="p">
-          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
+          {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
       </Flex>
-      {longpress.isLongPressed === true && (
+      {longpress.isLongPressed && (
         <LongPressModal
           longpress={longpress}
           protocolId={protocol.id}
+          setTargetProtocolId={setTargetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       )}

@@ -8,9 +8,10 @@ import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useIsOT3 } from '../../hooks'
 import {
-  DisableHoming,
-  DisplayRobotName,
   DeviceReset,
+  DisplayRobotName,
+  EnableStatusLight,
+  GantryHoming,
   LegacySettings,
   OpenJupyterControl,
   RobotInformation,
@@ -33,9 +34,10 @@ jest.mock('../../../../redux/shell/update', () => ({
   getShellUpdateState: jest.fn(),
 }))
 jest.mock('../../hooks/useIsOT3')
-jest.mock('../AdvancedTab/DisplayRobotName')
-jest.mock('../AdvancedTab/DisableHoming')
 jest.mock('../AdvancedTab/DeviceReset')
+jest.mock('../AdvancedTab/DisplayRobotName')
+jest.mock('../AdvancedTab/EnableStatusLight')
+jest.mock('../AdvancedTab/GantryHoming')
 jest.mock('../AdvancedTab/LegacySettings')
 jest.mock('../AdvancedTab/OpenJupyterControl')
 jest.mock('../AdvancedTab/RobotInformation')
@@ -54,8 +56,8 @@ const mockGetShellUpdateState = getShellUpdateState as jest.MockedFunction<
 const mockAboutRobotName = DisplayRobotName as jest.MockedFunction<
   typeof DisplayRobotName
 >
-const mockDisableHoming = DisableHoming as jest.MockedFunction<
-  typeof DisableHoming
+const mockGantryHoming = GantryHoming as jest.MockedFunction<
+  typeof GantryHoming
 >
 const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
 const mockLegacySettings = LegacySettings as jest.MockedFunction<
@@ -88,6 +90,9 @@ const mockUseOlderAspirateBehavior = UseOlderAspirateBehavior as jest.MockedFunc
 const mockUseOlderProtocol = UseOlderProtocol as jest.MockedFunction<
   typeof UseOlderProtocol
 >
+const mockEnableStatusLight = EnableStatusLight as jest.MockedFunction<
+  typeof EnableStatusLight
+>
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const mockUpdateRobotStatus = jest.fn()
@@ -112,7 +117,7 @@ describe('RobotSettings Advanced tab', () => {
       downloading: true,
     } as ShellUpdateState)
     mockAboutRobotName.mockReturnValue(<div>Mock AboutRobotName Section</div>)
-    mockDisableHoming.mockReturnValue(<div>Mock DisableHoming Section</div>)
+    mockGantryHoming.mockReturnValue(<div>Mock GantryHoming Section</div>)
     mockDeviceReset.mockReturnValue(<div>Mock DeviceReset Section</div>)
     mockLegacySettings.mockReturnValue(<div>Mock LegacySettings Section</div>)
     mockOpenJupyterControl.mockReturnValue(
@@ -137,6 +142,7 @@ describe('RobotSettings Advanced tab', () => {
       <div>Mock UseOlderProtocol Section</div>
     )
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    mockEnableStatusLight.mockReturnValue(<div>mock EnableStatusLight</div>)
   })
 
   afterAll(() => {
@@ -149,9 +155,9 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock AboutRobotName Section')
   })
 
-  it('should render DisableHoming section', () => {
+  it('should render GantryHoming section', () => {
     const [{ getByText }] = render()
-    getByText('Mock DisableHoming Section')
+    getByText('Mock GantryHoming Section')
   })
 
   it('should render DeviceReset section', () => {
@@ -164,7 +170,7 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock LegacySettings Section')
   })
 
-  it('should not render LegacySettings section for OT-3', () => {
+  it('should not render LegacySettings section for Flex', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock LegacySettings Section')).toBeNull()
@@ -190,7 +196,7 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock ShortTrashBin Section')
   })
 
-  it('should not render ShortTrashBin section for OT-3', () => {
+  it('should not render ShortTrashBin section for Flex', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock ShortTrashBin Section')).toBeNull()
@@ -211,12 +217,18 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock UsageSettings Section')
   })
 
+  it('should not render UsageSettings for Flex', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Mock UsageSettings Section')).toBeNull()
+  })
+
   it('should render UseOlderAspirateBehavior section for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Mock UseOlderAspirateBehavior Section')
   })
 
-  it('should not render UseOlderAspirateBehavior section for OT-3', () => {
+  it('should not render UseOlderAspirateBehavior section for Flex', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock UseOlderAspirateBehavior Section')).toBeNull()
@@ -227,9 +239,20 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock UseOlderProtocol Section')
   })
 
-  it('should not render UseOlderProtocol section for OT-3', () => {
+  it('should not render UseOlderProtocol section for Flex', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock UseOlderProtocol Section')).toBeNull()
+  })
+
+  it('should not render EnableStatusLight section for OT-2', () => {
+    const [{ queryByText }] = render()
+    expect(queryByText('mock EnableStatusLight')).not.toBeInTheDocument()
+  })
+
+  it('should render EnableStatusLight section for Flex', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('mock EnableStatusLight')
   })
 })

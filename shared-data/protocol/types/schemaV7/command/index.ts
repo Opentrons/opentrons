@@ -7,6 +7,10 @@ import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
 import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
 import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
 import type {
+  IncidentalCreateCommand,
+  IncidentalRunTimeCommand,
+} from './incidental'
+import type {
   AnnotationRunTimeCommand,
   AnnotationCreateCommand,
 } from './annotation'
@@ -14,6 +18,14 @@ import type {
   CalibrationRunTimeCommand,
   CalibrationCreateCommand,
 } from './calibration'
+
+export * from './annotation'
+export * from './calibration'
+export * from './gantry'
+export * from './module'
+export * from './pipetting'
+export * from './setup'
+export * from './timing'
 
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
@@ -24,10 +36,11 @@ export interface CommonCommandRunTimeInfo {
   key?: string
   id: string
   status: CommandStatus
-  error: string | null
+  error?: RunCommandError | null
   createdAt: string
   startedAt: string | null
   completedAt: string | null
+  intent?: 'protocol' | 'setup'
 }
 export interface CommonCommandCreateInfo {
   key?: string
@@ -40,9 +53,9 @@ export type CreateCommand =
   | ModuleCreateCommand // directed at a hardware module
   | SetupCreateCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingCreateCommand // effecting the timing of command execution
-  // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
   | CalibrationCreateCommand // for automatic pipette calibration
   | AnnotationCreateCommand // annotating command execution
+  | IncidentalCreateCommand // command with only incidental effects (status bar animations)
 
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
@@ -51,6 +64,13 @@ export type RunTimeCommand =
   | ModuleRunTimeCommand // directed at a hardware module
   | SetupRunTimeCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingRunTimeCommand // effecting the timing of command execution
-  // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
   | CalibrationRunTimeCommand // for automatic pipette calibration
   | AnnotationRunTimeCommand // annotating command execution
+  | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
+
+interface RunCommandError {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
+}

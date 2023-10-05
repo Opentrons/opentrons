@@ -18,6 +18,7 @@ from opentrons.protocol_engine.types import (
     DeckType,
     ModuleOffsetVector,
     HeaterShakerLatchStatus,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -294,7 +295,7 @@ def test_get_properties_by_id(
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=0, y=68.06, z=98.26),
+            LabwareOffsetVector(x=0, y=68.8, z=108.96),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
@@ -344,7 +345,7 @@ def test_get_module_offset_for_ot2_standard(
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7.to_ot3_equivalent(),
-            LabwareOffsetVector(x=-20.005, y=67.96, z=0.26),
+            LabwareOffsetVector(x=-20.005, y=67.96, z=10.96),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
@@ -1743,3 +1744,48 @@ def test_is_edge_move_unsafe(
     result = subject.is_edge_move_unsafe(mount=mount, target_slot=target_slot)
 
     assert result is expected_result
+
+
+@pytest.mark.parametrize(
+    argnames=["module_def", "expected_offset_data"],
+    argvalues=[
+        (
+            lazy_fixture("thermocycler_v2_def"),
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
+            ),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=0.5),
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            None,
+        ),
+    ],
+)
+def test_get_default_gripper_offsets(
+    module_def: ModuleDefinition,
+    expected_offset_data: Optional[LabwareMovementOffsetData],
+) -> None:
+    """It should return the correct gripper offsets, if present."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+        },
+        requested_model_by_module_id={
+            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,  # Does not matter
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                definition=module_def,
+            ),
+        },
+    )
+    assert subject.get_default_gripper_offsets("module-1") == expected_offset_data

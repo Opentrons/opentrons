@@ -16,7 +16,7 @@ import { StyledText } from '../../../../atoms/text'
 import { Portal } from '../../../../App/portal'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { useIsOT3, useRobot } from '../../hooks'
 import { UpdateBuildroot } from '../UpdateBuildroot'
@@ -38,7 +38,7 @@ export function RobotServerVersion({
   const isOT3 = useIsOT3(robotName)
   const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
   const { autoUpdateAction } = useSelector((state: State) => {
-    return getBuildrootUpdateDisplayInfo(state, robotName)
+    return getRobotUpdateDisplayInfo(state, robotName)
   })
 
   const robotServerVersion =

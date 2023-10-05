@@ -4,18 +4,18 @@ from __future__ import annotations
 import pytest
 from decoy import Decoy, matchers
 from typing import Any, Dict, cast
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.commands.types import Command as CommandDict, CommandMessage
 from opentrons.commands.publisher import CommandPublisher, publish, publish_context
 
 
 @pytest.fixture
-def broker(decoy: Decoy) -> Broker:
+def broker(decoy: Decoy) -> LegacyBroker:
     """Return a mocked out Broker."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
-def test_publish_decorator(decoy: Decoy, broker: Broker) -> None:
+def test_publish_decorator(decoy: Decoy, broker: LegacyBroker) -> None:
     """It should publish "before" and "after" messages for decorated methods."""
     _act = decoy.mock()
 
@@ -69,7 +69,9 @@ def test_publish_decorator(decoy: Decoy, broker: Broker) -> None:
     assert before_message_id.value == after_message_id.value
 
 
-def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> None:
+def test_publish_decorator_with_arg_defaults(
+    decoy: Decoy, broker: LegacyBroker
+) -> None:
     """It should pass method argument defaults to the command creator."""
     _act = decoy.mock()
 
@@ -118,7 +120,7 @@ def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> No
     )
 
 
-def test_publish_decorator_with_error(decoy: Decoy, broker: Broker) -> None:
+def test_publish_decorator_with_error(decoy: Decoy, broker: LegacyBroker) -> None:
     """It should capture an exception and place it in the "after" message."""
 
     def _get_command_payload(foo: str, bar: int) -> Dict[str, Any]:
@@ -169,7 +171,9 @@ def test_publish_decorator_with_error(decoy: Decoy, broker: Broker) -> None:
     assert before_message_id.value == after_message_id.value
 
 
-def test_publish_decorator_remaps_instrument(decoy: Decoy, broker: Broker) -> None:
+def test_publish_decorator_remaps_instrument(
+    decoy: Decoy, broker: LegacyBroker
+) -> None:
     """It should pass "self" to command creator arguments named "instrument"."""
     _act = decoy.mock()
 
@@ -221,7 +225,7 @@ def test_publish_decorator_remaps_instrument(decoy: Decoy, broker: Broker) -> No
     )
 
 
-def test_publish_context(decoy: Decoy, broker: Broker) -> None:
+def test_publish_context(decoy: Decoy, broker: LegacyBroker) -> None:
     _act = decoy.mock()
 
     command = cast(
@@ -271,7 +275,7 @@ def test_publish_context(decoy: Decoy, broker: Broker) -> None:
     assert before_message_id.value == after_message_id.value
 
 
-def test_publish_context_with_error(decoy: Decoy, broker: Broker) -> None:
+def test_publish_context_with_error(decoy: Decoy, broker: LegacyBroker) -> None:
     command = cast(
         CommandDict,
         {"name": "some_command", "payload": {"foo": "hello", "bar": 42}},

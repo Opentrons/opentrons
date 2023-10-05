@@ -5,7 +5,7 @@
 // analytics replacement.
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
-import * as brActions from '../buildroot/constants'
+import * as RobotUpdate from '../robot-update/constants'
 import * as Sessions from '../sessions'
 import * as Alerts from '../alerts'
 import * as Constants from './constants'
@@ -138,8 +138,8 @@ export function makeEvent(
     //     properties: { ...data, runTime },
     //   }))
 
-    // buildroot update events
-    case brActions.BR_SET_UPDATE_SEEN: {
+    // robot update events
+    case RobotUpdate.ROBOTUPDATE_SET_UPDATE_SEEN: {
       const data = getBuildrootAnalyticsData(state, action.meta.robotName)
       return Promise.resolve({
         name: 'robotUpdateView',
@@ -147,7 +147,7 @@ export function makeEvent(
       })
     }
 
-    case brActions.BR_CHANGELOG_SEEN: {
+    case RobotUpdate.ROBOTUPDATE_CHANGELOG_SEEN: {
       const data = getBuildrootAnalyticsData(state, action.meta.robotName)
       return Promise.resolve({
         name: 'robotUpdateChangeLogView',
@@ -155,7 +155,7 @@ export function makeEvent(
       })
     }
 
-    case brActions.BR_UPDATE_IGNORED: {
+    case RobotUpdate.ROBOTUPDATE_UPDATE_IGNORED: {
       const data = getBuildrootAnalyticsData(state, action.meta.robotName)
       return Promise.resolve({
         name: 'robotUpdateIgnore',
@@ -163,7 +163,7 @@ export function makeEvent(
       })
     }
 
-    case brActions.BR_START_UPDATE: {
+    case RobotUpdate.ROBOTUPDATE_START_UPDATE: {
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
         name: 'robotUpdateInitiate',
@@ -171,7 +171,7 @@ export function makeEvent(
       })
     }
 
-    case brActions.BR_UNEXPECTED_ERROR: {
+    case RobotUpdate.ROBOTUPDATE_UNEXPECTED_ERROR: {
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
         name: 'robotUpdateError',
@@ -179,7 +179,7 @@ export function makeEvent(
       })
     }
 
-    case brActions.BR_SET_SESSION_STEP: {
+    case RobotUpdate.ROBOTUPDATE_SET_SESSION_STEP: {
       if (action.payload !== 'finished') return Promise.resolve(null)
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({

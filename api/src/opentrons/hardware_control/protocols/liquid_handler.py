@@ -16,6 +16,19 @@ class LiquidHandler(
     Calibratable[CalibrationType],
     Protocol[CalibrationType],
 ):
+    async def configure_for_volume(self, mount: Mount, volume: float) -> None:
+        """
+        Configure a pipette to handle the specified volume.
+
+        Some pipettes need to switch modes to handle different volumes of liquid. Calling
+        this ensures they do so. If the pipette does not need to switch modes, or the pipette
+        is already in the specified mode, nothing will happen.
+
+        If the pipette does need to switch modes, it will likely be unready for aspiration and
+        you will need to call :py:meth:`prepare_for_aspirate` afterwards.
+        """
+        ...
+
     async def prepare_for_aspirate(self, mount: Mount, rate: float = 1.0) -> None:
         """
         Prepare the pipette for aspiration.
@@ -68,6 +81,7 @@ class LiquidHandler(
         mount: Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette

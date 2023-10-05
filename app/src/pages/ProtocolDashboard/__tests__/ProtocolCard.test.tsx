@@ -2,14 +2,16 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import { useProtocolAnalysisAsDocumentQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ProtocolCard } from '../ProtocolCard'
 
-import type { ProtocolResource } from '@opentrons/shared-data'
-import type { ProtocolAnalyses } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolResource,
+} from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -22,8 +24,8 @@ jest.mock('react-router-dom', () => {
 })
 jest.mock('@opentrons/react-api-client')
 
-const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
-  typeof useProtocolAnalysesQuery
+const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
+  typeof useProtocolAnalysisAsDocumentQuery
 >
 
 const mockProtocol: ProtocolResource = {
@@ -48,6 +50,7 @@ const props = {
   longPress: jest.fn(),
   setTargetProtocol: jest.fn(),
   setShowDeleteConfirmationModal: jest.fn(),
+  setTargetProtocolId: jest.fn(),
 }
 
 const render = () => {
@@ -65,9 +68,9 @@ describe('ProtocolCard', () => {
   jest.useFakeTimers()
 
   beforeEach(() => {
-    mockUseProtocolAnalysesQuery.mockReturnValue({
-      data: { data: [{ result: 'ok' }] } as any,
-    } as UseQueryResult<ProtocolAnalyses>)
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: { result: 'ok' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
   })
   it('should redirect to protocol details after short click', () => {
     const [{ getByText }] = render()
@@ -77,9 +80,9 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol', () => {
-    mockUseProtocolAnalysesQuery.mockReturnValue({
-      data: { data: [{ result: 'error' }] } as any,
-    } as UseQueryResult<ProtocolAnalyses>)
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: { result: 'error' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
     const [{ getByText, getByLabelText, queryByText }] = render()
     getByLabelText('failedAnalysis_icon')
     getByText('Failed analysis')
@@ -105,9 +108,9 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing', async () => {
-    mockUseProtocolAnalysesQuery.mockReturnValue({
-      data: { data: [{ result: 'error' }] } as any,
-    } as UseQueryResult<ProtocolAnalyses>)
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: { result: 'error' } as any,
+    } as UseQueryResult<CompletedProtocolAnalysis>)
     const [{ getByText, getByLabelText }] = render()
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)

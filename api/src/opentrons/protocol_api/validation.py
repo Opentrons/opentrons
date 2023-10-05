@@ -14,11 +14,13 @@ from typing import (
 
 from typing_extensions import TypeGuard
 
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -37,17 +39,26 @@ if TYPE_CHECKING:
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
 _COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
 
-# Mapping of user-facing pipette names to names used by the internal Opentrons system
-_FLEX_PIPETTE_NAMES_MAP = {
-    "p50_single_gen3": "p50_single_flex",
-    "flex_1channel_50": "p50_single_flex",
-    "p50_multi_gen3": "p50_multi_flex",
-    "flex_8channel_50": "p50_multi_flex",
-    "p1000_single_gen3": "p1000_single_flex",
-    "flex_1channel_1000": "p1000_single_flex",
-    "p1000_multi_gen3": "p1000_multi_flex",
-    "flex_8channel_1000": "p1000_multi_flex",
-    "flex_96channel_1000": "p1000_96",
+# Mapping of public Python Protocol API pipette load names
+# to names used by the internal Opentrons system
+_PIPETTE_NAMES_MAP = {
+    "p10_single": PipetteNameType.P10_SINGLE,
+    "p10_multi": PipetteNameType.P10_MULTI,
+    "p20_single_gen2": PipetteNameType.P20_SINGLE_GEN2,
+    "p20_multi_gen2": PipetteNameType.P20_MULTI_GEN2,
+    "p50_single": PipetteNameType.P50_SINGLE,
+    "p50_multi": PipetteNameType.P50_MULTI,
+    "p300_single": PipetteNameType.P300_SINGLE,
+    "p300_multi": PipetteNameType.P300_MULTI,
+    "p300_single_gen2": PipetteNameType.P300_SINGLE_GEN2,
+    "p300_multi_gen2": PipetteNameType.P300_MULTI_GEN2,
+    "p1000_single": PipetteNameType.P1000_SINGLE,
+    "p1000_single_gen2": PipetteNameType.P1000_SINGLE_GEN2,
+    "flex_1channel_50": PipetteNameType.P50_SINGLE_FLEX,
+    "flex_8channel_50": PipetteNameType.P50_MULTI_FLEX,
+    "flex_1channel_1000": PipetteNameType.P1000_SINGLE_FLEX,
+    "flex_8channel_1000": PipetteNameType.P1000_MULTI_FLEX,
+    "flex_96channel_1000": PipetteNameType.P1000_96,
 }
 
 
@@ -57,6 +68,14 @@ class InvalidPipetteMountError(ValueError):
 
 class PipetteMountTypeError(TypeError):
     """An error raised when an invalid mount type is used for loading pipettes."""
+
+
+class LabwareDefinitionIsNotAdapterError(ValueError):
+    """An error raised when an adapter is attempted to be loaded as a labware."""
+
+
+class LabwareDefinitionIsNotLabwareError(ValueError):
+    """An error raised when a labware is not loaded using `load_labware`."""
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
@@ -99,26 +118,19 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     pipette_name = ensure_lowercase_name(pipette_name)
 
     try:
-        if pipette_name in _FLEX_PIPETTE_NAMES_MAP.keys():
-            # TODO (spp: 2023-07-11): !!! VERY IMPORTANT!!!
-            #  We DO NOT want to support the old 'gen3' suffixed names for Flex launch.
-            #  This provision to accept the old names is added only for maintaining
-            #  backwards compatibility during internal testing and should be phased out.
-            #  So remove this name mapping and conversion at an appropriate time before launch
-            checked_name = PipetteNameType(_FLEX_PIPETTE_NAMES_MAP[pipette_name])
-        else:
-            checked_name = PipetteNameType(pipette_name)
-        return checked_name
-    except ValueError as e:
+        return _PIPETTE_NAMES_MAP[pipette_name]
+    except KeyError:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
-        ) from e
+        ) from None
 
 
-def ensure_deck_slot(
-    deck_slot: Union[int, str], api_version: APIVersion
+def ensure_and_convert_deck_slot(
+    deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
 ) -> DeckSlotName:
     """Ensure that a primitive value matches a named deck slot.
+
+    Also, convert the deck slot to match the given `robot_type`.
 
     Params:
         deck_slot: The primitive value to validate. Valid values are like `5`, `"5"`, or `"C2"`.
@@ -129,6 +141,10 @@ def ensure_deck_slot(
         TypeError: If you provide something that's not an `int` or `str`.
         ValueError: If the value does not match a known deck slot.
         APIVersionError: If you provide a value like `"C2"`, but `api_version` is too old.
+
+    Returns:
+        A `DeckSlotName` appropriate for the given `robot_type`. For example, given `"5"`,
+        this will return `DeckSlotName.SLOT_C2` on a Flex.
     """
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
@@ -147,10 +163,18 @@ def ensure_deck_slot(
             f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
         )
 
-    return parsed_slot
+    return parsed_slot.to_equivalent_for_robot_type(robot_type)
 
 
-def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+def internal_slot_to_public_string(
+    slot_name: DeckSlotName, robot_type: RobotType
+) -> str:
+    """Convert an internal `DeckSlotName` to a user-facing Python Protocol API string.
+
+    This normalizes the string to the robot type's native format, like "5" for OT-2s or "C2" for
+    Flexes. This probably won't change anything because the internal `DeckSlotName` should already
+    match the robot's native format, but it's nice to have an explicit interface barrier.
+    """
     return slot_name.to_equivalent_for_robot_type(robot_type).id
 
 
@@ -160,6 +184,22 @@ def ensure_lowercase_name(name: str) -> str:
         raise TypeError(f"Value must be a string, but got {name}")
 
     return name.lower()
+
+
+def ensure_definition_is_adapter(definition: LabwareDefinition) -> None:
+    """Ensure that one of the definition's allowed roles is `adapter`."""
+    if LabwareRole.adapter not in definition.allowedRoles:
+        raise LabwareDefinitionIsNotAdapterError(
+            f"Labware {definition.parameters.loadName} is not an adapter."
+        )
+
+
+def ensure_definition_is_labware(definition: LabwareDefinition) -> None:
+    """Ensure that one of the definition's allowed roles is `labware` or that that field is empty."""
+    if definition.allowedRoles and LabwareRole.labware not in definition.allowedRoles:
+        raise LabwareDefinitionIsNotLabwareError(
+            f"Labware {definition.parameters.loadName} is not defined as a normal labware."
+        )
 
 
 _MODULE_ALIASES: Dict[str, ModuleModel] = {

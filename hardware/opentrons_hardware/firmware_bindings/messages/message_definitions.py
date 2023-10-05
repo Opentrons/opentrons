@@ -623,6 +623,24 @@ class BrushedMotorConfResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class GripperJawStateRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gripper_jaw_state_request
+    ] = MessageId.gripper_jaw_state_request
+
+
+@dataclass
+class GripperJawStateResponse(BaseMessage):  # noqa: D101
+    payload: payloads.GripperJawStatePayload
+    payload_type: Type[
+        payloads.GripperJawStatePayload
+    ] = payloads.GripperJawStatePayload
+    message_id: Literal[
+        MessageId.gripper_jaw_state_response
+    ] = MessageId.gripper_jaw_state_response
+
+
+@dataclass
 class GripperGripRequest(BaseMessage):  # noqa: D101
     payload: payloads.GripperMoveRequestPayload
     payload_type: Type[

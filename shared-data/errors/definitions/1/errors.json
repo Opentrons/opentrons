@@ -82,6 +82,38 @@
       "detail": "Move Condition Not Met",
       "category": "roboticsControlError"
     },
+    "2007": {
+      "detail": "Calibration Structure Not Found",
+      "category": "roboticsControlError"
+    },
+    "2008": {
+      "detail": "Calibration Edge Not Found",
+      "category": "roboticsControlError"
+    },
+    "2009": {
+      "detail": "Early Capacitance Sense Trigger",
+      "category": "roboticsControlError"
+    },
+    "2010": {
+      "detail": "Inaccurate Non-Contact Sweep",
+      "category": "roboticsControlError"
+    },
+    "2011": {
+      "detail": "Misaligned Gantry",
+      "category": "roboticsControlError"
+    },
+    "2012": {
+      "detail": "Unmatched tip presence states",
+      "category": "roboticsControlError"
+    },
+    "2013": {
+      "detail": "Position Unknown",
+      "category": "roboticsControlError"
+    },
+    "2014": {
+      "detail": "Execution Cancelled",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -146,6 +178,10 @@
       "detail": "Invalid Instrument Data",
       "category": "roboticsInteractionError"
     },
+    "3017": {
+      "detail": "Invalid Liquid Class Name",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -156,6 +192,18 @@
     },
     "4002": {
       "detail": "API Removed",
+      "category": "generalError"
+    },
+    "4003": {
+      "detail": "Not supported on this robot type",
+      "category": "generalError"
+    },
+    "4004": {
+      "detail": "Command Precondition Violated",
+      "category": "generalError"
+    },
+    "4005": {
+      "detail": "Command Parameter Limit Violated",
       "category": "generalError"
     }
   }

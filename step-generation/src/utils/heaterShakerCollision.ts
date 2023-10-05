@@ -81,10 +81,11 @@ export const pipetteIntoHeaterShakerLatchOpen = (
   labwareId: string
 ): boolean => {
   const labwareSlot: string = labware[labwareId]?.slot
+  const adapterSlot: string = labware[labwareSlot]?.slot
   const moduleUnderLabware: string | null | undefined =
     modules &&
-    labwareSlot &&
-    Object.keys(modules).find((moduleId: string) => moduleId === labwareSlot)
+    adapterSlot &&
+    Object.keys(modules).find((moduleId: string) => moduleId === adapterSlot)
   const moduleState =
     moduleUnderLabware && modules[moduleUnderLabware].moduleState
   const isHSLatchOpen: boolean = Boolean(
@@ -114,10 +115,11 @@ export const pipetteIntoHeaterShakerWhileShaking = (
   labwareId: string
 ): boolean => {
   const labwareSlot: string = labware[labwareId]?.slot
+  const adapterSlot: string = labware[labwareSlot]?.slot
   const moduleUnderLabware: string | null | undefined =
     modules &&
-    labwareSlot &&
-    Object.keys(modules).find((moduleId: string) => moduleId === labwareSlot)
+    adapterSlot &&
+    Object.keys(modules).find((moduleId: string) => moduleId === adapterSlot)
   const moduleState =
     moduleUnderLabware && modules[moduleUnderLabware].moduleState
   const isShaking: boolean = Boolean(

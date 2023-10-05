@@ -4,7 +4,10 @@ import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
-import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
+import {
+  mockLeftProtoPipette,
+  mockPipetteSettingsFieldsMap,
+} from '../../../../redux/pipettes/__fixtures__'
 import { isOT3Pipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
@@ -35,12 +38,14 @@ describe('PipetteOverflowMenu', () => {
   beforeEach(() => {
     props = {
       pipetteSpecs: mockLeftProtoPipette.modelSpecs,
+      pipetteSettings: mockPipetteSettingsFieldsMap,
       mount: LEFT,
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
       handleAboutSlideout: jest.fn(),
       handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: false,
+      isRunActive: false,
     }
   })
   afterEach(() => {
@@ -62,13 +67,8 @@ describe('PipetteOverflowMenu', () => {
   })
   it('renders information with no pipette attached', () => {
     props = {
+      ...props,
       pipetteSpecs: null,
-      mount: LEFT,
-      handleChangePipette: jest.fn(),
-      handleCalibrate: jest.fn(),
-      handleAboutSlideout: jest.fn(),
-      handleSettingsSlideout: jest.fn(),
-      isPipetteCalibrated: false,
     }
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Attach pipette' })
@@ -78,15 +78,10 @@ describe('PipetteOverflowMenu', () => {
 
   it('renders recalibrate pipette text for OT-3 pipette', () => {
     mockIsOT3Pipette.mockReturnValue(true)
-
     props = {
-      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
-      mount: LEFT,
-      handleChangePipette: jest.fn(),
-      handleCalibrate: jest.fn(),
-      handleAboutSlideout: jest.fn(),
-      handleSettingsSlideout: jest.fn(),
+      ...props,
       isPipetteCalibrated: true,
+      isRunActive: false,
     }
     const { getByRole } = render(props)
     const recalibrate = getByRole('button', {
@@ -129,5 +124,17 @@ describe('PipetteOverflowMenu', () => {
     expect(settings).toBeNull()
     fireEvent.click(about)
     expect(props.handleAboutSlideout).toHaveBeenCalled()
+  })
+
+  it('does not render the pipette settings button if the pipette has no settings', () => {
+    mockIsOT3Pipette.mockReturnValue(false)
+    props = {
+      ...props,
+      pipetteSettings: null,
+    }
+    const { queryByRole } = render(props)
+    const settings = queryByRole('button', { name: 'Pipette Settings' })
+
+    expect(settings).not.toBeInTheDocument()
   })
 })

@@ -3,7 +3,9 @@ import { connect } from 'react-redux'
 import {
   AlertModal,
   DeprecatedCheckboxField,
+  Flex,
   OutlineButton,
+  Text,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
@@ -151,6 +153,12 @@ class HintsComponent extends React.Component<Props, State> {
               </p>
             </span>
           </>
+        )
+      case 'waste_chute_warning':
+        return (
+          <Flex>
+            <Text>{i18n.t(`alert.hint.${hintKey}.body1`)}</Text>
+          </Flex>
         )
       default:
         return null

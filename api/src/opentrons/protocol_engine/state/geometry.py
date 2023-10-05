@@ -24,6 +24,8 @@ from ..types import (
     DeckType,
     CurrentWell,
     TipGeometry,
+    LabwareMovementOffsetData,
+    OnDeckLabwareLocation,
 )
 from .config import Config
 from .labware import LabwareView
@@ -42,6 +44,13 @@ class _TipDropSection(enum.Enum):
 
     LEFT = "left"
     RIGHT = "right"
+
+
+class _GripperMoveType(enum.Enum):
+    """Types of gripper movement."""
+
+    PICK_UP_LABWARE = enum.auto()
+    DROP_LABWARE = enum.auto()
 
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
@@ -127,7 +136,19 @@ class GeometryView:
     def _get_labware_position_offset(
         self, labware_id: str, labware_location: LabwareLocation
     ) -> LabwareOffsetVector:
-        """Gets the offset vector of a labware on the given location."""
+        """Gets the offset vector of a labware on the given location.
+
+        NOTE: Not to be confused with LPC offset.
+        - For labware on Deck Slot: returns an offset of (0, 0, 0)
+        - For labware on a Module: returns the nominal offset for the labware's position
+          when placed on the specified module (using slot-transformed labwareOffset
+          from the module's definition with any stacking overlap).
+          Does not include module calibration offset or LPC offset.
+        - For labware on another labware: returns the nominal offset for the labware
+          as placed on the specified labware, taking into account any offsets for labware
+          on modules as well as stacking overlaps.
+          Does not include module calibration offset or LPC offset.
+        """
         if isinstance(labware_location, DeckSlotLocation):
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
@@ -358,15 +379,15 @@ class GeometryView:
                 offset=well_location.offset,
             )
 
-        # return to top if labware is fixed trash
-        if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
-            z_offset = well_location.offset.z
-        else:
+        if self._labware.get_definition(labware_id).parameters.isTiprack:
             z_offset = self._labware.get_tip_drop_z_offset(
                 labware_id=labware_id,
                 length_scale=self._pipettes.get_return_tip_scale(pipette_id),
                 additional_offset=well_location.offset.z,
             )
+        else:
+            # return to top if labware is not tip rack
+            z_offset = well_location.offset.z
 
         return WellLocation(
             origin=WellOrigin.TOP,
@@ -407,28 +428,34 @@ class GeometryView:
             self._modules.raise_if_module_in_location(location)
         return location
 
-    def get_labware_center(
+    def get_labware_grip_point(
         self,
         labware_id: str,
         location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     ) -> Point:
-        """Get the center point of the labware as placed on the given location.
+        """Get the grip point of the labware as placed on the given location.
 
-        Returns the absolute position of the labware as if it were placed on the
-        specified location. Labware offset not included.
+        Returns the absolute position of the labware's gripping point as if
+        it were placed on the specified location. Labware offset (LPC offset) not included.
+
+        Grip point is the location where critical point of the gripper should move to
+        in order to pick/drop the given labware in the specified location.
+        It is calculated as the xy center of the slot with z as the point indicated by
+        z-position of labware bottom + grip height from labware bottom.
         """
-        labware_dimensions = self._labware.get_dimensions(labware_id)
-        offset = LabwareOffsetVector(x=0, y=0, z=0)
+        grip_height_from_labware_bottom = (
+            self._labware.get_grip_height_from_labware_bottom(labware_id)
+        )
         location_slot: DeckSlotName
 
-        if isinstance(location, ModuleLocation):
-            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            offset = self._modules.get_module_offset(
-                module_id=location.moduleId, deck_type=deck_type
-            )
-            location_slot = self._modules.get_location(location.moduleId).slotName
-        elif isinstance(location, OnLabwareLocation):
-            location_slot = self.get_ancestor_slot_name(location.labwareId)
+        if isinstance(location, DeckSlotLocation):
+            location_slot = location.slotName
+            offset = LabwareOffsetVector(x=0, y=0, z=0)
+        else:
+            if isinstance(location, ModuleLocation):
+                location_slot = self._modules.get_location(location.moduleId).slotName
+            else:  # OnLabwareLocation
+                location_slot = self.get_ancestor_slot_name(location.labwareId)
             labware_offset = self._get_labware_position_offset(labware_id, location)
             # Get the calibrated offset if the on labware location is on top of a module, otherwise return empty one
             cal_offset = self._get_calibrated_module_offset(location)
@@ -437,13 +464,12 @@ class GeometryView:
                 y=labware_offset.y + cal_offset.y,
                 z=labware_offset.z + cal_offset.z,
             )
-        else:
-            location_slot = location.slotName
+
         slot_center = self._labware.get_slot_center_position(location_slot)
         return Point(
             slot_center.x + offset.x,
             slot_center.y + offset.y,
-            slot_center.z + offset.z + labware_dimensions.z / 2,
+            slot_center.z + offset.z + grip_height_from_labware_bottom,
         )
 
     def get_extra_waypoints(
@@ -526,6 +552,8 @@ class GeometryView:
             # In order to avoid the complexity of finding tip drop locations for
             # variety of labware with different well configs, we will allow
             # location cycling only for fixed trash labware right now.
+            # TODO (spp, 2023-09-12): update this to possibly a labware-width based check,
+            #  or a 'trash' quirk check, once movable trash is implemented.
             return DropTipWellLocation(
                 origin=DropTipWellOrigin.DEFAULT,
                 offset=WellOffset(x=0, y=0, z=0),
@@ -616,3 +644,131 @@ class GeometryView:
                 if x_well_offset < 0:
                     x_well_offset = 0
         return x_well_offset
+
+    def get_final_labware_movement_offset_vectors(
+        self,
+        from_location: OnDeckLabwareLocation,
+        to_location: OnDeckLabwareLocation,
+        additional_offset_vector: LabwareMovementOffsetData,
+    ) -> LabwareMovementOffsetData:
+        """Calculate the final labware offset vector to use in labware movement."""
+        pick_up_offset = (
+            self.get_total_nominal_gripper_offset_for_move_type(
+                location=from_location, move_type=_GripperMoveType.PICK_UP_LABWARE
+            )
+            + additional_offset_vector.pickUpOffset
+        )
+        drop_offset = (
+            self.get_total_nominal_gripper_offset_for_move_type(
+                location=to_location, move_type=_GripperMoveType.DROP_LABWARE
+            )
+            + additional_offset_vector.dropOffset
+        )
+
+        return LabwareMovementOffsetData(
+            pickUpOffset=pick_up_offset, dropOffset=drop_offset
+        )
+
+    @staticmethod
+    def ensure_valid_gripper_location(
+        location: LabwareLocation,
+    ) -> Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]:
+        """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if not isinstance(
+            location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
+        ):
+            raise errors.LabwareMovementNotAllowedError(
+                "Off-deck labware movements are not supported using the gripper."
+            )
+        return location
+
+    def get_total_nominal_gripper_offset_for_move_type(
+        self, location: OnDeckLabwareLocation, move_type: _GripperMoveType
+    ) -> LabwareOffsetVector:
+        """Get the total of the offsets to be used to pick up labware in its current location."""
+        if move_type == _GripperMoveType.PICK_UP_LABWARE:
+            if isinstance(location, (ModuleLocation, DeckSlotLocation)):
+                return self._nominal_gripper_offsets_for_location(location).pickUpOffset
+            else:
+                # If it's a labware on a labware (most likely an adapter),
+                # we calculate the offset as sum of offsets for the direct parent labware
+                # and the underlying non-labware parent location.
+                direct_parent_offset = self._nominal_gripper_offsets_for_location(
+                    location
+                )
+                ancestor = self._labware.get_parent_location(location.labwareId)
+                assert isinstance(
+                    ancestor, (DeckSlotLocation, ModuleLocation)
+                ), "No gripper offsets for off-deck labware"
+                return (
+                    direct_parent_offset.pickUpOffset
+                    + self._nominal_gripper_offsets_for_location(
+                        location=ancestor
+                    ).pickUpOffset
+                )
+        else:
+            if isinstance(location, (ModuleLocation, DeckSlotLocation)):
+                return self._nominal_gripper_offsets_for_location(location).dropOffset
+            else:
+                # If it's a labware on a labware (most likely an adapter),
+                # we calculate the offset as sum of offsets for the direct parent labware
+                # and the underlying non-labware parent location.
+                direct_parent_offset = self._nominal_gripper_offsets_for_location(
+                    location
+                )
+                ancestor = self._labware.get_parent_location(location.labwareId)
+                assert isinstance(
+                    ancestor, (DeckSlotLocation, ModuleLocation)
+                ), "No gripper offsets for off-deck labware"
+                return (
+                    direct_parent_offset.dropOffset
+                    + self._nominal_gripper_offsets_for_location(
+                        location=ancestor
+                    ).dropOffset
+                )
+
+    def _nominal_gripper_offsets_for_location(
+        self, location: OnDeckLabwareLocation
+    ) -> LabwareMovementOffsetData:
+        """Provide the default gripper offset data for the given location type."""
+        if isinstance(location, DeckSlotLocation):
+            offsets = self._labware.get_deck_default_gripper_offsets()
+        elif isinstance(location, ModuleLocation):
+            offsets = self._modules.get_default_gripper_offsets(location.moduleId)
+        else:
+            # Labware is on a labware/adapter
+            offsets = self._labware_gripper_offsets(location.labwareId)
+        return offsets or LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+            dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        )
+
+    def _labware_gripper_offsets(
+        self, labware_id: str
+    ) -> Optional[LabwareMovementOffsetData]:
+        """Provide the most appropriate gripper offset data for the specified labware.
+
+        We check the types of gripper offsets available for the labware ("default" or slot-based)
+        and return the most appropriate one for the overall location of the labware.
+        Currently, only module adapters (specifically, the H/S universal flat adapter)
+        have non-default offsets that are specific to location of the module on deck,
+        so, this code only checks for the presence of those known offsets.
+        """
+        parent_location = self._labware.get_parent_location(labware_id)
+        assert isinstance(
+            parent_location, (DeckSlotLocation, ModuleLocation)
+        ), "No gripper offsets for off-deck labware"
+
+        if isinstance(parent_location, DeckSlotLocation):
+            slot_name = parent_location.slotName
+        else:
+            module_loc = self._modules.get_location(parent_location.moduleId)
+            slot_name = module_loc.slotName
+
+        slot_based_offset = self._labware.get_labware_gripper_offsets(
+            labware_id=labware_id, slot_name=slot_name.to_ot3_equivalent()
+        )
+
+        return slot_based_offset or self._labware.get_labware_gripper_offsets(
+            labware_id=labware_id, slot_name=None
+        )

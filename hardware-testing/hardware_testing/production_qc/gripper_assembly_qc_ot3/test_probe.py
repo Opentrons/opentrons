@@ -29,8 +29,8 @@ from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperP
 TEST_SLOT = 5
 PROBE_PREP_HEIGHT_MM = 5
 PROBE_POS_OFFSET = Point(13, 13, 0)
-JAW_ALIGNMENT_MM_X = 0.5
-JAW_ALIGNMENT_MM_Z = 0.5
+JAW_ALIGNMENT_MM_X = 2.0
+JAW_ALIGNMENT_MM_Z = 2.0
 PROBE_PF_MAX = 6.0
 DECK_PF_MIN = 9.0
 DECK_PF_MAX = 15.0
@@ -146,7 +146,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # move to 5 mm above the deck
         await api.move_to(mount, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
         z_ax = Axis.by_mount(mount)
-        found_pos = await api.capacitive_probe(mount, z_ax, probe_pos.z, pass_settings)
+        found_pos, _ = await api.capacitive_probe(
+            mount, z_ax, probe_pos.z, pass_settings
+        )
         print(f"Found deck height: {found_pos}")
 
         # check against max overrun

@@ -150,7 +150,7 @@ html_theme_options = {
     'font_family': "'Open Sans', sans-serif",
     'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
-    'fixed_sidebar': 'False',
+    'fixed_sidebar': 'True',
     'github_user': 'opentrons',
     'github_repo': 'opentrons',
     'github_button': True,

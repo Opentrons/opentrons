@@ -191,6 +191,10 @@ def _confirm_action(action: str) -> bool:
     return user_input == "y"
 
 
+def _validate_robot_sn(serial_number: str) -> bool:
+    return bool(re.match(SERIAL_REGEX, serial_number))
+
+
 def _parse_property(prop_name: str, value: Any) -> Optional[Tuple[PropId, Any]]:
     """Verify the value"""
     if prop_name not in PROPERTIES:
@@ -206,7 +210,7 @@ def _parse_property(prop_name: str, value: Any) -> Optional[Tuple[PropId, Any]]:
             if value != FORMAT_VERSION and not _confirm_action(confirm_msg):
                 return None
         elif prop_id == PropId.SERIAL_NUMBER:
-            if not re.match(SERIAL_REGEX, value):
+            if not _validate_robot_sn(value):
                 print(f"Invalid serial number: {value}")
                 return None
         else:
@@ -253,6 +257,16 @@ def _write_serial_number(serial_number: str, filepath: Optional[str] = None) -> 
         raise RuntimeError(f"Unable to write serial {serial_number} - {e}")
 
 
+def _get_property_from_barcode() -> Dict[PropId, Any]:
+    robot_serial = input("scan robot serial number: ").strip()
+    if not _validate_robot_sn(robot_serial):
+        raise ValueError(f"invalid serial number: {robot_serial}")
+    prompt = f"read serial '{robot_serial}', write to robot? (y/n): "
+    if "y" not in input(prompt):
+        raise ValueError(f"could not confirm serial: {robot_serial}")
+    return {PropId.SERIAL_NUMBER: robot_serial}
+
+
 def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
     if eeprom_api.open() == -1:
         raise RuntimeError("Could not setup eeprom")
@@ -260,8 +274,10 @@ def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
     # Check if we have properties passed in and convert them to PropId
     properties = _format_properties(args.property) if args.property else dict()
 
-    success = False
-    msg = ""
+    # Add serial number from barcode
+    if not properties:
+        properties = _get_property_from_barcode()
+
     # The eeprom has been setup and is ready for action
     if args.action == "clear":
         success, msg = clear_eeprom(eeprom_api)
@@ -299,7 +315,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--action",
         choices=ACTIONS,
-        required=True,
+        default="write",
         help="What we want the script to do.",
     )
     parser.add_argument(
@@ -309,14 +325,14 @@ if __name__ == "__main__":
         help=f"The Prop and value we want to write, {PROPERTIES}",
     )
     args = parser.parse_args()
+    stop_robot_server()
+    eeprom_path = Path(f"/sys/bus/i2c/devices/{args.bus}-{args.address}/eeprom")
+    eeprom_api = build_eeprom_driver(eeprom_path=eeprom_path)
     try:
-        stop_robot_server()
-        eeprom_path = Path(f"/sys/bus/i2c/devices/{args.bus}-{args.address}/eeprom")
-        eeprom_api = build_eeprom_driver(eeprom_path=eeprom_path)
         _main(args, eeprom_api)
     except Exception as e:
         print(e)
     finally:
-        eeprom_api._gpio.deactivate_eeprom_wp
+        eeprom_api._gpio.deactivate_eeprom_wp()
         eeprom_api.close()
         print("Exiting.")

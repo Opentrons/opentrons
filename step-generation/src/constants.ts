@@ -15,3 +15,6 @@ export const MODULES_WITH_COLLISION_ISSUES = [
   TEMPERATURE_MODULE_V1,
 ]
 export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'
+
+export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'

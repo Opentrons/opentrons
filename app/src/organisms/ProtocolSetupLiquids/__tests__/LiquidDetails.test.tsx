@@ -2,7 +2,7 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { getSlotLabwareName } from '../../Devices/ProtocolRun/utils/getSlotLabwareName'
+import { getLocationInfoNames } from '../../Devices/ProtocolRun/utils/getLocationInfoNames'
 import { getTotalVolumePerLiquidId } from '../../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from '../LiquidDetails'
 import { LiquidsLabwareDetailsModal } from '../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
@@ -13,11 +13,11 @@ import {
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('../../Devices/ProtocolRun/SetupLiquids/utils')
-jest.mock('../../Devices/ProtocolRun/utils/getSlotLabwareName')
+jest.mock('../../Devices/ProtocolRun/utils/getLocationInfoNames')
 jest.mock('../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal')
 
-const mockGetSlotLabwareNames = getSlotLabwareName as jest.MockedFunction<
-  typeof getSlotLabwareName
+const mockGetLocationInfoNames = getLocationInfoNames as jest.MockedFunction<
+  typeof getLocationInfoNames
 >
 const mockgetTotalVolumePerLiquidId = getTotalVolumePerLiquidId as jest.MockedFunction<
   typeof getTotalVolumePerLiquidId
@@ -46,7 +46,7 @@ describe('LiquidDetails', () => {
       },
     }
     mockgetTotalVolumePerLiquidId.mockReturnValue(50)
-    mockGetSlotLabwareNames.mockReturnValue({
+    mockGetLocationInfoNames.mockReturnValue({
       slotName: '4',
       labwareName: 'mock labware name',
     })
@@ -58,7 +58,7 @@ describe('LiquidDetails', () => {
     getByText('4')
     getByText('mock labware name')
     getByText('Location')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Volume')
     getByText('50 µL')
     getByLabelText('LiquidDetails_0').click()

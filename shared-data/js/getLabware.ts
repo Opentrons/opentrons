@@ -44,7 +44,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
   'opentrons_calibration_adapter_heatershaker_module',
-  'opentrons_calibration_adapter_magnetic_module',
   'opentrons_calibration_adapter_temperature_module',
   'opentrons_calibration_adapter_thermocycler_module',
   // TODO(lc 8-24-2022) We are temporarily filtering
@@ -62,9 +61,8 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
-  'opentrons_flex_96_tiprack_200ul',
-  'opentrons_flex_96_tiprack_1000ul',
-  'opentrons_flex_96_tiprack_50ul',
+  'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+  'opentrons_96_aluminumblock_nest_wellplate_100ul',
 ]
 
 export function getLabwareV1Def(

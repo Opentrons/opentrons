@@ -4,9 +4,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
-from opentrons.protocol_engine.types import ModuleOffsetVector
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+
+from opentrons.protocol_engine.types import ModuleOffsetVector
+from opentrons.util.broker import ReadOnlyBroker
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
@@ -99,13 +101,14 @@ class StateView(HasState[State]):
 
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
+        error = self._commands.get_error()
         return StateSummary.construct(
-            status=self.commands.get_status(),
-            errors=self._commands.get_all_errors(),
+            status=self._commands.get_status(),
+            errors=[] if error is None else [error],
             pipettes=self._pipettes.get_all(),
             labware=self._labware.get_all(),
             labwareOffsets=self._labware.get_labware_offsets(),
-            modules=self.modules.get_all(),
+            modules=self._modules.get_all(),
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
             liquids=self._liquid.get_all(),
@@ -236,6 +239,17 @@ class StateStore(StateView, ActionHandler):
             is_done = predicate()
 
         return is_done
+
+    # We return ReadOnlyBroker[None] instead of ReadOnlyBroker[StateView] in order to avoid
+    # confusion with state mutability. If a caller needs to know the new state, they can
+    # retrieve it explicitly with `ProtocolEngine.state_view`.
+    @property
+    def update_broker(self) -> ReadOnlyBroker[None]:
+        """Return a broker that you can use to get notified of all state updates.
+
+        This is an alternative interface to `wait_for()`.
+        """
+        return self._change_notifier.broker
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""

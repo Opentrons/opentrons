@@ -24,7 +24,7 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -40,14 +40,14 @@ import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ToasterOven')
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/protocol-storage/selectors')
 
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -246,18 +246,41 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const sendButton = getByRole('button', { name: 'Send' })
-    expect(sendButton).not.toBeDisabled()
+    const proceedButton = getByRole('button', { name: 'Send' })
+    expect(proceedButton).not.toBeDisabled()
     const otherRobot = getByText('otherRobot')
     otherRobot.click() // unselect default robot
-    expect(sendButton).not.toBeDisabled()
+    expect(proceedButton).not.toBeDisabled()
     const mockRobot = getByText('opentrons-robot-name')
     mockRobot.click()
-    expect(sendButton).not.toBeDisabled()
-    sendButton.click()
+    expect(proceedButton).not.toBeDisabled()
+    proceedButton.click()
     expect(mockMutateAsync).toBeCalledWith({
       files: [expect.any(Object), mockCustomLabwareFile],
       protocolKey: 'protocolKeyStub',
     })
+  })
+  it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
+    when(mockGetBuildrootUpdateDisplayInfo)
+      .calledWith(({} as any) as State, 'opentrons-robot-name')
+      .mockReturnValue({
+        autoUpdateAction: 'upgrade',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Send' })
+    expect(proceedButton).toBeDisabled()
+    expect(
+      getByText(
+        'A robot software update is required to run protocols with this version of the Opentrons App.'
+      )
+    ).toBeInTheDocument()
+    const linkToRobotDetails = getByText('Go to Robot')
+    linkToRobotDetails.click()
   })
 })

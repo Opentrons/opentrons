@@ -124,3 +124,27 @@ stages:
         mount: 'right'
     response:
         status_code: 200
+
+---
+test_name: Pipette calibrations inaccessible on flex
+marks:
+  - ot3_only
+  - usefixtures:
+    - ot3_server_base_url
+    - set_up_pipette_offset_temp_directory
+stages:
+  - name: GET request 403s
+    request:
+      url: "{ot3_server_base_url}/calibration/pipette_offset"
+      method: GET
+    response:
+      status_code: 403
+  - name: DELETE request 403s
+    request:
+      url: "{ot3_server_base_url}/calibration/pipette_offset"
+      method: DELETE
+      params:
+        pipette_id: '321'
+        mount: 'right'
+    response:
+        status_code: 403

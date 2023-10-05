@@ -1,6 +1,7 @@
 {
   "control_gantry": "control gantry",
   "drop_all_tips": "drop all tips",
+  "confirm_location": "confirm location",
   "home_button": "home",
   "home_description": "Return robot to starting position.",
   "home_label": "home all axes",

@@ -15,6 +15,7 @@ from opentrons.calibration_storage import (
 
 
 DATA_BOOT_D = Path("/data/boot.d")
+AUTHORIZED_KEYS = Path(os.path.expanduser("~/.ssh/authorized_keys"))
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +38,9 @@ class ResetOptionId(str, Enum):
     gripper_offset = "gripperOffsetCalibrations"
     tip_length_calibrations = "tipLengthCalibrations"
     runs_history = "runsHistory"
+    on_device_display = "onDeviceDisplay"
+    module_calibration = "moduleCalibration"
+    authorized_keys = "authorizedKeys"
 
 
 _OT_2_RESET_OPTIONS = [
@@ -51,6 +55,9 @@ _FLEX_RESET_OPTIONS = [
     ResetOptionId.pipette_offset,
     ResetOptionId.gripper_offset,
     ResetOptionId.runs_history,
+    ResetOptionId.on_device_display,
+    ResetOptionId.module_calibration,
+    ResetOptionId.authorized_keys,
 ]
 
 _settings_reset_options = {
@@ -59,7 +66,7 @@ _settings_reset_options = {
     ),
     ResetOptionId.deck_calibration: CommonResetOption(
         name="Deck Calibration",
-        description="Clear deck calibration (will also clear pipette " "offset)",
+        description="Clear deck calibration (will also clear pipette offset)",
     ),
     ResetOptionId.pipette_offset: CommonResetOption(
         name="Pipette Offset Calibrations",
@@ -71,15 +78,25 @@ _settings_reset_options = {
     ),
     ResetOptionId.tip_length_calibrations: CommonResetOption(
         name="Tip Length Calibrations",
-        description="Clear tip length calibrations (will also clear " "pipette offset)",
+        description="Clear tip length calibrations (will also clear pipette offset)",
     ),
-    # TODO(mm, 2022-05-23): Run and protocol history is a robot-server thing,
-    # and is not a concept known to this package (the `opentrons` library).
+    # TODO(mm, 2022-05-23): runs_history and on_device_display are robot-server things,
+    # and are not concepts known to this package (the `opentrons` library).
     # This option is defined here only as a convenience for robot-server.
-    # Find a way to split thing up and define this in robot-server instead.
+    # Find a way to split things up and define this in robot-server instead.
     ResetOptionId.runs_history: CommonResetOption(
         name="Clear Runs History",
         description="Erase this device's stored history of protocols and runs.",
+    ),
+    ResetOptionId.on_device_display: CommonResetOption(
+        name="On-Device Display Configuration",
+        description="Clear the configuration of the on-device display (touchscreen)",
+    ),
+    ResetOptionId.module_calibration: CommonResetOption(
+        name="Module Calibrations", description="Clear module offset calibrations"
+    ),
+    ResetOptionId.authorized_keys: CommonResetOption(
+        name="SSH Authorized Keys", description="Clear the ssh authorized keys"
     ),
 }
 
@@ -118,6 +135,12 @@ def reset(options: Set[ResetOptionId]) -> None:
     if ResetOptionId.gripper_offset in options:
         reset_gripper_offset()
 
+    if ResetOptionId.module_calibration in options:
+        reset_module_calibration()
+
+    if ResetOptionId.authorized_keys in options:
+        reset_authorized_keys()
+
 
 def reset_boot_scripts() -> None:
     if IS_ROBOT:
@@ -145,3 +168,20 @@ def reset_gripper_offset() -> None:
 def reset_tip_length_calibrations() -> None:
     clear_tip_length_calibration()
     clear_pipette_offset_calibrations()
+
+
+def reset_module_calibration() -> None:
+    try:
+        from opentrons.calibration_storage.ot3.module_offset import (
+            clear_module_offset_calibrations,
+        )
+
+        clear_module_offset_calibrations()
+    except ImportError:
+        log.warning("Tried to clear module offset calibrations on an OT-2")
+
+
+def reset_authorized_keys() -> None:
+    if IS_ROBOT and os.path.exists(AUTHORIZED_KEYS):
+        with open(AUTHORIZED_KEYS, "w") as fh:
+            fh.write("")

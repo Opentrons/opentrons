@@ -8,9 +8,8 @@ import { createLogger } from './log'
 import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
-import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
-import { registerBuildrootUpdate } from './buildroot'
+import { registerRobotUpdate } from './robot-update'
 import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
@@ -83,9 +82,8 @@ function startUp(): void {
     registerConfig(dispatch),
     registerDiscovery(dispatch),
     registerProtocolAnalysis(dispatch, mainWindow),
-    registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
-    registerBuildrootUpdate(dispatch),
+    registerRobotUpdate(dispatch),
     registerLabware(dispatch, mainWindow),
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),

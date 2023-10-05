@@ -9,6 +9,7 @@ import {
   TouchscreenBrightness,
   TouchScreenSleep,
   NetworkSettings,
+  Privacy,
   RobotName,
   RobotSettingsJoinOtherNetwork,
   RobotSettingsSelectAuthenticationType,
@@ -18,7 +19,7 @@ import {
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../organisms/RobotSettingsDashboard'
-import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
+import { getRobotUpdateAvailable } from '../../../redux/robot-update'
 import {
   getLocalRobot,
   getRobotApiVersion,
@@ -43,6 +44,7 @@ export type SettingOption =
   | 'TouchscreenSleep'
   | 'TouchscreenBrightness'
   | 'TextSize'
+  | 'Privacy'
   | 'DeviceReset'
   | 'UpdateChannel'
   | 'EthernetConnectionDetails'
@@ -65,7 +67,7 @@ export function RobotSettingsDashboard(): JSX.Element {
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
-      ? getBuildrootUpdateAvailable(state, localRobot)
+      ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
@@ -139,6 +141,10 @@ export function RobotSettingsDashboard(): JSX.Element {
       return <TouchScreenSleep setCurrentOption={setCurrentOption} />
     case 'TouchscreenBrightness':
       return <TouchscreenBrightness setCurrentOption={setCurrentOption} />
+    case 'Privacy':
+      return (
+        <Privacy robotName={robotName} setCurrentOption={setCurrentOption} />
+      )
     // TODO(bh, 2023-6-9): TextSize does not appear to be active in the app yet
     // case 'TextSize':
     //   return <TextSize setCurrentOption={setCurrentOption} />

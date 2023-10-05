@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 from typing import NamedTuple
 
-from opentrons.types import MountType, Point, DeckSlotName
+from opentrons.types import MountType, Point, DeckSlotName, Mount
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
@@ -30,6 +30,7 @@ from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     HeaterShakerMovementFlagger,
 )
 from opentrons.protocol_engine.execution.gantry_mover import GantryMover
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 
 @pytest.fixture
@@ -431,3 +432,20 @@ async def test_retract_axis(
     await subject.retract_axis(axis=MotorAxis.RIGHT_Z)
 
     decoy.verify(await mock_gantry_mover.retract_axis(MotorAxis.RIGHT_Z), times=1)
+
+
+async def test_check_valid_position(
+    decoy: Decoy,
+    subject: MovementHandler,
+    hardware_api: HardwareAPI,
+) -> None:
+    """It should check for an exception to determine if the position is ok."""
+    decoy.when(
+        await hardware_api.gantry_position(mount=Mount.LEFT, fail_on_not_homed=True)
+    ).then_return(Point(0, 0, 0))
+    decoy.when(
+        await hardware_api.gantry_position(mount=Mount.RIGHT, fail_on_not_homed=True)
+    ).then_raise(PositionUnknownError())
+
+    assert await subject.check_for_valid_position(MountType.LEFT)
+    assert not await subject.check_for_valid_position(MountType.RIGHT)

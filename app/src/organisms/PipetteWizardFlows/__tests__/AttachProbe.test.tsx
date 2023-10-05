@@ -9,15 +9,8 @@ import {
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { CalibrationErrorModal } from '../CalibrationErrorModal'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
-
-jest.mock('../CalibrationErrorModal')
-
-const mockCalibrationErrorModal = CalibrationErrorModal as jest.MockedFunction<
-  typeof CalibrationErrorModal
->
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
@@ -45,15 +38,12 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
-    mockCalibrationErrorModal.mockReturnValue(
-      <div>mock calibration error modal</div>
-    )
   })
   it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
@@ -63,6 +53,10 @@ describe('AttachProbe', () => {
         {
           commandType: 'home',
           params: { axes: ['leftZ'] },
+        },
+        {
+          commandType: 'home',
+          params: { skipIfMountPositionOk: 'left' },
         },
         {
           commandType: 'calibration/calibratePipette',
@@ -95,7 +89,7 @@ describe('AttachProbe', () => {
     const { getByText } = render(props)
     getByText(
       nestedTextMatcher(
-        'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the backmost pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
+        'Take the calibration probe from its storage location. Ensure its collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the backmost pipette nozzle as far as it can go. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
       )
     )
   })
@@ -108,7 +102,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
     getByTestId('Pipette_Probing_1.webm')
   })
@@ -125,7 +119,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
     getByTestId('Pipette_Probing_96.webm')
   })
@@ -140,7 +134,7 @@ describe('AttachProbe', () => {
     getByText('Stand back, robot is in motion')
     expect(
       screen.queryByText(
-        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
       )
     ).not.toBeInTheDocument()
   })
@@ -151,7 +145,10 @@ describe('AttachProbe', () => {
       errorMessage: 'error shmerror',
     }
     const { getByText } = render(props)
-    getByText('mock calibration error modal')
+    getByText(
+      'Return the calibration probe to its storage location before exiting.'
+    )
+    getByText('error shmerror')
   })
 
   it('renders the correct text when is on device', async () => {
@@ -162,7 +159,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     getByRole('button', { name: 'Begin calibration' }).click()
@@ -171,6 +168,10 @@ describe('AttachProbe', () => {
         {
           commandType: 'home',
           params: { axes: ['leftZ'] },
+        },
+        {
+          commandType: 'home',
+          params: { skipIfMountPositionOk: 'left' },
         },
         {
           commandType: 'calibration/calibratePipette',

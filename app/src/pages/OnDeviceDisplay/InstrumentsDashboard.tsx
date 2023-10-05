@@ -6,6 +6,8 @@ import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { Navigation } from '../../organisms/Navigation'
 import { AttachedInstrumentMountItem } from '../../organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+import { getShowPipetteCalibrationWarning } from '../../organisms/Devices/utils'
+import { PipetteRecalibrationODDWarning } from './PipetteRealibrationODDWarning'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const FETCH_PIPETTE_CAL_POLL = 10000
@@ -27,9 +29,18 @@ export const InstrumentsDashboard = (): JSX.Element => {
   const isNinetySixChannel = leftInstrument?.data?.channels === 96
 
   return (
-    <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex
+        paddingX={SPACING.spacing40}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+      >
+        {getShowPipetteCalibrationWarning(attachedInstruments) && (
+          <Flex paddingBottom={SPACING.spacing16}>
+            <PipetteRecalibrationODDWarning />
+          </Flex>
+        )}
         {isNinetySixChannel ? (
           <AttachedInstrumentMountItem
             mount="left"

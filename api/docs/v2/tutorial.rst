@@ -73,10 +73,12 @@ Everything else in the protocol file is required. Next, you’ll specify the ver
 
 For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on your robot can be a part of a protocol. 
 
+.. _tutorial-metadata:
+
 Metadata
 ^^^^^^^^
 
-Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version <version-table>` of the API the protocol requires. The `scripts <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/>`_ for this tutorial were validated against API version 2.15, so specify:
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version of the API <version-table>` the protocol requires. The `scripts <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/>`_ for this tutorial were validated against API version 2.15, so specify:
 
 .. code-block:: python
 
@@ -99,6 +101,8 @@ You can include any other information you like in the metadata dictionary. The f
         }
 
 Note, if you have a Flex, or are using an OT-2 with API v2.15 (or higher), we recommend adding a ``requirements`` section to your code. See the Requirements section below.
+
+.. _tutorial-requirements:
 
 Requirements
 ^^^^^^^^^^^^
@@ -190,7 +194,7 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
 .. code-block:: python
 
         # Flex
-        left_pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks[tips])
+        left_pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=[tips])
 
 .. code-block:: python
 
@@ -360,4 +364,4 @@ When it’s all done, check the results of your serial dilution procedure — yo
 Next Steps
 **********
 
-This tutorial has relied heavily on the ``transfer()`` method, but there's much more that the Python Protocol API can do. Many advanced applications use :ref:`building block commands <v2-atomic-commands>` for finer control over the robot. These commands let you aspirate and dispense separately, add air gaps, blow out excess liquid, move the pipette to any location, and more. For protocols that use Opentrons :ref:`new_modules`, there are methods to control their behavior. And all of the API's classes and methods are catalogued in the :ref:`protocol-api-reference`.
+This tutorial has relied heavily on the ``transfer()`` method, but there's much more that the Python Protocol API can do. Many advanced applications use :ref:`building block commands <v2-atomic-commands>` for finer control over the robot. These commands let you aspirate and dispense separately, add air gaps, blow out excess liquid, move the pipette to any location, and more. For protocols that use :ref:`Opentrons hardware modules <new_modules>`, there are methods to control their behavior. And all of the API's classes and methods are catalogued in the :ref:`API Reference <protocol-api-reference>`.

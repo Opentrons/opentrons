@@ -23,12 +23,14 @@ class CSVResult(enum.Enum):
         return self.value
 
     @classmethod
-    def from_bool(cls, b: bool) -> "CSVResult":
+    def from_bool(cls, b: Optional[bool]) -> Optional["CSVResult"]:
         """From bool."""
+        if b is None:
+            return None
         return cls.PASS if b else cls.FAIL
 
 
-def print_csv_result(test: str, result: CSVResult) -> None:
+def print_csv_result(test: str, result: Optional[CSVResult]) -> None:
     """Print CSV Result."""
     if bool(result):
         highlight = ""
@@ -41,6 +43,8 @@ META_DATA_TITLE = "META_DATA"
 META_DATA_TEST_NAME = "test_name"
 META_DATA_TEST_TAG = "test_tag"
 META_DATA_TEST_RUN_ID = "test_run_id"
+META_DATA_TEST_DEVICE_ID = "test_device_id"
+META_DATA_TEST_ROBOT_ID = "test_robot_id"
 META_DATA_TEST_TIME_UTC = "test_time_utc"
 META_DATA_TEST_OPERATOR = "test_operator"
 META_DATA_TEST_VERSION = "test_version"
@@ -90,6 +94,11 @@ class CSVLine:
         """Line stored."""
         return self._stored
 
+    @property
+    def num_data_points(self) -> int:
+        """Get the number of data points saved in this line."""
+        return len(self._data_types)
+
     def cache_start_time(self, start_time: float) -> None:
         """Line cache start time."""
         self._start_time = start_time
@@ -103,12 +112,17 @@ class CSVLine:
         return None
 
     @property
-    def result_passed(self) -> bool:
+    def result_passed(self) -> Optional[bool]:
         """Line result passed."""
-        for i, expected_type in enumerate(self._data_types):
-            if expected_type == CSVResult and self._data[i] != CSVResult.PASS:
+        if CSVResult in self._data_types:
+            if CSVResult.FAIL in self._data:
                 return False
-        return True
+            elif CSVResult.PASS in self._data:
+                return True
+            else:
+                return None
+        else:
+            return None
 
     def store(self, *data: Any, print_results: bool = True) -> None:
         """Line store data."""
@@ -120,15 +134,18 @@ class CSVLine:
         assert self._start_time, "no start time saved"
         self._elapsed_time = time() - self._start_time
         for i, expected_type in enumerate(self._data_types):
-            try:
-                self._data[i] = expected_type(data[i])
-            except ValueError:
-                raise ValueError(
-                    f"[{self.tag}] unexpected data type {type(data[i])} "
-                    f'with value "{data[i]}" at index {i}'
-                )
-        self._stored = True
-        if print_results and CSVResult in self._data_types:
+            if data[i] is None:
+                self._data[i] = None
+            else:
+                try:
+                    self._data[i] = expected_type(data[i])
+                except ValueError:
+                    raise ValueError(
+                        f"[{self.tag}] unexpected data type {type(data[i])} "
+                        f'with value "{data[i]}" at index {i}'
+                    )
+        self._stored = bool(None not in self._data)
+        if self._stored and print_results and CSVResult in self._data_types:
             print_csv_result(self.tag, CSVResult.from_bool(self.result_passed))
 
 
@@ -157,12 +174,15 @@ class CSVLineRepeating:
         return True
 
     @property
-    def result_passed(self) -> bool:
+    def result_passed(self) -> Optional[bool]:
         """CSV Line Repeating result passed."""
-        for line in self._lines:
-            if not line.result_passed:
-                return False
-        return True
+        results = [line.result_passed for line in self._lines]
+        if False in results:
+            return False
+        elif True in results:
+            return True
+        else:
+            return None
 
     def __getitem__(self, item: int) -> CSVLine:
         """CSV Line Repeating get item."""
@@ -245,27 +265,48 @@ class CSVSection:
         return True
 
     @property
-    def result_passed(self) -> bool:
+    def result_passed(self) -> Optional[bool]:
         """CSV Section result passed."""
-        for line in self.lines:
-            if not line.result_passed:
-                return False
-        return True
+        results = [line.result_passed for line in self.lines]
+        if False in results:
+            return False
+        elif True in results:
+            return True
+        else:
+            return None
 
 
-def _generate_meta_data_section() -> CSVSection:
-    return CSVSection(
-        title=META_DATA_TITLE,
-        lines=[
-            CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
-            CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
-            CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
-            CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
-            CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str]),
-            CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
-            CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
-        ],
-    )
+def _generate_meta_data_section(validate_meta_data: bool) -> CSVSection:
+    if validate_meta_data:
+        return CSVSection(
+            title=META_DATA_TITLE,
+            lines=[
+                CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
+                CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str, str, CSVResult]),
+                CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
+                CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str, CSVResult]),
+                CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
+                CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
+            ],
+        )
+    else:
+        return CSVSection(
+            title=META_DATA_TITLE,
+            lines=[
+                CSVLine(tag=META_DATA_TEST_NAME, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
+                CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_DEVICE_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_ROBOT_ID, data=[str]),
+                CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
+                CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str]),
+                CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
+                CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
+            ],
+        )
 
 
 def _generate_results_overview_section(tags: List[str]) -> CSVSection:
@@ -284,14 +325,16 @@ class CSVReport:
         sections: List[CSVSection],
         run_id: Optional[str] = None,
         start_time: Optional[float] = None,
+        validate_meta_data: bool = True,
     ) -> None:
         """CSV Report init."""
         self._test_name = test_name
         self._run_id = run_id if run_id else data_io.create_run_id()
+        self._validate_meta_data = validate_meta_data
         self._tag: Optional[str] = None
         self._file_name: Optional[str] = None
-        _section_meta = _generate_meta_data_section()
-        _section_titles = [s.title for s in sections]
+        _section_meta = _generate_meta_data_section(validate_meta_data)
+        _section_titles = [META_DATA_TITLE] + [s.title for s in sections]
         _section_results = _generate_results_overview_section(_section_titles)
         self._sections = [_section_meta, _section_results] + sections
         self._cache_start_time(start_time)  # must happen before storing any data
@@ -330,20 +373,32 @@ class CSVReport:
         raise ValueError(f"unexpected section title: {item}")
 
     def _refresh_results_overview_values(self) -> None:
-        for s in self._sections[2:]:
-            section = self[RESULTS_OVERVIEW_TITLE]
-            line = section[f"RESULT_{s.title}"]
+        results_section = self[RESULTS_OVERVIEW_TITLE]
+        for s in self._sections:
+            if s == results_section:
+                continue
+            line = results_section[f"RESULT_{s.title}"]
             assert isinstance(line, CSVLine)
-            line.store(CSVResult.PASS, print_results=False)
             if s.result_passed:
-                result = CSVResult.PASS
+                line.store(CSVResult.PASS, print_results=False)
+            elif s.result_passed is False:
+                line.store(CSVResult.FAIL, print_results=False)
             else:
-                result = CSVResult.FAIL
-            line.store(result, print_results=False)
+                line.store(None, print_results=False)
 
     def __str__(self) -> str:
         """CSV Report string."""
-        return "\n".join([str(s) for s in self._sections])
+        max_cols = max(
+            [
+                line.num_data_points
+                for section in self._sections
+                for line in section.lines
+            ]
+        )
+        max_cols += 2  # all lines are prepended with the timestamp and tag
+        # the first line in the CSV should be populated with "copy"
+        first_line = ",".join(["copy"] * max_cols)
+        return f"{first_line}\n" + "\n".join([str(s) for s in self._sections])
 
     @property
     def completed(self) -> bool:
@@ -356,12 +411,20 @@ class CSVReport:
     @property
     def parent(self) -> Path:
         """Parent directory of this report file."""
-        return data_io.create_folder_for_test_data(self._test_name)
+        test_path = data_io.create_folder_for_test_data(self._test_name)
+        return data_io.create_folder_for_test_data(test_path / self._run_id)
 
     @property
     def tag(self) -> str:
         """Tag."""
         return f"{self.__class__.__name__}-{self._tag}"
+
+    @property
+    def file_path(self) -> Path:
+        """Get file-path."""
+        if not self._file_name:
+            raise RuntimeError("must set tag of report using `Report.set_tag()`")
+        return self.parent / self._file_name
 
     def _cache_start_time(self, start_time: Optional[float] = None) -> None:
         checked_start_time = start_time if start_time else time()
@@ -382,9 +445,29 @@ class CSVReport:
         )
         self.save_to_disk()
 
+    def set_device_id(self, device_id: str, barcode_id: Optional[str] = None) -> None:
+        """Store DUT serial number."""
+        if self._validate_meta_data:
+            result = CSVResult.from_bool(device_id == barcode_id)
+            self(
+                META_DATA_TITLE,
+                META_DATA_TEST_DEVICE_ID,
+                [device_id, barcode_id, result],
+            )
+        else:
+            self(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, [device_id])
+
+    def set_robot_id(self, robot_id: str) -> None:
+        """Store robot serial number."""
+        self(META_DATA_TITLE, META_DATA_TEST_ROBOT_ID, [robot_id])
+
     def set_operator(self, operator: str) -> None:
         """Set operator."""
-        self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator])
+        if self._validate_meta_data:
+            result = CSVResult.from_bool(bool(operator))
+            self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator, result])
+        else:
+            self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator])
 
     def set_version(self, version: str) -> None:
         """Set version."""
@@ -401,5 +484,13 @@ class CSVReport:
         _report_str = str(self)
         assert self._file_name, "must set tag before saving to disk"
         return data_io.dump_data_to_file(
-            self._test_name, self._file_name, _report_str + "\n"
+            self._test_name, self._run_id, self._file_name, _report_str + "\n"
         )
+
+    def print_results(self) -> None:
+        """Print overall results."""
+        complete_msg = "complete" if self.completed else "incomplete"
+        print(f"done, {complete_msg} report -> {self.file_path}")
+        print("Overall Results:")
+        for line in self[RESULTS_OVERVIEW_TITLE].lines:
+            print(f" - {line.tag}: {line.result}")

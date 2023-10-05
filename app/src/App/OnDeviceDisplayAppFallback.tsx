@@ -38,7 +38,7 @@ export function OnDeviceDisplayAppFallback({
   }
   const modalHeader: ModalHeaderBaseProps = {
     title: t('error_boundary_title'),
-    iconName: 'information',
+    iconName: 'ot-alert',
     iconColor: COLORS.red2,
   }
 

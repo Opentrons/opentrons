@@ -78,27 +78,29 @@ def check_motion_bounds(
     )
     for ax in target_smoothie.keys():
         if target_smoothie[ax] < bounds[ax][0]:
-            bounds_message = bounds_message_format.format(
-                axis=ax,
-                tsp=target_smoothie[ax],
-                tdp=target_deck.get(ax, "unknown"),
-                dir="low",
-                limsp=bounds.get(ax, ("unknown",))[0],
-            )
+            format_detail = {
+                "axis": ax,
+                "tsp": target_smoothie[ax],
+                "tdp": target_deck.get(ax, "unknown"),
+                "dir": "low",
+                "limsp": bounds.get(ax, ("unknown",))[0],
+            }
+            bounds_message = bounds_message_format.format(**format_detail)
             mod_log.warning(bounds_message)
             if checks.value & MotionChecks.LOW.value:
-                raise OutOfBoundsMove(bounds_message)
+                raise OutOfBoundsMove(bounds_message, format_detail)
         elif target_smoothie[ax] > bounds[ax][1]:
-            bounds_message = bounds_message_format.format(
-                axis=ax,
-                tsp=target_smoothie[ax],
-                tdp=target_deck.get(ax, "unknown"),
-                dir="high",
-                limsp=bounds.get(ax, (None, "unknown"))[1],
-            )
+            format_detail = {
+                "axis": ax,
+                "tsp": target_smoothie[ax],
+                "tdp": target_deck.get(ax, "unknown"),
+                "dir": "high",
+                "limsp": bounds.get(ax, (None, "unknown"))[1],
+            }
+            bounds_message = bounds_message_format.format(**format_detail)
             mod_log.warning(bounds_message)
             if checks.value & MotionChecks.HIGH.value:
-                raise OutOfBoundsMove(bounds_message)
+                raise OutOfBoundsMove(bounds_message, format_detail)
 
 
 def ot2_axis_to_string(axis: Axis) -> str:

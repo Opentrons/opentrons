@@ -4,6 +4,7 @@
   "schemaVersion": 2,
   "parameters": {
     "loadName": "opentrons_96_pcr_adapter_armadillo_wellplate_200ul",
+    "quirks": ["gripperIncompatible"],
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false

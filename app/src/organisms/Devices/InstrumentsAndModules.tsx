@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -24,7 +23,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { InstrumentCard } from '../../molecules/InstrumentCard'
+import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
@@ -32,6 +31,7 @@ import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
   getIs96ChannelPipetteAttached,
   getOffsetCalibrationForMount,
+  getShowPipetteCalibrationWarning,
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
@@ -48,12 +48,6 @@ const FETCH_PIPETTE_CAL_POLL = 30000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
-
-const BANNER_LINK_CSS = css`
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: ${SPACING.spacing8};
-`
 
 export function InstrumentsAndModules({
   robotName,
@@ -74,22 +68,20 @@ export function InstrumentsAndModules({
     setSubsystemToUpdate,
   ] = React.useState<Subsystem | null>(null)
 
-  const { data: attachedInstruments } = useInstrumentsQuery()
-  // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
-  // { refetchInterval: EQUIPMENT_POLL_MS, },
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
+
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
-      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
-    ) ?? null
-  const badGripper =
-    (attachedInstruments?.data ?? []).find(
-      (i): i is BadGripper => i.subsystem === 'gripper' && !i.ok
+      (i): i is GripperData | BadGripper => i.subsystem === 'gripper'
     ) ?? null
   const attachedLeftPipette =
     attachedInstruments?.data?.find(
       (i): i is PipetteData =>
         i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
     ) ?? null
+  // A pipette is bad if it requires a firmware update.
   const badLeftPipette =
     attachedInstruments?.data?.find(
       (i): i is BadPipette =>
@@ -112,6 +104,11 @@ export function InstrumentsAndModules({
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
+  const attachPipetteRequired =
+    attachedLeftPipette == null && attachedRightPipette == null
+  const updatePipetteFWRequired =
+    badLeftPipette != null || badRightPipette != null
+
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // split modules in half and map into each column separately to avoid
@@ -185,6 +182,12 @@ export function InstrumentsAndModules({
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
+        {getShowPipetteCalibrationWarning(attachedInstruments) &&
+        (currentRunId == null || isRunTerminal) ? (
+          <Flex paddingBottom={SPACING.spacing16}>
+            <PipetteRecalibrationWarning />
+          </Flex>
+        ) : null}
         {isRobotViewable ? (
           <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
@@ -192,74 +195,36 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
             >
-              {badLeftPipette == null ? (
-                <PipetteCard
-                  pipetteId={attachedPipettes.left?.id}
-                  pipetteInfo={
-                    attachedPipettes.left?.model != null
-                      ? getPipetteModelSpecs(attachedPipettes.left?.model) ??
-                        null
-                      : null
-                  }
-                  isPipetteCalibrated={
-                    isOT3
-                      ? attachedLeftPipette?.data?.calibratedOffset != null
-                      : leftMountOffsetCalibration != null
-                  }
-                  mount={LEFT}
-                  robotName={robotName}
-                  is96ChannelAttached={is96ChannelAttached}
-                />
-              ) : (
-                <InstrumentCard
-                  label={t('mount', { side: 'left' })}
-                  description={t('instrument_attached')}
-                  banner={
-                    <Banner type="warning" marginBottom={SPACING.spacing4}>
-                      <Trans
-                        t={t}
-                        i18nKey="update_now"
-                        components={{
-                          calLink: (
-                            <StyledText
-                              as="p"
-                              css={BANNER_LINK_CSS}
-                              onClick={setSubsystemToUpdate('pipette_left')}
-                            />
-                          ),
-                        }}
-                      />
-                    </Banner>
-                  }
-                />
-              )}
-              {isOT3 && badGripper == null && (
+              <PipetteCard
+                pipetteId={attachedPipettes.left?.id}
+                pipetteModelSpecs={
+                  attachedPipettes.left?.model != null
+                    ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
+                    : null
+                }
+                isPipetteCalibrated={
+                  isOT3 && attachedLeftPipette?.ok
+                    ? attachedLeftPipette?.data?.calibratedOffset
+                        ?.last_modified != null
+                    : leftMountOffsetCalibration != null
+                }
+                mount={LEFT}
+                robotName={robotName}
+                pipetteIs96Channel={is96ChannelAttached}
+                pipetteIsBad={badLeftPipette != null}
+                updatePipette={() => setSubsystemToUpdate('pipette_left')}
+                isRunActive={currentRunId != null && !isRunTerminal}
+              />
+              {isOT3 && (
                 <GripperCard
                   attachedGripper={attachedGripper}
-                  isCalibrated={attachedGripper?.data?.calibratedOffset != null}
-                />
-              )}
-              {isOT3 && badGripper != null && (
-                <InstrumentCard
-                  label={t('shared:extension_mount')}
-                  description={t('instrument_attached')}
-                  banner={
-                    <Banner type="warning" marginBottom={SPACING.spacing4}>
-                      <Trans
-                        t={t}
-                        i18nKey="firmware_update_available_now"
-                        components={{
-                          updateLink: (
-                            <StyledText
-                              as="p"
-                              css={BANNER_LINK_CSS}
-                              onClick={() => setSubsystemToUpdate('gripper')}
-                            />
-                          ),
-                        }}
-                      />
-                    </Banner>
+                  isCalibrated={
+                    attachedGripper?.ok === true &&
+                    attachedGripper?.data?.calibratedOffset?.last_modified !=
+                      null
                   }
+                  setSubsystemToUpdate={setSubsystemToUpdate}
+                  isRunActive={currentRunId != null && !isRunTerminal}
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -270,6 +235,8 @@ export function InstrumentsAndModules({
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
+                  attachPipetteRequired={attachPipetteRequired}
+                  updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}
             </Flex>
@@ -278,46 +245,27 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
             >
-              {!Boolean(is96ChannelAttached) && badRightPipette == null && (
+              {!Boolean(is96ChannelAttached) && (
                 <PipetteCard
                   pipetteId={attachedPipettes.right?.id}
-                  pipetteInfo={
+                  pipetteModelSpecs={
                     attachedPipettes.right?.model != null
                       ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
                         null
                       : null
                   }
                   isPipetteCalibrated={
-                    isOT3
-                      ? attachedRightPipette?.data?.calibratedOffset != null
+                    isOT3 && attachedRightPipette?.ok
+                      ? attachedRightPipette?.data?.calibratedOffset
+                          ?.last_modified != null
                       : rightMountOffsetCalibration != null
                   }
                   mount={RIGHT}
                   robotName={robotName}
-                  is96ChannelAttached={false}
-                />
-              )}
-              {badRightPipette != null && (
-                <InstrumentCard
-                  label={t('mount', { side: 'right' })}
-                  description={t('instrument_attached')}
-                  banner={
-                    <Banner type="warning" marginBottom={SPACING.spacing4}>
-                      <Trans
-                        t={t}
-                        i18nKey="update_now"
-                        components={{
-                          calLink: (
-                            <StyledText
-                              as="p"
-                              css={BANNER_LINK_CSS}
-                              onClick={setSubsystemToUpdate('pipette_right')}
-                            />
-                          ),
-                        }}
-                      />
-                    </Banner>
-                  }
+                  pipetteIs96Channel={false}
+                  pipetteIsBad={badRightPipette != null}
+                  updatePipette={() => setSubsystemToUpdate('pipette_right')}
+                  isRunActive={currentRunId != null && !isRunTerminal}
                 />
               )}
               {rightColumnModules.map((module, index) => (
@@ -328,6 +276,8 @@ export function InstrumentsAndModules({
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
+                  attachPipetteRequired={attachPipetteRequired}
+                  updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}
             </Flex>

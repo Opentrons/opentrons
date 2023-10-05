@@ -1,7 +1,6 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, List, Optional, Union, Dict
-from typing_extensions import Literal
+from typing import cast, List, Optional, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -17,7 +16,6 @@ from ..types import (
     DeckPoint,
     DeckSlotLocation,
     LabwareLocation,
-    NonStackedLocation,
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
@@ -119,26 +117,6 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
-    def load_adapter(
-        self,
-        location: NonStackedLocation,
-        load_name: str,
-        namespace: str,
-        version: int,
-    ) -> commands.LoadAdapterResult:
-        """Execute a LoadLabware command and return the result."""
-        request = commands.LoadAdapterCreate(
-            params=commands.LoadAdapterParams(
-                location=location,
-                loadName=load_name,
-                namespace=namespace,
-                version=version,
-            )
-        )
-        result = self._transport.execute_command(request=request)
-
-        return cast(commands.LoadAdapterResult, result)
-
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
@@ -162,11 +140,9 @@ class SyncClient:
 
         return cast(commands.MoveLabwareResult, result)
 
-    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
-    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_pipette(
         self,
-        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
+        pipette_name: PipetteNameType,
         mount: MountType,
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""
@@ -281,6 +257,18 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.DropTipResult, result)
 
+    def configure_for_volume(
+        self, pipette_id: str, volume: float
+    ) -> commands.ConfigureForVolumeResult:
+        """Execute a ConfigureForVolume command."""
+        request = commands.ConfigureForVolumeCreate(
+            params=commands.ConfigureForVolumeParams(
+                pipetteId=pipette_id, volume=volume
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ConfigureForVolumeResult, result)
+
     def aspirate(
         self,
         pipette_id: str,
@@ -331,6 +319,7 @@ class SyncClient:
         well_location: WellLocation,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> commands.DispenseResult:
         """Execute a ``Dispense`` command and return the result."""
         request = commands.DispenseCreate(
@@ -341,6 +330,7 @@ class SyncClient:
                 wellLocation=well_location,
                 volume=volume,
                 flowRate=flow_rate,
+                pushOut=push_out,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -351,6 +341,7 @@ class SyncClient:
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        push_out: Optional[float],
     ) -> commands.DispenseInPlaceResult:
         """Execute a ``DispenseInPlace`` command and return the result."""
         request = commands.DispenseInPlaceCreate(
@@ -358,6 +349,7 @@ class SyncClient:
                 pipetteId=pipette_id,
                 volume=volume,
                 flowRate=flow_rate,
+                pushOut=push_out,
             )
         )
         result = self._transport.execute_command(request=request)

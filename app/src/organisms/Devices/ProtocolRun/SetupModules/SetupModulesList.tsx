@@ -15,6 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -26,7 +28,12 @@ import {
 } from '@opentrons/shared-data'
 import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
+import { useChainLiveCommands } from '../../../../resources/runs/hooks'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
+import { TertiaryButton } from '../../../../atoms/buttons'
+import { Tooltip } from '../../../../atoms/Tooltip'
+import { getModulePrepCommands } from '../../getModulePrepCommands'
+import { getModuleTooHot } from '../../getModuleTooHot'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import {
@@ -34,12 +41,15 @@ import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
+  useRunCalibrationStatus,
 } from '../../hooks'
-import { HeaterShakerWizard } from '../../HeaterShakerWizard'
+import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModuleImage } from './utils'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
+import type { ProtocolCalibrationStatus } from '../../hooks'
 
 interface SetupModulesListProps {
   robotName: string
@@ -58,7 +68,9 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
-  const isOt3 = useIsOT3(robotName)
+  const isOT3 = useIsOT3(robotName)
+
+  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
   const [
     showMultipleModulesModal,
@@ -120,14 +132,12 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           marginBottom={SPACING.spacing8}
-          data-testid="SetupModulesList_module_name"
           width="45%"
         >
           {t('module_name')}
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_location"
           marginRight={SPACING.spacing16}
           width="15%"
         >
@@ -135,18 +145,16 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         </StyledText>
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          data-testid="SetupModulesList_connection_status"
           marginRight={SPACING.spacing16}
           width="15%"
         >
-          {t('connection_status')}
+          {t('status')}
         </StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         width="100%"
         overflowY="auto"
-        data-testid="SetupModulesList_ListView"
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
@@ -160,7 +168,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 )}_slot_${slotName}`}
                 moduleModel={moduleDef.model}
                 displayName={moduleDef.displayName}
-                location={slotName}
+                slotName={slotName}
                 attachedModuleMatch={attachedModuleMatch}
                 heaterShakerModuleFromProtocol={
                   moduleRenderInfoForProtocolById[moduleId].moduleDef
@@ -168,7 +176,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     ? moduleRenderInfoForProtocolById[moduleId]
                     : null
                 }
-                isOt3={isOt3}
+                isOT3={isOT3}
+                calibrationStatus={calibrationStatus}
               />
             )
           }
@@ -181,34 +190,53 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 interface ModulesListItemProps {
   moduleModel: ModuleModel
   displayName: string
-  location: string
+  slotName: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
-  isOt3: boolean
+  isOT3: boolean
+  calibrationStatus: ProtocolCalibrationStatus
 }
 
-export const ModulesListItem = ({
+export function ModulesListItem({
   moduleModel,
   displayName,
-  location,
+  slotName,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
-  isOt3,
-}: ModulesListItemProps): JSX.Element => {
-  const { t } = useTranslation('protocol_setup')
+  isOT3,
+  calibrationStatus,
+}: ModulesListItemProps): JSX.Element {
+  const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
       : t('module_not_connected')
   const [
-    showHeaterShakerFlow,
-    setShowHeaterShakerFlow,
+    showModuleSetupModal,
+    setShowModuleSetupModal,
   ] = React.useState<Boolean>(false)
-  const heaterShakerAttachedModule =
-    attachedModuleMatch != null &&
-    attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
-      ? attachedModuleMatch
-      : null
+  const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
+
+  const handleCalibrateClick = (): void => {
+    if (attachedModuleMatch != null) {
+      chainLiveCommands(
+        getModulePrepCommands(attachedModuleMatch),
+        false
+      ).catch((e: Error) => {
+        setPrepCommandErrorMessage(e.message)
+      })
+    }
+    setShowModuleWizard(true)
+  }
+
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
 
   let subText: JSX.Element | null = null
   if (moduleModel === HEATERSHAKER_MODULE_V1) {
@@ -223,7 +251,7 @@ export const ModulesListItem = ({
           }
         `}
         marginTop={SPACING.spacing4}
-        onClick={() => setShowHeaterShakerFlow(true)}
+        onClick={() => setShowModuleSetupModal(true)}
       >
         <Flex flexDirection={DIRECTION_ROW}>
           <Icon
@@ -252,76 +280,124 @@ export const ModulesListItem = ({
       </StyledText>
     )
   }
+
+  const isModuleTooHot =
+    attachedModuleMatch != null ? getModuleTooHot(attachedModuleMatch) : false
+
+  let calibrateDisabledReason = t('calibrate_pipette_before_module_calibration')
+  if (calibrationStatus.reason === 'attach_pipette_failure_reason') {
+    calibrateDisabledReason = t('attach_pipette_before_module_calibration')
+  } else if (isModuleTooHot) {
+    calibrateDisabledReason = t('module_wizard_flows:module_too_hot')
+  }
+
+  let renderModuleStatus: JSX.Element = (
+    <StatusLabel
+      status={moduleConnectionStatus}
+      backgroundColor={COLORS.successBackgroundLight}
+      iconColor={COLORS.successEnabled}
+      textColor={COLORS.successText}
+    />
+  )
+
+  if (
+    isOT3 &&
+    attachedModuleMatch != null &&
+    attachedModuleMatch.moduleOffset?.last_modified == null
+  ) {
+    renderModuleStatus = (
+      <>
+        <TertiaryButton
+          {...targetProps}
+          onClick={handleCalibrateClick}
+          disabled={!calibrationStatus?.complete || isModuleTooHot}
+        >
+          {t('calibrate_now')}
+        </TertiaryButton>
+        {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
+        isModuleTooHot ? (
+          <Tooltip tooltipProps={tooltipProps}>
+            {calibrateDisabledReason}
+          </Tooltip>
+        ) : null}
+      </>
+    )
+  } else if (attachedModuleMatch == null) {
+    renderModuleStatus = (
+      <StatusLabel
+        status={moduleConnectionStatus}
+        backgroundColor={COLORS.warningBackgroundLight}
+        iconColor={COLORS.warningEnabled}
+        textColor={COLORS.warningText}
+      />
+    )
+  }
+
   return (
-    <Box
-      border={BORDERS.styleSolid}
-      borderColor={COLORS.medGreyEnabled}
-      borderWidth="1px"
-      borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing16}
-      backgroundColor={COLORS.white}
-      data-testid="ModulesListItem_Row"
-    >
-      {showHeaterShakerFlow && heaterShakerModuleFromProtocol != null ? (
-        <HeaterShakerWizard
-          onCloseClick={() => setShowHeaterShakerFlow(false)}
-          moduleFromProtocol={heaterShakerModuleFromProtocol}
-          attachedModule={heaterShakerAttachedModule}
+    <>
+      {showModuleWizard && attachedModuleMatch != null ? (
+        <ModuleWizardFlows
+          attachedModule={attachedModuleMatch}
+          closeFlow={() => setShowModuleWizard(false)}
+          initialSlotName={slotName}
+          isPrepCommandLoading={isCommandMutationLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        alignItems={JUSTIFY_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      <Box
+        border={BORDERS.styleSolid}
+        borderColor={COLORS.medGreyEnabled}
+        borderWidth="1px"
+        borderRadius={BORDERS.radiusSoftCorners}
+        padding={SPACING.spacing16}
+        backgroundColor={COLORS.white}
       >
-        <Flex alignItems={JUSTIFY_CENTER} width="45%">
-          <img width="60px" height="54px" src={getModuleImage(moduleModel)} />
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText
-              css={TYPOGRAPHY.pSemiBold}
-              marginLeft={SPACING.spacing20}
-            >
-              {displayName}
-            </StyledText>
-            {subText}
+        {showModuleSetupModal && heaterShakerModuleFromProtocol != null ? (
+          <ModuleSetupModal
+            close={() => setShowModuleSetupModal(false)}
+            moduleDisplayName={
+              heaterShakerModuleFromProtocol.moduleDef.displayName
+            }
+          />
+        ) : null}
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={JUSTIFY_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <Flex alignItems={JUSTIFY_CENTER} width="45%">
+            <img width="60px" height="54px" src={getModuleImage(moduleModel)} />
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText
+                css={TYPOGRAPHY.pSemiBold}
+                marginLeft={SPACING.spacing20}
+              >
+                {displayName}
+              </StyledText>
+              {subText}
+            </Flex>
+          </Flex>
+          <StyledText as="p" width="15%">
+            {t('slot_location', {
+              slotName:
+                getModuleType(moduleModel) === 'thermocyclerModuleType'
+                  ? isOT3
+                    ? TC_MODULE_LOCATION_OT3
+                    : TC_MODULE_LOCATION_OT2
+                  : slotName,
+            })}
+          </StyledText>
+          <Flex width="15%">
+            {moduleModel === MAGNETIC_BLOCK_V1 ? (
+              <StyledText as="p"> {t('n_a')}</StyledText>
+            ) : (
+              renderModuleStatus
+            )}
           </Flex>
         </Flex>
-        <StyledText as="p" width="15%">
-          {t('slot_location', {
-            slotName:
-              getModuleType(moduleModel) === 'thermocyclerModuleType'
-                ? isOt3
-                  ? TC_MODULE_LOCATION_OT3
-                  : TC_MODULE_LOCATION_OT2
-                : location,
-          })}
-        </StyledText>
-        <Flex width="15%">
-          {moduleModel === MAGNETIC_BLOCK_V1 ? (
-            <StyledText as="p"> {t('n_a')}</StyledText>
-          ) : (
-            <StatusLabel
-              id={location}
-              status={moduleConnectionStatus}
-              backgroundColor={
-                attachedModuleMatch != null
-                  ? COLORS.successBackgroundLight
-                  : COLORS.warningBackgroundLight
-              }
-              iconColor={
-                attachedModuleMatch != null
-                  ? COLORS.successEnabled
-                  : COLORS.warningEnabled
-              }
-              textColor={
-                attachedModuleMatch != null
-                  ? COLORS.successText
-                  : COLORS.warningText
-              }
-            />
-          )}
-        </Flex>
-      </Flex>
-    </Box>
+      </Box>
+    </>
   )
 }

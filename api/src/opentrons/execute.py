@@ -62,9 +62,11 @@ from opentrons.protocol_engine import (
     DeckType,
     EngineStatus,
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
+    command_monitor as pe_command_monitor,
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
+from opentrons.protocol_engine.types import PostRunHardwareState
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
@@ -406,13 +408,6 @@ def execute(  # noqa: C901
     else:
         # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
         # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
-        if emit_runlog:
-            raise NotImplementedError(
-                f"Printing the run log is not currently supported for Python protocols"
-                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-                f" Pass --no-print-runlog to opentrons_execute"
-                f" or emit_runlog=None to opentrons.execute.execute()."
-            )
         if custom_data_paths:
             raise NotImplementedError(
                 f"The custom_data_paths argument is not currently supported for Python protocols"
@@ -424,6 +419,7 @@ def execute(  # noqa: C901
             protocol_name=protocol_name,
             extra_labware=extra_labware,
             hardware_api=_get_global_hardware_controller(_get_robot_type()).wrapped(),
+            emit_runlog=emit_runlog,
         )
 
 
@@ -572,7 +568,8 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(),
-            drop_tips_and_home_after=False,
+            drop_tips_after_run=False,
+            post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         )
     )
 
@@ -640,8 +637,13 @@ def _run_file_pe(
     protocol_name: str,
     extra_labware: Dict[str, FoundLabware],
     hardware_api: HardwareControlAPI,
+    emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
     """Run a protocol file with Protocol Engine."""
+
+    def send_command_to_emit_runlog(event: pe_command_monitor.Event) -> None:
+        if emit_runlog is not None:
+            emit_runlog(_adapt_command(event))
 
     async def run(protocol_source: ProtocolSource) -> None:
         protocol_engine = await create_protocol_engine(
@@ -655,9 +657,12 @@ def _run_file_pe(
             hardware_api=hardware_api,
         )
 
-        # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
-        # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-        result = await protocol_runner.run(protocol_source)
+        with pe_command_monitor.monitor_commands(
+            protocol_engine, callback=send_command_to_emit_runlog
+        ):
+            # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
+            # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
+            result = await protocol_runner.run(protocol_source)
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
             raise _ProtocolEngineExecuteError(result.state_summary.errors)
@@ -728,6 +733,32 @@ def _adapt_protocol_source(
         )
 
         yield protocol_source
+
+
+def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMessage:
+    """Convert a Protocol Engine command event to an old-school command_types.CommandMesage."""
+    before_or_after: command_types.MessageSequenceId = (
+        "before" if isinstance(event, pe_command_monitor.RunningEvent) else "after"
+    )
+
+    message: command_types.CommentMessage = {
+        # TODO(mm, 2023-09-26): If we can without breaking the public API, remove the requirement
+        # to supply a "name" here. If we can't do that, consider adding a special name value
+        # so we don't have to lie and call every command a comment.
+        "name": "command.COMMENT",
+        "id": event.command.id,
+        "$": before_or_after,
+        # TODO(mm, 2023-09-26): Convert this machine-readable JSON into a human-readable message
+        # to match behavior from before Protocol Engine.
+        # https://opentrons.atlassian.net/browse/RSS-320
+        "payload": {"text": event.command.json()},
+        # As far as I know, "error" is not part of the public-facing API, so it doesn't matter
+        # what we put here. Leaving it as `None` to avoid difficulties in converting between
+        # the Protocol Engine `ErrorOccurrence` model and the regular Python `Exception` type
+        # that this field expects.
+        "error": None,
+    }
+    return message
 
 
 def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:

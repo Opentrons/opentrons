@@ -121,14 +121,15 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
           wells={props.missingTips}
         />
       )}
-      {props.wellLabelOption && (
-        <WellLabels
-          definition={props.definition}
-          wellLabelOption={props.wellLabelOption}
-          wellLabelColor={props.wellLabelColor}
-          highlightedWellLabels={props.highlightedWellLabels}
-        />
-      )}
+      {props.wellLabelOption &&
+        props.definition.metadata.displayCategory !== 'adapter' && (
+          <WellLabels
+            definition={props.definition}
+            wellLabelOption={props.wellLabelOption}
+            wellLabelColor={props.wellLabelColor}
+            highlightedWellLabels={props.highlightedWellLabels}
+          />
+        )}
     </g>
   )
 }

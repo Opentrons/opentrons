@@ -36,6 +36,7 @@ from .command_unions import (
     CommandCreate,
     CommandResult,
     CommandType,
+    CommandPrivateResult,
 )
 
 from .aspirate import (
@@ -118,14 +119,6 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
-from .load_adapter import (
-    LoadAdapter,
-    LoadAdapterParams,
-    LoadAdapterCreate,
-    LoadAdapterResult,
-    LoadAdapterCommandType,
-)
-
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -149,6 +142,7 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+    LoadPipettePrivateResult,
 )
 
 from .move_labware import (
@@ -264,6 +258,14 @@ from .retract_axis import (
     RetractAxisCommandType,
 )
 
+from .configure_for_volume import (
+    ConfigureForVolume,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeResult,
+    ConfigureForVolumeCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -271,8 +273,10 @@ __all__ = [
     "CommandCreate",
     "CommandResult",
     "CommandType",
+    "CommandPrivateResult",
     # base interfaces
     "AbstractCommandImpl",
+    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
@@ -347,12 +351,6 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
-    # load adapter command models
-    "LoadAdapter",
-    "LoadAdapterCreate",
-    "LoadAdapterParams",
-    "LoadAdapterResult",
-    "LoadAdapterCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
@@ -365,6 +363,7 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    "LoadPipettePrivateResult",
     # move labware command models
     "MoveLabware",
     "MoveLabwareCreate",
@@ -458,4 +457,10 @@ __all__ = [
     "thermocycler",
     # calibration command bundle
     "calibration",
+    # configure pipette volume command bundle
+    "ConfigureForVolume",
+    "ConfigureForVolumeCreate",
+    "ConfigureForVolumeParams",
+    "ConfigureForVolumeResult",
+    "ConfigureForVolumeCommandType",
 ]

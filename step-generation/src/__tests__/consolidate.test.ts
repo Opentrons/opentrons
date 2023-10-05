@@ -25,7 +25,7 @@ import {
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
@@ -97,6 +97,7 @@ beforeEach(() => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
+    dropTipLocation: FIXED_TRASH_ID,
   }
 })
 
@@ -1044,7 +1045,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1068,7 +1069,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1110,7 +1111,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1151,7 +1152,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1193,7 +1194,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1234,7 +1235,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1276,7 +1277,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1301,7 +1302,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1325,7 +1326,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1389,7 +1390,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1413,7 +1414,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1455,7 +1456,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1496,7 +1497,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1538,7 +1539,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1563,7 +1564,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1587,7 +1588,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1648,7 +1649,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1726,7 +1727,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1750,7 +1751,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1792,7 +1793,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1833,7 +1834,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1875,7 +1876,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1916,7 +1917,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -1958,7 +1959,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -1983,7 +1984,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2007,7 +2008,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2071,7 +2072,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2095,7 +2096,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2137,7 +2138,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2178,7 +2179,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2220,7 +2221,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2245,7 +2246,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2269,7 +2270,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2328,7 +2329,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2406,7 +2407,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2430,7 +2431,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2472,7 +2473,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2513,7 +2514,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2555,7 +2556,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2596,7 +2597,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2638,7 +2639,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2663,7 +2664,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2687,7 +2688,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2748,7 +2749,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2794,7 +2795,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2818,7 +2819,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2860,7 +2861,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2901,7 +2902,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2943,7 +2944,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -2968,7 +2969,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -2992,7 +2993,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 12,
@@ -3051,7 +3052,7 @@ describe('consolidate single-channel', () => {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           key: expect.any(String),
           params: {
             seconds: 11,
@@ -3092,7 +3093,7 @@ describe('consolidate multi-channel', () => {
     destWell: 'A12',
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
-
+    dropTipLocation: FIXED_TRASH_ID,
     // volume and changeTip should be explicit in tests
 
     preWetTip: false,

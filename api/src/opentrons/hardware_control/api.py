@@ -20,6 +20,10 @@ from typing import (
     cast,
 )
 
+from opentrons_shared_data.errors.exceptions import (
+    PositionUnknownError,
+    UnsupportedHardwareCommand,
+)
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
@@ -51,10 +55,8 @@ from .types import (
     PauseType,
     StatusBarState,
     EstopState,
-)
-from .errors import (
-    MustHomeError,
-    NotSupportedByHardware,
+    SubSystem,
+    SubSystemState,
 )
 from . import modules
 from .robot_calibration import (
@@ -326,6 +328,9 @@ class API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
+    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return {}
+
     # Incidentals (i.e. not motion) API
 
     async def set_lights(
@@ -485,14 +490,15 @@ class API(
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    async def halt(self) -> None:
-        """Immediately stop motion.
+    async def halt(self, disengage_before_stopping: bool = False) -> None:
+        """Immediately stop motion, cancel execution manager and cancel running tasks.
 
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
-        await self._backend.hard_halt()
-        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
+        if disengage_before_stopping:
+            await self._backend.hard_halt()
+        await self._backend.halt()
 
     async def stop(self, home_after: bool = True) -> None:
         """
@@ -502,7 +508,8 @@ class API(
         see :py:meth:`pause` for more detail), then home and reset the
         robot. After this call, no further recovery is necessary.
         """
-        await self._backend.halt()
+        await self._backend.halt()  # calls smoothie_driver.kill()
+        await self._execution_manager.cancel()
         self._log.info("Recovering from halt")
         await self.reset()
         await self.cache_instruments()
@@ -594,10 +601,13 @@ class API(
         # No internal code passes OT3 axes as arguments on an OT2. But a user/ client
         # can still explicitly specify an OT3 axis even when working on an OT2.
         # Adding this check in order to prevent misuse of axes types.
-        if axes and any(axis not in Axis.ot2_axes() for axis in axes):
-            raise NotSupportedByHardware(
-                f"At least one axis in {axes} is not supported on the OT2."
-            )
+        if axes:
+            unsupported = list(axis not in Axis.ot2_axes() for axis in axes)
+            if any(unsupported):
+                raise UnsupportedHardwareCommand(
+                    message=f"At least one axis in {axes} is not supported on the OT2.",
+                    detail={"unsupported_axes": unsupported},
+                )
         self._reset_last_mount()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis.ot2_axes()]
@@ -634,16 +644,24 @@ class API(
         plunger_ax = Axis.of_plunger(mount)
         position_axes = [Axis.X, Axis.Y, z_ax, plunger_ax]
 
-        if fail_on_not_homed and (
-            not self._backend.is_homed([ot2_axis_to_string(a) for a in position_axes])
-            or not self._current_position
-        ):
-            raise MustHomeError(
-                f"Current position of {str(mount)} pipette is unknown, please home."
-            )
-
+        if fail_on_not_homed:
+            if not self._current_position:
+                raise PositionUnknownError(
+                    message=f"Current position of {str(mount)} pipette is unknown,"
+                    " please home.",
+                    detail={"mount": str(mount), "missing_axes": position_axes},
+                )
+            axes_str = [ot2_axis_to_string(a) for a in position_axes]
+            if not self._backend.is_homed(axes_str):
+                unhomed = self._backend._unhomed_axes(axes_str)
+                raise PositionUnknownError(
+                    message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
+                    detail={"mount": str(mount), "unhomed_axes": unhomed},
+                )
         elif not self._current_position and not refresh:
-            raise MustHomeError("Current position is unknown; please home motors.")
+            raise PositionUnknownError(
+                message="Current position is unknown; please home motors."
+            )
         async with self._motion_lock:
             if refresh:
                 smoothie_pos = await self._backend.update_position()
@@ -723,7 +741,10 @@ class API(
         The effector of the x,y axis is the center of the carriage.
         The effector of the pipette mount axis are the mount critical points but only in z.
         """
-        raise NotSupportedByHardware("move_axes is not supported on the OT-2.")
+        raise UnsupportedHardwareCommand(
+            message="move_axes is not supported on the OT-2.",
+            detail={"axes_commanded": list(position.keys())},
+        )
 
     async def move_rel(
         self,
@@ -741,23 +762,32 @@ class API(
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
         # really want to fix it when we're not gearing up for a release.
-        mhe = MustHomeError(
-            "Cannot make a relative move because absolute position is unknown"
-        )
         if not self._current_position:
             if fail_on_not_homed:
-                raise mhe
+                raise PositionUnknownError(
+                    message="Cannot make a relative move because absolute position"
+                    " is unknown.",
+                    detail={
+                        "mount": str(mount),
+                        "fail_on_not_homed": fail_on_not_homed,
+                    },
+                )
             else:
                 await self.home()
 
         target_position = target_position_from_relative(
             mount, delta, self._current_position
         )
+
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
-        if fail_on_not_homed and not self._backend.is_homed(
-            [ot2_axis_to_string(axis) for axis in axes_moving if axis is not None]
-        ):
-            raise mhe
+        axes_str = [ot2_axis_to_string(a) for a in axes_moving]
+        if fail_on_not_homed and not self._backend.is_homed(axes_str):
+            unhomed = self._backend._unhomed_axes(axes_str)
+            raise PositionUnknownError(
+                message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
+                detail={"mount": str(mount), "unhomed_axes": unhomed},
+            )
+
         await self._cache_and_maybe_retract_mount(mount)
         await self._move(
             target_position,
@@ -930,7 +960,7 @@ class API(
         Prepare the pipette for aspiration.
         """
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE)
+        self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE, mount)
 
         if instrument.current_volume == 0:
             speed = self.plunger_speed(
@@ -983,12 +1013,13 @@ class API(
         mount: top_types.Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        push_out: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.
         """
 
-        dispense_spec = self.plan_check_dispense(mount, volume, rate)
+        dispense_spec = self.plan_check_dispense(mount, volume, rate, push_out)
         if not dispense_spec:
             return
         target_pos = target_position_from_plunger(

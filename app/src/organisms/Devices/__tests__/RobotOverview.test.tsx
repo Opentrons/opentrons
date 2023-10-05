@@ -12,7 +12,7 @@ import { useAuthorization } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getConfig, useFeatureFlag } from '../../../redux/config'
 import {
   getRobotAddressesByName,
@@ -29,6 +29,7 @@ import {
   useLights,
   useRobot,
   useRunStatuses,
+  useIsRobotViewable,
 } from '../hooks'
 import {
   expectedBadDeckTaskList,
@@ -51,7 +52,7 @@ import type { State } from '../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/robot-controls')
-jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot-update/selectors')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../ProtocolUpload/hooks')
@@ -115,8 +116,8 @@ const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFu
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
-const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
-  typeof getBuildrootUpdateDisplayInfo
+const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
+  typeof getRobotUpdateDisplayInfo
 >
 const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
@@ -124,11 +125,12 @@ const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
 const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
   typeof getRobotAddressesByName
 >
-
 const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-
 const mockUseAuthorization = useAuthorization as jest.MockedFunction<
   typeof useAuthorization
+>
+const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
+  typeof useIsRobotViewable
 >
 
 const mockToggleLights = jest.fn()
@@ -196,6 +198,7 @@ describe('RobotOverview', () => {
         authorizationToken: { token: 'my.authorization.jwt' },
         registrationToken: { token: 'my.registration.jwt' },
       })
+    when(mockUseIsRobotViewable).mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -250,6 +253,18 @@ describe('RobotOverview', () => {
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
+  })
+
+  it('does not render a missing calibration status label when the robot is not viewable', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedIncompleteDeckCalTaskList
+    )
+    mockUseFeatureFlag.mockReturnValue(true)
+    when(mockUseIsRobotViewable).mockReturnValue(false)
+    const [{ queryByText }] = render(props)
+    expect(
+      queryByText('Robot is missing calibration data')
+    ).not.toBeInTheDocument()
   })
 
   it('renders a recommended recalibration status label when the deck is bad and calibration wizard feature flag is set', () => {

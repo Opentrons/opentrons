@@ -261,9 +261,19 @@ class RobotClient:
         return response
 
     async def get_analysis(self, protocol_id: str, analysis_id: str) -> Response:
-        """GET /protocols/{protocol_id}/{analysis_id}."""
+        """GET /protocols/{protocol_id}/analyses/{analysis_id}."""
         response = await self.httpx_client.get(
             url=f"{self.base_url}/protocols/{protocol_id}/analyses/{analysis_id}"
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_analysis_as_document(
+        self, protocol_id: str, analysis_id: str
+    ) -> Response:
+        """GET /protocols/{protocol_id}/analyses/{analysis_id}/asDocument."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}/analyses/{analysis_id}/asDocument"
         )
         response.raise_for_status()
         return response
@@ -290,6 +300,20 @@ class RobotClient:
         response = await self.httpx_client.post(
             url=f"{self.base_url}/settings/reset",
             json=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_sessions(self) -> Response:
+        """GET /sessions."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/sessions")
+        response.raise_for_status()
+        return response
+
+    async def delete_session(self, session_id: str) -> Response:
+        """DELETE /sessions/{session_id}."""
+        response = await self.httpx_client.delete(
+            url=f"{self.base_url}/sessions/{session_id}"
         )
         response.raise_for_status()
         return response

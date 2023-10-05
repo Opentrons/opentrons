@@ -15,7 +15,6 @@ from typing import (
     Set,
     Union,
     Mapping,
-    Iterator,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
@@ -29,8 +28,6 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
-    create_tip_action_group,
-    PipetteAction,
     NODEID_SUBSYSTEM,
     motor_nodes,
     target_to_subsystem,
@@ -62,6 +59,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     SubSystemState,
     TipStateType,
+    GripperJawState,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -139,6 +137,7 @@ class OT3Simulator:
         self._initialized = False
         self._lights = {"button": False, "rails": False}
         self._estop_state_machine = EstopStateMachine(detector=None)
+        self._gear_motor_position: Dict[NodeId, float] = {}
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -189,6 +188,7 @@ class OT3Simulator:
             nodes.add(NodeId.gripper)
         self._present_nodes = nodes
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+        self._sim_jaw_state = GripperJawState.HOMED_READY
 
     @property
     def initialized(self) -> bool:
@@ -202,6 +202,10 @@ class OT3Simulator:
     @property
     def eeprom_data(self) -> EEPROMData:
         return EEPROMData()
+
+    @property
+    def gear_motor_position(self) -> Dict[NodeId, float]:
+        return self._gear_motor_position
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -252,21 +256,32 @@ class OT3Simulator:
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
-    def _get_motor_status(self, ax: Sequence[Axis]) -> Iterator[Optional[MotorStatus]]:
-        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+    def _get_motor_status(
+        self, axes: Sequence[Axis]
+    ) -> Dict[Axis, Optional[MotorStatus]]:
+        return {ax: self._motor_status.get(axis_to_node(ax)) for ax in axes}
+
+    def get_invalid_motor_axes(self, axes: Sequence[Axis]) -> List[Axis]:
+        """Get axes that currently do not have the motor-ok flag."""
+        return [
+            ax
+            for ax, status in self._get_motor_status(axes).items()
+            if not status or not status.motor_ok
+        ]
+
+    def get_invalid_encoder_axes(self, axes: Sequence[Axis]) -> List[Axis]:
+        """Get axes that currently do not have the encoder-ok flag."""
+        return [
+            ax
+            for ax, status in self._get_motor_status(axes).items()
+            if not status or not status.encoder_ok
+        ]
 
     def check_motor_status(self, axes: Sequence[Axis]) -> bool:
-        return all(
-            isinstance(status, MotorStatus) and status.motor_ok
-            for status in self._get_motor_status(axes)
-        )
+        return len(self.get_invalid_motor_axes(axes)) == 0
 
     def check_encoder_status(self, axes: Sequence[Axis]) -> bool:
-        """If any of the encoder statuses is ok, parking can proceed."""
-        return all(
-            isinstance(status, MotorStatus) and status.encoder_ok
-            for status in self._get_motor_status(axes)
-        )
+        return len(self.get_invalid_encoder_axes(axes)) == 0
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
@@ -293,7 +308,7 @@ class OT3Simulator:
         log_pressure: bool = True,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
-        sensor_id: SensorId = SensorId.S0,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> Dict[NodeId, float]:
 
         head_node = axis_to_node(Axis.by_mount(mount))
@@ -351,15 +366,18 @@ class OT3Simulator:
         self,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
+        stay_engaged: bool = True,
     ) -> None:
         """Move gripper inward."""
-        _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
+        _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition, stay_engaged)
+        self._sim_jaw_state = GripperJawState.GRIPPING
 
     @ensure_yield
     async def gripper_home_jaw(self, duty_cycle: float) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group(duty_cycle)
         self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
+        self._sim_jaw_state = GripperJawState.HOMED_READY
 
     @ensure_yield
     async def gripper_hold_jaw(
@@ -368,26 +386,40 @@ class OT3Simulator:
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
+        self._sim_jaw_state = GripperJawState.HOLDING
 
-    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+    async def check_for_tip_presence(
+        self,
+        mount: OT3Mount,
+        tip_state: TipStateType,
+        expect_multiple_responses: bool = False,
+    ) -> None:
         """Raise an error if the given state doesn't match the physical state."""
         pass
 
-    async def get_tip_present_state(self, mount: OT3Mount) -> int:
+    async def get_tip_present_state(
+        self, mount: OT3Mount, expect_multiple_responses: bool = False
+    ) -> bool:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 
-    @ensure_yield
+    async def get_jaw_state(self) -> GripperJawState:
+        """Get the state of the gripper jaw."""
+        return self._sim_jaw_state
+
     async def tip_action(
         self,
-        axes: Sequence[Axis],
-        distance: float = 33,
-        speed: float = -5.5,
-        tip_action: str = "drop",
+        moves: List[Move[Axis]],
     ) -> None:
-        _ = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
-        )
+        pass
+
+    async def home_tip_motors(
+        self,
+        distance: float,
+        velocity: float,
+        back_off: bool = True,
+    ) -> None:
+        pass
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
@@ -508,8 +540,20 @@ class OT3Simulator:
         return None
 
     @asynccontextmanager
-    async def restore_current(self) -> AsyncIterator[None]:
+    async def motor_current(
+        self,
+        run_currents: OT3AxisMap[float] = {},
+        hold_currents: OT3AxisMap[float] = {},
+    ) -> AsyncIterator[None]:
         """Save the current."""
+        yield
+
+    @asynccontextmanager
+    async def restore_z_r_run_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily restore the active current ONLY when homing or
+        retracting the Z_R axis while the 96-channel is attached.
+        """
         yield
 
     @ensure_yield
@@ -533,6 +577,7 @@ class OT3Simulator:
             Axis.Y: phony_bounds,
             Axis.X: phony_bounds,
             Axis.Z_G: phony_bounds,
+            Axis.Q: phony_bounds,
         }
 
     @property
@@ -656,8 +701,9 @@ class OT3Simulator:
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-    ) -> None:
+    ) -> bool:
         self._position[axis_to_node(moving)] += distance_mm
+        return True
 
     @ensure_yield
     async def capacitive_pass(

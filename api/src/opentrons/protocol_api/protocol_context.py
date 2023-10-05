@@ -14,9 +14,10 @@ from typing import (
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -41,7 +42,6 @@ from .core.module import (
     AbstractMagneticBlockCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
-from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
@@ -101,7 +101,7 @@ class ProtocolContext(CommandPublisher):
         self,
         api_version: APIVersion,
         core: ProtocolCore,
-        broker: Optional[Broker] = None,
+        broker: Optional[LegacyBroker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
         bundled_data: Optional[Dict[str, bytes]] = None,
@@ -232,6 +232,14 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def commands(self) -> List[str]:
+        """Return the run log.
+
+        This is a list of human-readable strings representing what's been done in the protocol so
+        far. For example, "Aspirating 123 µL from well A1 of 96 well plate in slot 1."
+
+        The exact format of these entries is not guaranteed. The format here may differ from other
+        places that show the run log, such as the Opentrons App.
+        """
         return self._commands
 
     @requires_version(2, 0)
@@ -365,7 +373,9 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_labware(
             load_name=load_name,
@@ -471,7 +481,9 @@ class ProtocolContext(CommandPublisher):
         if isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_adapter(
             load_name=load_name,
@@ -532,13 +544,10 @@ class ProtocolContext(CommandPublisher):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
-        """Move a loaded labware to a new location.
+        """Move a loaded labware to a new location. See :ref:`moving-labware` for more details.
 
-        *** This API method is currently being developed. ***
-        *** Expect changes without API level bump.        ***
-
-        :param labware: Labware to move. Should be a labware already loaded
-                        using :py:meth:`load_labware`
+        :param labware: The labware to move. It should be a labware already loaded
+                        using :py:meth:`load_labware`.
 
         :param new_location: Where to move the labware to. This is either:
 
@@ -549,27 +558,23 @@ class ProtocolContext(CommandPublisher):
                   with :py:meth:`load_labware` or :py:meth:`load_adapter`.
                 * The special constant :py:obj:`OFF_DECK`.
 
-        :param use_gripper: Whether to use gripper to perform this move.
-                            If True, will use the gripper to perform the move (OT3 only).
-                            If False, will pause protocol execution to allow the user
-                            to perform a manual move and click resume to continue
-                            protocol execution.
+        :param use_gripper: Whether to use the Flex Gripper for this movement.
 
-        Other experimental params:
+                * If ``True``, will use the gripper to perform an automatic
+                  movement. This will raise an error on an OT-2 protocol.
+                * If ``False``, will pause protocol execution until the user
+                  performs the movement. Protocol execution remains paused until
+                  the user presses **Confirm and resume**.
 
-        :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
-                                                associated with its pick up location.
-        :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
-                                             associated with its drop off location.
-        :param pick_up_offset: Offset to use when picking up labware.
-        :param drop_offset: Offset to use when dropping off labware.
+        Gripper-only parameters:
 
-        Before moving a labware from or to a hardware module, make sure that the labware
-        and its new location is reachable by the gripper. So, thermocycler lid should be
-        open and heater-shaker's labware latch should be open.
+        :param pick_up_offset: Optional x, y, z vector offset to use when picking up labware.
+        :param drop_offset: Optional x, y, z vector offset to use when dropping off labware.
+
+        Before moving a labware to or from a hardware module, make sure that the labware's
+        current and new locations are accessible, i.e., open the Thermocycler lid or
+        open the Heater-Shaker's labware latch.
         """
-        # TODO (spp, 2022-10-31): re-evaluate whether to allow specifying `use_gripper`
-        #  in the args or whether to have it specified in protocol requirements.
 
         if not isinstance(labware, Labware):
             raise ValueError(
@@ -582,7 +587,9 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(new_location, OffDeckType):
             location = new_location
         else:
-            location = validation.ensure_deck_slot(new_location, self._api_version)
+            location = validation.ensure_and_convert_deck_slot(
+                new_location, self._api_version, self._core.robot_type
+            )
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
@@ -598,6 +605,7 @@ class ProtocolContext(CommandPublisher):
             labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
+            pause_for_manual_move=True,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
@@ -679,7 +687,9 @@ class ProtocolContext(CommandPublisher):
         deck_slot = (
             None
             if location is None
-            else validation.ensure_deck_slot(location, self._api_version)
+            else validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
         )
 
         module_core = self._core.load_module(
@@ -754,16 +764,22 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
+        # TODO (spp: 2023-08-30): disallow loading Flex pipettes on OT-2 by checking robotType
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        is_96_channel = instrument_name in ("p1000_96", "flex_96channel_1000")
-        if is_96_channel and isinstance(self._core, ProtocolEngineCore):
-            checked_instrument_name = instrument_name
-            checked_mount = Mount.LEFT
-        else:
-            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-            checked_mount = validation.ensure_mount(mount)
+        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
+
+        checked_mount = Mount.LEFT if is_96_channel else validation.ensure_mount(mount)
 
         tip_racks = tip_racks or []
+
+        # TODO (tz, 9-12-23): move validation into PE
+        on_right_mount = self._instruments[Mount.RIGHT]
+        if is_96_channel and on_right_mount is not None:
+            raise RuntimeError(
+                f"Instrument already present on right:"
+                f" {on_right_mount.name}. In order to load a 96 channel pipette both mounts need to be available."
+            )
 
         existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
@@ -777,10 +793,8 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
-        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._core.load_instrument(
-            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
+            instrument_name=checked_instrument_name,
             mount=checked_mount,
         )
 
@@ -916,6 +930,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def deck(self) -> Deck:
         """An interface to provide information about what's currently loaded on the deck.
+        This object is useful for determining if a slot in the deck is free.
 
         This object behaves like a dictionary whose keys are the deck slot names.
         For instance, ``protocol.deck[1]``, ``protocol.deck["1"]``, and ``protocol.deck["D1"]``
@@ -925,14 +940,23 @@ class ProtocolContext(CommandPublisher):
         labware, a :py:obj:`~opentrons.protocol_api.ModuleContext` if the slot contains a hardware
         module, or ``None`` if the slot doesn't contain anything.
 
-        This object is useful for determining if a slot in the deck is free.
-
         Rather than filtering the objects in the deck map yourself,
-        you can also use :py:attr:`loaded_labwares` to see a dict of labwares
-        and :py:attr:`loaded_modules` to see a dict of modules.
+        you can also use :py:attr:`loaded_labwares` to get a dict of labwares
+        and :py:attr:`loaded_modules` to get a dict of modules.
 
-        For advanced control, you can delete an item of labware from the deck
-        with e.g. ``del protocol.deck['1']`` to free a slot for new labware.
+        For :ref:`advanced-control` *only*, you can delete an element of the ``deck`` dict.
+        This only works for deck slots that contain labware objects. For example, if slot
+        1 contains a labware, ``del protocol.deck['1']`` will free the slot so you can
+        load another labware there.
+
+        .. warning::
+            Deleting labware from a deck slot does not pause the protocol. Subsequent
+            commands continue immediately. If you need to physically move the labware to
+            reflect the new deck state, add a :py:meth:`.pause` or use
+            :py:meth:`.move_labware` instead.
+
+        .. versionchanged:: 2.15
+           ``del`` sets the corresponding labware's location to ``OFF_DECK``.
         """
         return self._deck
 
@@ -1002,7 +1026,7 @@ def _create_module_context(
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,
-    broker: Broker,
+    broker: LegacyBroker,
 ) -> ModuleTypes:
     module_cls: Optional[Type[ModuleTypes]] = None
     if isinstance(module_core, AbstractTemperatureModuleCore):

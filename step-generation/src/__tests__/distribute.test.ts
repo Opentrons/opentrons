@@ -81,6 +81,7 @@ beforeEach(() => {
     dispenseDelay: null,
     aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
+    dropTipLocation: FIXED_TRASH_ID,
   }
 
   blowoutSingleToTrash = blowoutHelper(FIXED_TRASH_ID, {

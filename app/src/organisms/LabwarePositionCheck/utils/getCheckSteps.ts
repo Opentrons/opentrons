@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash'
 import { SECTIONS } from '../constants'
 import { getLabwareDefinitionsFromCommands } from './labware'
 import {
@@ -19,6 +20,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LabwareLocationCombo } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -43,6 +45,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
+    adapterId: lastTiprackCheckStep.adapterId,
   }
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
@@ -51,6 +54,7 @@ export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
+    adapterId: lastTiprackCheckStep.adapterId,
   }
 
   return [
@@ -109,16 +113,31 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     ...onlySecondaryPipettePickUpTipCommands,
     ...uniqPrimaryPipettePickUpTipCommands,
   ].reduce<CheckTipRacksStep[]>((acc, { params }) => {
-    const labwareLocations = labwareLocationCombos.filter(
-      combo => combo.labwareId === params.labwareId
-    )
+    const labwareLocations = labwareLocationCombos.reduce<
+      LabwareLocationCombo[]
+    >((acc, labwareLocationCombo) => {
+      // remove labware that isn't accessed by a pickup tip command
+      if (labwareLocationCombo.labwareId !== params.labwareId) {
+        return acc
+      }
+      // remove duplicate definitionUri in same location
+      const comboAlreadyExists = acc.some(
+        accLocationCombo =>
+          labwareLocationCombo.definitionUri ===
+            accLocationCombo.definitionUri &&
+          isEqual(labwareLocationCombo.location, accLocationCombo.location)
+      )
+      return comboAlreadyExists ? acc : [...acc, labwareLocationCombo]
+    }, [])
+
     return [
       ...acc,
-      ...labwareLocations.map(({ location }) => ({
+      ...labwareLocations.map(({ location, adapterId }) => ({
         section: SECTIONS.CHECK_TIP_RACKS,
         labwareId: params.labwareId,
         pipetteId: params.pipetteId,
         location,
+        adapterId,
       })),
     ]
   }, [])
@@ -139,7 +158,8 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       )
     }
     const isTiprack = getIsTiprack(labwareDef)
-    if (isTiprack) return acc // skip any labware that is a tiprack
+    const adapter = (labwareDef?.allowedRoles ?? []).includes('adapter')
+    if (isTiprack || adapter) return acc // skip any labware that is a tiprack or adapter
 
     const labwareLocationCombos = getLabwareLocationCombos(
       commands,
@@ -149,7 +169,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     return [
       ...acc,
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
-        (innerAcc, { location, labwareId, moduleId }) => {
+        (innerAcc, { location, labwareId, moduleId, adapterId }) => {
           if (labwareId !== currentLabware.id) {
             return innerAcc
           }
@@ -162,6 +182,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
               pipetteId: primaryPipetteId,
               location,
               moduleId,
+              adapterId,
             },
           ]
         },

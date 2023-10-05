@@ -50,8 +50,11 @@ export const generateRobotStateTimeline = (
       // we know the current tip(s) aren't going to be reused, so we can drop them
       // immediately after the current step is done.
       const pipetteId = StepGeneration.getPipetteIdFromCCArgs(args)
+      const dropTipLocation =
+        'dropTipLocation' in args ? args.dropTipLocation : null
 
-      if (pipetteId) {
+      //  assume that whenever we have a pipetteId we also have a dropTipLocation
+      if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
           // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
@@ -71,6 +74,7 @@ export const generateRobotStateTimeline = (
                   curriedCommandCreator,
                   StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
                     pipette: pipetteId,
+                    dropTipLocation,
                   }),
                 ],
                 _invariantContext,

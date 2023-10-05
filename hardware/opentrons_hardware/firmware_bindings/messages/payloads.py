@@ -229,8 +229,8 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 class MotorPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 
-    current_position: utils.UInt32Field
-    encoder_position: utils.Int32Field
+    current_position_um: utils.UInt32Field
+    encoder_position_um: utils.Int32Field
     position_flags: MotorPositionFlagsField
 
 
@@ -521,11 +521,19 @@ class GripperInfoResponsePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class GripperJawStatePayload(EmptyPayload):
+    """A respones carrying info about the jaw state of a gripper."""
+
+    state: utils.UInt8Field
+
+
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
     duty_cycle: utils.UInt32Field
     encoder_position_um: utils.Int32Field
+    stay_engaged: utils.UInt8Field
 
 
 @dataclass(eq=False)
@@ -541,6 +549,7 @@ class PushTipPresenceNotificationPayload(EmptyPayload):
     """A notification that the ejector flag status has changed."""
 
     ejector_flag_status: utils.UInt8Field
+    sensor_id: SensorIdField
 
 
 @dataclass(eq=False)
@@ -550,6 +559,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
     request_stop_condition: MoveStopConditionField
+    acceleration: utils.Int32Field
 
 
 @dataclass(eq=False)

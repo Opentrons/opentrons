@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -10,11 +9,9 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   DIRECTION_ROW,
-  ALIGN_FLEX_END,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 import { CardButton } from '../../molecules/CardButton'
@@ -62,7 +59,7 @@ export function NetworkSetupMenu(): JSX.Element {
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black}
           >
-            {t('connect_to_a_network')}
+            {t('choose_network_type')}
           </StyledText>
         </Flex>
         <Flex
@@ -92,15 +89,6 @@ export function NetworkSetupMenu(): JSX.Element {
               description={t(networkOption.description)}
             />
           ))}
-        </Flex>
-        <Flex
-          alignSelf={ALIGN_FLEX_END}
-          marginTop={SPACING.spacing24}
-          width="fit-content"
-        >
-          <Link to="menu">
-            <TertiaryButton>To ODD Menu</TertiaryButton>
-          </Link>
         </Flex>
       </Flex>
     </>

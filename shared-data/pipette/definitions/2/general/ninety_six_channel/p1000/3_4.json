@@ -20,16 +20,24 @@
     "run": 0.8
   },
   "plungerPositionsConfigurations": {
-    "top": 0.5,
-    "bottom": 68.5,
-    "blowout": 73.5,
-    "drop": 80
+    "default": {
+      "top": 0.5,
+      "bottom": 68.5,
+      "blowout": 73.5,
+      "drop": 80
+    }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": { "count": 2 },
-    "capacitive": { "count": 2 },
-    "environment": { "count": 1 }
+    "pressure": {
+      "count": 2
+    },
+    "capacitive": {
+      "count": 2
+    },
+    "environment": {
+      "count": 1
+    }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -40,5 +48,9 @@
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904,
   "backlashDistance": 0.3,
-  "quirks": []
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 0.8,
+    "speed": 5
+  }
 }

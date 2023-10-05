@@ -25,14 +25,13 @@ export const MountingPlate = (
 
   const handleAttachMountingPlate = (): void => {
     setNumberOfTryAgains(numberOfTryAgains + 1)
-    chainRunCommands(
+    chainRunCommands?.(
       [
         {
           commandType: 'home' as const,
           params: { axes: ['rightZ'] },
         },
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: LEFT,

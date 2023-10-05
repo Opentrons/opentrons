@@ -33,6 +33,7 @@ describe('NavigationMenu', () => {
     props = {
       onClick: jest.fn(),
       robotName: 'otie',
+      setShowNavMenu: jest.fn(),
     }
     mockUseLights.mockReturnValue({
       lightsOn: false,
@@ -42,14 +43,14 @@ describe('NavigationMenu', () => {
       <div>mock RestartRobotConfirmationModal</div>
     )
   })
-  it('should render the home menu item and clicking home robot arm, dispatches home', () => {
+  it('should render the home menu item and clicking home gantry, dispatches home and call a mock function', () => {
     const { getByText, getByLabelText } = render(props)
     getByLabelText('BackgroundOverlay_ModalShell').click()
     expect(props.onClick).toHaveBeenCalled()
-    const home = getByText('Home gantry')
     getByLabelText('home-gantry_icon')
-    home.click()
+    getByText('Home gantry').click()
     expect(mockHome).toHaveBeenCalled()
+    expect(props.setShowNavMenu).toHaveBeenCalled()
   })
 
   it('should render the restart robot menu item and clicking it, dispatches restart robot', () => {
@@ -75,5 +76,12 @@ describe('NavigationMenu', () => {
     })
     const { getByText } = render(props)
     getByText('Lights off')
+  })
+
+  // ToDo (kk:09/29/2023) menu item clicking test will be added
+  it('should render the deck configuration menu item', () => {
+    const { getByText, getByLabelText } = render(props)
+    getByText('Deck configuration')
+    getByLabelText('deck-map_icon')
   })
 })

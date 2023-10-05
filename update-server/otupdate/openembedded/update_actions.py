@@ -127,7 +127,7 @@ class RootFSInterface:
 
             # check that the uncompressed size is greater than the partition size
             partition_size = PartitionManager.get_partition_size(part.path)
-            if total_size >= partition_size:
+            if total_size > partition_size:
                 msg = f"Write failed, update size ({total_size}) is larger than partition size {part.path} ({partition_size})."
                 LOG.error(msg)
                 return False, msg

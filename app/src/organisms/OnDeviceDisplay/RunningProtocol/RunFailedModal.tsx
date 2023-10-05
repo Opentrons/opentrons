@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import isEmpty from 'lodash/isEmpty'
 import { css } from 'styled-components'
 
 import {
@@ -66,7 +65,14 @@ export function RunFailedModal({
       header={modalHeader}
       onOutsideClick={() => setShowRunFailedModal(false)}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing40}
+        width="100%"
+        css={css`
+          word-break: break-all;
+        `}
+      >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing16}
@@ -91,14 +97,15 @@ export function RunFailedModal({
               <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
                 {highestPriorityError.detail}
               </StyledText>
-              {!isEmpty(highestPriorityError.errorInfo) && (
-                <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-                  {JSON.stringify(highestPriorityError.errorInfo)}
-                </StyledText>
-              )}
             </Flex>
           </Flex>
-          <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <StyledText
+            as="p"
+            textAlign={TYPOGRAPHY.textAlignLeft}
+            css={css`
+              word-break: break-word;
+            `}
+          >
             {t('contact_information')}
           </StyledText>
         </Flex>
@@ -134,7 +141,11 @@ const SCROLL_BAR_STYLE = css`
 `
 
 const _getHighestPriorityError = (error: RunError): RunError => {
-  if (error.wrappedErrors.length === 0) {
+  if (
+    error == null ||
+    error.wrappedErrors == null ||
+    error.wrappedErrors.length === 0
+  ) {
     return error
   }
 

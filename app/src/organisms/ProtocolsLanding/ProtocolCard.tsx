@@ -3,12 +3,13 @@ import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
-  OT3_STANDARD_MODEL,
+  FLEX_STANDARD_MODEL,
   getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
@@ -55,7 +56,6 @@ interface ProtocolCardProps {
   handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
-
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
@@ -78,6 +78,16 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis
   )
 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
+  instruments  or modules from a future version of the app. Please update 
+  the app to the most recent version to run this protocol.`
+
+  const UnknownAttachmentError = (
+    <StyledText color={COLORS.errorEnabled}>
+      {UNKNOWN_ATTACHMENT_ERROR}
+    </StyledText>
+  )
+
   return (
     <Box
       backgroundColor={COLORS.white}
@@ -89,13 +99,15 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       onClick={() => history.push(`/protocols/${protocolKey}`)}
       css={BORDERS.cardOutlineBorder}
     >
-      <AnalysisInfo
-        protocolKey={protocolKey}
-        mostRecentAnalysis={mostRecentAnalysis}
-        protocolDisplayName={protocolDisplayName}
-        isAnalyzing={isAnalyzing}
-        modified={modified}
-      />
+      <ErrorBoundary fallback={UnknownAttachmentError}>
+        <AnalysisInfo
+          protocolKey={protocolKey}
+          mostRecentAnalysis={mostRecentAnalysis}
+          protocolDisplayName={protocolDisplayName}
+          isAnalyzing={isAnalyzing}
+          modified={modified}
+        />
+      </ErrorBoundary>
       <Box
         position={POSITION_ABSOLUTE}
         top={SPACING.spacing4}
@@ -198,7 +210,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             <Flex gridGap={SPACING.spacing16}>
               <Flex
                 flex={`0 0 ${
-                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                  robotType === FLEX_STANDARD_MODEL ? '6.2rem' : SIZE_2
                 }`}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
@@ -287,7 +299,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <StyledText as="label" color={COLORS.darkGreyEnabled}>
                 {`${t('updated')} ${format(
                   new Date(modified),
-                  'MMM dd yy HH:mm'
+                  'M/d/yy HH:mm'
                 )}`}
               </StyledText>
             </Flex>

@@ -11,13 +11,14 @@ import type {
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
   LoadLiquidRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+  LoadFixtureRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 interface PipetteNamesByMount {
   left: PipetteName | null
@@ -117,11 +118,44 @@ export function parseInitialLoadedLabwareBySlot(
     .reverse()
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
-    (acc, command) =>
-      typeof command.params.location === 'object' &&
-      'slotName' in command.params.location
-        ? { ...acc, [command.params.location.slotName]: command }
-        : acc,
+    (acc, command) => {
+      if (
+        typeof command.params.location === 'object' &&
+        'slotName' in command.params.location
+      ) {
+        return { ...acc, [command.params.location.slotName]: command }
+      } else {
+        return acc
+      }
+    },
+    {}
+  )
+}
+
+interface LoadedLabwareByAdapter {
+  [labwareId: string]: LoadLabwareRunTimeCommand
+}
+export function parseInitialLoadedLabwareByAdapter(
+  commands: RunTimeCommand[]
+): LoadedLabwareByAdapter {
+  const loadLabwareCommandsReversed = commands
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reverse()
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
+    loadLabwareCommandsReversed,
+    (acc, command) => {
+      if (
+        typeof command.params.location === 'object' &&
+        'labwareId' in command.params.location
+      ) {
+        return { ...acc, [command.params.location.labwareId]: command }
+      } else {
+        return acc
+      }
+    },
     {}
   )
 }
@@ -177,18 +211,37 @@ interface LoadedModulesBySlot {
 export function parseInitialLoadedModulesBySlot(
   commands: RunTimeCommand[]
 ): LoadedModulesBySlot {
-  const loadLabwareCommandsReversed = commands
+  const loadModuleCommandsReversed = commands
     .filter(
       (command): command is LoadModuleRunTimeCommand =>
         command.commandType === 'loadModule'
     )
     .reverse()
   return reduce<LoadModuleRunTimeCommand, LoadedModulesBySlot>(
-    loadLabwareCommandsReversed,
+    loadModuleCommandsReversed,
     (acc, command) =>
       'slotName' in command.params.location
         ? { ...acc, [command.params.location.slotName]: command }
         : acc,
+    {}
+  )
+}
+
+interface LoadedFixturesBySlot {
+  [slotName: string]: LoadFixtureRunTimeCommand
+}
+export function parseInitialLoadedFixturesByCutout(
+  commands: RunTimeCommand[]
+): LoadedFixturesBySlot {
+  const loadFixtureCommandsReversed = commands
+    .filter(
+      (command): command is LoadFixtureRunTimeCommand =>
+        command.commandType === 'loadFixture'
+    )
+    .reverse()
+  return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
+    loadFixtureCommandsReversed,
+    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
     {}
   )
 }

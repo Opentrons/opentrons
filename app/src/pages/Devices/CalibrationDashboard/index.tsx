@@ -25,6 +25,7 @@ export function CalibrationDashboard(): JSX.Element {
   const [
     dashboardDeckCalLauncher,
     DashboardDeckCalWizard,
+    wasExitBeforeCompletion,
   ] = useDashboardCalibrateDeck(robotName)
   return (
     <ApiHostProvider
@@ -37,6 +38,7 @@ export function CalibrationDashboard(): JSX.Element {
         deckCalLauncher={dashboardDeckCalLauncher}
         tipLengthCalLauncher={dashboardTipLengthCalLauncher}
         pipOffsetCalLauncher={dashboardOffsetCalLauncher}
+        wasExitBeforeCompletion={wasExitBeforeCompletion}
       />
       {DashboardDeckCalWizard}
       {DashboardOffsetCalWizard}

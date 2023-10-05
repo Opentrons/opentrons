@@ -94,7 +94,7 @@ describe('ProtocolSetupLabware', () => {
   it('renders the Labware Setup page', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Labware')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Location')
     getByRole('button', { name: 'Map View' })
   })
@@ -106,10 +106,10 @@ describe('ProtocolSetupLabware', () => {
   })
 
   it('should launch and close the deck map', () => {
-    const [{ getByRole, getByText, getByTestId }] = render()
+    const [{ getByRole, getByText, getByLabelText }] = render()
 
     getByRole('button', { name: 'Map View' }).click()
-    getByTestId('ModalHeader_icon_close_Map View').click()
+    getByLabelText('closeIcon').click()
     getByText('Labware')
   })
 

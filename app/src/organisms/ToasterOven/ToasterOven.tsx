@@ -25,8 +25,6 @@ interface ToasterOvenProps {
   children: React.ReactNode
 }
 
-const TOASTER_OVEN_SIZE = 5
-
 /**
  * A toaster oven that renders up to 5 toasts in an app-level display container
  * @param children passes through and renders children
@@ -53,16 +51,35 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     options?: MakeToastOptions
   ): string {
     const id = uuidv4()
-
-    setToasts(t =>
-      [{ id, message, type, ...options }, ...t].slice(0, TOASTER_OVEN_SIZE)
-    )
+    const toastsForRemoval = toasts.map(toast => {
+      return {
+        ...toast,
+        exitNow: true,
+        zIndex: 1,
+        position: POSITION_FIXED,
+      }
+    })
+    setToasts(t => [
+      {
+        id,
+        message,
+        type,
+        ...options,
+        zIndex: 2,
+        position: POSITION_FIXED,
+      },
+      ...toastsForRemoval,
+    ])
 
     return id
   }
 
-  function makeSnackbar(message: string, options?: MakeSnackbarOptions): void {
-    setSnackbar({ message, ...options })
+  function makeSnackbar(
+    message: string,
+    duration?: number,
+    options?: MakeSnackbarOptions
+  ): void {
+    setSnackbar({ message, duration, ...options })
   }
 
   // This function is needed to actually make the snackbar auto-close in the context of the
@@ -89,7 +106,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           alignItems={ALIGN_FLEX_END}
           position={POSITION_FIXED}
           right={SPACING.spacing32}
-          bottom={SPACING.spacing16}
+          bottom={SPACING.spacing32}
           zIndex={1000}
           width="100%"
         >

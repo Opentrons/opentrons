@@ -14,8 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from opentrons_shared_data.errors import EnumeratedError
 
-from ..resources import pipette_data_provider
-from ..commands import Command, CommandCreate
+from ..commands import Command, CommandCreate, CommandPrivateResult
 from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
 
 
@@ -52,10 +51,12 @@ class StopAction:
     After a StopAction, the engine status will be marked as stopped.
     """
 
+    from_estop: bool = False
+
 
 @dataclass(frozen=True)
 class FinishErrorDetails:
-    """Error details for the payload of a FinishAction."""
+    """Error details for the payload of a FinishAction or HardwareStoppedAction."""
 
     error: Exception
     error_id: str
@@ -64,21 +65,27 @@ class FinishErrorDetails:
 
 @dataclass(frozen=True)
 class FinishAction:
-    """Gracefully stop processing commands in the engine.
-
-    After a FinishAction, the engine status will be marked as `succeeded` or `failed`
-    if `set_run_status` is True. If False, status will be `stopped`.
-    """
+    """Gracefully stop processing commands in the engine."""
 
     set_run_status: bool = True
+    """Whether to set the engine status depending on `error_details`.
+
+    If True, the engine status will be marked `succeeded` or `failed`, depending on `error_details`.
+    If False, the engine status will be marked `stopped`.
+    """
+
     error_details: Optional[FinishErrorDetails] = None
+    """The fatal error that caused the run to fail."""
 
 
 @dataclass(frozen=True)
 class HardwareStoppedAction:
-    """An action dispatched after hardware has successfully been stopped."""
+    """An action dispatched after hardware has been stopped for good, for this engine instance."""
 
     completed_at: datetime
+
+    finish_error_details: Optional[FinishErrorDetails]
+    """The error that happened while doing post-run finish steps (homing and dropping tips)."""
 
 
 @dataclass(frozen=True)
@@ -103,6 +110,7 @@ class UpdateCommandAction:
     """Update a given command."""
 
     command: Command
+    private_result: CommandPrivateResult
 
 
 @dataclass(frozen=True)
@@ -172,15 +180,6 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
-@dataclass(frozen=True)
-class AddPipetteConfigAction:
-    """Adds a pipette's static config to the state store."""
-
-    pipette_id: str
-    serial_number: str
-    config: pipette_data_provider.LoadedStaticPipetteData
-
-
 Action = Union[
     PlayAction,
     PauseAction,
@@ -197,5 +196,4 @@ Action = Union[
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    AddPipetteConfigAction,
 ]

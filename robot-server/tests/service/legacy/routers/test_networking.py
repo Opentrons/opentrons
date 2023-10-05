@@ -5,6 +5,7 @@ from mock import patch
 
 import pytest
 from opentrons.system import nmcli, wifi
+from typing import Optional
 
 
 def test_networking_status(api_client, monkeypatch):
@@ -84,7 +85,7 @@ def test_wifi_list(api_client, monkeypatch):
         },
     ]
 
-    async def mock_available():
+    async def mock_available(rescan: Optional[bool] = False):
         return expected_res
 
     monkeypatch.setattr(nmcli, "available_ssids", mock_available)

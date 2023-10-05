@@ -6,7 +6,7 @@ from typing import Dict
 from hardware_testing.opentrons_api.types import Point
 
 
-LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=96)
+LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=100)
 LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - LOCATION_A1_LEFT.x)
 
 PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
@@ -36,7 +36,18 @@ class PressureEventConfig:
 
 
 PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 11.0, 1000: 12.0}
-PRESSURE_FIXTURE_INSERT_DEPTH = {50: 28.5, 1000: 33.0}
+PRESSURE_FIXTURE_INSERT_DEPTH = {50: 30.0, 1000: 30.0}
+
+PRESSURE_ASPIRATE_DELTA_SPEC = {
+    1: {
+        50: {"delta": 1350.0, "margin": 0.1},  # absolute value  # percent of delta
+        1000: {"delta": 1000.0, "margin": 0.1},  # absolute value  # percent of delta
+    },
+    8: {
+        50: {"delta": 4000.0, "margin": 0.99},  # absolute value  # percent of delta
+        1000: {"delta": 4000.0, "margin": 0.99},  # absolute value  # percent of delta
+    },
+}
 
 DEFAULT_PRESSURE_SAMPLE_DELAY = 0.25
 DEFAULT_PRESSURE_SAMPLE_COUNT = 10
@@ -49,15 +60,15 @@ DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE = int(
     (1 * 60) / DEFAULT_PRESSURE_SAMPLE_DELAY
 )
 PRESSURE_NONE = PressureEventConfig(
-    min=-10.0,
-    max=10.0,
+    min=-8000.0,
+    max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=2.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_INSERTED = PressureEventConfig(
-    min=3000.0,
+    min=-8000.0,
     max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=50.0,
@@ -65,16 +76,16 @@ PRESSURE_INSERTED = PressureEventConfig(
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P50 = PressureEventConfig(
-    min=2000.0,
-    max=7000.0,
+    min=-8000.0,
+    max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=200.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
-    min=2000.0,
-    max=7000.0,
+    min=-8000.0,
+    max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=200.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,

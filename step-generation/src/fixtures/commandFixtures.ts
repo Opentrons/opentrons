@@ -1,11 +1,11 @@
+import { FIXED_TRASH_ID } from '../constants'
 import { tiprackWellNamesFlat } from './data'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   AspDispAirgapParams,
   BlowoutParams,
   TouchTipParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import { FIXED_TRASH_ID } from '../constants'
-import type { CreateCommand } from '@opentrons/shared-data'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
@@ -94,6 +94,7 @@ export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'
 export const TROUGH_LABWARE = 'troughId'
 export const DEFAULT_BLOWOUT_WELL = 'A1'
+export const TIPRACK_1 = 'tiprack1Id'
 export const AIR_GAP_META = { isAirGap: true } // to differentiate if the aspirate or dispense command is an air gap or not
 // =================
 type MakeAspDispHelper<P> = (
@@ -238,7 +239,7 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
 })
 export const delayCommand = (seconds: number): CreateCommand => ({
-  commandType: 'delay',
+  commandType: 'waitForDuration',
   key: expect.any(String),
   params: {
     seconds: seconds,
@@ -268,7 +269,7 @@ export const delayWithOffset = (
     },
   },
   {
-    commandType: 'delay',
+    commandType: 'waitForDuration',
     key: expect.any(String),
     params: {
       seconds: seconds ?? 12,

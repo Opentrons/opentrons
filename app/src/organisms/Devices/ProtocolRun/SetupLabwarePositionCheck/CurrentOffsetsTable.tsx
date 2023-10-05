@@ -7,7 +7,6 @@ import pick from 'lodash/pick'
 import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
-  getModuleDisplayName,
 } from '@opentrons/shared-data'
 import {
   Flex,
@@ -30,6 +29,8 @@ import type {
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
+import { getDisplayLocation } from '../../../LabwarePositionCheck/utils/getDisplayLocation'
+import { getLabwareDefinitionsFromCommands } from '../../../LabwarePositionCheck/utils/labware'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -65,7 +66,7 @@ export function CurrentOffsetsTable(
   props: CurrentOffsetsTableProps
 ): JSX.Element {
   const { currentOffsets, commands, labware, modules } = props
-  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
@@ -90,10 +91,12 @@ export function CurrentOffsetsTable(
           return (
             <OffsetTableRow key={offset.id}>
               <OffsetTableDatum>
-                {t('slot', { slotName: offset.location.slotName })}
-                {offset.location.moduleModel != null
-                  ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
-                  : null}
+                {getDisplayLocation(
+                  offset.location,
+                  getLabwareDefinitionsFromCommands(commands),
+                  t,
+                  i18n
+                )}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
               <OffsetTableDatum>
@@ -134,7 +137,7 @@ export function CurrentOffsetsTable(
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
     >
-      <StyledText as="h6">{t('applied_offset_data')}</StyledText>
+      <StyledText as="label">{t('applied_offset_data')}</StyledText>
       {isLabwareOffsetCodeSnippetsOn ? (
         <LabwareOffsetTabs
           TableComponent={TableComponent}

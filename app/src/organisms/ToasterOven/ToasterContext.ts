@@ -3,7 +3,10 @@ import * as React from 'react'
 import type { ToastProps, ToastType } from '../../atoms/Toast'
 import type { SnackbarProps } from '../../atoms/Snackbar'
 
-export type MakeToastOptions = Omit<ToastProps, 'id' | 'message' | 'type'>
+export type MakeToastOptions = Omit<
+  ToastProps,
+  'id' | 'message' | 'type' | 'exitNow'
+>
 
 type MakeToast = (
   message: string,
@@ -27,4 +30,8 @@ export const ToasterContext = React.createContext<ToasterContextType>({
 
 export type MakeSnackbarOptions = Omit<SnackbarProps, 'message'>
 
-type MakeSnackbar = (message: string, options?: MakeSnackbarOptions) => void
+type MakeSnackbar = (
+  message: string,
+  duration?: number,
+  options?: MakeSnackbarOptions
+) => void

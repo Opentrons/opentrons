@@ -64,3 +64,11 @@ async def test_engage_from_base_cycle(magdeck: MagDeck) -> None:
         "data": {"engaged": False, "height": 0.0},
         "status": "disengaged",
     }
+
+
+async def test_forcible_deactivate(
+    magdeck: MagDeck, execution_manager: ExecutionManager
+) -> None:
+    """Can override wait_for_is_running."""
+    await execution_manager.pause()
+    await magdeck.deactivate(must_be_running=False)

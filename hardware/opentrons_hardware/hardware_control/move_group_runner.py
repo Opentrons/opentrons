@@ -10,6 +10,7 @@ from opentrons_shared_data.errors.exceptions import (
     GeneralError,
     MoveConditionNotMetError,
     EnumeratedError,
+    EStopActivatedError,
     MotionFailedError,
     PythonException,
 )
@@ -18,7 +19,6 @@ from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     ErrorCode,
-    MotorPositionFlags,
     ErrorSeverity,
     GearMotorId,
     MoveAckId,
@@ -71,8 +71,11 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     MoveStopConditionField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motor_position_status import (
+    extract_motor_status_info,
+)
 
-from .types import NodeDict
+from .types import NodeDict, MotorPositionStatus
 
 log = logging.getLogger(__name__)
 
@@ -126,7 +129,7 @@ class MoveGroupRunner:
 
     async def execute(
         self, can_messenger: CanMessenger
-    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+    ) -> NodeDict[MotorPositionStatus]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
         prep() and execute() can be used to replace a single call to run() to
@@ -143,9 +146,7 @@ class MoveGroupRunner:
         move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
-    async def run(
-        self, can_messenger: CanMessenger
-    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+    async def run(self, can_messenger: CanMessenger) -> NodeDict[MotorPositionStatus]:
         """Run the move group.
 
         Args:
@@ -169,39 +170,48 @@ class MoveGroupRunner:
     @staticmethod
     def _accumulate_move_completions(
         completions: _Completions,
-    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+    ) -> NodeDict[MotorPositionStatus]:
         position: NodeDict[
-            List[Tuple[Tuple[int, int], float, float, bool, bool]]
+            List[Tuple[Tuple[int, int], MotorPositionStatus]]
+        ] = defaultdict(list)
+        gear_motor_position: NodeDict[
+            List[Tuple[Tuple[int, int], MotorPositionStatus]]
         ] = defaultdict(list)
         for arbid, completion in completions:
-            if isinstance(completion, TipActionResponse):
-                continue
-            position[NodeId(arbid.parts.originating_node_id)].append(
+            move_info = (
                 (
-                    (
-                        completion.payload.group_id.value,
-                        completion.payload.seq_id.value,
-                    ),
-                    float(completion.payload.current_position_um.value) / 1000.0,
-                    float(completion.payload.encoder_position_um.value) / 1000.0,
-                    bool(
-                        completion.payload.position_flags.value
-                        & MotorPositionFlags.stepper_position_ok.value
-                    ),
-                    bool(
-                        completion.payload.position_flags.value
-                        & MotorPositionFlags.encoder_position_ok.value
-                    ),
-                )
+                    completion.payload.group_id.value,
+                    completion.payload.seq_id.value,
+                ),
+                extract_motor_status_info(completion),
             )
+            if isinstance(completion, TipActionResponse):
+                # if any completions are TipActionResponses, separate them from the 'positions'
+                # dict so the left pipette's position doesn't get overwritten
+                gear_motor_position[NodeId(arbid.parts.originating_node_id)].append(
+                    move_info
+                )
+            else:
+                position[NodeId(arbid.parts.originating_node_id)].append(move_info)
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
+        if any(gear_motor_position):
+            return {
+                node: next(
+                    reversed(
+                        sorted(
+                            poslist, key=lambda position_element: position_element[0]
+                        )
+                    )
+                )[1]
+                for node, poslist in gear_motor_position.items()
+            }
         return {
             node: next(
                 reversed(
                     sorted(poslist, key=lambda position_element: position_element[0])
                 )
-            )[1:]
+            )[1]
             for node, poslist in position.items()
         }
 
@@ -267,6 +277,7 @@ class MoveGroupRunner:
             ),
             duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             encoder_position_um=Int32Field(int(step.encoder_position_um)),
+            stay_engaged=UInt8Field(int(step.stay_engaged)),
         )
         if step.move_type == MoveType.home:
             return GripperHomeRequest(payload=payload)
@@ -326,6 +337,17 @@ class MoveGroupRunner:
             ),
             action=PipetteTipActionTypeField(step.action),
             request_stop_condition=MoveStopConditionField(step.stop_condition),
+            acceleration=Int32Field(
+                int(
+                    (
+                        step.acceleration_mm_sec_sq
+                        * 1000.0
+                        / tip_interrupts_per_sec
+                        / tip_interrupts_per_sec
+                    )
+                    * (2**31)
+                )
+            ),
         )
         return TipActionRequest(payload=tip_action_payload)
 
@@ -352,7 +374,7 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[List[MoveStopCondition]] = []
         self._start_at_index = start_at_index
-        self._expected_tip_action_motors: List[List[List[GearMotorId]]] = []
+        self._expected_tip_action_motors = []
 
         for move_group in move_groups:
             move_set = set()
@@ -485,7 +507,7 @@ class MoveScheduler:
         elif isinstance(message, TipActionResponse):
             if self._handle_tip_action_motors(message):
                 self._remove_move_group(message, arbitration_id)
-            self._handle_move_completed(message, arbitration_id)
+                self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
 
@@ -505,6 +527,18 @@ class MoveScheduler:
                 nodes.append(NodeId(node_id))
         return nodes
 
+    def _filtered_errors(self) -> List[EnumeratedError]:
+        """If multiple errors occurred, filter which ones we raise.
+
+        This function primarily handles the case when an Estop is pressed during a run.
+        Multiple kinds of error messages may arise, but the only one that is important
+        to raise is the message about the Estop.
+        """
+        for err in self._errors:
+            if isinstance(err, EStopActivatedError):
+                return [err]
+        return self._errors
+
     async def _send_stop_if_necessary(
         self, can_messenger: CanMessenger, group_id: int
     ) -> None:
@@ -517,12 +551,13 @@ class MoveScheduler:
             if err != ErrorCode.stop_requested:
                 log.warning("Stop request failed")
             if self._errors:
-                if len(self._errors) > 1:
+                errors_to_show = self._filtered_errors()
+                if len(errors_to_show) > 1:
                     raise MotionFailedError(
-                        "Motion failed with multiple errors", wrapping=self._errors
+                        "Motion failed with multiple errors", wrapping=errors_to_show
                     )
                 else:
-                    raise self._errors[0]
+                    raise errors_to_show[0]
             else:
                 # This happens when the move completed without stop condition
                 raise MoveConditionNotMetError(detail={"group-id": str(group_id)})

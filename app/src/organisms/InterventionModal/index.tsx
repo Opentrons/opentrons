@@ -18,11 +18,9 @@ import {
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   ALIGN_FLEX_START,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
-  Link,
   Icon,
   PrimaryButton,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -84,7 +82,7 @@ const FOOTER_STYLE = {
   display: DISPLAY_FLEX,
   width: '100%',
   alignItems: ALIGN_CENTER,
-  justifyContent: JUSTIFY_SPACE_BETWEEN,
+  justifyContent: JUSTIFY_FLEX_END,
 } as const
 
 export interface InterventionModalProps {
@@ -204,6 +202,8 @@ export function InterventionModal({
           <Box {...CONTENT_STYLE}>
             {childContent}
             <Box {...FOOTER_STYLE}>
+              {/* 
+              TODO(BC, 08/31/23): reintroduce this link and justify space between when support article is written 
               <Link css={TYPOGRAPHY.darkLinkH4SemiBold} href="" external>
                 {t('protocol_info:manual_steps_learn_more')}
                 <Icon
@@ -212,6 +212,7 @@ export function InterventionModal({
                   size="0.5rem"
                 />
               </Link>
+              */}
               <PrimaryButton onClick={onResume}>
                 {t('confirm_and_resume')}
               </PrimaryButton>

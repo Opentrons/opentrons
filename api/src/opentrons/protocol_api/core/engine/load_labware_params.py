@@ -7,7 +7,8 @@ from opentrons.protocol_engine.state.labware import LabwareLoadParams
 # Default versions of Opentrons standard labware definitions in Python Protocol API
 # v2.14 and above. Labware not explicitly listed here default to 1.
 #
-# This will need to be extended t
+# TODO(jbl 2023-08-01) this needs to be done more holistically, both to find the version and make sure that
+#   it corresponds to the API level is was released with
 _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     # v1 of many labware definitions have wrong `zDimension`s. (Jira RSS-202.)
     # For "opentrons_96_aluminumblock_generic_pcr_strip_200ul" and
@@ -18,36 +19,24 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     # The following labware definitions have had a version bump due to using new properties
     # introduced in an inplace schema v2 update
     "armadillo_96_wellplate_200ul_pcr_full_skirt": 2,
+    "biorad_96_wellplate_200ul_pcr": 2,
+    "biorad_384_wellplate_50ul": 2,
+    "corning_12_wellplate_6.9ml_flat": 2,
     "corning_384_wellplate_112ul_flat": 2,
+    "corning_48_wellplate_1.6ml_flat": 2,
+    "corning_96_wellplate_360ul_flat": 2,
+    "nest_1_reservoir_195ml": 2,
     "nest_96_wellplate_100ul_pcr_full_skirt": 2,
     "nest_96_wellplate_200ul_flat": 2,
     "nest_96_wellplate_2ml_deep": 2,
-}
-
-
-_MAP_OT3_TO_FLEX_LOAD_NAMES: Dict[str, str] = {
-    "opentrons_ot3_96_tiprack_50ul": "opentrons_flex_96_tiprack_50ul",
-    "opentrons_ot3_96_tiprack_200ul": "opentrons_flex_96_tiprack_200ul",
-    "opentrons_ot3_96_tiprack_1000ul": "opentrons_flex_96_tiprack_1000ul",
+    "opentrons_96_wellplate_200ul_pcr_full_skirt": 2,
+    "corning_6_wellplate_16.8ml_flat": 2,
+    "corning_24_wellplate_3.4ml_flat": 2,
 }
 
 
 class AmbiguousLoadLabwareParamsError(RuntimeError):
     """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""
-
-
-def resolve_loadname(load_name: str) -> str:
-    """Temporarily check for old Flex tiprack loadnames so that an error is not raised.
-
-    REMOVE FOR LAUNCH.
-    Args:
-        load_name: Load name of the labware.
-
-    Returns:
-        Either the updated loadname or the original loadname if no match.
-
-    """
-    return _MAP_OT3_TO_FLEX_LOAD_NAMES.get(load_name, load_name)
 
 
 def resolve(

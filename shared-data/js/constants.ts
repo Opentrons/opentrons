@@ -45,7 +45,11 @@ export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 
 export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
 export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
-export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1]
+export const GRIPPER_V1_2: 'gripperV1.2' = 'gripperV1.2'
+export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2]
+
+// robot display name
+export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
@@ -164,8 +168,8 @@ export const MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM = 53
 
 export const OT2_STANDARD_MODEL: 'OT-2 Standard' = 'OT-2 Standard'
 export const OT2_STANDARD_DECKID: 'ot2_standard' = 'ot2_standard'
-export const OT3_STANDARD_MODEL: 'OT-3 Standard' = 'OT-3 Standard'
-export const OT3_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
+export const FLEX_STANDARD_MODEL: 'OT-3 Standard' = 'OT-3 Standard'
+export const FLEX_STANDARD_DECKID: 'ot3_standard' = 'ot3_standard'
 
 export const SINGLE_CHANNEL: 'Single-Channel' = 'Single-Channel'
 export const EIGHT_CHANNEL: '8-Channel' = '8-Channel'
@@ -178,3 +182,10 @@ export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
 export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
+
+export const WASTE_CHUTE_SLOT: 'D3' = 'D3'
+
+export const STAGING_AREA_LOAD_NAME = 'stagingArea'
+export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
+export const TRASH_BIN_LOAD_NAME = 'trashBin'
+export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'

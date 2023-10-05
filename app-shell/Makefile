@@ -23,7 +23,7 @@ dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-*","dist/**/Open
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
-# Other SSH args for buildroot robots
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
 # TODO(mc, 2018-03-27): move all this to some sort of envfile
@@ -125,7 +125,7 @@ dist-win: package-deps
 
 .PHONY: dist-ot3
 dist-ot3: package-deps
-	NO_PYTHON=true NO_USB_DETECTION=true $(builder) --linux --arm64 --dir
+	NO_PYTHON=true $(builder) --linux --arm64 --dir
 	cd dist/linux-arm64-unpacked
 
 # Aliases matching github actions OS names for easier calling in
@@ -159,8 +159,17 @@ _dist-collect-artifacts:
 # development
 #####################################################################
 
+.PHONY: clean-dev-autoupdate
+clean-dev-autoupdate:
+	rm -f ./dev-app-update.yml
+
+dev-app-update.yml:
+	cp ./dev-app-update-$(OPENTRONS_PROJECT).yml ./dev-app-update.yml
+
+
 .PHONY: dev
 dev: export NODE_ENV := development
-dev:
+dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
+dev: clean-dev-autoupdate ./dev-app-update.yml
 	webpack
 	$(electron)

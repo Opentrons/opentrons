@@ -97,14 +97,6 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
-from .load_adapter import (
-    LoadAdapter,
-    LoadAdapterParams,
-    LoadAdapterCreate,
-    LoadAdapterResult,
-    LoadAdapterCommandType,
-)
-
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -127,6 +119,7 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+    LoadPipettePrivateResult,
 )
 
 from .move_labware import (
@@ -233,6 +226,15 @@ from .retract_axis import (
     RetractAxisCommandType,
 )
 
+from .configure_for_volume import (
+    ConfigureForVolume,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeResult,
+    ConfigureForVolumeCommandType,
+    ConfigureForVolumePrivateResult,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -242,12 +244,12 @@ Command = Union[
     DispenseInPlace,
     BlowOut,
     BlowOutInPlace,
+    ConfigureForVolume,
     DropTip,
     DropTipInPlace,
     Home,
     RetractAxis,
     LoadLabware,
-    LoadAdapter,
     LoadLiquid,
     LoadModule,
     LoadPipette,
@@ -293,6 +295,7 @@ CommandParams = Union[
     AspirateParams,
     AspirateInPlaceParams,
     CommentParams,
+    ConfigureForVolumeParams,
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
@@ -303,7 +306,6 @@ CommandParams = Union[
     HomeParams,
     RetractAxisParams,
     LoadLabwareParams,
-    LoadAdapterParams,
     LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
@@ -350,6 +352,7 @@ CommandType = Union[
     AspirateCommandType,
     AspirateInPlaceCommandType,
     CommentCommandType,
+    ConfigureForVolumeCommandType,
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
@@ -360,7 +363,6 @@ CommandType = Union[
     HomeCommandType,
     RetractAxisCommandType,
     LoadLabwareCommandType,
-    LoadAdapterCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
@@ -406,6 +408,7 @@ CommandCreate = Union[
     AspirateCreate,
     AspirateInPlaceCreate,
     CommentCreate,
+    ConfigureForVolumeCreate,
     CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
@@ -416,7 +419,6 @@ CommandCreate = Union[
     HomeCreate,
     RetractAxisCreate,
     LoadLabwareCreate,
-    LoadAdapterCreate,
     LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
@@ -462,6 +464,7 @@ CommandResult = Union[
     AspirateResult,
     AspirateInPlaceResult,
     CommentResult,
+    ConfigureForVolumeResult,
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,
@@ -472,7 +475,6 @@ CommandResult = Union[
     HomeResult,
     RetractAxisResult,
     LoadLabwareResult,
-    LoadAdapterResult,
     LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
@@ -512,4 +514,8 @@ CommandResult = Union[
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
     calibration.MoveToMaintenancePositionResult,
+]
+
+CommandPrivateResult = Union[
+    None, LoadPipettePrivateResult, ConfigureForVolumePrivateResult
 ]

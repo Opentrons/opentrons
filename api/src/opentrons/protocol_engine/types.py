@@ -80,24 +80,10 @@ LabwareLocation = Union[
 ]
 """Union of all locations where it's legal to keep a labware."""
 
+OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
+
 NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
-
-
-class LabwareMovementStrategy(str, Enum):
-    """Strategy to use for labware movement."""
-
-    USING_GRIPPER = "usingGripper"
-    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
-    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
-
-
-@dataclass
-class LabwareMovementOffsetData:
-    """Offsets to be used during labware movement."""
-
-    pickUpOffset: Optional[LabwareOffsetVector]
-    dropOffset: Optional[LabwareOffsetVector]
 
 
 class WellOrigin(str, Enum):
@@ -191,9 +177,7 @@ class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
-    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
-    # https://opentrons.atlassian.net/browse/RLIQ-255
-    pipetteName: Union[PipetteNameType, Literal["p1000_96"]]
+    pipetteName: PipetteNameType
     mount: MountType
 
 
@@ -398,6 +382,13 @@ class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
 
 
+class LabwareMovementOffsetData(BaseModel):
+    """Offsets to be used during labware movement."""
+
+    pickUpOffset: LabwareOffsetVector
+    dropOffset: LabwareOffsetVector
+
+
 # TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON
 # schema that it's sourced from. We already do that for labware definitions and JSON protocols.
 class ModuleDefinition(BaseModel):
@@ -455,6 +446,10 @@ class ModuleDefinition(BaseModel):
     compatibleWith: List[ModuleModel] = Field(
         ...,
         description="List of module models this model is compatible with.",
+    )
+    gripperOffsets: Optional[Dict[str, LabwareMovementOffsetData]] = Field(
+        default_factory=dict,
+        description="Offsets to use for labware movement using gripper",
     )
 
 
@@ -624,3 +619,38 @@ class HeaterShakerMovementRestrictors:
     plate_shaking: bool
     latch_status: HeaterShakerLatchStatus
     deck_slot: int
+
+
+class LabwareMovementStrategy(str, Enum):
+    """Strategy to use for labware movement."""
+
+    USING_GRIPPER = "usingGripper"
+    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
+    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
+
+
+class PostRunHardwareState(Enum):
+    """State of robot gantry & motors after a stop is performed and the hardware API is reset.
+
+    HOME_AND_STAY_ENGAGED: home the gantry and keep all motors engaged. This allows the
+        robot to continue performing movement actions without re-homing
+    HOME_THEN_DISENGAGE: home the gantry and then disengage motors.
+        Reduces current consumption of the motors and prevents coil heating.
+        Re-homing is required to re-engage the motors and resume robot movement.
+    STAY_ENGAGED_IN_PLACE: do not home after the stop and keep the motors engaged.
+        Keeps gantry in the same position as prior to `stop()` execution
+        and allows the robot to execute movement commands without requiring to re-home first.
+    DISENGAGE_IN_PLACE: disengage motors and do not home the robot
+    Probable states for pipette:
+        - for 1- or 8-channel:
+            - HOME_AND_STAY_ENGAGED after protocol runs
+            - STAY_ENGAGED_IN_PLACE after maintenance runs
+        - for 96-channel:
+            - HOME_THEN_DISENGAGE after protocol runs
+            - DISENGAGE_IN_PLACE after maintenance runs
+    """
+
+    HOME_AND_STAY_ENGAGED = "homeAndStayEngaged"
+    HOME_THEN_DISENGAGE = "homeThenDisengage"
+    STAY_ENGAGED_IN_PLACE = "stayEngagedInPlace"
+    DISENGAGE_IN_PLACE = "disengageInPlace"

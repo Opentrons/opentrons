@@ -69,12 +69,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       {...styleProps}
     >
       {isGripperAttached ? (
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          backgroundColor={COLORS.lightGreyHover}
-          width="3.75rem"
-          height="3.75rem"
-        >
+        <Flex justifyContent={JUSTIFY_CENTER} size="3.75rem">
           <img src={flexGripper} alt="flex gripper" />
         </Flex>
       ) : null}
@@ -92,6 +87,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing2}
         paddingRight={SPACING.spacing24}
+        width="100%"
       >
         {banner}
         <StyledText

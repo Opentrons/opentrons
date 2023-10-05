@@ -18,6 +18,11 @@ PipetteModelMajorVersionType = Literal[1, 2, 3]
 PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5, 6]
 
 
+class LiquidClasses(enum.Enum):
+    default = enum.auto()
+    lowVolumeDefault = enum.auto()
+
+
 class PipetteTipType(enum.Enum):
     t10 = 10
     t20 = 20
@@ -25,6 +30,15 @@ class PipetteTipType(enum.Enum):
     t200 = 200
     t300 = 300
     t1000 = 1000
+
+    @classmethod
+    def check_and_return_type(
+        cls, working_volume: int, maximum_volume: int
+    ) -> "PipetteTipType":
+        try:
+            return cls(working_volume)
+        except ValueError:
+            return cls(maximum_volume)
 
 
 class PipetteChannelType(int, enum.Enum):
@@ -126,6 +140,8 @@ class MutableConfig:
         max: float,
         name: str,
     ) -> "MutableConfig":
+        if units == "mm/sec":
+            units = "mm/s"
         return cls(
             value=value,
             default=default,

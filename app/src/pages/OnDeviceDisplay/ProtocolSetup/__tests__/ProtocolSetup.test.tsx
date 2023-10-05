@@ -9,12 +9,14 @@ import {
   useInstrumentsQuery,
   useRunQuery,
   useProtocolQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../../i18n'
+import { useToaster } from '../../../../organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
@@ -70,6 +72,7 @@ jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/config')
 jest.mock('../ConfirmAttachedModal')
+jest.mock('../../../../organisms/ToasterOven')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -126,6 +129,10 @@ const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.Mock
 const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
   typeof ConfirmAttachedModal
 >
+const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
+  typeof useDoorQuery
+>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -177,6 +184,21 @@ const mockLiquids = [
 ]
 
 const mockPlay = jest.fn()
+const mockOffset = {
+  id: 'fake_labware_offset',
+  createdAt: 'timestamp',
+  definitionUri: 'fake_def_uri',
+  location: { slotName: 'A1' },
+  vector: { x: 1, y: 2, z: 3 },
+}
+
+const mockDoorStatus = {
+  data: {
+    status: 'closed',
+    doorRequiredClosedForProtocol: true,
+  },
+}
+const MOCK_MAKE_SNACKBAR = jest.fn()
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
@@ -223,7 +245,14 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(ot3StandardDeckDef as any)
     when(mockUseRunQuery)
       .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({ data: { data: { protocolId: PROTOCOL_ID } } } as any)
+      .mockReturnValue({
+        data: {
+          data: {
+            protocolId: PROTOCOL_ID,
+            labwareOffsets: [mockOffset],
+          },
+        },
+      } as any)
     when(mockUseProtocolQuery)
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .mockReturnValue({
@@ -240,7 +269,7 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, PROTOCOL_NAME)
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
@@ -249,6 +278,12 @@ describe('ProtocolSetup', () => {
     mockConfirmAttachedModal.mockReturnValue(
       <div>mock ConfirmAttachedModal</div>
     )
+    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
+    when(mockUseToaster)
+      .calledWith()
+      .mockReturnValue(({
+        makeSnackbar: MOCK_MAKE_SNACKBAR,
+      } as unknown) as any)
   })
 
   afterEach(() => {
@@ -321,7 +356,8 @@ describe('ProtocolSetup', () => {
   it('should launch LPC when clicked', () => {
     mockUseLPCDisabledReason.mockReturnValue(null)
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
-    getByText('Recommended')
+    getByText(/Recommended/)
+    getByText(/1 offset applied/)
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
     getByText('mock LPC Wizard')
@@ -332,5 +368,25 @@ describe('ProtocolSetup', () => {
     const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByRole('button', { name: 'play' }).click()
     getByText('mock ConfirmAttachedModal')
+  })
+  it('should render a loading skeleton while awaiting a response from the server', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
+    const [{ getAllByTestId }] = render(`/runs/${RUN_ID}/setup/`)
+    expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+  })
+
+  it('should render toast and make a button disabled when a robot door is open', () => {
+    const mockOpenDoorStatus = {
+      data: {
+        status: 'open',
+        doorRequiredClosedForProtocol: true,
+      },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
+    getByRole('button', { name: 'play' }).click()
+    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
+      'Close the robot door before starting the run.'
+    )
   })
 })

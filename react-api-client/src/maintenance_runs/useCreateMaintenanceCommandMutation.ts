@@ -14,6 +14,7 @@ import type {
 import type { CreateCommand } from '@opentrons/shared-data'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
+  maintenanceRunId: string
   command: CreateCommand
   waitUntilComplete?: boolean
   timeout?: number

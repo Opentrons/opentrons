@@ -5,6 +5,7 @@ import type {
   LabwareOffset,
   PipetteName,
   ModuleModel,
+  FixtureLoadName,
 } from '../../../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -58,26 +59,48 @@ export interface LoadLiquidRunTimeCommand
     LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
+export interface LoadFixtureCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'loadFixture'
+  params: LoadFixtureParams
+}
+export interface LoadFixtureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadFixtureCreateCommand {
+  result?: LoadLabwareResult
+}
 
 export type SetupRunTimeCommand =
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
+  | LoadFixtureRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
+
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
+  | LoadFixtureCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
 
-export type LabwareLocation = { slotName: string } | { moduleId: string }
+export type LabwareLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
+  | { labwareId: string }
+
+export type NonStackedLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
 
 export interface ModuleLocation {
   slotName: string
 }
-interface LoadPipetteParams {
+export interface LoadPipetteParams {
+  pipetteName: string
   pipetteId: string
   mount: 'left' | 'right'
 }
@@ -85,25 +108,36 @@ interface LoadPipetteResult {
   pipetteId: string
 }
 interface LoadLabwareParams {
-  labwareId: string
   location: LabwareLocation
+  version: number
+  namespace: string
+  loadName: string
   displayName?: string
+  labwareId?: string
 }
 interface LoadLabwareResult {
   labwareId: string
   definition: LabwareDefinition2
   offset: LabwareOffset
 }
-interface MoveLabwareParams {
+
+export type LabwareMovementStrategy =
+  | 'usingGripper'
+  | 'manualMoveWithPause'
+  | 'manualMoveWithoutPause'
+
+export interface MoveLabwareParams {
   labwareId: string
   newLocation: LabwareLocation
+  strategy: LabwareMovementStrategy
 }
 interface MoveLabwareResult {
   offsetId: string
 }
 interface LoadModuleParams {
-  moduleId: string
+  moduleId?: string
   location: ModuleLocation
+  model: ModuleModel
 }
 interface LoadModuleResult {
   moduleId: string
@@ -115,4 +149,10 @@ interface LoadLiquidParams {
 }
 interface LoadLiquidResult {
   liquidId: string
+}
+export type Cutout = 'B3' | 'C3' | 'D3'
+interface LoadFixtureParams {
+  location: { cutout: Cutout }
+  loadName: FixtureLoadName
+  fixtureId?: string
 }

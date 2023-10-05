@@ -56,9 +56,14 @@ stages:
           status: failed
           errors:
             - id: !anystr
-              errorType: PythonException
               createdAt: !anystr
-              detail: 'opentrons.hardware_control.errors.NoTipAttachedError: Cannot perform DROPTIP without a tip attached'
+              errorType: 'UnexpectedTipRemovalError'
+              detail: 'Cannot perform DROPTIP without a tip attached.'
+              errorInfo:
+                mount: 'LEFT'
+                pipette_name: 'p10_single'
+              errorCode: '3005'
+              wrappedErrors: []
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
@@ -70,8 +75,17 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 4
+          totalLength: 5
         data:
+          # Initial home
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -107,12 +121,14 @@ stages:
             status: failed
             error:
               id: !anystr
-              errorType: PythonException
               createdAt: !anystr
-              detail: 'opentrons.hardware_control.errors.NoTipAttachedError: Cannot perform DROPTIP without a tip attached'
-              errorCode: '4000'
-              errorInfo: !anydict
-              wrappedErrors: !anylist
+              errorType: 'UnexpectedTipRemovalError'
+              detail: 'Cannot perform DROPTIP without a tip attached.'
+              errorInfo:
+                mount: 'LEFT'
+                pipette_name: 'p10_single'
+              errorCode: '3005'
+              wrappedErrors: []
             params:
               pipetteId: pipetteId
               labwareId: tipRackId

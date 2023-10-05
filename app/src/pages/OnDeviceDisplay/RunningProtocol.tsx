@@ -1,28 +1,31 @@
 import * as React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  OVERFLOW_HIDDEN,
+  POSITION_RELATIVE,
   SPACING,
   useSwipe,
-  COLORS,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_HIDDEN,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
+  useAllCommandsQuery,
   useProtocolQuery,
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
-import { TertiaryButton } from '../../atoms/buttons'
+import {
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+} from '@opentrons/api-client'
+
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
@@ -44,8 +47,8 @@ import {
 import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
+import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
@@ -123,31 +126,35 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
-  const currentCommand = robotSideAnalysis?.commands.find(
-    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
-  )
+  const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
+    cursor: null,
+    pageLength: 1,
+  })
+  const lastRunCommand = allCommandsQueryData?.data[0] ?? null
 
   React.useEffect(() => {
     if (
-      currentCommand != null &&
+      lastRunCommand != null &&
       interventionModalCommandKey != null &&
-      currentCommand.key !== interventionModalCommandKey
+      lastRunCommand.key !== interventionModalCommandKey
     ) {
       // set intervention modal command key to null if different from current command key
       setInterventionModalCommandKey(null)
     } else if (
-      currentCommand?.key != null &&
-      isInterventionCommand(currentCommand) &&
+      lastRunCommand?.key != null &&
+      isInterventionCommand(lastRunCommand) &&
       interventionModalCommandKey === null
     ) {
-      setInterventionModalCommandKey(currentCommand.key)
+      setInterventionModalCommandKey(lastRunCommand.key)
     }
-  }, [currentCommand, interventionModalCommandKey])
+  }, [lastRunCommand, interventionModalCommandKey])
 
   return (
     <>
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+        <OpenDoorAlertModal />
+      ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
-
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
@@ -172,10 +179,11 @@ export function RunningProtocol(): JSX.Element {
         ) : null}
         {interventionModalCommandKey != null &&
         runRecord?.data != null &&
-        currentCommand != null ? (
+        lastRunCommand != null &&
+        isInterventionCommand(lastRunCommand) ? (
           <InterventionModal
             robotName={robotName}
-            command={currentCommand}
+            command={lastRunCommand}
             onResume={playRun}
             run={runRecord.data}
             analysis={robotSideAnalysis}
@@ -233,17 +241,6 @@ export function RunningProtocol(): JSX.Element {
             <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
           </Flex>
         </Flex>
-      </Flex>
-      {/* temporary */}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing24}
-        width="fit-content"
-        paddingRight={SPACING.spacing32}
-      >
-        <Link to="/dashboard">
-          <TertiaryButton>back to RobotDashboard</TertiaryButton>
-        </Link>
       </Flex>
     </>
   )

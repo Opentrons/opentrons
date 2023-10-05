@@ -1,3 +1,5 @@
+:og:description: How to engage and disengage the Magnetic Module for the OT-2 in a Python protocol.
+
 .. _magnetic-module:
 
 ***************
@@ -5,7 +7,7 @@ Magnetic Module
 ***************
 
 .. note::
-   The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the :ref:`magnetic-block`.
+   The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the :ref:`Magnetic Block <magnetic-block>`.
 
 The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. 
 

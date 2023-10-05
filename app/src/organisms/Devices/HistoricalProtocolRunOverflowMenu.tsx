@@ -31,7 +31,7 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_AGAIN,
 } from '../../redux/analytics'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
 
 import type { Run } from '@opentrons/api-client'
@@ -108,7 +108,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robotName)
+      return getRobotUpdateDisplayInfo(state, robotName)
     })?.autoUpdateAction
   )
   const [targetProps, tooltipProps] = useHoverTooltip()

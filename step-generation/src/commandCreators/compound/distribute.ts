@@ -6,6 +6,12 @@ import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
+  curryCommandCreator,
+  reduceCommandCreators,
+  blowoutUtil,
+  getDispenseAirGapLocation,
+} from '../../utils'
+import {
   aspirate,
   delay,
   dispense,
@@ -14,13 +20,8 @@ import {
   replaceTip,
   touchTip,
 } from '../atomic'
+import { configureForVolume } from '../atomic/configureForVolume'
 import { mixUtil } from './mix'
-import {
-  curryCommandCreator,
-  reduceCommandCreators,
-  blowoutUtil,
-  getDispenseAirGapLocation,
-} from '../../utils'
 import type {
   DistributeArgs,
   CommandCreator,
@@ -67,6 +68,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
         labware: args.sourceLabware,
       })
     )
+  }
+
+  if (
+    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
   if (errors.length > 0)
@@ -232,6 +240,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
+            dropTipLocation: args.dropTipLocation,
           }),
         ]
       }
@@ -280,6 +289,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ? [
               curryCommandCreator(dropTip, {
                 pipette: args.pipette,
+                dropTipLocation: args.dropTipLocation,
               }),
             ]
           : []
@@ -345,9 +355,23 @@ export const distribute: CommandCreator<DistributeArgs> = (
               dispenseDelaySeconds: dispenseDelay?.seconds,
             })
           : []
+
+      const configureForVolumeCommand: CurriedCommandCreator[] =
+        invariantContext.pipetteEntities[args.pipette].name ===
+          'p50_single_flex' ||
+        invariantContext.pipetteEntities[args.pipette].name === 'p50_multi_flex'
+          ? [
+              curryCommandCreator(configureForVolume, {
+                pipetteId: args.pipette,
+                volume: args.volume * destWellChunk.length + disposalVolume,
+              }),
+            ]
+          : []
+
       return [
         ...tipCommands,
         ...mixBeforeAspirateCommands,
+        ...configureForVolumeCommand,
         curryCommandCreator(aspirate, {
           pipette,
           volume: args.volume * destWellChunk.length + disposalVolume,

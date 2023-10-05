@@ -58,8 +58,9 @@ stages:
             - id: !anystr
               errorType: ExceptionInProtocolError
               createdAt: !anystr
-              detail: 'NoTipAttachedError [line 9]: Cannot perform DROPTIP without a tip attached'
+              detail: 'UnexpectedTipRemovalError [line 9]: Error 3005 UNEXPECTED_TIP_REMOVAL (UnexpectedTipRemovalError): Cannot perform DROPTIP without a tip attached.'
               errorCode: '4000'
+              wrappedErrors: !anylist
 
   - name: Verify commands contain the expected results
     request:
@@ -72,8 +73,16 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 3
+          totalLength: 4
         data:
+          - id: !anystr
+            key: !anystr
+            commandType: home
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -108,8 +117,8 @@ stages:
               id: !anystr
               errorType: LegacyContextCommandError
               createdAt: !anystr
-              detail: 'Cannot perform DROPTIP without a tip attached'
-              errorCode: '4000'
+              detail: 'Cannot perform DROPTIP without a tip attached.'
+              errorCode: '3005'
               errorInfo: !anydict
               wrappedErrors: !anylist
             params:

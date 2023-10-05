@@ -6,6 +6,7 @@
   "connection_troubleshooting_intro": "If you’re having trouble with the robot’s connection, try these troubleshooting tasks. First, double check that the robot is powered on.",
   "contact_support_for_connection_help": "If none of these work, contact Opentrons Support for help (via the question mark link in this app, or by emailing {{support_email}}.)",
   "control_gantry": "Control gantry",
+  "deck_configuration": "Deck configuration",
   "devices": "Devices",
   "disconnect_from_network": "Disconnect from network",
   "empty": "Empty",

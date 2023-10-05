@@ -21,6 +21,7 @@ import {
   getLabwareFieldForPositioningField,
 } from '../utils'
 import { AspDispSection } from './AspDispSection'
+import { DropTipField } from '../fields/DropTipField'
 
 import { StepFormProps } from '../types'
 
@@ -194,8 +195,11 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       )}
 
       <div className={styles.section_header}>
-        <span className={styles.section_header_text}>
+        <span className={styles.section_header_text_column}>
           {i18n.t('form.step_edit_form.section.sterility')}
+        </span>
+        <span className={styles.section_header_text_column}>
+          {i18n.t('form.step_edit_form.section.dropTip')}
         </span>
       </div>
       <div className={styles.section_wrapper}>
@@ -207,6 +211,9 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
             path={formData.path}
             stepType={formData.stepType}
           />
+        </div>
+        <div className={cx(styles.form_row, styles.section_column)}>
+          <DropTipField {...propsForFields.dropTip_location} />
         </div>
       </div>
     </div>

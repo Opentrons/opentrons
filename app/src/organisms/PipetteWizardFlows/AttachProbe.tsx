@@ -4,13 +4,14 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TYPOGRAPHY,
+  COLORS,
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { NINETY_SIX_CHANNEL, LEFT, MotorAxes } from '@opentrons/shared-data'
+import { LEFT, MotorAxes } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { CalibrationErrorModal } from './CalibrationErrorModal'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
@@ -45,7 +46,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setShowErrorMessage,
     errorMessage,
     isOnDevice,
-    selectedPipette,
     flowType,
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
@@ -59,7 +59,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
-    chainRunCommands(
+    chainRunCommands?.(
       [
         {
           commandType: 'home' as const,
@@ -68,14 +68,18 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           },
         },
         {
-          // @ts-expect-error calibration type not yet supported
+          commandType: 'home' as const,
+          params: {
+            skipIfMountPositionOk: mount,
+          },
+        },
+        {
           commandType: 'calibration/calibratePipette' as const,
           params: {
             mount: mount,
           },
         },
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,
@@ -97,6 +101,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     src = pipetteProbe8
   } else if (is96Channel) {
     src = probing96
+  }
+  let probeLocation = ''
+  if (is8Channel) {
+    probeLocation = t('backmost')
+  } else if (is96Channel) {
+    probeLocation = t('ninety_six_probe_location')
   }
 
   const pipetteProbeVid = (
@@ -139,39 +149,42 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     )
 
   return errorMessage != null ? (
-    <CalibrationErrorModal
-      proceed={proceed}
-      isOnDevice={isOnDevice}
-      errorMessage={errorMessage}
-      chainRunCommands={chainRunCommands}
-      mount={mount}
-      setShowErrorMessage={setShowErrorMessage}
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={
+        <Trans
+          t={t}
+          i18nKey={'return_probe_error'}
+          values={{ error: errorMessage }}
+          components={{
+            block: <StyledText as="p" />,
+            bold: (
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            ),
+          }}
+        />
+      }
     />
   ) : (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
-      //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
-        channel: is8Channel ? 8 : 1,
+        channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
-        is8Channel || selectedPipette === NINETY_SIX_CHANNEL ? (
+        <StyledText css={BODY_STYLE}>
           <Trans
             t={t}
-            i18nKey={
-              is8Channel
-                ? 'install_probe_8_channel'
-                : 'install_probe_96_channel'
-            }
+            i18nKey={'install_probe'}
+            values={{ location: probeLocation }}
             components={{
-              strong: <strong />,
-              block: <StyledText css={BODY_STYLE} />,
+              bold: <strong />,
             }}
           />
-        ) : (
-          <StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>
-        )
+        </StyledText>
       }
       proceedButtonText={t('begin_calibration')}
       proceed={handleOnClick}

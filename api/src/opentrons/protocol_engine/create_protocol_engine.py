@@ -10,6 +10,7 @@ from opentrons.util.async_helpers import async_context_manager_in_thread
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, ModuleDataProvider
 from .state import Config, StateStore
+from .types import PostRunHardwareState
 
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
@@ -44,7 +45,8 @@ async def create_protocol_engine(
 def create_protocol_engine_in_thread(
     hardware_api: HardwareControlAPI,
     config: Config,
-    drop_tips_and_home_after: bool,
+    drop_tips_after_run: bool,
+    post_run_hardware_state: PostRunHardwareState,
 ) -> typing.Generator[
     typing.Tuple[ProtocolEngine, asyncio.AbstractEventLoop], None, None
 ]:
@@ -66,7 +68,9 @@ def create_protocol_engine_in_thread(
     3. Joins the thread.
     """
     with async_context_manager_in_thread(
-        _protocol_engine(hardware_api, config, drop_tips_and_home_after)
+        _protocol_engine(
+            hardware_api, config, drop_tips_after_run, post_run_hardware_state
+        )
     ) as (
         protocol_engine,
         loop,
@@ -78,7 +82,8 @@ def create_protocol_engine_in_thread(
 async def _protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
-    drop_tips_and_home_after: bool,
+    drop_tips_after_run: bool,
+    post_run_hardware_state: PostRunHardwareState,
 ) -> typing.AsyncGenerator[ProtocolEngine, None]:
     protocol_engine = await create_protocol_engine(
         hardware_api=hardware_api,
@@ -88,4 +93,7 @@ async def _protocol_engine(
         protocol_engine.play()
         yield protocol_engine
     finally:
-        await protocol_engine.finish(drop_tips_and_home=drop_tips_and_home_after)
+        await protocol_engine.finish(
+            drop_tips_after_run=drop_tips_after_run,
+            post_run_hardware_state=post_run_hardware_state,
+        )

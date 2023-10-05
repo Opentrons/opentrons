@@ -17,28 +17,50 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
-import { getAdditionalEquipment } from '../../step-forms/selectors'
-import { toggleIsGripperRequired } from '../../step-forms/actions/additionalItems'
+import { getEnableDeckModification } from '../../feature-flags/selectors'
+import {
+  getAdditionalEquipment,
+  getInitialDeckSetup,
+  getLabwareEntities,
+} from '../../step-forms/selectors'
+import {
+  deleteDeckFixture,
+  toggleIsGripperRequired,
+} from '../../step-forms/actions/additionalItems'
 import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
-import { GripperRow } from './GripperRow'
+import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
+import { FLEX_TRASH_DEF_URI } from '../../constants'
+import { deleteContainer } from '../../labware-ingred/actions'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => void
 }
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
+  const enableDeckModification = useSelector(getEnableDeckModification)
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const labwareEntities = useSelector(getLabwareEntities)
+  //  trash bin can only  be altered for the flex
+  const trashBin = Object.values(labwareEntities).find(
+    lw => lw.labwareDefURI === FLEX_TRASH_DEF_URI
+  )
+  const trashSlot =
+    trashBin != null ? initialDeckSetup.labware[trashBin?.id].slot : null
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
   const additionalEquipment = useSelector(getAdditionalEquipment)
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
+  )
+  const wasteChute = Object.values(additionalEquipment).find(
+    equipment => equipment?.name === 'wasteChute'
   )
 
   const dispatch = useDispatch()
@@ -85,9 +107,6 @@ export function EditModulesCard(props: Props): JSX.Element {
         : moduleType !== 'magneticBlockType'
   )
 
-  const handleGripperClick = (): void => {
-    dispatch(toggleIsGripperRequired())
-  }
   return (
     <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
@@ -125,10 +144,38 @@ export function EditModulesCard(props: Props): JSX.Element {
             )
           }
         })}
+        {enableDeckModification && isFlex ? (
+          <>
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                trashBin != null
+                  ? dispatch(deleteContainer({ labwareId: trashBin.id }))
+                  : null
+              }
+              isEquipmentAdded={trashBin != null}
+              name="trashBin"
+              hasWasteChute={wasteChute != null}
+              trashBinSlot={trashSlot ?? undefined}
+              trashBinId={trashBin?.id}
+            />
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                dispatch(
+                  wasteChute != null ? deleteDeckFixture(wasteChute.id) : null
+                )
+              }
+              isEquipmentAdded={wasteChute != null}
+              name="wasteChute"
+              hasWasteChute={wasteChute != null}
+              trashBinId={trashBin?.id}
+            />
+          </>
+        ) : null}
         {isFlex ? (
-          <GripperRow
-            handleGripper={handleGripperClick}
-            isGripperAdded={isGripperAttached}
+          <AdditionalItemsRow
+            handleAttachment={() => dispatch(toggleIsGripperRequired())}
+            isEquipmentAdded={isGripperAttached}
+            name="gripper"
           />
         ) : null}
       </div>

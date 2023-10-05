@@ -11,18 +11,19 @@ import {
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+  MoveLabwareCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  PipetteName,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { uuid } from '../../utils'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  FIXED_TRASH_ID,
-  SPAN7_8_10_11_SLOT,
-} from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
@@ -69,11 +70,6 @@ import type {
   ProfileStepItem,
 } from '../../form-types'
 import {
-  FileLabware,
-  FilePipette,
-  FileModule,
-} from '@opentrons/shared-data/protocol/types/schemaV4'
-import {
   CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
@@ -115,7 +111,11 @@ import {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
-import { ToggleIsGripperRequiredAction } from '../actions/additionalItems'
+import {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
+  ToggleIsGripperRequiredAction,
+} from '../actions/additionalItems'
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -140,6 +140,8 @@ export type UnsavedFormActions =
   | EditProfileStepAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
+  | CreateDeckFixtureAction
+  | DeleteDeckFixtureAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -200,6 +202,8 @@ export const unsavedForm = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
+    case 'CREATE_DECK_FIXTURE':
+    case 'DELETE_DECK_FIXTURE':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -487,6 +491,8 @@ export type SavedStepFormsActions =
   | ReplaceCustomLabwareDef
   | EditModuleAction
   | ToggleIsGripperRequiredAction
+  | CreateDeckFixtureAction
+  | DeleteDeckFixtureAction
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
@@ -590,7 +596,6 @@ export const savedStepForms = (
         ...stepForm,
       }))
     }
-
     case 'DUPLICATE_LABWARE':
     case 'CREATE_CONTAINER': {
       // auto-update initial deck setup state.
@@ -610,7 +615,6 @@ export const savedStepForms = (
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
       }
-
       return {
         ...savedStepForms,
         [INITIAL_DECK_SETUP_STEP_ID]: {
@@ -1095,11 +1099,7 @@ export const batchEditFormChanges = (
     }
   }
 }
-const initialLabwareState: NormalizedLabwareById = {
-  [FIXED_TRASH_ID]: {
-    labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
-  },
-}
+const initialLabwareState: NormalizedLabwareById = {}
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
 export const labwareInvariantProperties: Reducer<
   NormalizedLabwareById,
@@ -1141,12 +1141,28 @@ export const labwareInvariantProperties: Reducer<
       action: LoadFileAction
     ): NormalizedLabwareById => {
       const { file } = action.payload
-      return mapValues(
-        file.labware,
-        (fileLabware: FileLabware, id: string) => ({
-          labwareDefURI: fileLabware.definitionId,
-        })
+      const loadLabwareCommands = Object.values(file.commands).filter(
+        (command): command is LoadLabwareCreateCommand =>
+          command.commandType === 'loadLabware'
       )
+      const labware = {
+        ...loadLabwareCommands.reduce(
+          (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
+            const { labwareId, loadName } = command.params
+            const defUri = labwareId?.split(':')[1]
+            const id = labwareId ?? ''
+            return {
+              ...acc,
+              [id]: {
+                labwareDefURI: loadName.includes('/') ? loadName : defUri ?? '',
+              },
+            }
+          },
+          {}
+        ),
+      }
+
+      return Object.keys(labware).length > 0 ? labware : state
     },
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,
@@ -1202,16 +1218,31 @@ export const moduleInvariantProperties: Reducer<
       action: LoadFileAction
     ): ModuleEntities => {
       const { file } = action.payload
-      // @ts-expect-error(sa, 2021-6-10): falling back to {} will not create a valid `ModuleEntity`, as per TODO below it is theoritically unnecessary anyways
-      return mapValues(
-        // @ts-expect-error(sa, 2021-6-10): type narrow modules, they do not exist on the v3 schema
-        file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
-        (fileModule: FileModule, id: string) => ({
-          id,
-          type: getModuleType(fileModule.model),
-          model: fileModule.model,
-        })
+      const loadModuleCommands = Object.values(file.commands).filter(
+        (command): command is LoadModuleCreateCommand =>
+          command.commandType === 'loadModule'
       )
+      const modules = loadModuleCommands.reduce(
+        (acc: ModuleEntities, command: LoadModuleCreateCommand) => {
+          const { moduleId, model, location } = command.params
+          if (moduleId == null) {
+            console.error(
+              `expected module ${model} in location ${location.slotName} to have an id, but id does not`
+            )
+            return acc
+          }
+          return {
+            ...acc,
+            [moduleId]: {
+              id: moduleId,
+              type: getModuleType(model),
+              model,
+            },
+          }
+        },
+        {}
+      )
+      return Object.keys(modules).length > 0 ? modules : state
     },
   },
   {}
@@ -1230,24 +1261,27 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      return mapValues(
-        file.pipettes,
-        (
-          filePipette: FilePipette,
-          pipetteId: string
-        ): NormalizedPipetteById[keyof NormalizedPipetteById] => {
-          const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
-          assert(
-            tiprackDefURI,
-            `expected tiprackDefURI in file metadata for pipette ${pipetteId}`
-          )
-          return {
-            id: pipetteId,
-            name: filePipette.name,
-            tiprackDefURI,
-          }
-        }
+      const loadPipetteCommands = Object.values(file.commands).filter(
+        (command): command is LoadPipetteCreateCommand =>
+          command.commandType === 'loadPipette'
       )
+      const pipettes = loadPipetteCommands.reduce(
+        (acc: NormalizedPipetteById, command) => {
+          const { pipetteName, pipetteId } = command.params
+          const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
+
+          return {
+            ...acc,
+            [pipetteId]: {
+              id: pipetteId,
+              name: pipetteName as PipetteName,
+              tiprackDefURI,
+            },
+          }
+        },
+        {}
+      )
+      return Object.keys(pipettes).length > 0 ? pipettes : state
     },
     CREATE_PIPETTES: (
       state: NormalizedPipetteById,
@@ -1275,17 +1309,15 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       action: LoadFileAction
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
-      const gripper = file.commands.filter(
-        command =>
-          // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
+      const gripper = Object.values(file.commands).filter(
+        (command): command is MoveLabwareCreateCommand =>
           command.commandType === 'moveLabware' &&
-          // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
           command.params.strategy === 'usingGripper'
       )
+      //  TODO(jr, 9/18/23): add wasteChute when loadFixture commands exist
       const hasGripper = gripper.length > 0
-      // @ts-expect-error  (jr, 6/22/23): OT-3 Standard doesn't exist on schemav6
       const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
-      const additionalEquipmentId = uuid()
+      const additionalEquipmentId = `${uuid()}:gripper`
       const updatedEquipment = {
         [additionalEquipmentId]: {
           name: 'gripper' as const,
@@ -1301,25 +1333,45 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     TOGGLE_IS_GRIPPER_REQUIRED: (
       state: NormalizedAdditionalEquipmentById
     ): NormalizedAdditionalEquipmentById => {
-      const additionalEquipmentId = Object.keys(state)[0]
-      const existingEquipment = state[additionalEquipmentId]
+      let updatedEquipment = { ...state }
+      const gripperId = `${uuid()}:gripper`
+      const gripperKey = Object.keys(updatedEquipment).find(
+        key => updatedEquipment[key].name === 'gripper'
+      )
 
-      let updatedEquipment
-
-      if (existingEquipment && existingEquipment.name === 'gripper') {
-        updatedEquipment = {}
+      if (gripperKey != null) {
+        updatedEquipment = omit(updatedEquipment, [gripperKey])
       } else {
-        const newAdditionalEquipmentId = uuid()
         updatedEquipment = {
-          [newAdditionalEquipmentId]: {
+          ...updatedEquipment,
+          [gripperId]: {
             name: 'gripper' as const,
-            id: newAdditionalEquipmentId,
+            id: gripperId,
           },
         }
       }
-
       return updatedEquipment
     },
+    //  @ts-expect-error
+    CREATE_DECK_FIXTURE: (
+      state: NormalizedAdditionalEquipmentById,
+      action: CreateDeckFixtureAction
+    ): NormalizedAdditionalEquipmentById => {
+      const { location, id, name } = action.payload
+      return {
+        ...state,
+        [id]: {
+          name,
+          id,
+          location,
+        },
+      }
+    },
+    //  @ts-expect-error
+    DELETE_DECK_FIXTURE: (
+      state: NormalizedAdditionalEquipmentById,
+      action: DeleteDeckFixtureAction
+    ): NormalizedAdditionalEquipmentById => omit(state, action.payload.id),
     DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
   },
   initialAdditionalEquipmentState

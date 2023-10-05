@@ -115,8 +115,12 @@ function startUsbHttpRequests(dispatch: Dispatch): void {
     .then((list: PortInfo[]) => {
       const ot3UsbSerialPort = list.find(
         port =>
-          port.productId === DEFAULT_PRODUCT_ID &&
-          port.vendorId === DEFAULT_VENDOR_ID
+          port.productId?.localeCompare(DEFAULT_PRODUCT_ID, 'en-US', {
+            sensitivity: 'base',
+          }) === 0 &&
+          port.vendorId?.localeCompare(DEFAULT_VENDOR_ID, 'en-US', {
+            sensitivity: 'base',
+          }) === 0
       )
 
       // retry if no OT-3 serial port found - usb-detection and serialport packages have race condition

@@ -28,7 +28,6 @@ from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
 from .command_fixtures import (
     create_load_labware_command,
-    create_load_adapter_command,
     create_move_labware_command,
 )
 
@@ -149,56 +148,9 @@ def test_handles_load_labware(
             created_at=datetime(year=2021, month=1, day=2),
         )
     )
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(UpdateCommandAction(private_result=None, command=command))
 
     assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
-
-    assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
-
-
-def test_handles_load_adapter(
-    subject: LabwareStore,
-    well_plate_def: LabwareDefinition,
-) -> None:
-    """It should add the adapter data to the state."""
-    offset_request = LabwareOffsetCreate(
-        definitionUri="offset-definition-uri",
-        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
-        vector=LabwareOffsetVector(x=1, y=2, z=3),
-    )
-
-    command = create_load_adapter_command(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        adapter_id="test-adapter-id",
-        definition=well_plate_def,
-        offset_id="offset-id",
-    )
-
-    expected_definition_uri = uri_from_details(
-        load_name=well_plate_def.parameters.loadName,
-        namespace=well_plate_def.namespace,
-        version=well_plate_def.version,
-    )
-
-    expected_adapter_data = LoadedLabware(
-        id="test-adapter-id",
-        loadName=well_plate_def.parameters.loadName,
-        definitionUri=expected_definition_uri,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offsetId="offset-id",
-        displayName=None,
-    )
-
-    subject.handle_action(
-        AddLabwareOffsetAction(
-            request=offset_request,
-            labware_offset_id="offset-id",
-            created_at=datetime(year=2021, month=1, day=2),
-        )
-    )
-    subject.handle_action(UpdateCommandAction(command=command))
-
-    assert subject.state.labware_by_id["test-adapter-id"] == expected_adapter_data
 
     assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
 
@@ -243,7 +195,9 @@ def test_handles_move_labware(
             created_at=datetime(year=2021, month=1, day=2),
         )
     )
-    subject.handle_action(UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     move_command = create_move_labware_command(
         labware_id="my-labware-id",
@@ -251,7 +205,9 @@ def test_handles_move_labware(
         offset_id="my-new-offset",
         strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
-    subject.handle_action(UpdateCommandAction(command=move_command))
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=move_command)
+    )
 
     assert subject.state.labware_by_id["my-labware-id"].location == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_4
@@ -283,13 +239,17 @@ def test_handles_move_labware_off_deck(
             created_at=datetime(year=2021, month=1, day=2),
         )
     )
-    subject.handle_action(UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     move_labware_off_deck_cmd = create_move_labware_command(
         labware_id="my-labware-id",
         new_location=OFF_DECK_LOCATION,
         strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
-    subject.handle_action(UpdateCommandAction(command=move_labware_off_deck_cmd))
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=move_labware_off_deck_cmd)
+    )
     assert subject.state.labware_by_id["my-labware-id"].location == OFF_DECK_LOCATION
     assert subject.state.labware_by_id["my-labware-id"].offsetId is None

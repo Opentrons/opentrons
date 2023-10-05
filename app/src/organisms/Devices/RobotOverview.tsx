@@ -175,7 +175,7 @@ export function RobotOverview({
           </Box>
         </Flex>
       </Flex>
-      {robotModel === 'OT-2' && !isRobotBusy ? (
+      {robotModel === 'OT-2' && !isRobotBusy && isRobotViewable ? (
         <CalibrationStatusBanner robotName={robotName} />
       ) : null}
       <Flex

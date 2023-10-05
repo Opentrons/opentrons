@@ -14,11 +14,14 @@ import {
   StyleProps,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
+  JUSTIFY_FLEX_START,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import SuccessIcon from '../../assets/images/icon_success.png'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
+import type { RobotType } from '@opentrons/shared-data'
 
 interface Props extends StyleProps {
   iconColor: string
@@ -27,7 +30,15 @@ interface Props extends StyleProps {
   children?: React.ReactNode
   subHeader?: string | JSX.Element
   isPending?: boolean
+  robotType?: RobotType
+  /**
+   *  this prop is to change justifyContent of OnDeviceDisplay buttons
+   *  TODO(jr, 8/9/23): this SHOULD be refactored so the
+   *  buttons' justifyContent is specified at the parent level
+   */
+  justifyContentForOddButton?: string
 }
+
 const BACKGROUND_SIZE = '47rem'
 
 const HEADER_STYLE = css`
@@ -55,18 +66,6 @@ const SUBHEADER_STYLE = css`
     margin-right: 4.5rem;
   }
 `
-const BUTTON_STYLE = css`
-  width: 100%;
-  justify-content: ${JUSTIFY_FLEX_END};
-  padding-right: ${SPACING.spacing32};
-  padding-bottom: ${SPACING.spacing32};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    justify-content: ${JUSTIFY_SPACE_BETWEEN};
-    padding-bottom: ${SPACING.spacing32};
-    padding-left: ${SPACING.spacing32};
-  }
-`
 const WIZARD_CONTAINER_STYLE = css`
   min-height: 394px;
   flex-direction: ${DIRECTION_COLUMN};
@@ -91,16 +90,40 @@ export function SimpleWizardBody(props: Props): JSX.Element {
     subHeader,
     isSuccess,
     isPending,
+    robotType = FLEX_ROBOT_TYPE,
     ...styleProps
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
+
+  const BUTTON_STYLE = css`
+    width: 100%;
+    justify-content: ${JUSTIFY_FLEX_END};
+    padding-right: ${SPACING.spacing32};
+    padding-bottom: ${SPACING.spacing32};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      justify-content: ${props.justifyContentForOddButton ??
+      JUSTIFY_SPACE_BETWEEN};
+      padding-bottom: ${SPACING.spacing32};
+      padding-left: ${SPACING.spacing32};
+    }
+  `
+
+  const ICON_POSITION_STYLE = css`
+    justify-content: ${JUSTIFY_CENTER};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      justify-content: ${JUSTIFY_FLEX_START};
+      margin-top: ${isSuccess ? SPACING.spacing32 : '8.1875rem'};
+    }
+  `
 
   return (
     <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
       <Flex
         width="100%"
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
+        css={ICON_POSITION_STYLE}
         flexDirection={DIRECTION_COLUMN}
         flex="1 0 auto"
       >
@@ -125,8 +148,8 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           <>
             {isSuccess ? (
               <img
-                width="250px"
-                height="208px"
+                width={robotType === FLEX_ROBOT_TYPE ? '250px' : '160px'}
+                height={robotType === FLEX_ROBOT_TYPE ? '208px' : '120px'}
                 src={SuccessIcon}
                 alt="Success Icon"
               />

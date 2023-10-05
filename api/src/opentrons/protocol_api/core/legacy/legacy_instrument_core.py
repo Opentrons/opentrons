@@ -116,6 +116,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        push_out: Optional[float],
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -125,7 +126,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
             in_place: Whether we should move_to location.
+            push_out: The amount to push the plunger below bottom position.
         """
+        if push_out:
+            raise APIVersionError("push_out is not supported in this API version.")
         if not in_place:
             self.move_to(location=location)
 
@@ -503,3 +507,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     to_loc=location,
                     is_multichannel=self.get_channels() > 1,
                 )
+
+    def configure_for_volume(self, volume: float) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass

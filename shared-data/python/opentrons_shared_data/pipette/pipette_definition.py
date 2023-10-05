@@ -1,4 +1,5 @@
-from typing import List, Dict, Tuple, Optional
+import re
+from typing import List, Dict, Tuple
 from pydantic import BaseModel, Field, validator
 from typing_extensions import Literal
 from dataclasses import dataclass
@@ -7,6 +8,8 @@ from . import types as pip_types, dev_types
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
+
+NOZZLE_MAP_NAMES = re.compile(r"[A-Z]{1}[0-9]{1,2}")
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -101,10 +104,10 @@ class SupportedTipsDefinition(BaseModel):
     dispense: ulPerMMDefinition = Field(
         ..., description="The default pipetting functions list for dispensing."
     )
-    default_blowout_volume: Optional[float] = Field(
+    default_push_out_volume: float = Field(
         ...,
-        description="The default volume for a blowout command with this tip type.",
-        alias="defaultBlowoutVolume",
+        description="The default volume for a push-out during dispense.",
+        alias="defaultPushOutVolume",
     )
 
 
@@ -136,7 +139,7 @@ class PlungerPositions(BaseModel):
     )
 
 
-class TipHandlingConfigurations(BaseModel):
+class PlungerHomingConfigurations(BaseModel):
     current: float = Field(
         ...,
         description="Either the z motor current needed for picking up tip or the plunger motor current for dropping tip off the nozzle.",
@@ -145,6 +148,9 @@ class TipHandlingConfigurations(BaseModel):
         ...,
         description="The speed to move the z or plunger axis for tip pickup or drop off.",
     )
+
+
+class TipHandlingConfigurations(PlungerHomingConfigurations):
     presses: int = Field(
         default=0.0, description="The number of tries required to force pick up a tip."
     )
@@ -173,6 +179,11 @@ class PartialTipDefinition(BaseModel):
         default=None,
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
+    )
+    per_tip_pickup_current: float = Field(
+        default=0.5,
+        description="A current scale for pick up tip in a partial tip configuration",
+        alias="perTipPickupCurrent",
     )
 
 
@@ -203,12 +214,15 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     drop_tip_configurations: TipHandlingConfigurations = Field(
         ..., alias="dropTipConfigurations"
     )
+    plunger_homing_configurations: PlungerHomingConfigurations = Field(
+        ..., alias="plungerHomingConfigurations"
+    )
     plunger_motor_configurations: MotorConfigurations = Field(
         ..., alias="plungerMotorConfigurations"
     )
-    plunger_positions_configurations: PlungerPositions = Field(
-        ..., alias="plungerPositionsConfigurations"
-    )
+    plunger_positions_configurations: Dict[
+        pip_types.LiquidClasses, PlungerPositions
+    ] = Field(..., alias="plungerPositionsConfigurations")
     available_sensors: AvailableSensorDefinition = Field(..., alias="availableSensors")
     partial_tip_configurations: PartialTipDefinition = Field(
         ..., alias="partialTipConfigurations"
@@ -251,6 +265,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     def convert_quirks(cls, v: List[str]) -> List[pip_types.Quirks]:
         return [pip_types.Quirks(q) for q in v]
 
+    @validator("plunger_positions_configurations", pre=True)
+    def convert_plunger_positions(
+        cls, v: Dict[str, PlungerPositions]
+    ) -> Dict[pip_types.LiquidClasses, PlungerPositions]:
+        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
+
     class Config:
         json_encoders = {
             pip_types.PipetteChannelType: lambda v: v.value,
@@ -269,6 +289,18 @@ class PipetteGeometryDefinition(BaseModel):
         description="The shared data relative path to the 3D representation of the pipette model.",
         alias="pathTo3D",
     )
+    nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+
+    @validator("nozzle_map", pre=True)
+    def check_nonempty_strings(
+        cls, v: Dict[str, List[float]]
+    ) -> Dict[str, List[float]]:
+        # Note, the key should be able to be a regex but I think
+        # we're not on a pydantic version that supports that.
+        for k in v.keys():
+            if not NOZZLE_MAP_NAMES.match(k):
+                raise ValueError("{k} is not a valid key entry for nozzle map.")
+        return v
 
 
 class PipetteLiquidPropertiesDefinition(BaseModel):
@@ -309,7 +341,6 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
 class PipetteConfigurations(
     PipetteGeometryDefinition,
     PipettePhysicalPropertiesDefinition,
-    PipetteLiquidPropertiesDefinition,
 ):
     """The full pipette configurations of a given model and version."""
 
@@ -319,3 +350,46 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
+    liquid_properties: Dict[
+        pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition
+    ] = Field(
+        ..., description="A dictionary of liquid properties keyed by liquid classes."
+    )
+
+    @validator("liquid_properties", pre=True)
+    def convert_liquid_properties_key(
+        cls, v: Dict[str, PipetteLiquidPropertiesDefinition]
+    ) -> Dict[pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition]:
+        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
+
+
+def liquid_class_for_volume_between_default_and_defaultlowvolume(
+    volume: float,
+    current_liquid_class_name: pip_types.LiquidClasses,
+    available_liquid_classes: Dict[
+        pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition
+    ],
+) -> pip_types.LiquidClasses:
+    """Determine the appropriate liquid class to use for a volume.
+
+    This function has such a weird name because it is hardcoded to only use the liquid
+    classes default and defaultLowVolume. It should no longer be used when those liquid
+    classes change.
+    """
+    # For now, until we add more liquid classes, we're going to hardcode the default
+    # and lowVolumeDefault liquid classes as the ones to switch between.
+    has_lvd = pip_types.LiquidClasses.lowVolumeDefault in available_liquid_classes
+
+    if not has_lvd:
+        return pip_types.LiquidClasses.default
+    if volume >= available_liquid_classes[pip_types.LiquidClasses.default].min_volume:
+        return pip_types.LiquidClasses.default
+    return pip_types.LiquidClasses.lowVolumeDefault
+
+
+def default_tip_for_liquid_class(
+    liquid_class_config: PipetteLiquidPropertiesDefinition,
+) -> pip_types.PipetteTipType:
+    """Provide a "default tip", the one with the largest volume."""
+    tip_names = liquid_class_config.supported_tips.keys()
+    return sorted(tip_names, key=lambda tip: tip.value)[-1]

@@ -11,7 +11,8 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
   Module,
-  SlotLabels,
+  COLORS,
+  TrashSlotName,
 } from '@opentrons/components'
 import {
   MODULES_WITH_COLLISION_ISSUES,
@@ -34,7 +35,11 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
-import { PSEUDO_DECK_SLOTS } from '../../constants'
+import {
+  FLEX_TRASH_DEF_URI,
+  OT_2_TRASH_DEF_URI,
+  PSEUDO_DECK_SLOTS,
+} from '../../constants'
 import { i18n } from '../../localization'
 import {
   getLabwareIsCompatible,
@@ -62,9 +67,15 @@ import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
 import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
-import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
+import {
+  AdapterControls,
+  SlotControls,
+  LabwareControls,
+  DragPreview,
+} from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
+import { SlotLabels } from './SlotLabels'
 import styles from './DeckSetup.css'
 
 export const DECK_LAYER_BLOCKLIST = [
@@ -83,13 +94,13 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
   robotType: RobotType
+  trashSlot: string | null
 }
 
 export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10
 export const VIEWBOX_WIDTH = 520
 export const VIEWBOX_HEIGHT = 414
-const FLEX_TRASH_SLOT = 'A3'
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
 
@@ -146,8 +157,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     showGen1MultichannelCollisionWarnings,
     deckDef,
     robotType,
+    trashSlot,
   } = props
-  const trashSlot = robotType === FLEX_ROBOT_TYPE ? FLEX_TRASH_SLOT : '12'
 
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
@@ -281,6 +292,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           moduleOnDeck.slot
         )
 
+        const isAdapter =
+          labwareLoadedOnModule?.def.metadata.displayCategory === 'adapter'
         return (
           <Module
             key={slot.id}
@@ -301,22 +314,38 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   y={0}
                   labwareOnDeck={labwareLoadedOnModule}
                 />
-                <LabwareControls
-                  slot={labwareInterfaceSlotDef}
-                  setHoveredLabware={setHoveredLabware}
-                  setDraggedLabware={setDraggedLabware}
-                  swapBlocked={
-                    swapBlocked &&
-                    (labwareLoadedOnModule.id === hoveredLabware?.id ||
-                      labwareLoadedOnModule.id === draggedLabware?.id)
-                  }
-                  labwareOnDeck={labwareLoadedOnModule}
-                  selectedTerminalItemId={props.selectedTerminalItemId}
-                />
+                {isAdapter ? (
+                  //  @ts-expect-error
+                  <AdapterControls
+                    allLabware={allLabware}
+                    onDeck={false}
+                    labwareId={labwareLoadedOnModule.id}
+                    key={slot.id}
+                    slot={slot}
+                    selectedTerminalItemId={props.selectedTerminalItemId}
+                    handleDragHover={handleHoverEmptySlot}
+                  />
+                ) : (
+                  <LabwareControls
+                    slot={labwareInterfaceSlotDef}
+                    setHoveredLabware={setHoveredLabware}
+                    setDraggedLabware={setDraggedLabware}
+                    swapBlocked={
+                      swapBlocked &&
+                      (labwareLoadedOnModule.id === hoveredLabware?.id ||
+                        labwareLoadedOnModule.id === draggedLabware?.id)
+                    }
+                    labwareOnDeck={labwareLoadedOnModule}
+                    selectedTerminalItemId={props.selectedTerminalItemId}
+                  />
+                )}
               </>
             ) : null}
-            {labwareLoadedOnModule == null && !shouldHideChildren ? (
-              // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
+
+            {labwareLoadedOnModule == null &&
+            !shouldHideChildren &&
+            !isAdapter ? (
+              //  @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
               <SlotControls
                 key={slot.id}
                 slot={labwareInterfaceSlotDef}
@@ -380,12 +409,19 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
-        if (allModules.some(m => m.id === labware.slot)) return null
+        if (
+          labware.slot === 'offDeck' ||
+          allModules.some(m => m.id === labware.slot) ||
+          allLabware.some(lab => lab.id === labware.slot)
+        )
+          return null
         const slot = deckSlots.find(slot => slot.id === labware.slot)
         if (slot == null) {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
+        const labwareIsAdapter =
+          labware.def.metadata.displayCategory === 'adapter'
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
@@ -394,8 +430,70 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               labwareOnDeck={labware}
             />
             <g>
+              {labwareIsAdapter ? (
+                <>
+                  {/* @ts-expect-error */}
+                  <AdapterControls
+                    allLabware={allLabware}
+                    onDeck={true}
+                    labwareId={labware.id}
+                    key={slot.id}
+                    slot={slot}
+                    selectedTerminalItemId={props.selectedTerminalItemId}
+                    handleDragHover={handleHoverEmptySlot}
+                  />
+                </>
+              ) : (
+                <LabwareControls
+                  slot={slot}
+                  setHoveredLabware={setHoveredLabware}
+                  setDraggedLabware={setDraggedLabware}
+                  swapBlocked={
+                    swapBlocked &&
+                    (labware.id === hoveredLabware?.id ||
+                      labware.id === draggedLabware?.id)
+                  }
+                  labwareOnDeck={labware}
+                  selectedTerminalItemId={props.selectedTerminalItemId}
+                />
+              )}
+            </g>
+          </React.Fragment>
+        )
+      })}
+
+      {/* all adapters on deck and not on module  */}
+      {allLabware.map(labware => {
+        if (
+          allModules.some(m => m.id === labware.slot) ||
+          labware.slot === 'offDeck'
+        )
+          return null
+        const slotOnDeck = deckSlots.find(slot => slot.id === labware.slot)
+        if (slotOnDeck != null) {
+          return null
+        }
+        const slotForOnTheDeck = allLabware.find(lab => lab.id === labware.slot)
+          ?.slot
+        const slotForOnMod = allModules.find(mod => mod.id === slotForOnTheDeck)
+          ?.slot
+        const deckDefSlot = deckSlots.find(
+          s => s.id === (slotForOnMod ?? slotForOnTheDeck)
+        )
+        if (deckDefSlot == null) {
+          console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
+          return null
+        }
+        return (
+          <React.Fragment key={labware.id}>
+            <LabwareOnDeck
+              x={deckDefSlot.position[0]}
+              y={deckDefSlot.position[1]}
+              labwareOnDeck={labware}
+            />
+            <g>
               <LabwareControls
-                slot={slot}
+                slot={deckDefSlot}
                 setHoveredLabware={setHoveredLabware}
                 setDraggedLabware={setDraggedLabware}
                 swapBlocked={
@@ -433,6 +531,12 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const trashSlot =
+    Object.values(activeDeckSetup.labware).find(
+      lw =>
+        lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
+        lw.labwareDefURI === FLEX_TRASH_DEF_URI
+    )?.slot ?? null
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
@@ -460,11 +564,15 @@ export const DeckSetup = (): JSX.Element => {
           viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
           width="100%"
           height="100%"
-          trashSlotName={FLEX_TRASH_SLOT}
+          trashSlotName={
+            trashSlot != null ? (trashSlot as TrashSlotName) : undefined
+          }
+          trashColor={COLORS.darkGreyEnabled}
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
             <>
               <DeckSetupContents
+                trashSlot={trashSlot}
                 robotType={robotType}
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}

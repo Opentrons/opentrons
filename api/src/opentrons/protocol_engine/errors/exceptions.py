@@ -210,32 +210,6 @@ class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
-class LabwareDefinitionIsNotLabwareError(ProtocolEngineError):
-    """Raised when trying to load a labware via loadLabware that is not a labware."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a LabwareDefinitionIsNotLabwareError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
-class LabwareDefinitionIsNotAdapterError(ProtocolEngineError):
-    """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a LabwareDefinitionIsNotAdapterError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
 class LabwareCannotBeStackedError(ProtocolEngineError):
     """Raised when trying to load labware onto another labware it is not defined to be loaded onto."""
 
@@ -424,7 +398,7 @@ class MustHomeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a MustHomeError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(ErrorCodes.POSITION_UNKNOWN, message, details, wrapping)
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):
@@ -684,7 +658,9 @@ class HardwareNotSupportedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a HardwareNotSupportedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )
 
 
 class GripperNotAttachedError(ProtocolEngineError):
@@ -700,6 +676,19 @@ class GripperNotAttachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, details, wrapping)
 
 
+class CannotPerformGripperAction(ProtocolEngineError):
+    """Raised when trying to perform an illegal gripper action."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CannotPerformGripperAction."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LabwareMovementNotAllowedError(ProtocolEngineError):
     """Raised when attempting an illegal labware movement."""
 
@@ -710,6 +699,19 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareMovementNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsNotAllowedInLocationError(ProtocolEngineError):
+    """Raised when attempting an illegal labware load into slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsNotAllowedInLocationError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -736,7 +738,9 @@ class FirmwareUpdateRequired(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LocationIsOccupiedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, details, wrapping
+        )
 
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
@@ -765,6 +769,32 @@ class InvalidPipettingVolumeError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidPushOutVolumeError(ProtocolEngineError):
+    """Raised when attempting to use an invalid volume for dispense push_out."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidPushOutVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidDispenseVolumeError(ProtocolEngineError):
+    """Raised when attempting to dispense a volume that was not aspirated."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidDispenseVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class InvalidAxisForRobotType(ProtocolEngineError):
     """Raised when attempting to use an axis that is not present on the given type of robot."""
 
@@ -789,3 +819,18 @@ class EStopActivatedError(ProtocolEngineError):
     ) -> None:
         """Build an EStopActivatedError."""
         super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+
+
+class NotSupportedOnRobotType(ProtocolEngineError):
+    """Raised when attempting to perform an action that is not supported for the given robot type."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NotSupportedOnRobotType exception."""
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )

@@ -7,13 +7,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import {
   useAttachedPipettesFromInstrumentsQuery,
   useIsOT3,
   usePipetteOffsetCalibrations,
-} from '../../organisms/Devices/hooks'
+} from '../Devices/hooks'
+import { getShowPipetteCalibrationWarning } from '../Devices/utils'
+import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
 import type { FormattedPipetteOffsetCalibration } from '.'
@@ -32,7 +35,9 @@ export function RobotSettingsPipetteOffsetCalibration({
   const { t } = useTranslation('device_settings')
 
   const isOT3 = useIsOT3(robotName)
-
+  const { data: instrumentsData } = useInstrumentsQuery({
+    enabled: isOT3,
+  })
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const attachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery()
   const ot3AttachedLeftPipetteOffsetCal =
@@ -64,6 +69,9 @@ export function RobotSettingsPipetteOffsetCalibration({
       {isOT3 ? (
         <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
       ) : null}
+      {getShowPipetteCalibrationWarning(instrumentsData) && (
+        <PipetteRecalibrationWarning />
+      )}
       {showPipetteOffsetCalItems ? (
         <PipetteOffsetCalibrationItems
           robotName={robotName}
@@ -73,7 +81,9 @@ export function RobotSettingsPipetteOffsetCalibration({
           updateRobotStatus={updateRobotStatus}
         />
       ) : (
-        <StyledText as="label">{t('not_calibrated')}</StyledText>
+        <StyledText as="label" marginTop={SPACING.spacing8}>
+          {t('no_pipette_attached')}
+        </StyledText>
       )}
     </Flex>
   )

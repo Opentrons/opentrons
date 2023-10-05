@@ -145,9 +145,6 @@ def build_liquid_model_v2(
             )
     max_volume = int(input("please provide the max volume of the pipette\n"))
     min_volume = float(input("please provide the min volume of the pipette\n"))
-    default_blow_out_volume = float(
-        input("please provide the default blow out volume\n")
-    )
     default_tipracks = input(
         "please input the load names of default tipracks separated by commas\n"
     )
@@ -158,7 +155,6 @@ def build_liquid_model_v2(
             "maxVolume": max_volume,
             "minVolume": min_volume,
             "defaultTipracks": list_default_tipracks,
-            "defaultBlowOutVolume": default_blow_out_volume,
         }
     )
 
@@ -278,14 +274,9 @@ def migrate_new_blow_out_configs_v2() -> None:
 def fill_blowout_configs(
     pipette_gen: int, shaft_diameters: Dict[str, float], volumes: List[str]
 ) -> None:
-    default_blowout_for_tip = {
-        "p50": {"t50": 1.5},
-        "p1000": {"t50": 3.2, "t200": 16, "t1000": 16},
-    }
 
     general_config_files = Path(GENERAL_ROOT).glob("*")
     for pipette_type in general_config_files:  # single, eight, 96-channel
-        pipette_type_str = str(pipette_type).split("/")[-1]
         for volume in volumes:  # pipette max volume- p10, p20, p50, etc.
             shaft_diameter = shaft_diameters[volume]
             # calculate uL per mm, default blowout vol
@@ -302,46 +293,6 @@ def fill_blowout_configs(
                 gen_path = GENERAL_ROOT / pipette_type / volume
                 version_str = str(general_file_version).split("/")[-1][:-5]
                 save_to_file(gen_path, version_str, general_config_dict, GENERAL_SCHEMA)
-
-            # do the same for liquid data files
-            for liquid_file_version in Path(
-                LIQUID_ROOT / pipette_type_str / volume
-            ).glob(f"{str(pipette_gen)}_*.json"):
-                with open(liquid_file_version, "r") as file:
-                    liquid_config_dict = json.load(file)
-                    # gen 3 default blowout volumes change depending on tip volume
-                    if pipette_gen == 3:
-                        for tip in liquid_config_dict["supportedTips"]:
-                            default_blowout_volume = default_blowout_for_tip[volume][
-                                tip
-                            ]
-                            liquid_config_dict["supportedTips"][tip][
-                                "defaultBlowoutVolume"
-                            ] = round(default_blowout_volume, 3)
-                    # gen 1 and 2 pipettes only have 1 compatible tip per pipette size
-                    else:
-                        # calculate blowout distance from the last checked file for this pip size, bottom and
-                        # blowout positions don't change between revisions of the same pipette type
-                        blowout_distance = (
-                            general_config_dict["plungerPositionsConfigurations"][
-                                "bottom"
-                            ]
-                            - general_config_dict["plungerPositionsConfigurations"][
-                                "blowout"
-                            ]
-                        )
-                        default_blowout_volume = blowout_distance * ul_per_mm
-                        for tip in liquid_config_dict["supportedTips"]:
-                            liquid_config_dict["supportedTips"][tip][
-                                "defaultBlowoutVolume"
-                            ] = round(default_blowout_volume, 3)
-
-                    # get path to pass into save_to_file
-                    liquid_path = Path(LIQUID_ROOT / pipette_type_str / volume)
-                    version_str = str(liquid_file_version).split("/")[-1][:-5]
-                save_to_file(
-                    liquid_path, version_str, liquid_config_dict, LIQUID_SCHEMA
-                )
 
 
 def build_new_pipette_model_v2(

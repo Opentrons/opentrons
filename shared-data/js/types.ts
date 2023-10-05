@@ -21,13 +21,18 @@ import {
   RIGHT,
   GRIPPER_V1,
   GRIPPER_V1_1,
+  GRIPPER_V1_2,
+  EXTENSION,
   MAGNETIC_BLOCK_V1,
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
-import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
-import { EXTENSION } from '.'
+import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -81,6 +86,7 @@ export type LabwareDisplayCategory =
   | 'aluminumBlock'
   | 'trash'
   | 'other'
+  | 'adapter'
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
@@ -166,6 +172,8 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export type LabwareRoles = 'labware' | 'adapter' | 'fixture' | 'maintenance'
+
 // NOTE: must be synced with shared-data/labware/schemas/2.json
 export interface LabwareDefinition2 {
   version: number
@@ -179,6 +187,7 @@ export interface LabwareDefinition2 {
   ordering: string[][]
   wells: LabwareWellMap
   groups: LabwareWellGroup[]
+  allowedRoles?: LabwareRoles[]
 }
 
 export type ModuleType =
@@ -212,13 +221,22 @@ export type ModuleModel =
   | HeaterShakerModuleModel
   | MagneticBlockModel
 
-export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
+export type GripperModel =
+  | typeof GRIPPER_V1
+  | typeof GRIPPER_V1_1
+  | typeof GRIPPER_V1_2
 
 export type ModuleModelWithLegacy =
   | ModuleModel
   | typeof THERMOCYCLER
   | typeof MAGDECK
   | typeof TEMPDECK
+
+export type FixtureLoadName =
+  | typeof STAGING_AREA_LOAD_NAME
+  | typeof STANDARD_SLOT_LOAD_NAME
+  | typeof TRASH_BIN_LOAD_NAME
+  | typeof WASTE_CHUTE_LOAD_NAME
 
 export interface DeckOffset {
   x: number
@@ -468,6 +486,8 @@ export type MotorAxis =
   | 'rightZ'
   | 'leftPlunger'
   | 'rightPlunger'
+  | 'extensionZ'
+  | 'extensionJaw'
 
 export type MotorAxes = MotorAxis[]
 
@@ -489,6 +509,7 @@ export interface GripperDefinition {
     polynomial: [[number, number], [number, number]]
     defaultGripForce: number
     defaultHomeForce: number
+    defaultIdleForce: number
     min: number
     max: number
   }
@@ -500,3 +521,21 @@ export interface GripperDefinition {
     jawWidth: { min: number; max: number }
   }
 }
+
+export type StatusBarAnimation =
+  | 'idle'
+  | 'confirm'
+  | 'updating'
+  | 'disco'
+  | 'off'
+
+export type StatusBarAnimations = StatusBarAnimation[]
+
+// TODO(bh, 2023-09-28): refine types when settled
+export interface Fixture {
+  fixtureId: string
+  fixtureLocation: string
+  loadName: FixtureLoadName
+}
+
+export type DeckConfiguration = Fixture[]
