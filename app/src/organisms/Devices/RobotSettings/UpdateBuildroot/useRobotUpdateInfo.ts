@@ -1,10 +1,9 @@
 import * as React from 'react'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 
-export function useRobotUpdateInfo(session: RobotUpdateSession | null): {
-  updateStep: UpdateStep
-  progressPercent: number
-} {
+export function useRobotUpdateInfo(
+  session: RobotUpdateSession | null
+): { updateStep: UpdateStep; progressPercent: number } {
   const shellReportedUpdateStep = React.useMemo(
     () => getShellReportedUpdateStep(session),
     [session]
@@ -17,7 +16,10 @@ export function useRobotUpdateInfo(session: RobotUpdateSession | null): {
     session?.progress
   )
 
-  return { updateStep, progressPercent }
+  return {
+    updateStep,
+    progressPercent,
+  }
 }
 
 export type UpdateStep =
