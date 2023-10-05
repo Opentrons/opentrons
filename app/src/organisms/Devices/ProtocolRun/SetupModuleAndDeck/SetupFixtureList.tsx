@@ -15,9 +15,19 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FixtureLoadName, getFixtureDisplayName } from '@opentrons/shared-data'
+import {
+  FixtureLoadName,
+  getFixtureDisplayName,
+  LoadFixtureRunTimeCommand,
+} from '@opentrons/shared-data'
+import {
+  useLoadedFixturesConfigStatus,
+  NOT_CONFIGURED,
+  CONFIGURED,
+} from '../../../../resources/deck_configuration/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
+import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { getFixtureImage } from './utils'
 
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
@@ -67,13 +77,16 @@ export const SetupFixtureList = (props: SetupModulesListProps): JSX.Element => {
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
-        {map(loadedFixturesBySlot, ({ params }) => {
+        {map(loadedFixturesBySlot, ({ params, id }) => {
           const { loadName, location } = params
+          console.log(id)
           return (
             <FixtureListItem
               key={`SetupFixturesList_${loadName}_slot_${location.cutout}`}
               loadName={loadName}
               cutout={location.cutout}
+              loadedFixtures={Object.values(loadedFixturesBySlot)}
+              commandId={id}
             />
           )
         })}
@@ -83,25 +96,44 @@ export const SetupFixtureList = (props: SetupModulesListProps): JSX.Element => {
 }
 
 interface FixtureListItemProps {
+  loadedFixtures: LoadFixtureRunTimeCommand[]
   loadName: FixtureLoadName
   cutout: string
+  commandId: string
 }
 
 export function FixtureListItem({
+  loadedFixtures,
   loadName,
   cutout,
+  commandId,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const configuration = useLoadedFixturesConfigStatus(loadedFixtures)
+  const configurationStatus = configuration.find(
+    config => config.id === commandId
+  )?.configurationStatus
 
-  const statusLabel = (
-    <StatusLabel
-      status="Configured"
-      backgroundColor={COLORS.successBackgroundLight}
-      iconColor={COLORS.successEnabled}
-      textColor={COLORS.successText}
-    />
-  )
-  // TODO(jr, 10/4/23): wire up other status labels
+  let statusLabel
+  if (configurationStatus !== CONFIGURED) {
+    statusLabel = (
+      <StatusLabel
+        status={configurationStatus ?? ''}
+        backgroundColor={COLORS.warningBackgroundLight}
+        iconColor={COLORS.warningEnabled}
+        textColor={COLORS.warningText}
+      />
+    )
+  } else {
+    statusLabel = (
+      <StatusLabel
+        status={configurationStatus}
+        backgroundColor={COLORS.successBackgroundLight}
+        iconColor={COLORS.successEnabled}
+        textColor={COLORS.successText}
+      />
+    )
+  }
 
   return (
     <>
@@ -149,7 +181,19 @@ export function FixtureListItem({
           <StyledText as="p" width="15%">
             {cutout}
           </StyledText>
-          <Flex width="15%">{statusLabel}</Flex>
+          <Flex
+            width="15%"
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing10}
+          >
+            {statusLabel}
+            {configurationStatus === NOT_CONFIGURED ? (
+              //  TODO(jr, 10/4/23): wire up update deck cta
+              <TertiaryButton onClick={() => console.log('wire this up')}>
+                <StyledText as="label">{t('update_deck')}</StyledText>
+              </TertiaryButton>
+            ) : null}
+          </Flex>
         </Flex>
       </Box>
     </>
