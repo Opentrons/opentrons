@@ -21,7 +21,10 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
+import {
+  useCurrentSubsystemUpdateQuery,
+  usePipetteSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import {
   LEFT,
@@ -124,9 +127,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
-  const settings = useSelector((state: State) =>
-    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId ?? '')
-  )
+  const settings = usePipetteSettingsQuery({
+    refetchInterval: 5000,
+    enabled: pipetteId != null,
+  }).data?.[pipetteId ?? '']?.fields
 
   const [
     selectedPipette,
