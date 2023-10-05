@@ -4,17 +4,13 @@ import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 export function useRobotUpdateInfo(
   session: RobotUpdateSession | null
 ): { updateStep: UpdateStep; progressPercent: number } {
+  const progressPercent = useFindProgressPercentFrom(session)
+
   const shellReportedUpdateStep = React.useMemo(
     () => getShellReportedUpdateStep(session),
     [session]
   )
-
   const updateStep = useTransitionUpdateStepFrom(shellReportedUpdateStep)
-  const progressPercent = useFindProgressPercentFrom(
-    updateStep,
-    session?.fileInfo?.isManualFile ?? false,
-    session?.progress
-  )
 
   return {
     updateStep,
@@ -57,91 +53,131 @@ function getShellReportedUpdateStep(
   return reportedUpdateStep
 }
 
+// Shell steps sometimes backtrack, so use guarded transitions.
 function useTransitionUpdateStepFrom(
   reportedUpdateStep: UpdateStep | null
 ): UpdateStep {
   const [updateStep, setUpdateStep] = React.useState<UpdateStep>('initial')
   const prevUpdateStep = React.useRef<UpdateStep | null>(null)
 
-  if (reportedUpdateStep === 'initial' && updateStep !== 'initial') {
-    setUpdateStep('initial')
-    prevUpdateStep.current = null
-  } else if (reportedUpdateStep === 'error' && updateStep !== 'error') {
-    setUpdateStep('error')
-  } else if (updateStep === 'initial') {
-    if (reportedUpdateStep === 'install' && prevUpdateStep.current == null) {
-      setUpdateStep('install')
-      prevUpdateStep.current = 'initial'
-    }
-  } else if (updateStep === 'install') {
-    if (
-      reportedUpdateStep === 'restart' &&
-      prevUpdateStep.current === 'initial'
-    ) {
-      setUpdateStep('restart')
-      prevUpdateStep.current = 'install'
-    }
-  } else if (updateStep === 'restart') {
-    if (
-      reportedUpdateStep === 'finished' &&
-      prevUpdateStep.current === 'install'
-    ) {
-      setUpdateStep('finished')
-      prevUpdateStep.current = 'restart'
-    }
+  switch (reportedUpdateStep) {
+    case 'initial':
+      if (updateStep !== 'initial') {
+        setUpdateStep('initial')
+        prevUpdateStep.current = null
+      }
+      break
+    case 'error':
+      if (updateStep !== 'error') {
+        setUpdateStep('error')
+      }
+      break
+    case 'install':
+      if (updateStep === 'initial' && prevUpdateStep.current == null) {
+        setUpdateStep('install')
+        prevUpdateStep.current = 'initial'
+      }
+      break
+    case 'restart':
+      if (updateStep === 'install' && prevUpdateStep.current === 'initial') {
+        setUpdateStep('restart')
+        prevUpdateStep.current = 'install'
+      }
+      break
+    case 'finished':
+      if (updateStep === 'restart' && prevUpdateStep.current === 'install') {
+        setUpdateStep('finished')
+        prevUpdateStep.current = 'restart'
+      }
+      break
   }
   return updateStep
 }
 
 function useFindProgressPercentFrom(
-  updateStep: UpdateStep,
-  filePathUsedForUpdate: boolean,
-  stepProgress?: number | null
+  session: RobotUpdateSession | null
 ): number {
   const [progressPercent, setProgressPercent] = React.useState<number>(0)
+  const prevSeenUpdateStep = React.useRef<string | null>(null)
   const prevSeenStepProgress = React.useRef<number>(0)
-  const currentStepWithProgress = React.useRef<number>(0)
+  const currentStepWithProgress = React.useRef<number>(-1)
 
-  const TOTAL_STEPS_WITH_PROGRESS = filePathUsedForUpdate ? 2 : 2
+  if (session == null) return progressPercent
 
-  if (updateStep === 'initial') {
+  const {
+    fileInfo,
+    step: sessionStep,
+    stage: sessionStage,
+    progress: stepProgress,
+  } = session
+
+  const TOTAL_STEPS_WITH_PROGRESS = fileInfo?.isManualFile ? 3 : 3
+
+  if (sessionStep === 'getToken') {
     if (progressPercent !== 0) {
       setProgressPercent(0)
       prevSeenStepProgress.current = 0
     }
-  } else if (updateStep === 'restart' || updateStep === 'finished') {
+    return progressPercent
+  } else if (sessionStep === 'restart' || sessionStep === 'finished') {
     if (progressPercent !== 100) {
       setProgressPercent(100)
       prevSeenStepProgress.current = 100
     }
     return progressPercent
-  } else if (
-    updateStep === 'error' ||
-    stepProgress == null ||
-    stepProgress === prevSeenStepProgress.current
-  ) {
+  } else if (sessionStage === 'error' || stepProgress == null) {
     return progressPercent
-  } else {
-    // Assume new step instead of stepProgress backtracking.
-    if (prevSeenStepProgress.current > 85 && stepProgress <= 60) {
-      currentStepWithProgress.current += 1
-      const completedStepsWithProgress =
-        (100 * currentStepWithProgress.current) / TOTAL_STEPS_WITH_PROGRESS
-      prevSeenStepProgress.current = 0
-      setProgressPercent(Math.round(completedStepsWithProgress + stepProgress))
-    } else {
-      const currentStepProgress =
-        progressPercent +
-        (stepProgress - prevSeenStepProgress.current) /
-          TOTAL_STEPS_WITH_PROGRESS
-      const nonBacktrackedProgressPercent = Math.max(
-        progressPercent,
-        currentStepProgress
-      )
-      setProgressPercent(Math.round(nonBacktrackedProgressPercent))
-    }
-    prevSeenStepProgress.current = stepProgress
   }
+
+  const stepAndStage = `${sessionStep}-${sessionStage}`
+
+  // Accomodate for shell progress oddities.
+  const isNewStateWithProgress =
+    prevSeenUpdateStep.current !== stepAndStage &&
+    stepProgress > 0 &&
+    stepProgress < 100
+
+  if (isNewStateWithProgress) {
+    console.log('HITTING TRANSITION')
+    currentStepWithProgress.current += 1
+    console.log('CURRENT STEP PROGRESS', currentStepWithProgress.current)
+    const completedStepsWithProgress =
+      (100 * currentStepWithProgress.current) / TOTAL_STEPS_WITH_PROGRESS
+    prevSeenStepProgress.current = 0
+    prevSeenUpdateStep.current = stepAndStage
+    setProgressPercent(completedStepsWithProgress + stepProgress)
+  } else if (stepProgress > prevSeenStepProgress.current) {
+    const currentStepProgress =
+      progressPercent +
+      (stepProgress - prevSeenStepProgress.current) / TOTAL_STEPS_WITH_PROGRESS
+    const nonBacktrackedProgressPercent = Math.max(
+      progressPercent,
+      currentStepProgress
+    )
+    prevSeenStepProgress.current = stepProgress
+    setProgressPercent(nonBacktrackedProgressPercent)
+  }
+
+  console.log(
+    '🚀 ~ file: useRobotUpdateInfo.ts:143 ~ updateStep:',
+    stepAndStage
+  )
+  console.log(
+    '🚀 ~ file: useRobotUpdateInfo.ts:165 ~ prevSeenUpdateStep.current :',
+    prevSeenUpdateStep.current
+  )
+  console.log(
+    '🚀 ~ file: useRobotUpdateInfo.ts:114 ~ stepProgress:',
+    stepProgress
+  )
+  console.log(
+    '🚀 ~ file: useRobotUpdateInfo.ts:113 ~ prevSeenStepProgress:',
+    prevSeenStepProgress
+  )
+  console.log(
+    '🚀 ~ file: useRobotUpdateInfo.ts:115 ~ currentStepWithProgress:',
+    currentStepWithProgress
+  )
 
   return progressPercent
 }
