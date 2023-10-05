@@ -1842,6 +1842,8 @@ class OT3API(
             raise
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
+            if push_out or dispense_spec.instr.push_out_volume:
+                dispense_spec.instr.ready_to_aspirate = False
 
     async def blow_out(
         self,
