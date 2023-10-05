@@ -182,9 +182,10 @@ export function InstrumentsAndModules({
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
-        {getShowPipetteCalibrationWarning(attachedInstruments) &&
-        (currentRunId == null || isRunTerminal) ? (
-          <Flex paddingBottom={SPACING.spacing16}>
+        {isRobotViewable &&
+        getShowPipetteCalibrationWarning(attachedInstruments) &&
+        (isRunTerminal || currentRunId == null) ? (
+          <Flex paddingBottom={SPACING.spacing16} width="100%">
             <PipetteRecalibrationWarning />
           </Flex>
         ) : null}
