@@ -195,7 +195,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {!pipetteIsBad && subsystemUpdateData == null && (
         <>
           <Box
-            padding={`${SPACING.spacing16} ${SPACING.spacing16}`}
+            padding={${SPACING.spacing16}}
             width="100%"
           >
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
