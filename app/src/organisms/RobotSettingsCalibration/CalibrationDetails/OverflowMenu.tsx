@@ -12,7 +12,7 @@ import {
   Mount,
   useOnClickOutside,
 } from '@opentrons/components'
-import { isOT3Pipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import {
   useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -82,7 +82,7 @@ export function OverflowMenu({
     showPipetteWizardFlows,
     setShowPipetteWizardFlows,
   ] = React.useState<boolean>(false)
-  const isFlexPipette = isOT3Pipette(pipetteName as PipetteName)
+  const isFlexPipette = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
     useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
       ?.last_modified ?? null

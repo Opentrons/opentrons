@@ -17,7 +17,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import {
-  isOT3Pipette,
+  isFlexPipette,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
@@ -103,7 +103,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   } = useMenuHandleClickOutside()
   const isOt3 = useIsOT3(robotName)
   const pipetteName = pipetteModelSpecs?.name
-  const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
+  const isFlexPipetteAttached = isFlexPipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteModelSpecs?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -134,16 +134,16 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
 
   const handleChangePipette = (): void => {
-    if (isOT3PipetteAttached && isOt3) {
+    if (isFlexPipetteAttached && isOt3) {
       setPipetteWizardFlow(FLOWS.DETACH)
-    } else if (!isOT3PipetteAttached && isOt3) {
+    } else if (!isFlexPipetteAttached && isOt3) {
       setShowAttachPipette(true)
     } else {
       setChangePipette(true)
     }
   }
   const handleCalibrate = (): void => {
-    if (isOT3PipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
+    if (isFlexPipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
   }
   const handleAboutSlideout = (): void => {
     setShowAboutSlideout(true)
@@ -243,7 +243,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 flex="100%"
                 paddingLeft={SPACING.spacing8}
               >
-                {isOT3PipetteAttached && !isPipetteCalibrated ? (
+                {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
                     <Trans
                       t={t}
@@ -339,9 +339,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box
             ref={pipetteOverflowWrapperRef}
-            data-testid={`PipetteCard_overflow_menu_${String(
-              pipetteDisplayName
-            )}`}
             onClick={() => setShowOverflowMenu(false)}
           >
             <PipetteOverflowMenu

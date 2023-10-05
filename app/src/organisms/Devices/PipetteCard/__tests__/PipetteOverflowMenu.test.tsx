@@ -8,7 +8,7 @@ import {
   mockLeftProtoPipette,
   mockPipetteSettingsFieldsMap,
 } from '../../../../redux/pipettes/__fixtures__'
-import { isOT3Pipette } from '@opentrons/shared-data'
+import { isFlexPipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
 
@@ -17,12 +17,12 @@ jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {
     ...actualSharedData,
-    isOT3Pipette: jest.fn(),
+    isFlexPipette: jest.fn(),
   }
 })
 
-const mockIsOT3Pipette = isOT3Pipette as jest.MockedFunction<
-  typeof isOT3Pipette
+const mockisFlexPipette = isFlexPipette as jest.MockedFunction<
+  typeof isFlexPipette
 >
 
 const render = (props: React.ComponentProps<typeof PipetteOverflowMenu>) => {
@@ -77,7 +77,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('renders recalibrate pipette text for OT-3 pipette', () => {
-    mockIsOT3Pipette.mockReturnValue(true)
+    mockisFlexPipette.mockReturnValue(true)
     props = {
       ...props,
       isPipetteCalibrated: true,
@@ -92,7 +92,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('should render recalibrate pipette text for OT-3 pipette', () => {
-    mockIsOT3Pipette.mockReturnValue(true)
+    mockisFlexPipette.mockReturnValue(true)
     props = {
       ...props,
       isPipetteCalibrated: true,
@@ -106,7 +106,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('renders only the about pipette button if FLEX pipette is attached', () => {
-    mockIsOT3Pipette.mockReturnValue(true)
+    mockisFlexPipette.mockReturnValue(true)
 
     const { getByRole, queryByRole } = render(props)
 
@@ -127,7 +127,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('does not render the pipette settings button if the pipette has no settings', () => {
-    mockIsOT3Pipette.mockReturnValue(false)
+    mockisFlexPipette.mockReturnValue(false)
     props = {
       ...props,
       pipetteSettings: null,

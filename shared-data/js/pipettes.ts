@@ -66,7 +66,7 @@ export function shouldLevel(specs: PipetteNameSpecs): boolean {
   return specs.displayCategory === 'GEN2' && specs.channels === 8
 }
 
-export function isOT3Pipette(pipetteName: PipetteName): boolean {
+export function isFlexPipette(pipetteName: PipetteName): boolean {
   return (
     OT3_PIPETTES.includes(pipetteName) ||
     getPipetteNameSpecs(pipetteName)?.displayCategory === 'FLEX'
@@ -76,13 +76,13 @@ export function isOT3Pipette(pipetteName: PipetteName): boolean {
 export const getIncompatiblePipetteNames = (
   currentPipette: PipetteName
 ): string[] => {
-  if (isOT3Pipette(currentPipette)) {
-    return getAllPipetteNames().filter(pipette => !isOT3Pipette(pipette))
+  if (isFlexPipette(currentPipette)) {
+    return getAllPipetteNames().filter(pipette => !isFlexPipette(pipette))
   } else if (
     getPipetteNameSpecs(currentPipette)?.displayCategory === 'GEN1' ||
     getPipetteNameSpecs(currentPipette)?.displayCategory === 'GEN2'
   ) {
-    return getAllPipetteNames().filter(pipette => isOT3Pipette(pipette))
+    return getAllPipetteNames().filter(pipette => isFlexPipette(pipette))
   } else {
     return []
   }
