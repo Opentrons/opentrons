@@ -16,7 +16,7 @@
         "id": "D1",
         "areaType": "slot",
         "matingSurfaceUnitVector": [-1, 1, -1],
-        "position": [3.0, 0.0, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -33,7 +33,7 @@
         "id": "D2",
         "areaType": "slot",
         "matingSurfaceUnitVector": [-1, 1, -1],
-        "position": [3.0, 0.0, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -45,7 +45,7 @@
       {
         "id": "D3",
         "areaType": "slot",
-        "position": [3.0, 0.0, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -60,22 +60,9 @@
         ]
       },
       {
-        "id": "extensionSlotD3",
-        "areaType": "slot",
-        "position": [3.0, 0.0, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
-        "displayName": "Slot D3",
-        "compatibleModuleTypes": []
-      },
-      {
         "id": "C1",
         "areaType": "slot",
-        "position": [0.0, 3, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -92,7 +79,7 @@
       {
         "id": "C2",
         "areaType": "slot",
-        "position": [0, 3, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -105,7 +92,7 @@
       {
         "id": "C3",
         "areaType": "slot",
-        "position": [328.0, 107, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -118,19 +105,6 @@
           "heaterShakerModuleType",
           "magneticBlockType"
         ]
-      },
-      {
-        "id": "extensionSlotC3",
-        "areaType": "slot",
-        "position": [0, 3, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
-        "displayName": "Slot C3",
-        "compatibleModuleTypes": []
       },
       {
         "id": "B1",
@@ -153,7 +127,7 @@
       {
         "id": "B2",
         "areaType": "slot",
-        "position": [0, 3, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -166,7 +140,7 @@
       {
         "id": "B3",
         "areaType": "slot",
-        "position": [328.0, 214.0, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -181,22 +155,9 @@
         ]
       },
       {
-        "id": "extensionSlotB3",
-        "areaType": "slot",
-        "position": [0, 0, 0.0],
-        "matingSurfaceUnitVector": [-1, 1, -1],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
-        "displayName": "Slot B3",
-        "compatibleModuleTypes": []
-      },
-      {
         "id": "A1",
         "areaType": "slot",
-        "position": [0.0, 0, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -214,7 +175,7 @@
       {
         "id": "A2",
         "areaType": "slot",
-        "position": [0, 0, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -227,7 +188,7 @@
       {
         "id": "A3",
         "areaType": "slot",
-        "position": [0, 0, 0.0],
+        "position": [0.0, 0.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -241,21 +202,9 @@
         ]
       },
       {
-        "id": "extensionSlotA3",
-        "areaType": "slot",
-        "position": [0, 0, 0.0],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
-        "displayName": "Slot A3",
-        "compatibleModuleTypes": []
-      },
-      {
         "id": "A4",
         "areaType": "slot",
-        "position": [0, 164, 14.5],
+        "position": [164.0, 0.0, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -267,7 +216,7 @@
       {
         "id": "B4",
         "areaType": "slot",
-        "position": [0, 164, 14.5],
+        "position": [164.0, 0.0, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -279,7 +228,7 @@
       {
         "id": "C4",
         "areaType": "slot",
-        "position": [0, 164, 14.5],
+        "position": [164.0, 0.0, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -291,7 +240,7 @@
       {
         "id": "D4",
         "areaType": "slot",
-        "position": [0, 164, 14.5],
+        "position": [164.0, 0.0, 14.5],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -303,55 +252,55 @@
       {
         "id": "movableTrash",
         "areaType": "movableTrash",
-        "position": [0, 164, 14.5],
+        "position": [-17.0, -2.75, 0.0],
         "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
         },
         "displayName": "Movable Trash"
       },
       {
         "id": "1/8cWasteChute",
         "areaType": "wasteChute",
-        "position": [0, 164, 14.5],
+        "position": [-13.50, 0, 0],
         "boundingBox": {
-          "xDimension": 128.0,
+          "xDimension": 155.0,
           "yDimension": 86.0,
-          "zDimension": 0
+          "zDimension": 154.0
         },
         "displayName": "1/8 Channel Waste Chute",
         "ableToDropLabware": false,
         "ableToDropTips": true,
-        "dropTipsOffset": [64, 64, 144.5]
-      },
-      {
-        "id": "gripperWasteChute",
-        "areaType": "wasteChute",
-        "position": [0, 164, 14.5],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
-        "displayName": "Gripper Waste Chute",
-        "ableToDropLabware": true,
-        "ableToDropTips": false,
-        "dropTipsOffset": [64, 57, 136.5]
+        "dropTipsOffset": [64, 21.91, 144.0]
       },
       {
         "id": "96cWasteChute",
         "areaType": "wasteChute",
-        "position": [0, 164, 14.5],
+        "position": [-13.50, 0, 0],
         "boundingBox": {
-          "xDimension": 128.0,
+          "xDimension": 155.0,
           "yDimension": 86.0,
-          "zDimension": 0
+          "zDimension": 154.0
         },
         "displayName": "96 Channel Waste Chute",
         "ableToDropLabware": false,
         "ableToDropTips": true,
-        "dropLabwareOffset": [14.445, 43.915, 115]
+        "dropTipsOffset": [14.445, 42.085, 115]
+      },
+      {
+        "id": "gripperWasteChute",
+        "areaType": "wasteChute",
+        "position": [-13.50, 0, 0],
+        "boundingBox": {
+          "xDimension": 155.0,
+          "yDimension": 86.0,
+          "zDimension": 154.0
+        },
+        "displayName": "Gripper Waste Chute",
+        "ableToDropLabware": true,
+        "ableToDropTips": false,
+        "dropLabwareOffset": [64, 29, 136.5]
       }
     ],
     "cutouts": [
