@@ -105,25 +105,35 @@ function createReadStreamWithSize(
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(source)
     const scheduledResolve = setTimeout(handleSuccess, 0)
-
-    readStream.once('error', handleError)
     let seenDataLength = 0
     let notifiedDataLength = 0
-    readStream.on('data', chunk => {
+
+    const onData = (chunk: Buffer): void => {
       seenDataLength += chunk.length
-      if (size !== Infinity && (seenDataLength/size > (notifiedDataLength/size + 0.01))) {
+      if (
+        size !== Infinity &&
+        seenDataLength / size > notifiedDataLength / size + 0.01
+      ) {
         progress?.(seenDataLength / size)
         notifiedDataLength = seenDataLength
       }
-    })
+
+      if (seenDataLength === size) {
+        readStream.removeListener('data', onData)
+        readStream.removeListener('error', handleError)
+      }
+    }
+
+    readStream.once('error', handleError)
+    readStream.on('data', onData)
 
     function handleSuccess(): void {
-      readStream.removeListener('error', handleError)
       resolve(readStream)
     }
 
     function handleError(error: Error): void {
       clearTimeout(scheduledResolve)
+      readStream.removeListener('data', onData)
       reject(error)
     }
   })

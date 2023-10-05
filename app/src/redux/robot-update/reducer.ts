@@ -200,7 +200,10 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
       return state.session
         ? {
             ...state,
-            session: { ...state.session, progress: action.payload * 100 },
+            session: {
+              ...state.session,
+              progress: Math.round(action.payload * 100),
+            },
           }
         : state
     }
