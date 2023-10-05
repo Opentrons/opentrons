@@ -180,7 +180,7 @@
     },
     "locations": {
       "type": "object",
-      "required": ["addressableAreas", "cutouts"],
+      "required": ["addressableAreas", "calibrationPoints", "cutouts"],
       "properties": {
         "addressableAreas": {
           "type": "array",
