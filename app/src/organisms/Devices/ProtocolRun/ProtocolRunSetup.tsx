@@ -159,7 +159,7 @@ export function ProtocolRunSetup({
   let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
     count: modules.length,
   })
-  if (!hasModules) {
+  if (!hasModules && !enableDeckConfig) {
     moduleDescription = i18n.format(t('no_modules_specified'), 'capitalize')
   } else if (isOT3 && enableDeckConfig && (hasModules || hasFixtures)) {
     moduleDescription = t('install_modules_and_fixtures')
@@ -260,46 +260,51 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </StyledText>
           ) : (
-            stepsKeysInOrder.map((stepKey, index) => (
-              <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
-                {(stepKey === 'liquid_setup_step' && !hasLiquids) ||
+            stepsKeysInOrder.map((stepKey, index) => {
+              const setupStepTitle = t(
+                isOT3 && stepKey === MODULE_SETUP_KEY && enableDeckConfig
+                  ? `module_and_deck_setup`
+                  : `${stepKey}_title`
+              )
+              const showEmptySetupStep =
+                (stepKey === 'liquid_setup_step' && !hasLiquids) ||
                 (stepKey === 'module_setup_step' &&
-                  (!hasModules ||
-                    (enableDeckConfig && !hasModules && !hasFixtures))) ? (
-                  <EmptySetupStep
-                    title={t(`${stepKey}_title`)}
-                    description={StepDetailMap[stepKey].description}
-                    label={t('step', { index: index + 1 })}
-                  />
-                ) : (
-                  <SetupStep
-                    expanded={stepKey === expandedStepKey}
-                    label={t('step', { index: index + 1 })}
-                    title={t(
-                      isOT3 && stepKey === MODULE_SETUP_KEY && enableDeckConfig
-                        ? `module_and_deck_setup`
-                        : `${stepKey}_title`
-                    )}
-                    description={StepDetailMap[stepKey].description}
-                    toggleExpanded={() =>
-                      stepKey === expandedStepKey
-                        ? setExpandedStepKey(null)
-                        : setExpandedStepKey(stepKey)
-                    }
-                    rightElement={
-                      <StepRightElement
-                        {...{ stepKey, runHasStarted, calibrationStatus }}
-                      />
-                    }
-                  >
-                    {StepDetailMap[stepKey].stepInternals}
-                  </SetupStep>
-                )}
-                {index !== stepsKeysInOrder.length - 1 ? (
-                  <Line marginTop={SPACING.spacing24} />
-                ) : null}
-              </Flex>
-            ))
+                  ((!enableDeckConfig && !hasModules) ||
+                    (enableDeckConfig && !hasModules && !hasFixtures)))
+              return (
+                <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
+                  {showEmptySetupStep ? (
+                    <EmptySetupStep
+                      title={t(`${stepKey}_title`)}
+                      description={StepDetailMap[stepKey].description}
+                      label={t('step', { index: index + 1 })}
+                    />
+                  ) : (
+                    <SetupStep
+                      expanded={stepKey === expandedStepKey}
+                      label={t('step', { index: index + 1 })}
+                      title={setupStepTitle}
+                      description={StepDetailMap[stepKey].description}
+                      toggleExpanded={() =>
+                        stepKey === expandedStepKey
+                          ? setExpandedStepKey(null)
+                          : setExpandedStepKey(stepKey)
+                      }
+                      rightElement={
+                        <StepRightElement
+                          {...{ stepKey, runHasStarted, calibrationStatus }}
+                        />
+                      }
+                    >
+                      {StepDetailMap[stepKey].stepInternals}
+                    </SetupStep>
+                  )}
+                  {index !== stepsKeysInOrder.length - 1 ? (
+                    <Line marginTop={SPACING.spacing24} />
+                  ) : null}
+                </Flex>
+              )
+            })
           )}
         </>
       ) : (

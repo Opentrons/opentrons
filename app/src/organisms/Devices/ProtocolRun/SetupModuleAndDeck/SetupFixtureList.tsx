@@ -32,11 +32,11 @@ import { getFixtureImage } from './utils'
 
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
 
-interface SetupModulesListProps {
+interface SetupFixtureListProps {
   loadedFixturesBySlot: LoadedFixturesBySlot
 }
 
-export const SetupFixtureList = (props: SetupModulesListProps): JSX.Element => {
+export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   const { loadedFixturesBySlot } = props
   const { t, i18n } = useTranslation('protocol_setup')
   return (
