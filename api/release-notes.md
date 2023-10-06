@@ -12,9 +12,9 @@ Welcome to the v7.0.1 release of the Opentrons robot software! This release buil
 
 This update may take longer than usual if you are updating from v6.x. Allow **approximately 15 minutes** for your robot to restart. This delay will only happen once.
 
-### New Features
-
 ### Bug Fixes
+
+- Fixed a problem with empty files being stored in the robot's database if the robot is power cycled at the wrong time.
 
 ### Known Issues
 
