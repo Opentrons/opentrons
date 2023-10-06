@@ -75,10 +75,10 @@ export function AddDeckConfigurationModal({
     availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
   }
 
-  const handleClickAdd = (index: number): void => {
+  const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
     updateDeckConfiguration({
       fixtureLocation,
-      loadName: availableFixtures[index],
+      loadName: fixtureLoadName,
     })
     setShowAddFixtureModal(false)
   }
@@ -107,18 +107,20 @@ export function AddDeckConfigurationModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableFixtures.map((fixture, index) => (
-                <React.Fragment key={`fixture_${index}`}>
+              {availableFixtures.map(fixture => (
+                <React.Fragment key={`${fixture}`}>
                   <Flex
                     flexDirection={DIRECTION_ROW}
                     alignItems={ALIGN_CENTER}
                     justifyContent={JUSTIFY_SPACE_BETWEEN}
                     padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                    backgroundColor={COLORS.fundamentalsBackground}
+                    backgroundColor={COLORS.medGreyEnabled}
                     borderRadius={BORDERS.borderRadiusSize1}
                   >
-                    <StyledText>{getFixtureDisplayName(fixture)}</StyledText>
-                    <TertiaryButton onClick={() => handleClickAdd(index)}>
+                    <StyledText css={TYPOGRAPHY.pSemiBold}>
+                      {getFixtureDisplayName(fixture)}
+                    </StyledText>
+                    <TertiaryButton onClick={() => handleClickAdd(fixture)}>
                       {t('add')}
                     </TertiaryButton>
                   </Flex>
