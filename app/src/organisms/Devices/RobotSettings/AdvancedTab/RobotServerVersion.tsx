@@ -18,7 +18,7 @@ import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { useIsOT3, useRobot } from '../../hooks'
-import { UpdateBuildroot } from '../UpdateBuildroot'
+import { handleUpdateBuildroot } from '../UpdateBuildroot'
 
 import type { State } from '../../../../redux/types'
 
@@ -35,7 +35,6 @@ export function RobotServerVersion({
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
-  const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
   const { autoUpdateAction } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
@@ -45,12 +44,6 @@ export function RobotServerVersion({
 
   return (
     <>
-      {showVersionInfoModal ? (
-        <UpdateBuildroot
-          robot={robot}
-          close={() => setShowVersionInfoModal(false)}
-        />
-      ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null ? (
         <Box marginBottom={SPACING.spacing16} width="100%">
           <UpdateRobotBanner robot={robot} />
@@ -95,7 +88,7 @@ export function RobotServerVersion({
               {t('up_to_date')}
             </StyledText>
             <TertiaryButton
-              onClick={() => setShowVersionInfoModal(true)}
+              onClick={() => handleUpdateBuildroot(robot)}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {t('reinstall')}

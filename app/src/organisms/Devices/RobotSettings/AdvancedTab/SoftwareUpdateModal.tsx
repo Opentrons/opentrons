@@ -21,7 +21,7 @@ import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
 import { Divider } from '../../../../atoms/structure'
 import { useRobot } from '../../hooks'
-import { UpdateBuildroot } from '../UpdateBuildroot'
+import { handleUpdateBuildroot } from '../UpdateBuildroot'
 
 const TECHNICAL_CHANGE_LOG_URL =
   'https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md'
@@ -50,22 +50,9 @@ export function SoftwareUpdateModal({
   const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
   const robot = useRobot(robotName)
 
-  const handleCloseModal = (): void => {
-    setShowUpdateModal(false)
-    closeModal()
-  }
-
-  const handleLaunchUpdateModal: React.MouseEventHandler = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowUpdateModal(true)
-  }
-
   if (robot?.status !== CONNECTABLE && robot?.status !== REACHABLE) return null
 
-  return showUpdateModal ? (
-    <UpdateBuildroot robot={robot} close={handleCloseModal} />
-  ) : (
+  return !showUpdateModal ? (
     <LegacyModal title={t('robot_update_available')} onClose={closeModal}>
       <Banner type="informing">{t('requires_restarting_the_robot')}</Banner>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing16}>
@@ -119,7 +106,10 @@ export function SoftwareUpdateModal({
             {t('remind_me_later')}
           </SecondaryButton>
           <PrimaryButton
-            onClick={handleLaunchUpdateModal}
+            onClick={() => {
+              setShowUpdateModal(true)
+              handleUpdateBuildroot(robot)
+            }}
             disabled={currentRunId != null}
           >
             {t('update_robot_now')}
@@ -127,5 +117,5 @@ export function SoftwareUpdateModal({
         </Flex>
       </Flex>
     </LegacyModal>
-  )
+  ) : null
 }

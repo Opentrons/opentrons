@@ -1,10 +1,11 @@
 import React from 'react'
+import NiceModal from '@ebay/nice-modal-react'
 
 import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
 import * as RobotUpdate from '../../../../../redux/robot-update'
 
 import { mountWithStore, WrapperWithStore } from '@opentrons/components'
-import { UpdateBuildroot } from '..'
+import { handleUpdateBuildroot } from '..'
 import { ViewUpdateModal } from '../ViewUpdateModal'
 import { RobotUpdateProgressModal } from '../RobotUpdateProgressModal'
 
@@ -33,12 +34,16 @@ const getRobotSystemType = RobotUpdate.getRobotSystemType as jest.MockedFunction
 const MOCK_STATE: State = { mockState: true } as any
 
 describe('UpdateBuildroot', () => {
-  const closeModal = jest.fn()
   const render = (): WrapperWithStore<
-    React.ComponentProps<typeof UpdateBuildroot>
+    React.ComponentProps<typeof NiceModal.Provider>
   > => {
-    return mountWithStore<React.ComponentProps<typeof UpdateBuildroot>>(
-      <UpdateBuildroot robot={mockRobot} close={closeModal} />,
+    return mountWithStore<React.ComponentProps<typeof NiceModal.Provider>>(
+      <NiceModal.Provider>
+        <button
+          onClick={() => handleUpdateBuildroot(mockRobot)}
+          id="testButton"
+        />
+      </NiceModal.Provider>,
       { initialState: MOCK_STATE }
     )
   }
@@ -53,7 +58,8 @@ describe('UpdateBuildroot', () => {
   })
 
   it('should set the update as seen on mount', () => {
-    const { store } = render()
+    const { store, wrapper } = render()
+    wrapper.find('#testButton').simulate('click')
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotUpdate.setRobotUpdateSeen(mockRobot.name)
@@ -62,14 +68,11 @@ describe('UpdateBuildroot', () => {
 
   it('renders a ViewUpdateModal if no session exists', () => {
     const { wrapper } = render()
+    wrapper.find('#testButton').simulate('click')
     const viewUpdate = wrapper.find(ViewUpdateModal)
 
     expect(viewUpdate.prop('robotName')).toBe(mockRobot.name)
     expect(viewUpdate.prop('robot')).toBe(mockRobot)
-
-    expect(closeModal).not.toHaveBeenCalled()
-    viewUpdate.invoke('closeModal')?.()
-    expect(closeModal).toHaveBeenCalled()
   })
 
   it('renders RobotUpdateProgressModal if session exists', () => {
@@ -86,6 +89,7 @@ describe('UpdateBuildroot', () => {
     getRobotUpdateSession.mockReturnValue(mockSession)
 
     const { wrapper } = render()
+    wrapper.find('#testButton').simulate('click')
     const progressModal = wrapper.find(RobotUpdateProgressModal)
 
     expect(progressModal.prop('robotName')).toBe(mockRobot.name)

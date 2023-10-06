@@ -20,7 +20,7 @@ import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { useIsRobotBusy } from '../hooks'
-import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
+import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
 import type { State } from '../../../redux/types'
 
@@ -49,8 +49,8 @@ const mockRestartRobot = restartRobot as jest.MockedFunction<
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
-const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
-  typeof UpdateBuildroot
+const mockUpdateBuildroot = handleUpdateBuildroot as jest.MockedFunction<
+  typeof handleUpdateBuildroot
 >
 const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
   typeof ChooseProtocolSlideout
@@ -90,7 +90,7 @@ describe('RobotOverviewOverflowMenu', () => {
       })
     when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(false)
-    when(mockUpdateBuildroot).mockReturnValue(<div>mock update buildroot</div>)
+    when(mockUpdateBuildroot).mockReturnValue()
     when(mockChooseProtocolSlideout).mockReturnValue(
       <div>choose protocol slideout</div>
     )
@@ -137,7 +137,7 @@ describe('RobotOverviewOverflowMenu', () => {
         updateFromFileDisabledReason: null,
       })
 
-    const { getByRole, getByText } = render(props)
+    const { getByRole } = render(props)
 
     const btn = getByRole('button')
     fireEvent.click(btn)
@@ -158,7 +158,7 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(homeBtn).toBeEnabled()
     expect(settingsBtn).toBeEnabled()
     fireEvent.click(updateRobotSoftwareBtn)
-    getByText('mock update buildroot')
+    expect(mockUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render disabled run a protocol, restart, disconnect, and home gantry menu items when robot is busy', () => {

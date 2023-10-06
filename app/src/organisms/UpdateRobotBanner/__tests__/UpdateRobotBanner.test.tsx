@@ -7,7 +7,7 @@ import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { UpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
+import { handleUpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
 import { UpdateRobotBanner } from '..'
 
 jest.mock('../../../redux/robot-update')
@@ -16,8 +16,8 @@ jest.mock('../../Devices/RobotSettings/UpdateBuildroot')
 const getRobotUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo as jest.MockedFunction<
   typeof Buildroot.getRobotUpdateDisplayInfo
 >
-const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
-  typeof UpdateBuildroot
+const mockUpdateBuildroot = handleUpdateBuildroot as jest.MockedFunction<
+  typeof handleUpdateBuildroot
 >
 const render = (props: React.ComponentProps<typeof UpdateRobotBanner>) => {
   return renderWithProviders(<UpdateRobotBanner {...props} />, {
@@ -32,7 +32,6 @@ describe('UpdateRobotBanner', () => {
     props = {
       robot: mockConnectableRobot,
     }
-    mockUpdateBuildroot.mockReturnValue(<div>mockUpdateBuildroot</div>)
     getRobotUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
@@ -51,7 +50,7 @@ describe('UpdateRobotBanner', () => {
     )
     const btn = getByRole('button', { name: 'View update' })
     fireEvent.click(btn)
-    getByText('mockUpdateBuildroot')
+    expect(mockUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render nothing if update is not available when autoUpdateAction returns reinstall', () => {
