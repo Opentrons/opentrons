@@ -59,7 +59,7 @@ stages:
               errorCode: 4000,
               errorType: ExceptionInProtocolError
               createdAt: !anystr
-              detail: UnexpectedTipRemovalError [line 9]: Error 3005 UNEXPECTED_TIP_REMOVAL (UnexpectedTipRemovalError): Cannot perform PREPARE_ASPIRATE without a tip attached.
+              detail: Cannot perform PREPARE_ASPIRATE without a tip attached.
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
