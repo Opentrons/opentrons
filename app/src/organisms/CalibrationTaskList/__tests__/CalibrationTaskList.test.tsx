@@ -43,6 +43,7 @@ const render = (robotName: string = 'otie') => {
         pipOffsetCalLauncher={mockPipOffsetCalLauncher}
         tipLengthCalLauncher={mockTipLengthCalLauncher}
         deckCalLauncher={mockDeckCalLauncher}
+        exitBeforeDeckConfigCompletion={false}
       />
     </StaticRouter>,
     {
@@ -93,6 +94,7 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )
@@ -118,6 +120,7 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )
@@ -142,6 +145,7 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )
@@ -166,6 +170,7 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )
@@ -189,6 +194,7 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )
@@ -212,10 +218,33 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )
     expect(getByText('Calibrations complete!')).toBeTruthy()
+  })
+
+  it('exiting a recalibrate wizard from a task will allow the current calibrations screen to show', () => {
+    mockUseCalibrationTaskList.mockReturnValueOnce(
+      expectedIncompleteRightMountTaskList
+    )
+
+    const [{ getByText, rerender }] = render()
+    const recalibrateLink = getByText('Recalibrate')
+    recalibrateLink.click()
+    rerender(
+      <StaticRouter>
+        <CalibrationTaskList
+          robotName={'otie'}
+          pipOffsetCalLauncher={mockPipOffsetCalLauncher}
+          tipLengthCalLauncher={mockTipLengthCalLauncher}
+          deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={true}
+        />
+      </StaticRouter>
+    )
+    expect(getByText('Using current calibrations.')).toBeTruthy()
   })
 
   it('prevents the user from launching calibrations or recalibrations from a task when a protocol run is active', () => {
@@ -236,6 +265,7 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )
@@ -263,6 +293,7 @@ describe('CalibrationTaskList', () => {
           pipOffsetCalLauncher={mockPipOffsetCalLauncher}
           tipLengthCalLauncher={mockTipLengthCalLauncher}
           deckCalLauncher={mockDeckCalLauncher}
+          exitBeforeDeckConfigCompletion={false}
         />
       </StaticRouter>
     )

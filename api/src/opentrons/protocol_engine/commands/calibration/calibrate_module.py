@@ -17,7 +17,7 @@ from opentrons.protocol_engine.commands.command import (
 if TYPE_CHECKING:
     from ...state import StateView
 
-from ...types import ModuleOffsetVector
+from ...types import ModuleOffsetVector, DeckSlotLocation
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount
@@ -46,6 +46,10 @@ class CalibrateModuleResult(BaseModel):
         ..., description="Offset of calibrated module."
     )
 
+    location: DeckSlotLocation = Field(
+        ..., description="The deck slot this module was calibrated in."
+    )
+
 
 class CalibrateModuleImplementation(
     AbstractCommandImpl[CalibrateModuleParams, CalibrateModuleResult]
@@ -67,7 +71,7 @@ class CalibrateModuleImplementation(
             self._hardware_api,
         )
         ot3_mount = OT3Mount.from_mount(params.mount)
-        slot = self._state_view.modules.get_location(params.moduleId).slotName.id
+        slot = self._state_view.modules.get_location(params.moduleId)
         module_serial = self._state_view.modules.get_serial_number(params.moduleId)
         # NOTE (ba, 2023-03-31): There are two wells for calibration labware definitions
         # well A1 represents the location calibration square center relative to the adapters bottom-left corner
@@ -78,13 +82,14 @@ class CalibrateModuleImplementation(
 
         # start the calibration
         module_offset = await calibration.calibrate_module(
-            ot3_api, ot3_mount, slot, module_serial, nominal_position
+            ot3_api, ot3_mount, slot.slotName.id, module_serial, nominal_position
         )
 
         return CalibrateModuleResult(
             moduleOffset=ModuleOffsetVector(
                 x=module_offset.x, y=module_offset.y, z=module_offset.z
-            )
+            ),
+            location=slot,
         )
 
 

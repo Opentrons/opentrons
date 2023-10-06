@@ -118,8 +118,8 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 const topLabwareId =
                   labwareInAdapterInMod?.result?.labwareId ?? nestedLabwareId
                 const topLabwareDisplayName =
-                  labwareInAdapterInMod?.result?.definition.metadata
-                    .displayName ?? nestedLabwareDisplayName
+                  labwareInAdapterInMod?.params.displayName ??
+                  nestedLabwareDisplayName
 
                 const wellFill = getWellFillFromLabwareId(
                   topLabwareId ?? '',
@@ -196,8 +196,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 const topLabwareId =
                   labwareInAdapter?.result?.labwareId ?? labwareId
                 const topLabwareDisplayName =
-                  labwareInAdapter?.result?.definition.metadata.displayName ??
-                  displayName
+                  labwareInAdapter?.params.displayName ?? displayName
                 const wellFill = getWellFillFromLabwareId(
                   topLabwareId ?? '',
                   liquids,

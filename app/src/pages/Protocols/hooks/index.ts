@@ -6,6 +6,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { getLabwareSetupItemGroups } from '../utils'
+import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -13,7 +14,7 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
-import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ProtocolPipette {
   hardwareType: 'pipette'
@@ -85,14 +86,24 @@ export const useRequiredProtocolHardware = (
       ]
     : []
 
+  const handleModuleConnectionCheckFor = (
+    attachedModules: AttachedModule[],
+    model: ModuleModel
+  ): boolean => {
+    const ASSUME_ALWAYS_CONNECTED_MODULES = ['magneticBlockV1']
+
+    return !ASSUME_ALWAYS_CONNECTED_MODULES.includes(model)
+      ? attachedModules.some(m => m.moduleModel === model)
+      : true
+  }
+
   const requiredModules: ProtocolModule[] = analysis.modules.map(
     ({ location, model }) => {
       return {
         hardwareType: 'module',
         moduleModel: model,
         slot: location.slotName as Slot,
-        // TODO: check module compatability using brent's changes when they're in edge
-        connected: attachedModules.some(m => m.moduleModel === model),
+        connected: handleModuleConnectionCheckFor(attachedModules, model),
       }
     }
   )

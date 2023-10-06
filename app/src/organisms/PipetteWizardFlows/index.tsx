@@ -64,17 +64,26 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
+  const requiresFirmwareUpdate = !attachedPipette?.ok
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = React.useMemo(
     () =>
       memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
+        ? getPipetteWizardSteps(
+            flowType,
+            mount,
+            selectedPipette,
+            isGantryEmpty,
+            requiresFirmwareUpdate
+          )
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
-            mount
+            mount,
+            requiresFirmwareUpdate
           ),
     []
   )

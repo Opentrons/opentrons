@@ -70,7 +70,6 @@ describe('ProtocolInstrumentMountItem', () => {
     props = {
       mount: LEFT,
       attachedInstrument: null,
-      attachedCalibrationData: null,
       speccedName: 'p1000_multi_flex',
     }
     mockPipetteWizardFlows.mockReturnValue(<div>pipette wizard flow</div>)

@@ -2,7 +2,18 @@
 
 exports[`InstrumentDiagram 96-channel GEN1 renders correctly 1`] = `
 .c0 {
-  min-width: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 <div
@@ -10,6 +21,7 @@ exports[`InstrumentDiagram 96-channel GEN1 renders correctly 1`] = `
 >
   <img
     className=""
+    height="100%"
     src="ninety-six-channel-gen1.png"
   />
 </div>
@@ -17,7 +29,18 @@ exports[`InstrumentDiagram 96-channel GEN1 renders correctly 1`] = `
 
 exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
 .c0 {
-  min-width: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   -webkit-transform: scaleX(-1);
   -ms-transform: scaleX(-1);
   transform: scaleX(-1);
@@ -30,6 +53,7 @@ exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
 >
   <img
     className=""
+    height="100%"
     src="multi-channel_GEN2_800px.png"
   />
 </div>
@@ -37,7 +61,18 @@ exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
 
 exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 .c0 {
-  min-width: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 <div
@@ -45,6 +80,7 @@ exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 >
   <img
     className=""
+    height="100%"
     src="multi-channel_GEN1_800px.png"
   />
 </div>
@@ -52,7 +88,18 @@ exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 
 exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
 .c0 {
-  min-width: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   -webkit-transform: scaleX(-1);
   -ms-transform: scaleX(-1);
   transform: scaleX(-1);
@@ -65,6 +112,7 @@ exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
 >
   <img
     className=""
+    height="100%"
     src="single-channel_GEN2_800px.png"
   />
 </div>
@@ -72,7 +120,18 @@ exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
 
 exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 .c0 {
-  min-width: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 <div
@@ -80,6 +139,7 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 >
   <img
     className=""
+    height="100%"
     src="single_channel_GEN1_800px.png"
   />
 </div>
@@ -87,7 +147,18 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 
 exports[`InstrumentDiagram eight-channel FLEX renders correctly 1`] = `
 .c0 {
-  min-width: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   -webkit-transform: scaleX(-1);
   -ms-transform: scaleX(-1);
   transform: scaleX(-1);
@@ -100,6 +171,7 @@ exports[`InstrumentDiagram eight-channel FLEX renders correctly 1`] = `
 >
   <img
     className=""
+    height="100%"
     src="eight-channel-flex.png"
   />
 </div>
@@ -107,7 +179,18 @@ exports[`InstrumentDiagram eight-channel FLEX renders correctly 1`] = `
 
 exports[`InstrumentDiagram single-channel FLEX renders correctly 1`] = `
 .c0 {
-  min-width: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   -webkit-transform: scaleX(-1);
   -ms-transform: scaleX(-1);
   transform: scaleX(-1);
@@ -120,25 +203,13 @@ exports[`InstrumentDiagram single-channel FLEX renders correctly 1`] = `
 >
   <img
     className=""
+    height="100%"
     src="single-channel-flex.png"
   />
 </div>
 `;
 
 exports[`InstrumentGroup Renders correctly 1`] = `
-.c2 {
-  min-width: 0;
-}
-
-.c3 {
-  min-width: 0;
-  -webkit-transform: scaleX(-1);
-  -ms-transform: scaleX(-1);
-  transform: scaleX(-1);
-  -webkit-filter: FlipH;
-  filter: FlipH;
-}
-
 .c0 {
   display: -webkit-box;
   display: -webkit-flex;
@@ -159,6 +230,41 @@ exports[`InstrumentGroup Renders correctly 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+}
+
+.c2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  -webkit-filter: FlipH;
+  filter: FlipH;
 }
 
 <section
@@ -188,6 +294,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
     >
       <img
         className=""
+        height="100%"
         src="multi-channel_GEN1_800px.png"
       />
     </div>
@@ -200,6 +307,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
     >
       <img
         className=""
+        height="100%"
         src="single_channel_GEN1_800px.png"
       />
     </div>

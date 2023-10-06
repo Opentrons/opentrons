@@ -23,6 +23,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
+import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
@@ -30,6 +31,7 @@ import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
   getIs96ChannelPipetteAttached,
   getOffsetCalibrationForMount,
+  getShowPipetteCalibrationWarning,
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
@@ -180,6 +182,13 @@ export function InstrumentsAndModules({
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
+        {isRobotViewable &&
+        getShowPipetteCalibrationWarning(attachedInstruments) &&
+        (isRunTerminal || currentRunId == null) ? (
+          <Flex paddingBottom={SPACING.spacing16} width="100%">
+            <PipetteRecalibrationWarning />
+          </Flex>
+        ) : null}
         {isRobotViewable ? (
           <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
@@ -196,7 +205,8 @@ export function InstrumentsAndModules({
                 }
                 isPipetteCalibrated={
                   isOT3 && attachedLeftPipette?.ok
-                    ? attachedLeftPipette?.data?.calibratedOffset != null
+                    ? attachedLeftPipette?.data?.calibratedOffset
+                        ?.last_modified != null
                     : leftMountOffsetCalibration != null
                 }
                 mount={LEFT}
@@ -204,15 +214,18 @@ export function InstrumentsAndModules({
                 pipetteIs96Channel={is96ChannelAttached}
                 pipetteIsBad={badLeftPipette != null}
                 updatePipette={() => setSubsystemToUpdate('pipette_left')}
+                isRunActive={currentRunId != null && !isRunTerminal}
               />
               {isOT3 && (
                 <GripperCard
                   attachedGripper={attachedGripper}
                   isCalibrated={
                     attachedGripper?.ok === true &&
-                    attachedGripper?.data?.calibratedOffset != null
+                    attachedGripper?.data?.calibratedOffset?.last_modified !=
+                      null
                   }
                   setSubsystemToUpdate={setSubsystemToUpdate}
+                  isRunActive={currentRunId != null && !isRunTerminal}
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -244,7 +257,8 @@ export function InstrumentsAndModules({
                   }
                   isPipetteCalibrated={
                     isOT3 && attachedRightPipette?.ok
-                      ? attachedRightPipette?.data?.calibratedOffset != null
+                      ? attachedRightPipette?.data?.calibratedOffset
+                          ?.last_modified != null
                       : rightMountOffsetCalibration != null
                   }
                   mount={RIGHT}
@@ -252,6 +266,7 @@ export function InstrumentsAndModules({
                   pipetteIs96Channel={false}
                   pipetteIsBad={badRightPipette != null}
                   updatePipette={() => setSubsystemToUpdate('pipette_right')}
+                  isRunActive={currentRunId != null && !isRunTerminal}
                 />
               )}
               {rightColumnModules.map((module, index) => (

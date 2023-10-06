@@ -43,7 +43,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
@@ -89,7 +89,7 @@ describe('AttachProbe', () => {
     const { getByText } = render(props)
     getByText(
       nestedTextMatcher(
-        'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the backmost pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
+        'Take the calibration probe from its storage location. Ensure its collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the backmost pipette nozzle as far as it can go. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
       )
     )
   })
@@ -159,7 +159,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Ensure its collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
     getByRole('button', { name: 'Begin calibration' }).click()

@@ -16,7 +16,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     LabwareOffsetVector,
     DeckType,
-    ModuleOffsetVector,
+    ModuleOffsetData,
     HeaterShakerLatchStatus,
     LabwareMovementOffsetData,
 )
@@ -44,7 +44,7 @@ def make_module_view(
     requested_model_by_module_id: Optional[Dict[str, Optional[ModuleModel]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
-    module_offset_by_serial: Optional[Dict[str, ModuleOffsetVector]] = None,
+    module_offset_by_serial: Optional[Dict[str, ModuleOffsetData]] = None,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -325,7 +325,8 @@ def test_get_module_offset_for_ot2_standard(
         },
     )
     assert (
-        subject.get_module_offset("module-id", DeckType.OT2_STANDARD) == expected_offset
+        subject.get_nominal_module_offset("module-id", DeckType.OT2_STANDARD)
+        == expected_offset
     )
 
 
@@ -379,7 +380,9 @@ def test_get_module_offset_for_ot3_standard(
             )
         },
     )
-    result_offset = subject.get_module_offset("module-id", DeckType.OT3_STANDARD)
+    result_offset = subject.get_nominal_module_offset(
+        "module-id", DeckType.OT3_STANDARD
+    )
     assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
         (expected_offset.x, expected_offset.y, expected_offset.z)
     )

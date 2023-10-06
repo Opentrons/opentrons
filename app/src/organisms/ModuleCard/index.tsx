@@ -123,7 +123,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset == null
+  const requireModuleCalibration = module.moduleOffset?.last_modified == null
   const isPipetteReady =
     (!attachPipetteRequired ?? false) && (!updatePipetteFWRequired ?? false)
   const latestRequestId = last(requestIds)
@@ -279,7 +279,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           onCloseClick={() => setShowTestShake(false)}
         />
       )}
-      <Box padding={`${SPACING.spacing16} ${SPACING.spacing8}`} width="100%">
+      <Box padding={SPACING.spacing16} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
