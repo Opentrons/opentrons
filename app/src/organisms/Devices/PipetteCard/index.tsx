@@ -122,7 +122,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     subsystem,
     {
-      enabled: isOt3,
+      enabled: isOt3 && pipetteIsBad,
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
