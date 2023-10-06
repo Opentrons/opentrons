@@ -40,13 +40,8 @@ import { useIsOT3 } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-
 import type { State } from '../../../redux/types'
-import type {
-  PipetteModelSpecs,
-  PipetteMount,
-  PipetteName,
-} from '@opentrons/shared-data'
+import type { PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type {
   PipetteWizardFlow,
