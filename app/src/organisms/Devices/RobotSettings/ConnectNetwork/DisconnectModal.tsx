@@ -106,14 +106,18 @@ export const DisconnectModal = ({
     wifi?.ipAddress == null
 
   if (isDisconnected) {
-    // as a fallback, when in a disconnected state clear redux wifi status data to ensure no stale data
-    dispatch(clearWifiStatus(robotName))
     disconnectModalBody = t('disconnect_from_wifi_network_success')
   } else if (isRequestPending) {
     disconnectModalBody = t('disconnecting_from_wifi_network', { ssid })
   } else if (isRequestFailed) {
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
   }
+
+  React.useEffect(() => {
+    if (isDisconnected) {
+      dispatch(clearWifiStatus(robotName))
+    }
+  }, [isDisconnected])
 
   return (
     <LegacyModal

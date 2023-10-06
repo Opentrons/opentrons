@@ -24,7 +24,7 @@ const getWifiInterfaceKey = (
     networkingState.interfaces ?? {}
   )
   const wifiInterfaceEntry = networkInterfacesEntries.find(
-    networkInterface => networkInterface[1]?.type === 'wifi'
+    networkInterface => networkInterface[1]?.type === Constants.INTERFACE_WIFI
   )
   const wifiInterfaceKey = wifiInterfaceEntry?.[0]
 
@@ -101,7 +101,7 @@ export const networkingReducer: Reducer<NetworkingState, Action> = (
               macAddress: 'unknown',
               gatewayAddress: null,
               state: 'disconnected',
-              type: 'wifi',
+              type: Constants.INTERFACE_WIFI,
             },
           },
         },
