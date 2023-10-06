@@ -35,6 +35,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   setFetching: React.Dispatch<React.SetStateAction<boolean>>
   hasCalData: boolean
   requiredPipette?: LoadedPipette
+  nextMount?: 'left' | 'right' | 'both'
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
@@ -56,6 +57,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     isRobotMoving,
     requiredPipette,
     setShowErrorMessage,
+    nextMount,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteName =
@@ -132,21 +134,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
   }
 
-  // if gantry is empty and 96 channel is required, proceed to attach 96
-  // home Z anytime we proceed to next thing
-
   const handleProceed = (): void => {
     if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
-    } else if (
-      isSuccess &&
-      attachedPipettes[LEFT] == null &&
-      attachedPipettes[RIGHT] == null &&
-      (requiredPipette?.pipetteName === 'p1000_96' ||
-        selectedPipette === NINETY_SIX_CHANNEL)
-    ) {
-      console.log('proceeding to 96 attach')
-      // empty gantry and proceeding to attach 96-channel
+    } else if (isSuccess && nextMount !== null) {
+      // move the gantry into the correct position for the next step of strung together flows
       chainRunCommands?.(
         [
           {
@@ -158,8 +150,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
           {
             commandType: 'calibration/moveToMaintenancePosition' as const,
             params: {
-              mount: RIGHT,
-              maintenancePosition: 'attachPlate',
+              mount: nextMount === 'right' ? RIGHT : 'left',
+              maintenancePosition:
+                nextMount === 'both' ? 'attachPlate' : 'attachInstrument',
             },
           },
         ],
@@ -176,6 +169,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
+      // proceeding to attach probe for calibration
       const axes: MotorAxes =
         mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
       chainRunCommands?.(
