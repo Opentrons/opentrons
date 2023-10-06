@@ -62,7 +62,8 @@ async def _force_pick_up(api, x_pt, y_pt, z_pt, block_pos) -> tuple:
     return stall_count, final_encoder_pos, open_loop_pos
 
 
-async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, current: float, calibrate: bool, slot: str) -> None:
+async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, current: float, calibrate: bool, slot: str,
+                speed: float) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating, stall_detection_enable=True)
     await api.cache_instruments()
     await api.home()
@@ -130,18 +131,26 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, current
             print(f"\t{key}: {calibration_block_position[key]}")
         await api.home()
 
+    # get pipette config
+    pipette = helpers_ot3._get_pipette_from_mount(api, mount)
+    config_model = pipette.pick_up_configurations
+    # print current speed and current values
+    print(f"Current settings:\n\t>> current: {config_model.current}A\n\t>> speed: {config_model.speed}mm/s\n")
+    # set current and speed values
+    print(f"Setting pick up current to {current}A\n")
+    await helpers_ot3.update_pick_up_current(api, mount, current)
+    print(f"Setting pick up speed to {speed}mm/s\n")
+    config_model.speed = speed
+    # print out updated current and speed values
+    test_current = config_model.current
+    test_speed = config_model.speed
+    print(f"96ch pick up current: {test_current}A\n")
+    print(f"96ch pick up speed: {test_speed}mm/s\n")
+
     start_time = time.perf_counter()
     total_stalls = 0
     for i in range(cycles):
         print(f"\n========== Cycle {i + 1}/{cycles} ==========\n")
-
-        print(f"Setting pick up current to {current}A\n")
-        await helpers_ot3.update_pick_up_current(api, mount, current)
-
-        pipette = helpers_ot3._get_pipette_from_mount(api, mount)
-        config_model = pipette.pick_up_configurations
-        test_current = config_model.current
-        print(f"96ch pick up current: {test_current}A\n")
 
         cur_pos = await api.gantry_position(OT3Mount.LEFT)
         await api.move_to(OT3Mount.LEFT, Point(xy_pos[0], xy_pos[1], cur_pos[2]))
@@ -185,11 +194,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
-    parser.add_argument("--cycles", type=int, default=5)
+    parser.add_argument("--cycles", type=int, default=10000)
     parser.add_argument("--current", type=float, default=0.75)
     parser.add_argument("--calibrate_height", action="store_true")
     parser.add_argument("--slot", type=str, default="C2")
+    parser.add_argument("--speed", type=float, default=10.0)
     args = parser.parse_args()
     mount = mount_options[args.mount]
 
-    asyncio.run(_main(args.simulate, args.cycles, mount, args.current, args.calibrate_height, args.slot))
+    asyncio.run(_main(args.simulate, args.cycles, mount, args.current, args.calibrate_height, args.slot, args.speed))
