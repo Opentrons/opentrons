@@ -137,7 +137,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   const handleProceed = (): void => {
     if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
-    } else if (isSuccess && nextMount !== null) {
+    } else if (isSuccess && nextMount != null) {
       // move the gantry into the correct position for the next step of strung together flows
       chainRunCommands?.(
         [
