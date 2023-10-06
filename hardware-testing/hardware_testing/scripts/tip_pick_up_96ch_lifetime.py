@@ -73,10 +73,12 @@ async def _main(is_simulating: bool) -> None:
     await helpers_ot3.update_drop_tip_speed(api, mount, 10.0)
     # set clamp speed to 5.5
     api.clamp_drop_tip_speed = 5.5
+    # set clamp distance to 18.25
+    await helpers_ot3.update_pick_up_distance(api, mount, 18.25)
 
     test_name = "tip-pick-up-lifetime-test"
     if args.restart_flag:
-        if (os.path.exists(path)):
+        if os.path.exists(path):
             with open(path, 'r') as openfile:
                 complete_dict = json.load(openfile)
                 file_name = complete_dict['csv_name']
