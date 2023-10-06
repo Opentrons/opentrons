@@ -8,8 +8,6 @@ from opentrons_shared_data.pipette.types import PipetteChannelType
 
 MODULE_LOG = logging.getLogger(__name__)
 
-MachineType = Literal["ot2", "ot3"]
-
 
 class MotionChecks(enum.Enum):
     NONE = 0

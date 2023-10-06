@@ -10,7 +10,6 @@ import os
 import pathlib
 import queue
 from typing import (
-    cast,
     Any,
     Dict,
     List,
@@ -21,6 +20,7 @@ from typing import (
     Optional,
     Union,
 )
+from typing_extensions import Literal
 
 import opentrons
 from opentrons import should_use_ot3
@@ -29,7 +29,6 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.hardware_control.types import MachineType
 
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -72,6 +71,14 @@ _JSON_TOO_NEW_MESSAGE = (
     " or the opentrons.simulate.simulate() function."
     " Use the Opentrons App instead."
 )
+
+
+# TODO(mm, 2023-10-05): Deduplicate this with opentrons.protocols.parse().
+_UserSpecifiedRobotType = Literal["OT-2", "Flex"]
+"""The user-facing robot type specifier.
+
+This should match what `opentrons.protocols.parse()` accepts in a protocol's `requirements` dict.
+"""
 
 
 class AccumulatingHandler(logging.Handler):
@@ -165,9 +172,10 @@ def get_protocol_api(
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     hardware_simulator: Optional[ThreadManagedHardware] = None,
-    # TODO(mm, 2022-12-14): The name and type of this parameter should be unified with
-    # robotType in a standalone Python protocol's `requirements` dict. Jira RCORE-318.
-    machine: Optional[MachineType] = None,
+    # Additional arguments are kw-only to make mistakes harder in environments without
+    # type checking, like Jupyter Notebook.
+    *,
+    robot_type: Optional[_UserSpecifiedRobotType] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -202,8 +210,9 @@ def get_protocol_api(
                           it will look for labware in the ``labware`` subdirectory of the Jupyter
                           data directory.
     :param hardware_simulator: If specified, a hardware simulator instance.
-    :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
-                    determined from persistent settings.
+    :param robot_type: The type of robot to simulate: either ``"Flex"`` or ``"OT-2"``.
+                       If you're running this function on a robot, the default is the type of that
+                       robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -219,7 +228,7 @@ def get_protocol_api(
             for uri, details in (find_jupyter_labware() or {}).items()
         }
 
-    checked_hardware = _check_hardware_simulator(hardware_simulator, machine)
+    checked_hardware = _check_hardware_simulator(hardware_simulator, robot_type)
     return _build_protocol_context(
         version=checked_version,
         hardware_simulator=checked_hardware,
@@ -230,14 +239,15 @@ def get_protocol_api(
 
 
 def _check_hardware_simulator(
-    hardware_simulator: Optional[ThreadManagedHardware], machine: Optional[MachineType]
+    hardware_simulator: Optional[ThreadManagedHardware],
+    machine: Optional[_UserSpecifiedRobotType],
 ) -> ThreadManagedHardware:
     # TODO(mm, 2022-12-14): This should fail with a more descriptive error if someone
     # runs this on a robot, and that robot doesn't have a matching robot type.
     # Jira RCORE-318.
     if hardware_simulator:
         return hardware_simulator
-    elif machine == "ot3" or should_use_ot3():
+    elif machine == "Flex" or should_use_ot3():
         from opentrons.hardware_control.ot3api import OT3API
 
         return ThreadManager(OT3API.build_hardware_simulator)
@@ -307,10 +317,6 @@ def simulate(  # noqa: C901
     hardware_simulator_file_path: Optional[str] = None,
     duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
-    # TODO(mm, 2022-12-14): Now that protocols declare their target robot types
-    # intrinsically, the `machine` param should be removed in favor of determining
-    # it automatically.
-    machine: Optional[MachineType] = None,
 ) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
     """
     Simulate the protocol itself.
@@ -434,7 +440,7 @@ def simulate(  # noqa: C901
             bundled_data=getattr(protocol, "bundled_data", None),
             hardware_simulator=hardware_simulator,
             extra_labware=gpa_extras,
-            machine=machine,
+            robot_type="Flex" if protocol.robot_type == "OT-3 Standard" else "OT-2",
         )
     except protocol_api.ProtocolEngineCoreRequiredError as e:
         raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
@@ -624,7 +630,6 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         choices=["runlog", "nothing"],
         default="runlog",
     )
-    parser.add_argument("-m", "--machine", choices=["ot2", "ot3"])
     return parser
 
 
@@ -671,7 +676,6 @@ def main() -> int:
         duration_estimator=duration_estimator,
         hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
         log_level=args.log_level,
-        machine=cast(Optional[MachineType], args.machine),
     )
 
     if maybe_bundle:

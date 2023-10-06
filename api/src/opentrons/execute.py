@@ -123,6 +123,9 @@ def get_protocol_api(
     bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
+    # If you add any more arguments here, make sure they're kw-only to make mistakes harder in
+    # environments without type checking, like Jupyter Notebook.
+    # *
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
