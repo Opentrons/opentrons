@@ -72,7 +72,7 @@ def test_filter_zero_duration_step() -> None:
         Axis.P_R: 0,
     }
     moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
-    for block in moves[0].blocks:
+    for block in (moves[0].blocks[0], moves[0].blocks[1]):
         block.distance = f64(25.0)
         block.time = f64(1.0)
         block.initial_speed = f64(25.0)
@@ -84,7 +84,7 @@ def test_filter_zero_duration_step() -> None:
         moves=moves,
         present_nodes=present_nodes,
     )
-    assert len(move_group) == 3
+    assert len(move_group) == 2
     for step in move_group:
         assert set(present_nodes) == set(step.keys())
 
