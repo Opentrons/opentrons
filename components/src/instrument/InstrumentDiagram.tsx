@@ -15,10 +15,7 @@ import type { StyleProps } from '..'
 
 export interface InstrumentDiagramProps extends StyleProps {
   mount: Mount
-  pipetteSpecs?: Pick<
-    PipetteNameSpecs,
-    'displayCategory' | 'channels' | 'name'
-  > | null
+  pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
   className?: string
   imageStyle?: FlattenSimpleInterpolation
 }
