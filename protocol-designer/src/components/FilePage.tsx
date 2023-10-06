@@ -193,6 +193,7 @@ export class FilePage extends React.Component<Props, State> {
                 className={styles.swap_button}
                 iconName="swap-horizontal"
                 name={'swapPipettes'}
+                disabled={instruments?.left?.pipetteSpecs?.channels === 96}
               >
                 {i18n.t('button.swap')}
               </OutlineButton>
