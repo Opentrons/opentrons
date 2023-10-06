@@ -9,11 +9,13 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   BORDERS,
+  PrimaryButton,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
+  CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -27,16 +29,20 @@ import {
 import type { AxiosError } from 'axios'
 import type {
   CreateMaintenanceRunData,
-  InstrumentData,
   MaintenanceRun,
   PipetteData,
 } from '@opentrons/api-client'
 import { ExitConfirmation } from './ExitConfirmation'
+import { getDropTipWizardSteps } from './getDropTipWizardSteps'
+import { BEFORE_BEGINNING, BLOWOUT_SUCCESS, CHOOSE_BLOWOUT_LOCATION, CHOOSE_DROP_TIP_LOCATION, DROP_TIP_SUCCESS, POSITION_AND_BLOWOUT, POSITION_AND_DROP_TIP } from './constants'
+import { BeforeBeginning } from './BeforeBeginning'
+import { ChooseLocation } from './ChooseLocation'
+import { JogToPosition } from './JogToPosition'
 
 const RUN_REFETCH_INTERVAL = 5000
 
 interface MaintenanceRunManagerProps {
-  mount: PipetteData['mount'] 
+  mount: PipetteData['mount']
   closeFlow: () => void
   onComplete?: () => void
   instrumentModel?: PipetteData['instrumentModel']
@@ -44,7 +50,7 @@ interface MaintenanceRunManagerProps {
 export function DropTipWizard(
   props: MaintenanceRunManagerProps
 ): JSX.Element | null {
-  const { closeFlow, mount, instrumentModel} = props
+  const { closeFlow, mount, instrumentModel } = props
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
@@ -155,14 +161,9 @@ export function DropTipWizard(
 }
 
 interface DropTipWizardProps {
-  mount: PipetteData['mount'] 
+  mount: PipetteData['mount']
   createdMaintenanceRunId: string | null
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
+  createMaintenanceRun: CreateMaintenanceRunType
   isCreateLoading: boolean
   isRobotMoving: boolean
   isExiting: boolean
@@ -184,37 +185,37 @@ export const DropTipWizardComponent = (
 ): JSX.Element | null => {
   const {
     // maintenanceRunId,
-    // createMaintenanceRun,
+    createMaintenanceRun,
     handleCleanUpAndClose,
     // chainRunCommands,
     // attachedInstrument,
-    // isCreateLoading,
+    isCreateLoading,
     isRobotMoving,
     // createRunCommand,
     // setErrorMessage,
     errorMessage,
     // isExiting,
-    // createdMaintenanceRunId,
+    createdMaintenanceRunId,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('drop_tip_wizard')
-  const DropTipWizardSteps = []
-  const [currentStepIndex] = React.useState<number>(0)
 
-  const totalStepCount = DropTipWizardSteps.length - 1
-  // const currentStep = DropTipWizardSteps?.[currentStepIndex]
-  // const isFinalStep = currentStepIndex === DropTipWizardSteps.length - 1
-  // const goBack = (): void => {
-  //   setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
-  // }
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const [shouldDispenseLiquid, setShouldDispenseLiquid] = React.useState<boolean | null>(null)
+  const DropTipWizardSteps = getDropTipWizardSteps(shouldDispenseLiquid)
+  const currentStep = shouldDispenseLiquid != null ? getDropTipWizardSteps(shouldDispenseLiquid)[currentStepIndex] : null
+  const isFinalStep = currentStepIndex === DropTipWizardSteps.length - 1
+  const goBack = (): void => {
+    setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
+  }
 
-  // const handleProceed = (): void => {
-  //   if (isFinalStep) {
-  //     handleCleanUpAndClose()
-  //   } else {
-  //     setCurrentStepIndex(currentStepIndex + 1)
-  //   }
-  // }
+  const proceed = (): void => {
+    if (isFinalStep) {
+      handleCleanUpAndClose()
+    } else {
+      setCurrentStepIndex(currentStepIndex + 1)
+    }
+  }
 
   const {
     confirm: confirmExit,
@@ -246,7 +247,6 @@ export const DropTipWizardComponent = (
   //   setErrorMessage,
   //   errorMessage,
   // }
-  // if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmExit) {
     modalContent = (
@@ -255,6 +255,18 @@ export const DropTipWizardComponent = (
         handleExit={confirmExit}
         isRobotMoving={isRobotMoving}
       />
+    )
+  } else if (shouldDispenseLiquid == null) {
+    modalContent = (
+      <BeforeBeginning {...{createMaintenanceRun, isCreateLoading, createdMaintenanceRunId, setShouldDispenseLiquid}} />
+    )
+  } else if (currentStep === CHOOSE_BLOWOUT_LOCATION || currentStep === CHOOSE_DROP_TIP_LOCATION) {
+    modalContent = <ChooseLocation handleProceed={proceed} />
+  } else if (currentStep === POSITION_AND_BLOWOUT || currentStep === POSITION_AND_DROP_TIP) {
+    modalContent = <JogToPosition handleProceed={proceed} handleGoBack={goBack} />
+  } else if (currentStep === BLOWOUT_SUCCESS || currentStep === DROP_TIP_SUCCESS) {
+    modalContent = (
+      <PrimaryButton onClick={proceed}>PROCEED</PrimaryButton>
     )
   }
 
@@ -268,8 +280,8 @@ export const DropTipWizardComponent = (
   const wizardHeader = (
     <WizardHeader
       title={t('drop_tips')}
-      currentStep={currentStepIndex + 1}
-      totalSteps={totalStepCount + 1}
+      currentStep={shouldDispenseLiquid != null ? currentStepIndex + 1 : null}
+      totalSteps={DropTipWizardSteps.length}
       onExit={handleExit}
     />
   )

@@ -202,9 +202,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       )}
       {showDropTipWizard && (
         <DropTipWizard
-          instrumentModel={pipetteModelSpecs?.model}
           mount={mount}
-          closeModal={() => setChangePipette(false)}
+          closeFlow={() => setShowDropTipWizard(false)}
         />
       )}
       {showSlideout &&

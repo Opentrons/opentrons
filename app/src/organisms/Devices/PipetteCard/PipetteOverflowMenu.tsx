@@ -104,7 +104,7 @@ export const PipetteOverflowMenu = (
             >
               {t('about_pipette')}
             </MenuItem>
-            <MenuItem onClick={() => handleChangePipette()} >
+            <MenuItem onClick={() => handleDropTip()} >
               {i18n.format(t('drop_tips'), 'capitalize')}
             </MenuItem>
             <Divider marginY="0" />
