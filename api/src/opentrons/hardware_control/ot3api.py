@@ -34,7 +34,9 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
+from opentrons_shared_data.errors.exceptions import (
+    StallOrCollisionDetectedError,
+)
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs, feature_flags as ff
@@ -1894,6 +1896,42 @@ class OT3API(
         finally:
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
+
+    async def get_tip_presence_status(self, mount: OT3Mount) -> bool:
+        """
+        Check tip presence status. If a high throughput pipette is present,
+        move the tip motors down before checking the sensor status.
+        """
+        checked_mount = OT3Mount.from_mount(mount)
+        high_throughput = self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+        if high_throughput:
+            # check if we're already at the tip_presence_check position, if we are dont move
+
+            instrument = self._pipette_handler.get_pipette(checked_mount)
+            tip_presence_check_target = instrument.tip_presence_check_dist_mm
+
+            # if position is not known, home gear motors before any potential movement
+            if self._backend.gear_motor_position is None:
+                await self.home_gear_motors()
+
+            tip_motor_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+                Axis.of_main_tool_actuator(checked_mount)
+            ]
+
+            # only move tip motors if they are not already below the sensor
+            if tip_motor_pos_float < tip_presence_check_target:
+                clamp_moves = self._build_moves(
+                    {Axis.Q: tip_motor_pos_float}, {Axis.Q: tip_presence_check_target}
+                )
+                await self._backend.tip_action(moves=clamp_moves[0])
+        tip_status = await self._backend.get_tip_present_state(
+            mount=checked_mount, expect_multiple_responses=high_throughput
+        )
+
+        if high_throughput:
+            # return tip motors to neutral position
+            await self.home_gear_motors()
+        return tip_status
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec

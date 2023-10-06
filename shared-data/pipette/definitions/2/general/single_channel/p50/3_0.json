@@ -56,5 +56,6 @@
   "plungerHomingConfigurations": {
     "current": 1.0,
     "speed": 30
-  }
+  },
+  "tipPresenceCheckDistanceMM": "0.0"
 }
