@@ -35,7 +35,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   setFetching: React.Dispatch<React.SetStateAction<boolean>>
   hasCalData: boolean
   requiredPipette?: LoadedPipette
-  nextMount?: 'left' | 'right' | 'both'
+  nextMount?: string
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
