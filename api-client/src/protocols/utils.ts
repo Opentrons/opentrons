@@ -227,7 +227,7 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-interface LoadedFixturesBySlot {
+export interface LoadedFixturesBySlot {
   [slotName: string]: LoadFixtureRunTimeCommand
 }
 export function parseInitialLoadedFixturesByCutout(

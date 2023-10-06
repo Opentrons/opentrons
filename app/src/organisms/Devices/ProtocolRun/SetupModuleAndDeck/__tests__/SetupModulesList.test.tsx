@@ -144,7 +144,7 @@ describe('SetupModulesList', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({})
     const { getByText } = render(props)
-    getByText('Module Name')
+    getByText('Module')
     getByText('Location')
     getByText('Status')
   })
@@ -170,7 +170,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Magnetic Module')
-    getByText('Slot 1')
+    getByText('1')
     getByText('Connected')
   })
 
@@ -192,7 +192,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Magnetic Module')
-    getByText('Slot 1')
+    getByText('1')
     getByText('Not connected')
   })
 
@@ -224,7 +224,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')
-    getByText('Slot 7,8,10,11')
+    getByText('7,8,10,11')
     getByText('Connected')
   })
 
@@ -253,7 +253,7 @@ describe('SetupModulesList', () => {
 
     const { getByText, getByRole } = render(props)
     getByText('Thermocycler Module')
-    getByText('Slot A1+B1')
+    getByText('A1+B1')
     getByRole('button', { name: 'Calibrate now' }).click()
     await waitFor(() => {
       getByText('mock ModuleWizardFlows')
@@ -321,7 +321,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')
-    getByText('Slot A1+B1')
+    getByText('A1+B1')
     getByText('Connected')
   })
 
@@ -427,7 +427,7 @@ describe('SetupModulesList', () => {
       },
     } as any)
     const { getByText } = render(props)
-    const moduleSetup = getByText('View module setup instructions')
+    const moduleSetup = getByText('View setup instructions')
     fireEvent.click(moduleSetup)
     getByText('mockModuleSetupModal')
   })
