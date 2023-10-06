@@ -1,20 +1,23 @@
 import {
   checkModuleCompatibility,
+  Fixture,
   getDeckDefFromRobotType,
+  STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
-import {
-  useAttachedModules,
-  useProtocolDetailsForRun,
-  useStoredProtocolAnalysis,
-} from '.'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
+import { useAttachedModules } from './useAttachedModules'
+import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
+import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
+
 import type { AttachedModule } from '../../../redux/modules/types'
+import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null
+  conflictedFixture?: Fixture
 }
 
 export interface ModuleRenderInfoById {
@@ -27,7 +30,7 @@ export function useModuleRenderInfoForProtocolById(
 ): ModuleRenderInfoById {
   const { robotType } = useProtocolDetailsForRun(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-
+  const { data: deckConfig } = useDeckConfigurationQuery()
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()
@@ -56,15 +59,24 @@ export function useModuleRenderInfoForProtocolById(
         return {
           ...protocolMod,
           attachedModuleMatch: compatibleAttachedModule,
+          conflictedFixture: deckConfig?.find(
+            fixture =>
+              fixture.fixtureLocation === protocolMod.slotName &&
+              fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+          ),
         }
       }
       return {
         ...protocolMod,
         attachedModuleMatch: null,
+        conflictedFixture: deckConfig?.find(
+          fixture =>
+            fixture.fixtureLocation === protocolMod.slotName &&
+            fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+        ),
       }
     }
   )
-
   return allModuleRenderInfo.reduce(
     (acc, moduleInfo) => ({
       ...acc,

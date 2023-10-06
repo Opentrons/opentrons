@@ -19,6 +19,7 @@ import {
 } from '@opentrons/components'
 import {
   STAGING_AREA_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 
@@ -101,6 +102,19 @@ export function ProtocolRunSetup({
         fixtureId: 'stubbedFixtureId_2',
         loadName: STAGING_AREA_LOAD_NAME,
         location: { cutout: 'B3' },
+      },
+      createdAt: 'fakeTimestamp',
+      startedAt: 'fakeTimestamp',
+      completedAt: 'fakeTimestamp',
+      status: 'succeeded',
+    },
+    C3: {
+      id: 'stubbed_load_fixture_2',
+      commandType: 'loadFixture',
+      params: {
+        fixtureId: 'stubbedFixtureId_2',
+        loadName: TRASH_BIN_LOAD_NAME,
+        location: { cutout: 'C3' },
       },
       createdAt: 'fakeTimestamp',
       startedAt: 'fakeTimestamp',

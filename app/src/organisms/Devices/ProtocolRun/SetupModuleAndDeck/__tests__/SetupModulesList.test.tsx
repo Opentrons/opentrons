@@ -25,16 +25,23 @@ import {
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import { SetupModulesList } from '../SetupModulesList'
+import { LocationConflictModal } from '../LocationConflictModal'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import {
+  ModuleModel,
+  ModuleType,
+  STAGING_AREA_LOAD_NAME,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../hooks')
+jest.mock('../LocationConflictModal')
 jest.mock('../UnMatchedModuleWarning')
 jest.mock('../../../../ModuleCard/ModuleSetupModal')
 jest.mock('../../../../ModuleWizardFlows')
 jest.mock('../MultipleModulesModal')
 jest.mock('../../../../../resources/runs/hooks')
+
 const mockUseIsOt3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
@@ -62,6 +69,9 @@ const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFuncti
 >
 const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
   typeof useChainLiveCommands
+>
+const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
+  typeof LocationConflictModal
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -135,6 +145,9 @@ describe('SetupModulesList', () => {
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
+    mockLocationConflictModal.mockReturnValue(
+      <div>mock location conflict modal</div>
+    )
   })
   afterEach(() => resetAllWhenMocks())
 
@@ -431,7 +444,7 @@ describe('SetupModulesList', () => {
     fireEvent.click(moduleSetup)
     getByText('mockModuleSetupModal')
   })
-  it('shoulde render a magnetic block', () => {
+  it('shoulde render a magnetic block with a conflicted fixture', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockMagneticBlock.id]: {
         moduleId: mockMagneticBlock.id,
@@ -449,11 +462,18 @@ describe('SetupModulesList', () => {
         protocolLoadOrder: 0,
         slotName: '1',
         attachedModuleMatch: null,
+        conflictedFixture: {
+          fixtureId: 'mockId',
+          fixtureLocation: '1',
+          loadName: STAGING_AREA_LOAD_NAME,
+        },
       },
     } as any)
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('No USB connection required')
-    getByText('N/A')
+    getByText('Location conflict')
     getByText('Magnetic Block GEN1')
+    getByRole('button', { name: 'Update deck' }).click()
+    getByText('mock location conflict modal')
   })
 })

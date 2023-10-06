@@ -25,6 +25,7 @@ import {
   MAGNETIC_BLOCK_V1,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
+  Fixture,
 } from '@opentrons/shared-data'
 import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
@@ -45,6 +46,7 @@ import {
 } from '../../hooks'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
+import { LocationConflictModal } from './LocationConflictModal'
 import { getModuleImage } from './utils'
 
 import type { ModuleModel } from '@opentrons/shared-data'
@@ -160,7 +162,14 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       >
         {map(
           moduleRenderInfoForProtocolById,
-          ({ moduleDef, attachedModuleMatch, slotName, moduleId }) => {
+          ({
+            moduleDef,
+            attachedModuleMatch,
+            slotName,
+            moduleId,
+            conflictedFixture,
+          }) => {
+            console.log(conflictedFixture)
             return (
               <ModulesListItem
                 key={`SetupModulesList_${String(
@@ -178,6 +187,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 }
                 isOT3={isOT3}
                 calibrationStatus={calibrationStatus}
+                conflictedFixture={conflictedFixture}
               />
             )
           }
@@ -195,6 +205,7 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isOT3: boolean
   calibrationStatus: ProtocolCalibrationStatus
+  conflictedFixture?: Fixture
 }
 
 export function ModulesListItem({
@@ -205,6 +216,7 @@ export function ModulesListItem({
   heaterShakerModuleFromProtocol,
   isOT3,
   calibrationStatus,
+  conflictedFixture,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
   const moduleConnectionStatus =
@@ -215,6 +227,10 @@ export function ModulesListItem({
     showModuleSetupModal,
     setShowModuleSetupModal,
   ] = React.useState<Boolean>(false)
+  const [
+    showLocationConflictModal,
+    setShowLocationConflictModal,
+  ] = React.useState<boolean>(false)
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
@@ -233,7 +249,7 @@ export function ModulesListItem({
     }
     setShowModuleWizard(true)
   }
-
+  console.log(conflictedFixture)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
@@ -331,6 +347,13 @@ export function ModulesListItem({
 
   return (
     <>
+      {showLocationConflictModal ? (
+        <LocationConflictModal
+          onCloseClick={() => setShowLocationConflictModal(false)}
+          cutout={slotName}
+          requiredModule={moduleModel}
+        />
+      ) : null}
       {showModuleWizard && attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
@@ -382,8 +405,30 @@ export function ModulesListItem({
                 : TC_MODULE_LOCATION_OT2
               : slotName}
           </StyledText>
-          <Flex width="15%">
-            {moduleModel === MAGNETIC_BLOCK_V1 ? (
+          <Flex
+            width="15%"
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing10}
+          >
+            {conflictedFixture != null ? (
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing10}
+              >
+                <StatusLabel
+                  status={t('location_conflict')}
+                  backgroundColor={COLORS.warningBackgroundLight}
+                  iconColor={COLORS.warningEnabled}
+                  textColor={COLORS.warningText}
+                />
+                <TertiaryButton
+                  width="max-content"
+                  onClick={() => setShowLocationConflictModal(true)}
+                >
+                  <StyledText as="label">{t('update_deck')}</StyledText>
+                </TertiaryButton>
+              </Flex>
+            ) : moduleModel === MAGNETIC_BLOCK_V1 ? (
               <StyledText as="p"> {t('n_a')}</StyledText>
             ) : (
               renderModuleStatus
