@@ -33,6 +33,7 @@ import { useChainLiveCommands } from '../../../../resources/runs/hooks'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
+import { useFeatureFlag } from '../../../../redux/config'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
 import { getModuleTooHot } from '../../getModuleTooHot'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
@@ -169,7 +170,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             moduleId,
             conflictedFixture,
           }) => {
-            console.log(conflictedFixture)
             return (
               <ModulesListItem
                 key={`SetupModulesList_${String(
@@ -231,6 +231,8 @@ export function ModulesListItem({
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = React.useState<boolean>(false)
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
@@ -249,7 +251,7 @@ export function ModulesListItem({
     }
     setShowModuleWizard(true)
   }
-  console.log(conflictedFixture)
+
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
@@ -410,7 +412,7 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing10}
           >
-            {conflictedFixture != null ? (
+            {conflictedFixture != null && enableDeckConfig ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing10}
