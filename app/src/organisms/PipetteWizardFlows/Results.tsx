@@ -123,10 +123,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
             header = t('ninety_six_detached_success', {
               pipetteName: NINETY_SIX_CHANNEL,
             })
-          } else {
+          } else if (
+            attachedPipettes[LEFT] == null &&
+            attachedPipettes[RIGHT] == null
+          ) {
             header = t('all_pipette_detached')
             subHeader = t('gantry_empty_for_96_channel_success')
             buttonText = t('attach_pip')
+          } else {
+            buttonText = t('detach_next_pip')
           }
         }
       }
