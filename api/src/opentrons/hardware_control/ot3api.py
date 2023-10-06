@@ -1928,8 +1928,9 @@ class OT3API(
             mount=checked_mount, expect_multiple_responses=high_throughput
         )
 
-        # return tip motors to neutral position
-        await self.home_gear_motors()
+        if high_throughput:
+            # return tip motors to neutral position
+            await self.home_gear_motors()
         return tip_status
 
     async def _force_pick_up_tip(
