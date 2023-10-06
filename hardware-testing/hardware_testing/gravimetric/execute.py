@@ -544,7 +544,6 @@ def _get_liquid_height(
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
                 resources.ctx._core.get_hardware(),
-                30,
             )
         _tip_counter[0] = 0
     if cfg.jog:
@@ -600,9 +599,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         _MEASUREMENTS = list()
     try:
         ui.print_title("FIND LIQUID HEIGHT")
-        ui.print_info("homing...")
-        resources.ctx.home()
-        resources.pipette.home_plunger()
         first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
@@ -615,7 +611,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(
-            labware_on_scale["A1"], _liquid_height, name="Water"
+            well, _liquid_height, name="Water"
         )
         vial_volume = liquid_tracker.get_volume(well)
         ui.print_info(

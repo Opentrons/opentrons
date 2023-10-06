@@ -44,3 +44,11 @@
   flex: 0 1 13rem;
   padding: 0 3rem 0;
 }
+
+.slot_map_container_modal {
+  display: flex;
+  height: 16rem;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}

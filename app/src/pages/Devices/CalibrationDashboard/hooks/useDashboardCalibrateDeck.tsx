@@ -29,10 +29,11 @@ export type DashboardCalDeckInvoker = (
 
 export function useDashboardCalibrateDeck(
   robotName: string
-): [DashboardCalDeckInvoker, JSX.Element | null] {
+): [DashboardCalDeckInvoker, JSX.Element | null, boolean] {
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
+  const wasExitBeforeCompletion = React.useRef<boolean>(false)
   const invalidateHandlerRef = React.useRef<(() => void) | undefined>()
   const { t } = useTranslation('robot_calibration')
 
@@ -118,6 +119,7 @@ export function useDashboardCalibrateDeck(
           showSpinner={showSpinner}
           dispatchRequests={dispatchRequests}
           isJogging={isJogging}
+          wasExitBeforeCompletion={wasExitBeforeCompletion}
           offsetInvalidationHandler={invalidateHandlerRef.current}
         />
       )}
@@ -126,5 +128,9 @@ export function useDashboardCalibrateDeck(
 
   if (!(startingSession || deckCalSession != null)) Wizard = null
 
-  return [handleStartDashboardDeckCalSession, Wizard]
+  return [
+    handleStartDashboardDeckCalSession,
+    Wizard,
+    wasExitBeforeCompletion.current,
+  ]
 }

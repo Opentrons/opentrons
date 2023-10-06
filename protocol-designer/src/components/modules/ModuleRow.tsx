@@ -45,7 +45,6 @@ export function ModuleRow(props: Props): JSX.Element {
   } = props
   const type: ModuleType = moduleOnDeck?.type || props.type
   const isFlex = robotType === FLEX_ROBOT_TYPE
-
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
   /*
@@ -118,7 +117,7 @@ export function ModuleRow(props: Props): JSX.Element {
   })
 
   return (
-    <div>
+    <div style={{ marginBottom: '1rem' }}>
       <h4 className={styles.row_title}>
         <ModuleIcon
           moduleType={type}

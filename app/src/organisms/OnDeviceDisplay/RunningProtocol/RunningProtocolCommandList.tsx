@@ -69,6 +69,11 @@ const COMMAND_ROW_STYLE = css`
 //   backdrop-filter: blur(1.5px);
 // `
 
+interface VisibleIndexRange {
+  lowestVisibleIndex: number
+  highestVisibleIndex: number
+}
+
 interface RunningProtocolCommandListProps {
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
@@ -100,6 +105,10 @@ export function RunningProtocolCommandList({
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
+  const [visibleRange, setVisibleRange] = React.useState<VisibleIndexRange>({
+    lowestVisibleIndex: 0,
+    highestVisibleIndex: 0,
+  })
 
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
@@ -119,6 +128,27 @@ export function RunningProtocolCommandList({
       })
     }
   }
+
+  React.useEffect(() => {
+    // Note (kk:09/25/2023) Need -1 because the element of highestVisibleIndex cannot really readable
+    // due to limited space
+    const isCurrentCommandVisible =
+      currentRunCommandIndex != null &&
+      currentRunCommandIndex >= visibleRange.lowestVisibleIndex &&
+      currentRunCommandIndex <= visibleRange.highestVisibleIndex - 1
+
+    if (
+      ref.current != null &&
+      !isCurrentCommandVisible &&
+      currentRunCommandIndex != null
+    ) {
+      ref.current.scrollToIndex(currentRunCommandIndex)
+    }
+  }, [
+    currentRunCommandIndex,
+    visibleRange.highestVisibleIndex,
+    visibleRange.lowestVisibleIndex,
+  ])
 
   return (
     <Flex
@@ -162,6 +192,20 @@ export function RunningProtocolCommandList({
             viewportRef={viewPortRef}
             ref={ref}
             items={robotSideAnalysis?.commands}
+            onViewportIndexesChange={([
+              lowestVisibleIndex,
+              highestVisibleIndex,
+            ]) => {
+              if (
+                currentRunCommandIndex != null &&
+                currentRunCommandIndex >= 0
+              ) {
+                setVisibleRange({
+                  lowestVisibleIndex,
+                  highestVisibleIndex,
+                })
+              }
+            }}
             initialIndex={currentRunCommandIndex}
             margin={0}
           >

@@ -140,9 +140,11 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - The new :py:meth:`.move_labware` method can move labware automatically using the Flex Gripper. You can also move labware manually on Flex.
   
-  - :py:meth:`.load_module` supports loading the :ref:`magnetic-block`. 
+  - :py:meth:`.load_module` supports loading the :ref:`Magnetic Block <magnetic-block>`. 
   
   - The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.
+  
+  - The new :py:meth:`.configure_for_volume` method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See :ref:`pipette-volume-modes`. 
   
 - Flex and OT-2 features
 
@@ -150,7 +152,7 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - Optionally specify ``"robotType": "OT-2"`` in ``requirements``.
 
-  - Use coordinates or numbers to specify :ref:`deck-slots`. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of ``robotType``.
+  - Use coordinates or numbers to specify :ref:`deck slots <deck-slots>`. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of ``robotType``.
   
   - The new :py:meth:`.load_adapter` method lets you load adapters and labware separately on modules, and lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
   
@@ -158,7 +160,9 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
   
   - Manual labware moves support moving to or from the new :py:obj:`~.protocol_api.OFF_DECK` location (outside of the robot).
   
-  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
+  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.  
+  
+  - The new ``push_out`` parameter of the :py:meth:`.dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
   
   - By default, repeated calls to :py:meth:`.drop_tip` cycle through multiple locations above the trash bin to prevent tips from stacking up.
   
@@ -292,7 +296,7 @@ Version 2.8
 
 - You can now pass in a list of volumes to distribute and consolidate. See :ref:`distribute-consolidate-volume-list` for more information.
 
-  - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
+  - Passing in a zero volume to any :ref:`complex command <v2-complex-commands>` will result in no actions taken for aspirate or dispense
 
 - :py:meth:`.Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.
 
@@ -323,13 +327,13 @@ Version 2.6
 
   - Protocols that manually configure pipette flow rates will be unaffected
 
-  - For a comparison between API Versions, see :ref:`defaults`
+  - For a comparison between API Versions, see :ref:`ot2-flow-rates`
 
 
 Version 2.5
 -----------
 
-- New :ref:`new-utility-commands` were added:
+- New :ref:`utility commands <new-utility-commands>` were added:
 
   - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
   - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
@@ -353,7 +357,7 @@ Version 2.3
   module gen2"`` and ``"temperature module gen2"``, respectively.
 - All pipettes will return tips to tip racks from a higher position to avoid
   possible collisions.
-- During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
+- During a :py:meth:`.mix`, the pipette will no longer move up to clear the liquid in
   between every dispense and following aspirate.
 - You can now access the Temperature Module's status via :py:obj:`.TemperatureModuleContext.status`.
 

@@ -10,27 +10,23 @@ import subprocess
 from time import sleep
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.protocols import (
-    gravimetric_ot3_p50_single,
-    gravimetric_ot3_p50_multi,
-    gravimetric_ot3_p50_multi_50ul_tip_increment,
-    gravimetric_ot3_p1000_single,
+from hardware_testing.protocols.gravimetric_lpc.gravimetric import (
+    gravimetric_ot3_p1000_96,
     gravimetric_ot3_p1000_multi,
+    gravimetric_ot3_p1000_single,
+    gravimetric_ot3_p50_single,
     gravimetric_ot3_p1000_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_200ul_tip_increment,
+    gravimetric_ot3_p50_multi,
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
-    gravimetric_ot3_p1000_96,
-    gravimetric_ot3_p1000_96_50ul_tip,
-    gravimetric_ot3_p1000_96_200ul_tip,
-    gravimetric_ot3_p1000_96_1000ul_tip,
+    gravimetric_ot3_p50_multi_50ul_tip_increment,
 )
-from hardware_testing.protocols import (
-    photometric_ot3_p50_single,
-    photometric_ot3_p50_multi,
-    photometric_ot3_p1000_single,
+from hardware_testing.protocols.gravimetric_lpc.photometric import (
     photometric_ot3_p1000_multi,
-    photometric_ot3_p1000_96_50ul,
-    photometric_ot3_p1000_96_200ul,
+    photometric_ot3_p1000_single,
+    photometric_ot3_p50_multi,
+    photometric_ot3_p1000_96,
+    photometric_ot3_p50_single,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -84,9 +80,9 @@ GRAVIMETRIC_CFG_INCREMENT = {
             1000: gravimetric_ot3_p1000_multi_1000ul_tip_increment,
         },
         96: {
-            50: gravimetric_ot3_p1000_96_50ul_tip,
-            200: gravimetric_ot3_p1000_96_200ul_tip,
-            1000: gravimetric_ot3_p1000_96_1000ul_tip,
+            50: gravimetric_ot3_p1000_96,
+            200: gravimetric_ot3_p1000_96,
+            1000: gravimetric_ot3_p1000_96,
         },
     },
 }
@@ -111,7 +107,7 @@ PHOTOMETRIC_CFG = {
             200: photometric_ot3_p1000_multi,
             1000: photometric_ot3_p1000_multi,
         },
-        96: {50: photometric_ot3_p1000_96_50ul, 200: photometric_ot3_p1000_96_200ul},
+        96: {50: photometric_ot3_p1000_96, 200: photometric_ot3_p1000_96},
     },
 }
 
@@ -282,7 +278,13 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][args.tip]
+            _tip_cfg = max(tip_volumes)
+            if len(tip_volumes) > 0:
+                ui.print_info(
+                    f"WARNING: using source Protocol for {_tip_cfg} tip, "
+                    f"but test includes multiple tips ({tip_volumes})"
+                )
+            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][_tip_cfg]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,
@@ -299,8 +301,13 @@ class RunArgs:
             )
         else:
             if args.increment:
+                assert len(tip_volumes) == 1, (
+                    f"tip must be specified "
+                    f"when running --increment test "
+                    f"with {args.channels}ch P{args.pipette}"
+                )
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
-                    args.tip
+                    tip_volumes[0]
                 ]
             else:
                 protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
@@ -569,13 +576,14 @@ if __name__ == "__main__":
         )
         sleep(1)
     try:
-        if not run_args.ctx.is_simulating():
+        if not run_args.ctx.is_simulating() and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
+        ui.print_info("homing...")
+        run_args.ctx.home()
         for tip, volumes in run_args.volumes:
-            hw = run_args.ctx._core.get_hardware()
             if args.channels == 96 and not run_args.ctx.is_simulating():
-                delay = 0 if args.photometric else 30
-                ui.alert_user_ready(f"Load 9 {tip}ul tipracks", hw, delay)
+                hw = run_args.ctx._core.get_hardware()
+                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             _main(args, run_args, tip, volumes)
     finally:
         if run_args.recorder is not None:

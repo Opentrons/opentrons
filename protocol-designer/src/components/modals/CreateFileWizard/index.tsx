@@ -21,7 +21,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   SPAN7_8_10_11_SLOT,
-  FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
@@ -34,7 +33,10 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
+import {
+  FLEX_TRASH_DEF_URI,
+  INITIAL_DECK_SETUP_STEP_ID,
+} from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
@@ -190,20 +192,27 @@ export function CreateFileWizard(): JSX.Element | null {
           },
         })
       )
-      // default trash labware locations in initial deck setup step
-      dispatch(
-        steplistActions.changeSavedStepForm({
-          stepId: INITIAL_DECK_SETUP_STEP_ID,
-          update: {
-            labwareLocationUpdate: {
-              [FIXED_TRASH_ID]: {
-                slotName:
-                  values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
-              },
-            },
-          },
-        })
-      )
+      if (
+        enableDeckModification &&
+        values.additionalEquipment.includes('trashBin')
+      ) {
+        // defaulting trash to appropriate locations
+        dispatch(
+          labwareIngredActions.createContainer({
+            labwareDefURI: FLEX_TRASH_DEF_URI,
+            slot: 'A3',
+          })
+        )
+      }
+
+      if (!enableDeckModification) {
+        dispatch(
+          labwareIngredActions.createContainer({
+            labwareDefURI: FLEX_TRASH_DEF_URI,
+            slot: values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
+          })
+        )
+      }
       // create modules
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))

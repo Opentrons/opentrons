@@ -39,6 +39,11 @@ const mockResetConfigOptions = [
     name: 'Module Calibration FooBar',
     description: 'moduleCalibration fooBar description',
   },
+  {
+    id: 'authorizedKeys',
+    name: 'SSH Keys Foo',
+    description: 'SSH Keys foo description',
+  },
 ]
 
 const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
@@ -76,12 +81,13 @@ describe('DeviceReset', () => {
   })
 
   it('should render text and button', () => {
-    const [{ getByText, getByTestId }] = render(props)
+    const [{ getByText, getByTestId, queryByText }] = render(props)
     getByText('Clear pipette calibration')
     getByText('Clear gripper calibration')
     getByText('Clear module calibration')
     getByText('Clear protocol run history')
     getByText('Clears information about past runs of all protocols.')
+    expect(queryByText('Clear the ssh authorized keys')).not.toBeInTheDocument()
     expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })
 

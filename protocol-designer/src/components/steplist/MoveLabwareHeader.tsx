@@ -46,7 +46,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
 
   let destSlot: string | null | undefined = null
   if (destinationSlot === 'offDeck') {
-    destSlot = 'off deck'
+    destSlot = 'off-deck'
   } else if (
     destinationSlot != null &&
     moduleEntities[destinationSlot] != null

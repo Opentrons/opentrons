@@ -10,8 +10,10 @@ import httpx
 from httpx import Response
 
 
-STARTUP_WAIT = 20
-SHUTDOWN_WAIT = 20
+_STARTUP_WAIT = 20
+_SHUTDOWN_WAIT = 20
+
+_RUN_POLL_INTERVAL = 0.1
 
 
 class RobotClient:
@@ -85,14 +87,14 @@ class RobotClient:
             # returns some kind of "not ready."
             await asyncio.sleep(0.1)
 
-    async def wait_until_alive(self, timeout_sec: float = STARTUP_WAIT) -> bool:
+    async def wait_until_alive(self, timeout_sec: float = _STARTUP_WAIT) -> bool:
         try:
             await asyncio.wait_for(self._poll_for_alive(), timeout=timeout_sec)
             return True
         except asyncio.TimeoutError:
             return False
 
-    async def wait_until_dead(self, timeout_sec: float = SHUTDOWN_WAIT) -> bool:
+    async def wait_until_dead(self, timeout_sec: float = _SHUTDOWN_WAIT) -> bool:
         """Retry GET /health and until unreachable."""
         try:
             await asyncio.wait_for(self._poll_for_dead(), timeout=timeout_sec)
@@ -303,3 +305,40 @@ class RobotClient:
         )
         response.raise_for_status()
         return response
+
+    async def get_sessions(self) -> Response:
+        """GET /sessions."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/sessions")
+        response.raise_for_status()
+        return response
+
+    async def delete_session(self, session_id: str) -> Response:
+        """DELETE /sessions/{session_id}."""
+        response = await self.httpx_client.delete(
+            url=f"{self.base_url}/sessions/{session_id}"
+        )
+        response.raise_for_status()
+        return response
+
+
+async def poll_until_run_completes(
+    robot_client: RobotClient, run_id: str, poll_interval: float = _RUN_POLL_INTERVAL
+) -> Any:
+    """Wait until a run completes.
+
+    You probably want to wrap this in an `anyio.fail_after()` timeout in case something causes
+    the run to hang forever.
+
+    Returns:
+        The completed run response. You can inspect its `status` to see whether it
+        succeeded, failed, or was stopped.
+    """
+    completed_run_statuses = {"stopped", "failed", "succeeded"}
+    while True:
+        run = (await robot_client.get_run(run_id=run_id)).json()
+        status = run["data"]["status"]
+        if status in completed_run_statuses:
+            return run
+        else:
+            # The run is still ongoing. Wait a beat, then poll again.
+            await asyncio.sleep(poll_interval)

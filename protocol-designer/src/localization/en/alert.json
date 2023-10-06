@@ -145,12 +145,16 @@
         "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       },
       "LABWARE_OFF_DECK": {
-        "title": "Labware is off deck",
+        "title": "Labware is off-deck",
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
       },
       "HEATER_SHAKER_LATCH_CLOSED": {
         "title": "Heater-Shaker labware latch is closed",
         "body": "The Heater-Shaker’s labware latch must be open when moving labware to or from the module. Add a Heater-Shaker step that opens the latch before this step."
+      },
+      "DROP_TIP_LOCATION_DOES_NOT_EXIST": {
+        "title": "Attempting to drop tip in an unknown location",
+        "body": "The Waste Chute or Trash Bin to drop tip in does not exist."
       }
     },
     "warning": {

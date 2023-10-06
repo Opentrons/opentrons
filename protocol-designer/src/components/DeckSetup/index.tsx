@@ -12,6 +12,7 @@ import {
   RobotWorkSpaceRenderProps,
   Module,
   COLORS,
+  TrashSlotName,
 } from '@opentrons/components'
 import {
   MODULES_WITH_COLLISION_ISSUES,
@@ -34,7 +35,11 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
-import { PSEUDO_DECK_SLOTS } from '../../constants'
+import {
+  FLEX_TRASH_DEF_URI,
+  OT_2_TRASH_DEF_URI,
+  PSEUDO_DECK_SLOTS,
+} from '../../constants'
 import { i18n } from '../../localization'
 import {
   getLabwareIsCompatible,
@@ -89,13 +94,13 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
   robotType: RobotType
+  trashSlot: string | null
 }
 
 export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10
 export const VIEWBOX_WIDTH = 520
 export const VIEWBOX_HEIGHT = 414
-const FLEX_TRASH_SLOT = 'A3'
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
 
@@ -152,8 +157,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     showGen1MultichannelCollisionWarnings,
     deckDef,
     robotType,
+    trashSlot,
   } = props
-  const trashSlot = robotType === FLEX_ROBOT_TYPE ? FLEX_TRASH_SLOT : '12'
 
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
@@ -526,6 +531,12 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const trashSlot =
+    Object.values(activeDeckSetup.labware).find(
+      lw =>
+        lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
+        lw.labwareDefURI === FLEX_TRASH_DEF_URI
+    )?.slot ?? null
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
@@ -553,12 +564,15 @@ export const DeckSetup = (): JSX.Element => {
           viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
           width="100%"
           height="100%"
-          trashSlotName={FLEX_TRASH_SLOT}
+          trashSlotName={
+            trashSlot != null ? (trashSlot as TrashSlotName) : undefined
+          }
           trashColor={COLORS.darkGreyEnabled}
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
             <>
               <DeckSetupContents
+                trashSlot={trashSlot}
                 robotType={robotType}
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}

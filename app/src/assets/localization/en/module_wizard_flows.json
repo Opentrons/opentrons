@@ -39,6 +39,7 @@
   "select_location": "Select module location",
   "select_the_slot": "Select the slot where you installed the {{module}} on the deck map to the right. The location must be correct for successful calibration.",
   "stand_back": "Stand back, calibration in progress",
+  "stand_back_exiting": "Stand back, robot is in motion",
   "start_setup": "Start setup",
   "successfully_calibrated": "{{module}} successfully calibrated"
 }

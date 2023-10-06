@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
@@ -20,6 +21,15 @@ import {
 } from './constants'
 import type { GripperWizardStepProps, SuccessStep } from './types'
 
+const HEADER_STYLE = css`
+  p {
+    text-transform: lowercase;
+  }
+
+  p::first-letter {
+    text-transform: uppercase;
+  }
+`
 export const Success = (
   props: Pick<GripperWizardStepProps, 'proceed'> &
     Pick<GripperWizardStepProps, 'isRobotMoving'> &
@@ -66,6 +76,7 @@ export const Success = (
       iconColor={COLORS.successEnabled}
       header={header}
       isSuccess
+      css={HEADER_STYLE}
     >
       {isOnDevice ? (
         <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">

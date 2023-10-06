@@ -8,7 +8,7 @@ import os
 from typing import Tuple, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.errors import MustHomeError
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
@@ -247,7 +247,7 @@ async def _single_axis_move(
                     await api.move_rel(
                         mount=MOUNT, delta=move_error_correction, speed=35
                     )
-            except MustHomeError:
+            except PositionUnknownError:
                 await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
 
             if DELAY > 0:

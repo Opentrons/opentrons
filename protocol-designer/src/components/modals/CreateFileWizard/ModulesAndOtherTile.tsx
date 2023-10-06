@@ -10,6 +10,9 @@ import {
   PrimaryButton,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  useHoverTooltip,
+  Tooltip,
+  WRAP,
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -53,7 +56,7 @@ const getCrashableModuleSelected = (
 ): boolean => {
   const formModule = modules[moduleType]
   const crashableModuleOnDeck =
-    formModule?.onDeck && formModule?.model
+    formModule?.onDeck && formModule?.model != null
       ? isModuleWithCollisionIssue(formModule.model)
       : false
 
@@ -72,9 +75,19 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     goBack,
     proceed,
   } = props
+  const robotType = values.fields.robotType
   const moduleRestrictionsDisabled = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const enableDeckModification = useSelector(
+    featureFlagSelectors.getEnableDeckModification
+  )
+  const hasATrash =
+    robotType === FLEX_ROBOT_TYPE && enableDeckModification
+      ? values.additionalEquipment.includes('wasteChute') ||
+        values.additionalEquipment.includes('trashBin')
+      : true
 
   const { left, right } = values.pipettesByMount
 
@@ -114,7 +127,6 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
       showHeaterShakerPipetteCollisions={showHeaterShakerPipetteCollisions}
     />
   )
-  const robotType = values.fields.robotType
 
   return (
     <HandleEnter onEnter={proceed}>
@@ -140,7 +152,10 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
               onSetFieldTouched={setFieldTouched}
             />
           ) : (
-            <FlexModuleFields {...props} />
+            <FlexModuleFields
+              {...props}
+              enableDeckModification={enableDeckModification}
+            />
           )}
           {robotType === OT2_ROBOT_TYPE && moduleRestrictionsDisabled !== true
             ? modCrashWarning
@@ -167,9 +182,18 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
               }
             }}
           />
-          <PrimaryButton onClick={() => proceed()}>
+          <PrimaryButton
+            onClick={() => proceed()}
+            disabled={!hasATrash}
+            {...targetProps}
+          >
             {i18n.t('modal.create_file_wizard.review_file_details')}
           </PrimaryButton>
+          {!hasATrash ? (
+            <Tooltip {...tooltipProps}>
+              {i18n.t(`tooltip.disabled_no_trash`)}
+            </Tooltip>
+          ) : null}
         </Flex>
       </Flex>
     </HandleEnter>
@@ -189,11 +213,12 @@ const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [TEMPERATURE_MODULE_V2]: 'D3',
 }
 
-function FlexModuleFields(props: WizardTileProps): JSX.Element {
-  const { values, setFieldValue } = props
-  const enableDeckModification = useSelector(
-    featureFlagSelectors.getEnableDeckModification
-  )
+interface FlexModuleFieldsProps extends WizardTileProps {
+  enableDeckModification: boolean
+}
+function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
+  const { values, setFieldValue, enableDeckModification } = props
+
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
@@ -211,7 +236,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   }
 
   return (
-    <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
+    <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         return (
@@ -251,19 +276,34 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         showCheckbox
       />
       {enableDeckModification && isFlex ? (
-        <EquipmentOption
-          onClick={() => handleSetEquipmentOption('wasteChute')}
-          isSelected={values.additionalEquipment.includes('wasteChute')}
-          //  todo(jr, 9/14/23): update the asset
-          image={
-            <AdditionalItemImage
-              src={gripperImage}
-              alt="Opentrons Waste Chute"
-            />
-          }
-          text="Waste Chute"
-          showCheckbox
-        />
+        <>
+          <EquipmentOption
+            onClick={() => handleSetEquipmentOption('wasteChute')}
+            isSelected={values.additionalEquipment.includes('wasteChute')}
+            //  todo(jr, 9/14/23): update the asset
+            image={
+              <AdditionalItemImage
+                src={gripperImage}
+                alt="Opentrons Waste Chute"
+              />
+            }
+            text="Waste Chute"
+            showCheckbox
+          />
+          <EquipmentOption
+            onClick={() => handleSetEquipmentOption('trashBin')}
+            isSelected={values.additionalEquipment.includes('trashBin')}
+            //  todo(jr, 9/14/23): update the asset with trash bin
+            image={
+              <AdditionalItemImage
+                src={gripperImage}
+                alt="Opentrons Trash Bin"
+              />
+            }
+            text="Trash Bin"
+            showCheckbox
+          />
+        </>
       ) : null}
     </Flex>
   )

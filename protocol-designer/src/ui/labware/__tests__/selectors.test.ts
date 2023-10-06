@@ -8,7 +8,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT, FIXED_TRASH_ID } from '../../../constants'
+import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import {
   getDisposalLabwareOptions,
   getLabwareOptions,
@@ -32,38 +32,36 @@ describe('labware selectors', () => {
   let trash: LabwareEntities
   let otherLabware: LabwareEntities
 
+  const mockTrash = 'mockTrash'
+  const mockTrash2 = 'mockTrash2'
   beforeEach(() => {
     trash = {
-      // @ts-expect-error(sa, 2021-6-15): missing id and labwareDefURI
-      fixedTrash: {
+      [mockTrash]: {
         def: { ...fixtureTrash },
-      },
+      } as any,
     }
 
     tipracks = {
-      // @ts-expect-error(sa, 2021-6-15): missing labwareDefURI
       tiprack100Id: {
         id: 'tiprack100Id',
         def: { ...fixtureTiprack1000ul },
-      },
-      // @ts-expect-error(sa, 2021-6-15): missing labwareDefURI
+      } as any,
       tiprack10Id: {
         id: 'tiprack10Id',
         def: { ...fixtureTiprack10ul },
-      },
+      } as any,
     }
 
     otherLabware = {
-      // @ts-expect-error(sa, 2021-6-15): missing labwareDefURI
       wellPlateId: {
         id: 'wellPlateId',
         def: { ...fixture96Plate },
-      },
+      } as any,
     }
 
     names = {
-      fixedTrash: 'Trash',
-      fixedTrash2: 'Trash',
+      [mockTrash]: 'Trash',
+      [mockTrash2]: 'Trash',
 
       tiprack100Id: 'Opentrons Tip Rack 1000 µL',
       tiprack10Id: 'Opentrons Tip Rack 10 µL',
@@ -97,11 +95,11 @@ describe('labware selectors', () => {
       expect(
         // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
-      ).toEqual([{ name: 'Trash', value: 'fixedTrash' }])
+      ).toEqual([{ name: 'Trash Bin', value: mockTrash }])
     })
     it('filters out labware that is NOT trash when multiple trash bins present', () => {
       const trash2 = {
-        fixedTrash2: {
+        mockTrash2: {
           def: { ...fixtureTrash },
         },
       }
@@ -115,8 +113,8 @@ describe('labware selectors', () => {
         // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([
-        { name: 'Trash', value: 'fixedTrash' },
-        { name: 'Trash', value: 'fixedTrash2' },
+        { name: 'Trash Bin', value: mockTrash },
+        { name: 'Trash Bin', value: mockTrash2 },
       ])
     })
   })
@@ -155,11 +153,11 @@ describe('labware selectors', () => {
         )
       ).toEqual([
         { name: 'Source Plate', value: 'wellPlateId' },
-        { name: 'Trash', value: 'fixedTrash' },
+        { name: 'Trash', value: mockTrash },
       ])
     })
 
-    it('should return labware options for move labware with tips and no trash', () => {
+    it('should return labware options for move labware with tips and trash', () => {
       const labwareEntities = {
         ...tipracks,
         ...trash,
@@ -187,6 +185,7 @@ describe('labware selectors', () => {
         { name: 'Opentrons Tip Rack 10 µL', value: 'tiprack10Id' },
         { name: 'Opentrons Tip Rack 1000 µL', value: 'tiprack100Id' },
         { name: 'Source Plate', value: 'wellPlateId' },
+        { name: 'Trash', value: mockTrash },
       ])
     })
 
@@ -268,8 +267,8 @@ describe('labware selectors', () => {
         { name: 'HS Plate in Heater-Shaker', value: 'hsPlateId' },
         { name: 'TC Plate in Thermocycler', value: 'tcPlateId' },
         { name: 'Temp Plate in Temperature Module', value: 'tempPlateId' },
+        { name: 'Trash', value: mockTrash },
         { name: 'Well Plate in Magnetic Module', value: 'wellPlateId' },
-        { name: 'Trash', value: 'fixedTrash' },
       ])
     })
 
@@ -321,24 +320,24 @@ describe('labware selectors', () => {
           savedStep
         )
       ).toEqual([
+        { name: 'Trash', value: mockTrash },
         { name: 'Well Plate in Magnetic Module', value: 'wellPlateId' },
-        { name: 'Trash', value: 'fixedTrash' },
       ])
     })
   })
 
   describe('_sortLabwareDropdownOptions', () => {
     const trashOption = {
-      name: 'Some kinda fixed trash',
-      value: FIXED_TRASH_ID,
+      name: 'Trash Bin',
+      value: mockTrash,
     }
     const zzzPlateOption = { name: 'Zzz Plate', value: 'zzz' }
     const aaaPlateOption = { name: 'Aaa Plate', value: 'aaa' }
     it('should sort labware ids in alphabetical order but with fixed trash at the bottom', () => {
       const result = _sortLabwareDropdownOptions([
-        trashOption,
         aaaPlateOption,
         zzzPlateOption,
+        trashOption,
       ])
       expect(result).toEqual([aaaPlateOption, zzzPlateOption, trashOption])
     })

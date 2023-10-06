@@ -243,6 +243,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         }
       />
     )
+
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
@@ -270,7 +271,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}
-      back={goBack}
+      back={movement !== MOVE_PIN_TO_FRONT_JAW ? goBack : undefined}
     />
   )
 }

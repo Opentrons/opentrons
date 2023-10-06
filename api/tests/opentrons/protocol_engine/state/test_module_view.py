@@ -295,7 +295,7 @@ def test_get_properties_by_id(
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=0, y=68.06, z=98.26),
+            LabwareOffsetVector(x=0, y=68.8, z=108.96),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
@@ -345,7 +345,7 @@ def test_get_module_offset_for_ot2_standard(
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7.to_ot3_equivalent(),
-            LabwareOffsetVector(x=-20.005, y=67.96, z=0.26),
+            LabwareOffsetVector(x=-20.005, y=67.96, z=10.96),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),

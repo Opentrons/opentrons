@@ -40,6 +40,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 
 interface ReplaceTipArgs {
   pipette: string
+  dropTipLocation: string
 }
 
 /**
@@ -52,7 +53,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette } = args
+  const { pipette, dropTipLocation } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
@@ -86,6 +87,12 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         }),
       ],
     }
+  }
+  if (
+    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
   if (
     modulePipetteCollision({
@@ -134,6 +141,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(dropTip, {
       pipette,
+      dropTipLocation,
     }),
     curryCommandCreator(_pickUpTip, {
       pipette,

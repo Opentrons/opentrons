@@ -132,14 +132,16 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
     InvalidPipetteModel,
-    FirmwareUpdateRequired,
-    OverPressureDetected,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     MoveGroup,
 )
-from opentrons_hardware.hardware_control.types import NodeMap
+from opentrons_hardware.hardware_control.types import (
+    NodeMap,
+    MotorPositionStatus,
+    MoveCompleteAck,
+)
 from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
 
 from opentrons_hardware.hardware_control.tool_sensors import (
@@ -169,6 +171,8 @@ from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
     UnmatchedTipPresenceStates,
+    PipetteOverpressureError,
+    FirmwareUpdateRequiredError,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -187,12 +191,15 @@ Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
 
 
 def requires_update(func: Wrapped) -> Wrapped:
-    """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
+    """Decorator that raises FirmwareUpdateRequiredError if the update_required flag is set."""
 
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         if self.update_required and self.initialized:
-            raise FirmwareUpdateRequired()
+            raise FirmwareUpdateRequiredError(
+                func.__name__,
+                self.subsystems_to_update,
+            )
         return await func(self, *args, **kwargs)
 
     return cast(Wrapped, wrapper)
@@ -343,6 +350,10 @@ class OT3Controller:
     def update_required(self) -> bool:
         return self._subsystem_manager.update_required and self._check_updates
 
+    @property
+    def subsystems_to_update(self) -> List[SubSystem]:
+        return self._subsystem_manager.subsystems_to_update
+
     @staticmethod
     def _build_system_hardware(
         can_messenger: CanMessenger,
@@ -382,10 +393,13 @@ class OT3Controller:
         async for update in self._subsystem_manager.update_firmware(subsystems, force):
             yield update
 
+    def get_current_settings(
+        self, gantry_load: GantryLoad
+    ) -> OT3AxisMap[CurrentConfig]:
+        return get_current_settings(self._configuration.current_settings, gantry_load)
+
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
-        self._current_settings = get_current_settings(
-            self._configuration.current_settings, gantry_load
-        )
+        self._current_settings = self.get_current_settings(gantry_load)
         await self.set_default_currents()
 
     async def update_motor_status(self) -> None:
@@ -484,11 +498,11 @@ class OT3Controller:
 
     def _handle_motor_status_response(
         self,
-        response: NodeMap[Tuple[float, float, bool, bool]],
+        response: NodeMap[MotorPositionStatus],
     ) -> None:
         for axis, pos in response.items():
-            self._position.update({axis: pos[0]})
-            self._encoder_position.update({axis: pos[1]})
+            self._position.update({axis: pos.motor_position})
+            self._encoder_position.update({axis: pos.encoder_position})
             # TODO (FPS 6-01-2023): Remove this once the Feature Flag to ignore stall detection is removed.
             # This check will latch the motor status for an axis at "true" if it was ever set to true.
             # To account for the case where a motor axis has its power reset, we also depend on the
@@ -502,7 +516,8 @@ class OT3Controller:
             self._motor_status.update(
                 {
                     axis: MotorStatus(
-                        motor_ok=(pos[2] or motor_ok_latch), encoder_ok=pos[3]
+                        motor_ok=(pos.motor_ok or motor_ok_latch),
+                        encoder_ok=pos.encoder_ok,
                     )
                 }
             )
@@ -684,7 +699,7 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
             self._gear_motor_position = {
-                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+                NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
             }
         else:
             log.debug("no position returned from NodeId.pipette_left")
@@ -702,7 +717,7 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
             self._gear_motor_position = {
-                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+                NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
             }
         else:
             log.debug("no position returned from NodeId.pipette_left")
@@ -768,7 +783,7 @@ class OT3Controller:
         attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
     ) -> AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
-            raise InvalidPipetteName(name=attached.name_int, mount=mount)
+            raise InvalidPipetteName(name=attached.name_int, mount=mount.name)
         try:
             # TODO (lc 12-8-2022) We should return model as an int rather than
             # a string.
@@ -789,7 +804,7 @@ class OT3Controller:
             }
         except KeyError:
             raise InvalidPipetteModel(
-                name=attached.name.name, model=attached.model, mount=mount
+                name=attached.name.name, model=attached.model, mount=mount.name
             )
 
     @staticmethod
@@ -929,14 +944,51 @@ class OT3Controller:
             self._current_settings[axis].hold_current = current
 
     @asynccontextmanager
-    async def restore_current(self) -> AsyncIterator[None]:
-        """Save the current."""
-        old_current_settings = deepcopy(self._current_settings)
+    async def motor_current(
+        self,
+        run_currents: OT3AxisMap[float] = {},
+        hold_currents: OT3AxisMap[float] = {},
+    ) -> AsyncIterator[None]:
+        """Update and restore current."""
+        assert self._current_settings
+        old_settings = deepcopy(self._current_settings)
+        if run_currents:
+            await self.set_active_current(run_currents)
+        if hold_currents:
+            await self.set_hold_current(hold_currents)
         try:
             yield
         finally:
-            self._current_settings = old_current_settings
-            await self.set_default_currents()
+            if run_currents:
+                await self.set_active_current(
+                    {ax: old_settings[ax].run_current for ax in run_currents.keys()}
+                )
+            if hold_currents:
+                await self.set_hold_current(
+                    {ax: old_settings[ax].hold_current for ax in hold_currents.keys()}
+                )
+            if not run_currents and not hold_currents:
+                self._current_settings = old_settings
+                await self.set_default_currents()
+
+    @asynccontextmanager
+    async def restore_z_r_run_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily restore the active current ONLY when homing or
+        retracting the Z_R axis while the 96-channel is attached.
+        """
+        assert self._current_settings
+        high_throughput_settings = deepcopy(self._current_settings)
+        conf = self.get_current_settings(GantryLoad.LOW_THROUGHPUT)[Axis.Z_R]
+        # outside of homing and retracting, Z_R run current should
+        # be reduced to its hold current
+        await self.set_active_current({Axis.Z_R: conf.run_current})
+        try:
+            yield
+        finally:
+            await self.set_active_current(
+                {Axis.Z_R: high_throughput_settings[Axis.Z_R].run_current}
+            )
 
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
@@ -1088,6 +1140,7 @@ class OT3Controller:
 
     @asynccontextmanager
     async def _monitor_overpressure(self, mounts: List[NodeId]) -> AsyncIterator[None]:
+        msg = "The pressure sensor on the {} mount has exceeded operational limits."
         if ff.overpressure_detection_enabled() and mounts:
             tools_with_id = map_pipette_type_to_sensor_id(
                 mounts, self._subsystem_manager.device_info
@@ -1113,8 +1166,10 @@ class OT3Controller:
                     q_msg = _pop_queue()
                     if q_msg:
                         mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
-                        raise OverPressureDetected(mount.name)
-
+                        raise PipetteOverpressureError(
+                            message=msg.format(str(mount)),
+                            detail={"mount": mount},
+                        )
         else:
             yield
 
@@ -1146,8 +1201,8 @@ class OT3Controller:
             sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
-            self._position.update({node: point[0]})
-            self._encoder_position.update({node: point[1]})
+            self._position.update({node: point.motor_position})
+            self._encoder_position.update({node: point.encoder_position})
         return self._position
 
     async def capacitive_probe(
@@ -1158,8 +1213,8 @@ class OT3Controller:
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
         probe: InstrumentProbeType,
-    ) -> None:
-        pos, _ = await capacitive_probe(
+    ) -> bool:
+        status = await capacitive_probe(
             self._messenger,
             sensor_node_for_mount(mount),
             axis_to_node(moving),
@@ -1169,7 +1224,8 @@ class OT3Controller:
             relative_threshold_pf=sensor_threshold_pf,
         )
 
-        self._position[axis_to_node(moving)] = pos
+        self._position[axis_to_node(moving)] = status.motor_position
+        return status.move_ack == MoveCompleteAck.stopped_by_condition
 
     async def capacitive_pass(
         self,

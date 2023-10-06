@@ -10,6 +10,7 @@ import {
   Flex,
   Icon,
   useHoverTooltip,
+  useInterval,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -22,6 +23,7 @@ import {
 import { QuaternaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useIsOT3 } from '../../organisms/Devices/hooks'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
@@ -40,9 +42,11 @@ type RobotStatusHeaderProps = StyleProps &
     robotModel: string | null
   }
 
+const STATUS_REFRESH_MS = 5000
+
 export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const { name, local, robotModel, ...styleProps } = props
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     'devices_landing',
     'device_settings',
     'run_details',
@@ -51,6 +55,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
+  const isOT3 = useIsOT3(name)
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
@@ -70,8 +75,9 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing8}
           overflowWrap="anywhere"
         >
-          {`${truncateString(displayName, 80, 65)}; ${t(
-            `run_details:status_${currentRunStatus}`
+          {`${truncateString(displayName, 80, 65)}; ${i18n.format(
+            t(`run_details:status_${currentRunStatus}`),
+            'lowerCase'
           )}`}
         </StyledText>
         <Link
@@ -94,14 +100,17 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   )
 
   const wifiAddress = addresses.find(addr => addr.ip === wifi?.ipAddress)
-  const isOT3ConnectedViaWifi =
+  const isConnectedViaWifi =
     wifiAddress != null && wifiAddress.healthStatus === HEALTH_STATUS_OK
 
   const ethernetAddress = addresses.find(
     addr => addr.ip === ethernet?.ipAddress
   )
+  // do not show ethernet connection for OT-2
   const isOT3ConnectedViaEthernet =
-    ethernetAddress != null && ethernetAddress.healthStatus === HEALTH_STATUS_OK
+    isOT3 &&
+    ethernetAddress != null &&
+    ethernetAddress.healthStatus === HEALTH_STATUS_OK
 
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
   const isOT3ConnectedViaUSB =
@@ -112,7 +121,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   if (isOT3ConnectedViaEthernet) {
     iconName = 'ethernet'
     tooltipTranslationKey = 'device_settings:ethernet'
-  } else if (isOT3ConnectedViaWifi) {
+  } else if (isConnectedViaWifi) {
     iconName = 'wifi'
     tooltipTranslationKey = 'device_settings:wifi'
   } else if ((local != null && local) || isOT3ConnectedViaUSB) {
@@ -120,10 +129,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     tooltipTranslationKey = 'device_settings:wired_usb'
   }
 
-  React.useEffect(() => {
-    dispatch(fetchStatus(name))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  useInterval(() => dispatch(fetchStatus(name)), STATUS_REFRESH_MS, true)
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
