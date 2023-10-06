@@ -140,7 +140,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, current
     print(f"Setting pick up current to {current}A\n")
     await helpers_ot3.update_pick_up_current(api, mount, current)
     print(f"Setting pick up speed to {speed}mm/s\n")
-    config_model.speed = speed
+    await helpers_ot3.update_pick_up_tip_speed(api, mount, speed)  # config_model.speed = speed
     # print out updated current and speed values
     test_current = config_model.current
     test_speed = config_model.speed
