@@ -32,7 +32,12 @@ import { HandleEnter } from './HandleEnter'
 
 import type { FormState, WizardTileProps } from './types'
 
-export function FirstPipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
+export function FirstPipetteTypeTile(
+  props: Omit<
+    PipetteTypeTileProps,
+    'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
+  >
+): JSX.Element {
   const mount = LEFT
   const allow96Channel = useSelector(getAllow96Channel)
   return (
@@ -46,7 +51,10 @@ export function FirstPipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
   )
 }
 export function SecondPipetteTypeTile(
-  props: PipetteTypeTileProps
+  props: Omit<
+    PipetteTypeTileProps,
+    'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
+  >
 ): JSX.Element | null {
   if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
