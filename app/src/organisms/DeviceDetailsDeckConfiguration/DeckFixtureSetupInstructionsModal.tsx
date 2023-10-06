@@ -22,7 +22,8 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 
 const SETUP_INSTRUCTION_URL = 'www.opentrons.com/support/fixtures'
-const SETUP_INSTRUCTION_EXTERNAL_URL = 'https://opentrons.com/support/fixtures'
+const SETUP_INSTRUCTION_EXTERNAL_URL =
+  'https://support.opentrons.com/s/article/Deck-configuration-on-Opentrons-Flex'
 const IMG_ALT = 'QRCode for Deck fixture setup instructions page'
 
 interface DeckFixtureSetupInstructionsModalProps {
