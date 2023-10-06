@@ -5,7 +5,14 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 from opentrons_shared_data.module import load_definition
 
-from ..types import ModuleModel, ModuleDefinition, ModuleOffsetVector
+from opentrons.types import DeckSlotName
+from ..types import (
+    ModuleModel,
+    ModuleDefinition,
+    ModuleOffsetVector,
+    ModuleOffsetData,
+    DeckSlotLocation,
+)
 
 
 class ModuleDataProvider:
@@ -18,15 +25,20 @@ class ModuleDataProvider:
         return ModuleDefinition.parse_obj(data)
 
     @staticmethod
-    def load_module_calibrations() -> Dict[str, ModuleOffsetVector]:
+    def load_module_calibrations() -> Dict[str, ModuleOffsetData]:
         """Load the module calibration offsets."""
-        module_calibrations: Dict[str, ModuleOffsetVector] = dict()
+        module_calibrations: Dict[str, ModuleOffsetData] = dict()
         calibration_data = load_all_module_calibrations()
         for calibration in calibration_data:
             # NOTE module_id is really the module serial number, change this
-            module_calibrations[calibration.module_id] = ModuleOffsetVector(
-                x=calibration.offset.x,
-                y=calibration.offset.y,
-                z=calibration.offset.z,
+            module_calibrations[calibration.module_id] = ModuleOffsetData(
+                moduleOffsetVector=ModuleOffsetVector(
+                    x=calibration.offset.x,
+                    y=calibration.offset.y,
+                    z=calibration.offset.z,
+                ),
+                location=DeckSlotLocation(
+                    slotName=DeckSlotName.from_primitive(calibration.slot),
+                ),
             )
         return module_calibrations

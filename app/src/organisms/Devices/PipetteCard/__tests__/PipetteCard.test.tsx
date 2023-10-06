@@ -3,7 +3,10 @@ import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
+import {
+  useCurrentSubsystemUpdateQuery,
+  usePipetteSettingsQuery,
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
@@ -30,6 +33,7 @@ jest.mock('../../hooks')
 jest.mock('../AboutPipetteSlideout')
 jest.mock('../../../../redux/robot-api')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../redux/pipettes')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -56,6 +60,9 @@ const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jest.MockedFunction<
   typeof useCurrentSubsystemUpdateQuery
 >
+const mockUsePipetteSettingsQuery = usePipetteSettingsQuery as jest.MockedFunction<
+  typeof usePipetteSettingsQuery
+>
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -81,6 +88,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
     when(mockAboutPipettesSlideout).mockReturnValue(
@@ -105,6 +113,9 @@ describe('PipetteCard', () => {
     mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
       data: undefined,
     } as any)
+    when(mockUsePipetteSettingsQuery)
+      .calledWith({ refetchInterval: 5000, enabled: true })
+      .mockReturnValue({} as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -121,6 +132,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('left Mount')
@@ -136,6 +148,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText, getByRole } = render(props)
     getByText('Both Mounts')
@@ -156,6 +169,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('right Mount')
@@ -170,6 +184,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('right Mount')
@@ -184,6 +199,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('left Mount')
@@ -199,6 +215,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { queryByText } = render(props)
     expect(queryByText('Calibrate now')).toBeNull()
@@ -213,6 +230,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Calibrate now')
@@ -226,6 +244,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: false,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByRole, getByText, queryByText } = render(props)
 
@@ -248,6 +267,7 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: true,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Right mount')
@@ -268,10 +288,19 @@ describe('PipetteCard', () => {
       isPipetteCalibrated: false,
       pipetteIsBad: true,
       updatePipette: jest.fn(),
+      isRunActive: false,
     }
     const { getByText } = render(props)
     getByText('Right mount')
     getByText('Instrument attached')
     getByText('Firmware update in progress...')
+  })
+  it('does not render a pipette settings slideout card if the pipette has no settings', () => {
+    const { queryByTestId } = render(props)
+    expect(
+      queryByTestId(
+        `PipetteSettingsSlideout_${mockRobotName}_${props.pipetteId}`
+      )
+    ).not.toBeInTheDocument()
   })
 })

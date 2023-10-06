@@ -11,7 +11,8 @@ export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
-  isGantryEmpty: boolean
+  isGantryEmpty: boolean,
+  requiresFirmwareUpdate: boolean
 ): PipetteWizardStep[] => {
   switch (flowType) {
     case FLOWS.CALIBRATE: {
@@ -32,7 +33,7 @@ export const getPipetteWizardSteps = (
     }
     case FLOWS.ATTACH: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        return [
+        const ALL_STEPS = [
           {
             section: SECTIONS.BEFORE_BEGINNING,
             mount: mount,
@@ -53,6 +54,9 @@ export const getPipetteWizardSteps = (
             flowType: FLOWS.CALIBRATE,
           },
         ]
+        return requiresFirmwareUpdate
+          ? ALL_STEPS
+          : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
       } else {
         //  pipette needs to be detached before attached 96 channel
         if (!isGantryEmpty) {
@@ -60,7 +64,7 @@ export const getPipetteWizardSteps = (
           if (mount === LEFT) {
             detachMount = RIGHT
           }
-          return [
+          const ALL_STEPS = [
             {
               section: SECTIONS.BEFORE_BEGINNING,
               mount: detachMount,
@@ -113,9 +117,14 @@ export const getPipetteWizardSteps = (
               flowType: FLOWS.CALIBRATE,
             },
           ]
+          return requiresFirmwareUpdate
+            ? ALL_STEPS
+            : ALL_STEPS.filter(
+                step => step.section !== SECTIONS.FIRMWARE_UPDATE
+              )
           //  gantry empty to attach 96 channel
         } else {
-          return [
+          const ALL_STEPS = [
             {
               section: SECTIONS.BEFORE_BEGINNING,
               mount: mount,
@@ -158,6 +167,11 @@ export const getPipetteWizardSteps = (
               flowType: FLOWS.CALIBRATE,
             },
           ]
+          return requiresFirmwareUpdate
+            ? ALL_STEPS
+            : ALL_STEPS.filter(
+                step => step.section !== SECTIONS.FIRMWARE_UPDATE
+              )
         }
       }
     }

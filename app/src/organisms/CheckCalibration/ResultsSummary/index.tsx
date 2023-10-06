@@ -111,7 +111,7 @@ export function ResultsSummary(
 
   // check all calibration status
   // if all of them are good, this returns true. otherwise return false
-  const isCalibrationCompleted = (): boolean => {
+  const isCalibrationRecommended = (): boolean => {
     const isOffsetsBad =
       pipetteResultsBad(calibrationsByMount.left.calibration).offsetBad &&
       pipetteResultsBad(calibrationsByMount.right.calibration).offsetBad
@@ -130,7 +130,7 @@ export function ResultsSummary(
     >
       <Box marginBottom="1.5rem">
         <CalibrationHealthCheckResults
-          isCalibrationCompleted={isCalibrationCompleted()}
+          isCalibrationRecommended={isCalibrationRecommended()}
         />
       </Box>
       <Box marginBottom={SPACING.spacing16}>

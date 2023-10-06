@@ -68,7 +68,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
-  const isOt3 = useIsOT3(robotName)
+  const isOT3 = useIsOT3(robotName)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
@@ -176,7 +176,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     ? moduleRenderInfoForProtocolById[moduleId]
                     : null
                 }
-                isOt3={isOt3}
+                isOT3={isOT3}
                 calibrationStatus={calibrationStatus}
               />
             )
@@ -193,7 +193,7 @@ interface ModulesListItemProps {
   slotName: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
-  isOt3: boolean
+  isOT3: boolean
   calibrationStatus: ProtocolCalibrationStatus
 }
 
@@ -203,7 +203,7 @@ export function ModulesListItem({
   slotName,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
-  isOt3,
+  isOT3,
   calibrationStatus,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
@@ -292,37 +292,43 @@ export function ModulesListItem({
   }
 
   let renderModuleStatus: JSX.Element = (
-    <>
-      <TertiaryButton
-        {...targetProps}
-        onClick={handleCalibrateClick}
-        disabled={!calibrationStatus?.complete || isModuleTooHot}
-      >
-        {t('calibrate_now')}
-      </TertiaryButton>
-      {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
-      isModuleTooHot ? (
-        <Tooltip tooltipProps={tooltipProps}>{calibrateDisabledReason}</Tooltip>
-      ) : null}
-    </>
+    <StatusLabel
+      status={moduleConnectionStatus}
+      backgroundColor={COLORS.successBackgroundLight}
+      iconColor={COLORS.successEnabled}
+      textColor={COLORS.successText}
+    />
   )
 
-  if (attachedModuleMatch == null) {
+  if (
+    isOT3 &&
+    attachedModuleMatch != null &&
+    attachedModuleMatch.moduleOffset?.last_modified == null
+  ) {
+    renderModuleStatus = (
+      <>
+        <TertiaryButton
+          {...targetProps}
+          onClick={handleCalibrateClick}
+          disabled={!calibrationStatus?.complete || isModuleTooHot}
+        >
+          {t('calibrate_now')}
+        </TertiaryButton>
+        {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
+        isModuleTooHot ? (
+          <Tooltip tooltipProps={tooltipProps}>
+            {calibrateDisabledReason}
+          </Tooltip>
+        ) : null}
+      </>
+    )
+  } else if (attachedModuleMatch == null) {
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
         backgroundColor={COLORS.warningBackgroundLight}
         iconColor={COLORS.warningEnabled}
         textColor={COLORS.warningText}
-      />
-    )
-  } else if (attachedModuleMatch.moduleOffset?.last_modified != null) {
-    renderModuleStatus = (
-      <StatusLabel
-        status={moduleConnectionStatus}
-        backgroundColor={COLORS.successBackgroundLight}
-        iconColor={COLORS.successEnabled}
-        textColor={COLORS.successText}
       />
     )
   }
@@ -377,7 +383,7 @@ export function ModulesListItem({
             {t('slot_location', {
               slotName:
                 getModuleType(moduleModel) === 'thermocyclerModuleType'
-                  ? isOt3
+                  ? isOT3
                     ? TC_MODULE_LOCATION_OT3
                     : TC_MODULE_LOCATION_OT2
                   : slotName,

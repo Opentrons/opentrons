@@ -13,10 +13,11 @@ import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { LevelPipette } from './LevelPipette'
 
-import type {
+import {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 import type { Mount } from '../../redux/pipettes/types'
@@ -129,6 +130,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
       header={header}
       subHeader={subHeader}
       isSuccess={success || isWrongWantedPipette || confirmPipetteLevel}
+      robotType={OT2_ROBOT_TYPE}
     >
       <>
         {!success && !wrongWantedPipette && !confirmPipetteLevel && (

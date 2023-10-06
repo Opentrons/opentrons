@@ -14,11 +14,11 @@ import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
-import { UsageSettings } from './AdvancedTab/UsageSettings'
 import {
-  GantryHoming,
-  DisplayRobotName,
   DeviceReset,
+  DisplayRobotName,
+  EnableStatusLight,
+  GantryHoming,
   LegacySettings,
   OpenJupyterControl,
   RobotInformation,
@@ -26,6 +26,7 @@ import {
   ShortTrashBin,
   Troubleshooting,
   UpdateRobotSoftware,
+  UsageSettings,
   UseOlderAspirateBehavior,
   UseOlderProtocol,
 } from './AdvancedTab'
@@ -123,9 +124,7 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
+      {showSoftwareUpdateModal ? (
         <UpdateBuildroot
           robot={robot}
           close={() => setShowSoftwareUpdateModal(false)}
@@ -182,6 +181,13 @@ export function RobotSettingsAdvanced({
           robotName={robotName}
           isRobotBusy={isRobotBusy}
         />
+
+        {isOT3 ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <EnableStatusLight robotName={robotName} />
+          </>
+        ) : null}
         <Divider marginY={SPACING.spacing16} />
         <OpenJupyterControl robotIp={ipAddress} />
         <Divider marginY={SPACING.spacing16} />

@@ -22,7 +22,35 @@ stages:
         errors:
           - id: ProtocolRobotTypeMismatch
             title: Protocol For Different Robot Type
-            detail: "This protocol is for OT-3 Standard robots. It can't be analyzed or run on this robot, which is an OT-2 Standard."
+            detail: "This protocol is for Flex robots. It can't be analyzed or run on this robot, which is an OT-2."
             errorCode: '4000'
 
-# TODO(mm, 2022-12-12): Also make sure an OT-3 server rejects OT-2 protocols.
+---
+
+test_name: Make sure an OT-3 server rejects OT-2 protocols.
+
+marks:
+  - ot3_only
+  - usefixtures:
+    - ot3_server_base_url
+  - parametrize:
+      key: protocol_file_path
+      vals:
+        - 'tests/integration/protocols/empty_ot2.json'
+        - 'tests/integration/protocols/empty_ot2.py'
+
+stages:
+  - name: Upload the protocol.
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      files:
+        files: "{protocol_file_path}"
+    response:
+      status_code: 422
+      json:
+        errors:
+          - id: ProtocolRobotTypeMismatch
+            title: Protocol For Different Robot Type
+            detail: "This protocol is for OT-2 robots. It can't be analyzed or run on this robot, which is a Flex."
+            errorCode: '4000'

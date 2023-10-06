@@ -35,6 +35,7 @@ const NON_FEATURE_FLAG_SETTINGS = [
   'useOldAspirationFunctions',
   'disableLogAggregation',
   'disableFastProtocolUpload',
+  'disableStatusBar',
 ]
 
 export function RobotSettingsFeatureFlags({

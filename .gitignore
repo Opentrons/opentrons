@@ -155,3 +155,6 @@ opentrons-robot-app.tar.gz
 
 # local VERSION.json file when pushing to Flex
 *new_version_file.json
+
+# swap files
+*.swp

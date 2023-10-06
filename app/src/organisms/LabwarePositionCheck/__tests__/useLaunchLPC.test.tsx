@@ -80,7 +80,7 @@ describe('useLaunchLPC hook', () => {
       Promise.resolve({ data: { definitionUri: 'fakeDefUri' } })
     )
     mockDeleteMaintenanceRun = jest.fn((_data, opts) => {
-      opts?.onSuccess()
+      opts?.onSettled()
     })
     const store = mockStore({ isOnDevice: false })
     wrapper = ({ children }) => (
@@ -184,7 +184,7 @@ describe('useLaunchLPC hook', () => {
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(
       MOCK_MAINTENANCE_RUN_ID,
       {
-        onSuccess: expect.any(Function),
+        onSettled: expect.any(Function),
       }
     )
     expect(result.current.LPCWizard).toBeNull()

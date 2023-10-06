@@ -57,6 +57,11 @@ const mockResetConfigOptions = [
     name: 'module calibration FooBar',
     description: 'moduleCalibration fooBar description',
   },
+  {
+    id: 'authorizedKeys',
+    name: 'SSH Keys Foo',
+    description: 'SSH Keys foo description',
+  },
 ]
 
 const render = () => {
@@ -97,6 +102,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByText('Clear protocol run history')
     getByText('Boot scripts')
     getByText('Clear custom boot scripts')
+    getByText('Clear SSH public keys')
     const downloads = getAllByText('Download')
     expect(downloads.length).toBe(2)
     getByRole('checkbox', { name: 'Clear deck calibration' })
@@ -104,6 +110,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByRole('checkbox', { name: 'Clear tip length calibrations' })
     getByRole('checkbox', { name: 'Clear protocol run history' })
     getByRole('checkbox', { name: 'Clear custom boot scripts' })
+    getByRole('checkbox', { name: 'Clear SSH public keys' })
     getByRole('button', { name: 'Clear data and restart robot' })
     getByTestId('Slideout_icon_close_Device Reset')
   })

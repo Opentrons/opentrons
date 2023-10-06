@@ -77,6 +77,18 @@ class InstrumentConfigurer(Protocol):
     def attached_instruments(self) -> Dict[Mount, PipetteDict]:
         return self.get_attached_instruments()
 
+    def get_attached_pipettes(self) -> Dict[Mount, PipetteDict]:
+        """Get the status dicts of cached attached pipettes.
+
+        Works like get_attached_instruments but for pipettes only - on the Flex,
+        there will be no gripper information here.
+        """
+        ...
+
+    @property
+    def attached_pipettes(self) -> Dict[Mount, PipetteDict]:
+        return self.get_attached_pipettes()
+
     def calibrate_plunger(
         self,
         mount: Mount,

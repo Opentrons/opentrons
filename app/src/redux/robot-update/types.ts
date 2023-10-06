@@ -16,6 +16,7 @@ export interface RobotUpdateInfo {
 export interface RobotUpdateFileInfo {
   systemFile: string
   version: string
+  isManualFile: boolean
 }
 
 // stage response from API
