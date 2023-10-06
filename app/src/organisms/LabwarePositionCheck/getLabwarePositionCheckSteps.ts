@@ -1,13 +1,26 @@
 import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
-import { getCheckSteps } from './utils/getCheckSteps'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  FLEX_ROBOT_TYPE,
+  RobotType,
+} from '@opentrons/shared-data'
+import { getTipBasedLPCSteps } from './utils/getTipBasedLPCSteps'
+import { getProbeBasedLPCSteps } from './utils/getProbeBasedLPCSteps'
 import type { LabwarePositionCheckStep } from './types'
-import { getGoldenCheckSteps } from './utils/getGoldenCheckSteps'
 
 export const getLabwarePositionCheckSteps = (
-  protocolData: CompletedProtocolAnalysis
+  protocolData: CompletedProtocolAnalysis,
+  robotType: RobotType
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
+    if (protocolData.pipettes.length === 0) {
+      throw new Error(
+        'no pipettes loaded within protocol, labware position check cannot be performed'
+      )
+    }
+    if (robotType === FLEX_ROBOT_TYPE)
+      return getProbeBasedLPCSteps(protocolData)
+
     // filter out any pipettes that are not being used in the protocol
     const pipettesUsedInProtocol: CompletedProtocolAnalysis['pipettes'] = protocolData.pipettes.filter(
       ({ id }) =>
@@ -31,7 +44,7 @@ export const getLabwarePositionCheckSteps = (
     const secondaryPipetteId =
       pipettesUsedInProtocol.find(({ id }) => id !== primaryPipetteId)?.id ??
       null
-    return getCheckSteps({
+    return getTipBasedLPCSteps({
       primaryPipetteId,
       secondaryPipetteId,
       labware,
@@ -41,20 +54,4 @@ export const getLabwarePositionCheckSteps = (
   }
   console.error('expected pipettes to be in protocol data')
   return []
-}
-
-export const getGoldenLabwarePositionCheckSteps = (
-  protocolData: CompletedProtocolAnalysis
-): LabwarePositionCheckStep[] => {
-  if (protocolData != null && 'pipettes' in protocolData) {
-    if (protocolData.pipettes.length === 0) {
-      throw new Error(
-        'no pipettes loaded within protocol, labware position check cannot be performed'
-      )
-    }
-    return getGoldenCheckSteps(protocolData)
-  }
-  throw new Error(
-    'no pipettes found in protocol, labware position check cannot be performed'
-  )
 }

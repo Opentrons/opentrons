@@ -26,7 +26,7 @@ function getPrimaryPipetteId(pipettes: LoadedPipette[]): string {
   }, pipettes[0]).id
 }
 
-export const getGoldenCheckSteps = (
+export const getProbeBasedLPCSteps = (
   protocolData: CompletedProtocolAnalysis
 ): LabwarePositionCheckStep[] => {
   return [
