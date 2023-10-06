@@ -46,6 +46,7 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from .util.entrypoint_util import (
     find_jupyter_labware,
@@ -222,13 +223,23 @@ def get_protocol_api(
     else:
         checked_version = version
 
+    current_robot_type = _get_current_robot_type()
+    if robot_type is None:
+        if current_robot_type is None:
+            parsed_robot_type: RobotType = "OT-2 Standard"
+        else:
+            parsed_robot_type = current_robot_type
+    else:
+        parsed_robot_type = parse.robot_type_from_python_identifier(robot_type)
+    _validate_can_simulate_for_robot_type(parsed_robot_type)
+
     if extra_labware is None:
         extra_labware = {
             uri: details.definition
             for uri, details in (find_jupyter_labware() or {}).items()
         }
 
-    checked_hardware = _check_hardware_simulator(hardware_simulator, robot_type)
+    checked_hardware = _check_hardware_simulator(hardware_simulator, parsed_robot_type)
     return _build_protocol_context(
         version=checked_version,
         hardware_simulator=checked_hardware,
@@ -239,19 +250,16 @@ def get_protocol_api(
 
 
 def _check_hardware_simulator(
-    hardware_simulator: Optional[ThreadManagedHardware],
-    machine: Optional[_UserSpecifiedRobotType],
+    hardware_simulator: Optional[ThreadManagedHardware], robot_type: RobotType
 ) -> ThreadManagedHardware:
-    # TODO(mm, 2022-12-14): This should fail with a more descriptive error if someone
-    # runs this on a robot, and that robot doesn't have a matching robot type.
-    # Jira RCORE-318.
     if hardware_simulator:
         return hardware_simulator
-    elif machine == "Flex" or should_use_ot3():
+    elif robot_type == "OT-3 Standard":
+        # Local import because this isn't available on OT-2s.
         from opentrons.hardware_control.ot3api import OT3API
 
         return ThreadManager(OT3API.build_hardware_simulator)
-    else:
+    elif robot_type == "OT-2 Standard":
         return ThreadManager(OT2API.build_hardware_simulator)
 
 
@@ -283,6 +291,32 @@ def _build_protocol_context(
         raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
     context.home()
     return context
+
+
+def _get_current_robot_type() -> Optional[RobotType]:
+    """Return the type of robot that we're running on, or None if we're not on a robot."""
+    if IS_ROBOT:
+        return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
+    else:
+        return None
+
+
+def _validate_can_simulate_for_robot_type(robot_type: RobotType) -> None:
+    """Raise if this device cannot simulate protocols written for the given robot type."""
+    current_robot_type = _get_current_robot_type()
+    if current_robot_type is None:
+        # When installed locally, this package can simulate protocols for any robot type.
+        pass
+    elif robot_type != current_robot_type:
+        # Match robot server behavior: raise an early warning if we're on a robot and the caller
+        # tries to simulate a protocol written for a different robot type.
+
+        # FIXME: This exposes the internal strings "OT-2 Standard" and "OT-3 Standard".
+        # https://opentrons.atlassian.net/browse/RSS-370
+        raise RuntimeError(
+            f'This robot is of type "{current_robot_type}",'
+            f' so it can\'t simulate protocols for robot type "{robot_type}"'
+        )
 
 
 def bundle_from_sim(
