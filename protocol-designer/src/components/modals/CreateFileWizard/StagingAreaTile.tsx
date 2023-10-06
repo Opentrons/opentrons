@@ -24,40 +24,56 @@ import { HandleEnter } from './HandleEnter'
 
 import type { WizardTileProps } from './types'
 
+const STAGING_AREA_SLOTS = ['A3', 'B3', 'C3', 'D3']
+
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   const { values, goBack, proceed, setFieldValue } = props
   const isOt2 = values.fields.robotType === OT2_ROBOT_TYPE
   const deckConfigurationFF = useSelector(getEnableDeckModification)
+  const stagingAreaItems = values.additionalEquipment.filter(equipment =>
+    equipment.includes(STAGING_AREA_LOAD_NAME)
+  )
+
+  const savedStagingAreaSlots = stagingAreaItems.flatMap(item => {
+    const [loadName, fixtureLocation] = item.split('_')
+    const fixtureId = `id_${fixtureLocation}`
+    return [
+      {
+        fixtureId,
+        fixtureLocation,
+        loadName,
+      },
+    ] as DeckConfiguration
+  })
 
   //  NOTE: fixtureId doesn't matter since we don't create
   //  the entity until you complete the create file wizard via createDeckFixture action
   //  fixtureId here is only needed to visually add to the deck configurator
-  const STANDARD_EMPTY_SLOTS: DeckConfiguration = [
-    {
-      fixtureId: 'id_a3',
-      fixtureLocation: 'A3',
+  const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_SLOTS.map(
+    fixtureLocation => ({
+      fixtureId: `id_${fixtureLocation}`,
+      fixtureLocation,
       loadName: STANDARD_SLOT_LOAD_NAME,
-    },
-    {
-      fixtureId: 'id_b3',
-      fixtureLocation: 'B3',
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    },
-    {
-      fixtureId: 'id_c3',
-      fixtureLocation: 'C3',
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    },
-    {
-      fixtureId: 'id_d3',
-      fixtureLocation: 'D3',
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    },
-  ]
+    })
+  )
+
+  STANDARD_EMPTY_SLOTS.forEach(emptySlot => {
+    if (
+      !savedStagingAreaSlots.some(
+        slot => slot.fixtureLocation === emptySlot.fixtureLocation
+      )
+    ) {
+      savedStagingAreaSlots.push(emptySlot)
+    }
+  })
+
+  const initialSlots =
+    stagingAreaItems.length > 0 ? savedStagingAreaSlots : STANDARD_EMPTY_SLOTS
 
   const [updatedSlots, setUpdatedSlots] = React.useState<DeckConfiguration>(
-    STANDARD_EMPTY_SLOTS
+    initialSlots
   )
+
   if (!deckConfigurationFF || isOt2) {
     proceed()
     return null
