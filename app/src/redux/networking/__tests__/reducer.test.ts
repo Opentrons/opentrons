@@ -206,6 +206,29 @@ const SPECS: ReducerSpec[] = [
       },
     },
   },
+
+  {
+    name: 'handles clear wifi status action',
+    action: Actions.clearWifiStatus(ROBOT_NAME),
+    state: {
+      [ROBOT_NAME]: Fixtures.mockNetworkingStatus,
+    },
+    expected: {
+      [ROBOT_NAME]: {
+        ...Fixtures.mockNetworkingStatus,
+        interfaces: {
+          ...Fixtures.mockNetworkingStatus.interfaces,
+          wlan0: {
+            ipAddress: null,
+            macAddress: 'unknown',
+            gatewayAddress: null,
+            state: 'disconnected',
+            type: 'wifi',
+          },
+        },
+      },
+    },
+  },
 ]
 
 describe('networkingReducer', () => {
