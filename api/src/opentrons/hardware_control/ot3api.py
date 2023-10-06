@@ -1924,12 +1924,9 @@ class OT3API(
                     {Axis.Q: tip_motor_pos_float}, {Axis.Q: tip_presence_check_target}
                 )
                 await self._backend.tip_action(moves=clamp_moves[0])
-        try:
-            tip_status = await self._backend.get_tip_present_state(
-                mount=checked_mount, expect_multiple_responses=high_throughput
-            )
-        except Exception:
-            raise
+        tip_status = await self._backend.get_tip_present_state(
+            mount=checked_mount, expect_multiple_responses=high_throughput
+        )
 
         # return tip motors to neutral position
         await self.home_gear_motors()
