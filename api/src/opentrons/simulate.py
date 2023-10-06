@@ -35,7 +35,7 @@ from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
+from opentrons.config import IS_ROBOT
 from opentrons import protocol_api
 from opentrons.commands import types as command_types
 
