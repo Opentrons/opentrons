@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -22,12 +21,12 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-
 import {
-  LEFT,
-  getAttachedPipetteSettingsFieldsById,
-} from '../../../redux/pipettes'
+  useCurrentSubsystemUpdateQuery,
+  usePipetteSettingsQuery,
+} from '@opentrons/react-api-client'
+
+import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
@@ -42,7 +41,6 @@ import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
-import type { State } from '../../../redux/types'
 import type {
   PipetteModelSpecs,
   PipetteMount,
@@ -125,9 +123,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
-  const settings = useSelector((state: State) =>
-    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId ?? '')
-  )
+  const settings =
+    usePipetteSettingsQuery({
+      refetchInterval: 5000,
+      enabled: pipetteId != null,
+    })?.data?.[pipetteId ?? '']?.fields ?? null
 
   const [
     selectedPipette,
