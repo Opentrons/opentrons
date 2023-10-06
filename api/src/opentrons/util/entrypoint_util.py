@@ -1,18 +1,35 @@
 """ opentrons.util.entrypoint_util: functions common to entrypoints
 """
 
+import asyncio
+import contextlib
 from dataclasses import dataclass
 import logging
 from json import JSONDecodeError
 import pathlib
 import shutil
-from typing import BinaryIO, Dict, Sequence, TextIO, Optional, Union, TYPE_CHECKING
+import tempfile
+from typing import (
+    BinaryIO,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Sequence,
+    TextIO,
+    Union,
+    TYPE_CHECKING,
+)
 
 from jsonschema import ValidationError  # type: ignore
 
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import labware
 from opentrons.calibration_storage import helpers
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ErrorOccurrence as ProtocolEngineErrorOccurrence,
+)
+from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -139,3 +156,72 @@ def copy_file_like(source: Union[BinaryIO, TextIO], destination: pathlib.Path) -
     ) as destination_file:
         # Use copyfileobj() to limit memory usage.
         shutil.copyfileobj(fsrc=source, fdst=destination_file)
+
+
+@contextlib.contextmanager
+def adapt_protocol_source(
+    protocol_file: Union[BinaryIO, TextIO],
+    protocol_name: str,
+    extra_labware: Dict[str, FoundLabware],
+) -> Generator[ProtocolSource, None, None]:
+    """Create a `ProtocolSource` representing input protocol files."""
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        # It's not well-defined in our customer-facing interfaces whether the supplied protocol_name
+        # should be just the filename part, or a path with separators. In case it contains stuff
+        # like "../", sanitize it to just the filename part so we don't save files somewhere bad.
+        safe_protocol_name = pathlib.Path(protocol_name).name
+
+        temp_protocol_file = pathlib.Path(temporary_directory) / safe_protocol_name
+
+        # FIXME(mm, 2023-06-26): Copying this file is pure overhead, and it introduces encoding
+        # hazards. Remove this when we can parse JSONv6+ and PAPIv2.14+ protocols without going
+        # through the filesystem. https://opentrons.atlassian.net/browse/RSS-281
+        copy_file_like(source=protocol_file, destination=temp_protocol_file)
+
+        custom_labware_files = [labware.path for labware in extra_labware.values()]
+
+        protocol_source = asyncio.run(
+            ProtocolReader().read_saved(
+                files=[temp_protocol_file] + custom_labware_files,
+                directory=None,
+                files_are_prevalidated=False,
+            )
+        )
+
+        yield protocol_source
+
+
+class ProtocolEngineExecuteError(Exception):
+    def __init__(self, errors: List[ProtocolEngineErrorOccurrence]) -> None:
+        """Raised when there was any fatal error running a protocol through Protocol Engine.
+
+        Protocol Engine reports errors as data, not as exceptions.
+        But the only way for `opentrons.execute.execute()` and `opentrons.simulate.simulate()`
+        to signal problems to their callers is to raise something.
+        So we need this class to wrap them.
+
+        Params:
+            errors: The errors that Protocol Engine reported.
+        """
+        # Show the full error details if this is part of a traceback. Don't try to summarize.
+        super().__init__(errors)
+
+        self._error_occurrences = errors
+
+    def to_stderr_string(self) -> str:
+        """Return a string suitable as the stderr output of the `opentrons_execute` CLI.
+
+        This summarizes from the full error details.
+        """
+        # It's unclear what exactly we should extract here.
+        #
+        # First, do we print the first element, or the last, or all of them?
+        #
+        # Second, do we print the .detail? .errorCode? .errorInfo? .wrappedErrors?
+        # By contract, .detail seems like it would be insufficient, but experimentally,
+        # it includes a lot, like:
+        #
+        #     ProtocolEngineError [line 3]: Error 4000 GENERAL_ERROR (ProtocolEngineError):
+        #     UnexpectedProtocolError: Labware "fixture_12_trough" not found with version 1
+        #     in namespace "fixture".
+        return self._error_occurrences[0].detail

@@ -11,15 +11,12 @@ import argparse
 import contextlib
 import logging
 import os
-from pathlib import Path
 import sys
-import tempfile
 from typing import (
     TYPE_CHECKING,
     BinaryIO,
     Callable,
     Dict,
-    Generator,
     List,
     Optional,
     TextIO,
@@ -59,23 +56,16 @@ from opentrons.protocol_engine import (
     Config,
     DeckType,
     EngineStatus,
-    ErrorOccurrence as ProtocolEngineErrorOccurrence,
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
 
-from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+from opentrons.protocol_reader import ProtocolSource
 
 from opentrons.protocol_runner import create_protocol_runner
 
-from .util.entrypoint_util import (
-    FoundLabware,
-    find_jupyter_labware,
-    labware_from_paths,
-    datafiles_from_paths,
-    copy_file_like,
-)
+from .util import entrypoint_util
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import (
@@ -172,7 +162,7 @@ def get_protocol_api(
     if extra_labware is None:
         extra_labware = {
             uri: details.definition
-            for uri, details in (find_jupyter_labware() or {}).items()
+            for uri, details in (entrypoint_util.find_jupyter_labware() or {}).items()
         }
 
     robot_type = _get_robot_type()
@@ -369,12 +359,12 @@ def execute(  # noqa: C901
     # to match documented behavior.
     # See notes in https://github.com/Opentrons/opentrons/pull/13107
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = entrypoint_util.labware_from_paths(custom_labware_paths)
     else:
-        extra_labware = find_jupyter_labware() or {}
+        extra_labware = entrypoint_util.find_jupyter_labware() or {}
 
     if custom_data_paths:
-        extra_data = datafiles_from_paths(custom_data_paths)
+        extra_data = entrypoint_util.datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
 
@@ -493,47 +483,13 @@ def main() -> int:
             emit_runlog=printer,
         )
         return 0
-    except _ProtocolEngineExecuteError as error:
-        # _ProtocolEngineExecuteError is a wrapper that's meaningless to the CLI user.
+    except entrypoint_util.ProtocolEngineExecuteError as error:
+        # This exception is a wrapper that's meaningless to the CLI user.
         # Take the actual protocol problem out of it and just print that.
         print(error.to_stderr_string(), file=sys.stderr)
         return 1
     # execute() might raise other exceptions, but we don't have a nice way to print those.
     # Just let Python show a traceback.
-
-
-class _ProtocolEngineExecuteError(Exception):
-    def __init__(self, errors: List[ProtocolEngineErrorOccurrence]) -> None:
-        """Raised when there was any fatal error running a protocol through Protocol Engine.
-
-        Protocol Engine reports errors as data, not as exceptions.
-        But the only way for `execute()` to signal problems to its caller is to raise something.
-        So we need this class to wrap them.
-
-        Params:
-            errors: The errors that Protocol Engine reported.
-        """
-        # Show the full error details if this is part of a traceback. Don't try to summarize.
-        super().__init__(errors)
-        self._error_occurrences = errors
-
-    def to_stderr_string(self) -> str:
-        """Return a string suitable as the stderr output of the `opentrons_execute` CLI.
-
-        This summarizes from the full error details.
-        """
-        # It's unclear what exactly we should extract here.
-        #
-        # First, do we print the first element, or the last, or all of them?
-        #
-        # Second, do we print the .detail? .errorCode? .errorInfo? .wrappedErrors?
-        # By contract, .detail seems like it would be insufficient, but experimentally,
-        # it includes a lot, like:
-        #
-        #     ProtocolEngineError [line 3]: Error 4000 GENERAL_ERROR (ProtocolEngineError):
-        #     UnexpectedProtocolError: Labware "fixture_12_trough" not found with version 1
-        #     in namespace "fixture".
-        return self._error_occurrences[0].detail
 
 
 def _create_live_context_non_pe(
@@ -642,7 +598,7 @@ def _run_file_non_pe(
 def _run_file_pe(
     protocol_file: Union[BinaryIO, TextIO],
     protocol_name: str,
-    extra_labware: Dict[str, FoundLabware],
+    extra_labware: Dict[str, entrypoint_util.FoundLabware],
     hardware_api: HardwareControlAPI,
     emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
@@ -671,9 +627,11 @@ def _run_file_pe(
             unsubscribe()
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
-            raise _ProtocolEngineExecuteError(result.state_summary.errors)
+            raise entrypoint_util.ProtocolEngineExecuteError(
+                result.state_summary.errors
+            )
 
-    with _adapt_protocol_source(
+    with entrypoint_util.adapt_protocol_source(
         protocol_file=protocol_file,
         protocol_name=protocol_name,
         extra_labware=extra_labware,
@@ -695,39 +653,6 @@ def _get_protocol_engine_config() -> Config:
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
     )
-
-
-@contextlib.contextmanager
-def _adapt_protocol_source(
-    protocol_file: Union[BinaryIO, TextIO],
-    protocol_name: str,
-    extra_labware: Dict[str, FoundLabware],
-) -> Generator[ProtocolSource, None, None]:
-    """Create a `ProtocolSource` representing input protocol files."""
-    with tempfile.TemporaryDirectory() as temporary_directory:
-        # It's not well-defined in our customer-facing interfaces whether the supplied protocol_name
-        # should be just the filename part, or a path with separators. In case it contains stuff
-        # like "../", sanitize it to just the filename part so we don't save files somewhere bad.
-        safe_protocol_name = Path(protocol_name).name
-
-        temp_protocol_file = Path(temporary_directory) / safe_protocol_name
-
-        # FIXME(mm, 2023-06-26): Copying this file is pure overhead, and it introduces encoding
-        # hazards. Remove this when we can parse JSONv6+ and PAPIv2.14+ protocols without going
-        # through the filesystem. https://opentrons.atlassian.net/browse/RSS-281
-        copy_file_like(source=protocol_file, destination=temp_protocol_file)
-
-        custom_labware_files = [labware.path for labware in extra_labware.values()]
-
-        protocol_source = asyncio.run(
-            ProtocolReader().read_saved(
-                files=[temp_protocol_file] + custom_labware_files,
-                directory=None,
-                files_are_prevalidated=False,
-            )
-        )
-
-        yield protocol_source
 
 
 def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:

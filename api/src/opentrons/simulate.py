@@ -50,11 +50,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from .util.entrypoint_util import (
-    find_jupyter_labware,
-    labware_from_paths,
-    datafiles_from_paths,
-)
+from .util import entrypoint_util
 
 
 # See Jira RCORE-535.
@@ -250,7 +246,7 @@ def get_protocol_api(
     if extra_labware is None:
         extra_labware = {
             uri: details.definition
-            for uri, details in (find_jupyter_labware() or {}).items()
+            for uri, details in (entrypoint_util.find_jupyter_labware() or {}).items()
         }
 
     checked_hardware = _check_hardware_simulator(hardware_simulator, parsed_robot_type)
@@ -441,12 +437,12 @@ def simulate(  # noqa: C901
     # to match documented behavior.
     # See notes in https://github.com/Opentrons/opentrons/pull/13107
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = entrypoint_util.labware_from_paths(custom_labware_paths)
     else:
-        extra_labware = find_jupyter_labware() or {}
+        extra_labware = entrypoint_util.find_jupyter_labware() or {}
 
     if custom_data_paths:
-        extra_data = datafiles_from_paths(custom_data_paths)
+        extra_data = entrypoint_util.datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
 
