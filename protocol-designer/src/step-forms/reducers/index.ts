@@ -1350,7 +1350,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         {}
       )
       const hasGripper = gripperCommands.length > 0
-      const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
+      const isFlex = file.robot.model === FLEX_ROBOT_TYPE
       const gripperId = `${uuid()}:gripper`
       const gripper = {
         [gripperId]: {
@@ -1358,7 +1358,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           id: gripperId,
         },
       }
-      if (isOt3) {
+      if (isFlex) {
         if (hasGripper) {
           return { ...state, ...gripper, ...fixtures }
         } else {
