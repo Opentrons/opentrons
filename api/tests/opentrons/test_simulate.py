@@ -279,9 +279,6 @@ class TestGetProtocolAPILabware:
             load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
         )
 
-    @pytest.mark.xfail(
-        strict=True, raises=pytest.fail.Exception
-    )  # TODO(mm, 2023-07-14): Fix this bug.
     def test_jupyter_override(
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -292,7 +289,7 @@ class TestGetProtocolAPILabware:
             "JUPYTER_NOTEBOOK_LABWARE_DIR",
             get_shared_data_root() / self.LW_FIXTURE_DIR,
         )
-        context = simulate.get_protocol_api(api_version)
+        context = simulate.get_protocol_api(api_version, extra_labware={})
         with pytest.raises(Exception, match="Labware .+ not found"):
             context.load_labware(
                 load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
@@ -302,6 +299,7 @@ class TestGetProtocolAPILabware:
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """It should tolerate the Jupyter labware directory not existing on the filesystem."""
+        monkeypatch.setattr(simulate, "IS_ROBOT", True)
         monkeypatch.setattr(
             simulate, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
         )
