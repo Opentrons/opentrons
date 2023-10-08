@@ -1,8 +1,10 @@
 import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { GripperWizardFlows } from './'
 
 import type { Story, Meta } from '@storybook/react'
 
+const queryClient = new QueryClient()
 export default {
   title: 'App/organisms/GripperWizardFlows',
   component: GripperWizardFlows,
@@ -10,7 +12,11 @@ export default {
 
 const Template: Story<
   React.ComponentProps<typeof GripperWizardFlows>
-> = args => <GripperWizardFlows {...args} />
+> = args => (
+  <QueryClientProvider client={queryClient}>
+    <GripperWizardFlows {...args} />
+  </QueryClientProvider>
+)
 
 export const Attach = Template.bind({})
 Attach.args = {
