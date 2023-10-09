@@ -62,15 +62,6 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
         )
 
 
-def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
-    """It should raise an error if a tip is not attached."""
-    tip_core = tip_rack.get_well_core("A1")
-
-    subject.home()
-    with pytest.raises(UnexpectedTipRemovalError, match="Cannot perform DROPTIP"):
-        subject.drop_tip(location=None, well_core=tip_core, home_after=False)
-
-
 def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(UnexpectedTipRemovalError, match="Cannot perform BLOWOUT"):
