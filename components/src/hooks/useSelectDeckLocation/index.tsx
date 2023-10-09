@@ -110,7 +110,7 @@ export function DeckLocationSelect({
                   d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"
                 />
                 <RobotCoordsForeignDiv
-                  x={isThermocycler ? '-65' : slot.position[0]}
+                  x={slot.position[0]}
                   y={slot.position[1]}
                   width={slot.boundingBox.xDimension}
                   height={slot.boundingBox.yDimension}
