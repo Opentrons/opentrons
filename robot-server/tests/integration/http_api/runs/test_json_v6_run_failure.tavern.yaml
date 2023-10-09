@@ -67,13 +67,12 @@ stages:
         data:
           errors:
             - id: !anystr
-              errorType: TipNotAttachedError
               createdAt: !anystr
-              detail: Pipette should have a tip attached, but does not.
               errorCode: '3005'
+              errorType: TipNotAttachedError 
+              detail: Pipette should have a tip attached, but does not.
               errorInfo: !anydict
               wrappedErrors: !anylist
-
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
