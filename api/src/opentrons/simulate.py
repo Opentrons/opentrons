@@ -230,6 +230,9 @@ def get_protocol_api(
         else:
             parsed_robot_type = current_robot_type
     else:
+        # TODO(mm, 2023-10-09): This raises a slightly wrong error message, mentioning the camelCase
+        # `robotType` field in Python files instead of the snake_case `robot_type` argument for this
+        # function.
         parsed_robot_type = parse.robot_type_from_python_identifier(robot_type)
     _validate_can_simulate_for_robot_type(parsed_robot_type)
 
