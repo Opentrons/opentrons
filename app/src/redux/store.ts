@@ -25,8 +25,6 @@ export const store = createStore(rootReducer, composeEnhancers(middleware))
 
 epicMiddleware.run(rootEpic)
 
-store.subscribe(() => console.log(store.getState()))
-
 // attach store to window if devtools are on once config initializes
 const unsubscribe = store.subscribe(() => {
   const { config } = store.getState()

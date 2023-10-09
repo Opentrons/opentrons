@@ -8,10 +8,6 @@ export function useMissingHardwareText(
   const missingProtocolHardwareType = missingProtocolHardware.map(
     hardware => hardware.hardwareType
   )
-  console.log(
-    '🚀 ~ file: useMissingHardwareText.ts:11 ~ missingProtocolHardwareType:',
-    missingProtocolHardwareType
-  )
   const countMissingHardwareType = (hwType: 'pipette' | 'module'): number => {
     return missingProtocolHardwareType.filter(
       hardwareType => hardwareType === hwType

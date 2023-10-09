@@ -63,17 +63,12 @@ export const useRequiredProtocolHardware = (
     data: attachedModulesData,
     isLoading: isLoadingModules,
   } = useModulesQuery()
-  console.log('🚀 ~ file: index.ts:66 ~ isLoadingModules:', isLoadingModules)
   const attachedModules = attachedModulesData?.data ?? []
 
   const {
     data: attachedInstrumentsData,
     isLoading: isLoadingInstruments,
   } = useInstrumentsQuery()
-  console.log(
-    '🚀 ~ file: index.ts:73 ~ isLoadingInstruments:',
-    isLoadingInstruments
-  )
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   if (analysis == null || analysis?.status !== 'completed') {
@@ -179,7 +174,6 @@ export const useMissingProtocolHardware = (
   const { requiredProtocolHardware, isLoading } = useRequiredProtocolHardware(
     protocolId
   )
-  console.log('🚀 ~ file: index.ts:236 ~ isLoading:', isLoading)
   return {
     missingProtocolHardware: requiredProtocolHardware.filter(
       hardware => !hardware.connected
