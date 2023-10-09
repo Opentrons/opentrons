@@ -91,7 +91,7 @@ class FixedVolumeByPosition(TypedDict):
 class _RequiredAddressableArea(TypedDict):
     id: str
     areaType: str
-    position: List[float]
+    offsetFromCutoutFixture: List[float]
     boundingBox: BoundingBox
     displayName: str
 
