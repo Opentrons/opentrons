@@ -74,6 +74,7 @@ import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
 import { useFeatureFlag } from '../../redux/config'
+import { ProtocolStats } from './ProtocolStats'
 
 const GRID_STYLE = css`
   display: grid;
@@ -193,7 +194,7 @@ export function ProtocolDetails(
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids'
+    'robot_config' | 'labware' | 'liquids' | 'stats'
   >('robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -339,6 +340,7 @@ export function ProtocolDetails(
         }
       />
     ),
+    stats: (<ProtocolStats analysis={mostRecentAnalysis} />)
   }
 
   const deckThumbnail = (
@@ -608,6 +610,17 @@ export function ProtocolDetails(
                 >
                   <StyledText>
                     {i18n.format(t('liquids'), 'capitalize')}
+                  </StyledText>
+                </RoundTab>
+              )}
+              {mostRecentAnalysis != null && (
+                <RoundTab
+                  data-testid="ProtocolDetails_stats"
+                  isCurrent={currentTab === 'stats'}
+                  onClick={() => setCurrentTab('stats')}
+                >
+                  <StyledText>
+                    {i18n.format(t('stats'), 'capitalize')}
                   </StyledText>
                 </RoundTab>
               )}
