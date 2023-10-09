@@ -27,6 +27,10 @@ stages:
           - id: runsHistory
             name: Clear Runs History
             description: !re_search 'Erase this device''s stored history of protocols and runs.'
+          - id: authorizedKeys
+            name: SSH Authorized Keys
+            description: !re_search 'Clear the ssh authorized keys'
+
 ---
 test_name: POST Reset bootScripts option
 marks:
@@ -122,6 +126,32 @@ stages:
       json:
         message: "gripperOffsetCalibrations is not a valid reset option."
         errorCode: "4000"
+---
+test_name: POST Reset authorizedKeys option
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+stages:
+  - name: POST Reset authorizedKeys true
+    request:
+      url: '{ot2_server_base_url}/settings/reset'
+      method: POST
+      json:
+        authorizedKeys: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'authorized_keys' were reset"
+  - name: POST Reset authorizedKeys false
+    request:
+      url: '{ot2_server_base_url}/settings/reset'
+      method: POST
+      json:
+        authorizedKeys: false
+    response:
+      status_code: 200
+      json:
+        message: 'Nothing to do'
 ---
 test_name: POST Reset non existant option
 marks:
