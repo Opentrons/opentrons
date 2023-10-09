@@ -179,4 +179,4 @@ class DeckDefinitionV4(_RequiredDeckDefinitionV4, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
 
 
-DeckDefinition = DeckDefinitionV3
+DeckDefinition = Union[DeckDefinitionV3, DeckDefinitionV4]
