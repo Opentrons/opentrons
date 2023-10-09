@@ -11,7 +11,10 @@ import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { DeckSlotLocation } from '../../hardware-sim/DeckSlotLocation'
 
-const X_CROP_MM = 60
+const X_CROP_MM = 0
+const X_ADJUSTMENT_FOR_TC = '-50'
+const Y_ADJUSTMENT_FOR_TC = '214'
+
 export function useDeckLocationSelect(
   robotType: RobotType
 ): { DeckLocationSelect: JSX.Element; selectedLocation: ModuleLocation } {
@@ -70,17 +73,11 @@ export function DeckLocationSelect({
                 d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-282c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v282 C-102,494.7-100.1,496.6-97.8,496.6z"
               />
               <RobotCoordsForeignDiv
-                x="-50"
-                y="214"
+                x={X_ADJUSTMENT_FOR_TC}
+                y={Y_ADJUSTMENT_FOR_TC}
                 width={slot.boundingBox.xDimension}
                 height="282"
-                innerDivProps={{
-                  display: 'flex',
-                  alignItems: ALIGN_CENTER,
-                  justifyContent: JUSTIFY_CENTER,
-                  height: '100%',
-                  gridGap: SPACING.spacing4,
-                }}
+                innerDivProps={INNER_DIV_PROPS}
               >
                 <Icon name="check-circle" size="1.5rem" color={COLORS.white} />
                 <Text color={COLORS.white} fontSize="1.5rem">
@@ -92,6 +89,7 @@ export function DeckLocationSelect({
         } else if (slot.id === 'A1' && isThermocycler) {
           return null
         }
+        console.log(slot.position[1])
         return (
           <React.Fragment key={slot.id}>
             <DeckSlotLocation
@@ -101,26 +99,19 @@ export function DeckLocationSelect({
               onClick={() => !isDisabled && setSelectedLocation(slotLocation)}
               cursor={isDisabled || isSelected ? 'default' : 'pointer'}
               deckDefinition={deckDef}
-              showExtensions={isThermocycler}
             />
             {isSelected ? (
               <g>
-                <path
+                {/* <path
                   fill={fill}
                   d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"
-                />
+                /> */}
                 <RobotCoordsForeignDiv
                   x={slot.position[0]}
                   y={slot.position[1]}
                   width={slot.boundingBox.xDimension}
                   height={slot.boundingBox.yDimension}
-                  innerDivProps={{
-                    display: 'flex',
-                    alignItems: ALIGN_CENTER,
-                    justifyContent: JUSTIFY_CENTER,
-                    height: '100%',
-                    gridGap: SPACING.spacing4,
-                  }}
+                  innerDivProps={INNER_DIV_PROPS}
                 >
                   <Icon
                     name="check-circle"
@@ -142,4 +133,12 @@ export function DeckLocationSelect({
       />
     </RobotCoordinateSpace>
   )
+}
+
+const INNER_DIV_PROPS = {
+  display: 'flex',
+  alignItems: ALIGN_CENTER,
+  justifyContent: JUSTIFY_CENTER,
+  height: '100%',
+  gridGap: SPACING.spacing4,
 }
