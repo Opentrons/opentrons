@@ -147,7 +147,7 @@
             "required": [
               "id",
               "areaType",
-              "position",
+              "offsetFromCutoutFixture",
               "boundingBox",
               "displayName"
             ],
@@ -161,9 +161,9 @@
                 "type": "string",
                 "enum": ["slot", "movableTrash", "fixedTrash", "wasteChute"]
               },
-              "position": {
+              "offsetFromCutoutFixture": {
                 "$ref": "#/definitions/xyzArray",
-                "description": "Relative position of the addressable area as it sits on the cutout slot."
+                "description": "Relative offset of the addressable area as it sits on the cutout slot."
               },
               "matingSurfaceUnitVector": {
                 "$ref": "#/definitions/unitVector",

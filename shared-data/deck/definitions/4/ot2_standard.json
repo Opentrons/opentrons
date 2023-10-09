@@ -15,7 +15,7 @@
       {
         "id": "1",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -32,7 +32,7 @@
       {
         "id": "2",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -49,7 +49,7 @@
       {
         "id": "3",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -66,7 +66,7 @@
       {
         "id": "4",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -83,7 +83,7 @@
       {
         "id": "5",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -100,7 +100,7 @@
       {
         "id": "6",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -117,7 +117,7 @@
       {
         "id": "7",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -135,7 +135,7 @@
       {
         "id": "8",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -152,7 +152,7 @@
       {
         "id": "9",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -169,7 +169,7 @@
       {
         "id": "10",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -186,7 +186,7 @@
       {
         "id": "11",
         "areaType": "slot",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
@@ -203,7 +203,7 @@
       {
         "id": "fixedTrash",
         "areaType": "fixedTrash",
-        "position": [0.0, 0.0, 0.0],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "boundingBox": {
           "xDimension": 172.86,
           "yDimension": 165.86,
