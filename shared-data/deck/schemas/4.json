@@ -74,49 +74,6 @@
           "description": "Attributes for the element"
         }
       }
-    },
-    "cutoutSlot": {
-      "type": "string",
-      "enum": [
-        "A1",
-        "A2",
-        "A3",
-        "B1",
-        "B2",
-        "B3",
-        "C1",
-        "C2",
-        "C3",
-        "D1",
-        "D2",
-        "D3",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12"
-      ]
-    },
-    "cutoutFixtureType": {
-      "type": "string",
-      "enum": [
-        "singleStandardSlot",
-        "singleLeftSlot",
-        "singleCenterSlot",
-        "singleRightSlot",
-        "stagingAreaRightSlot",
-        "fixedTrashSlot",
-        "trashBinAdapter",
-        "wasteChuteRightAdapter",
-        "wasteChuteRightAdapterWithStagingAreaSlot"
-      ]
     }
   },
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
@@ -301,7 +258,7 @@
                 "description": "Cutout fixtures that can be loaded onto this cutout.",
                 "type": "array",
                 "items": {
-                  "$ref": "#/definitions/cutoutFixtureType"
+                  "type": "string"
                 }
               }
             }
@@ -329,12 +286,12 @@
             "description": "Cutout locations this cutout fixture can be.",
             "type": "array",
             "items": {
-              "$ref": "#/definitions/cutoutSlot"
+              "type": "string"
             }
           },
           "fixtureType": {
             "description": "The type of cutout fixture.",
-            "$ref": "#/definitions/cutoutFixtureType"
+            "type": "string"
           },
           "displayName": {
             "description": "A human-readable nickname for this area e.g. \"Standard Right Slot\" or \"Slot With Movable Trash\"",
@@ -343,9 +300,6 @@
           "onFixtureItems": {
             "description": "",
             "type": "object",
-            "propertyNames": {
-              "$ref": "#/definitions/cutoutSlot"
-            },
             "additionalProperties": {
               "type": "array",
               "items": {
