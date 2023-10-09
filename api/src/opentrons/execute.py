@@ -353,8 +353,6 @@ def execute(  # noqa: C901
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
 
-    contents = protocol_file.read()
-
     # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
     # to match documented behavior.
     # See notes in https://github.com/Opentrons/opentrons/pull/13107
@@ -368,6 +366,7 @@ def execute(  # noqa: C901
     else:
         extra_data = {}
 
+    contents = protocol_file.read()
     try:
         protocol = parse.parse(
             contents,

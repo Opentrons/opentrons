@@ -437,8 +437,6 @@ def simulate(  # noqa: C901
     stack_logger.propagate = propagate_logs
     # _CommandScraper will set the level of this logger.
 
-    contents = protocol_file.read()
-
     # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
     # to match documented behavior.
     # See notes in https://github.com/Opentrons/opentrons/pull/13107
@@ -460,6 +458,7 @@ def simulate(  # noqa: C901
             pathlib.Path(hardware_simulator_file_path),
         )
 
+    contents = protocol_file.read()
     try:
         protocol = parse.parse(
             contents,
