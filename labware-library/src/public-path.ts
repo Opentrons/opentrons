@@ -4,7 +4,7 @@ console.log('in public path')
 console.log({ hostname: location.hostname })
 let _publicPath = '/'
 if (location.hostname.startsWith('sandbox')) {
-  console.log('sandbox environment')
+  console.log('in sandbox environment')
   // if we're serving from sandbox, ensure the public path is set to name
   // of the deploy folder
   const basePath = location.pathname.slice(1).split('/')[0] || ''
