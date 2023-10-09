@@ -17,6 +17,7 @@ import {
   COLORS,
   JUSTIFY_END,
   ALIGN_CENTER,
+  Box,
 } from '@opentrons/components'
 import {
   Fixture,
@@ -116,9 +117,9 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
               >
-                <StyledText as="p" width="7.8125rem">
-                  {t('protocol_specifies')}
-                </StyledText>
+                <Box width="7.8125rem">
+                  <StyledText as="p">{t('protocol_specifies')}</StyledText>
+                </Box>
                 <StyledText as="p">
                   {requiredFixture && getFixtureDisplayName(requiredFixture)}
                   {requiredModule && getModuleDisplayName(requiredModule)}
@@ -130,9 +131,9 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
               >
-                <StyledText as="p" width="max-content">
-                  {t('currently_configured')}
-                </StyledText>
+                <Box width="max-content">
+                  <StyledText as="p">{t('currently_configured')}</StyledText>
+                </Box>
                 <StyledText as="p">{currentFixtureDisplayName}</StyledText>
               </Flex>
             </Flex>
