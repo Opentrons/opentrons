@@ -33,11 +33,10 @@ describe('Touchscreen DeckFixtureSetupInstructionsModal', () => {
       "First, unscrew and remove the deck slot where you'll install a fixture. Then put the fixture in place and attach it as needed."
     )
     getByText(
-      'For detailed instructions for different types of fixtures, scan the QR code or go to the link below.'
+      'For details on installing different fixture types, scan the QR code or search for “deck configuration” on support.opentrons.com'
     )
     const img = getByRole('img')
     expect(img.getAttribute('src')).toEqual(PNG_FILE_NAME)
-    getByText('www.opentrons.com/support/fixtures')
   })
 
   it('should call a mock function when tapping the close icon', () => {

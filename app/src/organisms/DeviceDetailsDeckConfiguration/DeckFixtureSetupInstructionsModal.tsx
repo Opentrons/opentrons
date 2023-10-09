@@ -71,15 +71,6 @@ export function DeckFixtureSetupInstructionsModal({
                   {t('deck_fixture_setup_modal_bottom_description')}
                 </StyledText>
               </Flex>
-              <Flex
-                padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-                backgroundColor={COLORS.light1}
-                borderRadius={BORDERS.borderRadiusSize3}
-              >
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {SETUP_INSTRUCTION_URL}
-                </StyledText>
-              </Flex>
             </Flex>
             <Flex>
               <img src={imgSrc} alt={IMG_ALT} width="178px" height="178px" />
@@ -96,7 +87,7 @@ export function DeckFixtureSetupInstructionsModal({
               >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing32}
+                  gridGap={SPACING.spacing16}
                 >
                   <StyledText as="p">
                     {t('deck_fixture_setup_modal_top_description')}
