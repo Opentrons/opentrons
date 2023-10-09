@@ -6,7 +6,11 @@ import {
   useCommandQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
 import { InterventionModal } from '../../InterventionModal'
@@ -142,5 +146,12 @@ describe('RunProgressMeter', () => {
     mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
     const { findByText } = render(props)
     expect(await findByText('MOCK INTERVENTION MODAL')).toBeTruthy()
+  })
+
+  it('should render the correct run status when run status is completed', () => {
+    mockUseCommandQuery.mockReturnValue({ data: null } as any)
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_SUCCEEDED)
+    const { getByText } = render(props)
+    getByText('Protocol completed')
   })
 })

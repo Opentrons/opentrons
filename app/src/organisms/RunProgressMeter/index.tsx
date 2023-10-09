@@ -132,7 +132,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     )
   } else if (
     analysis != null &&
-    analysisCommands[lastRunAnalysisCommandIndex] != null
+    analysisCommands[lastRunAnalysisCommandIndex] != null &&
+    runStatus != null &&
+    !TERMINAL_RUN_STATUSES.includes(runStatus)
   ) {
     currentStepContents = (
       <CommandText
