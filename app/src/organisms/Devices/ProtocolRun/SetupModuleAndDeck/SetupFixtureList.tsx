@@ -116,20 +116,20 @@ export function FixtureListItem({
   )?.configurationStatus
 
   let statusLabel
-  if (configurationStatus !== CONFIGURED) {
+  if (configurationStatus != null && configurationStatus !== CONFIGURED) {
     statusLabel = (
       <StatusLabel
         status={
           configurationStatus === CONFLICTING
             ? t('location_conflict')
-            : configurationStatus ?? ''
+            : configurationStatus
         }
         backgroundColor={COLORS.warningBackgroundLight}
         iconColor={COLORS.warningEnabled}
         textColor={COLORS.warningText}
       />
     )
-  } else {
+  } else if (configurationStatus != null) {
     statusLabel = (
       <StatusLabel
         status={configurationStatus}
@@ -138,6 +138,9 @@ export function FixtureListItem({
         textColor={COLORS.successText}
       />
     )
+    //  shouldn't run into this case
+  } else {
+    statusLabel = 'status label unknown'
   }
 
   const [

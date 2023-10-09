@@ -25,7 +25,6 @@ import {
   MAGNETIC_BLOCK_V1,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
-  Fixture,
 } from '@opentrons/shared-data'
 import { Banner } from '../../../../atoms/Banner'
 import { StyledText } from '../../../../atoms/text'
@@ -50,7 +49,7 @@ import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { LocationConflictModal } from './LocationConflictModal'
 import { getModuleImage } from './utils'
 
-import type { ModuleModel } from '@opentrons/shared-data'
+import type { ModuleModel, Fixture } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import type { ProtocolCalibrationStatus } from '../../hooks'
 
