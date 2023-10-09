@@ -41,7 +41,7 @@ stages:
       strict:
         - json:off
 
-  - name: Wait for the protocol to complete
+  - name: Wait for the run to fail
     max_retries: 10
     delay_after: 0.1
     request:
@@ -54,12 +54,26 @@ stages:
       json:
         data:
           status: failed
+
+  - name: Verify the run contains the expected error
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
           errors:
             - id: !anystr
-              errorCode: 4000,
-              errorType: ExceptionInProtocolError
+              errorType: TipNotAttachedError
               createdAt: !anystr
-              detail: Cannot perform PREPARE_ASPIRATE without a tip attached.
+              detail: Pipette should have a tip attached, but does not.
+              errorCode: '3005'
+              errorInfo: !anydict
+              wrappedErrors: !anylist
+
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
@@ -81,7 +95,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
-            params: { }
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -110,7 +124,7 @@ stages:
               pipetteId: pipetteId
           - id: !anystr
             key: !anystr
-            commandType: aspirate 
+            commandType: aspirate
             createdAt: !anystr
             startedAt: !anystr
             completedAt: !anystr
@@ -128,7 +142,7 @@ stages:
               labwareId: tipRackId
               wellName: A1
               wellLocation:
-                origin: bottom 
+                origin: bottom
                 offset:
                   x: 0
                   y: 0
