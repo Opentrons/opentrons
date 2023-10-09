@@ -192,6 +192,7 @@ export function ProtocolDetails(
   const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
+  const enableProtocolStats = useFeatureFlag('protocolStats')
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids' | 'stats'
@@ -340,7 +341,7 @@ export function ProtocolDetails(
         }
       />
     ),
-    stats: (<ProtocolStats analysis={mostRecentAnalysis} />)
+    stats: <ProtocolStats analysis={mostRecentAnalysis} />,
   }
 
   const deckThumbnail = (
@@ -613,7 +614,7 @@ export function ProtocolDetails(
                   </StyledText>
                 </RoundTab>
               )}
-              {mostRecentAnalysis != null && (
+              {enableProtocolStats && mostRecentAnalysis != null && (
                 <RoundTab
                   data-testid="ProtocolDetails_stats"
                   isCurrent={currentTab === 'stats'}
