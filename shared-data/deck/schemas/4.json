@@ -47,33 +47,6 @@
         "yDimension": { "$ref": "#/definitions/positiveNumber" },
         "zDimension": { "$ref": "#/definitions/positiveNumber" }
       }
-    },
-    "svgsonNode": {
-      "type": "object",
-      "description": "An svgson node that corresponds to a single svg tag",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Element name, like svg, circle, line…"
-        },
-        "type": {
-          "type": "string",
-          "description": "Element type like element, text…"
-        },
-        "value": {
-          "type": "string",
-          "description": "Element value, used in text nodes."
-        },
-        "children": {
-          "type": "array",
-          "description": "List of element children",
-          "items": { "$ref": "#/definitions/svgsonNode" }
-        },
-        "attributes": {
-          "type": "object",
-          "description": "Attributes for the element"
-        }
-      }
     }
   },
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
@@ -87,8 +60,7 @@
     "metadata",
     "robot",
     "locations",
-    "cutoutFixtures",
-    "layers"
+    "cutoutFixtures"
   ],
   "properties": {
     "otId": {
@@ -308,13 +280,6 @@
             }
           }
         }
-      }
-    },
-    "layers": {
-      "type": "array",
-      "description": "Layered feature groups of the deck.",
-      "items": {
-        "$ref": "#/definitions/svgsonNode"
       }
     },
     "gripperOffsets": {

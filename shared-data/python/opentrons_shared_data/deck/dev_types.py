@@ -172,7 +172,6 @@ class _RequiredDeckDefinitionV4(TypedDict):
     robot: Robot
     locations: LocationsV4
     cutoutFixtures: List[CutoutFixture]
-    layers: List[INode]
 
 
 class DeckDefinitionV4(_RequiredDeckDefinitionV4, total=False):
