@@ -14,7 +14,6 @@ if TYPE_CHECKING:
         DeckDefinitionV3,
         DeckSchemaVersion3,
         DeckDefinitionV4,
-        DeckSchemaVersion4,
     )
 
 DEFAULT_DECK_DEFINITION_VERSION = 3
@@ -39,11 +38,6 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
 
 
 @overload
-def load(name: str, version: "DeckSchemaVersion4") -> "DeckDefinitionV4":
-    ...
-
-
-@overload
 def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3":
     ...
 
@@ -55,6 +49,10 @@ def load(name: str, version: int) -> "DeckDefinition":
 
 def load(name: str, version: int = DEFAULT_DECK_DEFINITION_VERSION) -> object:
     return json.loads(load_shared_data(f"deck/definitions/{version}/{name}.json"))
+
+
+def load_v4(name: str) -> "DeckDefinitionV4":
+    return json.loads(load_shared_data(f"deck/definitions/4/{name}.json"))  # type: ignore[no-any-return]
 
 
 def load_schema(version: int) -> "DeckSchema":
