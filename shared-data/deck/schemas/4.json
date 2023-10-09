@@ -149,17 +149,10 @@
                 "type": "string"
               },
               "compatibleModuleTypes": {
-                "description": "An array of module types that can be placed in this area.",
+                "description": "An array of module types that can be placed in this area. The module type names can be found in the moduleType field of a module definition.",
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "enum": [
-                    "magneticModuleType",
-                    "temperatureModuleType",
-                    "thermocyclerModuleType",
-                    "heaterShakerModuleType",
-                    "magneticBlockType"
-                  ]
+                  "type": "string"
                 }
               },
               "ableToDropTips": {
