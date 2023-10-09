@@ -158,3 +158,6 @@ opentrons-robot-app.tar.gz
 
 # ignore linux swap files
 *.swp
+
+# asdf versions file
+*.tool-versions
