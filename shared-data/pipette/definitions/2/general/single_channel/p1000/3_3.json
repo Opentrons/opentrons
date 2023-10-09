@@ -4,7 +4,6 @@
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
-    "current": 0.15,
     "presses": 1,
     "speed": 5,
     "increment": 0.0,
@@ -39,7 +38,10 @@
     }
   },
   "partialTipConfigurations": {
-    "partialTipSupported": false
+    "partialTipSupported": false,
+    "perTipPickupCurrent": {
+      "1": 0.15
+    }
   },
   "backCompatNames": [],
   "channels": 1,

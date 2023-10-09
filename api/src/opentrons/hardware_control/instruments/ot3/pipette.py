@@ -97,7 +97,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
                 self._config.nozzle_map,
-                self._pick_up_configurations.current,
                 self._config.partial_tip_configurations.per_tip_pickup_current,
             )
         )
@@ -261,7 +260,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
                 self._config.nozzle_map,
-                self._pick_up_configurations.current,
                 self._config.partial_tip_configurations.per_tip_pickup_current,
             )
         )
@@ -321,8 +319,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         cp_with_tip_length = self._nozzle_manager.critical_point_with_tip_length(
             cp_override,
             self.current_tip_length if cp_override != CriticalPoint.NOZZLE else 0.0,
-            cp_override, self.current_tip_length
-
         )
         cp = cp_with_tip_length + instr
 

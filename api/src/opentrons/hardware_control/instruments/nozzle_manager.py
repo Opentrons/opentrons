@@ -210,8 +210,7 @@ class NozzleConfigurationManager:
     def build_from_nozzlemap(
         cls,
         nozzle_map: Dict[str, List[float]],
-        default_pickup_current: float,
-        pick_up_current_map: Optional[Dict[int, float]] = None,
+        pick_up_current_map: Dict[int, float],
     ) -> "NozzleConfigurationManager":
 
         sorted_nozzlemap = list(nozzle_map.keys())
@@ -227,14 +226,7 @@ class NozzleConfigurationManager:
             back_left_nozzle=first_nozzle,
             front_right_nozzle=last_nozzle,
         )
-        if pick_up_current_map:
-            current_map = pick_up_current_map
-        else:
-            current_map = {
-                num_tips + 1: default_pickup_current
-                for num_tips in range(len(starting_nozzle_config.map_store))
-            }
-        return cls(starting_nozzle_config, current_map)
+        return cls(starting_nozzle_config, pick_up_current_map)
 
     @property
     def starting_nozzle_offset(self) -> Point:

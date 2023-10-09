@@ -141,7 +141,7 @@ class PlungerPositions(BaseModel):
 
 class PlungerHomingConfigurations(BaseModel):
     current: float = Field(
-        ...,
+        default=None,
         description="Either the z motor current needed for picking up tip or the plunger motor current for dropping tip off the nozzle.",
     )
     speed: float = Field(
@@ -181,7 +181,7 @@ class PartialTipDefinition(BaseModel):
         alias="availableConfigurations",
     )
     per_tip_pickup_current: Dict[int, float] = Field(
-        default=None,
+        ...,
         description="A current dictionary look-up by partial tip configuration.",
         alias="perTipPickupCurrent",
     )

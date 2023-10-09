@@ -111,7 +111,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
                 self._config.nozzle_map,
-                self._pick_up_configurations.current,
                 self._config.partial_tip_configurations.per_tip_pickup_current,
             )
         )
@@ -295,7 +294,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
                 self._config.nozzle_map,
-                self._pick_up_configurations.current,
                 self._config.partial_tip_configurations.per_tip_pickup_current,
             )
         )
