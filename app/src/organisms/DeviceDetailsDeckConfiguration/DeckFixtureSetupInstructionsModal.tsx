@@ -59,7 +59,7 @@ export function DeckFixtureSetupInstructionsModal({
           onOutsideClick={() => setShowSetupInstructionsModal(false)}
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing12}
