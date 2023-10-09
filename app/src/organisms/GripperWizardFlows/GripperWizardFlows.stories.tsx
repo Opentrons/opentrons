@@ -1,10 +1,21 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import { configReducer } from '../../redux/config/reducer'
 import { GripperWizardFlows } from './'
 
+import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 const queryClient = new QueryClient()
+const dummyConfig = {
+  config: {
+    isOnDevice: false,
+  },
+} as any
+const store: Store<any> = createStore(configReducer, dummyConfig)
+
 export default {
   title: 'App/organisms/GripperWizardFlows',
   component: GripperWizardFlows,
@@ -14,7 +25,9 @@ const Template: Story<
   React.ComponentProps<typeof GripperWizardFlows>
 > = args => (
   <QueryClientProvider client={queryClient}>
-    <GripperWizardFlows {...args} />
+    <Provider store={store}>
+      <GripperWizardFlows {...args} />
+    </Provider>
   </QueryClientProvider>
 )
 
