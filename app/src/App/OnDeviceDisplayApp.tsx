@@ -50,6 +50,12 @@ import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
 
+Object.defineProperty(window.navigator, 'onLine', {
+  get: () => true
+})
+window.dispatchEvent(new Event('online'))
+
+
 export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: InitialLoadingScreen,
@@ -257,7 +263,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="localhost">
+    <ApiHostProvider hostname="127.0.0.1">
       <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
         <Box width="100%" css="user-select: none;">
           {isIdle ? (
