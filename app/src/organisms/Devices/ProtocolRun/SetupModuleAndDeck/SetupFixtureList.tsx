@@ -22,12 +22,14 @@ import {
 } from '@opentrons/shared-data'
 import {
   useLoadedFixturesConfigStatus,
-  NOT_CONFIGURED,
   CONFIGURED,
+  CONFLICTING,
+  NOT_CONFIGURED,
 } from '../../../../resources/deck_configuration/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
+import { LocationConflictModal } from './LocationConflictModal'
 import { getFixtureImage } from './utils'
 
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
@@ -115,16 +117,23 @@ export function FixtureListItem({
   )?.configurationStatus
 
   let statusLabel
-  if (configurationStatus !== CONFIGURED) {
+  if (
+    configurationStatus === CONFLICTING ||
+    configurationStatus === NOT_CONFIGURED
+  ) {
     statusLabel = (
       <StatusLabel
-        status={configurationStatus ?? ''}
+        status={
+          configurationStatus === CONFLICTING
+            ? t('location_conflict')
+            : configurationStatus
+        }
         backgroundColor={COLORS.warningBackgroundLight}
         iconColor={COLORS.warningEnabled}
         textColor={COLORS.warningText}
       />
     )
-  } else {
+  } else if (configurationStatus === CONFIGURED) {
     statusLabel = (
       <StatusLabel
         status={configurationStatus}
@@ -133,10 +142,25 @@ export function FixtureListItem({
         textColor={COLORS.successText}
       />
     )
+    //  shouldn't run into this case
+  } else {
+    statusLabel = 'status label unknown'
   }
+
+  const [
+    showLocationConflictModal,
+    setShowLocationConflictModal,
+  ] = React.useState<boolean>(false)
 
   return (
     <>
+      {showLocationConflictModal ? (
+        <LocationConflictModal
+          onCloseClick={() => setShowLocationConflictModal(false)}
+          cutout={cutout}
+          requiredFixture={loadName}
+        />
+      ) : null}
       <Box
         border={BORDERS.styleSolid}
         borderColor={COLORS.medGreyEnabled}
@@ -187,10 +211,18 @@ export function FixtureListItem({
             gridGap={SPACING.spacing10}
           >
             {statusLabel}
-            {configurationStatus === NOT_CONFIGURED ? (
-              //  TODO(jr, 10/4/23): wire up update deck cta
-              <TertiaryButton onClick={() => console.log('wire this up')}>
-                <StyledText as="label">{t('update_deck')}</StyledText>
+            {configurationStatus !== CONFIGURED ? (
+              <TertiaryButton
+                width="max-content"
+                onClick={() =>
+                  configurationStatus === CONFLICTING
+                    ? setShowLocationConflictModal(true)
+                    : console.log('wire this up')
+                }
+              >
+                <StyledText as="label" cursor="pointer">
+                  {t('update_deck')}
+                </StyledText>
               </TertiaryButton>
             ) : null}
           </Flex>
