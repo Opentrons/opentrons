@@ -258,7 +258,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Movable Trash",
+        "displayName": "Trash Bin",
         "ableToDropTips": true,
         "dropTipsOffset": [123.25, 45.75, 40.0]
       },
