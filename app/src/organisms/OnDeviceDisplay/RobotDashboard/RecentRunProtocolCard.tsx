@@ -138,7 +138,14 @@ export function ProtocolWithLastRun({
       addSuffix: true,
     }
   ).replace('about ', '')
-
+  console.log(
+    '🚀 ~ file: RecentRunProtocolCard.tsx:147 ~ isProtocolFetching:',
+    isProtocolFetching
+  )
+  console.log(
+    '🚀 ~ file: RecentRunProtocolCard.tsx:147 ~ isLookingForHardware:',
+    isLookingForHardware
+  )
   return isProtocolFetching || isLookingForHardware ? (
     <Skeleton
       height="24.5rem"

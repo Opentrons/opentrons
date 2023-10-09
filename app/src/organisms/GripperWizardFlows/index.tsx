@@ -83,6 +83,7 @@ export function GripperWizardFlows(
       setCreatedMaintenanceRunId(response.data.id)
     },
   })
+  console.log('🚀 ~ file: index.tsx:81 ~ isLoading:', isCreateLoading)
 
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
