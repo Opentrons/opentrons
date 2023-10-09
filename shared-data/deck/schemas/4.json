@@ -220,7 +220,7 @@
                 "type": "string"
               },
               "compatibleFixtureTypes": {
-                "description": "Cutout fixtures that can be loaded onto this cutout.",
+                "description": "A list of cutout fixture types that can be loaded onto this cutout.",
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -237,18 +237,18 @@
         "type": "object",
         "required": [
           "id",
-          "cutoutLocation",
+          "cutoutLocationIds",
           "fixtureType",
           "displayName",
-          "onFixtureItems"
+          "onFixtureAddressableAreas"
         ],
         "properties": {
           "id": {
             "description": "Unique identifier for the cutout fixture.",
             "type": "string"
           },
-          "cutoutLocation": {
-            "description": "Cutout locations this cutout fixture can be.",
+          "cutoutLocationIds": {
+            "description": "A list of compatible cutout ids this cutout fixture can be placed on.",
             "type": "array",
             "items": {
               "type": "string"
@@ -262,8 +262,8 @@
             "description": "A human-readable nickname for this area e.g. \"Standard Right Slot\" or \"Slot With Movable Trash\"",
             "type": "string"
           },
-          "onFixtureItems": {
-            "description": "",
+          "onFixtureAddressableAreas": {
+            "description": "A mapping of cutout location ids (matching the entries in cutoutLocationIds) to compatible addressableArea ids.",
             "type": "object",
             "additionalProperties": {
               "type": "array",

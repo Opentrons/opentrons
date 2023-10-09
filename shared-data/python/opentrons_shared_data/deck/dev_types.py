@@ -114,10 +114,10 @@ class Cutout(TypedDict):
 
 class CutoutFixture(TypedDict):
     id: str
-    cutoutLocation: List[str]
+    cutoutLocationIds: List[str]
     fixtureType: str
     displayName: str
-    onFixtureItems: Dict[str, List[str]]
+    onFixtureAddressableAreas: Dict[str, List[str]]
 
 
 Fixture = Union[
