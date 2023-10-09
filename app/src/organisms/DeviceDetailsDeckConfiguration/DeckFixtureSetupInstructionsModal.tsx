@@ -59,19 +59,15 @@ export function DeckFixtureSetupInstructionsModal({
           onOutsideClick={() => setShowSetupInstructionsModal(false)}
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing12}
-              >
-                <StyledText as="p">
-                  {t('deck_fixture_setup_modal_top_description')}
-                </StyledText>
-                <StyledText as="p">
-                  {t('deck_fixture_setup_modal_bottom_description')}
-                </StyledText>
-              </Flex>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <StyledText as="p">
+                {t('deck_fixture_setup_modal_top_description')}
+              </StyledText>
+              <StyledText as="p">
+                {t('deck_fixture_setup_modal_bottom_description')}
+              </StyledText>
             </Flex>
+
             <Flex>
               <img src={imgSrc} alt={IMG_ALT} width="178px" height="178px" />
             </Flex>
