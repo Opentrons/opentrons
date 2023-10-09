@@ -426,7 +426,9 @@ export function ModulesListItem({
                   width="max-content"
                   onClick={() => setShowLocationConflictModal(true)}
                 >
-                  <StyledText as="label">{t('update_deck')}</StyledText>
+                  <StyledText as="label" cursor="pointer">
+                    {t('update_deck')}
+                  </StyledText>
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (

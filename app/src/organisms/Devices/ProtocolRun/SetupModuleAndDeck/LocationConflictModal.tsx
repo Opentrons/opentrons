@@ -10,7 +10,6 @@ import {
   TYPOGRAPHY,
   SPACING,
   PrimaryButton,
-  ALIGN_FLEX_END,
   SecondaryButton,
   Icon,
   DIRECTION_ROW,
@@ -116,11 +115,12 @@ export const LocationConflictModal = (
                 backgroundColor={COLORS.fundamentalsBackground}
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
+                alignItems={ALIGN_CENTER}
               >
-                <Box width="7.8125rem">
-                  <StyledText as="p">{t('protocol_specifies')}</StyledText>
+                <Box width="107px">
+                  <StyledText as="label">{t('protocol_specifies')}</StyledText>
                 </Box>
-                <StyledText as="p">
+                <StyledText as="label">
                   {requiredFixture && getFixtureDisplayName(requiredFixture)}
                   {requiredModule && getModuleDisplayName(requiredModule)}
                 </StyledText>
@@ -130,11 +130,14 @@ export const LocationConflictModal = (
                 backgroundColor={COLORS.fundamentalsBackground}
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
+                alignItems={ALIGN_CENTER}
               >
                 <Box width="max-content">
-                  <StyledText as="p">{t('currently_configured')}</StyledText>
+                  <StyledText as="label">
+                    {t('currently_configured')}
+                  </StyledText>
                 </Box>
-                <StyledText as="p">{currentFixtureDisplayName}</StyledText>
+                <StyledText as="label">{currentFixtureDisplayName}</StyledText>
               </Flex>
             </Flex>
           </Flex>
@@ -144,13 +147,10 @@ export const LocationConflictModal = (
             gridGap={SPACING.spacing8}
             justifyContent={JUSTIFY_END}
           >
-            <SecondaryButton onClick={onCloseClick} alignSelf={ALIGN_FLEX_END}>
-              {i18n.format(t('shared:close'), 'capitalize')}
+            <SecondaryButton onClick={onCloseClick}>
+              {i18n.format(t('shared:cancel'), 'capitalize')}
             </SecondaryButton>
-            <PrimaryButton
-              onClick={handleUpdateDeck}
-              alignSelf={ALIGN_FLEX_END}
-            >
+            <PrimaryButton onClick={handleUpdateDeck}>
               {t('update_deck')}
             </PrimaryButton>
           </Flex>

@@ -24,6 +24,7 @@ import {
   useLoadedFixturesConfigStatus,
   CONFIGURED,
   CONFLICTING,
+  NOT_CONFIGURED,
 } from '../../../../resources/deck_configuration/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
@@ -116,7 +117,10 @@ export function FixtureListItem({
   )?.configurationStatus
 
   let statusLabel
-  if (configurationStatus != null && configurationStatus !== CONFIGURED) {
+  if (
+    configurationStatus === CONFLICTING ||
+    configurationStatus === NOT_CONFIGURED
+  ) {
     statusLabel = (
       <StatusLabel
         status={
@@ -129,7 +133,7 @@ export function FixtureListItem({
         textColor={COLORS.warningText}
       />
     )
-  } else if (configurationStatus != null) {
+  } else if (configurationStatus === CONFIGURED) {
     statusLabel = (
       <StatusLabel
         status={configurationStatus}
@@ -216,7 +220,9 @@ export function FixtureListItem({
                     : console.log('wire this up')
                 }
               >
-                <StyledText as="label">{t('update_deck')}</StyledText>
+                <StyledText as="label" cursor="pointer">
+                  {t('update_deck')}
+                </StyledText>
               </TertiaryButton>
             ) : null}
           </Flex>
