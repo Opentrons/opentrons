@@ -34,8 +34,6 @@ export function DeckSlotLocation(
     return null
   }
 
-  console.log('showExtensions', showExtensions)
-
   const contentsBySlotName: { [slotName: string]: JSX.Element } = {
     A1: (
       <>
