@@ -311,7 +311,7 @@ def _validate_can_simulate_for_robot_type(robot_type: RobotType) -> None:
         # When installed locally, this package can simulate protocols for any robot type.
         pass
     elif robot_type != current_robot_type:
-        # Match robot server behavior: raise an early warning if we're on a robot and the caller
+        # Match robot server behavior: raise an early error if we're on a robot and the caller
         # tries to simulate a protocol written for a different robot type.
 
         # FIXME: This exposes the internal strings "OT-2 Standard" and "OT-3 Standard".
