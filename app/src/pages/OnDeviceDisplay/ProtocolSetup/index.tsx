@@ -587,7 +587,7 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
-              title={t('modules')}
+              title={t('modules_and_deck')}
               detail={modulesDetail()}
               status={modulesStatus}
               disabled={protocolModulesInfo.length === 0}
