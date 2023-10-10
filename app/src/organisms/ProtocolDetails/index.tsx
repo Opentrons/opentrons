@@ -183,7 +183,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   )
 }
 
-interface ProtocolDetailsProps extends StoredProtocolData {}
+interface ProtocolDetailsProps extends StoredProtocolData { }
 
 export function ProtocolDetails(
   props: ProtocolDetailsProps
@@ -251,34 +251,34 @@ export function ProtocolDetails(
   const requiredFixtureDetails =
     enableDeckConfig && mostRecentAnalysis?.commands != null
       ? [
-          ...map(
-            parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands)
-          ),
-          STUBBED_LOAD_FIXTURE,
-        ]
+        ...map(
+          parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands)
+        ),
+        STUBBED_LOAD_FIXTURE,
+      ]
       : []
 
   const requiredLabwareDetails =
     mostRecentAnalysis != null
       ? map({
-          ...parseInitialLoadedLabwareByModuleId(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-          ...parseInitialLoadedLabwareBySlot(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-          ...parseInitialLoadedLabwareByAdapter(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-        }).filter(
-          labware => labware.result?.definition?.parameters?.format !== 'trash'
-        )
+        ...parseInitialLoadedLabwareByModuleId(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+        ...parseInitialLoadedLabwareBySlot(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+        ...parseInitialLoadedLabwareByAdapter(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+      }).filter(
+        labware => labware.result?.definition?.parameters?.format !== 'trash'
+      )
       : []
 
   const protocolDisplayName = getProtocolDisplayName(
@@ -341,7 +341,7 @@ export function ProtocolDetails(
         }
       />
     ),
-    stats: <ProtocolStats analysis={mostRecentAnalysis} />,
+    stats: enableProtocolStats ? <ProtocolStats analysis={mostRecentAnalysis} /> : null,
   }
 
   const deckThumbnail = (
@@ -416,8 +416,8 @@ export function ProtocolDetails(
             width="100%"
           >
             {analysisStatus !== 'loading' &&
-            mostRecentAnalysis != null &&
-            mostRecentAnalysis.errors.length > 0 ? (
+              mostRecentAnalysis != null &&
+              mostRecentAnalysis.errors.length > 0 ? (
               <ProtocolAnalysisFailure
                 protocolKey={protocolKey}
                 errors={mostRecentAnalysis.errors.map(e => e.detail)}
@@ -630,13 +630,12 @@ export function ProtocolDetails(
               backgroundColor={COLORS.white}
               border={BORDERS.lineBorder}
               // remove left upper corner border radius when first tab is active
-              borderRadius={`${
-                currentTab === 'robot_config'
+              borderRadius={`${currentTab === 'robot_config'
                   ? '0'
                   : String(BORDERS.radiusSoftCorners)
-              } ${String(BORDERS.radiusSoftCorners)} ${String(
-                BORDERS.radiusSoftCorners
-              )} ${String(BORDERS.radiusSoftCorners)}`}
+                } ${String(BORDERS.radiusSoftCorners)} ${String(
+                  BORDERS.radiusSoftCorners
+                )} ${String(BORDERS.radiusSoftCorners)}`}
               padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
             >
               {contentsByTabName[currentTab]}

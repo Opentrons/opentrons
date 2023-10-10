@@ -121,6 +121,20 @@ export const ProtocolStats = (
     }
   )
 
+  const toRawStat = (row: StatRowProps): {[stat: string]: number} => (
+    {[row.displayName]: row.datum}
+  )
+  console.log(
+    JSON.stringify({
+      [analysis.metadata?.protocolName]: [
+        toRawStat(gripperMoveCount),
+        ...pipettePickUpStats.map(toRawStat),
+        ...pipetteAspirateStats.map(toRawStat),
+        ...pipetteDispenseStats.map(toRawStat),
+      ]
+    }
+    )
+  )
   return (
     <Flex
       css={HIDE_SCROLLBAR}
