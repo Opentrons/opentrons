@@ -52,6 +52,8 @@ import { hackWindowNavigatorOnLine } from './hacks'
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
 
+// forces electron to think we're online which means axios won't elide
+// network calls to localhost. see ./hacks.ts for more.
 hackWindowNavigatorOnLine()
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
