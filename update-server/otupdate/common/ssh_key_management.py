@@ -268,7 +268,7 @@ async def add_from_local(request: web.Request) -> web.Response:
         for key in pub_keys:
             try:
                 with open(key, "r") as gh:
-                    ssh_key = gh.read()
+                    ssh_key = gh.read().strip()
                     if "ssh-rsa" not in ssh_key and "ecdsa" not in ssh_key:
                         LOG.warning(f"Invalid ssh public key: {key}")
                         continue
@@ -276,7 +276,7 @@ async def add_from_local(request: web.Request) -> web.Response:
                     if not key_present(key_hash):
                         fh.write(f"{ssh_key}\n")
                         LOG.info(f"Added new rsa key: {key}")
-                        new_keys.append(key_hash)
+                    new_keys.append(key_hash)
             except Exception as e:
                 LOG.error(f"Could not process ssh public key: {key} {e}")
                 continue
