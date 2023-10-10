@@ -38,7 +38,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import {
   ModuleRenderInfoForProtocol,
-  useIsOT3,
+  useIsFlex,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
@@ -68,7 +68,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 

@@ -7,7 +7,7 @@ import {
 
 import type { State } from '../../../redux/types'
 
-export function useIsOT3(robotName: string): boolean {
+export function useIsFlex(robotName: string): boolean {
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )

@@ -18,7 +18,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
-import { useIsOT3, useRobot } from '../../hooks'
+import { useIsFlex, useRobot } from '../../hooks'
 import { UpdateBuildroot } from '../UpdateBuildroot'
 
 import type { State } from '../../../../redux/types'
@@ -35,7 +35,7 @@ export function RobotServerVersion({
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
   const { autoUpdateAction } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)

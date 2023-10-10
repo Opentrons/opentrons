@@ -8,7 +8,7 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import {
-  useIsOT3,
+  useIsFlex,
   useRunStatuses,
   useIsLegacySessionInProgress,
 } from '../Devices/hooks'
@@ -53,7 +53,7 @@ export const ModuleOverflowMenu = (
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { isRunTerminal, isRunStill } = useRunStatuses()
   const isLegacySessionInProgress = useIsLegacySessionInProgress()
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const isIncompatibleWithOT3 =
     isOT3 && module.moduleModel === 'thermocyclerModuleV1'
 

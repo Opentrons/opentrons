@@ -35,7 +35,7 @@ import {
 } from '../../../../../redux/analytics'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
   useRobot,
@@ -64,7 +64,7 @@ export function DeviceResetSlideout({
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const runsQueryResponse = useAllRunsQuery()
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)

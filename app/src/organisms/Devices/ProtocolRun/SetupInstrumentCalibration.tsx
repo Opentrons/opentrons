@@ -15,7 +15,7 @@ import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibration
 import {
   useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
-  useIsOT3,
+  useIsFlex,
 } from '../hooks'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
@@ -40,7 +40,7 @@ export function SetupInstrumentCalibration({
 }: SetupInstrumentCalibrationProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
 
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
     enabled: isOT3,

@@ -12,7 +12,7 @@ import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useIsOT3,
+  useIsFlex,
   useModuleRenderInfoForProtocolById,
   useStoredProtocolAnalysis,
 } from '../../hooks'
@@ -40,7 +40,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     t('list_view'),
     t('map_view')
   )
-  const isOt3 = useIsOT3(robotName)
+  const isOt3 = useIsFlex(robotName)
 
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,

@@ -19,7 +19,7 @@ import { CheckCalibration } from '../../organisms/CheckCalibration'
 import {
   useRobot,
   useRunStatuses,
-  useIsOT3,
+  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../organisms/Devices/hooks'
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
@@ -84,7 +84,7 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const dispatch = useDispatch<Dispatch>()
 
   React.useEffect(() => {

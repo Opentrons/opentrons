@@ -18,7 +18,7 @@ import {
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import {
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useRobot,
   useAttachedPipettes,
@@ -98,7 +98,7 @@ const mockRobotSettingsTipLengthCalibration = RobotSettingsTipLengthCalibration 
 const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
   typeof useAttachedPipettesFromInstrumentsQuery
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockRobotSettingsModuleCalibration = RobotSettingsModuleCalibration as jest.MockedFunction<
   typeof RobotSettingsModuleCalibration
 >
@@ -149,7 +149,7 @@ describe('RobotSettingsCalibration', () => {
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
     mockGetRequestById.mockReturnValue(null)
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     mockUseFeatureFlag.mockReturnValue(false)
     mockCalibrationStatusCard.mockReturnValue(
       <div>Mock CalibrationStatusCard</div>
@@ -205,7 +205,7 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('does not render a Deck Calibration component for an OT-3', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock RobotSettingsDeckCalibration')).toBeNull()
   })
@@ -221,7 +221,7 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('does not render a Tip Length Calibration component for an OT-3', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock RobotSettingsTipLengthCalibration')).toBeNull()
   })
@@ -232,13 +232,13 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('does not render a Calibration Health Check component for an OT-3', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock CalibrationHealthCheck')).toBeNull()
   })
 
   it('renders a Gripper Calibration component for an OT-3', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock RobotSettingsGripperCalibration')
   })
@@ -253,7 +253,7 @@ describe('RobotSettingsCalibration', () => {
       left: mockAttachedPipetteInformation,
       right: null,
     })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock RobotSettingsDeckCalibration')).toBeNull()
     expect(queryByText('Mock RobotSettingsTipLengthCalibration')).toBeNull()
@@ -265,14 +265,14 @@ describe('RobotSettingsCalibration', () => {
       left: mockAttachedPipetteInformation,
       right: null,
     })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock RobotSettingsPipetteOffsetCalibration')
   })
 
   it('render a Module Calibration component for an OT-3 and module calibration feature flag is on', () => {
     mockUseFeatureFlag.mockReturnValue(true)
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock RobotSettingsModuleCalibration')
   })

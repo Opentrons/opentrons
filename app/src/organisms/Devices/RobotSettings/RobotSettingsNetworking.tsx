@@ -31,7 +31,7 @@ import {
 } from '../../../redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
 
-import { useIsOT3, useIsRobotBusy } from '../hooks'
+import { useIsFlex, useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
 
@@ -55,7 +55,7 @@ export function RobotSettingsNetworking({
   const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy({ poll: true })
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
 
   const [showDisconnectModal, setShowDisconnectModal] = React.useState<boolean>(
     false

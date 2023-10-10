@@ -18,7 +18,7 @@ import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
 import {
   useAttachedPipettes,
-  useIsOT3,
+  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
 
@@ -65,7 +65,7 @@ export function PipetteOffsetCalibrationItems({
   })
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
   const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const attachedPipettes = Boolean(isOT3)
     ? attachedPipetteFromInstrumentQuery
     : attachedPipettesFromPipetteQuery

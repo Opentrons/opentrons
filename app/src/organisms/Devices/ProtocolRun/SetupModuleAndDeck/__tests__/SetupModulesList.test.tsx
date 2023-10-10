@@ -12,9 +12,10 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
+import { useFeatureFlag } from '../../../../../redux/config'
 import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
-import { MultipleModulesModal } from '../MultipleModulesModal'
-import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
+import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
   useIsFlex,
   useModuleRenderInfoForProtocolById,
@@ -22,19 +23,27 @@ import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../../hooks'
-import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
+import { MultipleModulesModal } from '../MultipleModulesModal'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
+import { LocationConflictModal } from '../LocationConflictModal'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import {
+  ModuleModel,
+  ModuleType,
+  STAGING_AREA_LOAD_NAME,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../hooks')
+jest.mock('../LocationConflictModal')
 jest.mock('../UnMatchedModuleWarning')
 jest.mock('../../../../ModuleCard/ModuleSetupModal')
 jest.mock('../../../../ModuleWizardFlows')
 jest.mock('../MultipleModulesModal')
 jest.mock('../../../../../resources/runs/hooks')
+jest.mock('../../../../../redux/config')
+
 const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
@@ -62,6 +71,12 @@ const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFuncti
 >
 const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
   typeof useChainLiveCommands
+>
+const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
+  typeof LocationConflictModal
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -131,10 +146,16 @@ describe('SetupModulesList', () => {
       .mockReturnValue({
         complete: true,
       })
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
+    mockLocationConflictModal.mockReturnValue(
+      <div>mock location conflict modal</div>
+    )
   })
   afterEach(() => resetAllWhenMocks())
 
@@ -144,7 +165,7 @@ describe('SetupModulesList', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({})
     const { getByText } = render(props)
-    getByText('Module Name')
+    getByText('Module')
     getByText('Location')
     getByText('Status')
   })
@@ -170,7 +191,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Magnetic Module')
-    getByText('Slot 1')
+    getByText('1')
     getByText('Connected')
   })
 
@@ -192,7 +213,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Magnetic Module')
-    getByText('Slot 1')
+    getByText('1')
     getByText('Not connected')
   })
 
@@ -224,7 +245,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')
-    getByText('Slot 7,8,10,11')
+    getByText('7,8,10,11')
     getByText('Connected')
   })
 
@@ -253,7 +274,7 @@ describe('SetupModulesList', () => {
 
     const { getByText, getByRole } = render(props)
     getByText('Thermocycler Module')
-    getByText('Slot A1+B1')
+    getByText('A1+B1')
     getByRole('button', { name: 'Calibrate now' }).click()
     await waitFor(() => {
       getByText('mock ModuleWizardFlows')
@@ -321,7 +342,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')
-    getByText('Slot A1+B1')
+    getByText('A1+B1')
     getByText('Connected')
   })
 
@@ -427,11 +448,14 @@ describe('SetupModulesList', () => {
       },
     } as any)
     const { getByText } = render(props)
-    const moduleSetup = getByText('View module setup instructions')
+    const moduleSetup = getByText('View setup instructions')
     fireEvent.click(moduleSetup)
     getByText('mockModuleSetupModal')
   })
-  it('shoulde render a magnetic block', () => {
+  it('shoulde render a magnetic block with a conflicted fixture', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(true)
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockMagneticBlock.id]: {
         moduleId: mockMagneticBlock.id,
@@ -449,11 +473,18 @@ describe('SetupModulesList', () => {
         protocolLoadOrder: 0,
         slotName: '1',
         attachedModuleMatch: null,
+        conflictedFixture: {
+          fixtureId: 'mockId',
+          fixtureLocation: '1',
+          loadName: STAGING_AREA_LOAD_NAME,
+        },
       },
     } as any)
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('No USB connection required')
-    getByText('N/A')
+    getByText('Location conflict')
     getByText('Magnetic Block GEN1')
+    getByRole('button', { name: 'Update deck' }).click()
+    getByText('mock location conflict modal')
   })
 })

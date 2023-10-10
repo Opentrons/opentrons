@@ -19,7 +19,7 @@ import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
-  useIsOT3,
+  useIsFlex,
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
@@ -68,7 +68,7 @@ export function ProtocolRunSetup({
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(

@@ -38,7 +38,7 @@ import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { useIsOT3 } from './hooks'
+import { useIsFlex } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
@@ -153,7 +153,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
-  const isOT3 = useIsOT3(props.robotName)
+  const isOT3 = useIsFlex(props.robotName)
   const {
     data: pipettesData,
     isLoading: isPipetteQueryLoading,

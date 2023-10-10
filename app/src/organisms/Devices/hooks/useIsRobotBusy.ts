@@ -5,7 +5,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 import { DISENGAGED } from '../../EmergencyStop'
-import { useIsOT3 } from './useIsOT3'
+import { useIsFlex } from './useIsFlex'
 
 const ROBOT_STATUS_POLL_MS = 30000
 
@@ -22,7 +22,7 @@ export function useIsRobotBusy(
   const allSessionsQueryResponse = useAllSessionsQuery(queryOptions)
   const host = useHost()
   const robotName = host?.robotName
-  const isOT3 = useIsOT3(robotName ?? '')
+  const isOT3 = useIsFlex(robotName ?? '')
   const { data: estopStatus, error: estopError } = useEstopQuery({
     ...queryOptions,
     enabled: isOT3,

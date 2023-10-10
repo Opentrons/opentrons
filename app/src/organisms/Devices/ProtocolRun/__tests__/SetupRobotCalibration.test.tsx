@@ -10,7 +10,7 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
 } from '../../../../redux/analytics'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useDeckCalibrationData, useIsOT3, useRunHasStarted } from '../../hooks'
+import { useDeckCalibrationData, useIsFlex, useRunHasStarted } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
@@ -40,7 +40,7 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -86,7 +86,7 @@ describe('SetupRobotCalibration', () => {
       isDeckCalibrated: true,
     })
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -102,7 +102,7 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('renders only pipette calibration component for OT-3', () => {
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     const { getByText, queryByText } = render()[0]
 
     expect(queryByText('Mock SetupDeckCalibration')).toBeNull()

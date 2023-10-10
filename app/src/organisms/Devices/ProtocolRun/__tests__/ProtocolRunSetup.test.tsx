@@ -17,7 +17,7 @@ import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useIsOT3,
+  useIsFlex,
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
@@ -41,7 +41,7 @@ jest.mock('../EmptySetupStep')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -98,7 +98,7 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -194,7 +194,7 @@ describe('ProtocolRunSetup', () => {
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
     it('renders robot calibration setup for OT-3', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       const { getByText } = render()
 
       getByText(

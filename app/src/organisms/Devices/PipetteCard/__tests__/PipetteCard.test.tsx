@@ -10,7 +10,7 @@ import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { getAttachedPipetteSettingsFieldsById } from '../../../../redux/pipettes'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData, useIsOT3 } from '../../hooks'
+import { useDeckCalibrationData, useIsFlex } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
@@ -56,7 +56,7 @@ const mockAboutPipettesSlideout = AboutPipetteSlideout as jest.MockedFunction<
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jest.MockedFunction<
   typeof useCurrentSubsystemUpdateQuery
 >
@@ -90,7 +90,7 @@ describe('PipetteCard', () => {
       updatePipette: jest.fn(),
       isRunActive: false,
     }
-    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
     when(mockAboutPipettesSlideout).mockReturnValue(
       <div>mock about slideout</div>
     )
@@ -206,7 +206,7 @@ describe('PipetteCard', () => {
     getByText('Empty')
   })
   it('does not render banner to calibrate for ot2 pipette if not calibrated', () => {
-    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
     props = {
       pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
@@ -221,7 +221,7 @@ describe('PipetteCard', () => {
     expect(queryByText('Calibrate now')).toBeNull()
   })
   it('renders banner to calibrate for ot3 pipette if not calibrated', () => {
-    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(true)
     props = {
       pipetteModelSpecs: { ...mockLeftSpecs, name: 'p300_single_flex' },
       mount: LEFT,

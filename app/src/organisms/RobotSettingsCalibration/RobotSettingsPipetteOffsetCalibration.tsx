@@ -12,7 +12,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import {
   useAttachedPipettesFromInstrumentsQuery,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
 } from '../Devices/hooks'
 import { getShowPipetteCalibrationWarning } from '../Devices/utils'
@@ -34,7 +34,7 @@ export function RobotSettingsPipetteOffsetCalibration({
 }: RobotSettingsPipetteOffsetCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const { data: instrumentsData } = useInstrumentsQuery({
     enabled: isOT3,
   })

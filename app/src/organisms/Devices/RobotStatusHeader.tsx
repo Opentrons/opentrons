@@ -23,7 +23,7 @@ import {
 import { QuaternaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
-import { useIsOT3 } from '../../organisms/Devices/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
@@ -55,7 +55,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
-  const isOT3 = useIsOT3(name)
+  const isOT3 = useIsFlex(name)
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })

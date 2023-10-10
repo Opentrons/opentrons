@@ -36,7 +36,7 @@ import { ChangePipette } from '../../ChangePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
-import { useIsOT3 } from '../hooks'
+import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
@@ -53,6 +53,7 @@ import type {
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
 import { DropTipWizard } from '../../DropTipWizard'
+import { getRobotByName, getRobotModelByName } from '../../../redux/discovery'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
@@ -102,7 +103,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const isOt3 = useIsOT3(robotName)
+  const isOt3 = useIsFlex(robotName)
+
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, robotName)
+  )
   const pipetteName = pipetteModelSpecs?.name
   const isFlexPipetteAttached = isFlexPipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteModelSpecs?.displayName
@@ -202,6 +207,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       )}
       {showDropTipWizard && pipetteModelSpecs != null ? (
         <DropTipWizard
+        robotType={getRobotByName(robotName)}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
           closeFlow={() => setShowDropTipWizard(false)}

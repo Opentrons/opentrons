@@ -13,7 +13,7 @@ import {
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
-import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
+import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -78,7 +78,7 @@ export function RobotSettingsAdvanced({
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)

@@ -20,7 +20,7 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
@@ -52,7 +52,7 @@ export function CalibrationDataDownload({
   const doTrackEvent = useTrackEvent()
 
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()

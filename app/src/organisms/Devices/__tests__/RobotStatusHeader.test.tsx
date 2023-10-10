@@ -16,7 +16,7 @@ import {
 } from '../../../redux/discovery'
 import { getNetworkInterfaces } from '../../../redux/networking'
 
-import { useIsOT3 } from '../hooks'
+import { useIsFlex } from '../hooks'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
@@ -46,7 +46,7 @@ const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
 const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
   typeof getRobotAddressesByName
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const MOCK_OTIE = {
   name: 'otie',
@@ -120,7 +120,7 @@ describe('RobotStatusHeader', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -213,7 +213,7 @@ describe('RobotStatusHeader', () => {
         wifi: null,
         ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
       })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     const [{ getByLabelText }] = render(props)
 
     getByLabelText('usb')

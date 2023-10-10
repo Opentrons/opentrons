@@ -27,7 +27,7 @@ import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationW
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
+import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
   getIs96ChannelPipetteAttached,
   getOffsetCalibrationForMount,
@@ -62,7 +62,7 @@ export function InstrumentsAndModules({
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const [
     subsystemToUpdate,
     setSubsystemToUpdate,

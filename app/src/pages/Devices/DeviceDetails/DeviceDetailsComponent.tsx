@@ -15,7 +15,7 @@ import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAnd
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
-import { useIsOT3 } from '../../../organisms/Devices/hooks'
+import { useIsFlex } from '../../../organisms/Devices/hooks'
 import { useFeatureFlag } from '../../../redux/config'
 
 interface DeviceDetailsComponentProps {
@@ -25,7 +25,7 @@ interface DeviceDetailsComponentProps {
 export function DeviceDetailsComponent({
   robotName,
 }: DeviceDetailsComponentProps): JSX.Element {
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const { data: estopStatus, error: estopError } = useEstopQuery({
     enabled: isOT3,
   })

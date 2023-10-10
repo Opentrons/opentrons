@@ -84,7 +84,7 @@ import {
   useIsRobotViewable,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-  useIsOT3,
+  useIsFlex,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
@@ -149,7 +149,7 @@ export function ProtocolRunHeader({
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
   )
-  const isOT3 = useIsOT3(robotName)
+  const isOT3 = useIsFlex(robotName)
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
