@@ -1,0 +1,300 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "xyzArray": {
+      "type": "array",
+      "description": "Array of 3 numbers, [x, y, z]",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
+    "unitVector": {
+      "type": "array",
+      "description": "Array of 3 unit directions, [x, y, z]",
+      "items": {
+        "type": "number",
+        "enum": [1, -1]
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "boundingBox": {
+      "type": "object",
+      "description": "The active area (both pipettes can reach) of a fixture on the deck",
+      "required": ["xDimension", "yDimension", "zDimension"],
+      "properties": {
+        "xDimension": { "$ref": "#/definitions/positiveNumber" },
+        "yDimension": { "$ref": "#/definitions/positiveNumber" },
+        "zDimension": { "$ref": "#/definitions/positiveNumber" }
+      }
+    }
+  },
+  "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "otId",
+    "schemaVersion",
+    "cornerOffsetFromOrigin",
+    "dimensions",
+    "metadata",
+    "robot",
+    "locations",
+    "cutoutFixtures"
+  ],
+  "properties": {
+    "otId": {
+      "description": "Unique internal ID generated using UUID",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "description": "Schema version of a deck is a single integer",
+      "enum": [4]
+    },
+    "cornerOffsetFromOrigin": {
+      "$ref": "#/definitions/xyzArray",
+      "description": "Position of left-front-bottom corner of entire deck to robot coordinate system origin"
+    },
+    "dimensions": {
+      "$ref": "#/definitions/xyzArray",
+      "description": "Outer dimensions of a deck bounding box"
+    },
+    "metadata": {
+      "description": "Optional metadata about the Deck",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "description": "A short, human-readable name for the deck",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Tags to be used in searching for this deck",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "robot": {
+      "type": "object",
+      "required": ["model"],
+      "properties": {
+        "model": {
+          "description": "Model of the robot",
+          "type": "string",
+          "enum": ["OT-2 Standard", "OT-3 Standard"]
+        }
+      }
+    },
+    "locations": {
+      "type": "object",
+      "required": ["addressableAreas", "calibrationPoints", "cutouts"],
+      "properties": {
+        "addressableAreas": {
+          "type": "array",
+          "description": "Ordered slots available for placing labware",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "areaType",
+              "offsetFromCutoutFixture",
+              "boundingBox",
+              "displayName"
+            ],
+            "properties": {
+              "id": {
+                "description": "Unique identifier for slot",
+                "type": "string"
+              },
+              "areaType": {
+                "description": "The type of deck item, defining allowed behavior.",
+                "type": "string",
+                "enum": ["slot", "movableTrash", "fixedTrash", "wasteChute"]
+              },
+              "offsetFromCutoutFixture": {
+                "$ref": "#/definitions/xyzArray",
+                "description": "Relative offset of the addressable area as it sits on the cutout slot."
+              },
+              "matingSurfaceUnitVector": {
+                "$ref": "#/definitions/unitVector",
+                "description": "An optional diagonal direction of force, defined by spring location, which governs the mating surface of objects placed in slot."
+              },
+              "boundingBox": {
+                "$ref": "#/definitions/boundingBox"
+              },
+              "displayName": {
+                "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Movable Trash\"",
+                "type": "string"
+              },
+              "compatibleModuleTypes": {
+                "description": "An array of module types that can be placed in this area. The module type names can be found in the moduleType field of a module definition.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "ableToDropTips": {
+                "description": "Whether tips are allowed to be dropped into this area.",
+                "type": "boolean"
+              },
+              "ableToDropLabware": {
+                "description": "Whether labware is allowed to be dropped (different then being placed) into this area.",
+                "type": "boolean"
+              },
+              "dropTipsOffset": {
+                "description": "Relative positional offset of where the pipette should drop tips from.",
+                "$ref": "#/definitions/xyzArray"
+              },
+              "dropLabwareOffset": {
+                "description": "Relative positional offset of where the gripper should drop labware from.",
+                "$ref": "#/definitions/xyzArray"
+              }
+            }
+          }
+        },
+        "calibrationPoints": {
+          "type": "array",
+          "description": "Key points for deck calibration",
+          "items": {
+            "type": "object",
+            "required": ["id", "position", "displayName"],
+            "properties": {
+              "id": {
+                "description": "Unique identifier for calibration point",
+                "type": "string"
+              },
+              "position": {
+                "$ref": "#/definitions/xyzArray"
+              },
+              "displayName": {
+                "description": "An optional human-readable nickname for this point Eg \"Slot 3 Cross\" or \"Slot 1 Dot\"",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "cutouts": {
+          "type": "array",
+          "description": "The machined cutout slots on the deck surface.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "position",
+              "displayName",
+              "compatibleFixtureTypes"
+            ],
+            "properties": {
+              "id": {
+                "description": "Unique identifier for the cutout",
+                "type": "string"
+              },
+              "position": {
+                "description": "Absolute position of the cutout",
+                "$ref": "#/definitions/xyzArray"
+              },
+              "displayName": {
+                "description": "An optional human-readable nickname for this cutout e.g. \"Cutout A1\"",
+                "type": "string"
+              },
+              "compatibleFixtureTypes": {
+                "description": "A list of cutout fixture types that can be loaded onto this cutout.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cutoutFixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "cutoutLocationIds",
+          "fixtureType",
+          "displayName",
+          "onFixtureAddressableAreas"
+        ],
+        "properties": {
+          "id": {
+            "description": "Unique identifier for the cutout fixture.",
+            "type": "string"
+          },
+          "cutoutLocationIds": {
+            "description": "A list of compatible cutout ids this cutout fixture can be placed on.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fixtureType": {
+            "description": "The type of cutout fixture.",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "A human-readable nickname for this area e.g. \"Standard Right Slot\" or \"Slot With Movable Trash\"",
+            "type": "string"
+          },
+          "onFixtureAddressableAreas": {
+            "description": "A mapping of cutout location ids (matching the entries in cutoutLocationIds) to compatible addressableArea ids.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "gripperOffsets": {
+      "type": "object",
+      "description": "Offsets to be added when calculating the coordinates a gripper should go to when picking up or dropping a labware on this deck.",
+      "properties": {
+        "default": {
+          "type": "object",
+          "properties": {
+            "pickUpOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate pick-up coordinates of a labware placed on this deck."
+            },
+            "dropOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate drop coordinates of a labware placed on this deck."
+            }
+          },
+          "required": ["pickUpOffset", "dropOffset"]
+        }
+      },
+      "required": ["default"]
+    }
+  }
+}
