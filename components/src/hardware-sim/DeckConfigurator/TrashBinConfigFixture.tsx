@@ -6,23 +6,23 @@ import {
 } from '@opentrons/shared-data'
 
 import { Icon } from '../../icons'
-import { Btn, Flex } from '../../primitives'
+import { Btn, Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS } from '../../ui-style-constants'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
 import type { Cutout } from '@opentrons/shared-data'
 
 // TODO: replace stubs with JSON definitions when available
-const standardSlotDef = {
+const trashBinDef = {
   schemaVersion: 1,
   version: 1,
   namespace: 'opentrons',
   metadata: {
-    displayName: 'standard slot',
+    displayName: 'Trash bin',
   },
   parameters: {
-    loadName: 'standard_slot',
+    loadName: 'trash_bin',
   },
   boundingBox: {
     xDimension: 246.5,
@@ -31,21 +31,22 @@ const standardSlotDef = {
   },
 }
 
-interface EmptyFixtureProps {
+interface TrashBinConfigFixtureProps {
   fixtureLocation: Cutout
-  handleClickAdd: (fixtureLocation: Cutout) => void
+  handleClickRemove?: (fixtureLocation: Cutout) => void
 }
 
-export function EmptyFixture(props: EmptyFixtureProps): JSX.Element {
-  const { handleClickAdd, fixtureLocation } = props
+export function TrashBinConfigFixture(
+  props: TrashBinConfigFixtureProps
+): JSX.Element {
+  const { handleClickRemove, fixtureLocation } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   // TODO: migrate to fixture location for v4
-  const standardSlot = deckDef.locations.orderedSlots.find(
+  const trashBinSlot = deckDef.locations.orderedSlots.find(
     slot => slot.id === fixtureLocation
   )
-  const [xSlotPosition = 0, ySlotPosition = 0] = standardSlot?.position ?? []
-
+  const [xSlotPosition = 0, ySlotPosition = 0] = trashBinSlot?.position ?? []
   // TODO: remove adjustment when reading from fixture position
   // adjust x differently for right side/left side
   const isLeftSideofDeck =
@@ -58,7 +59,7 @@ export function EmptyFixture(props: EmptyFixtureProps): JSX.Element {
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = standardSlotDef.boundingBox
+  const { xDimension, yDimension } = trashBinDef.boundingBox
 
   return (
     <RobotCoordsForeignObject
@@ -71,19 +72,26 @@ export function EmptyFixture(props: EmptyFixtureProps): JSX.Element {
     >
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={COLORS.mediumBlueEnabled}
-        border={`5px dashed ${COLORS.blueEnabled}`}
+        backgroundColor={COLORS.grey2}
         borderRadius={BORDERS.radiusSoftCorners}
+        color={COLORS.white}
+        gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_CENTER}
         width="100%"
       >
-        <Btn
-          display={DISPLAY_FLEX}
-          justifyContent={JUSTIFY_CENTER}
-          onClick={() => handleClickAdd(fixtureLocation)}
-        >
-          <Icon name="add" color={COLORS.blueEnabled} height="2rem" />
-        </Btn>
+        {}
+        <Text css={TYPOGRAPHY.bodyTextSemiBold}>
+          {trashBinDef.metadata.displayName}
+        </Text>
+        {handleClickRemove != null ? (
+          <Btn
+            display={DISPLAY_FLEX}
+            justifyContent={JUSTIFY_CENTER}
+            onClick={() => handleClickRemove(fixtureLocation)}
+          >
+            <Icon name="remove" color={COLORS.white} height="2.25rem" />
+          </Btn>
+        ) : null}
       </Flex>
     </RobotCoordsForeignObject>
   )

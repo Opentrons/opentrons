@@ -31,13 +31,13 @@ const stagingAreaDef = {
   },
 }
 
-interface StagingAreaFixtureProps {
+interface StagingAreaConfigFixtureProps {
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
 }
 
-export function StagingAreaFixture(
-  props: StagingAreaFixtureProps
+export function StagingAreaConfigFixture(
+  props: StagingAreaConfigFixtureProps
 ): JSX.Element {
   const { handleClickRemove, fixtureLocation } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)

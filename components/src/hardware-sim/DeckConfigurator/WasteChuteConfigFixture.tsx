@@ -31,12 +31,14 @@ const wasteChuteDef = {
   },
 }
 
-interface WasteChuteFixtureProps {
+interface WasteChuteConfigFixtureProps {
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
 }
 
-export function WasteChuteFixture(props: WasteChuteFixtureProps): JSX.Element {
+export function WasteChuteConfigFixture(
+  props: WasteChuteConfigFixtureProps
+): JSX.Element {
   const { handleClickRemove, fixtureLocation } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
