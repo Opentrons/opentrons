@@ -541,14 +541,8 @@ def simulate(  # noqa: C901
                 )
             protocol_file.seek(0)
             return _run_file_pe(
-                protocol_file=protocol_file,
-                protocol_name=(
-                    file_name
-                    if file_name is not None
-                    else "<protocol>"  # FIX BEFORE MERGE
-                ),
+                protocol=protocol,
                 robot_type=protocol.robot_type,
-                extra_labware=extra_labware,
                 hardware_api=hardware_simulator,
                 stack_logger=stack_logger,
                 log_level=log_level,
@@ -854,12 +848,8 @@ def _run_file_non_pe(
 
 
 def _run_file_pe(
-    # TODO(mm, 2023-10-02): Can we combine protocol_file, protocol_name, and robot_type
-    # into a single `Protocol` argument?
-    protocol_file: Union[BinaryIO, TextIO],
-    protocol_name: str,
+    protocol: Protocol,
     robot_type: RobotType,
-    extra_labware: Dict[str, entrypoint_util.FoundLabware],
     hardware_api: ThreadManagedHardware,
     stack_logger: logging.Logger,
     log_level: str,
@@ -889,11 +879,7 @@ def _run_file_pe(
 
         return scraper.commands, None  # FIX BEFORE MERGE
 
-    with entrypoint_util.adapt_protocol_source(
-        protocol_file=protocol_file,
-        protocol_name=protocol_name,
-        extra_labware=extra_labware,
-    ) as protocol_source:
+    with entrypoint_util.adapt_protocol_source(protocol) as protocol_source:
         return asyncio.run(run(protocol_source))
 
 

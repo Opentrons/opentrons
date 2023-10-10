@@ -410,9 +410,7 @@ def execute(  # noqa: C901
             )
         protocol_file.seek(0)
         _run_file_pe(
-            protocol_file=protocol_file,
-            protocol_name=protocol_name,
-            extra_labware=extra_labware,
+            protocol=protocol,
             hardware_api=_get_global_hardware_controller(_get_robot_type()),
             emit_runlog=emit_runlog,
         )
@@ -594,9 +592,7 @@ def _run_file_non_pe(
 
 
 def _run_file_pe(
-    protocol_file: Union[BinaryIO, TextIO],
-    protocol_name: str,
-    extra_labware: Dict[str, entrypoint_util.FoundLabware],
+    protocol: Protocol,
     hardware_api: ThreadManagedHardware,
     emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
@@ -629,11 +625,7 @@ def _run_file_pe(
                 result.state_summary.errors
             )
 
-    with entrypoint_util.adapt_protocol_source(
-        protocol_file=protocol_file,
-        protocol_name=protocol_name,
-        extra_labware=extra_labware,
-    ) as protocol_source:
+    with entrypoint_util.adapt_protocol_source(protocol) as protocol_source:
         asyncio.run(run(protocol_source))
 
 
