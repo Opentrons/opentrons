@@ -102,7 +102,10 @@ export const getSlotIdsBlockedBySpanning = (
 }
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
-  slot: string
+  slot: string,
+  /* we don't always want to count the slot as full if there is a staging area present
+     since labware/wasteChute can still go on top of staging areas  **/
+  includeStagingAreas?: boolean
 ): boolean => {
   if (
     slot === SPAN7_8_10_11_SLOT &&
@@ -118,7 +121,18 @@ export const getSlotIsEmpty = (
   } else if (slot === '12') {
     return false
   }
-  // NOTE: should work for both deck slots and module slots
+
+  const filteredAdditioanlEquipmentOnDeck = includeStagingAreas
+    ? values(initialDeckSetup.additionalEquipmentOnDeck).filter(
+        (additionalEquipment: AdditionalEquipmentOnDeck) =>
+          additionalEquipment.location === slot
+      )
+    : values(initialDeckSetup.additionalEquipmentOnDeck).filter(
+        (additionalEquipment: AdditionalEquipmentOnDeck) =>
+          additionalEquipment.location === slot &&
+          additionalEquipment.name !== 'stagingArea'
+      )
+
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -127,10 +141,7 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...values(initialDeckSetup.additionalEquipmentOnDeck).filter(
-        (additionalEquipment: AdditionalEquipmentOnDeck) =>
-          additionalEquipment.location === slot
-      ),
+      ...filteredAdditioanlEquipmentOnDeck,
     ].length === 0
   )
 }

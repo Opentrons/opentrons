@@ -152,7 +152,11 @@ export function ModuleRow(props: Props): JSX.Element {
           )}
           {slot &&
             (isFlex ? (
-              <FlexSlotMap selectedSlots={[slot]} moduleType={type} />
+              <FlexSlotMap
+                selectedSlots={
+                  type === THERMOCYCLER_MODULE_TYPE ? ['A1', 'B1'] : [slot]
+                }
+              />
             ) : (
               <div {...targetProps}>
                 <SlotMap

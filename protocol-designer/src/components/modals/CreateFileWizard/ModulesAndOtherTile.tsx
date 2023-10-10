@@ -220,6 +220,14 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
   const { values, setFieldValue, enableDeckModification } = props
 
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
+  const allStagingAreasInUse =
+    values.additionalEquipment.filter(equipment =>
+      equipment.includes('stagingArea')
+    ).length === 4
+  const allModulesInSideSlotsOnDeck =
+    values.modulesByType.heaterShakerModuleType.onDeck &&
+    values.modulesByType.thermocyclerModuleType.onDeck &&
+    values.modulesByType.temperatureModuleType.onDeck
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
     if (values.additionalEquipment.includes(equipment)) {
@@ -241,6 +249,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
         const moduleType = getModuleType(moduleModel)
         return (
           <EquipmentOption
+            //  TODO(jr, 10/10/23): add disabled option here for if the deck is full
             key={moduleModel}
             isSelected={values.modulesByType[moduleType].onDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
@@ -302,6 +311,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
             }
             text="Trash Bin"
             showCheckbox
+            disabled={allStagingAreasInUse && allModulesInSideSlotsOnDeck}
           />
         </>
       ) : null}

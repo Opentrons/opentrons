@@ -15,7 +15,7 @@ import { i18n } from '../../localization'
 import stagingAreaImage from '../../images/staging_area.png'
 import { getStagingAreaSlots } from '../../utils'
 import { Portal } from '../portals/TopPortal'
-import { StagingAreaModal } from './StagingAreaModal'
+import { StagingAreasModal } from './StagingAreasModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.css'
@@ -38,7 +38,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
     <>
       {stagingAreaModal ? (
         <Portal>
-          <StagingAreaModal
+          <StagingAreasModal
             onCloseClick={() => openStagingAreaModal(false)}
             stagingAreas={stagingAreas}
           />
@@ -50,7 +50,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
         </h4>
 
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <AdditionalItemImage
+          <StagingAreaImage
             src={stagingAreaImage}
             alt={i18n.t(
               `modules.additional_equipment_display_names.stagingAreas`
@@ -112,7 +112,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
   )
 }
 
-const AdditionalItemImage = styled.img`
+const StagingAreaImage = styled.img`
   width: 6rem;
   max-height: 4rem;
   display: block;

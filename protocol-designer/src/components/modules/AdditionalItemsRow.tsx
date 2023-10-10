@@ -98,7 +98,7 @@ export function AdditionalItemsRow(
                 <FlexSlotMap
                   selectedSlots={
                     name === 'trashBin'
-                      ? [trashBinSlot] ?? []
+                      ? [trashBinSlot ?? '']
                       : [WASTE_CHUTE_SLOT]
                   }
                 />

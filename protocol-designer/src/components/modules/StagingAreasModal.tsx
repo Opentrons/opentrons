@@ -33,15 +33,16 @@ import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import { getStagingAreaSlots } from '../../utils'
 
 const STAGING_AREA_SLOTS = ['A3', 'B3', 'C3', 'D3']
-export interface StagingAreaValues {
+
+export interface StagingAreasValues {
   selectedSlots: string[]
 }
 
-const StagingAreaModalComponent = (
-  props: StagingAreaModalProps
+const StagingAreasModalComponent = (
+  props: StagingAreasModalProps
 ): JSX.Element => {
   const { onCloseClick, stagingAreas } = props
-  const { values, setFieldValue } = useFormikContext<StagingAreaValues>()
+  const { values, setFieldValue } = useFormikContext<StagingAreasValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const areSlotsEmpty = values.selectedSlots.map(slot =>
     getSlotIsEmpty(initialDeckSetup, slot)
@@ -96,7 +97,7 @@ const StagingAreaModalComponent = (
     setFieldValue('selectedSlots', updatedSelectedSlots)
   }
 
-  const handleClickRemove = (fixtureLocation: string) => {
+  const handleClickRemove = (fixtureLocation: string): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
       if (slot.fixtureLocation === fixtureLocation) {
         return {
@@ -163,17 +164,19 @@ const StagingAreaModalComponent = (
   )
 }
 
-export interface StagingAreaModalProps {
+export interface StagingAreasModalProps {
   onCloseClick: () => void
   stagingAreas: AdditionalEquipmentEntity[]
 }
 
-export const StagingAreaModal = (props: StagingAreaModalProps): JSX.Element => {
+export const StagingAreasModal = (
+  props: StagingAreasModalProps
+): JSX.Element => {
   const { onCloseClick, stagingAreas } = props
   const dispatch = useDispatch()
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
-  const onSaveClick = (values: StagingAreaValues): void => {
+  const onSaveClick = (values: StagingAreasValues): void => {
     onCloseClick()
 
     values.selectedSlots.forEach(slot => {
@@ -201,7 +204,7 @@ export const StagingAreaModal = (props: StagingAreaModalProps): JSX.Element => {
             {i18n.t(`modules.additional_equipment_display_names.stagingAreas`)}
           </Text>
         </Box>
-        <StagingAreaModalComponent
+        <StagingAreasModalComponent
           onCloseClick={onCloseClick}
           stagingAreas={stagingAreas}
         />

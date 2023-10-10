@@ -2,8 +2,6 @@ import * as React from 'react'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  ModuleType,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { RobotCoordinateSpace } from '@opentrons/components/src/hardware-sim/RobotCoordinateSpace'
 import { DeckSlotLocation } from '@opentrons/components/src/hardware-sim/DeckSlotLocation'
@@ -19,11 +17,9 @@ import {
 
 interface FlexSlotMapProps {
   selectedSlots: string[]
-  //    need to special case the TC GEN2 to select 2 slots
-  moduleType?: ModuleType
 }
 export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
-  const { moduleType, selectedSlots } = props
+  const { selectedSlots } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const slotFill = (
     <Flex
@@ -56,12 +52,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
         const slot = deckDef.locations.orderedSlots.find(
           slot => slot.id === selectedSlot
         )
-        const aOneSlot = deckDef.locations.orderedSlots.find(
-          slot => slot.id === 'A1'
-        )
         const [xSlotPosition = 0, ySlotPosition = 0] = slot?.position ?? []
-        const [xSlotPosition2 = 0, ySlotPosition2 = 0] =
-          aOneSlot?.position ?? []
 
         const isLeftSideofDeck =
           selectedSlot === 'A1' ||
@@ -83,30 +74,16 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
         const yDimension = 106.0
 
         return (
-          <>
-            <RobotCoordsForeignObject
-              width={xDimension}
-              height={yDimension}
-              x={x}
-              y={y}
-              flexProps={{ flex: '1' }}
-              foreignObjectProps={{ flex: '1' }}
-            >
-              {slotFill}
-            </RobotCoordsForeignObject>
-            {moduleType === THERMOCYCLER_MODULE_TYPE ? (
-              <RobotCoordsForeignObject
-                width={xDimension}
-                height={yDimension}
-                x={xAdjustment}
-                y={ySlotPosition2 + yAdjustment}
-                flexProps={{ flex: '1' }}
-                foreignObjectProps={{ flex: '1' }}
-              >
-                {slotFill}
-              </RobotCoordsForeignObject>
-            ) : null}
-          </>
+          <RobotCoordsForeignObject
+            width={xDimension}
+            height={yDimension}
+            x={x}
+            y={y}
+            flexProps={{ flex: '1' }}
+            foreignObjectProps={{ flex: '1' }}
+          >
+            {slotFill}
+          </RobotCoordsForeignObject>
         )
       })}
     </RobotCoordinateSpace>

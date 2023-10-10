@@ -41,7 +41,11 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   const { onCloseClick, trashName } = props
   const { values } = useFormikContext<TrashValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, values.selectedSlot)
+  const isSlotEmpty = getSlotIsEmpty(
+    initialDeckSetup,
+    values.selectedSlot,
+    trashName === 'trashBin'
+  )
   const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const [field] = useField('selectedSlot')
 
