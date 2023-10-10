@@ -32,11 +32,22 @@ class StaticPythonInfo:
 @dataclass(frozen=True)
 class _ProtocolCommon:
     text: str
+
     filename: Optional[str]
+    """The original name of the main protocol file, if it had a name.
+
+    For JSON protocols, this will be the name of the .json file.
+    For Python protocols, this will be the name of the .py file.
+    For bundled protocols, this will be the name of the .zip file.
+
+    This can be `None` if, for example, we've parsed the protocol from an in-memory text stream.
+    """
+
     # TODO(mm, 2023-06-22): Move api_level out of _ProtocolCommon and into PythonProtocol.
     # JSON protocols do not have an intrinsic api_level, especially since JSONv6,
     # where they are no longer executed via the Python Protocol API.
     api_level: "APIVersion"
+
     robot_type: RobotType
 
 
