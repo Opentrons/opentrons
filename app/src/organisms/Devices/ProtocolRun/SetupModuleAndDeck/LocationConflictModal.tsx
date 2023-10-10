@@ -19,20 +19,24 @@ import {
   Box,
 } from '@opentrons/components'
 import {
-  Fixture,
-  FixtureLoadName,
   getFixtureDisplayName,
   getModuleDisplayName,
-  ModuleModel,
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
 import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
+import type {
+  Cutout,
+  Fixture,
+  FixtureLoadName,
+  ModuleModel,
+} from '@opentrons/shared-data'
+
 interface LocationConflictModalProps {
   onCloseClick: () => void
-  cutout: string
+  cutout: Cutout
   requiredFixture?: FixtureLoadName
   requiredModule?: ModuleModel
 }

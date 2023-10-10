@@ -28,12 +28,12 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
-import type { FixtureLoadName } from '@opentrons/shared-data'
+import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 interface AddDeckConfigurationModalProps {
-  fixtureLocation: string
+  fixtureLocation: Cutout
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
   isOnDevice?: boolean
 }

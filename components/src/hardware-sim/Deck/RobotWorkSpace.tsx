@@ -3,7 +3,7 @@ import { StyleProps, Svg } from '../../primitives'
 import { StyledDeck } from './StyledDeck'
 
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
-import type { TrashSlotName } from './FlexTrash'
+import type { TrashLocation } from './FlexTrash'
 
 export interface RobotWorkSpaceRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }
@@ -19,7 +19,8 @@ export interface RobotWorkSpaceProps extends StyleProps {
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
   deckFill?: string
   deckLayerBlocklist?: string[]
-  trashSlotName?: TrashSlotName
+  // TODO(bh, 2023-10-09): remove
+  trashSlotName?: TrashLocation
   trashColor?: string
   id?: string
 }
@@ -84,7 +85,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
           deckFill={deckFill}
           def={deckDef}
           layerBlocklist={deckLayerBlocklist}
-          trashSlotName={trashSlotName}
+          trashLocation={trashSlotName}
           trashColor={trashColor}
         />
       )}

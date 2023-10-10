@@ -11,6 +11,8 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
+import type { Cutout } from '@opentrons/shared-data'
+
 // TODO: replace stubs with JSON definitions when available
 const standardSlotDef = {
   schemaVersion: 1,
@@ -30,8 +32,8 @@ const standardSlotDef = {
 }
 
 interface EmptyFixtureProps {
-  fixtureLocation: string
-  handleClickAdd: (fixtureLocation: string) => void
+  fixtureLocation: Cutout
+  handleClickAdd: (fixtureLocation: Cutout) => void
 }
 
 export function EmptyFixture(props: EmptyFixtureProps): JSX.Element {

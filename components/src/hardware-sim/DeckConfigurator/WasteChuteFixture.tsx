@@ -11,6 +11,8 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
+import type { Cutout } from '@opentrons/shared-data'
+
 // TODO: replace stubs with JSON definitions when available
 const wasteChuteDef = {
   schemaVersion: 1,
@@ -30,8 +32,8 @@ const wasteChuteDef = {
 }
 
 interface WasteChuteFixtureProps {
-  fixtureLocation: string
-  handleClickRemove?: (fixtureLocation: string) => void
+  fixtureLocation: Cutout
+  handleClickRemove?: (fixtureLocation: Cutout) => void
 }
 
 export function WasteChuteFixture(props: WasteChuteFixtureProps): JSX.Element {

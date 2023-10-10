@@ -18,12 +18,12 @@ import { StagingAreaFixture } from './StagingAreaFixture'
 import { TrashBinFixture } from './TrashBinFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { Cutout, DeckConfiguration } from '@opentrons/shared-data'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
-  handleClickAdd: (fixtureLocation: string) => void
-  handleClickRemove: (fixtureLocation: string) => void
+  handleClickAdd: (fixtureLocation: Cutout) => void
+  handleClickRemove: (fixtureLocation: Cutout) => void
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode

@@ -11,13 +11,15 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
+import type { Cutout } from '@opentrons/shared-data'
+
 // TODO: replace stubs with JSON definitions when available
 const trashBinDef = {
   schemaVersion: 1,
   version: 1,
   namespace: 'opentrons',
   metadata: {
-    displayName: 'Trash',
+    displayName: 'Trash bin',
   },
   parameters: {
     loadName: 'trash_bin',
@@ -30,8 +32,8 @@ const trashBinDef = {
 }
 
 interface TrashBinFixtureProps {
-  fixtureLocation: string
-  handleClickRemove?: (fixtureLocation: string) => void
+  fixtureLocation: Cutout
+  handleClickRemove?: (fixtureLocation: Cutout) => void
 }
 
 export function TrashBinFixture(props: TrashBinFixtureProps): JSX.Element {

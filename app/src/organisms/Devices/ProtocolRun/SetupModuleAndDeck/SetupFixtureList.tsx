@@ -33,6 +33,7 @@ import { LocationConflictModal } from './LocationConflictModal'
 import { getFixtureImage } from './utils'
 
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+import type { Cutout } from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   loadedFixturesBySlot: LoadedFixturesBySlot
@@ -100,7 +101,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 interface FixtureListItemProps {
   loadedFixtures: LoadFixtureRunTimeCommand[]
   loadName: FixtureLoadName
-  cutout: string
+  cutout: Cutout
   commandId: string
 }
 

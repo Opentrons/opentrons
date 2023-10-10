@@ -1,4 +1,5 @@
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 
 import type { Fixture, LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
 
@@ -34,7 +35,8 @@ export function useLoadedFixturesConfigStatus(
       configurationStatus = CONFIGURED
     } else if (
       deckConfigurationAtLocation != null &&
-      deckConfigurationAtLocation.loadName !== loadedFixture.params.loadName
+      deckConfigurationAtLocation.loadName !== loadedFixture.params.loadName &&
+      deckConfigurationAtLocation.loadName !== STANDARD_SLOT_LOAD_NAME
     ) {
       configurationStatus = CONFLICTING
     }
