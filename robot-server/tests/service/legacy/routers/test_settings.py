@@ -514,6 +514,7 @@ def test_available_resets(api_client):
             "bootScripts",
             "tipLengthCalibrations",
             "runsHistory",
+            "authorizedKeys",
         ]
     ) == sorted([item["id"] for item in options_list])
 
@@ -551,6 +552,7 @@ def mock_persistence_resetter(
                 "pipetteOffsetCalibrations": False,
                 "tipLengthCalibrations": False,
                 "runsHistory": False,
+                "authorizedKeys": False,
             },
             set(),
         ],
@@ -562,6 +564,7 @@ def mock_persistence_resetter(
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
                 "runsHistory": True,
+                "authorizedKeys": True,
                 # TODO(mm, 2023-08-04): Figure out how to test Flex-only options,
                 # then add gripperOffsetCalibrations and onDeviceDisplay.
             },
@@ -575,8 +578,10 @@ def mock_persistence_resetter(
                 # mark_directory_reset() being an async method, and api_client having
                 # its own event loop that interferes with making this test async.
                 ResetOptionId.runs_history,
+                ResetOptionId.authorized_keys,
             },
         ],
+        [{"authorizedKeys": True}, {ResetOptionId.authorized_keys}],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],
         [{"pipetteOffsetCalibrations": True}, {ResetOptionId.pipette_offset}],
         [{"tipLengthCalibrations": True}, {ResetOptionId.tip_length_calibrations}],
