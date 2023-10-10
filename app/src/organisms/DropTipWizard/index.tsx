@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { UseMutateFunction } from 'react-query'
 import {
@@ -26,7 +26,6 @@ import {
   useCreateTargetedMaintenanceRunMutation,
 } from '../../resources/runs/hooks'
 
-import type { AxiosError } from 'axios'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
@@ -34,12 +33,14 @@ import type {
 } from '@opentrons/api-client'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
-import { BEFORE_BEGINNING, BLOWOUT_SUCCESS, CHOOSE_BLOWOUT_LOCATION, CHOOSE_DROP_TIP_LOCATION, DROP_TIP_SUCCESS, POSITION_AND_BLOWOUT, POSITION_AND_DROP_TIP } from './constants'
+import { BLOWOUT_SUCCESS, CHOOSE_BLOWOUT_LOCATION, CHOOSE_DROP_TIP_LOCATION, DROP_TIP_SUCCESS, POSITION_AND_BLOWOUT, POSITION_AND_DROP_TIP } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
+import { StyledText } from '../../atoms/text'
+import { Jog } from '../../molecules/JogControls'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -53,7 +54,7 @@ interface MaintenanceRunManagerProps {
 export function DropTipWizard(
   props: MaintenanceRunManagerProps
 ): JSX.Element {
-  const { closeFlow, mount, instrumentModelSpecs } = props
+  const { closeFlow, mount, instrumentModelSpecs, robotType } = props
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
@@ -144,6 +145,7 @@ export function DropTipWizard(
 
   return (
     <DropTipWizardComponent
+      robotType={robotType}
       createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
       mount={mount}
@@ -164,6 +166,7 @@ export function DropTipWizard(
 }
 
 interface DropTipWizardProps {
+  robotType: RobotType
   mount: PipetteData['mount']
   createdMaintenanceRunId: string | null
   createMaintenanceRun: CreateMaintenanceRunType
@@ -187,6 +190,7 @@ export const DropTipWizardComponent = (
   props: DropTipWizardProps
 ): JSX.Element | null => {
   const {
+    robotType,
     // maintenanceRunId,
     createMaintenanceRun,
     handleCleanUpAndClose,
@@ -201,7 +205,7 @@ export const DropTipWizardComponent = (
     createdMaintenanceRunId,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
-  const { t } = useTranslation('drop_tip_wizard')
+  const { t, i18n } = useTranslation('drop_tip_wizard')
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [shouldDispenseLiquid, setShouldDispenseLiquid] = React.useState<boolean | null>(null)
@@ -218,6 +222,9 @@ export const DropTipWizardComponent = (
     } else {
       setCurrentStepIndex(currentStepIndex + 1)
     }
+  }
+  const handleJog: Jog = (axis, direction, step) => {
+    console.log('TODO Jog with params: ', axis, direction, step)
   }
 
   const {
@@ -267,14 +274,22 @@ export const DropTipWizardComponent = (
   } else if (currentStep === CHOOSE_BLOWOUT_LOCATION || currentStep === CHOOSE_DROP_TIP_LOCATION) {
     modalContent = (
       <ChooseLocation
+        robotType={robotType}
         handleProceed={proceed}
         title={currentStep === CHOOSE_BLOWOUT_LOCATION ? t('choose_blowout_location') : t('choose_drop_tip_location')}
-        body={currentStep === CHOOSE_BLOWOUT_LOCATION ? t('select_blowout_slot') : t('select_drop_tip_slot')}
+        body={(
+          <Trans
+            t={t}
+            i18nKey={currentStep === CHOOSE_BLOWOUT_LOCATION ? 'select_blowout_slot' : 'select_drop_tip_slot'}
+            components={{ block: <StyledText as="p" /> }}
+          />
+        )}
       />
     )
   } else if (currentStep === POSITION_AND_BLOWOUT || currentStep === POSITION_AND_DROP_TIP) {
     modalContent = (
       <JogToPosition
+        handleJog={handleJog}
         handleProceed={proceed}
         handleGoBack={goBack}
         body={currentStep === POSITION_AND_BLOWOUT ? t('position_and_blowout') : t('position_and_drop_tip')}
@@ -299,7 +314,7 @@ export const DropTipWizardComponent = (
 
   const wizardHeader = (
     <WizardHeader
-      title={t('drop_tips')}
+      title={i18n.format(t('drop_tips'), 'capitalize')}
       currentStep={shouldDispenseLiquid != null ? currentStepIndex + 1 : null}
       totalSteps={DropTipWizardSteps.length}
       onExit={handleExit}

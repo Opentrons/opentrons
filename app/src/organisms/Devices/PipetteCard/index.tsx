@@ -17,8 +17,10 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   isFlexPipette,
   NINETY_SIX_CHANNEL,
+  OT2_ROBOT_TYPE,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
@@ -103,11 +105,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const isOt3 = useIsFlex(robotName)
-
-  const robotModel = useSelector((state: State) =>
-    getRobotModelByName(state, robotName)
-  )
+  const isFlex = useIsFlex(robotName)
   const pipetteName = pipetteModelSpecs?.name
   const isFlexPipetteAttached = isFlexPipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteModelSpecs?.displayName
@@ -127,7 +125,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     subsystem,
     {
-      enabled: isOt3 && pipetteIsBad,
+      enabled: isFlex && pipetteIsBad,
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
@@ -141,9 +139,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
 
   const handleChangePipette = (): void => {
-    if (isFlexPipetteAttached && isOt3) {
+    if (isFlexPipetteAttached && isFlex) {
       setPipetteWizardFlow(FLOWS.DETACH)
-    } else if (!isFlexPipetteAttached && isOt3) {
+    } else if (!isFlexPipetteAttached && isFlex) {
       setShowAttachPipette(true)
     } else {
       setChangePipette(true)
@@ -207,7 +205,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       )}
       {showDropTipWizard && pipetteModelSpecs != null ? (
         <DropTipWizard
-        robotType={getRobotByName(robotName)}
+          robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
           mount={mount}
           instrumentModelSpecs={pipetteModelSpecs}
           closeFlow={() => setShowDropTipWizard(false)}
@@ -248,9 +246,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     pipetteSpecs={pipetteModelSpecs}
                     mount={mount}
                     //  pipette images for Flex are slightly smaller so need to be scaled accordingly
-                    transform={isOt3 ? 'scale(0.4)' : 'scale(0.3)'}
+                    transform={isFlex ? 'scale(0.4)' : 'scale(0.3)'}
                     size="3.125rem"
-                    transformOrigin={isOt3 ? '-50% -10%' : '20% -10%'}
+                    transformOrigin={isFlex ? '-50% -10%' : '20% -10%'}
                   />
                 ) : null}
               </Flex>

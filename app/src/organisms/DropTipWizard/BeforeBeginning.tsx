@@ -24,7 +24,7 @@ export const BeforeBeginning = (
     isCreateLoading,
     setShouldDispenseLiquid
   } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<'liquid_and_tips' | 'only_tips'>('liquid_and_tips')
   const handleProceed = (): void => {
     createMaintenanceRun({})
@@ -66,7 +66,7 @@ export const BeforeBeginning = (
         <PrimaryButton
           disabled={isCreateLoading}
           onClick={handleProceed}>
-          {t('shared:continue')}
+          {i18n.format(t('shared:continue'), 'capitalize')}
         </PrimaryButton>
       </Flex>
     </Flex>
