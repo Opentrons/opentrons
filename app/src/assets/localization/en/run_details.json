@@ -38,6 +38,7 @@
   "error_info": "Error {{errorCode}}: {{errorType}}",
   "error_type": "Error: {{errorType}}",
   "failed_step": "Failed step",
+  "final_step": "Final Step",
   "ignore_stored_data": "Ignore stored data",
   "labware_offset_data": "labware offset data",
   "labware": "labware",

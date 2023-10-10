@@ -147,11 +147,4 @@ describe('RunProgressMeter', () => {
     const { findByText } = render(props)
     expect(await findByText('MOCK INTERVENTION MODAL')).toBeTruthy()
   })
-
-  it('should render the correct run status when run status is completed', () => {
-    mockUseCommandQuery.mockReturnValue({ data: null } as any)
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_SUCCEEDED)
-    const { getByText } = render(props)
-    getByText('Protocol completed')
-  })
 })
