@@ -8,20 +8,20 @@ import {
   DIRECTION_COLUMN,
   LabeledValue,
   SPACING,
-  Tooltip,
-  useHoverTooltip,
   Box,
   TYPOGRAPHY,
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import gripperImage from '../../images/flex_gripper.png'
+import stagingAreaImage from '../../images/staging_area.png'
 import { Portal } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.css'
 import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import { getStagingAreaSlots } from '../../utils'
+import { StagingAreaModal } from './StagingAreaModal'
 
 interface StagingAreasRowProps {
   handleAttachment: () => void
@@ -30,20 +30,18 @@ interface StagingAreasRowProps {
 
 export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
   const { handleAttachment, stagingAreas } = props
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const hasStagingAreas = stagingAreas.length > 0
   const [trashModal, openTrashModal] = React.useState<boolean>(false)
-  //    we can assume that the location is always a string
-  const stagingAreaLocations = stagingAreas.map(area => area.location as string)
+  const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
   return (
     <>
       {trashModal ? (
         <Portal>
-          {/* <TrashModal
-            onCloseClick={() => openTrashModal(false)}
-            trashName={name}
-            trashBinId={trashBinId}
-          /> */}
+          <StagingAreaModal
+            onCloseClick={handleAttachment}
+            stagingAreas={stagingAreas}
+          />
         </Portal>
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -53,29 +51,35 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
 
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <AdditionalItemImage
-            //  TODO(jr, 9/13/23): update this image to the waste chute and trash asset
-            src={gripperImage}
+            src={stagingAreaImage}
             alt={i18n.t(
               `modules.additional_equipment_display_names.stagingAreas`
             )}
           />
+          <div
+            className={styles.module_col}
+            style={{ marginLeft: SPACING.spacing32 }}
+          />
+          {hasStagingAreas ? (
+            <>
+              <div className={styles.module_col}>
+                <LabeledValue
+                  label="Position"
+                  value={`Slots ${stagingAreaLocations}`}
+                />
+              </div>
 
-          <div className={styles.module_col}>
-            <LabeledValue
-              label="Position"
-              value={`Slots in ${stagingAreaLocations}`}
-            />
-          </div>
-          <div className={styles.slot_map}>
-            <FlexSlotMap selectedSlot={WASTE_CHUTE_SLOT} />
-          </div>
-
+              <div className={styles.slot_map}>
+                <FlexSlotMap selectedSlot={WASTE_CHUTE_SLOT} />
+              </div>
+            </>
+          ) : null}
           <Box
             flexDirection={DIRECTION_ROW}
             flex="1 0 40%"
             textAlign={TYPOGRAPHY.textAlignRight}
           >
-            {stagingAreas.length > 0 ? (
+            {hasStagingAreas ? (
               <OutlineButton
                 onClick={() => openTrashModal(true)}
                 className={styles.module_button}
@@ -84,29 +88,23 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
               </OutlineButton>
             ) : null}
             <Box
-              {...targetProps}
               width="6.75rem"
               display="inline-block"
               marginRight={SPACING.spacing16}
             >
               <OutlineButton
                 className={styles.module_button}
-                onClick={handleAttachment}
+                onClick={
+                  hasStagingAreas
+                    ? handleAttachment
+                    : () => openTrashModal(true)
+                }
               >
-                {stagingAreas.length > 0
+                {hasStagingAreas
                   ? i18n.t('shared.remove')
                   : i18n.t('shared.add')}
               </OutlineButton>
             </Box>
-            {/* {disabledRemoveButton ? (
-              <Tooltip
-                {...tooltipProps}
-                width="10rem"
-                textAlign={TYPOGRAPHY.textAlignCenter}
-              >
-                {i18n.t(`tooltip.disabled_cannot_delete_trash`)}
-              </Tooltip>
-            ) : null} */}
           </Box>
         </Flex>
       </Flex>

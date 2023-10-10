@@ -112,6 +112,12 @@ export function EditModulesCard(props: Props): JSX.Element {
         : moduleType !== 'magneticBlockType'
   )
 
+  const handleDeleteStagingAreas = (): void => {
+    stagingAreas.forEach(stagingArea => {
+      dispatch(deleteDeckFixture(stagingArea.id))
+    })
+  }
+
   return (
     <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
@@ -134,12 +140,6 @@ export function EditModulesCard(props: Props): JSX.Element {
               name="gripper"
             />
           </Box>
-        ) : null}
-        {enableDeckModification && isFlex ? (
-          <StagingAreasRow
-            handleAttachment={() => console.log('wire this up')}
-            stagingAreas={stagingAreas}
-          />
         ) : null}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
           const moduleData = modules[moduleType]
@@ -166,6 +166,10 @@ export function EditModulesCard(props: Props): JSX.Element {
         })}
         {enableDeckModification && isFlex ? (
           <>
+            <StagingAreasRow
+              handleAttachment={handleDeleteStagingAreas}
+              stagingAreas={stagingAreas}
+            />
             <AdditionalItemsRow
               handleAttachment={() =>
                 trashBin != null

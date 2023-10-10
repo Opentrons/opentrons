@@ -208,6 +208,24 @@ export function CreateFileWizard(): JSX.Element | null {
         )
       }
 
+      // add waste chute
+      if (
+        enableDeckModification &&
+        values.additionalEquipment.includes('wasteChute')
+      ) {
+        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+      }
+      //  add staging areas
+      const stagingAreas = values.additionalEquipment.filter(equipment =>
+        equipment.includes('stagingArea')
+      )
+      if (enableDeckModification && stagingAreas.length > 0) {
+        stagingAreas.forEach(stagingArea => {
+          const [, location] = stagingArea.split('_')
+          dispatch(createDeckFixture('stagingArea', location))
+        })
+      }
+
       if (!enableDeckModification) {
         dispatch(
           labwareIngredActions.createContainer({
@@ -235,24 +253,6 @@ export function CreateFileWizard(): JSX.Element | null {
           })
         )
       })
-
-      // add waste chute
-      if (
-        enableDeckModification &&
-        values.additionalEquipment.includes('wasteChute')
-      ) {
-        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
-      }
-      //  add staging areas
-      const stagingAreas = values.additionalEquipment.filter(equipment =>
-        equipment.includes('stagingArea')
-      )
-      if (enableDeckModification && stagingAreas.length > 0) {
-        stagingAreas.forEach(stagingArea => {
-          const [, location] = stagingArea.split('_')
-          dispatch(createDeckFixture('stagingArea', location))
-        })
-      }
     }
   }
   const wizardHeader = (
