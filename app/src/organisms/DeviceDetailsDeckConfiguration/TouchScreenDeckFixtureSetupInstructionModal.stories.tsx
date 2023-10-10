@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { touchScreenViewport } from '../../DesignTokens/constants'
-import { DeckFixtureSetupInstructionModal } from './DeckFixtureSetupInstructionModal'
+import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Organisms/DeckFixtureSetupInstructionModal',
+  title: 'ODD/Organisms/DeckFixtureSetupInstructionsModal',
   argTypes: {
     modalSize: {
       options: ['small', 'medium', 'large'],
@@ -16,9 +16,10 @@ export default {
 } as Meta
 
 const Template: Story<
-  React.ComponentProps<typeof DeckFixtureSetupInstructionModal>
-> = args => <DeckFixtureSetupInstructionModal {...args} />
+  React.ComponentProps<typeof DeckFixtureSetupInstructionsModal>
+> = args => <DeckFixtureSetupInstructionsModal {...args} />
 export const Default = Template.bind({})
 Default.args = {
   setShowSetupInstructionsModal: () => {},
+  isOnDevice: true,
 }

@@ -105,12 +105,12 @@ export function usePipetteFlowWizardHeaderText(
         attachedPipettes[LEFT] != null &&
         attachedPipettes[RIGHT] == null
       ) {
-        return t('detach_mount_attach_96', { mount: capitalize(RIGHT) })
+        return t('detach_mount_attach_96', { mount: capitalize(LEFT) })
       } else if (
         attachedPipettes[LEFT] == null &&
         attachedPipettes[RIGHT] != null
       ) {
-        return t('detach_mount_attach_96', { mount: capitalize(LEFT) })
+        return t('detach_mount_attach_96', { mount: capitalize(RIGHT) })
       } else {
         return t('detach_pipettes_attach_96')
       }

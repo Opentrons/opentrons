@@ -8,28 +8,37 @@ import {
   useHoverTooltip,
   PrimaryButton,
 } from '@opentrons/components'
-import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { Tooltip } from '../../../../atoms/Tooltip'
+import { useFeatureFlag } from '../../../../redux/config'
+import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
+import { SetupFixtureList } from './SetupFixtureList'
+import type { LoadedFixturesBySlot } from '@opentrons/api-client'
 
-interface SetupModulesProps {
+interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
+  loadedFixturesBySlot: LoadedFixturesBySlot
+  hasModules: boolean
 }
 
-export const SetupModules = ({
+export const SetupModuleAndDeck = ({
   expandLabwarePositionCheckStep,
   robotName,
   runId,
-}: SetupModulesProps): JSX.Element => {
+  loadedFixturesBySlot,
+  hasModules,
+}: SetupModuleAndDeckProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
     t('map_view')
   )
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const runHasStarted = useRunHasStarted(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -38,7 +47,15 @@ export const SetupModules = ({
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing32}>
         {toggleGroup}
         {selectedValue === t('list_view') ? (
-          <SetupModulesList robotName={robotName} runId={runId} />
+          <>
+            {hasModules ? (
+              <SetupModulesList robotName={robotName} runId={runId} />
+            ) : null}
+            {Object.keys(loadedFixturesBySlot).length > 0 &&
+            enableDeckConfig ? (
+              <SetupFixtureList loadedFixturesBySlot={loadedFixturesBySlot} />
+            ) : null}
+          </>
         ) : (
           <SetupModulesMap robotName={robotName} runId={runId} />
         )}

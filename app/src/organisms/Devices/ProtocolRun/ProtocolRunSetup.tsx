@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { parseAllRequiredModuleModels } from '@opentrons/api-client'
+import {
+  LoadedFixturesBySlot,
+  parseAllRequiredModuleModels,
+} from '@opentrons/api-client'
 import {
   Flex,
   ALIGN_CENTER,
@@ -14,9 +17,15 @@ import {
   TYPOGRAPHY,
   Link,
 } from '@opentrons/components'
+import {
+  STAGING_AREA_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
+} from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
+import { useFeatureFlag } from '../../../redux/config'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   useIsFlex,
@@ -31,7 +40,7 @@ import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMo
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
-import { SetupModules } from './SetupModules'
+import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
@@ -66,6 +75,53 @@ export function ProtocolRunSetup({
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+  //  TODO(Jr, 10/4/23): stubbed in the fixtures for now - delete IMMEDIATELY
+  // const loadedFixturesBySlot = parseInitialLoadedFixturesByCutout(
+  //   protocolData?.commands ?? []
+  // )
+
+  const STUBBED_LOAD_FIXTURE_BY_SLOT: LoadedFixturesBySlot = {
+    D3: {
+      id: 'stubbed_load_fixture',
+      commandType: 'loadFixture',
+      params: {
+        fixtureId: 'stubbedFixtureId',
+        loadName: WASTE_CHUTE_LOAD_NAME,
+        location: { cutout: 'D3' },
+      },
+      createdAt: 'fakeTimestamp',
+      startedAt: 'fakeTimestamp',
+      completedAt: 'fakeTimestamp',
+      status: 'succeeded',
+    },
+    B3: {
+      id: 'stubbed_load_fixture_2',
+      commandType: 'loadFixture',
+      params: {
+        fixtureId: 'stubbedFixtureId_2',
+        loadName: STAGING_AREA_LOAD_NAME,
+        location: { cutout: 'B3' },
+      },
+      createdAt: 'fakeTimestamp',
+      startedAt: 'fakeTimestamp',
+      completedAt: 'fakeTimestamp',
+      status: 'succeeded',
+    },
+    C3: {
+      id: 'stubbed_load_fixture_2',
+      commandType: 'loadFixture',
+      params: {
+        fixtureId: 'stubbedFixtureId_2',
+        loadName: TRASH_BIN_LOAD_NAME,
+        location: { cutout: 'C3' },
+      },
+      createdAt: 'fakeTimestamp',
+      startedAt: 'fakeTimestamp',
+      completedAt: 'fakeTimestamp',
+      status: 'succeeded',
+    },
+  }
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
   const isOT3 = useIsFlex(robotName)
@@ -111,6 +167,19 @@ export function ProtocolRunSetup({
   if (robot == null) return null
   const hasLiquids = protocolData != null && protocolData.liquids?.length > 0
   const hasModules = protocolData != null && modules.length > 0
+  const hasFixtures =
+    protocolData != null && Object.keys(STUBBED_LOAD_FIXTURE_BY_SLOT).length > 0
+
+  let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
+    count: modules.length,
+  })
+  if (!hasModules && !enableDeckConfig) {
+    moduleDescription = i18n.format(t('no_modules_specified'), 'capitalize')
+  } else if (isOT3 && enableDeckConfig && (hasModules || hasFixtures)) {
+    moduleDescription = t('install_modules_and_fixtures')
+  } else if (isOT3 && enableDeckConfig && !hasModules && !hasFixtures) {
+    moduleDescription = t('no_modules_or_fixtures')
+  }
 
   const StepDetailMap: Record<
     StepKey,
@@ -139,17 +208,15 @@ export function ProtocolRunSetup({
     },
     [MODULE_SETUP_KEY]: {
       stepInternals: (
-        <SetupModules
+        <SetupModuleAndDeck
           expandLabwarePositionCheckStep={() => setExpandedStepKey(LPC_KEY)}
           robotName={robotName}
           runId={runId}
+          loadedFixturesBySlot={STUBBED_LOAD_FIXTURE_BY_SLOT}
+          hasModules={hasModules}
         />
       ),
-      description: !hasModules
-        ? i18n.format(t('no_modules_specified'), 'capitalize')
-        : t(`${MODULE_SETUP_KEY}_description`, {
-            count: modules.length,
-          }),
+      description: moduleDescription,
     },
     [LPC_KEY]: {
       stepInternals: (
@@ -207,40 +274,51 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </StyledText>
           ) : (
-            stepsKeysInOrder.map((stepKey, index) => (
-              <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
-                {(stepKey === 'liquid_setup_step' && !hasLiquids) ||
-                (stepKey === 'module_setup_step' && !hasModules) ? (
-                  <EmptySetupStep
-                    title={t(`${stepKey}_title`)}
-                    description={StepDetailMap[stepKey].description}
-                    label={t('step', { index: index + 1 })}
-                  />
-                ) : (
-                  <SetupStep
-                    expanded={stepKey === expandedStepKey}
-                    label={t('step', { index: index + 1 })}
-                    title={t(`${stepKey}_title`)}
-                    description={StepDetailMap[stepKey].description}
-                    toggleExpanded={() =>
-                      stepKey === expandedStepKey
-                        ? setExpandedStepKey(null)
-                        : setExpandedStepKey(stepKey)
-                    }
-                    rightElement={
-                      <StepRightElement
-                        {...{ stepKey, runHasStarted, calibrationStatus }}
-                      />
-                    }
-                  >
-                    {StepDetailMap[stepKey].stepInternals}
-                  </SetupStep>
-                )}
-                {index !== stepsKeysInOrder.length - 1 ? (
-                  <Line marginTop={SPACING.spacing24} />
-                ) : null}
-              </Flex>
-            ))
+            stepsKeysInOrder.map((stepKey, index) => {
+              const setupStepTitle = t(
+                isOT3 && stepKey === MODULE_SETUP_KEY && enableDeckConfig
+                  ? `module_and_deck_setup`
+                  : `${stepKey}_title`
+              )
+              const showEmptySetupStep =
+                (stepKey === 'liquid_setup_step' && !hasLiquids) ||
+                (stepKey === 'module_setup_step' &&
+                  ((!enableDeckConfig && !hasModules) ||
+                    (enableDeckConfig && !hasModules && !hasFixtures)))
+              return (
+                <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
+                  {showEmptySetupStep ? (
+                    <EmptySetupStep
+                      title={t(`${stepKey}_title`)}
+                      description={StepDetailMap[stepKey].description}
+                      label={t('step', { index: index + 1 })}
+                    />
+                  ) : (
+                    <SetupStep
+                      expanded={stepKey === expandedStepKey}
+                      label={t('step', { index: index + 1 })}
+                      title={setupStepTitle}
+                      description={StepDetailMap[stepKey].description}
+                      toggleExpanded={() =>
+                        stepKey === expandedStepKey
+                          ? setExpandedStepKey(null)
+                          : setExpandedStepKey(stepKey)
+                      }
+                      rightElement={
+                        <StepRightElement
+                          {...{ stepKey, runHasStarted, calibrationStatus }}
+                        />
+                      }
+                    >
+                      {StepDetailMap[stepKey].stepInternals}
+                    </SetupStep>
+                  )}
+                  {index !== stepsKeysInOrder.length - 1 ? (
+                    <Line marginTop={SPACING.spacing24} />
+                  ) : null}
+                </Flex>
+              )
+            })
           )}
         </>
       ) : (

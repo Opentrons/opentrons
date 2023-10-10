@@ -29,16 +29,16 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
           ?.displayCategory ?? []
       : []
 
+  const isFlexPipette =
+    selectedPipetteDisplayCategory === 'FLEX' ||
+    selectedPipetteName === 'p1000_96'
   const tiprackOptions = allLabware
     ? Object.values(allLabware)
         .filter(def => def.metadata.displayCategory === 'tipRack')
         .filter(def => {
-          if (allowAllTipracks && selectedPipetteDisplayCategory !== 'FLEX') {
+          if (allowAllTipracks && !isFlexPipette) {
             return !def.metadata.displayName.includes('Flex')
-          } else if (
-            allowAllTipracks &&
-            selectedPipetteDisplayCategory === 'FLEX'
-          ) {
+          } else if (allowAllTipracks && isFlexPipette) {
             return def.metadata.displayName.includes('Flex')
           } else {
             return (

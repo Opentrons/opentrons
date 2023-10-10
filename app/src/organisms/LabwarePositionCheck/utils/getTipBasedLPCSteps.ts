@@ -30,7 +30,9 @@ interface LPCArgs {
   commands: RunTimeCommand[]
 }
 
-export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
+export const getTipBasedLPCSteps = (
+  args: LPCArgs
+): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
   if (checkTipRacksSectionSteps.length < 1) return []
   const allButLastTiprackCheckSteps = checkTipRacksSectionSteps.slice(

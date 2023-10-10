@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { RIGHT } from '@opentrons/shared-data'
+import { TYPOGRAPHY, COLORS } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { Skeleton } from '../../atoms/Skeleton'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { CheckPipetteButton } from './CheckPipetteButton'
@@ -28,6 +30,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     chainRunCommands,
     isOnDevice,
     flowType,
+    errorMessage,
+    setShowErrorMessage,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteWizardStep = {
@@ -42,6 +46,12 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     chainRunCommands?.(
       [
         {
+          commandType: 'home' as const,
+          params: {
+            axes: ['leftZ'],
+          },
+        },
+        {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: RIGHT,
@@ -54,8 +64,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       .then(() => {
         proceed()
       })
-      .catch(() => {
-        proceed()
+      .catch(error => {
+        setShowErrorMessage(error.message)
       })
   }
   const channel = memoizedAttachedPipettes[mount]?.data.channels
@@ -80,7 +90,26 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   }
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={
+        <Trans
+          t={t}
+          i18nKey={'detach_pipette_error'}
+          values={{ error: errorMessage }}
+          components={{
+            block: <StyledText as="p" />,
+            bold: (
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            ),
+          }}
+        />
+      }
+    />
+  ) : (
     <GenericWizardTile
       header={
         isFetching ? (

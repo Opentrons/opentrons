@@ -42,13 +42,8 @@ import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-
 import type { State } from '../../../redux/types'
-import type {
-  PipetteModelSpecs,
-  PipetteMount,
-  PipetteName,
-} from '@opentrons/shared-data'
+import type { PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type {
   PipetteWizardFlow,
@@ -181,12 +176,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {pipetteWizardFlow != null ? (
         <PipetteWizardFlows
           flowType={pipetteWizardFlow}
-          mount={
-            //  hardcoding in LEFT mount for whenever a 96 channel is selected
-            selectedPipette === NINETY_SIX_CHANNEL
-              ? LEFT
-              : (mount as PipetteMount)
-          }
+          mount={mount}
           closeFlow={() => {
             setSelectedPipette(SINGLE_MOUNT_PIPETTES)
             setPipetteWizardFlow(null)

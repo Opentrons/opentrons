@@ -1,0 +1,497 @@
+{
+  "otId": "ot3_standard",
+  "schemaVersion": 4,
+  "cornerOffsetFromOrigin": [-204.31, -76.59, 0],
+  "dimensions": [854.995, 581.74, 0],
+  "metadata": {
+    "displayName": "OT-3 Standard Deck",
+    "tags": ["ot3", "12 slots", "standard"]
+  },
+  "robot": {
+    "model": "OT-3 Standard"
+  },
+  "locations": {
+    "addressableAreas": [
+      {
+        "id": "D1",
+        "areaType": "slot",
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot D1",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "heaterShakerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "D2",
+        "areaType": "slot",
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot D2",
+        "compatibleModuleTypes": ["magneticBlockType"]
+      },
+      {
+        "id": "D3",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot D3",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "heaterShakerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "C1",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot C1",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "heaterShakerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "C2",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot C2",
+        "compatibleModuleTypes": ["magneticBlockType"]
+      },
+      {
+        "id": "C3",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot C3",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "heaterShakerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "B1",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot B1",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "thermocyclerModuleType",
+          "heaterShakerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "B2",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot B2",
+        "compatibleModuleTypes": ["magneticBlockType"]
+      },
+      {
+        "id": "B3",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot B3",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "heaterShakerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "A1",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot A1",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "heaterShakerModuleType",
+          "thermocyclerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "A2",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot A2",
+        "compatibleModuleTypes": ["magneticBlockType"]
+      },
+      {
+        "id": "A3",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot A3",
+        "compatibleModuleTypes": [
+          "temperatureModuleType",
+          "heaterShakerModuleType",
+          "magneticBlockType"
+        ]
+      },
+      {
+        "id": "A4",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot A4",
+        "compatibleModuleTypes": []
+      },
+      {
+        "id": "B4",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot B4",
+        "compatibleModuleTypes": []
+      },
+      {
+        "id": "C4",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot C4",
+        "compatibleModuleTypes": []
+      },
+      {
+        "id": "D4",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot D4",
+        "compatibleModuleTypes": []
+      },
+      {
+        "id": "movableTrash",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "1/8cWasteChute",
+        "areaType": "wasteChute",
+        "offsetFromCutoutFixture": [-13.5, 0, 0],
+        "boundingBox": {
+          "xDimension": 155.0,
+          "yDimension": 86.0,
+          "zDimension": 154.0
+        },
+        "displayName": "1/8 Channel Waste Chute",
+        "ableToDropTips": true,
+        "dropTipsOffset": [64.0, 21.91, 144.0]
+      },
+      {
+        "id": "96cWasteChute",
+        "areaType": "wasteChute",
+        "offsetFromCutoutFixture": [-13.5, 0, 0],
+        "boundingBox": {
+          "xDimension": 155.0,
+          "yDimension": 86.0,
+          "zDimension": 154.0
+        },
+        "displayName": "96 Channel Waste Chute",
+        "ableToDropTips": true,
+        "dropTipsOffset": [14.445, 42.085, 115]
+      },
+      {
+        "id": "gripperWasteChute",
+        "areaType": "wasteChute",
+        "offsetFromCutoutFixture": [-13.5, 0, 0],
+        "boundingBox": {
+          "xDimension": 155.0,
+          "yDimension": 86.0,
+          "zDimension": 154.0
+        },
+        "displayName": "Gripper Waste Chute",
+        "ableToDropLabware": true,
+        "dropLabwareOffset": [64, 29, 136.5]
+      }
+    ],
+    "cutouts": [
+      {
+        "id": "D1",
+        "position": [0.0, 0.0, 0.0],
+        "displayName": "Cutout D1",
+        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+      },
+      {
+        "id": "D2",
+        "position": [164.0, 0.0, 0.0],
+        "displayName": "Cutout D2",
+        "compatibleFixtureTypes": ["singleCenterSlot"]
+      },
+      {
+        "id": "D3",
+        "position": [328.0, 0.0, 0.0],
+        "displayName": "Cutout D3",
+        "compatibleFixtureTypes": [
+          "singleRightSlot",
+          "stagingAreaRightSlot",
+          "trashBinAdapter",
+          "wasteChuteRightAdapter",
+          "wasteChuteRightAdapterWithStagingAreaSlot"
+        ]
+      },
+      {
+        "id": "C1",
+        "position": [0.0, 107, 0.0],
+        "displayName": "Cutout C1",
+        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+      },
+      {
+        "id": "C2",
+        "position": [164.0, 107, 0.0],
+        "displayName": "Cutout C2",
+        "compatibleFixtureTypes": ["singleCenterSlot"]
+      },
+      {
+        "id": "C3",
+        "position": [328.0, 107, 0.0],
+        "displayName": "Cutout C3",
+        "compatibleFixtureTypes": [
+          "singleRightSlot",
+          "stagingAreaRightSlot",
+          "trashBinAdapter"
+        ]
+      },
+      {
+        "id": "B1",
+        "position": [0.0, 214.0, 0.0],
+        "displayName": "Cutout B1",
+        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+      },
+      {
+        "id": "B2",
+        "position": [164.0, 214.0, 0.0],
+        "displayName": "Cutout B2",
+        "compatibleFixtureTypes": ["singleCenterSlot"]
+      },
+      {
+        "id": "B3",
+        "position": [328.0, 214.0, 0.0],
+        "displayName": "Cutout B3",
+        "compatibleFixtureTypes": [
+          "singleRightSlot",
+          "stagingAreaRightSlot",
+          "trashBinAdapter"
+        ]
+      },
+      {
+        "id": "A1",
+        "position": [0.0, 321.0, 0.0],
+        "displayName": "Cutout A1",
+        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+      },
+      {
+        "id": "A2",
+        "position": [164.0, 321.0, 0.0],
+        "displayName": "Cutout A2",
+        "compatibleFixtureTypes": ["singleCenterSlot"]
+      },
+      {
+        "id": "A3",
+        "position": [328.0, 321.0, 0.0],
+        "displayName": "Cutout A3",
+        "compatibleFixtureTypes": [
+          "singleRightSlot",
+          "stagingAreaRightSlot",
+          "trashBinAdapter"
+        ]
+      }
+    ],
+    "calibrationPoints": []
+  },
+  "cutoutFixtures": [
+    {
+      "id": "singleLeftSlot",
+      "cutoutLocationIds": ["D1", "C1", "B1", "A1"],
+      "fixtureType": "singleLeftSlot",
+      "displayName": "Standard Slot Left",
+      "onFixtureAddressableAreas": {
+        "D1": ["D1"],
+        "C1": ["C1"],
+        "B1": ["B1"],
+        "A1": ["A1"]
+      }
+    },
+    {
+      "id": "singleCenterSlot",
+      "cutoutLocationIds": ["D2", "C2", "B2", "A2"],
+      "fixtureType": "singleCenterSlot",
+      "displayName": "Standard Slot Center",
+      "onFixtureAddressableAreas": {
+        "D2": ["D2"],
+        "C2": ["C2"],
+        "B2": ["B2"],
+        "A2": ["A2"]
+      }
+    },
+    {
+      "id": "singleRightSlot",
+      "cutoutLocationIds": ["D3", "C3", "B3", "A3"],
+      "fixtureType": "singleRightSlot",
+      "displayName": "Standard Slot Right",
+      "onFixtureAddressableAreas": {
+        "D3": ["D3"],
+        "C3": ["C3"],
+        "B3": ["B3"],
+        "A3": ["A3"]
+      }
+    },
+    {
+      "id": "stagingAreaRightSlot",
+      "cutoutLocationIds": ["D3", "C3", "B3", "A3"],
+      "fixtureType": "stagingAreaRightSlot",
+      "displayName": "Staging Area Slot",
+      "onFixtureAddressableAreas": {
+        "D3": ["D3", "D4"],
+        "C3": ["C3", "C4"],
+        "B3": ["B3", "B4"],
+        "A3": ["A3", "A4"]
+      }
+    },
+    {
+      "id": "trashBinAdapter",
+      "cutoutLocationIds": ["D1", "C1", "B1", "A1", "D3", "C3", "B3", "A3"],
+      "fixtureType": "trashBinAdapter",
+      "displayName": "Slot With Movable Trash",
+      "onFixtureAddressableAreas": {
+        "D1": ["movableTrash"],
+        "C1": ["movableTrash"],
+        "B1": ["movableTrash"],
+        "A1": ["movableTrash"],
+        "D3": ["movableTrash"],
+        "C3": ["movableTrash"],
+        "B3": ["movableTrash"],
+        "A3": ["movableTrash"]
+      }
+    },
+    {
+      "id": "wasteChuteRightAdapter",
+      "cutoutLocationIds": ["D3"],
+      "fixtureType": "wasteChuteRightAdapter",
+      "displayName": "Slot With Waste Chute Adapter",
+      "onFixtureAddressableAreas": {
+        "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute"]
+      }
+    },
+    {
+      "id": "wasteChuteRightAdapterWithStagingAreaSlot",
+      "cutoutLocationIds": ["D3"],
+      "fixtureType": "wasteChuteRightAdapterWithStagingAreaSlot",
+      "displayName": "Slot With Waste Chute Adapter and Staging Area Slot",
+      "onFixtureAddressableAreas": {
+        "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute", "D4"]
+      }
+    }
+  ],
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": -0.25
+      }
+    }
+  }
+}

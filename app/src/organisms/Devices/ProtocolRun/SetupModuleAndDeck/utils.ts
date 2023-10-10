@@ -4,7 +4,8 @@ import thermoModuleGen1 from '../../../../assets/images/thermocycler_closed.png'
 import heaterShakerModule from '../../../../assets/images/heater_shaker_module_transparent.png'
 import thermoModuleGen2 from '../../../../assets/images/thermocycler_gen_2_closed.png'
 import magneticBlockGen1 from '../../../../assets/images/magnetic_block_gen_1.png'
-import type { ModuleModel } from '@opentrons/shared-data'
+import stagingArea from '../../../../assets/images/staging_area_slot.png'
+import type { FixtureLoadName, ModuleModel } from '@opentrons/shared-data'
 
 export function getModuleImage(model: ModuleModel): string {
   switch (model) {
@@ -24,5 +25,25 @@ export function getModuleImage(model: ModuleModel): string {
       return magneticBlockGen1
     default:
       return 'Error: unknown module model'
+  }
+}
+
+//  TODO(jr, 10/4/23): add correct assets for wasteChute, trashBin, standardSlot
+export function getFixtureImage(fixture: FixtureLoadName): string {
+  switch (fixture) {
+    case 'stagingArea': {
+      return stagingArea
+    }
+    case 'wasteChute': {
+      return stagingArea
+    }
+    case 'standardSlot': {
+      return stagingArea
+    }
+    case 'trashBin': {
+      return stagingArea
+    }
+    default:
+      return 'Error: unknown fixture'
   }
 }

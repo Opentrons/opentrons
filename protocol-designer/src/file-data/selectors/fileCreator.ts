@@ -12,6 +12,7 @@ import {
   FLEX_STANDARD_DECKID,
   PipetteName,
   SPAN7_8_10_11_SLOT,
+  Cutout,
 } from '@opentrons/shared-data'
 import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -37,6 +38,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
   RobotState,
+  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import type {
   CreateCommand,
@@ -47,7 +49,9 @@ import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
+  LoadFixtureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -100,6 +104,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
+  getAdditionalEquipmentEntities,
 
   (
     fileMetadata,
@@ -115,7 +120,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI
+    labwareDefsByURI,
+    additionalEquipmentEntities
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -265,7 +271,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
-            displayName: def.metadata.displayName,
+            displayName:
+              labwareNicknamesById[labwareId] ?? def.metadata.displayName,
             labwareId: labwareId,
             loadName,
             namespace: namespace,
@@ -279,6 +286,30 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         }
 
         return [...acc, loadLabwareCommands]
+      },
+      []
+    )
+
+    //  TODO(jr, 10/3/23): add staging area, standard slot, and trash bin loadFixtures
+    const loadFixtureCommands = reduce<
+      AdditionalEquipmentEntity,
+      LoadFixtureCreateCommand[]
+    >(
+      Object.values(additionalEquipmentEntities),
+      (acc, additionalEquipment): LoadFixtureCreateCommand[] => {
+        if (additionalEquipment.name === 'gripper') return acc
+
+        const loadFixtureCommands = {
+          key: uuid(),
+          commandType: 'loadFixture' as const,
+          params: {
+            fixtureId: additionalEquipment.id,
+            location: { cutout: additionalEquipment.location as Cutout },
+            loadName: additionalEquipment.name,
+          },
+        }
+
+        return [...acc, loadFixtureCommands]
       },
       []
     )
@@ -315,6 +346,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareDefsByURI
     )
     const loadCommands: CreateCommand[] = [
+      ...loadFixtureCommands,
       ...loadPipetteCommands,
       ...loadModuleCommands,
       ...loadAdapterCommands,

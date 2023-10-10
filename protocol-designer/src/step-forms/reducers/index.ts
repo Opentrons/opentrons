@@ -19,6 +19,10 @@ import {
   MAGNETIC_MODULE_V1,
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
+  LoadFixtureCreateCommand,
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
@@ -1309,23 +1313,57 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       action: LoadFileAction
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
-      const gripper = Object.values(file.commands).filter(
+      const gripperCommands = Object.values(file.commands).filter(
         (command): command is MoveLabwareCreateCommand =>
           command.commandType === 'moveLabware' &&
           command.params.strategy === 'usingGripper'
       )
-      //  TODO(jr, 9/18/23): add wasteChute when loadFixture commands exist
-      const hasGripper = gripper.length > 0
-      const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
-      const additionalEquipmentId = `${uuid()}:gripper`
-      const updatedEquipment = {
-        [additionalEquipmentId]: {
+      const fixtureCommands = Object.values(file.commands).filter(
+        (command): command is LoadFixtureCreateCommand =>
+          command.commandType === 'loadFixture'
+      )
+      const fixtures = fixtureCommands.reduce(
+        (
+          acc: NormalizedAdditionalEquipmentById,
+          command: LoadFixtureCreateCommand
+        ) => {
+          const { fixtureId, loadName, location } = command.params
+          const id = fixtureId ?? ''
+          //  TODO(jr, 10/03/23): filtering out staging area for now
+          //  until it is supported
+          if (
+            loadName === STAGING_AREA_LOAD_NAME ||
+            loadName === STANDARD_SLOT_LOAD_NAME ||
+            loadName === TRASH_BIN_LOAD_NAME
+          ) {
+            return acc
+          }
+          return {
+            ...acc,
+            [id]: {
+              id: id,
+              name: loadName,
+              location: location.cutout,
+            },
+          }
+        },
+        {}
+      )
+      const hasGripper = gripperCommands.length > 0
+      const isFlex = file.robot.model === FLEX_ROBOT_TYPE
+      const gripperId = `${uuid()}:gripper`
+      const gripper = {
+        [gripperId]: {
           name: 'gripper' as const,
-          id: additionalEquipmentId,
+          id: gripperId,
         },
       }
-      if (hasGripper && isOt3) {
-        return { ...state, ...updatedEquipment }
+      if (isFlex) {
+        if (hasGripper) {
+          return { ...state, ...gripper, ...fixtures }
+        } else {
+          return { ...state, ...fixtures }
+        }
       } else {
         return { ...state }
       }

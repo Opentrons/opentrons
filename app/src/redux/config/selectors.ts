@@ -81,13 +81,6 @@ export const getIsOnDevice: (state: State) => boolean = createSelector(
   config => config?.isOnDevice ?? false
 )
 
-export const getSendAllProtocolsToOT3: (
-  state: State
-) => boolean = createSelector(
-  getConfig,
-  config => config?.protocols.sendAllProtocolsToOT3 ?? false
-)
-
 export const getProtocolsDesktopSortKey: (
   state: State
 ) => ProtocolSort | null = createSelector(
