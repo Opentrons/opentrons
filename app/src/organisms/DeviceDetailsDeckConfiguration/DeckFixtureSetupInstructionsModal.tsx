@@ -2,14 +2,12 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -21,8 +19,7 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 
-const SETUP_INSTRUCTION_URL = 'www.opentrons.com/support/fixtures'
-const SETUP_INSTRUCTION_EXTERNAL_URL =
+const SETUP_INSTRUCTION_URL =
   'https://support.opentrons.com/s/article/Deck-configuration-on-Opentrons-Flex'
 const IMG_ALT = 'QRCode for Deck fixture setup instructions page'
 
@@ -92,7 +89,7 @@ export function DeckFixtureSetupInstructionsModal({
                     {t('deck_fixture_setup_modal_bottom_description')}
                   </StyledText>
                 </Flex>
-                <ExternalLink href={SETUP_INSTRUCTION_EXTERNAL_URL}>
+                <ExternalLink href={SETUP_INSTRUCTION_URL}>
                   {t('deck_fixture_setup_instructions')}
                 </ExternalLink>
               </Flex>

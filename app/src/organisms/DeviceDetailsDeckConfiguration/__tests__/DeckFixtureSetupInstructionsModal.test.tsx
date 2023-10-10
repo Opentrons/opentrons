@@ -16,6 +16,7 @@ const render = (
     i18nInstance: i18n,
   })
 }
+
 describe('Touchscreen DeckFixtureSetupInstructionsModal', () => {
   let props: React.ComponentProps<typeof DeckFixtureSetupInstructionsModal>
 
