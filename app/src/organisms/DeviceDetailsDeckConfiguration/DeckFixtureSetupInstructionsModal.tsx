@@ -86,7 +86,7 @@ export function DeckFixtureSetupInstructionsModal({
                     {t('deck_fixture_setup_modal_top_description')}
                   </StyledText>
                   <StyledText as="p">
-                    {t('deck_fixture_setup_modal_bottom_description')}
+                    {t('deck_fixture_setup_modal_bottom_description_desktop')}
                   </StyledText>
                 </Flex>
                 <ExternalLink href={SETUP_INSTRUCTION_URL}>
