@@ -32,7 +32,6 @@ from opentrons.commands import types as command_types
 
 from opentrons.hardware_control import (
     API as OT2API,
-    HardwareControlAPI,
     ThreadManagedHardware,
     ThreadManager,
 )
@@ -414,7 +413,7 @@ def execute(  # noqa: C901
             protocol_file=protocol_file,
             protocol_name=protocol_name,
             extra_labware=extra_labware,
-            hardware_api=_get_global_hardware_controller(_get_robot_type()).wrapped(),
+            hardware_api=_get_global_hardware_controller(_get_robot_type()),
             emit_runlog=emit_runlog,
         )
 
@@ -598,21 +597,21 @@ def _run_file_pe(
     protocol_file: Union[BinaryIO, TextIO],
     protocol_name: str,
     extra_labware: Dict[str, entrypoint_util.FoundLabware],
-    hardware_api: HardwareControlAPI,
+    hardware_api: ThreadManagedHardware,
     emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
     """Run a protocol file with Protocol Engine."""
 
     async def run(protocol_source: ProtocolSource) -> None:
         protocol_engine = await create_protocol_engine(
-            hardware_api=hardware_api,
+            hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(),
         )
 
         protocol_runner = create_protocol_runner(
             protocol_config=protocol_source.config,
             protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
+            hardware_api=hardware_api.wrapped(),
         )
 
         unsubscribe = protocol_runner.broker.subscribe(
