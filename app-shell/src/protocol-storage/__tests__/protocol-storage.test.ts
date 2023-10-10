@@ -9,6 +9,7 @@ import {
   fetchProtocols,
   getUnixTimeFromAnalysisPath,
   getParsedAnalysisFromPath,
+  preParityMigrateProtocolsFrom,
 } from '../'
 
 describe('protocol storage directory utilities', () => {
@@ -140,6 +141,85 @@ describe('protocol storage directory utilities', () => {
             )
           ).toEqual(NaN)
         })
+    })
+  })
+
+  describe('preParityMigrateProtocolsFrom', () => {
+    const protocolsDir = path.join(
+      '__mock-app-path__',
+      PROTOCOLS_DIRECTORY_NAME
+    )
+    const tempProtocolsDir = path.join('__mock-app-path__', 'temp_protocols')
+    const firstProtocolDirName = 'protocol_item_1'
+    const secondProtocolDirName = 'protocol_item_2'
+    const migrateProtocolsFromTempDirectory = preParityMigrateProtocolsFrom(
+      tempProtocolsDir,
+      protocolsDir
+    )
+
+    beforeEach(async () => {
+      return await fs
+        .mkdir(path.join(tempProtocolsDir))
+        .then(() =>
+          fs.mkdir(path.join(tempProtocolsDir, firstProtocolDirName, 'src'))
+        )
+        .then(() =>
+          fs.createFile(
+            path.join(tempProtocolsDir, firstProtocolDirName, 'src', 'main.py')
+          )
+        )
+        .then(() => fs.mkdir(path.join(tempProtocolsDir, 'analysis')))
+        .then(() =>
+          fs.createFile(
+            path.join(
+              tempProtocolsDir,
+              firstProtocolDirName,
+              'analysis',
+              'fake_timestamp0.json'
+            )
+          )
+        )
+        .then(() =>
+          fs.mkdir(path.join(tempProtocolsDir, secondProtocolDirName, 'src'))
+        )
+        .then(() =>
+          fs.createFile(
+            path.join(
+              tempProtocolsDir,
+              secondProtocolDirName,
+              'src',
+              'main.json'
+            )
+          )
+        )
+        .then(() =>
+          fs.mkdir(
+            path.join(tempProtocolsDir, secondProtocolDirName, 'analysis')
+          )
+        )
+        .then(() =>
+          fs.createFile(
+            path.join(
+              tempProtocolsDir,
+              secondProtocolDirName,
+              'analysis',
+              'fake_timestamp1.json'
+            )
+          )
+        )
+    })
+
+    afterEach(() => {
+      return Promise.all([
+        fs.rmdir(protocolsDir, { recursive: true }),
+        fs.rmdir(tempProtocolsDir, { recursive: true }),
+      ])
+    })
+
+    it('TEST ONE HERE', () => {
+      return migrateProtocolsFromTempDirectory().then(() =>
+        expect('CONDITIONS HERE, EXAMPLE')
+      )
     })
   })
 })
