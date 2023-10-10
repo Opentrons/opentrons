@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -19,7 +19,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   truncateString,
-  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
