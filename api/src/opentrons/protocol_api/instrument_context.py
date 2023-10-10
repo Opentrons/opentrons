@@ -608,7 +608,7 @@ class InstrumentContext(publisher.CommandPublisher):
                        (Default will use all remaining volume in tip)
         :type volume: float
 
-        :param height: The number of millimiters to move above the current Well
+        :param height: The number of millimeters to move above the current Well
                        to air-gap aspirate. (Default: 5mm above current Well)
         :type height: float
 
