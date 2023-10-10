@@ -31,6 +31,7 @@
   "detach_and_retry": "detach and retry",
   "detach_mount_attach_96": "Detach {{mount}} Pipette and Attach 96-Channel Pipette",
   "detach_mounting_plate_instructions": "Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.",
+  "detach_next_pipette": "Detach next pipette",
   "detach_pipette_to_attach_96": "Detach {{pipetteName}} and attach 96-Channel pipette",
   "detach_pipette": "detach {{mount}} pipette",
   "detach_pipettes_attach_96": "Detach Pipettes and Attach 96-Channel Pipette",

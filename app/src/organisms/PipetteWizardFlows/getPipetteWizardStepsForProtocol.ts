@@ -72,7 +72,12 @@ export const getPipetteWizardStepsForProtocol = (
           mount: LEFT,
           flowType: FLOWS.DETACH,
         },
-        { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
+        {
+          section: SECTIONS.RESULTS,
+          mount: LEFT,
+          flowType: FLOWS.DETACH,
+          nextMount: mount,
+        },
         {
           section: SECTIONS.MOUNT_PIPETTE,
           mount: mount,
@@ -165,13 +170,23 @@ export const getPipetteWizardStepsForProtocol = (
         mount: LEFT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: RIGHT,
+      },
       {
         section: SECTIONS.DETACH_PIPETTE,
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -229,7 +244,12 @@ export const getPipetteWizardStepsForProtocol = (
         mount: LEFT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -287,7 +307,12 @@ export const getPipetteWizardStepsForProtocol = (
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
