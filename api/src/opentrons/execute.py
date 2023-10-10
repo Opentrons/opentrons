@@ -33,8 +33,6 @@ from opentrons import protocol_api, __version__, should_use_ot3
 
 from opentrons.commands import types as command_types
 
-from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-
 from opentrons.hardware_control import (
     API as OT2API,
     HardwareControlAPI,
@@ -73,6 +71,7 @@ from opentrons.protocol_runner import create_protocol_runner
 
 from .util.entrypoint_util import (
     FoundLabware,
+    find_jupyter_labware,
     labware_from_paths,
     datafiles_from_paths,
     copy_file_like,
@@ -123,6 +122,9 @@ def get_protocol_api(
     bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
+    # If you add any more arguments here, make sure they're kw-only to make mistakes harder in
+    # environments without type checking, like Jupyter Notebook.
+    # *
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -169,7 +171,8 @@ def get_protocol_api(
 
     if extra_labware is None:
         extra_labware = {
-            uri: details.definition for uri, details in _get_jupyter_labware().items()
+            uri: details.definition
+            for uri, details in (find_jupyter_labware() or {}).items()
         }
 
     robot_type = _get_robot_type()
@@ -195,7 +198,7 @@ def get_protocol_api(
         context = _create_live_context_pe(
             api_version=checked_version,
             robot_type=robot_type,
-            deck_type=guess_deck_type_from_global_config(),
+            deck_type=deck_type,
             hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
             bundled_data=bundled_data,
             extra_labware=extra_labware,
@@ -362,10 +365,13 @@ def execute(  # noqa: C901
 
     contents = protocol_file.read()
 
+    # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
+    # to match documented behavior.
+    # See notes in https://github.com/Opentrons/opentrons/pull/13107
     if custom_labware_paths:
         extra_labware = labware_from_paths(custom_labware_paths)
     else:
-        extra_labware = _get_jupyter_labware()
+        extra_labware = find_jupyter_labware() or {}
 
     if custom_data_paths:
         extra_data = datafiles_from_paths(custom_data_paths)
@@ -393,6 +399,8 @@ def execute(  # noqa: C901
 
     # Guard against trying to run protocols for the wrong robot type.
     # This matches what robot-server does.
+    # FIXME: This exposes the internal strings "OT-2 Standard" and "OT-3 Standard".
+    # https://opentrons.atlassian.net/browse/RSS-370
     if protocol.robot_type != _get_robot_type():
         raise RuntimeError(
             f'This robot is of type "{_get_robot_type()}",'
@@ -687,17 +695,6 @@ def _get_protocol_engine_config() -> Config:
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
     )
-
-
-def _get_jupyter_labware() -> Dict[str, FoundLabware]:
-    """Return labware files in this robot's Jupyter Notebook directory."""
-    if IS_ROBOT:
-        # JUPYTER_NOTEBOOK_LABWARE_DIR should never be None when IS_ROBOT == True.
-        assert JUPYTER_NOTEBOOK_LABWARE_DIR is not None
-        if JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():
-            return labware_from_paths([JUPYTER_NOTEBOOK_LABWARE_DIR])
-
-    return {}
 
 
 @contextlib.contextmanager

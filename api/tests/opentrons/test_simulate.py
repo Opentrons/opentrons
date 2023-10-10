@@ -15,6 +15,7 @@ from opentrons import simulate, protocols
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
+from opentrons.util import entrypoint_util
 
 if TYPE_CHECKING:
     from tests.opentrons.conftest import Bundle, Protocol
@@ -195,8 +196,12 @@ class TestSimulatePythonLabware:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Putting labware in the Jupyter directory should make it available."""
-        monkeypatch.setattr(simulate, "IS_ROBOT", True)
-        monkeypatch.setattr(simulate, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
+        monkeypatch.setattr(
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR
+        )
         simulate.simulate(protocol_file=protocol_filelike, file_name=file_name)
 
     @pytest.mark.xfail(
@@ -209,8 +214,12 @@ class TestSimulatePythonLabware:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Passing any custom_labware_paths should prevent searching the Jupyter directory."""
-        monkeypatch.setattr(simulate, "IS_ROBOT", True)
-        monkeypatch.setattr(simulate, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
+        monkeypatch.setattr(
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR
+        )
         with pytest.raises(Exception, match="Labware .+ not found"):
             simulate.simulate(
                 protocol_file=protocol_filelike,
@@ -225,9 +234,11 @@ class TestSimulatePythonLabware:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """It should tolerate the Jupyter labware directory not existing on the filesystem."""
-        monkeypatch.setattr(simulate, "IS_ROBOT", True)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            simulate, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
         )
         with pytest.raises(Exception, match="Labware .+ not found"):
             simulate.simulate(protocol_file=protocol_filelike, file_name=file_name)
@@ -268,9 +279,11 @@ class TestGetProtocolAPILabware:
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Putting labware in the Jupyter directory should make it available."""
-        monkeypatch.setattr(simulate, "IS_ROBOT", True)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            simulate,
+            entrypoint_util,
             "JUPYTER_NOTEBOOK_LABWARE_DIR",
             get_shared_data_root() / self.LW_FIXTURE_DIR,
         )
@@ -279,20 +292,19 @@ class TestGetProtocolAPILabware:
             load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
         )
 
-    @pytest.mark.xfail(
-        strict=True, raises=pytest.fail.Exception
-    )  # TODO(mm, 2023-07-14): Fix this bug.
     def test_jupyter_override(
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Passing any extra_labware should prevent searching the Jupyter directory."""
-        monkeypatch.setattr(simulate, "IS_ROBOT", True)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            simulate,
+            entrypoint_util,
             "JUPYTER_NOTEBOOK_LABWARE_DIR",
             get_shared_data_root() / self.LW_FIXTURE_DIR,
         )
-        context = simulate.get_protocol_api(api_version)
+        context = simulate.get_protocol_api(api_version, extra_labware={})
         with pytest.raises(Exception, match="Labware .+ not found"):
             context.load_labware(
                 load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
@@ -302,8 +314,11 @@ class TestGetProtocolAPILabware:
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """It should tolerate the Jupyter labware directory not existing on the filesystem."""
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            simulate, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
         )
         with_nonexistent_jupyter_extra_labware = simulate.get_protocol_api(api_version)
         with pytest.raises(Exception, match="Labware .+ not found"):
