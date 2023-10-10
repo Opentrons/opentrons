@@ -256,7 +256,7 @@ class InstrumentContext(publisher.CommandPublisher):
         push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
-        Dispense a volume of liquid (in microliters/uL) using this pipette
+        Dispense a volume of liquid (in microliters/µL) using this pipette
         into the specified location.
 
         If only a volume is passed, the pipette will dispense from its current
@@ -377,7 +377,7 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
-        Mix a volume of liquid (uL) using this pipette, by repeatedly
+        Mix a volume of liquid (µL) using this pipette, by repeatedly
         aspirating and dispensing in the same place.
 
         :param repetitions: how many times the pipette should mix (default: 1)
@@ -604,7 +604,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Pull air into the pipette current tip at the current location
 
-        :param volume: The amount in uL to aspirate air into the tube.
+        :param volume: The amount in µL to aspirate air into the tube.
                        (Default will use all remaining volume in tip)
         :type volume: float
 
@@ -1388,7 +1388,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def flow_rate(self) -> "FlowRates":
-        """The speeds (in uL/s) configured for the pipette.
+        """The speeds (in µL/s) configured for the pipette.
 
         This is an object with attributes ``aspirate``, ``dispense``, and
         ``blow_out`` holding the flow rates for the corresponding operation.
