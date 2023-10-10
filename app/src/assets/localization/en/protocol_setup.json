@@ -2,6 +2,8 @@
   "96_mount": "left + right mount",
   "adapter_slot_location_module": "Slot {{slotName}}, {{adapterName}} on {{moduleName}}",
   "adapter_slot_location": "Slot {{slotName}}, {{adapterName}}",
+  "add_fixture_to_deck": "Add this fixture to your deck configuration. It will be referenced during protocol analysis.",
+  "add_fixture": "Add {{fixtureName}} to deck configuration",
   "additional_labware": "{{count}} additional labware",
   "additional_off_deck_labware": "Additional Off-Deck Labware",
   "attach_gripper_failure_reason": "Attach the required gripper to continue",
