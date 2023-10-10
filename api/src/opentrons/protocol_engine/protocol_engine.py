@@ -12,8 +12,6 @@ from opentrons_shared_data.errors import (
     EnumeratedError,
 )
 
-from opentrons.util.broker import ReadOnlyBroker
-
 from .errors import ProtocolCommandFailedError, ErrorOccurrence
 from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
@@ -130,36 +128,6 @@ class ProtocolEngine:
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
-
-    @property
-    def state_update_broker(self) -> ReadOnlyBroker[None]:
-        """Return a broker that you can use to get notified of all state updates.
-
-        For example, you can use this to do something any time a new command starts running.
-
-        `ProtocolEngine` will publish a message to this broker (with the placeholder value `None`)
-        any time its state updates. Then, when you receive that message, you can get the latest
-        state through `state_view` and inspect it to see whether something happened that you care
-        about.
-
-        Warning:
-            Use this mechanism sparingly, because it has several footguns:
-
-            * Your callbacks will run synchronously, on every state update.
-              If they take a long time, they will harm analysis and run speed.
-
-            * Your callbacks will run in the thread and asyncio event loop that own this
-              `ProtocolEngine`. (See the concurrency notes in the `ProtocolEngine` docstring.)
-              If your callbacks interact with things in other threads or event loops,
-              take appropriate precautions to keep them concurrency-safe.
-
-            * Currently, if your callback raises an exception, it will propagate into
-              `ProtocolEngine` and be treated like any other internal error. This will probably
-              stop the run. If you expect your code to raise exceptions and don't want
-              that to happen, consider catching and logging them at the top level of your callback,
-              before they propagate into `ProtocolEngine`.
-        """
-        return self._state_store.update_broker
 
     def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""

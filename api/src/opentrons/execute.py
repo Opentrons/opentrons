@@ -60,7 +60,6 @@ from opentrons.protocol_engine import (
     DeckType,
     EngineStatus,
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
-    command_monitor as pe_command_monitor,
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
@@ -649,10 +648,6 @@ def _run_file_pe(
 ) -> None:
     """Run a protocol file with Protocol Engine."""
 
-    def send_command_to_emit_runlog(event: pe_command_monitor.Event) -> None:
-        if emit_runlog is not None:
-            emit_runlog(_adapt_command(event))
-
     async def run(protocol_source: ProtocolSource) -> None:
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api,
@@ -665,12 +660,15 @@ def _run_file_pe(
             hardware_api=hardware_api,
         )
 
-        with pe_command_monitor.monitor_commands(
-            protocol_engine, callback=send_command_to_emit_runlog
-        ):
+        unsubscribe = protocol_runner.broker.subscribe(
+            "command", lambda event: emit_runlog(event) if emit_runlog else None
+        )
+        try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
             result = await protocol_runner.run(protocol_source)
+        finally:
+            unsubscribe()
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
             raise _ProtocolEngineExecuteError(result.state_summary.errors)
@@ -730,32 +728,6 @@ def _adapt_protocol_source(
         )
 
         yield protocol_source
-
-
-def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMessage:
-    """Convert a Protocol Engine command event to an old-school command_types.CommandMesage."""
-    before_or_after: command_types.MessageSequenceId = (
-        "before" if isinstance(event, pe_command_monitor.RunningEvent) else "after"
-    )
-
-    message: command_types.CommentMessage = {
-        # TODO(mm, 2023-09-26): If we can without breaking the public API, remove the requirement
-        # to supply a "name" here. If we can't do that, consider adding a special name value
-        # so we don't have to lie and call every command a comment.
-        "name": "command.COMMENT",
-        "id": event.command.id,
-        "$": before_or_after,
-        # TODO(mm, 2023-09-26): Convert this machine-readable JSON into a human-readable message
-        # to match behavior from before Protocol Engine.
-        # https://opentrons.atlassian.net/browse/RSS-320
-        "payload": {"text": event.command.json()},
-        # As far as I know, "error" is not part of the public-facing API, so it doesn't matter
-        # what we put here. Leaving it as `None` to avoid difficulties in converting between
-        # the Protocol Engine `ErrorOccurrence` model and the regular Python `Exception` type
-        # that this field expects.
-        "error": None,
-    }
-    return message
 
 
 def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:
