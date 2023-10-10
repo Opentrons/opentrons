@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import {
   OutlineButton,
   Flex,
@@ -14,14 +13,13 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import stagingAreaImage from '../../images/staging_area.png'
+import { getStagingAreaSlots } from '../../utils'
 import { Portal } from '../portals/TopPortal'
-import { TrashModal } from './TrashModal'
+import { StagingAreaModal } from './StagingAreaModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.css'
-import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import { getStagingAreaSlots } from '../../utils'
-import { StagingAreaModal } from './StagingAreaModal'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 interface StagingAreasRowProps {
   handleAttachment: () => void
@@ -31,15 +29,17 @@ interface StagingAreasRowProps {
 export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
   const { handleAttachment, stagingAreas } = props
   const hasStagingAreas = stagingAreas.length > 0
-  const [trashModal, openTrashModal] = React.useState<boolean>(false)
+  const [stagingAreaModal, openStagingAreaModal] = React.useState<boolean>(
+    false
+  )
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
   return (
     <>
-      {trashModal ? (
+      {stagingAreaModal ? (
         <Portal>
           <StagingAreaModal
-            onCloseClick={handleAttachment}
+            onCloseClick={() => openStagingAreaModal(false)}
             stagingAreas={stagingAreas}
           />
         </Portal>
@@ -70,7 +70,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
               </div>
 
               <div className={styles.slot_map}>
-                <FlexSlotMap selectedSlot={WASTE_CHUTE_SLOT} />
+                <FlexSlotMap selectedSlots={stagingAreaLocations ?? []} />
               </div>
             </>
           ) : null}
@@ -81,7 +81,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
           >
             {hasStagingAreas ? (
               <OutlineButton
-                onClick={() => openTrashModal(true)}
+                onClick={() => openStagingAreaModal(true)}
                 className={styles.module_button}
               >
                 {i18n.t('shared.edit')}
@@ -97,7 +97,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
                 onClick={
                   hasStagingAreas
                     ? handleAttachment
-                    : () => openTrashModal(true)
+                    : () => openStagingAreaModal(true)
                 }
               >
                 {hasStagingAreas

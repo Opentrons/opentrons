@@ -152,7 +152,7 @@ export function ModuleRow(props: Props): JSX.Element {
           )}
           {slot &&
             (isFlex ? (
-              <FlexSlotMap selectedSlot={slot} moduleType={type} />
+              <FlexSlotMap selectedSlots={[slot]} moduleType={type} />
             ) : (
               <div {...targetProps}>
                 <SlotMap

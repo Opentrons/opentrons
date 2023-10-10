@@ -61,7 +61,10 @@ import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
 import { StagingAreaTile } from './StagingAreaTile'
 
-import type { NormalizedPipette } from '@opentrons/step-generation'
+import {
+  NormalizedPipette,
+  OT_2_TRASH_DEF_URI,
+} from '@opentrons/step-generation'
 import type { FormState } from './types'
 
 type WizardStep =
@@ -195,6 +198,8 @@ export function CreateFileWizard(): JSX.Element | null {
           },
         })
       )
+
+      //  add trash
       if (
         enableDeckModification &&
         values.additionalEquipment.includes('trashBin')
@@ -204,6 +209,20 @@ export function CreateFileWizard(): JSX.Element | null {
           labwareIngredActions.createContainer({
             labwareDefURI: FLEX_TRASH_DEF_URI,
             slot: 'A3',
+          })
+        )
+      }
+      if (
+        !enableDeckModification ||
+        (enableDeckModification && values.fields.robotType === OT2_ROBOT_TYPE)
+      ) {
+        dispatch(
+          labwareIngredActions.createContainer({
+            labwareDefURI:
+              values.fields.robotType === FLEX_ROBOT_TYPE
+                ? FLEX_TRASH_DEF_URI
+                : OT_2_TRASH_DEF_URI,
+            slot: values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
           })
         )
       }
@@ -226,14 +245,6 @@ export function CreateFileWizard(): JSX.Element | null {
         })
       }
 
-      if (!enableDeckModification) {
-        dispatch(
-          labwareIngredActions.createContainer({
-            labwareDefURI: FLEX_TRASH_DEF_URI,
-            slot: values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
-          })
-        )
-      }
       // create modules
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))

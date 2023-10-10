@@ -210,7 +210,7 @@ const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
   [HEATERSHAKER_MODULE_V1]: 'D1',
   [MAGNETIC_BLOCK_V1]: 'D2',
-  [TEMPERATURE_MODULE_V2]: 'D3',
+  [TEMPERATURE_MODULE_V2]: 'C1',
 }
 
 interface FlexModuleFieldsProps extends WizardTileProps {

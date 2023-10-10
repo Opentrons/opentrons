@@ -96,8 +96,10 @@ export function AdditionalItemsRow(
               </div>
               <div className={styles.slot_map}>
                 <FlexSlotMap
-                  selectedSlot={
-                    name === 'trashBin' ? trashBinSlot ?? '' : WASTE_CHUTE_SLOT
+                  selectedSlots={
+                    name === 'trashBin'
+                      ? [trashBinSlot] ?? []
+                      : [WASTE_CHUTE_SLOT]
                   }
                 />
               </div>
