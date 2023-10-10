@@ -38,19 +38,22 @@ import { BEFORE_BEGINNING, BLOWOUT_SUCCESS, CHOOSE_BLOWOUT_LOCATION, CHOOSE_DROP
 import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
+import { Success } from './Success'
+import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
 
 interface MaintenanceRunManagerProps {
+  robotType: RobotType
   mount: PipetteData['mount']
+  instrumentModelSpecs: PipetteModelSpecs
   closeFlow: () => void
   onComplete?: () => void
-  instrumentModel?: PipetteData['instrumentModel']
 }
 export function DropTipWizard(
   props: MaintenanceRunManagerProps
-): JSX.Element | null {
-  const { closeFlow, mount, instrumentModel } = props
+): JSX.Element {
+  const { closeFlow, mount, instrumentModelSpecs } = props
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
@@ -139,12 +142,12 @@ export function DropTipWizard(
     }
   }
 
-  return instrumentModel != null ? (
+  return (
     <DropTipWizardComponent
       createdMaintenanceRunId={createdMaintenanceRunId}
       maintenanceRunId={maintenanceRunData?.data.id}
       mount={mount}
-      instrumentModel={instrumentModel}
+      instrumentModelSpecs={instrumentModelSpecs}
       createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
@@ -157,7 +160,7 @@ export function DropTipWizard(
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}
     />
-  ) : null
+  )
 }
 
 interface DropTipWizardProps {
@@ -176,7 +179,7 @@ interface DropTipWizardProps {
   createRunCommand: ReturnType<
     typeof useCreateMaintenanceCommandMutation
   >['createMaintenanceCommand']
-  instrumentModel: PipetteData['instrumentModel']
+  instrumentModelSpecs: PipetteModelSpecs
   maintenanceRunId?: string
 }
 
@@ -223,6 +226,7 @@ export const DropTipWizardComponent = (
     cancel: cancelExit,
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
+
   // let chainMaintenanceRunCommands
 
   // if (maintenanceRunId != null) {
@@ -258,15 +262,31 @@ export const DropTipWizardComponent = (
     )
   } else if (shouldDispenseLiquid == null) {
     modalContent = (
-      <BeforeBeginning {...{createMaintenanceRun, isCreateLoading, createdMaintenanceRunId, setShouldDispenseLiquid}} />
+      <BeforeBeginning {...{ createMaintenanceRun, isCreateLoading, createdMaintenanceRunId, setShouldDispenseLiquid }} />
     )
   } else if (currentStep === CHOOSE_BLOWOUT_LOCATION || currentStep === CHOOSE_DROP_TIP_LOCATION) {
-    modalContent = <ChooseLocation handleProceed={proceed} />
+    modalContent = (
+      <ChooseLocation
+        handleProceed={proceed}
+        title={currentStep === CHOOSE_BLOWOUT_LOCATION ? t('choose_blowout_location') : t('choose_drop_tip_location')}
+        body={currentStep === CHOOSE_BLOWOUT_LOCATION ? t('select_blowout_slot') : t('select_drop_tip_slot')}
+      />
+    )
   } else if (currentStep === POSITION_AND_BLOWOUT || currentStep === POSITION_AND_DROP_TIP) {
-    modalContent = <JogToPosition handleProceed={proceed} handleGoBack={goBack} />
+    modalContent = (
+      <JogToPosition
+        handleProceed={proceed}
+        handleGoBack={goBack}
+        body={currentStep === POSITION_AND_BLOWOUT ? t('position_and_blowout') : t('position_and_drop_tip')}
+      />
+    )
   } else if (currentStep === BLOWOUT_SUCCESS || currentStep === DROP_TIP_SUCCESS) {
     modalContent = (
-      <PrimaryButton onClick={proceed}>PROCEED</PrimaryButton>
+      <Success
+        message={currentStep === BLOWOUT_SUCCESS ? t('blowout_complete') : t('drop_tip_complete')}
+        handleProceed={currentStep === BLOWOUT_SUCCESS ? proceed : handleCleanUpAndClose}
+        proceedText={currentStep === BLOWOUT_SUCCESS ? t('shared:continue') : t('shared:exit')}
+      />
     )
   }
 

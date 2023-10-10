@@ -10,19 +10,21 @@ const NEED_HELP_URL = ''
 
 interface ChooseLocationProps {
   handleProceed: () => void
+  title: string
+  body: string
 }
 
 export const ChooseLocation = (
   props: ChooseLocationProps
 ): JSX.Element | null => {
-  const { handleProceed } = props
+  const { handleProceed, title, body } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
   return (
     <Flex css={TILE_CONTAINER_STYLE}>
       <TwoUpTileLayout
-        title={t('position_the_pipette')}
-        body={t('enure_tip_is_position_for_blowout')}
+        title={title}
+        body={body}
         rightElement={<div>TODO: add graphic</div>}
         footer={
           <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
@@ -41,7 +43,6 @@ export const ChooseLocation = (
 const TILE_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  padding: ${SPACING.spacing32};
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 29.5rem;

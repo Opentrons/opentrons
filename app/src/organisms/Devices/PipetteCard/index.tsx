@@ -200,12 +200,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           closeModal={() => setChangePipette(false)}
         />
       )}
-      {showDropTipWizard && (
+      {showDropTipWizard && pipetteModelSpecs != null ? (
         <DropTipWizard
           mount={mount}
+          instrumentModelSpecs={pipetteModelSpecs}
           closeFlow={() => setShowDropTipWizard(false)}
         />
-      )}
+      ) : null}
       {showSlideout &&
         pipetteModelSpecs != null &&
         pipetteId != null &&
@@ -286,8 +287,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                   {pipetteIs96Channel
                     ? t('both_mounts')
                     : t('mount', {
-                        side: mount === LEFT ? t('left') : t('right'),
-                      })}
+                      side: mount === LEFT ? t('left') : t('right'),
+                    })}
                 </StyledText>
                 <Flex
                   paddingBottom={SPACING.spacing4}
