@@ -138,7 +138,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
 
   const RobotNameContainer = styled.div`
     max-width: ${(props: RobotNameContainerProps) =>
-      props.isGoToRun ? `149px` : undefined};
+      props.isGoToRun ? `150px` : undefined};
     @media screen and (max-width: 678px) {
       max-width: ${(props: RobotNameContainerProps) =>
         props.isGoToRun ? `105px` : undefined};
