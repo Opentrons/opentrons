@@ -301,6 +301,8 @@ def get_protocol_api(
         )
     else:
         if bundled_labware is not None:
+            # Protocol Engine has a deep assumption that standard labware definitions are always
+            # implicitly loadable.
             raise NotImplementedError(
                 f"The bundled_labware argument is not currently supported for Python protocols"
                 f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
