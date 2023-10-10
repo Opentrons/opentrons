@@ -80,6 +80,12 @@ This should match what `opentrons.protocols.parse()` accepts in a protocol's `re
 """
 
 
+# TODO(mm, 2023-10-05): Type _SimulateResultRunLog more precisely by using TypedDicts from
+# opentrons.commands.
+_SimulateResultRunLog = List[Mapping[str, Any]]
+_SimulateResult = Tuple[_SimulateResultRunLog, Optional[BundleContents]]
+
+
 class _AccumulatingHandler(logging.Handler):
     def __init__(
         self,
@@ -113,10 +119,10 @@ class _CommandScraper:
         self._logger = logger
         self._level = level
         self._broker = broker
-        self._commands: List[Mapping[str, Any]] = []
+        self._commands: _SimulateResultRunLog = []
 
     @property
-    def commands(self) -> List[Mapping[str, Mapping[str, Any]]]:
+    def commands(self) -> _SimulateResultRunLog:
         """The list of commands scraped while `.scrape()` was open, integrated with log messages.
 
         See :py:obj:`simulate` for the return type.
@@ -361,7 +367,7 @@ def simulate(  # noqa: C901
     hardware_simulator_file_path: Optional[str] = None,
     duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
-) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
+) -> _SimulateResult:
     """
     Simulate the protocol itself.
 
