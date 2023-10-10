@@ -28,7 +28,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
-  const handleReattachCarraigeProceed = (): void => {
+  const handleReattachCarriageProceed = (): void => {
     chainRunCommands?.(
       [
         {
@@ -97,7 +97,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
             onClick={
               flowType === FLOWS.ATTACH
                 ? proceed
-                : handleReattachCarraigeProceed
+                : handleReattachCarriageProceed
             }
             buttonText={capitalize(t('shared:continue'))}
           />
@@ -106,7 +106,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
             onClick={
               flowType === FLOWS.ATTACH
                 ? proceed
-                : handleReattachCarraigeProceed
+                : handleReattachCarriageProceed
             }
           >
             {capitalize(t('shared:continue'))}

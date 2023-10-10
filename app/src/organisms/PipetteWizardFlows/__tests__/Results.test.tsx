@@ -51,7 +51,6 @@ describe('Results', () => {
       isFetching: false,
       setFetching: jest.fn(),
       hasCalData: false,
-      nextMount: undefined,
     }
     pipettePromise = Promise.resolve()
     mockRefetchInstruments = jest.fn(() => pipettePromise)
