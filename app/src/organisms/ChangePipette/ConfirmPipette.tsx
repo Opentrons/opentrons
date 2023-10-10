@@ -111,7 +111,8 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   return !confirmPipetteLevel &&
     (wrongWantedPipette != null || (props.wantedPipette != null && success)) &&
     actualPipette != null &&
-    actualPipette.channels === 8 ? (
+    actualPipette.channels === 8 &&
+    actualPipette.displayCategory === 'GEN2' ? (
     <LevelPipette
       mount={mount}
       pipetteModelName={actualPipette.name}
