@@ -445,17 +445,16 @@ class InstrumentContext(publisher.CommandPublisher):
         self, location: Optional[Union[types.Location, labware.Well]] = None
     ) -> InstrumentContext:
         """
-        Blow liquid out of the tip.
+        Blows an extra amount of air through a pipette's tip to clear it.
 
-        If :py:attr:`dispense` is used to completely empty a pipette,
-        usually a small amount of liquid will remain in the tip. This
-        method moves the plunger past its usual stops to fully remove
-        any remaining liquid from the tip. Regardless of how much liquid
-        was in the tip when this function is called, after it is done
-        the tip will be empty.
+        If :py:attr:`dispense` is used to empty a pipette, usually
+        a small amount of liquid remains in the tip. During
+        a blowout, the pipette moves the plunger beyond its normal
+        limits to help remove all liquid from the pipette tip.
+        See also, :ref:`blow-out`.
 
-        :param location: The location to blow out into. If not specified,
-                         defaults to the current location of the pipette
+        :param location: The blowout location. If no location is specified,
+                         the pipette will blowout from its current position.
         :type location: :py:class:`.Well` or :py:class:`.Location` or None
 
         :raises RuntimeError: If no location is specified and location cache is
