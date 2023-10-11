@@ -21,7 +21,7 @@ Flex touchscreen
 - Manage instruments: View information about connected pipettes and the gripper. Attach, detach, or recalibrate instruments.
 - Robot settings: Customize the behavior of your Flex, including the LED and touchscreen displays.
 
-Flex features 
+Flex features
 
 - Analyze and run protocols that use the Flex robot, Flex pipettes, and Flex tip racks.
 - Move labware around the deck automatically with the Flex Gripper.
@@ -48,7 +48,6 @@ Python API features
 Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
 
 - JSON protocols created or modified with Protocol Designer v6.0.0 or higher.
-- Python protocols specifying an `apiLevel` of 2.14 or higher.
 
 ---
 
