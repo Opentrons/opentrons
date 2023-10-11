@@ -75,14 +75,13 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {deckDef.locations.orderedSlots.map(slotDef => (
-        <React.Fragment key={slotDef.id}>
-          <DeckSlotLocation
-            slotName={slotDef.id}
-            deckDefinition={deckDef}
-            slotClipColor={COLORS.transparent}
-            slotBaseColor={lightFill}
-          />
-        </React.Fragment>
+        <DeckSlotLocation
+          key={slotDef.id}
+          slotName={slotDef.id}
+          deckDefinition={deckDef}
+          slotClipColor={COLORS.transparent}
+          slotBaseColor={lightFill}
+        />
       ))}
       {stagingAreaFixtures.map(fixture => (
         <StagingAreaFixture

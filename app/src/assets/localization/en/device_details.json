@@ -45,6 +45,7 @@
   "discard_changes": "Discard changes",
   "disengaged": "Disengaged",
   "download_run_log": "Download protocol run log",
+  "drop_tips": "drop tips",
   "empty": "Empty",
   "error_details": "error details",
   "estop_disconnected": "E-stop disconnected. Robot movement is halted.",

@@ -4,7 +4,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import { getResetConfigOptions } from '../../../../../../redux/robot-admin'
-import { useIsOT3 } from '../../../../hooks'
+import { useIsFlex } from '../../../../hooks'
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
 jest.mock('../../../../../../redux/config')
@@ -19,7 +19,7 @@ const mockUpdateResetStatus = jest.fn()
 const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
   typeof getResetConfigOptions
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const mockResetConfigOptions = [
   {
@@ -81,7 +81,7 @@ const render = () => {
 describe('RobotSettings DeviceResetSlideout', () => {
   beforeEach(() => {
     mockGetResetConfigOptions.mockReturnValue(mockResetConfigOptions)
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -116,7 +116,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
   })
 
   it('should change some options and text for Flex', () => {
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
     const [{ getByText, getByRole, queryByRole, queryByText }] = render()
     getByText('Clear all data')
     getByText(

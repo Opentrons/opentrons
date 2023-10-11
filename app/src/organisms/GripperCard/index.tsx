@@ -67,6 +67,7 @@ export function GripperCard({
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     'gripper',
     {
+      enabled: attachedGripper?.ok === false,
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )

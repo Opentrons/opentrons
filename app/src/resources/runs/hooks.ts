@@ -150,7 +150,7 @@ export function useCreateTargetedMaintenanceRunMutation(
         .then(res => {
           if (isOnDevice)
             setOddRunIds({ currentRunId: res.data.id, oddRunId: res.data.id })
-          return res
+          return Promise.resolve(res)
         })
         .catch(error => error),
   }

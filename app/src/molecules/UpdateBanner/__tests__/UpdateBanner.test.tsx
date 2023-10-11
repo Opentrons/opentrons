@@ -4,10 +4,10 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UpdateBanner } from '..'
-import { useIsOT3 } from '../../../organisms/Devices/hooks'
+import { useIsFlex } from '../../../organisms/Devices/hooks'
 
 jest.mock('../../../organisms/Devices/hooks')
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = (props: React.ComponentProps<typeof UpdateBanner>) => {
   return renderWithProviders(<UpdateBanner {...props} />, {
@@ -28,7 +28,7 @@ describe('Module Update Banner', () => {
       serialNumber: 'test_number',
       isTooHot: false,
     }
-    when(mockUseIsOT3).calledWith(props.robotName).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(props.robotName).mockReturnValue(true)
   })
   it('enables the updateType and serialNumber to be used as the test ID', () => {
     const { getByTestId } = render(props)
@@ -104,7 +104,7 @@ describe('Module Update Banner', () => {
     expect(queryByText('Update now')).toBeInTheDocument()
   })
   it('should not render a calibrate update link if the robot is an OT-2', () => {
-    when(mockUseIsOT3).calledWith(props.robotName).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(props.robotName).mockReturnValue(false)
     const { queryByText } = render(props)
     expect(queryByText('Calibrate now')).not.toBeInTheDocument()
   })

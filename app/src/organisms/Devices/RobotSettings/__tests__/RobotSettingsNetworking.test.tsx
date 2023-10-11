@@ -17,7 +17,7 @@ import {
   useWifiList,
 } from '../../../../resources/networking/hooks'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
-import { useIsOT3, useIsRobotBusy } from '../../hooks'
+import { useIsFlex, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
@@ -44,7 +44,7 @@ const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
   typeof useCanDisconnect
 >
 
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
@@ -114,7 +114,7 @@ describe('RobotSettingsNetworking', () => {
       .calledWith(ROBOT_NAME, 10000)
       .mockReturnValue(mockWifiList)
 
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(false)
     when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(false)
     mockDisconnectModal.mockReturnValue(<div>mock disconnect modal</div>)
@@ -143,7 +143,7 @@ describe('RobotSettingsNetworking', () => {
 
   it('should render title and description for OT-3', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     const [{ getByText, queryByText }] = render()
     getByText('Wi-Fi - foo')
     getByText('Ethernet')
@@ -155,7 +155,7 @@ describe('RobotSettingsNetworking', () => {
 
   it('should render USB connection message for OT-3 when connected via USB', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     when(mockGetRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .mockReturnValue([

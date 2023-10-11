@@ -23,7 +23,7 @@ import {
 import { QuaternaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
-import { useIsOT3 } from '../../organisms/Devices/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
@@ -55,7 +55,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
-  const isOT3 = useIsOT3(name)
+  const isFlex = useIsFlex(name)
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
@@ -107,24 +107,24 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     addr => addr.ip === ethernet?.ipAddress
   )
   // do not show ethernet connection for OT-2
-  const isOT3ConnectedViaEthernet =
-    isOT3 &&
+  const isFlexConnectedViaEthernet =
+    isFlex &&
     ethernetAddress != null &&
     ethernetAddress.healthStatus === HEALTH_STATUS_OK
 
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
-  const isOT3ConnectedViaUSB =
+  const isFlexConnectedViaUSB =
     usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
 
   let iconName: IconName | null = null
   let tooltipTranslationKey = null
-  if (isOT3ConnectedViaEthernet) {
+  if (isFlexConnectedViaEthernet) {
     iconName = 'ethernet'
     tooltipTranslationKey = 'device_settings:ethernet'
   } else if (isConnectedViaWifi) {
     iconName = 'wifi'
     tooltipTranslationKey = 'device_settings:wifi'
-  } else if ((local != null && local) || isOT3ConnectedViaUSB) {
+  } else if ((local != null && local) || isFlexConnectedViaUSB) {
     iconName = 'usb'
     tooltipTranslationKey = 'device_settings:wired_usb'
   }

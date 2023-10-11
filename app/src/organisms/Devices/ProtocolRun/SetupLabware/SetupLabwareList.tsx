@@ -27,12 +27,12 @@ interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   commands: RunTimeCommand[]
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
-  isOt3: boolean
+  isFlex: boolean
 }
 export function SetupLabwareList(
   props: SetupLabwareListProps
 ): JSX.Element | null {
-  const { attachedModuleInfo, commands, extraAttentionModules, isOt3 } = props
+  const { attachedModuleInfo, commands, extraAttentionModules, isFlex } = props
   const { t } = useTranslation('protocol_setup')
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(commands)
 
@@ -67,7 +67,7 @@ export function SetupLabwareList(
             attachedModuleInfo={attachedModuleInfo}
             extraAttentionModules={extraAttentionModules}
             {...labwareItem}
-            isOt3={isOt3}
+            isFlex={isFlex}
             nestedLabwareInfo={getNestedLabwareInfo(labwareItem, commands)}
           />
         )
@@ -75,7 +75,7 @@ export function SetupLabwareList(
       <OffDeckLabwareList
         commands={commands}
         labwareItems={offDeckItems}
-        isOt3={isOt3}
+        isFlex={isFlex}
       />
     </Flex>
   )
