@@ -83,7 +83,6 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
       >
         {map(loadedFixturesBySlot, ({ params, id }) => {
           const { loadName, location } = params
-          console.log(id)
           return (
             <FixtureListItem
               key={`SetupFixturesList_${loadName}_slot_${location.cutout}`}
