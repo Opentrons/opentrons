@@ -324,6 +324,8 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
+        if self._hardware_api.is_movement_execution_taskified():
+            await self._hardware_api.cancel_execution_and_running_tasks()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -412,7 +414,6 @@ class ProtocolEngine:
         # order will be backwards because the stack is first-in-last-out.
         exit_stack = AsyncExitStack()
         exit_stack.push_async_callback(self._plugin_starter.stop)  # Last step.
-
         exit_stack.push_async_callback(
             # Cleanup after hardware halt and reset the hardware controller
             self._hardware_stopper.do_stop_and_recover,
@@ -432,7 +433,6 @@ class ProtocolEngine:
             disengage_before_stopping=disengage_before_stopping,
         )
         exit_stack.push_async_callback(self._queue_worker.join)  # First step.
-
         try:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()

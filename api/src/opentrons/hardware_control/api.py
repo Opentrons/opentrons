@@ -509,13 +509,22 @@ class API(
         robot. After this call, no further recovery is necessary.
         """
         await self._backend.halt()  # calls smoothie_driver.kill()
-        await self._execution_manager.cancel()
+        await self.cancel_execution_and_running_tasks()
         self._log.info("Recovering from halt")
         await self.reset()
         await self.cache_instruments()
 
         if home_after:
             await self.home()
+
+    def is_movement_execution_taskified(self) -> bool:
+        return self.taskify_movement_execution
+
+    def should_taskify_movement_execution(self, taskify: bool) -> None:
+        self.taskify_movement_execution = taskify
+
+    async def cancel_execution_and_running_tasks(self) -> None:
+        await self._execution_manager.cancel()
 
     async def reset(self) -> None:
         """Reset the stored state of the system."""

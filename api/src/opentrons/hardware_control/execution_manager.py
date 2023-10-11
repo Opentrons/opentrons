@@ -92,6 +92,15 @@ class ExecutionManagerProvider:
     def __init__(self, simulator: bool) -> None:
         self._em_simulate = simulator
         self._execution_manager = ExecutionManager()
+        self._taskify_movement_execution: bool = False
+
+    @property
+    def taskify_movement_execution(self) -> bool:
+        return self._taskify_movement_execution
+
+    @taskify_movement_execution.setter
+    def taskify_movement_execution(self, cancellable: bool) -> None:
+        self._taskify_movement_execution = cancellable
 
     @property
     def execution_manager(self) -> ExecutionManager:
@@ -125,7 +134,14 @@ class ExecutionManagerProvider:
         ) -> DecoratedReturn:
             if not inst._em_simulate:
                 await inst.execution_manager.wait_for_is_running()
-            return await decorated(inst, *args, **kwargs)
+            if inst.taskify_movement_execution:
+                decorated_task: "asyncio.Task[DecoratedReturn]" = asyncio.create_task(
+                    decorated(inst, *args, **kwargs)
+                )
+                inst.execution_manager.register_cancellable_task(decorated_task)
+                return await decorated_task
+            else:
+                return await decorated(inst, *args, **kwargs)
 
         return cast(DecoratedMethodReturningValue, replace)
 

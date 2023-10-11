@@ -213,3 +213,15 @@ class MotionController(Protocol):
     async def retract_axis(self, axis: Axis) -> None:
         """Retract the specified axis to its home position."""
         ...
+
+    def is_movement_execution_taskified(self) -> bool:
+        """Get whether move tasks are being executed inside cancellable tasks."""
+        ...
+
+    def should_taskify_movement_execution(self, taskify: bool) -> None:
+        """Specify whether move methods should be executed inside cancellable tasks."""
+        ...
+
+    async def cancel_execution_and_running_tasks(self) -> None:
+        """Cancel all tasks and set execution manager state to Cancelled."""
+        ...
