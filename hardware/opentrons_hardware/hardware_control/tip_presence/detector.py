@@ -63,6 +63,9 @@ class TipDetector:
 
     def start(self) -> None:
         self._messenger.add_listener(self._dispatch_tip_notification, self._filter)
+    
+    def __del__(self) -> None:
+        self._messenger.remove_listener(self._dispatch_tip_notification)
 
     def _dispatch_tip_notification(
         self, response: MessageDefinition, arb_id: ArbitrationId
