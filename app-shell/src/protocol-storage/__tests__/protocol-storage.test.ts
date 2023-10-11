@@ -9,7 +9,6 @@ import {
   fetchProtocols,
   getUnixTimeFromAnalysisPath,
   getParsedAnalysisFromPath,
-  preParityMigrateProtocolsFrom,
 } from '../'
 
 describe('protocol storage directory utilities', () => {
