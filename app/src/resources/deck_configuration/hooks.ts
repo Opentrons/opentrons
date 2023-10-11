@@ -1,7 +1,11 @@
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 
-import type { Fixture, LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
+import {
+  Fixture,
+  LoadFixtureRunTimeCommand,
+  STANDARD_SLOT_LOAD_NAME,
+} from '@opentrons/shared-data'
 
 export const CONFIGURED = 'configured'
 export const CONFLICTING = 'conflicting'
@@ -33,6 +37,8 @@ export function useLoadedFixturesConfigStatus(
       deckConfigurationAtLocation.loadName === loadedFixture.params.loadName
     ) {
       configurationStatus = CONFIGURED
+      //  special casing this for now until we know what the backend will give us. It is only
+      //  conflicting if the current deck configuration fixture is not the desired or standard slot
     } else if (
       deckConfigurationAtLocation != null &&
       deckConfigurationAtLocation.loadName !== loadedFixture.params.loadName &&

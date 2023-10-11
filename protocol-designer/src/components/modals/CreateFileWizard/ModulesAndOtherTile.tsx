@@ -129,7 +129,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   )
 
   return (
-    <HandleEnter onEnter={proceed}>
+    <HandleEnter disabled={!hasATrash} onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -169,14 +169,14 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         >
           <GoBack
             onClick={() => {
-              if (
-                props.values.pipettesByMount.left.pipetteName === 'p1000_96'
-              ) {
-                goBack(3)
-              } else if (
-                props.values.pipettesByMount.right.pipetteName === ''
-              ) {
-                goBack(2)
+              if (!enableDeckModification || robotType === OT2_ROBOT_TYPE) {
+                if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
+                  goBack(4)
+                } else if (values.pipettesByMount.right.pipetteName === '') {
+                  goBack(3)
+                } else {
+                  goBack(2)
+                }
               } else {
                 goBack()
               }

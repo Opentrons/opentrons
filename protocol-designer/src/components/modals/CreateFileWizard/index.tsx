@@ -59,6 +59,7 @@ import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
 import { FirstPipetteTipsTile, SecondPipetteTipsTile } from './PipetteTipsTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
+import { StagingAreaTile } from './StagingAreaTile'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
@@ -70,6 +71,7 @@ type WizardStep =
   | 'first_pipette_tips'
   | 'second_pipette_type'
   | 'second_pipette_tips'
+  | 'staging_area'
   | 'modulesAndOther'
 const WIZARD_STEPS: WizardStep[] = [
   'robotType',
@@ -78,6 +80,7 @@ const WIZARD_STEPS: WizardStep[] = [
   'first_pipette_tips',
   'second_pipette_type',
   'second_pipette_tips',
+  'staging_area',
   'modulesAndOther',
 ]
 
@@ -240,6 +243,16 @@ export function CreateFileWizard(): JSX.Element | null {
       ) {
         dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
       }
+      //  add staging areas
+      const stagingAreas = values.additionalEquipment.filter(equipment =>
+        equipment.includes('stagingArea')
+      )
+      if (enableDeckModification && stagingAreas.length > 0) {
+        stagingAreas.forEach(stagingArea => {
+          const [, location] = stagingArea.split('_')
+          dispatch(createDeckFixture('stagingArea', location))
+        })
+      }
     }
   }
   const wizardHeader = (
@@ -401,6 +414,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     ),
     second_pipette_tips: (formikProps: FormikProps<FormState>) => (
       <SecondPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
+    ),
+    staging_area: (formikProps: FormikProps<FormState>) => (
+      <StagingAreaTile {...{ ...formikProps, proceed, goBack }} />
     ),
     modulesAndOther: (formikProps: FormikProps<FormState>) => (
       <ModulesAndOtherTile
