@@ -47,16 +47,17 @@ function useFindProgressPercentFrom(
       prevSeenStepProgress.current = 100
     }
     return progressPercent
-  } else if (sessionStage === 'error' || stepProgress == null) {
+  } else if (
+    sessionStage === 'error' ||
+    sessionStage === null ||
+    stepProgress == null ||
+    sessionStep == null
+  ) {
     return progressPercent
   }
 
   const stepAndStage = `${sessionStep}-${sessionStage}`
   // Ignored because 0-100 is too fast to be worth recording.
-  console.log(
-    '🚀 ~ file: useRobotUpdateInfo.ts:129 ~ stepAndStage:',
-    stepAndStage
-  )
   const IGNORED_STEPS_AND_STAGES = ['processFile-awaiting-file']
   // Each stepAndStage is an equal fraction of the total steps.
   const TOTAL_STEPS_WITH_PROGRESS = fileInfo?.isManualFile ? 3 : 3
@@ -64,11 +65,13 @@ function useFindProgressPercentFrom(
   const isNewStateWithProgress =
     prevSeenUpdateStep.current !== stepAndStage &&
     stepProgress > 0 && // Accomodate for shell progress oddities.
-    stepProgress < 100 &&
-    !IGNORED_STEPS_AND_STAGES.includes(stepAndStage)
+    stepProgress < 100
 
   // Proceed to next fraction of progress bar.
-  if (isNewStateWithProgress) {
+  if (
+    isNewStateWithProgress &&
+    !IGNORED_STEPS_AND_STAGES.includes(stepAndStage)
+  ) {
     currentStepWithProgress.current += 1
     const completedStepsWithProgress =
       (100 * currentStepWithProgress.current) / TOTAL_STEPS_WITH_PROGRESS
@@ -77,7 +80,10 @@ function useFindProgressPercentFrom(
     setProgressPercent(completedStepsWithProgress + stepProgress)
   }
   // Proceed with current fraction of progress bar.
-  else if (stepProgress > prevSeenStepProgress.current) {
+  else if (
+    stepProgress > prevSeenStepProgress.current &&
+    !IGNORED_STEPS_AND_STAGES.includes(stepAndStage)
+  ) {
     const currentStepProgress =
       progressPercent +
       (stepProgress - prevSeenStepProgress.current) / TOTAL_STEPS_WITH_PROGRESS
