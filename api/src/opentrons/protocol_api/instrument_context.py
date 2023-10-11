@@ -137,7 +137,7 @@ class InstrumentContext(publisher.CommandPublisher):
         The default speed for Flex varies between 300 and 350 mm/s.
         The OT-2 default is 400 mm/s. In addition to changing the
         default, the speed of individual motions can be changed with the
-        ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
+        ``speed`` argument of the :py:meth:`InstrumentContext.move_to` method.
         See also, :ref:`gantry_speed`.
         """
         return self._core.get_default_speed()
@@ -1492,7 +1492,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def current_volume(self) -> float:
         """
-        The current amount of liquid, in microliters, held in the pipette.
+        The current amount of liquid held in the pipette. Measured in µL.
         """
         return self._core.get_current_volume()
 
@@ -1523,7 +1523,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def channels(self) -> int:
-        """The number of channels on the pipette."""
+        """The number of channels on the pipette. See also, :ref:`new-pipette`."""
         return self._core.get_channels()
 
     @property  # type: ignore
