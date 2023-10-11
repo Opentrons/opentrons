@@ -47,10 +47,13 @@ KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Hardware control for Opentrons Robots."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    "python-can==3.3.4",
     "pyserial==3.5",
     f"opentrons_shared_data=={VERSION}",
 ]
+
+EXTRAS = {
+    "CAN": ["python-can==3.3.4"],
+}
 
 
 def read(*parts: str) -> str:
@@ -80,6 +83,7 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRAS,
         include_package_data=True,
         package_data={
             "opentrons_hardware": ["py.typed", "opentrons_hardware.cmakefind"]

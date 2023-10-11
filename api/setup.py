@@ -60,6 +60,7 @@ DESCRIPTION = (
 PACKAGES = find_packages(where="src")
 INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
+    f"opentrons-hardware=={VERSION}",
     "aionotify==0.2.0",
     "anyio==3.3.0",
     "jsonschema==3.0.2",
