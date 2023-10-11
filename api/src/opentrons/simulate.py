@@ -925,7 +925,8 @@ def _clear_live_protocol_engine_contexts() -> None:
 def main() -> int:
     """Run the simulation"""
     parser = argparse.ArgumentParser(
-        prog="opentrons_simulate", description="Simulate an OT-2 protocol"
+        prog="opentrons_simulate",
+        description="Simulate a protocol for an Opentrons robot",
     )
     parser = get_arguments(parser)
 
