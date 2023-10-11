@@ -61,7 +61,7 @@ export function InstrumentsAndModules({
   )?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
   const [
     subsystemToUpdate,
@@ -214,7 +214,7 @@ export function InstrumentsAndModules({
                 pipetteIs96Channel={is96ChannelAttached}
                 pipetteIsBad={badLeftPipette != null}
                 updatePipette={() => setSubsystemToUpdate('pipette_left')}
-                isRunActive={currentRunId != null && !isRunTerminal}
+                isRunActive={currentRunId != null && isRunRunning}
               />
               {isOT3 && (
                 <GripperCard
@@ -225,7 +225,7 @@ export function InstrumentsAndModules({
                       null
                   }
                   setSubsystemToUpdate={setSubsystemToUpdate}
-                  isRunActive={currentRunId != null && !isRunTerminal}
+                  isRunActive={currentRunId != null && isRunRunning}
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -266,7 +266,7 @@ export function InstrumentsAndModules({
                   pipetteIs96Channel={false}
                   pipetteIsBad={badRightPipette != null}
                   updatePipette={() => setSubsystemToUpdate('pipette_right')}
-                  isRunActive={currentRunId != null && !isRunTerminal}
+                  isRunActive={currentRunId != null && isRunRunning}
                 />
               )}
               {rightColumnModules.map((module, index) => (
