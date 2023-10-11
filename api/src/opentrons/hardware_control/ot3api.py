@@ -732,12 +732,17 @@ class OT3API(
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
+    def is_movement_execution_taskified(self) -> bool:
+        return self.taskify_movement_execution
+
+    def should_taskify_movement_execution(self, taskify: bool) -> None:
+        self.taskify_movement_execution = taskify
+
     async def _stop_motors(self) -> None:
         """Immediately stop motors."""
         await self._backend.halt()
 
-    async def _cancel_execution_and_running_tasks(self) -> None:
-        """Cancel execution manager and all running (hardware module) tasks."""
+    async def cancel_execution_and_running_tasks(self) -> None:
         await self._execution_manager.cancel()
 
     async def halt(self, disengage_before_stopping: bool = False) -> None:
@@ -751,7 +756,7 @@ class OT3API(
     async def stop(self, home_after: bool = True) -> None:
         """Stop motion as soon as possible, reset, and optionally home."""
         await self._stop_motors()
-        await self._cancel_execution_and_running_tasks()
+        await self.cancel_execution_and_running_tasks()
         self._log.info("Resetting OT3API")
         await self.reset()
         if home_after:

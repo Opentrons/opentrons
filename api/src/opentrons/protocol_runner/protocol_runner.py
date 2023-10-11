@@ -155,12 +155,14 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
             equipment_broker = Broker[LegacyLoadInfo]()
-
             self._protocol_engine.add_plugin(
                 LegacyContextPlugin(
                     broker=self._broker, equipment_broker=equipment_broker
                 )
             )
+            self._hardware_api.should_taskify_movement_execution(taskify=True)
+        else:
+            self._hardware_api.should_taskify_movement_execution(taskify=False)
 
         context = self._legacy_context_creator.create(
             protocol=protocol,
@@ -220,6 +222,7 @@ class JsonRunner(AbstractRunner):
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -307,6 +310,7 @@ class LiveRunner(AbstractRunner):
         # of runner interface
         self._hardware_api = hardware_api
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     def prepare(self) -> None:
         """Set the task queue to wait until all commands are executed."""
