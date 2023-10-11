@@ -137,8 +137,8 @@ class InstrumentContext(publisher.CommandPublisher):
         The default speed for Flex varies between 300 and 350 mm/s.
         The OT-2 default is 400 mm/s. In addition to changing the
         default, the speed of individual motions can be changed with the
-        ``speed`` argument to :py:meth:`InstrumentContext.move_to`. See
-        also, :ref:`gantry_speed`.
+        ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
+        See also, :ref:`gantry_speed`.
         """
         return self._core.get_default_speed()
 
@@ -154,12 +154,13 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
-        Aspirate a given volume of liquid from the specified location, using
-        this pipette.
+        Draw liquid into a pipette tip. Includes parameters that control
+        aspiration volume, well location, tip position in a well,
+        and pipette flow rate.
 
-        :param volume: The volume to aspirate, in microliters (µL).  If 0 or
-                       unspecified, defaults to the highest volume possible
-                       with this pipette and its currently attached tip.
+        :param volume: The volume to aspirate. Measured in µL. If 0 or
+                       unspecified, defaults to the maximum volume for
+                       the pipette and its currently attached tip.
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
@@ -170,10 +171,9 @@ class InstrumentContext(publisher.CommandPublisher):
                          robot will aspirate from the exact specified location.
                          If unspecified, the robot will aspirate from the
                          current position.
-        :param rate: A relative modifier for how quickly to aspirate liquid.
-                     The flow rate for this aspirate will be
-                     `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
-                     If not specified, defaults to 1.0.
+        :param rate: How quickly a pipette aspirates liquid. Measured in µL/s.
+                     Calculated as `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
+                     If not specified, defaults to 1.0. See also, :ref:`new-plunger-flow-rates`.
         :type rate: float
         :returns: This instance.
 
