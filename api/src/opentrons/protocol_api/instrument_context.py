@@ -112,8 +112,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. note::
 
-            In robot software versions 6.3.0 and 6.3.1, protocols specifying API level 2.14 would
-            not respect ``starting_tip`` on the second and subsequent calls to
+            In robot software versions 6.3.0 and 6.3.1, protocols specifying API level 2.14 ignored ``starting_tip`` on the second and subsequent calls to
             :py:meth:`.InstrumentContext.pick_up_tip` with no argument. This is fixed for all API
             levels as of robot software version 7.0.0.
         """
@@ -125,7 +124,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def reset_tipracks(self) -> None:
-        """Reload all tips in each tip rack and reset starting tip"""
+        """Reload all tips in each tip rack and reset starting tip."""
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
@@ -133,12 +132,13 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def default_speed(self) -> float:
-        """The speed at which the robot's gantry moves.
+        """The speed at which the robot's gantry moves in mm/s.
 
-        By default, 400 mm/s. Changing this value will change the speed of the
-        pipette when moving between labware. In addition to changing the
+        The default speed for Flex varies between 300 and 350 mm/s.
+        The OT-2 default is 400 mm/s. In addition to changing the
         default, the speed of individual motions can be changed with the
         ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
+        See also, :ref:`gantry_speed` and :ref:`axis_speed_limits`.
         """
         return self._core.get_default_speed()
 
