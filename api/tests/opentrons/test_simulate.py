@@ -62,6 +62,12 @@ def test_simulate_function_apiv2_bundle(
     assert isinstance(bundle_contents, protocols.types.BundleContents)
 
 
+@pytest.mark.parametrize("protocol_file", ["testosaur_v2.py", "testosaur_v2_14.py"])
+def test_simulate_without_filename(protocol: Protocol, protocol_file: str) -> None:
+    """`simulate()` should accept a protocol without a filename."""
+    simulate.simulate(protocol.filelike)  # Should not raise.
+
+
 @pytest.mark.parametrize(
     ("protocol_file", "expected_entries"),
     [
