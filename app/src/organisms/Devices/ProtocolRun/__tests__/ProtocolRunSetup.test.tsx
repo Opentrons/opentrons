@@ -20,6 +20,7 @@ import {
   useIsOT3,
   useRobot,
   useRunCalibrationStatus,
+  useModuleCalibrationStatus,
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
@@ -51,6 +52,9 @@ const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFu
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
@@ -266,9 +270,41 @@ describe('ProtocolRunSetup', () => {
           ...MOCK_ROTOCOL_LIQUID_KEY,
         } as any)
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: true })
     })
     afterEach(() => {
       resetAllWhenMocks()
+    })
+
+    it('renders calibration ready if robot is Flex and modules are calibrated', () => {
+      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: true })
+
+      const { getAllByText } = render()
+      expect(getAllByText('Calibration ready').length).toEqual(2)
+    })
+
+    it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
+      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: false })
+
+      const { getByText } = render()
+      getByText('STEP 2')
+      getByText('Modules')
+      getByText('Calibration needed')
+    })
+
+    it('does not render calibration element if robot is OT-2', () => {
+      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+
+      const { getAllByText } = render()
+      expect(getAllByText('Calibration ready').length).toEqual(1)
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {

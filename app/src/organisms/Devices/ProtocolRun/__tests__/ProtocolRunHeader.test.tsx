@@ -66,6 +66,7 @@ import {
   useTrackProtocolRunEvent,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
   useIsOT3,
@@ -147,6 +148,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 >
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
   typeof useRunCreatedAtTimestamp
@@ -361,6 +365,9 @@ describe('ProtocolRunHeader', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ complete: true })
+    when(mockUseModuleCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
     when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)

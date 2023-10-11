@@ -8,7 +8,11 @@ import {
   useHoverTooltip,
   PrimaryButton,
 } from '@opentrons/components'
-import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
+import {
+  useRunHasStarted,
+  useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
+} from '../../hooks'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { SetupModulesMap } from './SetupModulesMap'
@@ -33,6 +37,9 @@ export const SetupModules = ({
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const runHasStarted = useRunHasStarted(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing32}>
@@ -45,7 +52,11 @@ export const SetupModules = ({
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>
         <PrimaryButton
-          disabled={missingModuleIds.length > 0 || runHasStarted}
+          disabled={
+            missingModuleIds.length > 0 ||
+            runHasStarted ||
+            !moduleCalibrationStatus.complete
+          }
           onClick={expandLabwarePositionCheckStep}
           id="ModuleSetup_proceedToLabwarePositionCheck"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
@@ -54,11 +65,15 @@ export const SetupModules = ({
           {t('proceed_to_labware_position_check')}
         </PrimaryButton>
       </Flex>
-      {missingModuleIds.length > 0 || runHasStarted ? (
+      {missingModuleIds.length > 0 ||
+      runHasStarted ||
+      !moduleCalibrationStatus.complete ? (
         <Tooltip tooltipProps={tooltipProps}>
           {runHasStarted
             ? t('protocol_run_started')
-            : t('plug_in_required_module', { count: missingModuleIds.length })}
+            : missingModuleIds.length > 0
+            ? t('plug_in_required_module', { count: missingModuleIds.length })
+            : t('calibrate_module_failure_reason')}
         </Tooltip>
       ) : null}
     </>

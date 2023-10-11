@@ -85,6 +85,7 @@ import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
   useIsOT3,
+  useModuleCalibrationStatus,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
@@ -476,10 +477,17 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runId
   )
+  const { complete: isModuleCalibrationComplete } = useModuleCalibrationStatus(
+    robotName,
+    runId
+  )
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
+  const isSetupComplete =
+    isCalibrationComplete &&
+    isModuleCalibrationComplete &&
+    missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getRobotUpdateDisplayInfo(state, robotName)
