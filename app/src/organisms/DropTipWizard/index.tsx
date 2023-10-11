@@ -41,7 +41,7 @@ import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
 import type { PipetteData } from '@opentrons/api-client'
-import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
+import type { PipetteModelSpecs, RobotType, SavePositionRunTimeCommand } from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
 const MANAGED_PIPETTE_ID = 'managedPipetteId'
@@ -231,8 +231,19 @@ export const DropTipWizardComponent = (
       setCurrentStepIndex(currentStepIndex + 1)
     }
   }
-  const handleJog: Jog = (axis, direction, step) => {
-    console.log('TODO Jog with params: ', axis, direction, step)
+  const handleJog: Jog = (axis, dir, step) => {
+    if (createdMaintenanceRunId != null) {
+      chainRunCommands(
+        createdMaintenanceRunId,
+        [{
+          commandType: 'moveRelative',
+          params: { pipetteId: MANAGED_PIPETTE_ID, distance: step * dir, axis },
+        }],
+        true
+      )
+        .then(data => { })
+        .catch((e: Error) => { })
+    }
   }
 
   const {
@@ -272,10 +283,39 @@ export const DropTipWizardComponent = (
         commandType: 'retractAxis' as const,
         params: { axis: 'y' },
       },
-      { commandType: 'savePosition' as const, params: {} },
-    ], true).then(position => {
-      console.log(position)
-      return Promise.resolve()
+      {
+        commandType: 'savePosition' as const, params: {
+          pipetteId: MANAGED_PIPETTE_ID
+        }
+      },
+    ], true).then(([
+      _retract1Response,
+      _retract2Response,
+      _retract3Response,
+      _retract4Response,
+      savePositionResponse,
+    ]) => {
+      const currentPosition = (savePositionResponse.data as SavePositionRunTimeCommand).result?.position
+      if (currentPosition != null) {
+        chainRunCommands(createdMaintenanceRunId, [
+          {
+            commandType: 'moveRelative',
+            params: {
+              pipetteId: MANAGED_PIPETTE_ID,
+              distance: currentPosition.y - y,
+              axis: 'y'
+            }
+          },
+          {
+            commandType: 'moveRelative',
+            params: {
+              pipetteId: MANAGED_PIPETTE_ID,
+              distance: currentPosition.x - x,
+              axis: 'x'
+            }
+          }
+        ], true).then(() => { }).catch(e => e)
+      }
     })
   }
 
