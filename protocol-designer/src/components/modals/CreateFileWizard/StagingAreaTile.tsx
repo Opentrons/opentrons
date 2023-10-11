@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'
-import { i18n } from '../../../localization'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -13,15 +12,16 @@ import {
   DeckConfigurator,
 } from '@opentrons/components'
 import {
-  DeckConfiguration,
   OT2_ROBOT_TYPE,
   STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
+import { i18n } from '../../../localization'
 import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
 
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { WizardTileProps } from './types'
 
 const STAGING_AREA_SLOTS = ['A3', 'B3', 'C3', 'D3']

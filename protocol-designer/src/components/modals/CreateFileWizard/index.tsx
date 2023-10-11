@@ -59,10 +59,10 @@ import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
 import { FirstPipetteTipsTile, SecondPipetteTipsTile } from './PipetteTipsTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
+import { StagingAreaTile } from './StagingAreaTile'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
-import { StagingAreaTile } from './StagingAreaTile'
 
 type WizardStep =
   | 'robotType'

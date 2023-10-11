@@ -170,13 +170,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           <GoBack
             onClick={() => {
               if (!enableDeckModification || robotType === OT2_ROBOT_TYPE) {
-                if (
-                  props.values.pipettesByMount.left.pipetteName === 'p1000_96'
-                ) {
+                if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
                   goBack(4)
-                } else if (
-                  props.values.pipettesByMount.right.pipetteName === ''
-                ) {
+                } else if (values.pipettesByMount.right.pipetteName === '') {
                   goBack(3)
                 } else {
                   goBack(2)
