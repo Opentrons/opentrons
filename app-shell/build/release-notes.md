@@ -6,6 +6,21 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.0.1
+
+Welcome to the v7.0.0 release of the Opentrons App! This release builds on the major release that added support for Opentrons Flex.
+
+### Improved Features
+
+- Pipettes move higher during Labware Position Check to avoid crashes in all deck slots, not just those with labware loaded in the protocol.
+
+### Bug Fixes
+
+- The app no longer blocks running valid protocols due to "not valid JSON" or "apiLevel not declared" errors.
+- Robot commands, like turning the lights on or off, no longer take a long time to execute.
+
+---
+
 ## Opentrons App Changes in 7.0.0
 
 Welcome to the v7.0.0 release of the Opentrons App! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
