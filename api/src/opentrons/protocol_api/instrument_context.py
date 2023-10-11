@@ -1593,15 +1593,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. note ::
 
-            Changing a pipette's mode will reset its :ref:`flow rates <new-plunger-flow-rates>`.
+            Changing a pipette's mode will reset its :ref:`flow rate <new-plunger-flow-rates>`.
 
-        This function will raise an error if called when the pipette's tip contains liquid. It won't
-        raise an error if no tip is attached, but changing modes may affect which tips the pipette can
-        subsequently pick up without raising an error.
+        This function will raise an error if called when the pipette's tip contains liquid. It won't raise an error if a tip is not attached, but changing modes may affect which tips the pipette can subsequently pick up without raising an error.
 
-        This function will also raise an error if ``volume`` is outside the :ref:`overall minimum and
-        maximum capacities <new-pipette-models>` of the pipette (e.g., setting ``volume=1`` for a Flex
-        1000 µL pipette).
+        This function will also raise an error if ``volume`` is outside of the :ref:`minimum and maximum capacities <new-pipette-models>` of the pipette (e.g., setting ``volume=1`` for a Flex 1000 µL pipette).
 
         :param volume: The volume, in µL, that the pipette will prepare to handle.
         :type volume: float
