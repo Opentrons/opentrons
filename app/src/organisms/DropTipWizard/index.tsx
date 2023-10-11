@@ -44,6 +44,7 @@ import type { PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
+const MANAGED_PIPETTE_ID = 'managedPipetteId'
 
 interface MaintenanceRunManagerProps {
   robotType: RobotType
@@ -79,7 +80,11 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
-      setCreatedMaintenanceRunId(response.data.id)
+      chainRunCommands(response.data.id, [{
+        commandType: 'loadPipette', params: { pipetteId: MANAGED_PIPETTE_ID, mount: mount, pipetteName: instrumentModelSpecs.name }
+      }], false).then(() => {
+        setCreatedMaintenanceRunId(response.data.id)
+      }).catch(e => e)
     },
   })
 
@@ -190,10 +195,9 @@ export const DropTipWizardComponent = (
 ): JSX.Element | null => {
   const {
     robotType,
-    // maintenanceRunId,
     createMaintenanceRun,
     handleCleanUpAndClose,
-    // chainRunCommands,
+    chainRunCommands,
     // attachedInstrument,
     isCreateLoading,
     isRobotMoving,
@@ -237,30 +241,44 @@ export const DropTipWizardComponent = (
     cancel: cancelExit,
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
-  // let chainMaintenanceRunCommands
+  const handleCreateAndSetup = (shouldDispenseLiquid: boolean): void => {
+    createMaintenanceRun({})
+      .then(() => {
+        setShouldDispenseLiquid(shouldDispenseLiquid)
+      })
+      .catch(e => e)
+  }
 
-  // if (maintenanceRunId != null) {
-  //   chainMaintenanceRunCommands = (
-  //     commands: CreateCommand[],
-  //     continuePastCommandFailure: boolean
-  //   ): Promise<CommandData[]> =>
-  //     chainRunCommands(maintenanceRunId, commands, continuePastCommandFailure)
-  // }
+  const moveToXYCoordinate = (x: number, y: number): Promise<void> => {
+    if (createdMaintenanceRunId == null) return Promise.reject(new Error('no maintenance run present to send move commands to'))
+    return chainRunCommands(createdMaintenanceRunId, [
+      {
+        commandType: 'retractAxis' as const,
+        params: {
+          axis: 'leftZ',
+        },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: {
+          axis: 'rightZ',
+        },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'x' },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'y' },
+      },
+      { commandType: 'savePosition' as const, params: {} },
+    ], true).then(position => {
+      console.log(position)
+      return Promise.resolve()
+    })
+  }
 
-  // const sharedProps = {
-  //   maintenanceRunId:
-  //     maintenanceRunId != null && createdMaintenanceRunId === maintenanceRunId
-  //       ? maintenanceRunId
-  //       : undefined,
-  //   isCreateLoading,
-  //   isRobotMoving,
-  //   attachedInstrument,
-  //   proceed: handleProceed,
-  //   goBack,
-  //   chainRunCommands: chainMaintenanceRunCommands,
-  //   setErrorMessage,
-  //   errorMessage,
-  // }
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmExit) {
     modalContent = (
@@ -272,14 +290,7 @@ export const DropTipWizardComponent = (
     )
   } else if (shouldDispenseLiquid == null) {
     modalContent = (
-      <BeforeBeginning
-        {...{
-          createMaintenanceRun,
-          isCreateLoading,
-          createdMaintenanceRunId,
-          setShouldDispenseLiquid,
-        }}
-      />
+      <BeforeBeginning {...{ handleCreateAndSetup, isCreateLoading, }} />
     )
   } else if (
     currentStep === CHOOSE_BLOWOUT_LOCATION ||
@@ -305,6 +316,7 @@ export const DropTipWizardComponent = (
             components={{ block: <StyledText as="p" /> }}
           />
         }
+        moveToXYCoordinate={moveToXYCoordinate}
       />
     )
   } else if (

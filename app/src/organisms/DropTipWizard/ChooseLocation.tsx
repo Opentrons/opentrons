@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
-import { RobotType } from '@opentrons/shared-data'
+import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
 const NEED_HELP_URL = ''
@@ -23,20 +23,27 @@ interface ChooseLocationProps {
   title: string
   body: string | JSX.Element
   robotType: RobotType
+  moveToXYCoordinate: (x: number, y: number) => Promise<void>
 }
 
 export const ChooseLocation = (
   props: ChooseLocationProps
 ): JSX.Element | null => {
-  const { handleProceed, title, body, robotType } = props
+  const { handleProceed, title, body, robotType, moveToXYCoordinate } = props
   const { t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const deckDef = getDeckDefFromRobotType(robotType)
   const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
     robotType
   )
 
   const handleConfirmPosition: React.MouseEventHandler = () => {
     console.log('MOVE TO selected location: ', selectedLocation)
-    handleProceed()
+    const deckLocation = deckDef.locations.orderedSlots.find(l => l.id === selectedLocation.slotName)
+    const x = deckLocation?.position[0]
+    const y = deckLocation?.position[1]
+    if (x != null && y != null) {
+      moveToXYCoordinate(x, y).then(handleProceed)
+    }
   }
   return (
     <Flex css={TILE_CONTAINER_STYLE}>
