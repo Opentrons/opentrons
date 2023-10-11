@@ -126,7 +126,9 @@ const StagingAreasModalComponent = (
             {hasConflictedSlot ? (
               <PDAlert
                 alertType="warning"
-                title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+                title={i18n.t(
+                  'alert.deck_config_placement.SLOT_OCCUPIED.staging_area'
+                )}
                 description={''}
               />
             ) : null}
