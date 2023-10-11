@@ -935,15 +935,21 @@ def main() -> int:
     # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
-    runlog, maybe_bundle = simulate(
-        protocol_file=args.protocol,
-        file_name=args.protocol.name,
-        custom_labware_paths=args.custom_labware_path,
-        custom_data_paths=(args.custom_data_path + args.custom_data_file),
-        duration_estimator=duration_estimator,
-        hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
-        log_level=args.log_level,
-    )
+    try:
+        runlog, maybe_bundle = simulate(
+            protocol_file=args.protocol,
+            file_name=args.protocol.name,
+            custom_labware_paths=args.custom_labware_path,
+            custom_data_paths=(args.custom_data_path + args.custom_data_file),
+            duration_estimator=duration_estimator,
+            hardware_simulator_file_path=getattr(
+                args, "custom_hardware_simulator_file"
+            ),
+            log_level=args.log_level,
+        )
+    except entrypoint_util.ProtocolEngineExecuteError as error:
+        print(error.to_stderr_string(), file=sys.stderr)
+        return 1
 
     if maybe_bundle:
         bundle_name = getattr(args, "bundle", None)
