@@ -460,7 +460,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :raises RuntimeError: If no location is specified and location cache is
                               None. This should happen if ``blow_out`` is called
                               without first calling a method that takes a
-                              location (eg, :py:meth:`.aspirate`,
+                              location (e.g., :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
         :returns: This instance.
         """
@@ -542,7 +542,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :raises RuntimeError: If no location is specified and location cache is
                               None. This should happen if `touch_tip` is called
                               without first calling a method that takes a
-                              location (eg, :py:meth:`.aspirate`,
+                              location (e.g., :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
         :returns: This instance.
 
@@ -616,7 +616,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :raises RuntimeError: If location cache is None.
                               This should happen if `touch_tip` is called
                               without first calling a method that takes a
-                              location (eg, :py:meth:`.aspirate`,
+                              location (e.g., :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
 
         :returns: This instance.
@@ -1583,15 +1583,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
-        """Configure a pipette to handle a specific volume of liquid, specified in µL. Depending on the
-        volume, the pipette will enter a certain pipetting mode. Changing pipette modes alters properties
-        of the instance of :py:class:`.InstrumentContext`, such as default flow rate, minimum volume, and
-        maximum volume. The pipette will remain in the mode set by this function until it is called again.
+        """Configure a pipette to handle a specific volume of liquid, measured in µL. Depending on the volume, the pipette will enter a certain pipetting mode.
+        Changing pipette modes alters properties of the instance of
+        :py:class:`.InstrumentContext`, such as default flow rate, minimum volume,
+        and maximum volume. The pipette remains in the mode set by this function until it is called again.
 
-        The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode
-        to accurately dispense 1 µL of liquid. Low-volume mode can only be set by calling this function.
-
-        For more information on available modes for certain pipettes, see :ref:`pipette-volume-modes`.
+        The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense 1 µL of liquid. Low-volume mode can
+        only be set by calling ``configure_for_volume``. See also, :ref:`pipette-volume-modes`.
 
         .. note ::
 
