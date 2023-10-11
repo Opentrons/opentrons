@@ -59,7 +59,7 @@ describe('PipetteOverflowMenu', () => {
     const detach = getByRole('button', { name: 'Detach pipette' })
     const settings = getByRole('button', { name: 'Pipette Settings' })
     const about = getByRole('button', { name: 'About pipette' })
-    const dropTip = getByRole('button', { name: 'Drop tip' })
+    const dropTip = getByRole('button', { name: 'Drop tips' })
     fireEvent.click(detach)
     expect(props.handleChangePipette).toHaveBeenCalled()
     fireEvent.click(settings)
