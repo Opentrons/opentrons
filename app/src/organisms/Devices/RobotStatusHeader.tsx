@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -44,6 +45,10 @@ type RobotStatusHeaderProps = StyleProps &
 
 const STATUS_REFRESH_MS = 5000
 
+interface RobotNameContainerProps {
+  isGoToRun: boolean
+}
+
 export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const { name, local, robotModel, ...styleProps } = props
   const { t, i18n } = useTranslation([
@@ -75,7 +80,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing8}
           overflowWrap="anywhere"
         >
-          {`${truncateString(displayName, 80, 65)}; ${i18n.format(
+          {`${truncateString(displayName, 68)}; ${i18n.format(
             t(`run_details:status_${currentRunStatus}`),
             'lowerCase'
           )}`}
@@ -131,6 +136,18 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
 
   useInterval(() => dispatch(fetchStatus(name)), STATUS_REFRESH_MS, true)
 
+  const RobotNameContainer = styled.div`
+    max-width: ${(props: RobotNameContainerProps) =>
+      props.isGoToRun ? `150px` : undefined};
+    @media screen and (max-width: 678px) {
+      max-width: ${(props: RobotNameContainerProps) =>
+        props.isGoToRun ? `105px` : undefined};
+    }
+  `
+
+  const isGoToRun =
+    currentRunId != null && currentRunStatus != null && displayName != null
+
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -146,13 +163,16 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-            <StyledText
-              as="h3"
-              id={`RobotStatusHeader_${String(name)}_robotName`}
-              overflowWrap="anywhere"
-            >
-              {name}
-            </StyledText>
+            <RobotNameContainer isGoToRun={isGoToRun}>
+              <StyledText
+                as="h3"
+                id={`RobotStatusHeader_${String(name)}_robotName`}
+                overflow="hidden"
+                textOverflow="ellipsis"
+              >
+                {name}
+              </StyledText>
+            </RobotNameContainer>
             {iconName != null ? (
               <Btn
                 {...targetProps}
