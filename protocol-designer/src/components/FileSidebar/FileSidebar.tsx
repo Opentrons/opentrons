@@ -43,7 +43,7 @@ export interface Props {
 
 export interface AdditionalEquipment {
   [additionalEquipmentId: string]: {
-    name: 'gripper' | 'wasteChute'
+    name: 'gripper' | 'wasteChute' | 'stagingArea'
     id: string
     location?: string
   }

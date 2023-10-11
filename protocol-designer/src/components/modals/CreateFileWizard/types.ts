@@ -6,8 +6,14 @@ import type {
 
 import type { NewProtocolFields } from '../../../load-file'
 
-export type AdditionalEquipment = 'gripper' | 'wasteChute' | 'trashBin'
-
+export type AdditionalEquipment =
+  | 'gripper'
+  | 'wasteChute'
+  | 'trashBin'
+  | 'stagingArea_A3'
+  | 'stagingArea_B3'
+  | 'stagingArea_C3'
+  | 'stagingArea_D3'
 export interface FormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
