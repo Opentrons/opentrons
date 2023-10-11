@@ -2,23 +2,24 @@ import * as React from 'react'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import {
-  DeckConfiguration,
   FLEX_ROBOT_TYPE,
-  LabwareDefinition2,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import type { Meta, StoryObj } from '@storybook/react'
 import {
   EXTENDED_DECK_CONFIG_FIXTURE,
   STANDARD_SLOT_DECK_CONFIG_FIXTURE,
 } from './__fixtures__'
 import { BaseDeck as BaseDeckComponent } from './'
-import {
-  HEATERSHAKER_MODULE_V1,
-  MAGNETIC_BLOCK_V1,
-  TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_V2,
-} from '@opentrons/shared-data/js'
+
+import type { Meta, StoryObj } from '@storybook/react'
+import type {
+  DeckConfiguration,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 const meta: Meta<React.ComponentProps<typeof BaseDeckComponent>> = {
   component: BaseDeckComponent,
