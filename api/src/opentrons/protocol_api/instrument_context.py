@@ -458,7 +458,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :type location: :py:class:`.Well` or :py:class:`.Location` or None
 
         :raises RuntimeError: If no location is specified and location cache is
-                              None. This should happen if `blow_out` is called
+                              None. This should happen if ``blow_out`` is called
                               without first calling a method that takes a
                               location (eg, :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
