@@ -395,7 +395,7 @@ class InstrumentContext(publisher.CommandPublisher):
                      and when dispensing, it will be
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette.
-        :returns: This instance
+        :returns: This instance.
 
         .. note::
 
@@ -463,7 +463,7 @@ class InstrumentContext(publisher.CommandPublisher):
                               without first calling a method that takes a
                               location (eg, :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
-        :returns: This instance
+        :returns: This instance.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
@@ -545,7 +545,7 @@ class InstrumentContext(publisher.CommandPublisher):
                               without first calling a method that takes a
                               location (eg, :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
-        :returns: This instance
+        :returns: This instance.
 
         .. note::
 
@@ -620,7 +620,7 @@ class InstrumentContext(publisher.CommandPublisher):
                               location (eg, :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
 
-        :returns: This instance
+        :returns: This instance.
 
         .. note::
 
@@ -654,7 +654,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This will not reset tip tracking, so the well flag will remain ``False``.
 
-        :returns: This instance
+        :returns: This instance.
 
         :param home_after:
             See the ``home_after`` parameter of :py:obj:`drop_tip`.
@@ -758,7 +758,7 @@ class InstrumentContext(publisher.CommandPublisher):
             prepare during :py:meth:`.aspirate`. Version 2.12 and earlier will raise an
             ``APIVersionError`` if a value is set for ``prep_after``.
 
-        :returns: This instance
+        :returns: This instance.
         """
 
         if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
@@ -930,7 +930,7 @@ class InstrumentContext(publisher.CommandPublisher):
             extensively test ``home_after=False`` with your particular pipette
             and your particular tips before relying on it.
 
-        :returns: This instance
+        :returns: This instance.
         """
         alternate_drop_location: bool = False
         if location is None:
@@ -1027,7 +1027,7 @@ class InstrumentContext(publisher.CommandPublisher):
               - ``mix_after`` is ignored.
 
 
-        :returns: This instance
+        :returns: This instance.
         """
         _log.debug("Distributing {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "distribute"
@@ -1059,7 +1059,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
                        Some parameters behave differently than when transferring.
                        ``disposal_volume`` and ``mix_before`` are ignored.
-        :returns: This instance
+        :returns: This instance.
         """
         _log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "consolidate"
@@ -1173,7 +1173,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
               See :ref:`param-disposal-volume` for details.
 
-        :returns: This instance
+        :returns: This instance.
         """
         _log.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
