@@ -129,16 +129,11 @@ def protocol_file() -> str:
 
 @pytest.fixture()
 def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
-    root = protocol_file
-    filename = os.path.join(os.path.dirname(__file__), "data", root)
-
-    file = open(filename)
-    text = "".join(list(file))
-    file.seek(0)
-
-    yield Protocol(text=text, filename=filename, filelike=file)
-
-    file.close()
+    filename = os.path.join(os.path.dirname(__file__), "data", protocol_file)
+    with open(filename, encoding="utf-8") as file:
+        text = file.read()
+        file.seek(0)
+        yield Protocol(text=text, filename=filename, filelike=file)
 
 
 @pytest.fixture()

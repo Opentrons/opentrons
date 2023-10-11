@@ -1,18 +1,34 @@
 """ opentrons.util.entrypoint_util: functions common to entrypoints
 """
 
+import asyncio
+import contextlib
 from dataclasses import dataclass
+import json
 import logging
 from json import JSONDecodeError
 import pathlib
-import shutil
-from typing import BinaryIO, Dict, Sequence, TextIO, Optional, Union, TYPE_CHECKING
+import tempfile
+from typing import (
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Sequence,
+    Union,
+    TYPE_CHECKING,
+)
 
 from jsonschema import ValidationError  # type: ignore
 
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import labware
 from opentrons.calibration_storage import helpers
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ErrorOccurrence as ProtocolEngineErrorOccurrence,
+)
+from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+from opentrons.protocols.types import JsonProtocol, Protocol, PythonProtocol
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -107,35 +123,96 @@ def datafiles_from_paths(paths: Sequence[Union[str, pathlib.Path]]) -> Dict[str,
     return datafiles
 
 
-# HACK(mm, 2023-06-29): This function is attempting to do something fundamentally wrong.
-# Remove it when we fix https://opentrons.atlassian.net/browse/RSS-281.
-def copy_file_like(source: Union[BinaryIO, TextIO], destination: pathlib.Path) -> None:
-    """Copy a file-like object to a path.
+@contextlib.contextmanager
+def adapt_protocol_source(protocol: Protocol) -> Generator[ProtocolSource, None, None]:
+    """Convert a `Protocol` to a `ProtocolSource`.
 
-    Limitations:
-        If `source` is text, the new file's encoding may not correctly match its original encoding.
-        This can matter if it's a Python file and it has an encoding declaration
-        (https://docs.python.org/3.7/reference/lexical_analysis.html#encoding-declarations).
-        Also, its newlines may get translated.
+    `Protocol` and `ProtocolSource` do basically the same thing. `Protocol` is the traditional
+    interface. `ProtocolSource` is the newer, but not necessarily better, interface that's required
+    to run stuff through Protocol Engine. Ideally, the two would be unified. Until then, we have
+    this shim.
+
+    This is a context manager because it needs to keep some temp files around.
     """
-    # When we read from the source stream, will it give us bytes, or text?
-    try:
-        # Experimentally, this is present (but possibly None) on text-mode streams,
-        # and not present on binary-mode streams.
-        getattr(source, "encoding")
-    except AttributeError:
-        source_is_text = False
+    # ProtocolReader needs to know the filename of the main protocol file so it can infer from its
+    # extension whether it's a JSON or Python protocol. But that filename doesn't necessarily exist,
+    # like when a user passes a text stream to opentrons.simulate.simulate(). As a hack, work
+    # backwards and synthesize a dummy filename with the correct extension.
+    if protocol.filename is not None:
+        # We were given a filename, so no need to guess.
+        #
+        # It's not well-defined in our customer-facing interfaces whether the supplied protocol_name
+        # should be just the filename part, or a path with separators. In case it contains stuff
+        # like "../", sanitize it to just the filename part so we don't save files somewhere bad.
+        main_file_name = pathlib.Path(protocol.filename).name
+    elif isinstance(protocol, JsonProtocol):
+        main_file_name = "protocol.json"
     else:
-        source_is_text = True
+        main_file_name = "protocol.py"
 
-    if source_is_text:
-        destination_mode = "wt"
-    else:
-        destination_mode = "wb"
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        # FIXME(mm, 2023-06-26): Copying these files is pure overhead, and it introduces encoding
+        # hazards. Remove this when we can parse JSONv6+ and PAPIv2.14+ protocols without going
+        # through the filesystem. https://opentrons.atlassian.net/browse/RSS-281
 
-    with open(
-        destination,
-        mode=destination_mode,
-    ) as destination_file:
-        # Use copyfileobj() to limit memory usage.
-        shutil.copyfileobj(fsrc=source, fdst=destination_file)
+        main_file = pathlib.Path(temporary_directory) / main_file_name
+        main_file.write_text(protocol.text, encoding="utf-8")
+
+        labware_files: List[pathlib.Path] = []
+        if isinstance(protocol, PythonProtocol) and protocol.extra_labware is not None:
+            for labware_index, labware_definition in enumerate(
+                protocol.extra_labware.values()
+            ):
+                new_labware_file = (
+                    pathlib.Path(temporary_directory) / f"{labware_index}.json"
+                )
+                new_labware_file.write_text(
+                    json.dumps(labware_definition), encoding="utf-8"
+                )
+                labware_files.append(new_labware_file)
+
+        protocol_source = asyncio.run(
+            ProtocolReader().read_saved(
+                files=[main_file] + labware_files,
+                directory=None,
+                files_are_prevalidated=False,
+            )
+        )
+
+        yield protocol_source
+
+
+class ProtocolEngineExecuteError(Exception):
+    def __init__(self, errors: List[ProtocolEngineErrorOccurrence]) -> None:
+        """Raised when there was any fatal error running a protocol through Protocol Engine.
+
+        Protocol Engine reports errors as data, not as exceptions.
+        But the only way for `opentrons.execute.execute()` and `opentrons.simulate.simulate()`
+        to signal problems to their callers is to raise something.
+        So we need this class to wrap them.
+
+        Params:
+            errors: The errors that Protocol Engine reported.
+        """
+        # Show the full error details if this is part of a traceback. Don't try to summarize.
+        super().__init__(errors)
+
+        self._error_occurrences = errors
+
+    def to_stderr_string(self) -> str:
+        """Return a string suitable as the stderr output of the `opentrons_execute` CLI.
+
+        This summarizes from the full error details.
+        """
+        # It's unclear what exactly we should extract here.
+        #
+        # First, do we print the first element, or the last, or all of them?
+        #
+        # Second, do we print the .detail? .errorCode? .errorInfo? .wrappedErrors?
+        # By contract, .detail seems like it would be insufficient, but experimentally,
+        # it includes a lot, like:
+        #
+        #     ProtocolEngineError [line 3]: Error 4000 GENERAL_ERROR (ProtocolEngineError):
+        #     UnexpectedProtocolError: Labware "fixture_12_trough" not found with version 1
+        #     in namespace "fixture".
+        return self._error_occurrences[0].detail

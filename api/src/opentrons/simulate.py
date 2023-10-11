@@ -4,12 +4,17 @@ This module has functions that provide a console entrypoint for simulating
 a protocol from the command line.
 """
 import argparse
+import asyncio
+import atexit
+from contextlib import ExitStack, contextmanager
 import sys
 import logging
 import os
 import pathlib
 import queue
 from typing import (
+    TYPE_CHECKING,
+    Generator,
     Any,
     Dict,
     List,
@@ -22,6 +27,8 @@ from typing import (
 )
 from typing_extensions import Literal
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 import opentrons
 from opentrons import should_use_ot3
 from opentrons.hardware_control import (
@@ -31,7 +38,16 @@ from opentrons.hardware_control import (
 )
 
 from opentrons.hardware_control.simulator_setup import load_simulator
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
+from opentrons.protocol_api.protocol_context import ProtocolContext
+from opentrons.protocol_engine import create_protocol_engine
+from opentrons.protocol_engine.create_protocol_engine import (
+    create_protocol_engine_in_thread,
+)
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
+from opentrons.protocol_reader.protocol_source import ProtocolSource
+from opentrons.protocol_runner.protocol_runner import create_protocol_runner
 from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 from opentrons.legacy_broker import LegacyBroker
@@ -40,31 +56,27 @@ from opentrons import protocol_api
 from opentrons.commands import types as command_types
 
 from opentrons.protocols import parse, bundle
-from opentrons.protocols.types import PythonProtocol, BundleContents
+from opentrons.protocols.types import (
+    ApiDeprecationError,
+    Protocol,
+    PythonProtocol,
+    BundleContents,
+)
 from opentrons.protocols.api_support.deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
+    for_simulation as deck_type_for_simulation,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from .util.entrypoint_util import (
-    find_jupyter_labware,
-    labware_from_paths,
-    datafiles_from_paths,
-)
+from .util import entrypoint_util
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import (
+        LabwareDefinition as LabwareDefinitionDict,
+    )
 
 
 # See Jira RCORE-535.
-_PYTHON_TOO_NEW_MESSAGE = (
-    "Python protocols with apiLevels higher than 2.13"
-    " cannot currently be simulated with"
-    " the opentrons_simulate command-line tool,"
-    " the opentrons.simulate.simulate() function,"
-    " or the opentrons.simulate.get_protocol_api() function."
-    " Use a lower apiLevel"
-    " or use the Opentrons App instead."
-)
 _JSON_TOO_NEW_MESSAGE = (
     "Protocols created by recent versions of Protocol Designer"
     " cannot currently be simulated with"
@@ -72,6 +84,22 @@ _JSON_TOO_NEW_MESSAGE = (
     " or the opentrons.simulate.simulate() function."
     " Use the Opentrons App instead."
 )
+
+
+# When a ProtocolContext is using a ProtocolEngine to control the robot,
+# it requires some long-lived resources. There's a background thread,
+# an asyncio event loop in that thread, and some ProtocolEngine-controlled background tasks in that
+# event loop.
+#
+# When we're executing a protocol file beginning-to-end, we can clean up those resources after it
+# completes. However, when someone gets a live ProtocolContext through get_protocol_api(), we have
+# no way of knowing when they're done with it. So, as a hack, we keep these resources open
+# indefinitely, letting them leak.
+#
+# We keep this at module scope so that the contained context managers aren't garbage-collected.
+# If they're garbage collected, they can close their resources prematurely.
+# https://stackoverflow.com/a/69155026/497934
+_LIVE_PROTOCOL_ENGINE_CONTEXTS = ExitStack()
 
 
 # TODO(mm, 2023-10-05): Deduplicate this with opentrons.protocols.parse().
@@ -82,11 +110,17 @@ This should match what `opentrons.protocols.parse()` accepts in a protocol's `re
 """
 
 
-class AccumulatingHandler(logging.Handler):
+# TODO(mm, 2023-10-05): Type _SimulateResultRunLog more precisely by using TypedDicts from
+# opentrons.commands.
+_SimulateResultRunLog = List[Mapping[str, Any]]
+_SimulateResult = Tuple[_SimulateResultRunLog, Optional[BundleContents]]
+
+
+class _AccumulatingHandler(logging.Handler):
     def __init__(
         self,
         level: str,
-        command_queue: "queue.Queue[Any]",
+        command_queue: "queue.Queue[object]",
     ) -> None:
         """Create the handler
 
@@ -96,82 +130,91 @@ class AccumulatingHandler(logging.Handler):
         self._command_queue = command_queue
         super().__init__(level)
 
-    def emit(self, record: Any) -> None:
+    def emit(self, record: object) -> None:
         self._command_queue.put(record)
 
 
-class CommandScraper:
-    """An object that handles scraping the broker for commands
-
-    This should be instantiated with the logger to integrate
-    messages from (e.g. ``logging.getLogger('opentrons')``), the
-    level to scrape, and the opentrons broker object to subscribe to.
-
-    The :py:attr:`commands` property contains the list of commands
-    and log messages integrated together. Each element of the list is
-    a dict following the pattern in the docs of :py:obj:`simulate`.
-    """
-
+class _CommandScraper:
     def __init__(
         self, logger: logging.Logger, level: str, broker: LegacyBroker
     ) -> None:
-        """Build the scraper.
+        """An object that handles scraping the broker for commands and integrating log messages
+        with them.
 
-        :param logger: The :py:class:`logging.logger` to scrape
-        :param level: The log level to scrape
-        :param broker: Which broker to subscribe to
+        Params:
+            logger: The logger to integrate messages from, e.g. ``logging.getLogger("opentrons")``.
+            level: The log level to scrape.
+            broker: The broker to subscribe to for commands.
         """
         self._logger = logger
+        self._level = level
         self._broker = broker
-        self._queue = queue.Queue()  # type: ignore
-        if level != "none":
-            level = getattr(logging, level.upper(), logging.WARNING)
-            self._logger.setLevel(level)
-            self._handler: Optional[AccumulatingHandler] = AccumulatingHandler(
-                level, self._queue
-            )
-            logger.addHandler(self._handler)
-        else:
-            self._handler = None
-        self._depth = 0
-        self._commands: List[Mapping[str, Any]] = []
-        self._unsub = self._broker.subscribe(
-            command_types.COMMAND, self._command_callback
-        )
+        self._commands: _SimulateResultRunLog = []
 
     @property
-    def commands(self) -> List[Mapping[str, Mapping[str, Any]]]:
-        """The list of commands. See :py:obj:`simulate`"""
+    def commands(self) -> _SimulateResultRunLog:
+        """The list of commands scraped while `.scrape()` was open, integrated with log messages.
+
+        See :py:obj:`simulate` for the return type.
+        """
         return self._commands
 
-    def __del__(self) -> None:
-        if getattr(self, "_handler", None):
-            try:
-                self._logger.removeHandler(self._handler)  # type: ignore
-            except Exception:
-                pass
-        if hasattr(self, "_unsub"):
-            self._unsub()
+    @contextmanager
+    def scrape(self) -> Generator[None, None, None]:
+        """While this context manager is open, scrape the broker for commands and integrate log
+        messages with them. The accumulated commands will be accessible through `.commands`.
+        """
+        log_queue: "queue.Queue[object]" = queue.Queue()
 
-    def _command_callback(self, message: command_types.CommandMessage) -> None:
-        """The callback subscribed to the broker"""
-        payload = message["payload"]
-        if message["$"] == "before":
-            self._commands.append(
-                {"level": self._depth, "payload": payload, "logs": []}
+        depth = 0
+
+        def handle_command(message: command_types.CommandMessage) -> None:
+            """The callback that we will subscribe to the broker."""
+            nonlocal depth
+            payload = message["payload"]
+            if message["$"] == "before":
+                self._commands.append({"level": depth, "payload": payload, "logs": []})
+                depth += 1
+            else:
+                while not log_queue.empty():
+                    self._commands[-1]["logs"].append(log_queue.get())
+                depth = max(depth - 1, 0)
+
+        if self._level != "none":
+            # The simulation entry points probably leave logging unconfigured, so the level will be
+            # Python's default. Set it to what the user asked to make sure we see the expected
+            # records.
+            #
+            # TODO(mm, 2023-10-03): This is a bit too intrusive for something whose job is just to
+            # "scrape." The entry point function should be responsible for setting the underlying
+            # logger's level.
+            level = getattr(logging, self._level.upper(), logging.WARNING)
+            self._logger.setLevel(level)
+
+            log_handler: Optional[_AccumulatingHandler] = _AccumulatingHandler(
+                level, log_queue
             )
-            self._depth += 1
         else:
-            while not self._queue.empty():
-                self._commands[-1]["logs"].append(self._queue.get())
-            self._depth = max(self._depth - 1, 0)
+            log_handler = None
+
+        with ExitStack() as exit_stack:
+            if log_handler is not None:
+                self._logger.addHandler(log_handler)
+                exit_stack.callback(self._logger.removeHandler, log_handler)
+
+            unsubscribe_from_broker = self._broker.subscribe(
+                command_types.COMMAND, handle_command
+            )
+            exit_stack.callback(unsubscribe_from_broker)
+
+            yield
 
 
 def get_protocol_api(
     version: Union[str, APIVersion],
-    bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
+    bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
-    extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
+    extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
     hardware_simulator: Optional[ThreadManagedHardware] = None,
     # Additional arguments are kw-only to make mistakes harder in environments without
     # type checking, like Jupyter Notebook.
@@ -235,28 +278,52 @@ def get_protocol_api(
         # function.
         parsed_robot_type = parse.robot_type_from_python_identifier(robot_type)
     _validate_can_simulate_for_robot_type(parsed_robot_type)
+    deck_type = deck_type_for_simulation(parsed_robot_type)
 
     if extra_labware is None:
         extra_labware = {
             uri: details.definition
-            for uri, details in (find_jupyter_labware() or {}).items()
+            for uri, details in (entrypoint_util.find_jupyter_labware() or {}).items()
         }
 
-    checked_hardware = _check_hardware_simulator(hardware_simulator, parsed_robot_type)
-    return _build_protocol_context(
-        version=checked_version,
-        hardware_simulator=checked_hardware,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
+    checked_hardware = _make_hardware_simulator(
+        override=hardware_simulator, robot_type=parsed_robot_type
     )
 
+    if checked_version < ENGINE_CORE_API_VERSION:
+        context = _create_live_context_non_pe(
+            api_version=checked_version,
+            deck_type=deck_type,
+            hardware_api=checked_hardware,
+            bundled_labware=bundled_labware,
+            bundled_data=bundled_data,
+            extra_labware=extra_labware,
+        )
+    else:
+        if bundled_labware is not None:
+            # Protocol Engine has a deep assumption that standard labware definitions are always
+            # implicitly loadable.
+            raise NotImplementedError(
+                f"The bundled_labware argument is not currently supported for Python protocols"
+                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
+            )
+        context = _create_live_context_pe(
+            api_version=checked_version,
+            robot_type=parsed_robot_type,
+            deck_type=deck_type,
+            hardware_api=checked_hardware,
+            bundled_data=bundled_data,
+            extra_labware=extra_labware,
+        )
 
-def _check_hardware_simulator(
-    hardware_simulator: Optional[ThreadManagedHardware], robot_type: RobotType
+    return context
+
+
+def _make_hardware_simulator(
+    override: Optional[ThreadManagedHardware], robot_type: RobotType
 ) -> ThreadManagedHardware:
-    if hardware_simulator:
-        return hardware_simulator
+    if override:
+        return override
     elif robot_type == "OT-3 Standard":
         # Local import because this isn't available on OT-2s.
         from opentrons.hardware_control.ot3api import OT3API
@@ -266,34 +333,25 @@ def _check_hardware_simulator(
         return ThreadManager(OT2API.build_hardware_simulator)
 
 
-def _build_protocol_context(
-    version: APIVersion,
-    hardware_simulator: ThreadManagedHardware,
-    bundled_labware: Optional[Dict[str, LabwareDefinition]],
-    bundled_data: Optional[Dict[str, bytes]],
-    extra_labware: Optional[Dict[str, LabwareDefinition]],
-) -> protocol_api.ProtocolContext:
-    """Internal version of :py:meth:`get_protocol_api` that allows deferring
-    version specification for use with
-    :py:meth:`.protocol_api.execute.run_protocol`
-    """
-    try:
-        context = protocol_api.create_protocol_context(
-            api_version=version,
-            hardware_api=hardware_simulator,
-            # FIXME(2022-12-02): Instead of guessing,
-            # match this to the robot type declared by the protocol.
-            # https://opentrons.atlassian.net/browse/RSS-156
-            deck_type=guess_deck_type_from_global_config(),
-            bundled_labware=bundled_labware,
-            bundled_data=bundled_data,
-            extra_labware=extra_labware,
-            use_simulating_core=True,
+@contextmanager
+def _make_hardware_simulator_cm(
+    config_file_path: Optional[pathlib.Path], robot_type: RobotType
+) -> Generator[ThreadManagedHardware, None, None]:
+    if config_file_path is not None:
+        result = ThreadManager(
+            load_simulator,
+            pathlib.Path(config_file_path),
         )
-    except protocol_api.ProtocolEngineCoreRequiredError as e:
-        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
-    context.home()
-    return context
+        try:
+            yield result
+        finally:
+            result.clean_up()
+    else:
+        result = _make_hardware_simulator(override=None, robot_type=robot_type)
+        try:
+            yield result
+        finally:
+            result.clean_up()
 
 
 def _get_current_robot_type() -> Optional[RobotType]:
@@ -329,7 +387,7 @@ def bundle_from_sim(
     From a protocol, and the context that has finished simulating that
     protocol, determine what needs to go in a bundle for the protocol.
     """
-    bundled_labware: Dict[str, LabwareDefinition] = {}
+    bundled_labware: Dict[str, "LabwareDefinitionDict"] = {}
     for lw in context.loaded_labwares.values():
         if (
             isinstance(lw, opentrons.protocol_api.labware.Labware)
@@ -345,7 +403,7 @@ def bundle_from_sim(
     )
 
 
-def simulate(  # noqa: C901
+def simulate(
     protocol_file: Union[BinaryIO, TextIO],
     file_name: Optional[str] = None,
     custom_labware_paths: Optional[List[str]] = None,
@@ -354,7 +412,7 @@ def simulate(  # noqa: C901
     hardware_simulator_file_path: Optional[str] = None,
     duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
-) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
+) -> _SimulateResult:
     """
     Simulate the protocol itself.
 
@@ -422,30 +480,22 @@ def simulate(  # noqa: C901
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
-
-    contents = protocol_file.read()
+    # _CommandScraper will set the level of this logger.
 
     # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
     # to match documented behavior.
     # See notes in https://github.com/Opentrons/opentrons/pull/13107
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = entrypoint_util.labware_from_paths(custom_labware_paths)
     else:
-        extra_labware = find_jupyter_labware() or {}
+        extra_labware = entrypoint_util.find_jupyter_labware() or {}
 
     if custom_data_paths:
-        extra_data = datafiles_from_paths(custom_data_paths)
+        extra_data = entrypoint_util.datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
 
-    hardware_simulator = None
-
-    if hardware_simulator_file_path:
-        hardware_simulator = ThreadManager(
-            load_simulator,
-            pathlib.Path(hardware_simulator_file_path),
-        )
-
+    contents = protocol_file.read()
     try:
         protocol = parse.parse(
             contents,
@@ -462,42 +512,43 @@ def simulate(  # noqa: C901
         else:
             raise
 
-    bundle_contents: Optional[BundleContents] = None
+    if protocol.api_level < APIVersion(2, 0):
+        raise ApiDeprecationError(version=protocol.api_level)
 
-    # we want a None literal rather than empty dict so get_protocol_api
-    # will look for custom labware if this is a robot
-    gpa_extras = getattr(protocol, "extra_labware", None) or None
+    _validate_can_simulate_for_robot_type(protocol.robot_type)
 
-    try:
-        context = get_protocol_api(
-            getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
-            bundled_labware=getattr(protocol, "bundled_labware", None),
-            bundled_data=getattr(protocol, "bundled_data", None),
-            hardware_simulator=hardware_simulator,
-            extra_labware=gpa_extras,
-            robot_type="Flex" if protocol.robot_type == "OT-3 Standard" else "OT-2",
-        )
-    except protocol_api.ProtocolEngineCoreRequiredError as e:
-        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
-
-    broker = context.broker
-    scraper = CommandScraper(stack_logger, log_level, broker)
-    if duration_estimator:
-        broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
-
-    try:
-        execute.run_protocol(protocol, context)
-        if (
-            isinstance(protocol, PythonProtocol)
-            and protocol.api_level >= APIVersion(2, 0)
-            and protocol.bundled_labware is None
-            and allow_bundle()
-        ):
-            bundle_contents = bundle_from_sim(protocol, context)
-    finally:
-        context.cleanup()
-
-    return scraper.commands, bundle_contents
+    with _make_hardware_simulator_cm(
+        config_file_path=(
+            None
+            if hardware_simulator_file_path is None
+            else pathlib.Path(hardware_simulator_file_path)
+        ),
+        robot_type=protocol.robot_type,
+    ) as hardware_simulator:
+        if protocol.api_level < ENGINE_CORE_API_VERSION:
+            return _run_file_non_pe(
+                protocol=protocol,
+                hardware_api=hardware_simulator,
+                logger=stack_logger,
+                level=log_level,
+                duration_estimator=duration_estimator,
+            )
+        else:
+            # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
+            # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
+            if custom_data_paths:
+                raise NotImplementedError(
+                    f"The custom_data_paths argument is not currently supported for Python protocols"
+                    f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
+                )
+            protocol_file.seek(0)
+            return _run_file_pe(
+                protocol=protocol,
+                robot_type=protocol.robot_type,
+                hardware_api=hardware_simulator,
+                stack_logger=stack_logger,
+                log_level=log_level,
+            )
 
 
 def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
@@ -687,6 +738,187 @@ def _get_bundle_dest(
         return None
 
 
+def _create_live_context_non_pe(
+    api_version: APIVersion,
+    hardware_api: ThreadManagedHardware,
+    deck_type: str,
+    extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
+    bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
+    bundled_data: Optional[Dict[str, bytes]],
+) -> ProtocolContext:
+    """Return a live ProtocolContext.
+
+    This controls the robot through the older infrastructure, instead of through Protocol Engine.
+    """
+    assert api_version < ENGINE_CORE_API_VERSION
+    return protocol_api.create_protocol_context(
+        api_version=api_version,
+        deck_type=deck_type,
+        hardware_api=hardware_api,
+        bundled_labware=bundled_labware,
+        bundled_data=bundled_data,
+        extra_labware=extra_labware,
+    )
+
+
+def _create_live_context_pe(
+    api_version: APIVersion,
+    hardware_api: ThreadManagedHardware,
+    robot_type: RobotType,
+    deck_type: str,
+    extra_labware: Dict[str, "LabwareDefinitionDict"],
+    bundled_data: Optional[Dict[str, bytes]],
+) -> ProtocolContext:
+    """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
+    assert api_version >= ENGINE_CORE_API_VERSION
+
+    global _LIVE_PROTOCOL_ENGINE_CONTEXTS
+    pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
+        create_protocol_engine_in_thread(
+            hardware_api=hardware_api.wrapped(),
+            config=_get_protocol_engine_config(robot_type),
+            drop_tips_after_run=False,
+            post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+        )
+    )
+
+    # `async def` so we can use loop.run_coroutine_threadsafe() to wait for its completion.
+    # Non-async would use call_soon_threadsafe(), which makes the waiting harder.
+    async def add_all_extra_labware() -> None:
+        for labware_definition_dict in extra_labware.values():
+            labware_definition = LabwareDefinition.parse_obj(labware_definition_dict)
+            pe.add_labware_definition(labware_definition)
+
+    # Add extra_labware to ProtocolEngine, being careful not to modify ProtocolEngine from this
+    # thread. See concurrency notes in ProtocolEngine docstring.
+    future = asyncio.run_coroutine_threadsafe(add_all_extra_labware(), loop)
+    future.result()
+
+    return protocol_api.create_protocol_context(
+        api_version=api_version,
+        hardware_api=hardware_api,
+        deck_type=deck_type,
+        protocol_engine=pe,
+        protocol_engine_loop=loop,
+        bundled_data=bundled_data,
+    )
+
+
+def _run_file_non_pe(
+    protocol: Protocol,
+    hardware_api: ThreadManagedHardware,
+    logger: logging.Logger,
+    level: str,
+    duration_estimator: Optional[DurationEstimator],
+) -> _SimulateResult:
+    """Run a protocol file without Protocol Engine, with the older infrastructure instead."""
+    if isinstance(protocol, PythonProtocol):
+        extra_labware = protocol.extra_labware
+        bundled_labware = protocol.bundled_labware
+        bundled_data = protocol.bundled_data
+    else:
+        # JSON protocols do have "bundled labware" embedded in them, but those aren't represented in
+        # the parsed Protocol object and we don't need to create the ProtocolContext with them.
+        # execute_apiv2.run_protocol() will pull them out of the JSON and load them into the
+        # ProtocolContext.
+        extra_labware = None
+        bundled_labware = None
+        bundled_data = None
+
+    context = _create_live_context_non_pe(
+        api_version=protocol.api_level,
+        hardware_api=hardware_api,
+        deck_type=deck_type_for_simulation(protocol.robot_type),
+        extra_labware=extra_labware,
+        bundled_labware=bundled_labware,
+        bundled_data=bundled_data,
+    )
+
+    scraper = _CommandScraper(logger=logger, level=level, broker=context.broker)
+    if duration_estimator:
+        context.broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
+
+    context.home()
+    with scraper.scrape():
+        try:
+            execute.run_protocol(protocol, context)
+            if (
+                isinstance(protocol, PythonProtocol)
+                and protocol.api_level >= APIVersion(2, 0)
+                and protocol.bundled_labware is None
+                and allow_bundle()
+            ):
+                bundle_contents: Optional[BundleContents] = bundle_from_sim(
+                    protocol, context
+                )
+            else:
+                bundle_contents = None
+
+        finally:
+            context.cleanup()
+
+    return scraper.commands, bundle_contents
+
+
+def _run_file_pe(
+    protocol: Protocol,
+    robot_type: RobotType,
+    hardware_api: ThreadManagedHardware,
+    stack_logger: logging.Logger,
+    log_level: str,
+) -> _SimulateResult:
+    """Run a protocol file with Protocol Engine."""
+
+    async def run(protocol_source: ProtocolSource) -> _SimulateResult:
+        protocol_engine = await create_protocol_engine(
+            hardware_api=hardware_api.wrapped(),
+            config=_get_protocol_engine_config(robot_type),
+        )
+
+        protocol_runner = create_protocol_runner(
+            protocol_config=protocol_source.config,
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api.wrapped(),
+        )
+
+        scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
+        with scraper.scrape():
+            result = await protocol_runner.run(protocol_source)
+
+        if result.state_summary.status != EngineStatus.SUCCEEDED:
+            raise entrypoint_util.ProtocolEngineExecuteError(
+                result.state_summary.errors
+            )
+
+        # We don't currently support returning bundle contents from protocols run through
+        # Protocol Engine. To get them, bundle_from_sim() requires direct access to the
+        # ProtocolContext, which opentrons.protocol_runner does not grant us.
+        bundle_contents = None
+
+        return scraper.commands, bundle_contents
+
+    with entrypoint_util.adapt_protocol_source(protocol) as protocol_source:
+        return asyncio.run(run(protocol_source))
+
+
+def _get_protocol_engine_config(robot_type: RobotType) -> Config:
+    """Return a Protocol Engine config to execute protocols on this device."""
+    return Config(
+        robot_type=robot_type,
+        deck_type=DeckType(deck_type_for_simulation(robot_type)),
+        ignore_pause=True,
+        use_virtual_pipettes=True,
+        use_virtual_modules=True,
+        use_virtual_gripper=True,
+    )
+
+
+@atexit.register
+def _clear_live_protocol_engine_contexts() -> None:
+    global _LIVE_PROTOCOL_ENGINE_CONTEXTS
+    _LIVE_PROTOCOL_ENGINE_CONTEXTS.close()
+
+
 # Note - this script is also set up as a setuptools entrypoint and thus does
 # an absolute minimum of work since setuptools does something odd generating
 # the scripts
@@ -703,15 +935,21 @@ def main() -> int:
     # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
-    runlog, maybe_bundle = simulate(
-        protocol_file=args.protocol,
-        file_name=args.protocol.name,
-        custom_labware_paths=args.custom_labware_path,
-        custom_data_paths=(args.custom_data_path + args.custom_data_file),
-        duration_estimator=duration_estimator,
-        hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
-        log_level=args.log_level,
-    )
+    try:
+        runlog, maybe_bundle = simulate(
+            protocol_file=args.protocol,
+            file_name=args.protocol.name,
+            custom_labware_paths=args.custom_labware_path,
+            custom_data_paths=(args.custom_data_path + args.custom_data_file),
+            duration_estimator=duration_estimator,
+            hardware_simulator_file_path=getattr(
+                args, "custom_hardware_simulator_file"
+            ),
+            log_level=args.log_level,
+        )
+    except entrypoint_util.ProtocolEngineExecuteError as error:
+        print(error.to_stderr_string(), file=sys.stderr)
+        return 1
 
     if maybe_bundle:
         bundle_name = getattr(args, "bundle", None)
