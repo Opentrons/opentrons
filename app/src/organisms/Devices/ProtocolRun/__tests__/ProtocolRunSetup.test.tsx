@@ -285,7 +285,7 @@ describe('ProtocolRunSetup', () => {
         .mockReturnValue({ complete: true })
 
       const { getAllByText } = render()
-      expect(getAllByText('Calibration ready').length === 2)
+      expect(getAllByText('Calibration ready').length).toEqual(2)
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
@@ -304,7 +304,7 @@ describe('ProtocolRunSetup', () => {
       when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
 
       const { getAllByText } = render()
-      expect(getAllByText('Calibration ready').length === 1)
+      expect(getAllByText('Calibration ready').length).toEqual(1)
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {

@@ -42,42 +42,12 @@ const mockMagneticModuleDefinition = {
   twoDimensionalRendering: { children: [] },
 }
 
-const mockTemperatureModuleDefinition = {
-  moduleId: 'someMagneticModule',
-  model: 'temperatureModuleV2' as ModuleModel,
-  type: 'temperatureModuleType' as ModuleType,
-  labwareOffset: { x: 5, y: 5, z: 5 },
-  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
-  dimensions: {
-    xDimension: 100,
-    yDimension: 100,
-    footprintXDimension: 50,
-    footprintYDimension: 50,
-    labwareInterfaceXDimension: 80,
-    labwareInterfaceYDimension: 120,
-  },
-  twoDimensionalRendering: { children: [] },
-}
-
 const MAGNETIC_MODULE_INFO = {
   moduleId: 'magneticModuleId',
   x: 0,
   y: 0,
   z: 0,
   moduleDef: mockMagneticModuleDefinition as any,
-  nestedLabwareDef: null,
-  nestedLabwareId: null,
-  nestedLabwareDisplayName: null,
-  protocolLoadOrder: 0,
-  slotName: '1',
-}
-
-const TEMPERATURE_MODULE_INFO = {
-  moduleId: 'temperatureModuleId',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockTemperatureModuleDefinition,
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
