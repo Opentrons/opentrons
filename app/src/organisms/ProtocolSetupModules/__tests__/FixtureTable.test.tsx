@@ -60,4 +60,7 @@ describe('FixtureTable', () => {
     getByText('Waste Chute')
     getByText('D3')
   })
+  it.todo('should render the current status - configured')
+  it.todo('should render the current status - not configured')
+  it.todo('should render the current status - location conflict')
 })

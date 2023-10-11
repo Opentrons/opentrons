@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs/hooks'
@@ -26,6 +27,7 @@ import {
 } from '../utils'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
+import { FixtureTable } from '../FixtureTable'
 import { ProtocolSetupModules } from '..'
 
 jest.mock('@opentrons/react-api-client')
@@ -40,6 +42,7 @@ jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../utils')
 jest.mock('../SetupInstructionsModal')
 jest.mock('../../ModuleWizardFlows')
+jest.mock('../FixtureTable')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -73,6 +76,12 @@ const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
 >
 const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
   typeof useChainLiveCommands
+>
+const mockFixtureTable = FixtureTable as jest.MockedFunction<
+  typeof FixtureTable
+>
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
 >
 
 const ROBOT_NAME = 'otie'
@@ -144,6 +153,10 @@ describe('ProtocolSetupModules', () => {
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
+    mockFixtureTable.mockReturnValue(<div>mock FixtureTable</div>)
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [],
+    } as any)
   })
 
   afterEach(() => {
@@ -153,11 +166,12 @@ describe('ProtocolSetupModules', () => {
 
   it('should render text and buttons', () => {
     const [{ getByRole, getByText }] = render()
-    getByText('Module Name')
+    getByText('Module')
     getByText('Location')
     getByText('Status')
     getByText('Setup Instructions')
     getByRole('button', { name: 'Map View' })
+    getByText('mock FixtureTable')
   })
 
   it('should launch deck map on button click', () => {

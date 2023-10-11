@@ -295,7 +295,7 @@ describe('ProtocolSetup', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByText('Prepare to run')
     getByText('Instruments')
-    getByText('Modules')
+    getByText('Modules & deck')
     getByText('Labware')
     getByText('Labware Position Check')
     getByText('Liquids')
@@ -329,7 +329,7 @@ describe('ProtocolSetup', () => {
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
-    queryByText('Modules')?.click()
+    queryByText('Modules & deck')?.click()
     getByText('Mock ProtocolSetupModules')
   })
 

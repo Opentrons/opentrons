@@ -62,7 +62,7 @@ export function FixtureTable(): JSX.Element {
                 {getFixtureDisplayName(fixture.loadName)}
               </StyledText>
             </Flex>
-            <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
+            <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
               <LocationIcon slotName={fixture.fixtureLocation} />
             </Flex>
             <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
