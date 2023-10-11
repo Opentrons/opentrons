@@ -11,16 +11,18 @@ import {
   BORDERS,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { FixtureLoadName, getFixtureDisplayName } from '@opentrons/shared-data'
+import { getFixtureDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
+import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
+
 interface NotConfiguredModalProps {
   onCloseClick: () => void
   requiredFixture: FixtureLoadName
-  cutout: string
+  cutout: Cutout
 }
 
 export const NotConfiguredModal = (

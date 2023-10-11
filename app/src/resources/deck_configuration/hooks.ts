@@ -1,11 +1,7 @@
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 
-import {
-  Fixture,
-  LoadFixtureRunTimeCommand,
-  STANDARD_SLOT_LOAD_NAME,
-} from '@opentrons/shared-data'
+import type { Fixture, LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
 
 export const CONFIGURED = 'configured'
 export const CONFLICTING = 'conflicting'
