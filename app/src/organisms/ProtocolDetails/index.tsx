@@ -39,7 +39,6 @@ import {
   parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
 import {
-  LoadFixtureRunTimeCommand,
   WASTE_CHUTE_LOAD_NAME,
   getGripperDisplayName,
 } from '@opentrons/shared-data'
@@ -70,7 +69,11 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
-import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
+import type {
+  JsonConfig,
+  LoadFixtureRunTimeCommand,
+  PythonConfig,
+} from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
 import { useFeatureFlag } from '../../redux/config'

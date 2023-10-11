@@ -11,20 +11,49 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   getFixtureDisplayName,
-  STANDARD_SLOT_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
+// import { parseInitialLoadedFixturesByCutout } from '@opentrons/api-client'
 
 import { StyledText } from '../../atoms/text'
+import { useFeatureFlag } from '../../redux/config'
 
-export function FixtureTable(): JSX.Element {
+import type {
+  CompletedProtocolAnalysis,
+  LoadFixtureRunTimeCommand,
+} from '@opentrons/shared-data'
+
+interface FixtureTableProps {
+  mostRecentAnalysis: CompletedProtocolAnalysis | null
+}
+
+export function FixtureTable({
+  mostRecentAnalysis,
+}: FixtureTableProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const deckConfig = useDeckConfigurationQuery().data ?? []
-  const fixtureDisplayList = deckConfig.filter(
-    fixture => fixture.loadName !== STANDARD_SLOT_LOAD_NAME
-  )
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
+    id: 'stubbed_load_fixture',
+    commandType: 'loadFixture',
+    params: {
+      fixtureId: 'stubbedFixtureId',
+      loadName: WASTE_CHUTE_LOAD_NAME,
+      location: { cutout: 'D3' },
+    },
+    createdAt: 'fakeTimestamp',
+    startedAt: 'fakeTimestamp',
+    completedAt: 'fakeTimestamp',
+    status: 'succeeded',
+  }
+  const requiredFixtureDetails =
+    enableDeckConfig && mostRecentAnalysis?.commands != null
+      ? [
+          // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
+          STUBBED_LOAD_FIXTURE,
+        ]
+      : []
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -41,11 +70,11 @@ export function FixtureTable(): JSX.Element {
         <StyledText flex="3 0 0"> {t('status')}</StyledText>
       </Flex>
       {/* ToDo (kk:10/10/2023) Add status will be implemented in a following PR */}
-      {fixtureDisplayList.map(fixture => {
+      {requiredFixtureDetails.map(fixture => {
         return (
           <Flex
             flexDirection={DIRECTION_ROW}
-            key={fixture.fixtureId}
+            key={fixture.params.fixtureId}
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.green3}
             borderRadius={BORDERS.borderRadiusSize3}
@@ -59,11 +88,11 @@ export function FixtureTable(): JSX.Element {
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
-                {getFixtureDisplayName(fixture.loadName)}
+                {getFixtureDisplayName(fixture.params.loadName)}
               </StyledText>
             </Flex>
             <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-              <LocationIcon slotName={fixture.fixtureLocation} />
+              <LocationIcon slotName={fixture.params.location.cutout} />
             </Flex>
             <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
               <StyledText

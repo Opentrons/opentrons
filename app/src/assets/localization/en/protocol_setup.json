@@ -127,6 +127,7 @@
   "modules_connected_plural": "{{count}} modules attached",
   "modules_connected": "{{count}} module attached",
   "modules_setup_step_title": "Module Setup",
+  "modules": "Modules",
   "mount_title": "{{mount}} MOUNT:",
   "mount": "{{mount}} mount",
   "multiple_modules_example": "Your protocol has two Temperature Modules. The Temperature Module attached to the first port starting from the left will be related to the first Temperature Module in your protocol while the second Temperature Module loaded would be related to the Temperature Module connected to the next port to the right. If using a hub, follow the same logic with the port ordering.",

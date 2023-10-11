@@ -35,7 +35,7 @@ import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
@@ -45,6 +45,7 @@ import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
+import { useFeatureFlag } from '../../redux/config'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -348,6 +349,7 @@ export function ProtocolSetupModules({
     title: t('map_view'),
     hasExitIcon: true,
   }
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <>
@@ -410,9 +412,9 @@ export function ProtocolSetupModules({
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <ODDBackButton
-          label={t('modules_and_deck')}
-          onClick={() => setSetupScreen('prepare to run')}
+        <ChildNavigation
+          header={enableDeckConfig ? t('modules_and_deck') : t('modules')}
+          onClickBack={() => setSetupScreen('prepare to run')}
         />
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
@@ -478,7 +480,9 @@ export function ProtocolSetupModules({
               )
             })}
           </Flex>
-          <FixtureTable />
+          {enableDeckConfig ? (
+            <FixtureTable mostRecentAnalysis={mostRecentAnalysis} />
+          ) : null}
         </Flex>
       </Flex>
       <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
