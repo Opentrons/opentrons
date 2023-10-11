@@ -4,22 +4,97 @@ import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 export function useRobotUpdateInfo(
   session: RobotUpdateSession | null
 ): { updateStep: UpdateStep; progressPercent: number } {
+  const progressPercent = useFindProgressPercentFrom(session)
+
   const shellReportedUpdateStep = React.useMemo(
     () => getShellReportedUpdateStep(session),
     [session]
   )
-
   const updateStep = useTransitionUpdateStepFrom(shellReportedUpdateStep)
-  const progressPercent = useFindProgressPercentFrom(
-    updateStep,
-    session?.fileInfo?.isManualFile ?? false,
-    session?.progress
-  )
 
   return {
     updateStep,
     progressPercent,
   }
+}
+
+function useFindProgressPercentFrom(
+  session: RobotUpdateSession | null
+): number {
+  const [progressPercent, setProgressPercent] = React.useState<number>(0)
+  const prevSeenUpdateStep = React.useRef<string | null>(null)
+  const prevSeenStepProgress = React.useRef<number>(0)
+  const currentStepWithProgress = React.useRef<number>(-1)
+
+  if (session == null) return progressPercent
+
+  const {
+    step: sessionStep,
+    stage: sessionStage,
+    progress: stepProgress,
+  } = session
+
+  if (sessionStep === 'getToken') {
+    if (progressPercent !== 0) {
+      setProgressPercent(0)
+      prevSeenStepProgress.current = 0
+    }
+    return progressPercent
+  } else if (sessionStep === 'restart' || sessionStep === 'finished') {
+    if (progressPercent !== 100) {
+      setProgressPercent(100)
+      prevSeenStepProgress.current = 100
+    }
+    return progressPercent
+  } else if (
+    sessionStage === 'error' ||
+    sessionStage === null ||
+    stepProgress == null ||
+    sessionStep == null
+  ) {
+    return progressPercent
+  }
+
+  const stepAndStage = `${sessionStep}-${sessionStage}`
+  // Ignored because 0-100 is too fast to be worth recording.
+  const IGNORED_STEPS_AND_STAGES = ['processFile-awaiting-file']
+  // Each stepAndStage is an equal fraction of the total steps.
+  const TOTAL_STEPS_WITH_PROGRESS = 3
+
+  const isNewStateWithProgress =
+    prevSeenUpdateStep.current !== stepAndStage &&
+    stepProgress > 0 && // Accomodate for shell progress oddities.
+    stepProgress < 100
+
+  // Proceed to next fraction of progress bar.
+  if (
+    isNewStateWithProgress &&
+    !IGNORED_STEPS_AND_STAGES.includes(stepAndStage)
+  ) {
+    currentStepWithProgress.current += 1
+    const completedStepsWithProgress =
+      (100 * currentStepWithProgress.current) / TOTAL_STEPS_WITH_PROGRESS
+    prevSeenStepProgress.current = 0
+    prevSeenUpdateStep.current = stepAndStage
+    setProgressPercent(completedStepsWithProgress + stepProgress)
+  }
+  // Proceed with current fraction of progress bar.
+  else if (
+    stepProgress > prevSeenStepProgress.current &&
+    !IGNORED_STEPS_AND_STAGES.includes(stepAndStage)
+  ) {
+    const currentStepProgress =
+      progressPercent +
+      (stepProgress - prevSeenStepProgress.current) / TOTAL_STEPS_WITH_PROGRESS
+    const nonBacktrackedProgressPercent = Math.max(
+      progressPercent,
+      currentStepProgress
+    )
+    prevSeenStepProgress.current = stepProgress
+    setProgressPercent(nonBacktrackedProgressPercent)
+  }
+
+  return progressPercent
 }
 
 export type UpdateStep =
@@ -57,91 +132,43 @@ function getShellReportedUpdateStep(
   return reportedUpdateStep
 }
 
+// Shell steps have the potential to backtrack, so use guarded transitions.
 function useTransitionUpdateStepFrom(
   reportedUpdateStep: UpdateStep | null
 ): UpdateStep {
   const [updateStep, setUpdateStep] = React.useState<UpdateStep>('initial')
   const prevUpdateStep = React.useRef<UpdateStep | null>(null)
 
-  if (reportedUpdateStep === 'initial' && updateStep !== 'initial') {
-    setUpdateStep('initial')
-    prevUpdateStep.current = null
-  } else if (reportedUpdateStep === 'error' && updateStep !== 'error') {
-    setUpdateStep('error')
-  } else if (updateStep === 'initial') {
-    if (reportedUpdateStep === 'install' && prevUpdateStep.current == null) {
-      setUpdateStep('install')
-      prevUpdateStep.current = 'initial'
-    }
-  } else if (updateStep === 'install') {
-    if (
-      reportedUpdateStep === 'restart' &&
-      prevUpdateStep.current === 'initial'
-    ) {
-      setUpdateStep('restart')
-      prevUpdateStep.current = 'install'
-    }
-  } else if (updateStep === 'restart') {
-    if (
-      reportedUpdateStep === 'finished' &&
-      prevUpdateStep.current === 'install'
-    ) {
-      setUpdateStep('finished')
-      prevUpdateStep.current = 'restart'
-    }
+  switch (reportedUpdateStep) {
+    case 'initial':
+      if (updateStep !== 'initial') {
+        setUpdateStep('initial')
+        prevUpdateStep.current = null
+      }
+      break
+    case 'error':
+      if (updateStep !== 'error') {
+        setUpdateStep('error')
+      }
+      break
+    case 'install':
+      if (updateStep === 'initial' && prevUpdateStep.current == null) {
+        setUpdateStep('install')
+        prevUpdateStep.current = 'initial'
+      }
+      break
+    case 'restart':
+      if (updateStep === 'install' && prevUpdateStep.current === 'initial') {
+        setUpdateStep('restart')
+        prevUpdateStep.current = 'install'
+      }
+      break
+    case 'finished':
+      if (updateStep === 'restart' && prevUpdateStep.current === 'install') {
+        setUpdateStep('finished')
+        prevUpdateStep.current = 'restart'
+      }
+      break
   }
   return updateStep
-}
-
-function useFindProgressPercentFrom(
-  updateStep: UpdateStep,
-  filePathUsedForUpdate: boolean,
-  stepProgress?: number | null
-): number {
-  const [progressPercent, setProgressPercent] = React.useState<number>(0)
-  const prevSeenStepProgress = React.useRef<number>(0)
-  const currentStepWithProgress = React.useRef<number>(0)
-
-  const TOTAL_STEPS_WITH_PROGRESS = filePathUsedForUpdate ? 2 : 2
-
-  if (updateStep === 'initial') {
-    if (progressPercent !== 0) {
-      setProgressPercent(0)
-      prevSeenStepProgress.current = 0
-    }
-  } else if (updateStep === 'restart' || updateStep === 'finished') {
-    if (progressPercent !== 100) {
-      setProgressPercent(100)
-      prevSeenStepProgress.current = 100
-    }
-    return progressPercent
-  } else if (
-    updateStep === 'error' ||
-    stepProgress == null ||
-    stepProgress === prevSeenStepProgress.current
-  ) {
-    return progressPercent
-  } else {
-    // Assume new step instead of stepProgress backtracking.
-    if (prevSeenStepProgress.current > 85 && stepProgress <= 60) {
-      currentStepWithProgress.current += 1
-      const completedStepsWithProgress =
-        (100 * currentStepWithProgress.current) / TOTAL_STEPS_WITH_PROGRESS
-      prevSeenStepProgress.current = 0
-      setProgressPercent(Math.round(completedStepsWithProgress + stepProgress))
-    } else {
-      const currentStepProgress =
-        progressPercent +
-        (stepProgress - prevSeenStepProgress.current) /
-          TOTAL_STEPS_WITH_PROGRESS
-      const nonBacktrackedProgressPercent = Math.max(
-        progressPercent,
-        currentStepProgress
-      )
-      setProgressPercent(Math.round(nonBacktrackedProgressPercent))
-    }
-    prevSeenStepProgress.current = stepProgress
-  }
-
-  return progressPercent
 }

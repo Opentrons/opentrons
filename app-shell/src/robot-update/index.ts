@@ -106,7 +106,12 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, systemFile)
+        uploadSystemFile(host, path, systemFile, progress =>
+          dispatch({
+            type: 'robotUpdate:FILE_UPLOAD_PROGRESS',
+            payload: progress,
+          })
+        )
           .then(() => ({
             type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,

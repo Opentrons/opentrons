@@ -241,12 +241,12 @@ export const statusPollEpic: Epic = (action$, state$) => {
             state$.pipe(
               filter(state => {
                 const session = getRobotUpdateSession(state)
-                return (
+                const willReturn =
                   session?.stage === READY_FOR_RESTART ||
                   // @ts-expect-error TODO: `session?.error === true` always returns false, remove it?
                   session?.error === true ||
                   session === null
-                )
+                return willReturn
               })
             )
           ),

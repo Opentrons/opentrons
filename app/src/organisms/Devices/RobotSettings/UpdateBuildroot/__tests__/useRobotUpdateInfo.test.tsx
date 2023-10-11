@@ -1,6 +1,10 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
-import { RobotUpdateSession } from '../../../../../redux/robot-update/types'
+import type {
+  RobotUpdateSession,
+  UpdateSessionStep,
+  UpdateSessionStage,
+} from '../../../../../redux/robot-update/types'
 
 describe('useRobotUpdateInfo', () => {
   const mockRobotUpdateSession: RobotUpdateSession | null = {
@@ -8,8 +12,8 @@ describe('useRobotUpdateInfo', () => {
     fileInfo: { isManualFile: true, systemFile: 'testFile', version: '1.0.0' },
     token: null,
     pathPrefix: null,
-    step: 'getToken',
-    stage: 'validating',
+    step: 'processFile',
+    stage: 'writing',
     progress: 50,
     error: null,
   }
@@ -43,7 +47,7 @@ describe('useRobotUpdateInfo', () => {
     )
 
     expect(result.current.updateStep).toBe('install')
-    expect(result.current.progressPercent).toBe(25)
+    expect(Math.round(result.current.progressPercent)).toBe(67)
 
     rerender({
       ...mockRobotUpdateSession,
@@ -66,7 +70,7 @@ describe('useRobotUpdateInfo', () => {
     )
 
     expect(result.current.updateStep).toBe('install')
-    expect(result.current.progressPercent).toBe(25)
+    expect(Math.round(result.current.progressPercent)).toBe(67)
 
     rerender({
       ...mockRobotUpdateSession,
@@ -74,7 +78,7 @@ describe('useRobotUpdateInfo', () => {
     })
 
     expect(result.current.updateStep).toBe('error')
-    expect(result.current.progressPercent).toBe(25)
+    expect(Math.round(result.current.progressPercent)).toBe(67)
   })
 
   it('should calculate correct progressPercent when the update is not manual', () => {
@@ -90,6 +94,20 @@ describe('useRobotUpdateInfo', () => {
     })
 
     expect(result.current.updateStep).toBe('install')
-    expect(result.current.progressPercent).toBe(25)
+    expect(Math.round(result.current.progressPercent)).toBe(67)
+  })
+
+  it('should ignore progressPercent reported by a step marked as ignored', () => {
+    const { result } = renderHook(session => useRobotUpdateInfo(session), {
+      initialProps: {
+        ...mockRobotUpdateSession,
+        step: 'processFile' as UpdateSessionStep,
+        stage: 'awaiting-file' as UpdateSessionStage,
+        progress: 100,
+      },
+    })
+
+    expect(result.current.updateStep).toBe('install')
+    expect(Math.round(result.current.progressPercent)).toBe(0)
   })
 })
