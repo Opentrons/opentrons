@@ -29,7 +29,6 @@ function useFindProgressPercentFrom(
   if (session == null) return progressPercent
 
   const {
-    fileInfo,
     step: sessionStep,
     stage: sessionStage,
     progress: stepProgress,
