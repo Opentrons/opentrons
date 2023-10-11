@@ -106,14 +106,12 @@ def is_robot(monkeypatch: pytest.MonkeyPatch) -> None:
 def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(config.feature_flags, inspect.isfunction):
         params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
         if any("robot_type" in p for p in params.args):
-            mock_get_ff = decoy.mock(func=func)
             decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-            monkeypatch.setattr(config.feature_flags, name, mock_get_ff)
         else:
-            mock_get_ff = decoy.mock(func=func)
             decoy.when(mock_get_ff()).then_return(False)
-            monkeypatch.setattr(config.feature_flags, name, mock_get_ff)
+        monkeypatch.setattr(config.feature_flags, name, mock_get_ff)
 
 
 @pytest.fixture
