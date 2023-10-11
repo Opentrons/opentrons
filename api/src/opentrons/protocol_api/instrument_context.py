@@ -138,7 +138,8 @@ class InstrumentContext(publisher.CommandPublisher):
         The OT-2 default is 400 mm/s. In addition to changing the
         default, the speed of individual motions can be changed with the
         ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
-        See also, :ref:`gantry_speed` and :ref:`axis_speed_limits`.
+        See also, :ref:`gantry_speed` 
+        and :ref:`axis_speed_limits`.
         """
         return self._core.get_default_speed()
 
