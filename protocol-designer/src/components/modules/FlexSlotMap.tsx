@@ -75,6 +75,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
 
         return (
           <RobotCoordsForeignObject
+            key={`${selectedSlot}_${slot?.id}`}
             width={xDimension}
             height={yDimension}
             x={x}
