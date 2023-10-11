@@ -124,7 +124,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def reset_tipracks(self) -> None:
-        """Reload all tips in each tip rack and reset starting tip."""
+        """Reload all tips in each tip rack and resets the starting tip."""
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
