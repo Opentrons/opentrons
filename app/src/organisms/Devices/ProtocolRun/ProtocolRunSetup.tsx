@@ -109,10 +109,10 @@ export function ProtocolRunSetup({
       status: 'succeeded',
     },
     C3: {
-      id: 'stubbed_load_fixture_2',
+      id: 'stubbed_load_fixture_3',
       commandType: 'loadFixture',
       params: {
-        fixtureId: 'stubbedFixtureId_2',
+        fixtureId: 'stubbedFixtureId_3',
         loadName: TRASH_BIN_LOAD_NAME,
         location: { cutout: 'C3' },
       },
