@@ -1842,7 +1842,9 @@ class OT3API(
             raise
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
-            if push_out or dispense_spec.instr.push_out_volume:
+            bottom = dispense_spec.instr.plunger_positions.bottom
+            plunger_target_pos = target_pos[Axis.of_main_tool_actuator(realmount)]
+            if (push_out is not None and push_out > 0) or  plunger_target_pos > bottom:
                 dispense_spec.instr.ready_to_aspirate = False
 
     async def blow_out(
