@@ -70,7 +70,7 @@ export function ProtocolRunSetup({
   const robot = useRobot(robotName)
   const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)
   const calibrationStatusModules = useModuleCalibrationStatus(robotName, runId)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsOT3(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
@@ -135,7 +135,7 @@ export function ProtocolRunSetup({
         />
       ),
       // change description for OT-3
-      description: isOT3
+      description: isFlex
         ? t(`${ROBOT_CALIBRATION_STEP_KEY}_description_pipettes_only`)
         : t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
     },
@@ -236,7 +236,7 @@ export function ProtocolRunSetup({
                           runHasStarted,
                           calibrationStatusRobot,
                           calibrationStatusModules,
-                          isOT3,
+                          isFlex,
                         }}
                       />
                     }
@@ -265,7 +265,7 @@ interface StepRightElementProps {
   calibrationStatusRobot: ProtocolCalibrationStatus
   calibrationStatusModules?: ProtocolCalibrationStatus
   runHasStarted: boolean
-  isOT3: boolean
+  isFlex: boolean
 }
 function StepRightElement(props: StepRightElementProps): JSX.Element | null {
   const {
@@ -273,14 +273,14 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
     runHasStarted,
     calibrationStatusRobot,
     calibrationStatusModules,
-    isOT3,
+    isFlex,
   } = props
   const { t } = useTranslation('protocol_setup')
 
   if (
     !runHasStarted &&
     (stepKey === ROBOT_CALIBRATION_STEP_KEY ||
-      (stepKey === MODULE_SETUP_KEY && isOT3))
+      (stepKey === MODULE_SETUP_KEY && isFlex))
   ) {
     const calibrationStatus =
       stepKey === ROBOT_CALIBRATION_STEP_KEY
