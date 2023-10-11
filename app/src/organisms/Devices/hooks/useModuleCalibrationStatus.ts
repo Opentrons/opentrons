@@ -9,14 +9,14 @@ export function useModuleCalibrationStatus(
   runId: string
 ): ProtocolCalibrationStatus {
   const isOT3 = useIsOT3(robotName)
-  // only check module calibration for Flex
-  if (!isOT3) {
-    return { complete: true }
-  }
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
+  // only check module calibration for Flex
+  if (!isOT3) {
+    return { complete: true }
+  }
 
   const moduleKeys = Object.keys(moduleRenderInfoForProtocolById)
   if (moduleKeys.length === 0) {
