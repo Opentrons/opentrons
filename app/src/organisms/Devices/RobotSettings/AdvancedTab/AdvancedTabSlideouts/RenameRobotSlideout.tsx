@@ -56,7 +56,7 @@ export function RenameRobotSlideout({
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
-  const isOt3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
   const trackEvent = useTrackEvent()
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
@@ -146,7 +146,7 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        {isOt3 ? null : (
+        {isFlex ? null : (
           <Banner type="informing" marginBottom={SPACING.spacing16}>
             {t('rename_robot_prefer_usb_connection')}
           </Banner>

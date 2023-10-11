@@ -40,7 +40,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     t('list_view'),
     t('map_view')
   )
-  const isOt3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
 
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
@@ -67,7 +67,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             attachedModuleInfo={moduleRenderInfoById}
             commands={protocolData?.commands ?? []}
             extraAttentionModules={moduleTypesThatRequireExtraAttention}
-            isOt3={isOt3}
+            isFlex={isFlex}
           />
         ) : (
           <SetupLabwareMap

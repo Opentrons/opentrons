@@ -62,7 +62,7 @@ export function InstrumentsAndModules({
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
   const [
     subsystemToUpdate,
     setSubsystemToUpdate,
@@ -115,7 +115,7 @@ export function InstrumentsAndModules({
   // the need for hardcoded heights without limitation, array will be split equally
   // or left column will contain 1 more item than right column
   // TODO(bh, 2022-10-27): once we're using real gripper data, combine the extension mount/module data into columns pre-render
-  const halfAttachedModulesSize = isOT3
+  const halfAttachedModulesSize = isFlex
     ? Math.floor(attachedModules?.length / 2)
     : Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
@@ -128,7 +128,7 @@ export function InstrumentsAndModules({
   const pipetteOffsetCalibrations =
     useAllPipetteOffsetCalibrationsQuery({
       refetchInterval: FETCH_PIPETTE_CAL_POLL,
-      enabled: !isOT3,
+      enabled: !isFlex,
     })?.data?.data ?? []
   const leftMountOffsetCalibration = getOffsetCalibrationForMount(
     pipetteOffsetCalibrations,
@@ -203,7 +203,7 @@ export function InstrumentsAndModules({
                     : null
                 }
                 isPipetteCalibrated={
-                  isOT3 && attachedLeftPipette?.ok
+                  isFlex && attachedLeftPipette?.ok
                     ? attachedLeftPipette?.data?.calibratedOffset
                         ?.last_modified != null
                     : leftMountOffsetCalibration != null
@@ -215,7 +215,7 @@ export function InstrumentsAndModules({
                 updatePipette={() => setSubsystemToUpdate('pipette_left')}
                 isRunActive={currentRunId != null && !isRunTerminal}
               />
-              {isOT3 && (
+              {isFlex && (
                 <GripperCard
                   attachedGripper={attachedGripper}
                   isCalibrated={
@@ -255,7 +255,7 @@ export function InstrumentsAndModules({
                       : null
                   }
                   isPipetteCalibrated={
-                    isOT3 && attachedRightPipette?.ok
+                    isFlex && attachedRightPipette?.ok
                       ? attachedRightPipette?.data?.calibratedOffset
                           ?.last_modified != null
                       : rightMountOffsetCalibration != null

@@ -124,7 +124,7 @@ export function ProtocolRunSetup({
   }
   const robot = useRobot(robotName)
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
@@ -175,9 +175,9 @@ export function ProtocolRunSetup({
   })
   if (!hasModules && !enableDeckConfig) {
     moduleDescription = i18n.format(t('no_modules_specified'), 'capitalize')
-  } else if (isOT3 && enableDeckConfig && (hasModules || hasFixtures)) {
+  } else if (isFlex && enableDeckConfig && (hasModules || hasFixtures)) {
     moduleDescription = t('install_modules_and_fixtures')
-  } else if (isOT3 && enableDeckConfig && !hasModules && !hasFixtures) {
+  } else if (isFlex && enableDeckConfig && !hasModules && !hasFixtures) {
     moduleDescription = t('no_modules_or_fixtures')
   }
 
@@ -202,7 +202,7 @@ export function ProtocolRunSetup({
         />
       ),
       // change description for OT-3
-      description: isOT3
+      description: isFlex
         ? t(`${ROBOT_CALIBRATION_STEP_KEY}_description_pipettes_only`)
         : t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
     },
@@ -276,7 +276,7 @@ export function ProtocolRunSetup({
           ) : (
             stepsKeysInOrder.map((stepKey, index) => {
               const setupStepTitle = t(
-                isOT3 && stepKey === MODULE_SETUP_KEY && enableDeckConfig
+                isFlex && stepKey === MODULE_SETUP_KEY && enableDeckConfig
                   ? `module_and_deck_setup`
                   : `${stepKey}_title`
               )

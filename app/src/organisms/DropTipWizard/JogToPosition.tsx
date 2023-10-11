@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   ALIGN_CENTER,
   RESPONSIVENESS,
   JUSTIFY_SPACE_BETWEEN,
@@ -15,7 +14,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { NeedHelpLink } from '../CalibrationPanels'
-import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
@@ -49,7 +47,7 @@ export const JogToPosition = (
   const isOnDevice = useSelector(getIsOnDevice)
   const [showFullJogControls, setShowFullJogControls] = React.useState(false)
 
-  const handleConfirmPosition = () => {
+  const handleConfirmPosition = (): void => {
     console.log('TODO: handle confirm position and show confirm screen')
     handleProceed()
   }

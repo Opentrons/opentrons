@@ -70,7 +70,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
@@ -184,7 +184,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     ? moduleRenderInfoForProtocolById[moduleId]
                     : null
                 }
-                isOT3={isOT3}
+                isFlex={isFlex}
                 calibrationStatus={calibrationStatus}
                 conflictedFixture={conflictedFixture}
               />
@@ -202,7 +202,7 @@ interface ModulesListItemProps {
   slotName: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
-  isOT3: boolean
+  isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
   conflictedFixture?: Fixture
 }
@@ -213,7 +213,7 @@ export function ModulesListItem({
   slotName,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
-  isOT3,
+  isFlex,
   calibrationStatus,
   conflictedFixture,
 }: ModulesListItemProps): JSX.Element {
@@ -314,7 +314,7 @@ export function ModulesListItem({
   )
 
   if (
-    isOT3 &&
+    isFlex &&
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleOffset?.last_modified == null
   ) {
@@ -401,7 +401,7 @@ export function ModulesListItem({
           </Flex>
           <StyledText as="p" width="15%">
             {getModuleType(moduleModel) === 'thermocyclerModuleType'
-              ? isOT3
+              ? isFlex
                 ? TC_MODULE_LOCATION_OT3
                 : TC_MODULE_LOCATION_OT2
               : slotName}

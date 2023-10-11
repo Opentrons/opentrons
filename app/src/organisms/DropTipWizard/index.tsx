@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { UseMutateFunction } from 'react-query'
 import {
   useConditionalConfirm,
   Flex,
@@ -9,7 +8,6 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   BORDERS,
-  PrimaryButton,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -25,12 +23,8 @@ import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
 } from '../../resources/runs/hooks'
-
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-  PipetteData,
-} from '@opentrons/api-client'
+import { StyledText } from '../../atoms/text'
+import { Jog } from '../../molecules/JogControls'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
 import {
@@ -45,9 +39,9 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
+
+import type { PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
-import { Jog } from '../../molecules/JogControls'
 
 const RUN_REFETCH_INTERVAL = 5000
 

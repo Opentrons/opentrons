@@ -153,7 +153,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
-  const isOT3 = useIsFlex(props.robotName)
+  const isFlex = useIsFlex(props.robotName)
   const {
     data: pipettesData,
     isLoading: isPipetteQueryLoading,
@@ -162,7 +162,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const {
     data: attachedInstruments,
     isLoading: isInstrumentsQueryLoading,
-  } = useInstrumentsQuery({ enabled: isOT3 })
+  } = useInstrumentsQuery({ enabled: isFlex })
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok

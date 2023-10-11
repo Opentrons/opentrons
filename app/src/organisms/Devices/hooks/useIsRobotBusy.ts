@@ -22,16 +22,16 @@ export function useIsRobotBusy(
   const allSessionsQueryResponse = useAllSessionsQuery(queryOptions)
   const host = useHost()
   const robotName = host?.robotName
-  const isOT3 = useIsFlex(robotName ?? '')
+  const isFlex = useIsFlex(robotName ?? '')
   const { data: estopStatus, error: estopError } = useEstopQuery({
     ...queryOptions,
-    enabled: isOT3,
+    enabled: isFlex,
   })
 
   return (
     robotHasCurrentRun ||
     (allSessionsQueryResponse?.data?.data != null &&
       allSessionsQueryResponse?.data?.data?.length !== 0) ||
-    (isOT3 && estopStatus?.data.status !== DISENGAGED && estopError == null)
+    (isFlex && estopStatus?.data.status !== DISENGAGED && estopError == null)
   )
 }

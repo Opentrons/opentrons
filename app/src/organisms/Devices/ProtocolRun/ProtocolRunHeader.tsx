@@ -149,14 +149,14 @@ export function ProtocolRunHeader({
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
   )
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
   let isDoorOpen = false
-  if (isOT3) {
+  if (isFlex) {
     isDoorOpen = doorStatus?.data.status === 'open'
-  } else if (!isOT3 && Boolean(doorSafetySetting?.value)) {
+  } else if (!isFlex && Boolean(doorSafetySetting?.value)) {
     isDoorOpen = doorStatus?.data.status === 'open'
   } else {
     isDoorOpen = false

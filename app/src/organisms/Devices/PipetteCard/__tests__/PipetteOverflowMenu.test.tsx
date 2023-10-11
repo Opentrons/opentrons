@@ -11,7 +11,6 @@ import {
 import { isFlexPipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
-import { drop } from 'lodash'
 
 jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data', () => {
@@ -80,21 +79,6 @@ describe('PipetteOverflowMenu', () => {
     fireEvent.click(btn)
     expect(props.handleChangePipette).toHaveBeenCalled()
   })
-  it('renders recalibrate pipette text for OT-3 pipette', () => {
-    mockisFlexPipette.mockReturnValue(true)
-    props = {
-      ...props,
-      isPipetteCalibrated: true,
-      isRunActive: false,
-    }
-    const { getByRole } = render(props)
-    const recalibrate = getByRole('button', {
-      name: 'Recalibrate pipette',
-    })
-    fireEvent.click(recalibrate)
-    expect(props.handleCalibrate).toHaveBeenCalled()
-  })
-
   it('renders recalibrate pipette text for OT-3 pipette', () => {
     mockisFlexPipette.mockReturnValue(true)
     props = {

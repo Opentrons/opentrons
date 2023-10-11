@@ -48,7 +48,7 @@ export function SetupRobotCalibration({
   const trackEvent = useTrackEvent()
 
   const runHasStarted = useRunHasStarted(runId)
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
 
   let tooltipText: string | null = null
   if (runHasStarted) {
@@ -65,11 +65,11 @@ export function SetupRobotCalibration({
         gridGap={SPACING.spacing16}
         marginY={SPACING.spacing16}
       >
-        {!isOT3 ? (
+        {!isFlex ? (
           <SetupDeckCalibration robotName={robotName} runId={runId} />
         ) : null}
         <SetupInstrumentCalibration robotName={robotName} runId={runId} />
-        {!isOT3 ? (
+        {!isFlex ? (
           <SetupTipLengthCalibration robotName={robotName} runId={runId} />
         ) : null}
       </Flex>

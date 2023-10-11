@@ -65,8 +65,8 @@ export function PipetteOffsetCalibrationItems({
   })
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
   const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
-  const isOT3 = useIsFlex(robotName)
-  const attachedPipettes = Boolean(isOT3)
+  const isFlex = useIsFlex(robotName)
+  const attachedPipettes = Boolean(isFlex)
     ? attachedPipetteFromInstrumentQuery
     : attachedPipettesFromPipetteQuery
 
@@ -77,7 +77,9 @@ export function PipetteOffsetCalibrationItems({
           <StyledTableHeader>{t('model_and_serial')}</StyledTableHeader>
           <StyledTableHeader>{t('mount')}</StyledTableHeader>
           {/* omit tip rack column for OT-3 */}
-          {isOT3 ? null : <StyledTableHeader>{t('tiprack')}</StyledTableHeader>}
+          {isFlex ? null : (
+            <StyledTableHeader>{t('tiprack')}</StyledTableHeader>
+          )}
           <StyledTableHeader>{t('last_calibrated_label')}</StyledTableHeader>
         </tr>
       </thead>
@@ -98,7 +100,7 @@ export function PipetteOffsetCalibrationItems({
                     {calibration.mount}
                   </StyledText>
                 </StyledTableCell>
-                {isOT3 ? null : (
+                {isFlex ? null : (
                   <StyledTableCell>
                     <StyledText as="p">
                       {calibration.tiprack != null &&
@@ -140,7 +142,7 @@ export function PipetteOffsetCalibrationItems({
                     serialNumber={calibration.serialNumber ?? null}
                     updateRobotStatus={updateRobotStatus}
                     pipetteName={
-                      isOT3
+                      isFlex
                         ? attachedPipetteFromInstrumentQuery[calibration.mount]
                             ?.instrumentName ?? null
                         : attachedPipettesFromPipetteQuery[calibration.mount]

@@ -50,7 +50,6 @@ import type {
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
 import { DropTipWizard } from '../../DropTipWizard'
-import { getRobotByName, getRobotModelByName } from '../../../redux/discovery'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null

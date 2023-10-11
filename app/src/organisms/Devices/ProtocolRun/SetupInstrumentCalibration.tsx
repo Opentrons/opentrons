@@ -40,10 +40,10 @@ export function SetupInstrumentCalibration({
 }: SetupInstrumentCalibrationProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
 
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
-    enabled: isOT3,
+    enabled: isFlex,
     refetchInterval: EQUIPMENT_POLL_MS,
   })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -71,7 +71,7 @@ export function SetupInstrumentCalibration({
       </StyledText>
       {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
         const pipetteInfo = runPipetteInfoByMount[mount]
-        if (pipetteInfo != null && !isOT3) {
+        if (pipetteInfo != null && !isFlex) {
           return (
             <SetupPipetteCalibrationItem
               key={index}
@@ -82,7 +82,7 @@ export function SetupInstrumentCalibration({
               instrumentsRefetch={refetch}
             />
           )
-        } else if (isOT3) {
+        } else if (isFlex) {
           return (
             <SetupFlexPipetteCalibrationItem
               key={index}

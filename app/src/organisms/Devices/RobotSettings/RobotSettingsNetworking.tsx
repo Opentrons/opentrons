@@ -55,7 +55,7 @@ export function RobotSettingsNetworking({
   const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy({ poll: true })
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
 
   const [showDisconnectModal, setShowDisconnectModal] = React.useState<boolean>(
     false
@@ -75,17 +75,17 @@ export function RobotSettingsNetworking({
   )
 
   const wifiAddress = addresses.find(addr => addr.ip === wifi?.ipAddress)
-  const isOT3ConnectedViaWifi =
+  const isFlexConnectedViaWifi =
     wifiAddress != null && wifiAddress.healthStatus === HEALTH_STATUS_OK
 
   const ethernetAddress = addresses.find(
     addr => addr.ip === ethernet?.ipAddress
   )
-  const isOT3ConnectedViaEthernet =
+  const isFlexConnectedViaEthernet =
     ethernetAddress != null && ethernetAddress.healthStatus === HEALTH_STATUS_OK
 
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
-  const isOT3ConnectedViaUSB =
+  const isFlexConnectedViaUSB =
     usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
@@ -106,7 +106,7 @@ export function RobotSettingsNetworking({
       </Portal>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex alignItems={ALIGN_CENTER}>
-          {isOT3ConnectedViaWifi ? (
+          {isFlexConnectedViaWifi ? (
             <Icon
               size="1.25rem"
               name="ot-check"
@@ -191,7 +191,7 @@ export function RobotSettingsNetworking({
         </Box>
         <Divider />
         <Flex alignItems={ALIGN_CENTER}>
-          {isOT3ConnectedViaEthernet ? (
+          {isFlexConnectedViaEthernet ? (
             <Icon
               size="1.25rem"
               name="ot-check"
@@ -204,12 +204,12 @@ export function RobotSettingsNetworking({
           )}
           <Icon
             size="1.25rem"
-            name={isOT3 ? 'ethernet' : 'usb'}
+            name={isFlex ? 'ethernet' : 'usb'}
             marginRight={SPACING.spacing12}
             data-testid="RobotSettings_Networking_usb_icon"
           />
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {isOT3 ? t('ethernet') : t('wired_usb')}
+            {isFlex ? t('ethernet') : t('wired_usb')}
           </StyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
@@ -252,13 +252,13 @@ export function RobotSettingsNetworking({
               </>
             ) : (
               <StyledText as="p" color={COLORS.darkGrey}>
-                {isOT3
+                {isFlex
                   ? t('not_connected_via_ethernet')
                   : t('not_connected_via_wired_usb')}
               </StyledText>
             )}
           </Flex>
-          {isOT3 ? null : (
+          {isFlex ? null : (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               marginTop={SPACING.spacing16}
@@ -279,11 +279,11 @@ export function RobotSettingsNetworking({
             </Flex>
           )}
         </Box>
-        {isOT3 ? (
+        {isFlex ? (
           <>
             <Divider />
             <Flex alignItems={ALIGN_CENTER}>
-              {isOT3ConnectedViaUSB ? (
+              {isFlexConnectedViaUSB ? (
                 <Icon
                   size="1.25rem"
                   name="ot-check"
@@ -306,7 +306,7 @@ export function RobotSettingsNetworking({
             </Flex>
             <Box paddingLeft="3.75rem">
               <StyledText as="p" color={COLORS.darkGrey}>
-                {isOT3ConnectedViaUSB
+                {isFlexConnectedViaUSB
                   ? t('directly_connected_to_this_computer')
                   : t('not_connected_via_usb')}
               </StyledText>

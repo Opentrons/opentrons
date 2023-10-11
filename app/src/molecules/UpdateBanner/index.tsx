@@ -62,8 +62,8 @@ export const UpdateBanner = ({
     hyperlinkText = t('update_now')
   }
 
-  const isOT3 = useIsFlex(robotName)
-  if (!isOT3 && updateType === 'calibration') return null
+  const isFlex = useIsFlex(robotName)
+  if (!isFlex && updateType === 'calibration') return null
 
   return (
     <>

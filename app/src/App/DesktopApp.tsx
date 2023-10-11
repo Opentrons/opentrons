@@ -142,10 +142,10 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
-  const isOT3 = useIsFlex(robotName)
+  const isFlex = useIsFlex(robotName)
 
   // E-stop is not supported on OT2
-  if (!isOT3) return null
+  if (!isFlex) return null
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
