@@ -79,7 +79,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   )
 
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments  or modules from a future version of Opentrons software. Please update 
+  instruments or modules from a future version of Opentrons software. Please update 
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (
