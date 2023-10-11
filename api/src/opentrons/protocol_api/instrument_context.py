@@ -137,9 +137,8 @@ class InstrumentContext(publisher.CommandPublisher):
         The default speed for Flex varies between 300 and 350 mm/s.
         The OT-2 default is 400 mm/s. In addition to changing the
         default, the speed of individual motions can be changed with the
-        ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
-        See also, :ref:`gantry_speed` 
-        and :ref:`axis_speed_limits`.
+        ``speed`` argument to :py:meth:`InstrumentContext.move_to`. See
+        also, :ref:`gantry_speed`.
         """
         return self._core.get_default_speed()
 
