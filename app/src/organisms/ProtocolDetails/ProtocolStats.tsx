@@ -13,11 +13,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import {
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import { StyledText } from '../../atoms/text'
 
 interface ProtocolStatsProps {
   analysis: ProtocolAnalysisOutput | null
@@ -121,19 +121,30 @@ export const ProtocolStats = (
     }
   )
 
-  const toRawStat = (row: StatRowProps): {[stat: string]: number} => (
-    {[row.displayName]: row.datum}
-  )
-  console.log(
+  // NOTE: logging data as JSON for quick copying
+  const toRawStat = (
+    row: StatRowProps
+  ): { [stat: string]: number | string } => ({
+    [row.displayName]: row.datum,
+  })
+  console.info(
     JSON.stringify({
-      [analysis.metadata?.protocolName]: [
-        toRawStat(gripperMoveCount),
-        ...pipettePickUpStats.map(toRawStat),
-        ...pipetteAspirateStats.map(toRawStat),
-        ...pipetteDispenseStats.map(toRawStat),
-      ]
-    }
-    )
+      [analysis.metadata?.protocolName]: {
+        ...toRawStat(gripperMoveCount),
+        ...pipettePickUpStats.reduce(
+          (acc, r) => ({ ...acc, ...toRawStat(r) }),
+          {}
+        ),
+        ...pipetteAspirateStats.reduce(
+          (acc, r) => ({ ...acc, ...toRawStat(r) }),
+          {}
+        ),
+        ...pipetteDispenseStats.reduce(
+          (acc, r) => ({ ...acc, ...toRawStat(r) }),
+          {}
+        ),
+      },
+    })
   )
   return (
     <Flex
