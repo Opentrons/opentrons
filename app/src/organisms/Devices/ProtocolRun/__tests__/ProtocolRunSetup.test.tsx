@@ -20,6 +20,7 @@ import {
   useIsOT3,
   useRobot,
   useRunCalibrationStatus,
+  useModuleCalibrationStatus,
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
@@ -51,6 +52,9 @@ const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFu
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
@@ -266,6 +270,9 @@ describe('ProtocolRunSetup', () => {
           ...MOCK_ROTOCOL_LIQUID_KEY,
         } as any)
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: true })
     })
     afterEach(() => {
       resetAllWhenMocks()
