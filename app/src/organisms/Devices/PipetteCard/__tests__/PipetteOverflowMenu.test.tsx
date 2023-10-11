@@ -11,6 +11,7 @@ import {
 import { isFlexPipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
+import { drop } from 'lodash'
 
 jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data', () => {
@@ -40,6 +41,7 @@ describe('PipetteOverflowMenu', () => {
       pipetteSpecs: mockLeftProtoPipette.modelSpecs,
       pipetteSettings: mockPipetteSettingsFieldsMap,
       mount: LEFT,
+      handleDropTip: jest.fn(),
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
       handleAboutSlideout: jest.fn(),
@@ -58,12 +60,15 @@ describe('PipetteOverflowMenu', () => {
     const detach = getByRole('button', { name: 'Detach pipette' })
     const settings = getByRole('button', { name: 'Pipette Settings' })
     const about = getByRole('button', { name: 'About pipette' })
+    const dropTip = getByRole('button', { name: 'Drop tip' })
     fireEvent.click(detach)
     expect(props.handleChangePipette).toHaveBeenCalled()
     fireEvent.click(settings)
     expect(props.handleSettingsSlideout).toHaveBeenCalled()
     fireEvent.click(about)
     expect(props.handleAboutSlideout).toHaveBeenCalled()
+    fireEvent.click(dropTip)
+    expect(props.handleDropTip).toHaveBeenCalled()
   })
   it('renders information with no pipette attached', () => {
     props = {
@@ -74,6 +79,20 @@ describe('PipetteOverflowMenu', () => {
     const btn = getByRole('button', { name: 'Attach pipette' })
     fireEvent.click(btn)
     expect(props.handleChangePipette).toHaveBeenCalled()
+  })
+  it('renders recalibrate pipette text for OT-3 pipette', () => {
+    mockisFlexPipette.mockReturnValue(true)
+    props = {
+      ...props,
+      isPipetteCalibrated: true,
+      isRunActive: false,
+    }
+    const { getByRole } = render(props)
+    const recalibrate = getByRole('button', {
+      name: 'Recalibrate pipette',
+    })
+    fireEvent.click(recalibrate)
+    expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
   it('renders recalibrate pipette text for OT-3 pipette', () => {

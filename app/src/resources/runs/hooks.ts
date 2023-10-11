@@ -144,7 +144,7 @@ export function useCreateTargetedMaintenanceRunMutation(
 
   return {
     ...createMaintenanceRunMutation,
-    createTargetedMaintenanceRun: (variables = undefined, ...options) =>
+    createTargetedMaintenanceRun: (variables, ...options) =>
       createMaintenanceRunMutation
         .createMaintenanceRun(variables, ...options)
         .then(res => {

@@ -142,7 +142,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       setChangePipette(true)
     }
   }
-  const handleDropTip = (): void => { setShowDropTipWizard(true) }
+  const handleDropTip = (): void => {
+    setShowDropTipWizard(true)
+  }
   const handleCalibrate = (): void => {
     if (isFlexPipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
   }
@@ -281,8 +283,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                   {pipetteIs96Channel
                     ? t('both_mounts')
                     : t('mount', {
-                      side: mount === LEFT ? t('left') : t('right'),
-                    })}
+                        side: mount === LEFT ? t('left') : t('right'),
+                      })}
                 </StyledText>
                 <Flex
                   paddingBottom={SPACING.spacing4}

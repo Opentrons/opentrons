@@ -92,23 +92,21 @@ export const PipetteOverflowMenu = (
                     : 'calibrate_pipette'
                 )}
               </MenuItem>
-            ): null}
+            ) : null}
             <MenuItem
               onClick={() => handleChangePipette()}
               disabled={isRunActive}
             >
               {t('detach_pipette')}
             </MenuItem>
-            <MenuItem
-              onClick={() => handleAboutSlideout()}
-            >
+            <MenuItem onClick={() => handleAboutSlideout()}>
               {t('about_pipette')}
             </MenuItem>
-            <MenuItem onClick={() => handleDropTip()} >
+            <MenuItem onClick={() => handleDropTip()}>
               {i18n.format(t('drop_tips'), 'capitalize')}
             </MenuItem>
             <Divider marginY="0" />
-            {(!isFlexPipetteAttached && pipetteSettings != null) ? (
+            {!isFlexPipetteAttached && pipetteSettings != null ? (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_view_settings`}
                 onClick={() => handleSettingsSlideout()}

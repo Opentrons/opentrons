@@ -1,7 +1,22 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { Flex, SPACING, DIRECTION_COLUMN, TYPOGRAPHY, DIRECTION_ROW, COLORS, BORDERS, JUSTIFY_CENTER, ALIGN_CENTER, RESPONSIVENESS, JUSTIFY_FLEX_START, DISPLAY_INLINE_BLOCK, JUSTIFY_SPACE_BETWEEN, PrimaryButton } from '@opentrons/components'
+import {
+  Flex,
+  SPACING,
+  DIRECTION_COLUMN,
+  TYPOGRAPHY,
+  DIRECTION_ROW,
+  COLORS,
+  BORDERS,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  RESPONSIVENESS,
+  JUSTIFY_FLEX_START,
+  DISPLAY_INLINE_BLOCK,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+} from '@opentrons/components'
 import { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
@@ -22,10 +37,12 @@ export const BeforeBeginning = (
   const {
     createMaintenanceRun,
     isCreateLoading,
-    setShouldDispenseLiquid
+    setShouldDispenseLiquid,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
-  const [flowType, setFlowType] = React.useState<'liquid_and_tips' | 'only_tips'>('liquid_and_tips')
+  const [flowType, setFlowType] = React.useState<
+    'liquid_and_tips' | 'only_tips'
+  >('liquid_and_tips')
   const handleProceed = (): void => {
     createMaintenanceRun({})
       .then(() => {
@@ -41,7 +58,11 @@ export const BeforeBeginning = (
         <Flex
           flex="1 0 auto"
           onClick={() => setFlowType('liquid_and_tips')}
-          css={flowType === 'liquid_and_tips' ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
+          css={
+            flowType === 'liquid_and_tips'
+              ? SELECTED_OPTIONS_STYLE
+              : UNSELECTED_OPTIONS_STYLE
+          }
         >
           {/* <img
             src={}
@@ -52,7 +73,11 @@ export const BeforeBeginning = (
         <Flex
           flex="1 0 auto"
           onClick={() => setFlowType('only_tips')}
-          css={flowType === 'only_tips' ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
+          css={
+            flowType === 'only_tips'
+              ? SELECTED_OPTIONS_STYLE
+              : UNSELECTED_OPTIONS_STYLE
+          }
         >
           {/* <img
             src={}
@@ -61,11 +86,12 @@ export const BeforeBeginning = (
           <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
         <NeedHelpLink href={NEED_HELP_URL} />
-        <PrimaryButton
-          disabled={isCreateLoading}
-          onClick={handleProceed}>
+        <PrimaryButton disabled={isCreateLoading} onClick={handleProceed}>
           {i18n.format(t('shared:continue'), 'capitalize')}
         </PrimaryButton>
       </Flex>
@@ -125,7 +151,6 @@ const SELECTED_OPTIONS_STYLE = css`
     }
   }
 `
-
 
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};

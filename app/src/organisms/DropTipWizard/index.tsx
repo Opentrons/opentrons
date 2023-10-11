@@ -33,7 +33,14 @@ import type {
 } from '@opentrons/api-client'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
-import { BLOWOUT_SUCCESS, CHOOSE_BLOWOUT_LOCATION, CHOOSE_DROP_TIP_LOCATION, DROP_TIP_SUCCESS, POSITION_AND_BLOWOUT, POSITION_AND_DROP_TIP } from './constants'
+import {
+  BLOWOUT_SUCCESS,
+  CHOOSE_BLOWOUT_LOCATION,
+  CHOOSE_DROP_TIP_LOCATION,
+  DROP_TIP_SUCCESS,
+  POSITION_AND_BLOWOUT,
+  POSITION_AND_DROP_TIP,
+} from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
@@ -51,9 +58,7 @@ interface MaintenanceRunManagerProps {
   closeFlow: () => void
   onComplete?: () => void
 }
-export function DropTipWizard(
-  props: MaintenanceRunManagerProps
-): JSX.Element {
+export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
   const { closeFlow, mount, instrumentModelSpecs, robotType } = props
   const {
     chainRunCommands,
@@ -208,9 +213,14 @@ export const DropTipWizardComponent = (
   const { t, i18n } = useTranslation('drop_tip_wizard')
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const [shouldDispenseLiquid, setShouldDispenseLiquid] = React.useState<boolean | null>(null)
+  const [shouldDispenseLiquid, setShouldDispenseLiquid] = React.useState<
+    boolean | null
+  >(null)
   const DropTipWizardSteps = getDropTipWizardSteps(shouldDispenseLiquid)
-  const currentStep = shouldDispenseLiquid != null ? getDropTipWizardSteps(shouldDispenseLiquid)[currentStepIndex] : null
+  const currentStep =
+    shouldDispenseLiquid != null
+      ? getDropTipWizardSteps(shouldDispenseLiquid)[currentStepIndex]
+      : null
   const isFinalStep = currentStepIndex === DropTipWizardSteps.length - 1
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
@@ -232,7 +242,6 @@ export const DropTipWizardComponent = (
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCleanUpAndClose, true)
-
 
   // let chainMaintenanceRunCommands
 
@@ -269,38 +278,76 @@ export const DropTipWizardComponent = (
     )
   } else if (shouldDispenseLiquid == null) {
     modalContent = (
-      <BeforeBeginning {...{ createMaintenanceRun, isCreateLoading, createdMaintenanceRunId, setShouldDispenseLiquid }} />
+      <BeforeBeginning
+        {...{
+          createMaintenanceRun,
+          isCreateLoading,
+          createdMaintenanceRunId,
+          setShouldDispenseLiquid,
+        }}
+      />
     )
-  } else if (currentStep === CHOOSE_BLOWOUT_LOCATION || currentStep === CHOOSE_DROP_TIP_LOCATION) {
+  } else if (
+    currentStep === CHOOSE_BLOWOUT_LOCATION ||
+    currentStep === CHOOSE_DROP_TIP_LOCATION
+  ) {
     modalContent = (
       <ChooseLocation
         robotType={robotType}
         handleProceed={proceed}
-        title={currentStep === CHOOSE_BLOWOUT_LOCATION ? t('choose_blowout_location') : t('choose_drop_tip_location')}
-        body={(
+        title={
+          currentStep === CHOOSE_BLOWOUT_LOCATION
+            ? t('choose_blowout_location')
+            : t('choose_drop_tip_location')
+        }
+        body={
           <Trans
             t={t}
-            i18nKey={currentStep === CHOOSE_BLOWOUT_LOCATION ? 'select_blowout_slot' : 'select_drop_tip_slot'}
+            i18nKey={
+              currentStep === CHOOSE_BLOWOUT_LOCATION
+                ? 'select_blowout_slot'
+                : 'select_drop_tip_slot'
+            }
             components={{ block: <StyledText as="p" /> }}
           />
-        )}
+        }
       />
     )
-  } else if (currentStep === POSITION_AND_BLOWOUT || currentStep === POSITION_AND_DROP_TIP) {
+  } else if (
+    currentStep === POSITION_AND_BLOWOUT ||
+    currentStep === POSITION_AND_DROP_TIP
+  ) {
     modalContent = (
       <JogToPosition
         handleJog={handleJog}
         handleProceed={proceed}
         handleGoBack={goBack}
-        body={currentStep === POSITION_AND_BLOWOUT ? t('position_and_blowout') : t('position_and_drop_tip')}
+        body={
+          currentStep === POSITION_AND_BLOWOUT
+            ? t('position_and_blowout')
+            : t('position_and_drop_tip')
+        }
       />
     )
-  } else if (currentStep === BLOWOUT_SUCCESS || currentStep === DROP_TIP_SUCCESS) {
+  } else if (
+    currentStep === BLOWOUT_SUCCESS ||
+    currentStep === DROP_TIP_SUCCESS
+  ) {
     modalContent = (
       <Success
-        message={currentStep === BLOWOUT_SUCCESS ? t('blowout_complete') : t('drop_tip_complete')}
-        handleProceed={currentStep === BLOWOUT_SUCCESS ? proceed : handleCleanUpAndClose}
-        proceedText={currentStep === BLOWOUT_SUCCESS ? t('shared:continue') : t('shared:exit')}
+        message={
+          currentStep === BLOWOUT_SUCCESS
+            ? t('blowout_complete')
+            : t('drop_tip_complete')
+        }
+        handleProceed={
+          currentStep === BLOWOUT_SUCCESS ? proceed : handleCleanUpAndClose
+        }
+        proceedText={
+          currentStep === BLOWOUT_SUCCESS
+            ? t('shared:continue')
+            : t('shared:exit')
+        }
       />
     )
   }

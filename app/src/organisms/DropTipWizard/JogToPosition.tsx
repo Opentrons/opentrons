@@ -1,7 +1,19 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { Flex, DIRECTION_COLUMN, DIRECTION_ROW, ALIGN_CENTER, RESPONSIVENESS, JUSTIFY_SPACE_BETWEEN, PrimaryButton, SecondaryButton, SPACING, ALIGN_FLEX_START, TYPOGRAPHY } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  ALIGN_CENTER,
+  RESPONSIVENESS,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  ALIGN_FLEX_START,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 import { useSelector } from 'react-redux'
@@ -21,7 +33,6 @@ const Header = styled.h1`
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
 `
-
 
 interface JogToPositionProps {
   handleProceed: () => void
@@ -57,7 +68,9 @@ export const JogToPosition = (
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_FLEX_START}
         >
-          <Header>{i18n.format(t('position_the_pipette'), 'capitalize')}</Header>
+          <Header>
+            {i18n.format(t('position_the_pipette'), 'capitalize')}
+          </Header>
           {body}
         </Flex>
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing20}>

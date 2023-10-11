@@ -341,7 +341,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for modules and fixtures', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseFeatureFlag)
         .calledWith('enableDeckConfiguration')
         .mockReturnValue(true)

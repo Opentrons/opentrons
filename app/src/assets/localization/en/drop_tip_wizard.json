@@ -8,7 +8,7 @@
   "no_proceed_to_drop_tip": "No, proceed to tip removal",
   "position_and_blowout": "Ensure that the pipette tip is centered above and level with where you want the liquid to be blown out. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned.",
   "position_and_drop_tip": "Ensure that the pipette tip is centered above and level with where you want to drop the tips. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned.",
-  "position_the_pipette":  "position the pipette",
+  "position_the_pipette": "position the pipette",
   "select_blowout_slot": "<block>You can blow out liquid into a labware or dispose of it.</block><block>Select the slot where you want to blow out the liquid on the deck map to the right. Once confirmed, the gantry will move to the chosen slot.</block>",
   "select_drop_tip_slot": "<block>You can return tips to a tip rack or dispose of them.</block><block>Select the slot where you want to drop the tips on the deck map to the right. Once confirmed, the gantry will move to the chosen slot.</block>",
   "yes_blow_out_liquid": "Yes, blow out liquid in labware"

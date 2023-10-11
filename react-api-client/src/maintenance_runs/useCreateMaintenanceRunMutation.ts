@@ -16,13 +16,13 @@ import type { AxiosError } from 'axios'
 export type CreateMaintenanceRunType = UseMutateAsyncFunction<
   MaintenanceRun,
   AxiosError,
-  CreateMaintenanceRunData 
+  CreateMaintenanceRunData
 >
 
 export type UseCreateMaintenanceRunMutationResult = UseMutationResult<
   MaintenanceRun,
   AxiosError,
-  CreateMaintenanceRunData 
+  CreateMaintenanceRunData
 > & {
   createMaintenanceRun: CreateMaintenanceRunType
 }
@@ -30,7 +30,7 @@ export type UseCreateMaintenanceRunMutationResult = UseMutationResult<
 export type UseCreateMaintenanceRunMutationOptions = UseMutationOptions<
   MaintenanceRun,
   AxiosError,
-  CreateMaintenanceRunData 
+  CreateMaintenanceRunData
 >
 
 export function useCreateMaintenanceRunMutation(
@@ -43,7 +43,7 @@ export function useCreateMaintenanceRunMutation(
   const mutation = useMutation<
     MaintenanceRun,
     AxiosError,
-    CreateMaintenanceRunData | undefined
+    CreateMaintenanceRunData
   >(
     [host, 'maintenance_runs'],
     (createMaintenanceRunData = {}) =>

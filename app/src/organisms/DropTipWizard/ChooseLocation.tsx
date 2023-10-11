@@ -1,7 +1,16 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { Flex, DIRECTION_COLUMN, DIRECTION_ROW, ALIGN_CENTER, RESPONSIVENESS, JUSTIFY_SPACE_BETWEEN, PrimaryButton, useDeckLocationSelect } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  ALIGN_CENTER,
+  RESPONSIVENESS,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  useDeckLocationSelect,
+} from '@opentrons/components'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 import { RobotType } from '@opentrons/shared-data'
@@ -21,7 +30,9 @@ export const ChooseLocation = (
 ): JSX.Element | null => {
   const { handleProceed, title, body, robotType } = props
   const { t } = useTranslation(['drop_tip_wizard', 'shared'])
-  const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(robotType)
+  const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
+    robotType
+  )
 
   const handleConfirmPosition: React.MouseEventHandler = () => {
     console.log('MOVE TO selected location: ', selectedLocation)
@@ -34,10 +45,13 @@ export const ChooseLocation = (
         body={body}
         rightElement={DeckLocationSelect}
         footer={
-          <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
+          >
             <NeedHelpLink href={NEED_HELP_URL} />
-            <PrimaryButton
-              onClick={handleConfirmPosition}>
+            <PrimaryButton onClick={handleConfirmPosition}>
               {t('shared:confirm_position')}
             </PrimaryButton>
           </Flex>

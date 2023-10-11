@@ -10,7 +10,11 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
 } from '../../../../redux/analytics'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useDeckCalibrationData, useIsFlex, useRunHasStarted } from '../../hooks'
+import {
+  useDeckCalibrationData,
+  useIsFlex,
+  useRunHasStarted,
+} from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'

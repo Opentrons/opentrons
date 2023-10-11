@@ -24,7 +24,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
         subsystem as Subsystem
       ).then(response => response.data),
     {
-      enabled: host!== null,
+      enabled: host !== null,
       onError: () => {
         queryClient.resetQueries([
           host,

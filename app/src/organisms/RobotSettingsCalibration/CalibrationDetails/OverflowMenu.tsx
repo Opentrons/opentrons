@@ -82,7 +82,7 @@ export function OverflowMenu({
     showPipetteWizardFlows,
     setShowPipetteWizardFlows,
   ] = React.useState<boolean>(false)
-  const isFlexPipette = isFlexPipette(pipetteName as PipetteName)
+  const isPipetteForFlex = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
     useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
       ?.last_modified ?? null
@@ -102,7 +102,7 @@ export function OverflowMenu({
     e.preventDefault()
     if (
       !isRunning &&
-      isFlexPipette &&
+      isPipetteForFlex &&
       calType === 'pipetteOffset' &&
       pipetteName != null
     ) {
@@ -199,7 +199,7 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {isFlexPipette ? (
+          {isPipetteForFlex ? (
             <MenuItem onClick={handleRecalibrate}>
               {t(
                 ot3PipCal == null
