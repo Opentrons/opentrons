@@ -135,6 +135,10 @@ class ExecutionManagerProvider:
             if not inst._em_simulate:
                 await inst.execution_manager.wait_for_is_running()
             if inst.taskify_movement_execution:
+                # Running these functions inside cancellable tasks makes it easier and
+                # faster to cancel protocol runs. In the higher, runner & engine layers,
+                # a cancellation request triggers cancellation of the running move task
+                # and hence, prevents any further communication with hardware.
                 decorated_task: "asyncio.Task[DecoratedReturn]" = asyncio.create_task(
                     decorated(inst, *args, **kwargs)
                 )

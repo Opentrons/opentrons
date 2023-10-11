@@ -215,11 +215,11 @@ class MotionController(Protocol):
         ...
 
     def is_movement_execution_taskified(self) -> bool:
-        """Get whether move tasks are being executed inside cancellable tasks."""
+        """Get whether move functions are being executed inside cancellable tasks."""
         ...
 
     def should_taskify_movement_execution(self, taskify: bool) -> None:
-        """Specify whether move methods should be executed inside cancellable tasks."""
+        """Specify whether move functions should be executed inside cancellable tasks."""
         ...
 
     async def cancel_execution_and_running_tasks(self) -> None:
