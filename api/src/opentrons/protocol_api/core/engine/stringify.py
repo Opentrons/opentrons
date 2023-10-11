@@ -10,7 +10,7 @@ from opentrons.protocol_engine.types import (
 def well(engine_client: SyncClient, well_name: str, labware_id: str) -> str:
     """Return a human-readable string representing a well and its location.
 
-    For example: "A1 on My Cool Labware on C2".
+    For example: "A1 of My Cool Labware on C2".
     """
     labware_location = OnLabwareLocation(labwareId=labware_id)
     return f"{well_name} of {_labware_location_string(engine_client, labware_location)}"
