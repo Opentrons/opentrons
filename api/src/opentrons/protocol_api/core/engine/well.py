@@ -72,7 +72,7 @@ class WellCore(AbstractWellCore):
         )
 
     def get_display_name(self) -> str:
-        """Get the well's full display name."""
+        """Get the full display name of the well (e.g. "A1 of Some Labware on 5")."""
         parent = self._engine_client.state.labware.get_display_name(self._labware_id)
         return f"{self._name} of {parent}"
 
