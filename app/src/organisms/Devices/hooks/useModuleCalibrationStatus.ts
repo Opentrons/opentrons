@@ -1,6 +1,6 @@
 import { useIsOT3 } from './useIsOT3'
-import { useModuleRenderInfoForProtocolById } from '.'
-import { ProtocolCalibrationStatus } from '.'
+import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
+import { ProtocolCalibrationStatus } from './useRunCalibrationStatus'
 
 export function useModuleCalibrationStatus(
   robotName: string,
