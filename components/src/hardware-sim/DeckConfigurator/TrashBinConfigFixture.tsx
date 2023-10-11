@@ -79,7 +79,6 @@ export function TrashBinConfigFixture(
         justifyContent={JUSTIFY_CENTER}
         width="100%"
       >
-        {}
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
           {trashBinDef.metadata.displayName}
         </Text>

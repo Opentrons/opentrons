@@ -1,7 +1,9 @@
 import * as React from 'react'
 
+import { COLORS } from '../../ui-style-constants'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
+import { WasteChute } from './WasteChuteFixture'
 
 import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 import type { WasteChuteLocation } from './WasteChuteFixture'
@@ -22,8 +24,8 @@ export function WasteChuteStagingAreaFixture(
   const {
     cutoutLocation,
     deckDefinition,
-    fixtureBaseColor,
-    slotClipColor,
+    fixtureBaseColor = COLORS.light1,
+    slotClipColor = COLORS.darkGreyEnabled,
     ...restProps
   } = props
 
@@ -57,6 +59,10 @@ export function WasteChuteStagingAreaFixture(
       <SlotClip d="M488,8.8v-10.5h10.6" stroke={slotClipColor} />,
       <SlotClip d="M619.8,77.9v10.1H609" stroke={slotClipColor} />,
       <SlotClip d="M619.8,8.8v-10.7H609" stroke={slotClipColor} />
+      <WasteChute
+        wasteIconColor={fixtureBaseColor}
+        backgroundColor={slotClipColor}
+      />
     </g>
   )
 }

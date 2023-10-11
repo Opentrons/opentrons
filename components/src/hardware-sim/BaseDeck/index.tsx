@@ -110,9 +110,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             />
           ))}
           {trashBinFixtures.map(fixture => (
-            <>
+            <React.Fragment key={fixture.fixtureId}>
               <SingleSlotFixture
-                key={fixture.fixtureId}
                 cutoutLocation={fixture.fixtureLocation}
                 deckDefinition={deckDef}
                 slotClipColor={COLORS.transparent}
@@ -125,7 +124,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 trashLocation={fixture.fixtureLocation as TrashLocation}
                 backgroundColor={darkFill}
               />
-            </>
+            </React.Fragment>
           ))}
           {wasteChuteFixtures.map(fixture => (
             <WasteChuteFixture
@@ -146,6 +145,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           )
           return slotDef != null ? (
             <Module
+              key={`${moduleModel} ${slotDef.id}`}
               def={getModuleDef2(moduleModel)}
               x={slotDef.position[0]}
               y={slotDef.position[1]}
@@ -170,6 +170,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         )
         return slotDef != null ? (
           <g
+            key={slotDef.id}
             transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
           >
             <LabwareRender definition={definition} />

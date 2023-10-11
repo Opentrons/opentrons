@@ -25,10 +25,6 @@ const meta: Meta<React.ComponentProps<typeof BaseDeckComponent>> = {
   title: 'Library/Molecules/Simulation/BaseDeck',
   argTypes: {
     deckConfig: {
-      // options: [
-      //   EXTENDED_DECK_CONFIG_FIXTURE,
-      //   STANDARD_SLOT_DECK_CONFIG_FIXTURE,
-      // ],
       options: ['single slot deck', 'staging area deck'],
       control: { type: 'radio' },
     },

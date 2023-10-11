@@ -73,7 +73,6 @@ export function StagingAreaConfigFixture(
         justifyContent={JUSTIFY_CENTER}
         width="100%"
       >
-        {}
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
           {stagingAreaDef.metadata.displayName}
         </Text>

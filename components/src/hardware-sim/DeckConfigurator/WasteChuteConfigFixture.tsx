@@ -73,7 +73,6 @@ export function WasteChuteConfigFixture(
         justifyContent={JUSTIFY_CENTER}
         width="100%"
       >
-        {}
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
           {wasteChuteDef.metadata.displayName}
         </Text>
