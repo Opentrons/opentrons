@@ -842,11 +842,22 @@ def _run_file_non_pe(
     with scraper.scrape():
         try:
             execute.run_protocol(protocol, context)
+            if (
+                isinstance(protocol, PythonProtocol)
+                and protocol.api_level >= APIVersion(2, 0)
+                and protocol.bundled_labware is None
+                and allow_bundle()
+            ):
+                bundle_contents: Optional[BundleContents] = bundle_from_sim(
+                    protocol, context
+                )
+            else:
+                bundle_contents = None
+
         finally:
             context.cleanup()
 
-    # FIX BEFORE MERGE
-    return scraper.commands, None
+    return scraper.commands, bundle_contents
 
 
 def _run_file_pe(
@@ -879,7 +890,12 @@ def _run_file_pe(
                 result.state_summary.errors
             )
 
-        return scraper.commands, None  # FIX BEFORE MERGE
+        # We don't currently support returning bundle contents from protocols run through
+        # Protocol Engine. To get them, bundle_from_sim() requires direct access to the
+        # ProtocolContext, which opentrons.protocol_runner does not grant us.
+        bundle_contents = None
+
+        return scraper.commands, bundle_contents
 
     with entrypoint_util.adapt_protocol_source(protocol) as protocol_source:
         return asyncio.run(run(protocol_source))
