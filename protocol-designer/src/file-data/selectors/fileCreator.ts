@@ -304,9 +304,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           commandType: 'loadFixture' as const,
           params: {
             fixtureId: additionalEquipment.id,
-            location: {
-              cutout: additionalEquipment.location as Cutout,
-            },
+            location: { cutout: additionalEquipment.location as Cutout },
             loadName: additionalEquipment.name,
           },
         }
