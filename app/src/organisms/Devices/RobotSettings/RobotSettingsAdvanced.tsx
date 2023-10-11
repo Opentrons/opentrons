@@ -38,7 +38,7 @@ import {
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
-import { UpdateBuildroot } from './UpdateBuildroot'
+import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { Portal } from '../../../App/portal'
 
@@ -69,10 +69,6 @@ export function RobotSettingsAdvanced({
   const [
     showDeviceResetModal,
     setShowDeviceResetModal,
-  ] = React.useState<boolean>(false)
-  const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
@@ -124,12 +120,6 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
-      {showSoftwareUpdateModal ? (
-        <UpdateBuildroot
-          robot={robot}
-          close={() => setShowSoftwareUpdateModal(false)}
-        />
-      ) : null}
       <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
@@ -194,7 +184,7 @@ export function RobotSettingsAdvanced({
         <UpdateRobotSoftware
           robotName={robotName}
           isRobotBusy={isRobotBusy}
-          onUpdateStart={() => setShowSoftwareUpdateModal(true)}
+          onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
         <Troubleshooting robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
