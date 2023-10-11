@@ -104,5 +104,5 @@ def test_well_on_labware_with_complicated_location(decoy: Decoy) -> None:
     )
     assert (
         result
-        == "well-name of lw-1-display-name on lw-2-display-name on module-display-name on C2"
+        == "well-name of lw-1-display-name on lw-2-display-name on module-display-name on slot C2"
     )

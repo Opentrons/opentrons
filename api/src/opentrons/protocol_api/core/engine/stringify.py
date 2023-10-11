@@ -20,9 +20,9 @@ def _labware_location_string(
     engine_client: SyncClient, location: LabwareLocation
 ) -> str:
     if isinstance(location, DeckSlotLocation):
-        # Returning just the ID, like "5" or "C2", matches historical behavior.
+        # TODO(mm, 2023-10-11):
         # Ideally, we might want to use the display name specified by the deck definition?
-        return location.slotName.id
+        return f"slot {location.slotName.id}"
 
     elif isinstance(location, ModuleLocation):
         module_name = engine_client.state.modules.get_definition(

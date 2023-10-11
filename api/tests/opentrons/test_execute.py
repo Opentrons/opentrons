@@ -74,10 +74,10 @@ def mock_get_attached_instr(  # noqa: D103
         (
             "testosaur_v2_14.py",
             [
-                "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
-                "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
-                "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
-                "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
+                "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on slot 1",
+                "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 500.0 uL/sec",
+                "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 1000.0 uL/sec",
+                "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on slot 1",
             ],
         ),
     ],
