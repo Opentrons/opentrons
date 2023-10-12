@@ -4,11 +4,9 @@ import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -407,28 +405,19 @@ export function ProtocolSetupModules({
           </Modal>
         ) : null}
       </Portal>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <ChildNavigation
-          header={enableDeckConfig ? t('modules_and_deck') : t('modules')}
-          onClickBack={() => setSetupScreen('prepare to run')}
-        />
-        <SmallButton
-          alignSelf={ALIGN_FLEX_END}
-          buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
-          buttonType="tertiaryLowLight"
-          iconName="information"
-          iconPlacement="startIcon"
-          onClick={() => setShowSetupInstructionsModal(true)}
-        />
-      </Flex>
+      <ChildNavigation
+        header={enableDeckConfig ? t('modules_and_deck') : t('modules')}
+        onClickBack={() => setSetupScreen('prepare to run')}
+        buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
+        buttonType="tertiaryLowLight"
+        iconName="information"
+        iconPlacement="startIcon"
+        onClickButton={() => setShowSetupInstructionsModal(true)}
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginTop={SPACING.spacing32}
+        marginTop="7.75rem"
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
           <InlineNotification
