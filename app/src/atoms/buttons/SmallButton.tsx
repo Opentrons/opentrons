@@ -16,7 +16,7 @@ import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
-type SmallButtonTypes =
+export type SmallButtonTypes =
   | 'alert'
   | 'primary'
   | 'secondary'
@@ -25,7 +25,7 @@ type SmallButtonTypes =
 
 export type ButtonCategory = 'default' | 'rounded'
 
-type IconPlacement = 'startIcon' | 'endIcon'
+export type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
   onClick: React.MouseEventHandler
   buttonType?: SmallButtonTypes
