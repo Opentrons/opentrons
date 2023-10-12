@@ -328,7 +328,6 @@ async def test_prep_aspirate(sim_and_instr):
     await hw_api.aspirate(mount, 1)
 
     # If we don't prep_after, we should still be fine
-    await hw_api.dispense(mount, 2, 1.0)
     await hw_api.drop_tip(mount)
     await hw_api.pick_up_tip(mount, 20.0, prep_after=False)
     hw_api.set_working_volume(mount, dummy_tip_vol)
