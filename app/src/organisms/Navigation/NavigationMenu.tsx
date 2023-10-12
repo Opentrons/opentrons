@@ -15,6 +15,7 @@ import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useLights } from '../Devices/hooks'
+import { useFeatureFlag } from '../../redux/config'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
 import type { Dispatch } from '../../redux/types'
@@ -34,6 +35,8 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
   ] = React.useState<boolean>(false)
+
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
@@ -90,18 +93,20 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             </StyledText>
           </Flex>
         </MenuItem>
-        <MenuItem key="deck-configuration" onClick={() => {}}>
-          <Flex alignItems={ALIGN_CENTER}>
-            <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
-            <StyledText
-              as="h4"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              marginLeft={SPACING.spacing12}
-            >
-              {t('deck_configuration')}
-            </StyledText>
-          </Flex>
-        </MenuItem>
+        {enableDeckConfig ? (
+          <MenuItem key="deck-configuration" onClick={() => {}}>
+            <Flex alignItems={ALIGN_CENTER}>
+              <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
+              <StyledText
+                as="h4"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                marginLeft={SPACING.spacing12}
+              >
+                {t('deck_configuration')}
+              </StyledText>
+            </Flex>
+          </MenuItem>
+        ) : null}
         <MenuItem key="light" onClick={toggleLights}>
           <Flex alignItems={ALIGN_CENTER}>
             <Icon

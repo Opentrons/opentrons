@@ -184,6 +184,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/emergency-stop',
   },
   {
+    Component:,
+    exact: true,
+    name: 'Deck Configuration',
+    path: '/deck-configuration'
+  }
+  {
     Component: () => (
       <>
         <BackButton />
