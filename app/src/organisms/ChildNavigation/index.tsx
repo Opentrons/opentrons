@@ -19,7 +19,12 @@ import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { StyledText } from '../../atoms/text'
 
+import type { IconName } from '@opentrons/components'
 import type { InlineNotificationProps } from '../../atoms/InlineNotification'
+import type {
+  IconPlacement,
+  SmallButtonTypes,
+} from '../../atoms/buttons/SmallButton'
 
 interface ChildNavigationProps {
   header: string
@@ -27,6 +32,9 @@ interface ChildNavigationProps {
   buttonText?: React.ReactNode
   inlineNotification?: InlineNotificationProps
   onClickButton?: React.MouseEventHandler
+  buttonType?: SmallButtonTypes
+  iconName?: IconName
+  iconPlacement?: IconPlacement
 }
 
 export function ChildNavigation({
@@ -35,6 +43,9 @@ export function ChildNavigation({
   inlineNotification,
   onClickBack,
   onClickButton,
+  buttonType = 'primary',
+  iconName,
+  iconPlacement,
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -59,9 +70,12 @@ export function ChildNavigation({
       </Flex>
       {onClickButton != null && buttonText != null ? (
         <SmallButton
+          buttonType={buttonType}
           buttonCategory="rounded"
           buttonText={buttonText}
           onClick={onClickButton}
+          iconName={iconName}
+          iconPlacement={iconPlacement}
         />
       ) : null}
       {inlineNotification != null ? (
