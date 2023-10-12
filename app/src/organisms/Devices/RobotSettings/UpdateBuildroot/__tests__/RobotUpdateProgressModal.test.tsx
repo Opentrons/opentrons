@@ -177,6 +177,6 @@ describe('DownloadUpdateModal', () => {
     })
 
     findByText('Try restarting the update.')
-    findByText('testRobot restart is taking longer than expected.')
+    findByText('testRobot restart is taking longer than expected to restart.')
   })
 })
