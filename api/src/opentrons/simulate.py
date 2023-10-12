@@ -440,14 +440,22 @@ def simulate(
     Each dict element in the run log has the following keys:
 
         - ``level``: The depth at which this command is nested - if this an
-                     aspirate inside a mix inside a transfer, for instance,
-                     it would be 3.
-        - ``payload``: The command, its arguments, and how to format its text.
-                       For more specific details see
-                       ``opentrons.commands``. To format a message from
-                       a payload do ``payload['text'].format(**payload)``.
+          aspirate inside a mix inside a transfer, for instance, it would be 3.
+
+        - ``payload``: The command. The human-readable run log text is available at
+          ``payload["text"]``. The other keys of ``payload`` are command-dependent;
+          see ``opentrons.commands``.
+
+          .. note::
+            In older software versions, ``payload["text"]`` was a
+            `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
+            To get human-readable text, you had to do ``payload["text"].format(**payload)``.
+            That usage is deprecated now. If ``payload["text"]`` happens to contain any
+            ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
+            ``KeyError``.
+
         - ``logs``: Any log messages that occurred during execution of this
-                    command, as a logging.LogRecord
+          command, as a :py:obj:`logging.LogRecord`.
 
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
