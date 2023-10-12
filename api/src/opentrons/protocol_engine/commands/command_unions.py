@@ -235,6 +235,15 @@ from .configure_for_volume import (
     ConfigureForVolumePrivateResult,
 )
 
+from .configure_nozzle_layout import (
+    ConfigureForVolume,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeResult,
+    ConfigureForVolumeCommandType,
+    ConfigureForVolumePrivateResult,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,

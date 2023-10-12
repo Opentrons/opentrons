@@ -266,6 +266,13 @@ from .configure_for_volume import (
     ConfigureForVolumeCommandType,
 )
 
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -463,4 +470,9 @@ __all__ = [
     "ConfigureForVolumeParams",
     "ConfigureForVolumeResult",
     "ConfigureForVolumeCommandType",
+    # configure nozzle layout command bundle
+    "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutParams",
+    "ConfigureNozzleLayoutResult",
+    "ConfigureNozzleLayoutCommandType",
 ]
