@@ -3,17 +3,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
-  RobotCoordsText,
-  RobotWorkSpace,
   useOnClickOutside,
-  FONT_SIZE_BODY_1,
-  FONT_WEIGHT_BOLD,
-  TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
   Module,
   COLORS,
   TrashLocation,
   FlexTrash,
+  RobotCoordinateSpaceWithDOMCoords,
+  WasteChuteFixture,
+  WasteChuteLocation,
+  StagingAreaFixture,
+  StagingAreaLocation,
+  SingleSlotFixture,
+  DeckFromData,
 } from '@opentrons/components'
 import {
   AdditionalEquipmentEntity,
@@ -23,9 +25,7 @@ import {
 import {
   getLabwareHasQuirk,
   inferModuleOrientationFromSlot,
-  GEN_ONE_MULTI_PIPETTES,
   DeckSlot as DeckDefSlot,
-  ModuleType,
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
   getModuleDef2,
@@ -36,24 +36,13 @@ import {
   RobotType,
   FLEX_ROBOT_TYPE,
   Cutout,
-  DeckConfiguration,
-  Fixture,
 } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import {
   FLEX_TRASH_DEF_URI,
   OT_2_TRASH_DEF_URI,
   PSEUDO_DECK_SLOTS,
 } from '../../constants'
-import { i18n } from '../../localization'
-import {
-  getLabwareIsCompatible,
-  getLabwareIsCustom,
-} from '../../utils/labwareModuleCompatibility'
-import {
-  selectors as labwareDefSelectors,
-  LabwareDefByDefURI,
-} from '../../labware-defs'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
@@ -81,18 +70,10 @@ import {
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
 import { SlotLabels } from './SlotLabels'
-import styles from './DeckSetup.css'
-import {
-  StagingAreaFixture,
-  StagingAreaLocation,
-} from '@opentrons/components/src/hardware-sim/BaseDeck/StagingAreaFixture'
-import { SingleSlotFixture } from '@opentrons/components/src/hardware-sim/BaseDeck/SingleSlotFixture'
-import {
-  WasteChuteFixture,
-  WasteChuteLocation,
-} from '@opentrons/components/src/hardware-sim/BaseDeck/WasteChuteFixture'
+import { DEFAULT_SLOTS } from './constants'
+import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
 
-import { DeckFromData } from '@opentrons/components/src/hardware-sim/Deck/DeckFromData'
+import styles from './DeckSetup.css'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -113,58 +94,8 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
   trashSlot: string | null
 }
 
-export const VIEWBOX_MIN_X = -64
-export const VIEWBOX_MIN_Y = -10
-export const VIEWBOX_WIDTH = 520
-export const VIEWBOX_HEIGHT = 414
-const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
-const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
 const lightFill = COLORS.light1
 const darkFill = COLORS.darkGreyEnabled
-export interface SwapBlockedArgs {
-  hoveredLabware?: LabwareOnDeckType | null
-  draggedLabware?: LabwareOnDeckType | null
-  modulesById: InitialDeckSetup['modules']
-  customLabwareDefs: LabwareDefByDefURI
-}
-
-export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
-  const {
-    hoveredLabware,
-    draggedLabware,
-    modulesById,
-    customLabwareDefs,
-  } = args
-  if (!hoveredLabware || !draggedLabware) {
-    return false
-  }
-
-  const sourceModuleType: ModuleType | null =
-    modulesById[draggedLabware.slot]?.type || null
-  const destModuleType: ModuleType | null =
-    modulesById[hoveredLabware.slot]?.type || null
-
-  const draggedLabwareIsCustom = getLabwareIsCustom(
-    customLabwareDefs,
-    draggedLabware
-  )
-  const hoveredLabwareIsCustom = getLabwareIsCustom(
-    customLabwareDefs,
-    hoveredLabware
-  )
-
-  // dragging custom labware to module gives not compat error
-  const labwareSourceToDestBlocked = sourceModuleType
-    ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
-      !hoveredLabwareIsCustom
-    : false
-  const labwareDestToSourceBlocked = destModuleType
-    ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
-      !draggedLabwareIsCustom
-    : false
-
-  return labwareSourceToDestBlocked || labwareDestToSourceBlocked
-}
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
@@ -210,7 +141,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const deckSlots: DeckDefSlot[] = values(deckSlotsById)
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
-  console.log(moduleParentSlots)
+
   const allLabware: LabwareOnDeckType[] = Object.keys(
     activeDeckSetup.labware
   ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
@@ -401,10 +332,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ))}
 
       {/* SlotControls for all empty deck + module slots */}
-      {/* {deckSlots
+      {deckSlots
         .filter(
           slot =>
-            !slotIdsBlockedBySpanning.includes(slot.id) && slot.id !== trashSlot
+            !slotIdsBlockedBySpanning.includes(slot.id) &&
+            getSlotIsEmpty(activeDeckSetup, slot.id) &&
+            slot.id !== trashSlot
         )
         .map(slot => {
           return (
@@ -418,7 +351,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               handleDragHover={handleHoverEmptySlot}
             />
           )
-        })} */}
+        })}
 
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
@@ -526,15 +459,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   )
 }
 
-const getHasGen1MultiChannelPipette = (
-  pipettes: InitialDeckSetup['pipettes']
-): boolean => {
-  const pipetteIds = Object.keys(pipettes)
-  return pipetteIds.some(pipetteId =>
-    GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)
-  )
-}
-
 export const DeckSetup = (): JSX.Element => {
   const drilledDown =
     useSelector(labwareIngredSelectors.getDrillDownLabwareId) != null
@@ -583,21 +507,6 @@ export const DeckSetup = (): JSX.Element => {
     activeDeckSetup.additionalEquipmentOnDeck
   ).map(aE => aE.location)
 
-  const DEFAULT_SLOTS = [
-    { fixtureId: '1', fixtureLocation: 'A1', loadName: 'standardSlot' },
-    { fixtureId: '2', fixtureLocation: 'A2', loadName: 'standardSlot' },
-    { fixtureId: '3', fixtureLocation: 'A3', loadName: 'standardSlot' },
-    { fixtureId: '4', fixtureLocation: 'B1', loadName: 'standardSlot' },
-    { fixtureId: '5', fixtureLocation: 'B2', loadName: 'standardSlot' },
-    { fixtureId: '6', fixtureLocation: 'B3', loadName: 'standardSlot' },
-    { fixtureId: '7', fixtureLocation: 'C1', loadName: 'standardSlot' },
-    { fixtureId: '8', fixtureLocation: 'C2', loadName: 'standardSlot' },
-    { fixtureId: '9', fixtureLocation: 'C3', loadName: 'standardSlot' },
-    { fixtureId: '10', fixtureLocation: 'D1', loadName: 'standardSlot' },
-    { fixtureId: '11', fixtureLocation: 'D2', loadName: 'standardSlot' },
-    { fixtureId: '12', fixtureLocation: 'D3', loadName: 'standardSlot' },
-  ]
-
   const filteredSlots = DEFAULT_SLOTS.filter(
     slot => !locations.includes(slot.fixtureLocation)
   )
@@ -606,7 +515,7 @@ export const DeckSetup = (): JSX.Element => {
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}
       <div ref={wrapperRef} className={styles.deck_wrapper}>
-        <RobotWorkSpace
+        <RobotCoordinateSpaceWithDOMCoords
           width="100%"
           height="100%"
           deckDef={deckDef}
@@ -647,7 +556,6 @@ export const DeckSetup = (): JSX.Element => {
                       <FlexTrash
                         robotType={robotType}
                         trashIconColor={lightFill}
-                        // TODO(bh, 2023-10-09): typeguard fixture location
                         trashLocation={fixture.fixtureLocation as TrashLocation}
                         backgroundColor={darkFill}
                       />
@@ -656,7 +564,6 @@ export const DeckSetup = (): JSX.Element => {
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture
                       key={fixture.id}
-                      // TODO(bh, 2023-10-09): typeguard fixture location
                       cutoutLocation={fixture.location as WasteChuteLocation}
                       deckDefinition={deckDef}
                       slotClipColor={darkFill}
@@ -683,41 +590,7 @@ export const DeckSetup = (): JSX.Element => {
               />
             </>
           )}
-        </RobotWorkSpace>
-      </div>
-    </div>
-  )
-}
-
-export const NullDeckState = (): JSX.Element => {
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-
-  return (
-    <div className={styles.deck_row}>
-      <div className={styles.deck_wrapper}>
-        <RobotWorkSpace
-          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-          deckDef={deckDef}
-          viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-          width="100%"
-          height="100%"
-        >
-          {() => (
-            <>
-              {/* TODO(IL, 2021-03-15): use styled-components for RobotCoordsText instead of style prop */}
-              <RobotCoordsText
-                x={5}
-                y={375}
-                style={{ textTransform: TEXT_TRANSFORM_UPPERCASE }}
-                fill="#cccccc"
-                fontWeight={FONT_WEIGHT_BOLD}
-                fontSize={FONT_SIZE_BODY_1}
-              >
-                {i18n.t('deck.inactive_deck')}
-              </RobotCoordsText>
-            </>
-          )}
-        </RobotWorkSpace>
+        </RobotCoordinateSpaceWithDOMCoords>
       </div>
     </div>
   )

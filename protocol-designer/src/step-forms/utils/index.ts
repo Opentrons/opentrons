@@ -122,7 +122,7 @@ export const getSlotIsEmpty = (
     return false
   }
 
-  const filteredAdditionalEquipmentOnDeck = includeStagingAreas
+  const filteredAdditioanlEquipmentOnDeck = includeStagingAreas
     ? values(initialDeckSetup.additionalEquipmentOnDeck).filter(
         (additionalEquipment: AdditionalEquipmentOnDeck) =>
           additionalEquipment.location === slot
@@ -141,7 +141,7 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...filteredAdditionalEquipmentOnDeck,
+      ...filteredAdditioanlEquipmentOnDeck,
     ].length === 0
   )
 }

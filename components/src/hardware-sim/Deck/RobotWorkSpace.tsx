@@ -80,6 +80,15 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       transform="scale(1, -1)"
       {...styleProps}
     >
+      {deckDef != null && (
+        <StyledDeck
+          deckFill={deckFill}
+          def={deckDef}
+          layerBlocklist={deckLayerBlocklist}
+          trashLocation={trashSlotName}
+          trashColor={trashColor}
+        />
+      )}
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
     </Svg>
   )
