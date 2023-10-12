@@ -139,7 +139,7 @@ function RenderModuleStatus({
   )
   if (conflictedFixture != null && enableDeckConfig) {
     moduleStatus = (
-      <>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Chip
           text={t('location_conflict')}
           type="warning"
@@ -148,7 +148,7 @@ function RenderModuleStatus({
         />
 
         <Icon name="more" size="3rem" />
-      </>
+      </Flex>
     )
   } else if (
     isModuleReady &&
@@ -156,7 +156,7 @@ function RenderModuleStatus({
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <>
         <Chip
           text={t('module_connected')}
           type="success"
@@ -166,7 +166,7 @@ function RenderModuleStatus({
         {isDuplicateModuleModel ? (
           <Icon name="information" size="2rem" />
         ) : null}
-      </Flex>
+      </>
     )
   } else if (
     isModuleReady &&
