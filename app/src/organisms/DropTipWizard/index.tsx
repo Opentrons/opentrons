@@ -206,6 +206,7 @@ export const DropTipWizardComponent = (
     errorMessage,
     // isExiting,
     createdMaintenanceRunId,
+    instrumentModelSpecs,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation('drop_tip_wizard')
@@ -372,7 +373,10 @@ export const DropTipWizardComponent = (
               currentStep === POSITION_AND_BLOWOUT
                 ? {
                   commandType: 'blowOutInPlace',
-                  params: { pipetteId: MANAGED_PIPETTE_ID }
+                  params: {
+                    pipetteId: MANAGED_PIPETTE_ID,
+                    flowRate: instrumentModelSpecs.defaultBlowOutFlowRate.value
+                  }
                 }
                 : {
                   commandType: 'dropTipInPlace',
