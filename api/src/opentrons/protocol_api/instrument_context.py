@@ -893,9 +893,9 @@ class InstrumentContext(publisher.CommandPublisher):
             The location to drop the tip.
         :type location:
             :py:class:`.types.Location` or :py:class:`.Well` or None
-        :param home_after: Whether to home this pipette's plunger
-                            after dropping the tip. If not specified,
-                            defaults to ``True`` on an OT-2.
+        :param home_after:
+            Whether to home this pipette's plunger after dropping the tip.
+            If not specified, defaults to ``True`` on an OT-2.
 
             Setting ``home_after=False`` saves waiting a couple of seconds
             after the pipette drops the tip, but risks causing other problems.
