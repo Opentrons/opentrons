@@ -24,17 +24,14 @@ import { NeedHelpLink } from '../CalibrationPanels'
 const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
-  handleCreateAndSetup: (shouldDispenseLiquid: boolean) => void,
+  handleCreateAndSetup: (shouldDispenseLiquid: boolean) => void
   isCreateLoading: boolean
 }
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const {
-    handleCreateAndSetup,
-    isCreateLoading,
-  } = props
+  const { handleCreateAndSetup, isCreateLoading } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'liquid_and_tips' | 'only_tips'

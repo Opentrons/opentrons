@@ -41,7 +41,12 @@ import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
 import type { PipetteData } from '@opentrons/api-client'
-import type { PipetteModelSpecs, RobotType, SavePositionRunTimeCommand } from '@opentrons/shared-data'
+import type {
+  Coordinates,
+  PipetteModelSpecs,
+  RobotType,
+  SavePositionRunTimeCommand,
+} from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
 const MANAGED_PIPETTE_ID = 'managedPipetteId'
@@ -80,11 +85,24 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
-      chainRunCommands(response.data.id, [{
-        commandType: 'loadPipette', params: { pipetteId: MANAGED_PIPETTE_ID, mount: mount, pipetteName: instrumentModelSpecs.name }
-      }], false).then(() => {
-        setCreatedMaintenanceRunId(response.data.id)
-      }).catch(e => e)
+      chainRunCommands(
+        response.data.id,
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              pipetteId: MANAGED_PIPETTE_ID,
+              mount: mount,
+              pipetteName: instrumentModelSpecs.name,
+            },
+          },
+        ],
+        false
+      )
+        .then(() => {
+          setCreatedMaintenanceRunId(response.data.id)
+        })
+        .catch(e => e)
     },
   })
 
@@ -236,14 +254,20 @@ export const DropTipWizardComponent = (
     if (createdMaintenanceRunId != null) {
       chainRunCommands(
         createdMaintenanceRunId,
-        [{
-          commandType: 'moveRelative',
-          params: { pipetteId: MANAGED_PIPETTE_ID, distance: step * dir, axis },
-        }],
+        [
+          {
+            commandType: 'moveRelative',
+            params: {
+              pipetteId: MANAGED_PIPETTE_ID,
+              distance: step * dir,
+              axis,
+            },
+          },
+        ],
         true
       )
-        .then(data => { })
-        .catch((e: Error) => { })
+        .then(data => {})
+        .catch((e: Error) => {})
     }
   }
 
@@ -261,63 +285,95 @@ export const DropTipWizardComponent = (
       .catch(e => e)
   }
 
-  const moveToXYCoordinate = (x: number, y: number): Promise<void> => {
-    if (createdMaintenanceRunId == null) return Promise.reject(new Error('no maintenance run present to send move commands to'))
-    return chainRunCommands(createdMaintenanceRunId, [
-      {
-        commandType: 'retractAxis' as const,
-        params: {
-          axis: 'leftZ',
-        },
-      },
-      {
-        commandType: 'retractAxis' as const,
-        params: {
-          axis: 'rightZ',
-        },
-      },
-      {
-        commandType: 'retractAxis' as const,
-        params: { axis: 'x' },
-      },
-      {
-        commandType: 'retractAxis' as const,
-        params: { axis: 'y' },
-      },
-      {
-        commandType: 'savePosition' as const, params: {
-          pipetteId: MANAGED_PIPETTE_ID
-        }
-      },
-    ], true).then(([
-      _retract1Response,
-      _retract2Response,
-      _retract3Response,
-      _retract4Response,
-      savePositionResponse,
-    ]) => {
-      const currentPosition = (savePositionResponse.data as SavePositionRunTimeCommand).result?.position
-      if (currentPosition != null) {
-        chainRunCommands(createdMaintenanceRunId, [
-          {
-            commandType: 'moveRelative',
-            params: {
-              pipetteId: MANAGED_PIPETTE_ID,
-              distance: y - currentPosition.y,
-              axis: 'y'
-            }
+  const retractAllAxesAndSavePosition = (): Promise<Coordinates> => {
+    if (createdMaintenanceRunId == null)
+      return Promise.reject(
+        new Error('no maintenance run present to send move commands to')
+      )
+    return chainRunCommands(
+      createdMaintenanceRunId,
+      [
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'leftZ',
           },
-          {
-            commandType: 'moveRelative',
-            params: {
-              pipetteId: MANAGED_PIPETTE_ID,
-              distance: x - currentPosition.x,
-              axis: 'x'
-            }
-          }
-        ], true).then(() => { }).catch(e => e)
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'rightZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'x' },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'y' },
+        },
+        {
+          commandType: 'savePosition' as const,
+          params: {
+            pipetteId: MANAGED_PIPETTE_ID,
+          },
+        },
+      ],
+      true
+    ).then(
+      ([
+        _retract1Response,
+        _retract2Response,
+        _retract3Response,
+        _retract4Response,
+        savePositionResponse,
+      ]) => {
+        const currentPosition = (savePositionResponse.data as SavePositionRunTimeCommand)
+          .result?.position
+        if (currentPosition != null) {
+          return Promise.resolve(currentPosition)
+        } else {
+          return Promise.reject(
+            new Error('current position could not be saved')
+          )
+        }
       }
-    })
+    )
+  }
+
+  const moveToXYCoordinate = (x: number, y: number): Promise<void> => {
+    if (createdMaintenanceRunId == null)
+      return Promise.reject(
+        new Error('no maintenance run present to send move commands to')
+      )
+
+    return retractAllAxesAndSavePosition()
+      .then(currentPosition =>
+        chainRunCommands(
+          createdMaintenanceRunId,
+          [
+            {
+              commandType: 'moveRelative',
+              params: {
+                pipetteId: MANAGED_PIPETTE_ID,
+                distance: y - currentPosition.y,
+                axis: 'y',
+              },
+            },
+            {
+              commandType: 'moveRelative',
+              params: {
+                pipetteId: MANAGED_PIPETTE_ID,
+                distance: x - currentPosition.x,
+                axis: 'x',
+              },
+            },
+          ],
+          true
+        )
+      )
+      .catch(e => e)
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -331,7 +387,7 @@ export const DropTipWizardComponent = (
     )
   } else if (shouldDispenseLiquid == null) {
     modalContent = (
-      <BeforeBeginning {...{ handleCreateAndSetup, isCreateLoading, }} />
+      <BeforeBeginning {...{ handleCreateAndSetup, isCreateLoading }} />
     )
   } else if (
     currentStep === CHOOSE_BLOWOUT_LOCATION ||
@@ -369,20 +425,27 @@ export const DropTipWizardComponent = (
         handleJog={handleJog}
         handleProceed={() => {
           if (createdMaintenanceRunId != null) {
-            chainRunCommands(createdMaintenanceRunId, [
-              currentStep === POSITION_AND_BLOWOUT
-                ? {
-                  commandType: 'blowOutInPlace',
-                  params: {
-                    pipetteId: MANAGED_PIPETTE_ID,
-                    flowRate: instrumentModelSpecs.defaultBlowOutFlowRate.value
-                  }
-                }
-                : {
-                  commandType: 'dropTipInPlace',
-                  params: { pipetteId: MANAGED_PIPETTE_ID }
-                }
-            ], true).then(() => {}).catch(e => e)
+            chainRunCommands(
+              createdMaintenanceRunId,
+              [
+                currentStep === POSITION_AND_BLOWOUT
+                  ? {
+                      commandType: 'blowOutInPlace',
+                      params: {
+                        pipetteId: MANAGED_PIPETTE_ID,
+                        flowRate:
+                          instrumentModelSpecs.defaultBlowOutFlowRate.value,
+                      },
+                    }
+                  : {
+                      commandType: 'dropTipInPlace',
+                      params: { pipetteId: MANAGED_PIPETTE_ID },
+                    },
+              ],
+              true
+            )
+              .then(() => {})
+              .catch(e => e)
             proceed()
           }
         }}

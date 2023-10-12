@@ -37,15 +37,27 @@ export const ChooseLocation = (
   )
 
   const handleConfirmPosition: React.MouseEventHandler = () => {
-    const deckLocation = deckDef.locations.orderedSlots.find(l => l.id === selectedLocation.slotName)
+    const deckLocation = deckDef.locations.orderedSlots.find(
+      l => l.id === selectedLocation.slotName
+    )
     const slotX = deckLocation?.position[0]
     const slotY = deckLocation?.position[1]
     const xDimension = deckLocation?.boundingBox.xDimension
     const yDimension = deckLocation?.boundingBox.yDimension
-    if (slotX != null && slotY != null && xDimension != null && yDimension != null) {
-      const targetX = slotX + (xDimension / 2)
-      const targetY = slotY + (yDimension / 2)
-      console.log('MOVE TO selected location: ', selectedLocation, targetX, targetY )
+    if (
+      slotX != null &&
+      slotY != null &&
+      xDimension != null &&
+      yDimension != null
+    ) {
+      const targetX = slotX + xDimension / 2
+      const targetY = slotY + yDimension / 2
+      console.log(
+        'MOVE TO selected location: ',
+        selectedLocation,
+        targetX,
+        targetY
+      )
       moveToXYCoordinate(targetX, targetY).then(handleProceed)
     }
   }
