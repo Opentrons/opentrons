@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 8-Channel 1000 \u03bcL",
+  "displayName": "Flex 8-Channel 1000 uL",
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {

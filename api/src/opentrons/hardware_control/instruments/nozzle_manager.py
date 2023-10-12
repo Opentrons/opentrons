@@ -104,6 +104,10 @@ class NozzleMap:
         y_rows_length = int(difference[1] // INTERNOZZLE_SPACING)
         return map_store_list[starting_idx + y_rows_length]
 
+    @property
+    def tip_count(self) -> int:
+        return len(self.map_store)
+
     @classmethod
     def build(
         cls,
@@ -263,9 +267,7 @@ class NozzleConfigurationManager:
             )
 
     def get_tip_configuration_current(self) -> float:
-        return self._pick_up_current_map[
-            len(self._current_nozzle_configuration.map_store)
-        ]
+        return self._pick_up_current_map[self._current_nozzle_configuration.tip_count]
 
     def critical_point_with_tip_length(
         self,
