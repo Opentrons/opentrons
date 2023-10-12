@@ -37,6 +37,7 @@ import {
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
+import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -133,6 +134,9 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -284,6 +288,9 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(({
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -295,7 +302,7 @@ describe('ProtocolSetup', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByText('Prepare to run')
     getByText('Instruments')
-    getByText('Modules & deck')
+    getByText('Modules')
     getByText('Labware')
     getByText('Labware Position Check')
     getByText('Liquids')
@@ -329,7 +336,7 @@ describe('ProtocolSetup', () => {
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
-    queryByText('Modules & deck')?.click()
+    queryByText('Modules')?.click()
     getByText('Mock ProtocolSetupModules')
   })
 
@@ -388,5 +395,13 @@ describe('ProtocolSetup', () => {
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run.'
     )
+  })
+
+  it('should render modules & deck when enableDeckConfiguration is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(true)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('Modules & deck')
   })
 })

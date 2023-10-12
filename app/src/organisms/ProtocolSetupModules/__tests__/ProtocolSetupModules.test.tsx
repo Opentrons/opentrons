@@ -6,7 +6,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs/hooks'
@@ -21,6 +20,7 @@ import { mockApiHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -34,6 +34,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/config')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -77,11 +78,11 @@ const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
 const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
   typeof useChainLiveCommands
 >
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 const mockFixtureTable = FixtureTable as jest.MockedFunction<
   typeof FixtureTable
->
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
 >
 
 const ROBOT_NAME = 'otie'
@@ -153,10 +154,10 @@ describe('ProtocolSetupModules', () => {
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
     mockFixtureTable.mockReturnValue(<div>mock FixtureTable</div>)
-    mockUseDeckConfigurationQuery.mockReturnValue({
-      data: [],
-    } as any)
   })
 
   afterEach(() => {
@@ -171,7 +172,6 @@ describe('ProtocolSetupModules', () => {
     getByText('Status')
     getByText('Setup Instructions')
     getByRole('button', { name: 'Map View' })
-    getByText('mock FixtureTable')
   })
 
   it('should launch deck map on button click', () => {
@@ -320,5 +320,13 @@ describe('ProtocolSetupModules', () => {
     const [{ getByText }] = render()
     getByText('Heater-Shaker Module GEN1')
     getByText('Calibration required Calibrate pipette first')
+  })
+
+  it('should render mock Fixture table when is enableDeckConfiguration on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('mock FixtureTable')
   })
 })
