@@ -13,8 +13,10 @@ import {
   Module,
   COLORS,
   TrashLocation,
+  FlexTrash,
 } from '@opentrons/components'
 import {
+  AdditionalEquipmentEntity,
   MODULES_WITH_COLLISION_ISSUES,
   ModuleTemporalProperties,
 } from '@opentrons/step-generation'
@@ -33,6 +35,9 @@ import {
   DeckDefinition,
   RobotType,
   FLEX_ROBOT_TYPE,
+  Cutout,
+  DeckConfiguration,
+  Fixture,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import {
@@ -77,6 +82,17 @@ import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
 import { SlotLabels } from './SlotLabels'
 import styles from './DeckSetup.css'
+import {
+  StagingAreaFixture,
+  StagingAreaLocation,
+} from '@opentrons/components/src/hardware-sim/BaseDeck/StagingAreaFixture'
+import { SingleSlotFixture } from '@opentrons/components/src/hardware-sim/BaseDeck/SingleSlotFixture'
+import {
+  WasteChuteFixture,
+  WasteChuteLocation,
+} from '@opentrons/components/src/hardware-sim/BaseDeck/WasteChuteFixture'
+
+import { DeckFromData } from '@opentrons/components/src/hardware-sim/Deck/DeckFromData'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -103,7 +119,8 @@ export const VIEWBOX_WIDTH = 520
 export const VIEWBOX_HEIGHT = 414
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
-
+const lightFill = COLORS.light1
+const darkFill = COLORS.darkGreyEnabled
 export interface SwapBlockedArgs {
   hoveredLabware?: LabwareOnDeckType | null
   draggedLabware?: LabwareOnDeckType | null
@@ -193,7 +210,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const deckSlots: DeckDefSlot[] = values(deckSlotsById)
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
-
+  console.log(moduleParentSlots)
   const allLabware: LabwareOnDeckType[] = Object.keys(
     activeDeckSetup.labware
   ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
@@ -384,14 +401,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ))}
 
       {/* SlotControls for all empty deck + module slots */}
-      {deckSlots
+      {/* {deckSlots
         .filter(
           slot =>
-            !slotIdsBlockedBySpanning.includes(slot.id) &&
-            getSlotIsEmpty(activeDeckSetup, slot.id) &&
-            //  todo(jr, 7/13/23): filtering out trash slot for now, remove this
-            //  when we start to support moving the trash location
-            slot.id !== trashSlot
+            !slotIdsBlockedBySpanning.includes(slot.id) && slot.id !== trashSlot
         )
         .map(slot => {
           return (
@@ -405,7 +418,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               handleDragHover={handleHoverEmptySlot}
             />
           )
-        })}
+        })} */}
 
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
@@ -508,7 +521,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           </React.Fragment>
         )
       })}
-
       <DragPreview getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords} />
     </>
   )
@@ -531,12 +543,12 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const trashSlot =
-    Object.values(activeDeckSetup.labware).find(
-      lw =>
-        lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-        lw.labwareDefURI === FLEX_TRASH_DEF_URI
-    )?.slot ?? null
+  const trash = Object.values(activeDeckSetup.labware).find(
+    lw =>
+      lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
+      lw.labwareDefURI === FLEX_TRASH_DEF_URI
+  )
+  const trashSlot = trash?.slot
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
@@ -554,25 +566,107 @@ export const DeckSetup = (): JSX.Element => {
     },
   })
 
+  const trashBinFixtures = [
+    {
+      fixtureId: trash?.id,
+      fixtureLocation: trash?.slot as Cutout,
+      loadName: 'trashBin',
+    },
+  ]
+  const wasteChuteFixtures = Object.values(
+    activeDeckSetup.additionalEquipmentOnDeck
+  ).filter(aE => aE.name === 'wasteChute')
+  const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
+    activeDeckSetup.additionalEquipmentOnDeck
+  ).filter(aE => aE.name === 'stagingArea')
+  const locations = Object.values(
+    activeDeckSetup.additionalEquipmentOnDeck
+  ).map(aE => aE.location)
+
+  const DEFAULT_SLOTS = [
+    { fixtureId: '1', fixtureLocation: 'A1', loadName: 'standardSlot' },
+    { fixtureId: '2', fixtureLocation: 'A2', loadName: 'standardSlot' },
+    { fixtureId: '3', fixtureLocation: 'A3', loadName: 'standardSlot' },
+    { fixtureId: '4', fixtureLocation: 'B1', loadName: 'standardSlot' },
+    { fixtureId: '5', fixtureLocation: 'B2', loadName: 'standardSlot' },
+    { fixtureId: '6', fixtureLocation: 'B3', loadName: 'standardSlot' },
+    { fixtureId: '7', fixtureLocation: 'C1', loadName: 'standardSlot' },
+    { fixtureId: '8', fixtureLocation: 'C2', loadName: 'standardSlot' },
+    { fixtureId: '9', fixtureLocation: 'C3', loadName: 'standardSlot' },
+    { fixtureId: '10', fixtureLocation: 'D1', loadName: 'standardSlot' },
+    { fixtureId: '11', fixtureLocation: 'D2', loadName: 'standardSlot' },
+    { fixtureId: '12', fixtureLocation: 'D3', loadName: 'standardSlot' },
+  ]
+
+  const filteredSlots = DEFAULT_SLOTS.filter(
+    slot => !locations.includes(slot.fixtureLocation)
+  )
+
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}
       <div ref={wrapperRef} className={styles.deck_wrapper}>
         <RobotWorkSpace
-          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-          deckDef={deckDef}
-          viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
           width="100%"
           height="100%"
-          trashSlotName={
-            trashSlot != null ? (trashSlot as TrashLocation) : undefined
-          }
-          trashColor={COLORS.darkGreyEnabled}
+          deckDef={deckDef}
+          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
             <>
+              {robotType === OT2_ROBOT_TYPE ? (
+                <DeckFromData def={deckDef} layerBlocklist={[]} />
+              ) : (
+                <>
+                  {filteredSlots.map(fixture => (
+                    <SingleSlotFixture
+                      key={fixture.fixtureId}
+                      cutoutLocation={fixture.fixtureLocation as Cutout}
+                      deckDefinition={deckDef}
+                      slotClipColor={darkFill}
+                      fixtureBaseColor={lightFill}
+                    />
+                  ))}
+                  {stagingAreaFixtures.map(fixture => (
+                    <StagingAreaFixture
+                      key={fixture.id}
+                      cutoutLocation={fixture.location as StagingAreaLocation}
+                      deckDefinition={deckDef}
+                      slotClipColor={darkFill}
+                      fixtureBaseColor={lightFill}
+                    />
+                  ))}
+                  {trashBinFixtures.map(fixture => (
+                    <React.Fragment key={fixture.fixtureId}>
+                      <SingleSlotFixture
+                        cutoutLocation={fixture.fixtureLocation}
+                        deckDefinition={deckDef}
+                        slotClipColor={COLORS.transparent}
+                        fixtureBaseColor={lightFill}
+                      />
+                      <FlexTrash
+                        robotType={robotType}
+                        trashIconColor={lightFill}
+                        // TODO(bh, 2023-10-09): typeguard fixture location
+                        trashLocation={fixture.fixtureLocation as TrashLocation}
+                        backgroundColor={darkFill}
+                      />
+                    </React.Fragment>
+                  ))}
+                  {wasteChuteFixtures.map(fixture => (
+                    <WasteChuteFixture
+                      key={fixture.id}
+                      // TODO(bh, 2023-10-09): typeguard fixture location
+                      cutoutLocation={fixture.location as WasteChuteLocation}
+                      deckDefinition={deckDef}
+                      slotClipColor={darkFill}
+                      fixtureBaseColor={lightFill}
+                    />
+                  ))}
+                </>
+              )}
               <DeckSetupContents
-                trashSlot={trashSlot}
+                trashSlot={trashSlot ?? null}
                 robotType={robotType}
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}
@@ -583,7 +677,10 @@ export const DeckSetup = (): JSX.Element => {
                   showGen1MultichannelCollisionWarnings,
                 }}
               />
-              <SlotLabels robotType={robotType} />
+              <SlotLabels
+                robotType={robotType}
+                hasStagingAreas={stagingAreaFixtures.length > 0}
+              />
             </>
           )}
         </RobotWorkSpace>
