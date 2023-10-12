@@ -158,7 +158,7 @@ class InstrumentContext(publisher.CommandPublisher):
         aspiration volume, well location, tip position in a well,
         and pipette flow rate.
 
-        :param volume: The volume to aspirate. Measured in µL. If 0 or
+        :param volume: The volume to aspirate, measured in µL. If 0 or
                        unspecified, defaults to the maximum volume for
                        the pipette and its currently attached tip.
         :type volume: int or float
@@ -171,7 +171,7 @@ class InstrumentContext(publisher.CommandPublisher):
                          robot will aspirate from the exact specified location.
                          If unspecified, the robot will aspirate from the
                          current position.
-        :param rate: How quickly a pipette aspirates liquid. Measured in µL/s.
+        :param rate: How quickly a pipette aspirates liquid, measured in µL/s.
                      Calculated as `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
                      If not specified, defaults to 1.0. See also, :ref:`new-plunger-flow-rates`.
         :type rate: float
@@ -256,35 +256,38 @@ class InstrumentContext(publisher.CommandPublisher):
         push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
-        Dispense a volume of liquid (in microliters/µL) using this pipette
-        into the specified location.
+        Dispense liquid from a pipette tip. Includes parameters that control
+        dispense volume, well location, tip position in a well, and pipette
+        flow rate.
 
-        If only a volume is passed, the pipette will dispense from its current
-        position. If only a location is passed (as in
-        ``instr.dispense(location=wellplate['A1'])``), all of the liquid
-        aspirated into the pipette will be dispensed (this volume is accessible
-        through :py:attr:`current_volume`).
-
-        :param volume: The volume of liquid to dispense, in microliters. If 0
+        :param volume: The volume to dispense, measured in µL. If 0
                        or unspecified, defaults to :py:attr:`current_volume`.
+                       
+                       If only a volume is passed, the pipette will dispense
+                       from its current position. 
         :type volume: int or float
 
-        :param location: Where to dispense into. If `location` is a
-                         :py:class:`.Well`, the robot will dispense into
-                         :py:obj:`well_bottom_clearance.dispense <well_bottom_clearance>`
-                         mm above the bottom of the well. If `location` is a
-                         :py:class:`.Location` (i.e. the result of
-                         :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
-                         robot will dispense into the exact specified location.
-                         If unspecified, the robot will dispense into the
-                         current position.
-        :param rate: A relative modifier for how quickly to dispense liquid.
-                     The flow rate for this dispense will be
-                     `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
-                     If not specified, defaults to 1.0.
+        :param location: Where to dispense liquid held in the pipette.
+                        If `location`is a :py:class:`.Well`, the robot will
+                        dispense into :py:obj:`well_bottom_clearance.dispense <well_bottom_clearance>`
+                        mm above the bottom of the well. If `location` is a
+                        :py:class:`.Location` (i.e. the result of
+                        :py:meth:`.Well.top` or :py:meth:`.Well.bottom`),
+                        the robot will dispense into the exact specified location.
+
+                        If only a location is passed (as in
+                        ``instr.dispense(location=wellplate['A1'])``),
+                        all of the liquid aspirated into the pipette will be dispensed
+                        (this volume is accessible through :py:attr:`current_volume`).
+
+                        If unspecified, the robot will dispense into the
+                        current position.
+        :param rate: How quickly a pipette dispenses liquid. Measured in µL/s.
+                     Calculated as `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
+                     If not specified, defaults to 1.0. See also, :ref:`new-plunger-flow-rates`.
         :type rate: float
-        :param push_out: Continue past the plunger bottom to guarantee all liquid
-                        leaves the tip. Specified in microliters. By default, this value is None.
+        :param push_out: Continue past the plunger bottom to help ensure all liquid
+                        leaves the tip. Measured in µL. The default value is ``None``.
         :type push_out: float
 
         :returns: This instance.
@@ -1492,7 +1495,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def current_volume(self) -> float:
         """
-        The current amount of liquid held in the pipette. Measured in µL.
+        The current amount of liquid held in the pipette, measured in µL.
         """
         return self._core.get_current_volume()
 
