@@ -18,10 +18,8 @@ import {
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Divider } from '../../../atoms/structure'
 
-import type {
-  Mount,
-  PipetteSettingsFieldsMap,
-} from '../../../redux/pipettes/types'
+import type { Mount } from '../../../redux/pipettes/types'
+import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null
