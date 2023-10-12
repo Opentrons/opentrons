@@ -523,23 +523,23 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of
-        removing left-over droplets
+        removing left-over droplets. See also, :ref:`touch-tip`.
 
         :param location: If no location is passed, pipette will
-                         touch tip at current well's edges
+                         touch tip at current well's edges.
         :type location: :py:class:`.Well` or None
         :param radius: Describes the proportion of the target well's
                        radius. When `radius=1.0`, the pipette tip will move to
-                       the edge of the target well; when `radius=0.5`, it will
+                       the edge of the target well. When `radius=0.5`, it will
                        move to 50% of the well's radius. Default: 1.0 (100%)
         :type radius: float
-        :param v_offset: The offset in mm from the top of the well to touch tip
-                         A positive offset moves the tip higher above the well,
-                         while a negative offset moves it lower into the well
-                         Default: -1.0 mm
+        :param v_offset: The offset in mm from the top of the well to touch tip.
+                         A positive offset moves the tip higher above the well.
+                         A negative offset moves it lower into the well.
+                         Default is -1.0 mm.
         :type v_offset: float
         :param speed: The speed for touch tip motion, in mm/s.
-                      Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+                      Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 1.0 mm/s.
         :type speed: float
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
         :raises RuntimeError: If no location is specified and location cache is
@@ -604,14 +604,16 @@ class InstrumentContext(publisher.CommandPublisher):
         self, volume: Optional[float] = None, height: Optional[float] = None
     ) -> InstrumentContext:
         """
-        Pull air into the pipette current tip at the current location
+        Pull air into the pipette current tip at the current location.
+        See also, :ref:`air-gap`.
 
         :param volume: The amount in µL to aspirate air into the tube.
-                       (Default will use all remaining volume in tip)
+                       Calling ``air_gap()`` with no arguments uses
+                       the entire remaining volume in the pipette.
         :type volume: float
 
-        :param height: The number of millimeters to move above the current Well
-                       to air-gap aspirate. (Default: 5mm above current Well)
+        :param height: The number of millimeters to move above the current well
+                       before aspirating air. The default is 5 mm above current well.
         :type height: float
 
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
@@ -683,8 +685,9 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands.
+        See also, :ref:`basic-tip-pickup`.
 
-        If no location is passed, the Pipette will pick up the next available
+        If no location is passed, the pipette will pick up the next available
         tip in its :py:attr:`InstrumentContext.tip_racks` list.
         Within each tip rack, tips will be picked up in the order specified by
         the labware definition and :py:meth:`.Labware.wells`.
@@ -702,8 +705,8 @@ class InstrumentContext(publisher.CommandPublisher):
           was not specified when creating the :py:class:`.InstrumentContext`.
 
         * If you want to pick up the next available tip(s) in a specific
-          tip rack, you may use the tip rack directly:
-          e.g. ``instr.pick_up_tip(tiprack)``
+          tip rack, you may use the tip rack directly
+          (e.g. ``instr.pick_up_tip(tiprack)``).
 
         * If the position to move to in the well needs to be specified,
           for instance to tell the robot to run its pick up tip routine
@@ -982,7 +985,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def home(self) -> InstrumentContext:
-        """Home the robot.
+        """Home the robot. See also, :ref:`utility-homing`.
 
         :returns: This instance.
         """
@@ -1390,7 +1393,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def flow_rate(self) -> "FlowRates":
-        """The speeds (in µL/s) configured for the pipette.
+        """The speeds (in µL/s) configured for the pipette. See also, :ref:`new-plunger-flow-rates`.
 
         This is an object with attributes ``aspirate``, ``dispense``, and
         ``blow_out`` holding the flow rates for the corresponding operation.
@@ -1586,7 +1589,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
-        """Configure a pipette to handle a specific volume of liquid, measured in µL. Depending on the volume, the pipette will enter a certain pipetting mode.
+        """Configure a pipette to handle a specific volume of liquid, measured in µL. Depending on the volume, the pipette will enter a unique pipetting mode.
         Changing pipette modes alters properties of the instance of
         :py:class:`.InstrumentContext`, such as default flow rate, minimum volume,
         and maximum volume. The pipette remains in the mode set by this function until it is called again.
