@@ -85,6 +85,7 @@ export interface PipetteSettingsUpdateFieldsMap {
 export type PipetteSettingsUpdateField = {
   value: PipetteSettingsField['value']
 } | null
+
 export interface UpdatePipetteSettingsData {
   fields: { [fieldId: string]: PipetteSettingsUpdateField }
 }
