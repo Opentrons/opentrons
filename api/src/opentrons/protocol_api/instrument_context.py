@@ -997,7 +997,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def home_plunger(self) -> InstrumentContext:
-        """Home the plunger associated with this mount
+        """Home the plunger associated with this mount.
 
         :returns: This instance.
         """
@@ -1343,7 +1343,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def mount(self) -> str:
-        """Return the name of the mount this pipette is attached to"""
+        """Return the name of the mount this pipette is attached to."""
         return self._core.get_mount().name.lower()
 
     @property  # type: ignore
@@ -1432,7 +1432,7 @@ class InstrumentContext(publisher.CommandPublisher):
         The tip racks that have been linked to this pipette.
 
         This is the property used to determine which tips to pick up next when
-        calling :py:meth:`pick_up_tip` without arguments.
+        calling :py:meth:`pick_up_tip` without arguments. See also, :ref:`basic-tip-pickup`.
         """
         return self._tip_racks
 
@@ -1459,7 +1459,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def name(self) -> str:
         """
-        The name string for the pipette (e.g. 'p300_single')
+        The name string for the pipette (e.g. 'p300_single).
         """
         return self._core.get_pipette_name()
 
@@ -1480,10 +1480,10 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def max_volume(self) -> float:
         """
-        The maximum volume, in microliters (µL), that this pipette can hold.
+        The maximum volume, in µL, that the pipette can hold.
 
         The maximum volume that you can actually aspirate might be lower than
-        this, depending on what kind of tip is attached to this pipette.  For
+        this, depending on what kind of tip is attached to this pipette. For
         example, a P300 Single-Channel pipette always has a ``max_volume`` of
         300 µL, but if it's using a 200 µL filter tip, its usable volume would
         be limited to 200 µL.
@@ -1546,7 +1546,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This is an object with attributes ``aspirate`` and ``dispense``,
         describing the default heights of the corresponding operation. The
-        default is 1.0mm for both aspirate and dispense.
+        default is 1.0 mm for both aspirate and dispense.
 
         When :py:meth:`aspirate` or :py:meth:`dispense` is given a
         :py:class:`.Well` rather than a full :py:class:`.Location`, the robot

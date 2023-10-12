@@ -10,6 +10,8 @@ Your robot needs to attach a disposable tip to the pipette before it can aspirat
 
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
+.. _basic-tip-pickup:
+
 Picking Up a Tip
 ================
 
