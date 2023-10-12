@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
@@ -115,6 +116,10 @@ export function CalibrationTaskList({
       fullPage
       backgroundColor={COLORS.fundamentalsBackground}
       childrenPadding={`${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing4}`}
+      css={css`
+        width: 50rem;
+        height: 47.5rem;
+      `}
     >
       {showCompletionScreen ? (
         <Flex
