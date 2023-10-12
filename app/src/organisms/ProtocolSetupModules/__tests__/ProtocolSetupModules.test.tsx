@@ -1,10 +1,18 @@
 import * as React from 'react'
+import { UseQueryResult } from 'react-query'
 import { waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+import {
+  DeckConfiguration,
+  Fixture,
+  getDeckDefFromRobotType,
+  STAGING_AREA_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
+} from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
@@ -84,6 +92,9 @@ const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
 const mockFixtureTable = FixtureTable as jest.MockedFunction<
   typeof FixtureTable
 >
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -101,6 +112,11 @@ const calibratedMockApiHeaterShaker = {
     last_modified: '2023-06-01T14:42:20.131798+00:00',
   },
 }
+const mockFixture = {
+  fixtureId: 'mockId',
+  fixtureLocation: '10' as any,
+  loadName: STAGING_AREA_LOAD_NAME,
+} as Fixture
 
 const render = () => {
   return renderWithProviders(
@@ -145,6 +161,9 @@ describe('ProtocolSetupModules', () => {
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -322,11 +341,18 @@ describe('ProtocolSetupModules', () => {
     getByText('Calibration required Calibrate pipette first')
   })
 
-  it('should render mock Fixture table when is enableDeckConfiguration on', () => {
+  it('should render mock Fixture table and module location conflict when is enableDeckConfiguration on', () => {
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: calibratedMockApiHeaterShaker,
+      },
+    ])
     when(mockUseFeatureFlag)
       .calledWith('enableDeckConfiguration')
       .mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('mock FixtureTable')
+    getByText('Location conflict')
   })
 })
