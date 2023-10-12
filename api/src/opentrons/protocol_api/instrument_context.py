@@ -394,8 +394,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :param rate: How quickly a pipette aspirates and dispense liquid
                     while mixing. The aspiration flow rate is calculated as
                     ``rate`` * :py:attr:`flow_rate.aspirate <flow_rate>`.
-                    The dispense flow rate is calculated as
-                    ``rate`` * :py:attr:`flow_rate.dispense <flow_rate>`.
+                    The dispense flow rate is calculated
+                    as ``rate`` * :py:attr:`flow_rate.dispense <flow_rate>`.
                     See also, :ref:`new-plunger-flow-rates`.
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette.
         :returns: This instance.
