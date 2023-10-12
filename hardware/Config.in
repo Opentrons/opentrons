@@ -1,5 +1,5 @@
 config BR2_PACKAGE_PYTHON_OPENTRONS_HARDWARE
-  bool "python-opentrons-system-server"
+  bool "python-opentrons-hardware"
   depends on BR2_PACKAGE_PYTHON3
   select BR2_PACKAGE_PYTHON_AIONOTIFY # runtime
   select BR2_PACKAGE_PYTHON_ANYIO # runtime
@@ -12,6 +12,6 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_HARDWARE
   select BR2_PACKAGE_PYTHON_CLICK # runtime
 
   help
-    Opentrons system HTTP server. Provides access to an OT-2 robot.
+    Opentrons hardware package. Provides an interface for OT-2 and Flex control.
 
     https://opentrons.com
