@@ -1125,7 +1125,7 @@ async def test_plunger_ready_to_aspirate_after_dispense(
 
     await ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
-    assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate == True
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate
 
     await ot3_hardware.aspirate(OT3Mount.LEFT, asp_vol)
     await ot3_hardware.dispense(OT3Mount.LEFT, disp_vol, push_out=push_out)
