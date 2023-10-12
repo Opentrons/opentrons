@@ -156,7 +156,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Draw liquid into a pipette tip. Includes parameters that control
         aspiration volume, well location, tip position in a well,
-        and pipette flow rate.
+        and pipette flow rate. See also, :ref:`new-aspirate`.
 
         :param volume: The volume to aspirate, measured in µL. If 0 or
                        unspecified, defaults to the maximum volume for
@@ -258,7 +258,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Dispense liquid from a pipette tip. Includes parameters that control
         dispense volume, well location, tip position in a well, and pipette
-        flow rate.
+        flow rate. See also, :ref:`new-dispense`.
 
         :param volume: The volume to dispense, measured in µL.
                         If 0 or unspecified, defaults to
@@ -379,23 +379,24 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
-        Mix a volume of liquid (µL) using this pipette, by repeatedly
-        aspirating and dispensing in the same place.
+        Mixes a volume of liquid by repeatedly aspirating and dispensing it in a single location.
+        See also, :ref:`mix`.
 
-        :param repetitions: how many times the pipette should mix (default: 1)
-        :param volume: number of microliters to mix.  If 0 or unspecified,
-                       defaults to the highest volume possible with this
-                       pipette and its currently attached tip.
-        :param location: a Well or a position relative to well.
-                         e.g, `plate.rows()[0][0].bottom()`.  If unspecified,
-                         the pipette will mix from its current position.
+        :param repetitions: Number of times to mix (default is 1).
+        :param volume: The volume to mix, measured in µL. If 0 or unspecified,
+                       defaults to the maximum volume for the pipette and its
+                       attached tip.
+        :param location: A well or a position relative to well
+                         (e.g, ``plate.rows()[0][0].bottom()``).
+                         If unspecified, the pipette will mix from
+                         its current position.
         :type location: types.Location
-        :param rate: A relative modifier for how quickly to aspirate and
-                     dispense liquid during this mix. When aspirating, the flow
-                     rate will be
-                     `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`,
-                     and when dispensing, it will be
+        :param rate: How quickly a pipette aspirates and dispense liquid
+                    while mixing. The aspiration flow rate is calculated as
+                     `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
+                    The dispense flow rate is calculated as
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
+                     See also, :ref:`new-plunger-flow-rates`.
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette.
         :returns: This instance.
 
