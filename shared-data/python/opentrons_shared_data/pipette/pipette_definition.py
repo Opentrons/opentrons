@@ -258,6 +258,16 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance the high throughput tip motors will travel to check tip status.",
         alias="tipPresenceCheckDistanceMM",
     )
+    connect_tiprack_distance_mm: float = Field(
+        default=0,
+        description="The distance to move the head down to connect with the tiprack before clamping.",
+        alias="connectTiprackDistanceMM",
+    )
+    end_tip_action_retract_distance_mm: float = Field(
+        default=0,
+        description="The distance to move the head up after a tip pickup or dropoff.",
+        alias="endTipActionRetractDistanceMM",
+    )
 
     @validator("pipette_type", pre=True)
     def convert_pipette_model_string(cls, v: str) -> pip_types.PipetteModelType:

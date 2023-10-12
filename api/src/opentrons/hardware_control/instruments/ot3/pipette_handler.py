@@ -9,7 +9,6 @@ from typing import (
     Any,
     cast,
     List,
-    Sequence,
     Iterator,
     TypeVar,
 )
@@ -72,58 +71,21 @@ class LiquidActionSpec:
     current: float
 
 
-# TODO during refactor we should figure out if
-# we still need these dataclasses
-
-
 @dataclass(frozen=True)
-class PickUpTipPressSpec:
-    relative_down: top_types.Point
-    relative_up: top_types.Point
-    current: Dict[Axis, float]
-    speed: float
-
-
-@dataclass(frozen=True)
-class TipMotorPickUpTipSpec:
+class TipActionMoveSpec:
     distance: float
     speed: float
-    # FIXME we should throw this in a config
-    # file of some sort
-    home_buffer: float = 0
 
 
 @dataclass(frozen=True)
-class PickUpTipSpec:
-    plunger_prep_pos: float
+class TipActionSpec:
     currents: Dict[Axis, float]
-    presses: List[PickUpTipPressSpec]
-    shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
-    retract_target: float
-    pick_up_motor_actions: Optional[List[TipMotorPickUpTipSpec]] = None
-    tiprack_down: Optional[top_types.Point] = None
-    tiprack_up: Optional[top_types.Point] = None
-
-
-@dataclass(frozen=True)
-class DropTipMove:
-    target_position: float
-    current: Dict[Axis, float]
-    speed: Optional[float]
-    home_after: bool = False
-    home_after_safety_margin: float = 0
-    home_axes: Sequence[Axis] = tuple()
-    is_ht_tip_action: bool = False
-    # FIXME we should throw this in a config
-    # file of some sort
-    home_buffer: float = 0
-
-
-@dataclass(frozen=True)
-class DropTipSpec:
-    drop_moves: List[DropTipMove]
-    shake_moves: List[Tuple[top_types.Point, Optional[float]]]
-    ending_current: Dict[Axis, float]
+    tip_action_moves: List[
+        TipActionMoveSpec
+    ]  # can be presses, gear pickup, or gear dropoff
+    shake_off_moves: List[Tuple[top_types.Point, Optional[float]]]  # this is the same
+    z_distance_to_tiprack: Optional[float] = None
+    ending_z_retract_distance: Optional[float] = None
 
 
 class OT3PipetteHandler:
@@ -728,7 +690,7 @@ class OT3PipetteHandler:
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
-    ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
+    ) -> Tuple[TipActionSpec, Callable[[], None]]:
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
@@ -751,7 +713,7 @@ class OT3PipetteHandler:
 
         pick_up_speed = instrument.pick_up_configurations.speed
 
-        def build_presses() -> Iterator[Tuple[float, float]]:
+        def build_presses() -> Iterator[float]:
             # Press the nozzle into the tip <presses> number of times,
             # moving further by <increment> mm after each press
             for i in range(checked_presses):
@@ -760,68 +722,54 @@ class OT3PipetteHandler:
                     -1.0 * instrument.pick_up_configurations.distance
                     + -1.0 * check_incr * i
                 )
+                yield press_dist
                 # move nozzle back up
                 backup_dist = -press_dist
-                yield (press_dist, backup_dist)
+                yield backup_dist
 
         if instrument.channels == 96:
             prep_move_dist = instrument.pick_up_configurations.prep_move_distance
             clamp_move_dist = instrument.pick_up_configurations.distance
             tip_motor_moves = [
-                TipMotorPickUpTipSpec(
+                TipActionMoveSpec(
                     distance=prep_move_dist,
                     speed=instrument.pick_up_configurations.prep_move_speed,
-                    home_buffer=10,
                 ),
-                TipMotorPickUpTipSpec(
+                TipActionMoveSpec(
                     distance=prep_move_dist + clamp_move_dist,
                     speed=instrument.pick_up_configurations.speed,
-                    home_buffer=10,
                 ),
             ]
             return (
-                PickUpTipSpec(
-                    plunger_prep_pos=instrument.plunger_positions.bottom,
+                TipActionSpec(
                     currents={
                         Axis.of_main_tool_actuator(
                             mount
                         ): instrument.plunger_motor_current.run,
                         Axis.Q: instrument.pick_up_configurations.current,
                     },
-                    presses=[],
-                    shake_off_list=[],
-                    retract_target=instrument.pick_up_configurations.distance,
-                    tiprack_down=top_types.Point(0, 0, -7),
-                    tiprack_up=top_types.Point(0, 0, 2),
-                    pick_up_motor_actions=tip_motor_moves,
+                    tip_action_moves=tip_motor_moves,
+                    shake_off_moves=[],
+                    z_distance_to_tiprack=(-1 * instrument.connect_tiprack_distance_mm),
+                    ending_z_retract_distance=instrument.end_tip_action_retract_distance_mm,
                 ),
                 add_tip_to_instr,
             )
         return (
-            PickUpTipSpec(
-                plunger_prep_pos=instrument.plunger_positions.bottom,
+            TipActionSpec(
                 currents={
                     Axis.of_main_tool_actuator(
                         mount
                     ): instrument.plunger_motor_current.run
                 },
-                presses=[
-                    PickUpTipPressSpec(
-                        current={
-                            Axis.by_mount(
-                                mount
-                            ): instrument.pick_up_configurations.current
-                        },
+                tip_action_moves=[
+                    TipActionMoveSpec(
+                        distance=dist,
                         speed=pick_up_speed,
-                        relative_down=top_types.Point(0, 0, press_dist),
-                        relative_up=top_types.Point(0, 0, backup_dist),
                     )
-                    for press_dist, backup_dist in build_presses()
+                    for dist in build_presses()
                 ],
-                shake_off_list=self._build_pickup_shakes(instrument),
-                retract_target=instrument.pick_up_configurations.distance
-                + check_incr * checked_presses
-                + 2,
+                shake_off_moves=self._build_pickup_shakes(instrument),
             ),
             add_tip_to_instr,
         )
@@ -846,101 +794,51 @@ class OT3PipetteHandler:
             (top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE), None),  # top
         ]
 
-    def _droptip_sequence_builder(
-        self,
-        bottom_pos: float,
-        droptip_seq: List[Dict[str, float]],
-        plunger_currents: Dict[Axis, float],
-        drop_tip_currents: Dict[Axis, float],
-        home_after: bool,
-        home_axes: Sequence[Axis],
-        is_ht_pipette: bool = False,
-    ) -> Callable[[], List[DropTipMove]]:
-        def build() -> List[DropTipMove]:
-            base = [
-                DropTipMove(
-                    target_position=bottom_pos, current=plunger_currents, speed=None
-                ),
-                DropTipMove(  # always finish drop-tip at a known safe plunger position
-                    target_position=bottom_pos, current=plunger_currents, speed=None
-                ),
-            ]
-            for move_seg in droptip_seq:
-                drop_move = DropTipMove(
-                    target_position=move_seg["distance"],
-                    current=drop_tip_currents,
-                    speed=move_seg["speed"],
-                    home_after=home_after,
-                    home_after_safety_margin=abs(bottom_pos - move_seg["distance"]),
-                    home_axes=home_axes,
-                    is_ht_tip_action=is_ht_pipette,
-                    home_buffer=10 if is_ht_pipette else 0,
-                )
-                base.insert(-1, drop_move)
-            return base
-
-        return build
-
     def plan_check_drop_tip(
         self,
         mount: OT3Mount,
-        home_after: bool,
-    ) -> Tuple[DropTipSpec, Callable[[], None]]:
+    ) -> Tuple[TipActionSpec, Callable[[], None]]:
         instrument = self.get_pipette(mount)
 
         is_96_chan = instrument.channels == 96
 
-        bottom = instrument.plunger_positions.bottom
-
         if is_96_chan:
+            prep_dist = instrument.drop_configurations.prep_move_distance
+            drop_tip_dist = instrument.drop_configurations.distance
             drop_seq = [
-                {
-                    "distance": instrument.drop_configurations.prep_move_distance,
-                    "speed": instrument.drop_configurations.prep_move_speed,
-                },
-                {
-                    "distance": instrument.drop_configurations.distance,
-                    "speed": instrument.drop_configurations.speed,
-                },
+                TipActionMoveSpec(
+                    distance=prep_dist,
+                    speed=instrument.drop_configurations.prep_move_speed,
+                ),
+                TipActionMoveSpec(
+                    distance=prep_dist + drop_tip_dist,
+                    speed=instrument.drop_configurations.speed,
+                ),
             ]
         else:
             drop_seq = [
-                {
-                    "distance": instrument.plunger_positions.drop_tip,
-                    "speed": instrument.drop_configurations.speed,
-                }
+                TipActionMoveSpec(
+                    distance=instrument.plunger_positions.drop_tip,
+                    speed=instrument.drop_configurations.speed,
+                )
             ]
-
-        shakes: List[Tuple[top_types.Point, Optional[float]]] = []
 
         def _remove_tips() -> None:
             instrument.set_current_volume(0)
             instrument.current_tiprack_diameter = 0.0
             instrument.remove_tip()
 
-        drop_tip_current_axis = (
-            Axis.Q if is_96_chan else Axis.of_main_tool_actuator(mount)
-        )
-        seq_builder_ot3 = self._droptip_sequence_builder(
-            bottom,
-            drop_seq,
-            {Axis.of_main_tool_actuator(mount): instrument.plunger_motor_current.run},
-            {drop_tip_current_axis: instrument.drop_configurations.current},
-            home_after,
-            (Axis.of_main_tool_actuator(mount),),
-            is_96_chan,
-        )
+        currents = {
+            Axis.of_main_tool_actuator(mount): instrument.plunger_motor_current.run
+        }
+        if is_96_chan:
+            currents[Axis.Q] = instrument.drop_configurations.current
 
-        seq_ot3 = seq_builder_ot3()
         return (
-            DropTipSpec(
-                drop_moves=seq_ot3,
-                shake_moves=shakes,
-                ending_current={
-                    Axis.of_main_tool_actuator(
-                        mount
-                    ): instrument.plunger_motor_current.run
-                },
+            TipActionSpec(
+                currents=currents,
+                tip_action_moves=drop_seq,
+                shake_off_moves=[],
             ),
             _remove_tips,
         )

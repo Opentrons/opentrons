@@ -57,5 +57,7 @@
     "current": 2.0,
     "speed": 5
   },
-  "tipPresenceCheckDistanceMM": "8.0"
+  "tipPresenceCheckDistanceMM": "8.0",
+  "connectTiprackDistanceMM": "7.0",
+  "endTipActionRetractDistanceMM": "2.0"
 }
