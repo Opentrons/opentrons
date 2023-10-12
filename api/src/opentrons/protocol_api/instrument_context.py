@@ -607,7 +607,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Pull air into the pipette current tip at the current location.
         See also, :ref:`air-gap`.
 
-        :param volume: The amount in µL to aspirate air into the tube.
+        :param volume: The amount of air to aspirate, measured in µL.
                        Calling ``air_gap()`` with no arguments uses
                        the entire remaining volume in the pipette.
         :type volume: float
