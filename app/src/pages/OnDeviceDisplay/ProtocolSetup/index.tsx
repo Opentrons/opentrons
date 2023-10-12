@@ -71,7 +71,10 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
+import {
+  getIsHeaterShakerAttached,
+  useFeatureFlag,
+} from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
@@ -513,6 +516,9 @@ function PrepareToRun({
   const isDoorOpen =
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
+
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -587,7 +593,7 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
-              title={t('modules')}
+              title={enableDeckConfig ? t('modules_and_deck') : t('modules')}
               detail={modulesDetail()}
               status={modulesStatus}
               disabled={protocolModulesInfo.length === 0}
