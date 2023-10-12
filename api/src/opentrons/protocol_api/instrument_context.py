@@ -268,20 +268,19 @@ class InstrumentContext(publisher.CommandPublisher):
         :type volume: int or float
 
         :param location: Where to dispense liquid held in the pipette.
-                        If `location`is a :py:class:`.Well`, the robot will
-                        dispense into :py:obj:`well_bottom_clearance.dispense <well_bottom_clearance>`
-                        mm above the bottom of the well. If `location` is a
-                        :py:class:`.Location` (i.e. the result of
-                        :py:meth:`.Well.top` or :py:meth:`.Well.bottom`),
-                        the robot will dispense into the exact specified location.
-
-                        If only a location is passed (as in
-                        ``instr.dispense(location=wellplate['A1'])``),
-                        all of the liquid aspirated into the pipette will be dispensed
-                        (this volume is accessible through :py:attr:`current_volume`).
-
-                        If unspecified, the robot will dispense into the
-                        current position.
+                        If ``location`` is a :py:class:`.Well`,
+                        the robot will dispense into
+                        :py:obj:`well_bottom_clearance.dispense <well_bottom_clearance>`
+                        mm above the bottom of the well.
+                        If `location` is a :py:class:`.Location`
+                        (i.e. the result of :py:meth:`.Well.top` or
+                        :py:meth:`.Well.bottom`), the robot will dispense into
+                        the exact specified location. If only a location is
+                        passed (e.g., ``instr.dispense(location=wellplate['A1'])``),
+                        all of the liquid aspirated into the pipette
+                        will be dispensed (this volume is accessible through
+                        :py:attr:`current_volume`). If unspecified,
+                        the robot will dispense into the current position.
         :param rate: How quickly a pipette dispenses liquid. Measured in µL/s.
                      Calculated as `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
                      If not specified, defaults to 1.0. See also, :ref:`new-plunger-flow-rates`.
