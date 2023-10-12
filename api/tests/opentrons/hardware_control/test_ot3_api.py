@@ -1096,10 +1096,10 @@ async def test_prepare_for_aspirate(
 @pytest.mark.parametrize(
     "asp_vol,disp_vol,push_out,is_ready",
     (
-        [5, 1, None, True], # Partial Dispense
-        [5, 5, None, False], # Full dispense (default push_out)
-        [5, 5, 0.0, True], # explicit no push out
-        [5, 5, 1.0, False], # explicit push out
+        [5, 1, None, True],  # Partial Dispense
+        [5, 5, None, False],  # Full dispense (default push_out)
+        [5, 5, 0.0, True],  # explicit no push out
+        [5, 5, 1.0, False],  # explicit push out
     ),
 )
 async def test_plunger_ready_to_aspirate_after_dispense(
@@ -1129,7 +1129,9 @@ async def test_plunger_ready_to_aspirate_after_dispense(
 
     await ot3_hardware.aspirate(OT3Mount.LEFT, asp_vol)
     await ot3_hardware.dispense(OT3Mount.LEFT, disp_vol, push_out=push_out)
-    assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate == is_ready
+    assert (
+        ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate == is_ready
+    )
 
 
 async def test_move_to_plunger_bottom(
