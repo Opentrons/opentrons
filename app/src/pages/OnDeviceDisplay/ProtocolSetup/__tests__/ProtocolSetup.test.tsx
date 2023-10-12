@@ -22,6 +22,7 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
 } from '../../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
@@ -64,6 +65,7 @@ jest.mock(
 jest.mock(
   '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 )
+jest.mock('../../../../redux/discovery')
 jest.mock('../../../../organisms/ProtocolSetupModules')
 jest.mock('../../../../organisms/ProtocolSetupModules/utils')
 jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
@@ -133,6 +135,9 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -215,6 +220,7 @@ describe('ProtocolSetup', () => {
     mockConfirmCancelRunModal.mockReturnValue(
       <div>Mock ConfirmCancelRunModal</div>
     )
+    mockUseModuleCalibrationStatus.mockReturnValue({ complete: true })
     when(mockUseRunControls)
       .calledWith(RUN_ID)
       .mockReturnValue({

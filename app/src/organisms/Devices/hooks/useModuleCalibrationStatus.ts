@@ -23,7 +23,11 @@ export function useModuleCalibrationStatus(
   const moduleData = moduleInfoKeys.map(
     key => moduleRenderInfoForProtocolById[key]
   )
-  if (moduleData.some(m => m.attachedModuleMatch?.moduleOffset == null)) {
+  if (
+    moduleData.some(
+      m => m.attachedModuleMatch?.moduleOffset?.last_modified == null
+    )
+  ) {
     return { complete: false, reason: 'calibrate_module_failure_reason' }
   } else {
     return { complete: true }
