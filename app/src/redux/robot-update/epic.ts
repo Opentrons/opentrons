@@ -25,7 +25,6 @@ import {
   RESTART_PATH,
   RESTART_STATUS_CHANGED,
   RESTART_SUCCEEDED_STATUS,
-  RESTART_TIMED_OUT_STATUS,
   restartRobotSuccess,
 } from '../robot-admin'
 
@@ -93,7 +92,6 @@ const UNABLE_TO_CANCEL_UPDATE_SESSION =
 const UNABLE_TO_COMMIT_UPDATE = 'Unable to commit update'
 const UNABLE_TO_RESTART_ROBOT = 'Unable to restart robot'
 const ROBOT_RECONNECTED_WITH_VERSION = 'Robot reconnected with version'
-const ROBOT_DID_NOT_RECONNECT = 'Robot did not successfully reconnect'
 const BUT_WE_EXPECTED = 'but we expected'
 const UNKNOWN = 'unknown'
 const CHECK_TO_VERIFY_UPDATE =
@@ -375,8 +373,7 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
       const session = getRobotUpdateSession(state)
       const robot = getRobotUpdateRobot(state)
       const restartDone =
-        action.payload.restartStatus === RESTART_SUCCEEDED_STATUS ||
-        action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
+        action.payload.restartStatus === RESTART_SUCCEEDED_STATUS
 
       return (
         restartDone &&
@@ -393,7 +390,6 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
       )
 
       const robotVersion = getRobotApiVersion(robot)
-      const timedOut = action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
       const actual = robotVersion ?? UNKNOWN
       const expected = targetVersion ?? UNKNOWN
       let finishAction
@@ -404,10 +400,6 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
         robotVersion === targetVersion
       ) {
         finishAction = setRobotUpdateSessionStep(FINISHED)
-      } else if (timedOut) {
-        finishAction = unexpectedRobotUpdateError(
-          `${ROBOT_DID_NOT_RECONNECT}. ${CHECK_TO_VERIFY_UPDATE}.`
-        )
       } else {
         finishAction = unexpectedRobotUpdateError(
           `${ROBOT_RECONNECTED_WITH_VERSION} ${actual}, ${BUT_WE_EXPECTED} ${expected}. ${CHECK_TO_VERIFY_UPDATE}.`
