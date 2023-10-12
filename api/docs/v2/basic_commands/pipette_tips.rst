@@ -70,6 +70,8 @@ Finally, sum the tip count in the range::
 
 For a more advanced "real-world" example, review the :ref:`off-deck location protocol <off-deck-location>` on the :ref:`moving-labware` page. This example also uses a ``for`` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
 
+.. _pipette-drop-tip:
+
 Dropping a Tip
 ==============
 

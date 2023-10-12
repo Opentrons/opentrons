@@ -863,7 +863,7 @@ class InstrumentContext(publisher.CommandPublisher):
         home_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
-        Drop the current tip.
+        Drop the current tip. See also, :ref:`pipette-drop-tip`.
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
@@ -878,24 +878,24 @@ class InstrumentContext(publisher.CommandPublisher):
 
             - If the only thing to specify is which well into which to drop
               a tip, `location` can be a :py:class:`.Well`. For instance,
-              if you have a tip rack in a variable called `tiprack`, you can
+              if you have a tip rack in a variable called ``tiprack``, you can
               drop a tip into a specific well on that tiprack with the call
-              `instr.drop_tip(tiprack.wells()[0])`. This style of call can
+              ``instr.drop_tip(tiprack.wells()[0])``. This style of call can
               be used to make the robot drop a tip into arbitrary labware.
             - If the position to drop the tip from as well as the
               :py:class:`.Well` to drop the tip into needs to be specified,
               for instance to tell the robot to drop a tip from an unusually
-              large height above the tiprack, `location`
+              large height above the tiprack, ``location``
               can be a :py:class:`.types.Location`; for instance, you can call
               `instr.drop_tip(tiprack.wells()[0].top())`.
 
         :param location:
-            The location to drop the tip
+            The location to drop the tip.
         :type location:
             :py:class:`.types.Location` or :py:class:`.Well` or None
-        :param home_after:
-            Whether to home this pipette's plunger after dropping the tip.
-            If not specified, defaults to ``True`` on an OT-2.
+        :param home_after: Whether to home this pipette's plunger after
+                            dropping the tip. If not specified,
+                            defaults to ``True`` on an OT-2.
 
             Setting ``home_after=False`` saves waiting a couple of seconds
             after the pipette drops the tip, but risks causing other problems.
@@ -905,12 +905,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
                 * You're using a GEN2 pipette, not a GEN1 pipette.
                 * You've tested ``home_after=False`` extensively with your
-                  particular pipette and your particular tips.
+                  pipette and tips.
                 * You understand the risks described below.
 
             The ejector shroud that pops the tip off the end of the pipette is
             driven by the plunger's stepper motor. Sometimes, the strain of
-            ejecting the tip can make that motor *skip* and fall out of sync
+            ejecting the tip can make that motor skip and fall out of sync
             with where the robot thinks it is.
 
             Homing the plunger fixes this, so, to be safe, we normally do it
