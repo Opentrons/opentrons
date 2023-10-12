@@ -1475,9 +1475,8 @@ async def test_drop_tip_full_tiprack(
             _fake_function,
         )
 
-        def set_mock_configs() -> None:
+        def set_mock_plunger_configs() -> None:
             mock_instr = pipette_handler.get_pipette(Mount.LEFT)
-            mock_instr.current_volume = 0.0
             mock_instr.backlash_distance = 0.1
             mock_instr.config.plunger_homing_configurations.current = 1.0
             mock_instr.plunger_positions.bottom = -18.5
@@ -1500,7 +1499,7 @@ async def test_drop_tip_full_tiprack(
                 backend._gear_motor_position[NodeId.pipette_left] += distance
 
         tip_action.side_effect = _update_gear_motor_pos
-        set_mock_configs()
+        set_mock_plunger_configs()
 
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)

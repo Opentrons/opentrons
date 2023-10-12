@@ -1655,7 +1655,11 @@ class OT3API(
         await self._hold_jaw_width(jaw_width_mm)
 
     async def _move_to_plunger_bottom(
-        self, mount: OT3Mount, rate: float, acquire_lock: bool = True
+        self,
+        mount: OT3Mount,
+        rate: float,
+        acquire_lock: bool = True,
+        check_current_vol: bool = True,
     ) -> None:
         """
         Move an instrument's plunger to its bottom position, while no liquids
@@ -1684,7 +1688,7 @@ class OT3API(
         """
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
-        if instrument.current_volume > 0:
+        if check_current_vol and instrument.current_volume > 0:
             raise RuntimeError("cannot position plunger while holding liquid")
         # target position is plunger BOTTOM
         target_pos = target_position_from_plunger(
@@ -2060,7 +2064,7 @@ class OT3API(
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount)
-        await self._move_to_plunger_bottom(realmount, rate=1.0)
+        await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
 
         async with self._backend.motor_current(run_currents=spec.currents):
             if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
