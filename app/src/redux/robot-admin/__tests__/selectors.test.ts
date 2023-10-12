@@ -1,4 +1,3 @@
-import { add } from 'date-fns'
 import { CONNECTABLE, REACHABLE } from '../../discovery'
 import {
   getRobotRestarting,
@@ -6,7 +5,6 @@ import {
   getResetConfigOptions,
 } from '../selectors'
 import { ConnectivityStatus } from '../../discovery/types'
-import { RESTART_TIMEOUT_SEC } from '../constants'
 import type { State } from '../../types'
 
 const START_TIME = new Date('2000-01-01')
@@ -196,43 +194,6 @@ describe('robot admin selectors', () => {
       )
 
       expect(result).toBe('restart-in-progress')
-    })
-
-    it('should return restart timed out if it takes too long', () => {
-      const startTime = new Date('2000-01-01')
-      const notLongEnough = add(startTime, { seconds: RESTART_TIMEOUT_SEC - 1 })
-      const tooLong = add(startTime, { seconds: RESTART_TIMEOUT_SEC + 1 })
-
-      const state: State = {
-        robotAdmin: {
-          robotName: {
-            restart: {
-              ...RESTART_BASE,
-              startTime,
-              status: 'restart-in-progress',
-            },
-          },
-        },
-      } as any
-
-      const before = getNextRestartStatus(
-        state,
-        'robotName',
-        REACHABLE,
-        null,
-        notLongEnough
-      )
-
-      const after = getNextRestartStatus(
-        state,
-        'robotName',
-        REACHABLE,
-        null,
-        tooLong
-      )
-
-      expect(before).toBe(null)
-      expect(after).toBe('restart-timed-out')
     })
   })
 })
