@@ -60,7 +60,6 @@ DESCRIPTION = (
 PACKAGES = find_packages(where="src")
 INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
-    f"opentrons-hardware=={VERSION}",
     "aionotify==0.2.0",
     "anyio==3.3.0",
     "jsonschema==3.0.2",
@@ -71,6 +70,11 @@ INSTALL_REQUIRES = [
     "click>=8.0.0,<9",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
 ]
+
+EXTRAS = {
+    "ot2-hardware": [f"opentrons-hardware=={VERSION}"],
+    "flex-hardware": [f"opentrons-hardware[FLEX]=={VERSION}"],
+}
 
 
 def read(*parts):
@@ -99,6 +103,7 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRAS,
         include_package_data=True,
         package_dir={"": "src"},
         package_data={"opentrons": ["py.typed"]},

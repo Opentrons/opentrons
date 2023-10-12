@@ -52,7 +52,7 @@ INSTALL_REQUIRES = [
 ]
 
 EXTRAS = {
-    "CAN": ["python-can==3.3.4"],
+    "FLEX": ["python-can==3.3.4"],
 }
 
 

@@ -36,7 +36,7 @@ types-mock = "==4.0.1"
 types-setuptools = "==57.0.2"
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons = { editable = true, path = "." }
-opentrons-hardware = { editable = true, path = "./../hardware", extras= ["CAN"] }
+opentrons-hardware = { editable = true, path = "./../hardware", extras= ["FLEX"] }
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
 pytest-profiling = "~=1.7.0"
