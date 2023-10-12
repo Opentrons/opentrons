@@ -551,6 +551,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
+  } else if (runStatus != null && DISABLED_STATUSES.includes(runStatus)) {
+    disableReason = t('close_door')
   }
 
   if (isProtocolAnalyzing) {
