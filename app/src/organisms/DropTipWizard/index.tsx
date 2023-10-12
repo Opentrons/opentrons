@@ -302,7 +302,7 @@ export const DropTipWizardComponent = (
             commandType: 'moveRelative',
             params: {
               pipetteId: MANAGED_PIPETTE_ID,
-              distance: currentPosition.y - y,
+              distance: y - currentPosition.y,
               axis: 'y'
             }
           },
@@ -310,7 +310,7 @@ export const DropTipWizardComponent = (
             commandType: 'moveRelative',
             params: {
               pipetteId: MANAGED_PIPETTE_ID,
-              distance: currentPosition.x - x,
+              distance: x - currentPosition.x,
               axis: 'x'
             }
           }
@@ -366,7 +366,22 @@ export const DropTipWizardComponent = (
     modalContent = (
       <JogToPosition
         handleJog={handleJog}
-        handleProceed={proceed}
+        handleProceed={() => {
+          if (createdMaintenanceRunId != null) {
+            chainRunCommands(createdMaintenanceRunId, [
+              currentStep === POSITION_AND_BLOWOUT
+                ? {
+                  commandType: 'blowOutInPlace',
+                  params: { pipetteId: MANAGED_PIPETTE_ID }
+                }
+                : {
+                  commandType: 'dropTipInPlace',
+                  params: { pipetteId: MANAGED_PIPETTE_ID }
+                }
+            ], true).then(() => {}).catch(e => e)
+            proceed()
+          }
+        }}
         handleGoBack={goBack}
         body={
           currentStep === POSITION_AND_BLOWOUT
