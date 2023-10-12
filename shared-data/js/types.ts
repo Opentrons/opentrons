@@ -532,9 +532,23 @@ export type StatusBarAnimation =
 export type StatusBarAnimations = StatusBarAnimation[]
 
 // TODO(bh, 2023-09-28): refine types when settled
+export type Cutout =
+  | 'A1'
+  | 'B1'
+  | 'C1'
+  | 'D1'
+  | 'A2'
+  | 'B2'
+  | 'C2'
+  | 'D2'
+  | 'A3'
+  | 'B3'
+  | 'C3'
+  | 'D3'
+
 export interface Fixture {
   fixtureId: string
-  fixtureLocation: string
+  fixtureLocation: Cutout
   loadName: FixtureLoadName
 }
 

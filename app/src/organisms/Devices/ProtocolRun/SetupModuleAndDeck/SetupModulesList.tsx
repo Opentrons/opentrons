@@ -49,7 +49,7 @@ import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { LocationConflictModal } from './LocationConflictModal'
 import { getModuleImage } from './utils'
 
-import type { ModuleModel, Fixture } from '@opentrons/shared-data'
+import type { Cutout, ModuleModel, Fixture } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import type { ProtocolCalibrationStatus } from '../../hooks'
 
@@ -351,7 +351,8 @@ export function ModulesListItem({
       {showLocationConflictModal ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          cutout={slotName}
+          // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
+          cutout={slotName as Cutout}
           requiredModule={moduleModel}
         />
       ) : null}

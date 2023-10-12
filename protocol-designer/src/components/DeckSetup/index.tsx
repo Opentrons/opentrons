@@ -12,7 +12,7 @@ import {
   RobotWorkSpaceRenderProps,
   Module,
   COLORS,
-  TrashSlotName,
+  TrashLocation,
 } from '@opentrons/components'
 import {
   MODULES_WITH_COLLISION_ISSUES,
@@ -565,7 +565,7 @@ export const DeckSetup = (): JSX.Element => {
           width="100%"
           height="100%"
           trashSlotName={
-            trashSlot != null ? (trashSlot as TrashSlotName) : undefined
+            trashSlot != null ? (trashSlot as TrashLocation) : undefined
           }
           trashColor={COLORS.darkGreyEnabled}
         >

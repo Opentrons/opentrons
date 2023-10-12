@@ -13,17 +13,17 @@ import { COLORS } from '../../ui-style-constants'
 import { DeckSlotLocation } from '../DeckSlotLocation'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { EmptyFixture } from './EmptyFixture'
-import { StagingAreaFixture } from './StagingAreaFixture'
-import { TrashBinFixture } from './TrashBinFixture'
-import { WasteChuteFixture } from './WasteChuteFixture'
+import { EmptyConfigFixture } from './EmptyConfigFixture'
+import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
+import { TrashBinConfigFixture } from './TrashBinConfigFixture'
+import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { Cutout, DeckConfiguration } from '@opentrons/shared-data'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
-  handleClickAdd: (fixtureLocation: string) => void
-  handleClickRemove: (fixtureLocation: string) => void
+  handleClickAdd: (fixtureLocation: Cutout) => void
+  handleClickRemove: (fixtureLocation: Cutout) => void
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode
@@ -84,28 +84,28 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         />
       ))}
       {stagingAreaFixtures.map(fixture => (
-        <StagingAreaFixture
+        <StagingAreaConfigFixture
           key={fixture.fixtureId}
           handleClickRemove={handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />
       ))}
       {emptyFixtures.map(fixture => (
-        <EmptyFixture
+        <EmptyConfigFixture
           key={fixture.fixtureId}
           handleClickAdd={handleClickAdd}
           fixtureLocation={fixture.fixtureLocation}
         />
       ))}
       {wasteChuteFixtures.map(fixture => (
-        <WasteChuteFixture
+        <WasteChuteConfigFixture
           key={fixture.fixtureId}
           handleClickRemove={handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />
       ))}
       {trashBinFixtures.map(fixture => (
-        <TrashBinFixture
+        <TrashBinConfigFixture
           key={fixture.fixtureId}
           handleClickRemove={handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}

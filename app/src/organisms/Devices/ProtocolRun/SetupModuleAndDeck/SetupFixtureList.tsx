@@ -34,6 +34,7 @@ import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+import type { Cutout } from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   loadedFixturesBySlot: LoadedFixturesBySlot
@@ -82,7 +83,6 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
       >
         {map(loadedFixturesBySlot, ({ params, id }) => {
           const { loadName, location } = params
-          console.log(id)
           return (
             <FixtureListItem
               key={`SetupFixturesList_${loadName}_slot_${location.cutout}`}
@@ -101,7 +101,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 interface FixtureListItemProps {
   loadedFixtures: LoadFixtureRunTimeCommand[]
   loadName: FixtureLoadName
-  cutout: string
+  cutout: Cutout
   commandId: string
 }
 

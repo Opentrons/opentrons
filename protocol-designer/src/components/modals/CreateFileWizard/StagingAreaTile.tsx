@@ -21,10 +21,10 @@ import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { Cutout, DeckConfiguration } from '@opentrons/shared-data'
 import type { WizardTileProps } from './types'
 
-const STAGING_AREA_SLOTS = ['A3', 'B3', 'C3', 'D3']
+const STAGING_AREA_SLOTS: Cutout[] = ['A3', 'B3', 'C3', 'D3']
 
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   const { values, goBack, proceed, setFieldValue } = props

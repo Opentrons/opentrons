@@ -29,6 +29,8 @@ import { StyledText } from '../../atoms/text'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { AddDeckConfigurationModal } from './AddDeckConfigurationModal'
 
+import type { Cutout } from '@opentrons/shared-data'
+
 interface DeviceDetailsDeckConfigurationProps {
   robotName: string
 }
@@ -47,17 +49,17 @@ export function DeviceDetailsDeckConfiguration({
   const [
     targetFixtureLocation,
     setTargetFixtureLocation,
-  ] = React.useState<string>('')
+  ] = React.useState<Cutout | null>(null)
 
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
-  const handleClickAdd = (fixtureLocation: string): void => {
+  const handleClickAdd = (fixtureLocation: Cutout): void => {
     setTargetFixtureLocation(fixtureLocation)
     setShowAddFixtureModal(true)
   }
 
-  const handleClickRemove = (fixtureLocation: string): void => {
+  const handleClickRemove = (fixtureLocation: Cutout): void => {
     updateDeckConfiguration({
       fixtureLocation,
       loadName: STANDARD_SLOT_LOAD_NAME,
@@ -71,7 +73,7 @@ export function DeviceDetailsDeckConfiguration({
 
   return (
     <>
-      {showAddFixtureModal ? (
+      {showAddFixtureModal && targetFixtureLocation != null ? (
         <AddDeckConfigurationModal
           fixtureLocation={targetFixtureLocation}
           setShowAddFixtureModal={setShowAddFixtureModal}
