@@ -2068,7 +2068,6 @@ class OT3API(
 
         async with self._backend.motor_current(run_currents=spec.currents):
             if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                # see if check for move.speed not being None is still needed
                 await self._tip_motor_action(realmount, spec.tip_action_moves)
             else:
                 for move in spec.tip_action_moves:
