@@ -444,7 +444,9 @@ export const DropTipWizardComponent = (
               ],
               true
             )
-              .then(() => {})
+              .then(() => {
+                retractAllAxesAndSavePosition()
+              })
               .catch(e => e)
             proceed()
           }
