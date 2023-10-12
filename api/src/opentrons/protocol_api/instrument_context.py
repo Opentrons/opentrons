@@ -260,11 +260,11 @@ class InstrumentContext(publisher.CommandPublisher):
         dispense volume, well location, tip position in a well, and pipette
         flow rate.
 
-        :param volume: The volume to dispense, measured in µL. If 0
-                       or unspecified, defaults to :py:attr:`current_volume`.
-                       
-                       If only a volume is passed, the pipette will dispense
-                       from its current position. 
+        :param volume: The volume to dispense, measured in µL.
+                        If 0 or unspecified, defaults to
+                        :py:attr:`current_volume`.
+                        If only a volume is passed, the pipette
+                        will dispense from its current position. 
         :type volume: int or float
 
         :param location: Where to dispense liquid held in the pipette.
