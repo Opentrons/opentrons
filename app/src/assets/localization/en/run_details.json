@@ -16,6 +16,7 @@
   "clear_protocol_to_make_available": "Clear protocol from robot to make it available.",
   "clear_protocol": "Clear protocol",
   "close_door_to_resume": "Close robot door to resume run",
+  "close_door": "Close robot door",
   "closing_protocol": "Closing Protocol",
   "comment_step": "Comment",
   "comment": "Comment",
