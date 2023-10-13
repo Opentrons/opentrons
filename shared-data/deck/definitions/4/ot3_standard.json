@@ -263,7 +263,7 @@
         "dropTipsOffset": [123.25, 45.75, 40.0]
       },
       {
-        "id": "1/8cWasteChute",
+        "id": "1and8ChannelWasteChute",
         "areaType": "wasteChute",
         "offsetFromCutoutFixture": [-13.5, 0, 0],
         "boundingBox": {
@@ -276,7 +276,7 @@
         "dropTipsOffset": [64.0, 21.91, 144.0]
       },
       {
-        "id": "96cWasteChute",
+        "id": "96ChannelWasteChute",
         "areaType": "wasteChute",
         "offsetFromCutoutFixture": [-13.5, 0, 0],
         "boundingBox": {
@@ -461,7 +461,7 @@
       "mayMountTo": ["D3"],
       "displayName": "Waste Chute Adapter for 1 or 8 Channel Pipettes",
       "providesAddressableAreas": {
-        "D3": ["1/8cWasteChute"]
+        "D3": ["1and8ChannelWasteChute"]
       }
     },
     {
@@ -469,7 +469,7 @@
       "mayMountTo": ["D3"],
       "displayName": "Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute"]
+        "D3": ["1and8ChannelWasteChute", "96ChannelWasteChute", "gripperWasteChute"]
       }
     },
     {
@@ -477,7 +477,7 @@
       "mayMountTo": ["D3"],
       "displayName": "Staging Slot With Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "D3": ["1/8cWasteChute", "D4"]
+        "D3": ["1and8ChannelWasteChute", "D4"]
       }
     },
     {
@@ -485,7 +485,7 @@
       "mayMountTo": ["D3"],
       "displayName": "Staging Slot With Waste Chute Adapter and Staging Area Slot",
       "providesAddressableAreas": {
-        "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute", "D4"]
+        "D3": ["1and8ChannelWasteChute", "96ChannelWasteChute", "gripperWasteChute", "D4"]
       }
     }
   ],
