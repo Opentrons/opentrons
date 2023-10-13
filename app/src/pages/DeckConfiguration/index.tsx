@@ -22,6 +22,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { AddDeckConfigurationModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddDeckConfigurationModal'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { Portal } from '../../App/portal'
 
 import type { Cutout } from '@opentrons/shared-data'
@@ -45,6 +46,10 @@ export function DeckConfiguration(): JSX.Element {
     targetFixtureLocation,
     setTargetFixtureLocation,
   ] = React.useState<Cutout | null>(null)
+  const [
+    showDiscardChangeModal,
+    setShowDiscardChangeModal,
+  ] = React.useState<boolean>(false)
 
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
@@ -61,6 +66,8 @@ export function DeckConfiguration(): JSX.Element {
     })
   }
 
+  const handleClickConfirm = (): void => {}
+
   const secondaryButton = (
     <SmallButton
       onClick={() => setShowSetupInstructionsModal(true)}
@@ -74,6 +81,11 @@ export function DeckConfiguration(): JSX.Element {
   return (
     <>
       <Portal level="top">
+        {showDiscardChangeModal ? (
+          <DeckConfigurationDiscardChangesModal
+            setShowConfirmationModal={setShowDiscardChangeModal}
+          />
+        ) : null}
         {showSetupInstructionsModal ? (
           <DeckFixtureSetupInstructionsModal
             setShowSetupInstructionsModal={setShowSetupInstructionsModal}
@@ -93,7 +105,7 @@ export function DeckConfiguration(): JSX.Element {
           header={t('devices_landing:deck_configuration')}
           onClickBack={() => history.goBack()}
           buttonText={t('shared:confirm')}
-          onClickButton={() => {}}
+          onClickButton={handleClickConfirm}
           secondaryButton={secondaryButton}
         />
         <Flex
