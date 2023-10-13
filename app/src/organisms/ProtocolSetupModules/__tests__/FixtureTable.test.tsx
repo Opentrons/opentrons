@@ -93,7 +93,7 @@ describe('FixtureTable', () => {
     const [{ getByText }] = render(props)
     getByText('Not configured')
   })
-  it('should render the current status - not configured', () => {
+  it('should render the current status - conflicting', () => {
     mockUseLoadedFixturesConfigStatus.mockReturnValue([
       { ...mockLoadedFixture, configurationStatus: 'conflicting' },
     ])

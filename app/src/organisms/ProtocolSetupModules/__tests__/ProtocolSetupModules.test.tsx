@@ -11,7 +11,6 @@ import {
   Fixture,
   getDeckDefFromRobotType,
   STAGING_AREA_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 

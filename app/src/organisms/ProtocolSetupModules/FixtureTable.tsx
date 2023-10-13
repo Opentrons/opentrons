@@ -63,7 +63,7 @@ export function FixtureTable({
         ]
       : []
 
-  const configuration = useLoadedFixturesConfigStatus(requiredFixtureDetails)
+  const configurations = useLoadedFixturesConfigStatus(requiredFixtureDetails)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -80,8 +80,8 @@ export function FixtureTable({
         <StyledText flex="3 0 0"> {t('status')}</StyledText>
       </Flex>
       {requiredFixtureDetails.map(fixture => {
-        const configurationStatus = configuration.find(
-          config => config.id === fixture.id
+        const configurationStatus = configurations.find(
+          configuration => configuration.id === fixture.id
         )?.configurationStatus
 
         let chipLabel
