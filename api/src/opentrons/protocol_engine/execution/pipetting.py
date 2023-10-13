@@ -226,7 +226,6 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> None:
         """Virtually blow out (no-op)."""
-        self._validate_tip_attached(pipette_id=pipette_id, command_name="blow-out")
 
     def _validate_tip_attached(self, pipette_id: str, command_name: str) -> None:
         """Validate if there is a tip attached."""
