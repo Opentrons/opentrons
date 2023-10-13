@@ -114,9 +114,9 @@ class Cutout(TypedDict):
 
 class CutoutFixture(TypedDict):
     id: str
-    cutoutLocationIds: List[str]
+    mayMountTo: List[str]
     displayName: str
-    onFixtureAddressableAreas: Dict[str, List[str]]
+    providesAddressableAreas: Dict[str, List[str]]
 
 
 Fixture = Union[
