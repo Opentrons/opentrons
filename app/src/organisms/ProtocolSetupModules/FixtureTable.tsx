@@ -84,7 +84,7 @@ export function FixtureTable({
           configuration => configuration.id === fixture.id
         )?.configurationStatus
 
-        let chipLabel
+        let chipLabel: JSX.Element
         if (
           configurationStatus === CONFLICTING ||
           configurationStatus === NOT_CONFIGURED
@@ -95,7 +95,7 @@ export function FixtureTable({
                 text={
                   configurationStatus === CONFLICTING
                     ? i18n.format(t('location_conflict'), 'capitalize')
-                    : i18n.format(configurationStatus, 'capitalize')
+                    : i18n.format(t('not_configured'), 'capitalize')
                 }
                 type="warning"
                 background={false}
@@ -107,7 +107,7 @@ export function FixtureTable({
         } else if (configurationStatus === CONFIGURED) {
           chipLabel = (
             <Chip
-              text={i18n.format(configurationStatus, 'capitalize')}
+              text={i18n.format(t('configured'), 'capitalize')}
               type="success"
               background={false}
               iconName="connection-status"
@@ -115,7 +115,7 @@ export function FixtureTable({
           )
           //  shouldn't run into this case
         } else {
-          chipLabel = 'status label unknown'
+          chipLabel = <div>status label unknown</div>
         }
 
         return (
@@ -130,11 +130,7 @@ export function FixtureTable({
             onClick={() => console.log('wire this up')}
           >
             <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
-              <StyledText
-                StyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {getFixtureDisplayName(fixture.params.loadName)}
               </StyledText>
             </Flex>
