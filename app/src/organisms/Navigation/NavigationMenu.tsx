@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -37,6 +39,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   ] = React.useState<boolean>(false)
 
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+  const history = useHistory()
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
@@ -94,7 +97,10 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           </Flex>
         </MenuItem>
         {enableDeckConfig ? (
-          <MenuItem key="deck-configuration" onClick={() => {}}>
+          <MenuItem
+            key="deck-configuration"
+            onClick={() => history.push('/deck-configuration')}
+          >
             <Flex alignItems={ALIGN_CENTER}>
               <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
               <StyledText

@@ -15,6 +15,15 @@ jest.mock('../../Devices/hooks')
 jest.mock('../../../redux/config')
 jest.mock('../RestartRobotConfirmationModal')
 
+const mockPush = jest.fn()
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
+
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockHome = home as jest.MockedFunction<typeof home>
 const mockToggleLights = jest.fn()
@@ -90,7 +99,6 @@ describe('NavigationMenu', () => {
     getByText('Lights off')
   })
 
-  // ToDo (kk:09/29/2023) menu item clicking test will be added
   it('should render the deck configuration menu item when enableDeckConfiguration is on', () => {
     when(mockUseFeatureFlag)
       .calledWith('enableDeckConfiguration')
@@ -98,5 +106,14 @@ describe('NavigationMenu', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('Deck configuration')
     getByLabelText('deck-map_icon')
+  })
+
+  it('should call a mock function when tapping deck configuration', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(true)
+    const { getByText } = render(props)
+    getByText('Deck configuration').click()
+    expect(mockPush).toHaveBeenCalledWith('/deck-configuration')
   })
 })

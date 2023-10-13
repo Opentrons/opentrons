@@ -38,6 +38,7 @@ export function DeckFixtureSetupInstructionsModal({
     iconName: 'information',
     iconColor: COLORS.darkBlack100,
     hasExitIcon: true,
+    onClick: () => setShowSetupInstructionsModal(false),
   }
 
   const modalProps: LegacyModalProps = {

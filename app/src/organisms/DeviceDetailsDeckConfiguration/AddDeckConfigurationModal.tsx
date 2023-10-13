@@ -51,6 +51,7 @@ export function AddDeckConfigurationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', { slotName: fixtureLocation }),
     hasExitIcon: true,
+    onClick: () => setShowAddFixtureModal(false),
   }
 
   const modalProps: LegacyModalProps = {
@@ -86,19 +87,25 @@ export function AddDeckConfigurationModal({
   return (
     <>
       {isOnDevice ? (
-        <Modal header={modalHeader}>
+        <Modal
+          header={modalHeader}
+          onOutsideClick={() => setShowAddFixtureModal(false)}
+        >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {/* ToDo (kk:10/05/2023) I will update this part later */}
-              {/* {availableFixtures.map((fixture, index) => (
-                <React.Fragment key={`fixture_${index}`}>
-                  <AddFixtureButton fixtureLoadName={fixture} />
+              {availableFixtures.map(fixture => (
+                <React.Fragment key={fixture}>
+                  <AddFixtureButton
+                    fixtureLoadName={fixture}
+                    handleClickAdd={handleClickAdd}
+                  />
                 </React.Fragment>
-              ))} */}
-              <AddFixtureButton fixtureLoadName={t('staging_area_slot')} />
+              ))}
+              {/* <AddFixtureButton fixtureLoadName={t('staging_area_slot')} />
               <AddFixtureButton fixtureLoadName={t('trash')} />
-              <AddFixtureButton fixtureLoadName={t('waste_chute')} />
+              <AddFixtureButton fixtureLoadName={t('waste_chute')} /> */}
             </Flex>
           </Flex>
         </Modal>
@@ -108,7 +115,7 @@ export function AddDeckConfigurationModal({
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {availableFixtures.map(fixture => (
-                <React.Fragment key={`${fixture}`}>
+                <React.Fragment key={fixture}>
                   <Flex
                     flexDirection={DIRECTION_ROW}
                     alignItems={ALIGN_CENTER}
@@ -135,10 +142,12 @@ export function AddDeckConfigurationModal({
 }
 
 interface AddFixtureButtonProps {
-  fixtureLoadName: string
+  fixtureLoadName: FixtureLoadName
+  handleClickAdd: (ixtureLoadName: FixtureLoadName) => void
 }
 function AddFixtureButton({
   fixtureLoadName,
+  handleClickAdd,
 }: AddFixtureButtonProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
@@ -146,7 +155,7 @@ function AddFixtureButton({
   // Need to update a function for onClick
   return (
     <Btn
-      onClick={() => {}}
+      onClick={() => handleClickAdd(fixtureLoadName)}
       display="flex"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       flexDirection={DIRECTION_ROW}
@@ -155,7 +164,7 @@ function AddFixtureButton({
       css={FIXTIRE_BUTTON_STYLE}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {fixtureLoadName}
+        {getFixtureDisplayName(fixtureLoadName)}
       </StyledText>
       <StyledText as="p">{t('add')}</StyledText>
     </Btn>
