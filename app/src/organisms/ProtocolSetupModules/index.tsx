@@ -132,7 +132,6 @@ function RenderModuleStatus({
 
   if (
     isModuleReady &&
-    calibrationStatus.complete &&
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (

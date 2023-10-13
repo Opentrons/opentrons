@@ -22,7 +22,9 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
 } from '../../../../organisms/Devices/hooks'
+import { getLocalRobot } from '../../../../redux/discovery'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -71,6 +73,7 @@ jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../../organisms/ToasterOven')
 
@@ -133,6 +136,12 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
+>
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -215,6 +224,8 @@ describe('ProtocolSetup', () => {
     mockConfirmCancelRunModal.mockReturnValue(
       <div>Mock ConfirmCancelRunModal</div>
     )
+    mockUseModuleCalibrationStatus.mockReturnValue({ complete: true })
+    mockGetLocalRobot.mockReturnValue({ name: '123' } as any)
     when(mockUseRunControls)
       .calledWith(RUN_ID)
       .mockReturnValue({
