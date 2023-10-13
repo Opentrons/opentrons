@@ -469,7 +469,11 @@
       "mayMountTo": ["D3"],
       "displayName": "Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "D3": ["1and8ChannelWasteChute", "96ChannelWasteChute", "gripperWasteChute"]
+        "D3": [
+          "1and8ChannelWasteChute",
+          "96ChannelWasteChute",
+          "gripperWasteChute"
+        ]
       }
     },
     {
@@ -485,7 +489,12 @@
       "mayMountTo": ["D3"],
       "displayName": "Staging Slot With Waste Chute Adapter and Staging Area Slot",
       "providesAddressableAreas": {
-        "D3": ["1and8ChannelWasteChute", "96ChannelWasteChute", "gripperWasteChute", "D4"]
+        "D3": [
+          "1and8ChannelWasteChute",
+          "96ChannelWasteChute",
+          "gripperWasteChute",
+          "D4"
+        ]
       }
     }
   ],
