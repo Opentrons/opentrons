@@ -1221,7 +1221,7 @@ exports[`icons help-circle renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons home-gantry renders correctly 1`] = `
+exports[`icons reset-position renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;

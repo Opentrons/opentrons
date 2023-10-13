@@ -68,7 +68,7 @@ describe('NavigationMenu', () => {
     const { getByText, getByLabelText } = render(props)
     getByLabelText('BackgroundOverlay_ModalShell').click()
     expect(props.onClick).toHaveBeenCalled()
-    getByLabelText('home-gantry_icon')
+    getByLabelText('reset-position_icon')
     getByText('Home gantry').click()
     expect(mockHome).toHaveBeenCalled()
     expect(props.setShowNavMenu).toHaveBeenCalled()

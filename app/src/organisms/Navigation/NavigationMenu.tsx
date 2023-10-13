@@ -63,11 +63,11 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem key="home-gantry" onClick={handleHomeGantry}>
+        <MenuItem key="reset-position" onClick={handleHomeGantry}>
           <Flex alignItems={ALIGN_CENTER}>
             <Icon
-              name="home-gantry"
-              aria-label="home-gantry_icon"
+              name="reset-position"
+              aria-label="reset-position_icon"
               size="2.5rem"
             />
             <StyledText
