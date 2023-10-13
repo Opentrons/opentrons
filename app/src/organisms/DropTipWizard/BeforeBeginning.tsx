@@ -17,7 +17,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
 } from '@opentrons/components'
-import { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
 
@@ -25,30 +24,20 @@ import { NeedHelpLink } from '../CalibrationPanels'
 const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
-  createMaintenanceRun: CreateMaintenanceRunType
+  handleCreateAndSetup: (shouldDispenseLiquid: boolean) => void
   isCreateLoading: boolean
-  createdMaintenanceRunId: string | null
-  setShouldDispenseLiquid: React.Dispatch<React.SetStateAction<boolean | null>>
 }
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const {
-    createMaintenanceRun,
-    isCreateLoading,
-    setShouldDispenseLiquid,
-  } = props
+  const { handleCreateAndSetup, isCreateLoading } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'liquid_and_tips' | 'only_tips'
   >('liquid_and_tips')
   const handleProceed = (): void => {
-    createMaintenanceRun({})
-      .then(() => {
-        setShouldDispenseLiquid(flowType === 'liquid_and_tips')
-      })
-      .catch(e => e)
+    handleCreateAndSetup(flowType === 'liquid_and_tips')
   }
 
   return (

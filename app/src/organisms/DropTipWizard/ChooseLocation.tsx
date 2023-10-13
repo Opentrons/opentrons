@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
-import { RobotType } from '@opentrons/shared-data'
+import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
 const NEED_HELP_URL = ''
@@ -23,20 +23,43 @@ interface ChooseLocationProps {
   title: string
   body: string | JSX.Element
   robotType: RobotType
+  moveToXYCoordinate: (x: number, y: number) => Promise<void>
 }
 
 export const ChooseLocation = (
   props: ChooseLocationProps
 ): JSX.Element | null => {
-  const { handleProceed, title, body, robotType } = props
+  const { handleProceed, title, body, robotType, moveToXYCoordinate } = props
   const { t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const deckDef = getDeckDefFromRobotType(robotType)
   const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
     robotType
   )
 
   const handleConfirmPosition: React.MouseEventHandler = () => {
-    console.log('MOVE TO selected location: ', selectedLocation)
-    handleProceed()
+    const deckLocation = deckDef.locations.orderedSlots.find(
+      l => l.id === selectedLocation.slotName
+    )
+    const slotX = deckLocation?.position[0]
+    const slotY = deckLocation?.position[1]
+    const xDimension = deckLocation?.boundingBox.xDimension
+    const yDimension = deckLocation?.boundingBox.yDimension
+    if (
+      slotX != null &&
+      slotY != null &&
+      xDimension != null &&
+      yDimension != null
+    ) {
+      const targetX = slotX + xDimension / 2
+      const targetY = slotY + yDimension / 2
+      console.log(
+        'MOVE TO selected location: ',
+        selectedLocation,
+        targetX,
+        targetY
+      )
+      moveToXYCoordinate(targetX, targetY).then(handleProceed)
+    }
   }
   return (
     <Flex css={TILE_CONTAINER_STYLE}>
