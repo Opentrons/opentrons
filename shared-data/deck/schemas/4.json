@@ -238,7 +238,6 @@
         "required": [
           "id",
           "cutoutLocationIds",
-          "fixtureType",
           "displayName",
           "onFixtureAddressableAreas"
         ],
@@ -253,10 +252,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "fixtureType": {
-            "description": "The type of cutout fixture.",
-            "type": "string"
           },
           "displayName": {
             "description": "A human-readable nickname for this area e.g. \"Standard Right Slot\" or \"Slot With Movable Trash\"",

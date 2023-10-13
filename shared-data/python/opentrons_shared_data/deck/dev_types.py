@@ -115,7 +115,6 @@ class Cutout(TypedDict):
 class CutoutFixture(TypedDict):
     id: str
     cutoutLocationIds: List[str]
-    fixtureType: str
     displayName: str
     onFixtureAddressableAreas: Dict[str, List[str]]
 

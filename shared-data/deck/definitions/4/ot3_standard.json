@@ -400,7 +400,6 @@
     {
       "id": "singleLeftSlot",
       "cutoutLocationIds": ["D1", "C1", "B1", "A1"],
-      "fixtureType": "singleLeftSlot",
       "displayName": "Standard Slot Left",
       "onFixtureAddressableAreas": {
         "D1": ["D1"],
@@ -412,7 +411,6 @@
     {
       "id": "singleCenterSlot",
       "cutoutLocationIds": ["D2", "C2", "B2", "A2"],
-      "fixtureType": "singleCenterSlot",
       "displayName": "Standard Slot Center",
       "onFixtureAddressableAreas": {
         "D2": ["D2"],
@@ -424,7 +422,6 @@
     {
       "id": "singleRightSlot",
       "cutoutLocationIds": ["D3", "C3", "B3", "A3"],
-      "fixtureType": "singleRightSlot",
       "displayName": "Standard Slot Right",
       "onFixtureAddressableAreas": {
         "D3": ["D3"],
@@ -436,7 +433,6 @@
     {
       "id": "stagingAreaRightSlot",
       "cutoutLocationIds": ["D3", "C3", "B3", "A3"],
-      "fixtureType": "stagingAreaRightSlot",
       "displayName": "Staging Area Slot",
       "onFixtureAddressableAreas": {
         "D3": ["D3", "D4"],
@@ -448,7 +444,6 @@
     {
       "id": "trashBinAdapter",
       "cutoutLocationIds": ["D1", "C1", "B1", "A1", "D3", "C3", "B3", "A3"],
-      "fixtureType": "trashBinAdapter",
       "displayName": "Slot With Movable Trash",
       "onFixtureAddressableAreas": {
         "D1": ["movableTrash"],
@@ -464,7 +459,6 @@
     {
       "id": "wasteChuteRightAdapter",
       "cutoutLocationIds": ["D3"],
-      "fixtureType": "wasteChuteRightAdapter",
       "displayName": "Slot With Waste Chute Adapter",
       "onFixtureAddressableAreas": {
         "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute"]
@@ -473,7 +467,6 @@
     {
       "id": "wasteChuteRightAdapterWithStagingAreaSlot",
       "cutoutLocationIds": ["D3"],
-      "fixtureType": "wasteChuteRightAdapterWithStagingAreaSlot",
       "displayName": "Slot With Waste Chute Adapter and Staging Area Slot",
       "onFixtureAddressableAreas": {
         "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute", "D4"]

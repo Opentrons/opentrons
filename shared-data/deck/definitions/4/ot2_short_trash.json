@@ -367,7 +367,6 @@
         "10",
         "11"
       ],
-      "fixtureType": "singleStandardSlot",
       "displayName": "Standard Slot",
       "onFixtureAddressableAreas": {
         "1": ["1"],
@@ -386,7 +385,6 @@
     {
       "id": "fixedTrashSlot",
       "cutoutLocationIds": ["12"],
-      "fixtureType": "fixedTrashSlot",
       "displayName": "Fixed Trash",
       "onFixtureAddressableAreas": {
         "12": ["shortFixedTrash"]
