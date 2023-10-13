@@ -20,10 +20,8 @@ import {
 
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
-import {
-  AddDeckConfigurationModal,
-  DeckFixtureSetupInstructionsModal,
-} from '../../organisms/DeviceDetailsDeckConfiguration'
+import { AddDeckConfigurationModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddDeckConfigurationModal'
+import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { Portal } from '../../App/portal'
 
 import type { Cutout } from '@opentrons/shared-data'
