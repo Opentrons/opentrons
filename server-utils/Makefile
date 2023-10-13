@@ -116,4 +116,6 @@ push: wheel
 .PHONY: push-ot3
 push-ot3: sdist
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-system-server","server_utils",,,$(version_file))
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","server_utils")
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","server_utils",,,$(version_file))
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-update-server","server_utils",,,$(version_file))
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/ot3usb","server_utils",,,$(version_file))

@@ -4,7 +4,8 @@ import logging
 from typing import Dict, Tuple, Union, cast
 from datetime import datetime, timezone
 from opentrons.util.helpers import utc_now
-from opentrons.config import IS_ROBOT
+
+from server_utils.config import IS_ROBOT
 
 from robot_server.system import errors
 from robot_server.service.errors import CommonErrorDef

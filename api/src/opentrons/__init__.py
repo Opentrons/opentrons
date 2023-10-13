@@ -140,6 +140,7 @@ async def initialize() -> ThreadManagedHardware:
     """
     Initialize the Opentrons hardware returning a hardware instance.
     """
+    # TODO (ba, 2023-10-12): Remove log init once the opentrons_hardware process is up and running
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 

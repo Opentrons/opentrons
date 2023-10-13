@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 aiohttp = "==3.4.4"
 typing-extensions = "==3.10.0.0"
+pydantic = "==1.8.2"
+server-utils = {path = "./../server-utils", editable = true}
 
 [dev-packages]
 otupdate = {path = ".", editable = true}

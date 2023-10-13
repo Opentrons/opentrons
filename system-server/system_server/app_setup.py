@@ -8,6 +8,9 @@ from system_server._version import version
 from system_server.settings import get_settings
 from system_server.router import router
 
+from server_utils import PackageName
+from server_utils.logging import log_init
+
 log = logging.getLogger(__name__)
 
 
@@ -40,7 +43,8 @@ async def on_startup() -> None:
     """Handle app startup."""
     # Load settings and (throw away the result) so that we detect errors early
     # on in startup, instead of the first time someone happens to use a setting.
-    get_settings()
+    settings = get_settings()
+    log_init(PackageName.SYSTEM_SERVER, settings.log_level)
 
 
 @app.on_event("shutdown")

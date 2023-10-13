@@ -7,9 +7,11 @@ from typing import NoReturn
 
 from . import get_app
 
-from otupdate.common import name_management, cli, systemd, constants
+from otupdate.common import name_management, cli, constants
 from otupdate.common.run_application import run_and_notify_up
 
+from server_utils import PackageName
+from server_utils.logging import log_init
 
 LOG = logging.getLogger(__name__)
 
@@ -17,8 +19,7 @@ LOG = logging.getLogger(__name__)
 async def main() -> NoReturn:
     parser = cli.build_root_parser()
     args = parser.parse_args()
-
-    systemd.configure_logging(getattr(logging, args.log_level.upper()))
+    log_init(PackageName.UPDATE_SERVER, args.log_level)
 
     # Because this involves restarting Avahi, this must happen early,
     # before the NameSynchronizer starts up and connects to Avahi.

@@ -55,6 +55,11 @@ class SystemServerSettings(BaseSettings):
         ),
     )
 
+    log_level: str = Field(
+        default="INFO",
+        description="The log level for the system server logs",
+    )
+
     class Config:
         """Prefix configuration for environment variables."""
 

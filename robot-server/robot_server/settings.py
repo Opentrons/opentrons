@@ -94,5 +94,10 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
+    log_level: str = Field(
+        default="INFO",
+        description="The log level for the robot server logs.",
+    )
+
     class Config:
         env_prefix = "OT_ROBOT_SERVER_"
