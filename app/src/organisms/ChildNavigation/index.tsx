@@ -36,7 +36,7 @@ interface ChildNavigationProps {
   buttonType?: SmallButtonTypes
   iconName?: IconName
   iconPlacement?: IconPlacement
-  secondaryButton?: React.ComponentProps<typeof SmallButton>
+  secondaryButton?: React.ReactNode
 }
 
 export function ChildNavigation({
