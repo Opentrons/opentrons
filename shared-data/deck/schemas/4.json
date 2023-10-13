@@ -237,33 +237,28 @@
         "type": "object",
         "required": [
           "id",
-          "cutoutLocationIds",
-          "fixtureType",
+          "mayMountTo",
           "displayName",
-          "onFixtureAddressableAreas"
+          "providesAddressableAreas"
         ],
         "properties": {
           "id": {
             "description": "Unique identifier for the cutout fixture.",
             "type": "string"
           },
-          "cutoutLocationIds": {
-            "description": "A list of compatible cutout ids this cutout fixture can be placed on.",
+          "mayMountTo": {
+            "description": "A list of compatible cutouts this fixture may be mounted to.",
             "type": "array",
             "items": {
               "type": "string"
             }
           },
-          "fixtureType": {
-            "description": "The type of cutout fixture.",
-            "type": "string"
-          },
           "displayName": {
             "description": "A human-readable nickname for this area e.g. \"Standard Right Slot\" or \"Slot With Movable Trash\"",
             "type": "string"
           },
-          "onFixtureAddressableAreas": {
-            "description": "A mapping of cutout location ids (matching the entries in cutoutLocationIds) to compatible addressableArea ids.",
+          "providesAddressableAreas": {
+            "description": "A mapping of mayMountTo locations to addressableArea ids.",
             "type": "object",
             "additionalProperties": {
               "type": "array",
