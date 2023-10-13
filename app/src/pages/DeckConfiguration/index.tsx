@@ -66,7 +66,15 @@ export function DeckConfiguration(): JSX.Element {
     })
   }
 
-  const handleClickConfirm = (): void => {}
+  const handleClickConfirm = (): void => {
+    // ToDo (kk:10/13/2023) add a function for the confirmation
+  }
+
+  const handleClickBack = (): void => {
+    // ToDo If there is any unsaved change, display DeckConfigurationDiscardChangesModal
+    // setShowDiscardChangeModal(true)
+    history.goBack()
+  }
 
   const secondaryButton = (
     <SmallButton
@@ -103,7 +111,7 @@ export function DeckConfiguration(): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}
-          onClickBack={() => history.goBack()}
+          onClickBack={handleClickBack}
           buttonText={t('shared:confirm')}
           onClickButton={handleClickConfirm}
           secondaryButton={secondaryButton}
