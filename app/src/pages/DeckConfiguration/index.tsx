@@ -18,6 +18,7 @@ import {
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
 
+import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   AddDeckConfigurationModal,
@@ -28,7 +29,11 @@ import { Portal } from '../../App/portal'
 import type { Cutout } from '@opentrons/shared-data'
 
 export function DeckConfiguration(): JSX.Element {
-  const { t, i18n } = useTranslation(['protocol_setup', 'devices_landing'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'devices_landing',
+    'shared',
+  ])
   const history = useHistory()
   const [
     showSetupInstructionsModal,
@@ -58,6 +63,16 @@ export function DeckConfiguration(): JSX.Element {
     })
   }
 
+  const secondaryButton = (
+    <SmallButton
+      onClick={() => setShowSetupInstructionsModal(true)}
+      buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
+      buttonType="tertiaryLowLight"
+      iconName="information"
+      iconPlacement="startIcon"
+    />
+  )
+
   return (
     <>
       <Portal level="top">
@@ -79,11 +94,9 @@ export function DeckConfiguration(): JSX.Element {
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}
           onClickBack={() => history.goBack()}
-          buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
-          buttonType="tertiaryLowLight"
-          iconName="information"
-          iconPlacement="startIcon"
-          onClickButton={() => setShowSetupInstructionsModal(true)}
+          buttonText={t('shared:confirm')}
+          onClickButton={() => {}}
+          secondaryButton={secondaryButton}
         />
         <Flex
           marginTop="7.75rem"

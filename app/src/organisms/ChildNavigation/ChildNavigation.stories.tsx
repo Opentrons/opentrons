@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { touchScreenViewport } from '../../DesignTokens/constants'
+import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '.'
 import type { Story, Meta } from '@storybook/react'
 
@@ -31,4 +32,21 @@ TitleWithLinkButton.args = {
   iconName: 'information',
   iconPlacement: 'startIcon',
   onClickButton: () => {},
+}
+
+export const TitleWithTwoButtons = Template.bind({})
+const secondaryButton = (
+  <SmallButton
+    onClick={() => {}}
+    buttonText="Setup Instructions"
+    buttonType="tertiaryLowLight"
+    iconName="information"
+    iconPlacement="startIcon"
+  />
+)
+TitleWithTwoButtons.args = {
+  header: 'Header',
+  buttonText: 'ButtonText',
+  onClickButton: () => {},
+  secondaryButton,
 }

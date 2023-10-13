@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
+  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_FLEX_START,
@@ -35,6 +36,7 @@ interface ChildNavigationProps {
   buttonType?: SmallButtonTypes
   iconName?: IconName
   iconPlacement?: IconPlacement
+  secondaryButton?: React.ComponentProps<typeof SmallButton>
 }
 
 export function ChildNavigation({
@@ -46,6 +48,7 @@ export function ChildNavigation({
   buttonType = 'primary',
   iconName,
   iconPlacement,
+  secondaryButton,
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -69,14 +72,17 @@ export function ChildNavigation({
         </StyledText>
       </Flex>
       {onClickButton != null && buttonText != null ? (
-        <SmallButton
-          buttonType={buttonType}
-          buttonCategory="rounded"
-          buttonText={buttonText}
-          onClick={onClickButton}
-          iconName={iconName}
-          iconPlacement={iconPlacement}
-        />
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+          {secondaryButton != null ? secondaryButton : null}
+          <SmallButton
+            buttonType={buttonType}
+            buttonCategory={buttonType === 'primary' ? 'rounded' : 'default'}
+            buttonText={buttonText}
+            onClick={onClickButton}
+            iconName={iconName}
+            iconPlacement={iconPlacement}
+          />
+        </Flex>
       ) : null}
       {inlineNotification != null ? (
         <InlineNotification

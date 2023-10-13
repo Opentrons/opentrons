@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,7 +18,6 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   getFixtureDisplayName,
   STAGING_AREA_LOAD_NAME,
-  // STANDARD_SLOT_LOAD_NAME,
   TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
@@ -38,9 +38,6 @@ interface AddDeckConfigurationModalProps {
   isOnDevice?: boolean
 }
 
-// ToDo (kk:09/29/2023)
-// update this component when Deck configuration component is ready
-// Need to use getFixtureDisplayName
 export function AddDeckConfigurationModal({
   fixtureLocation,
   setShowAddFixtureModal,
@@ -94,7 +91,6 @@ export function AddDeckConfigurationModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {/* ToDo (kk:10/05/2023) I will update this part later */}
               {availableFixtures.map(fixture => (
                 <React.Fragment key={fixture}>
                   <AddFixtureButton
@@ -103,9 +99,6 @@ export function AddDeckConfigurationModal({
                   />
                 </React.Fragment>
               ))}
-              {/* <AddFixtureButton fixtureLoadName={t('staging_area_slot')} />
-              <AddFixtureButton fixtureLoadName={t('trash')} />
-              <AddFixtureButton fixtureLoadName={t('waste_chute')} /> */}
             </Flex>
           </Flex>
         </Modal>
@@ -143,7 +136,7 @@ export function AddDeckConfigurationModal({
 
 interface AddFixtureButtonProps {
   fixtureLoadName: FixtureLoadName
-  handleClickAdd: (ixtureLoadName: FixtureLoadName) => void
+  handleClickAdd: (fixtureLoadName: FixtureLoadName) => void
 }
 function AddFixtureButton({
   fixtureLoadName,
@@ -151,8 +144,6 @@ function AddFixtureButton({
 }: AddFixtureButtonProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
-  // ToDo (kk:10/02/2023)
-  // Need to update a function for onClick
   return (
     <Btn
       onClick={() => handleClickAdd(fixtureLoadName)}
@@ -161,7 +152,7 @@ function AddFixtureButton({
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      css={FIXTIRE_BUTTON_STYLE}
+      css={FIXTURE_BUTTON_STYLE}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {getFixtureDisplayName(fixtureLoadName)}
@@ -171,7 +162,7 @@ function AddFixtureButton({
   )
 }
 
-const FIXTIRE_BUTTON_STYLE = css`
+const FIXTURE_BUTTON_STYLE = css`
   background-color: ${COLORS.light1};
   cursor: default;
   border-radius: ${BORDERS.borderRadiusSize3};
