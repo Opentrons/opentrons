@@ -79,16 +79,17 @@ export function FixtureTable({
         <StyledText flex="2 0 0">{t('location')}</StyledText>
         <StyledText flex="3 0 0"> {t('status')}</StyledText>
       </Flex>
-      {requiredFixtureDetails.map(fixture => {
+      {requiredFixtureDetails.map((fixture, index) => {
         const configurationStatus = configurations.find(
           configuration => configuration.id === fixture.id
         )?.configurationStatus
 
-        let chipLabel: JSX.Element
-        if (
+        const statusNotReady =
           configurationStatus === CONFLICTING ||
           configurationStatus === NOT_CONFIGURED
-        ) {
+
+        let chipLabel: JSX.Element
+        if (statusNotReady) {
           chipLabel = (
             <>
               <Chip
@@ -123,11 +124,16 @@ export function FixtureTable({
             flexDirection={DIRECTION_ROW}
             key={fixture.params.fixtureId}
             alignItems={ALIGN_CENTER}
-            backgroundColor={COLORS.green3}
+            backgroundColor={statusNotReady ? COLORS.yellow3 : COLORS.green3}
             borderRadius={BORDERS.borderRadiusSize3}
             gridGap={SPACING.spacing24}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
             onClick={() => console.log('wire this up')}
+            marginBottom={
+              index === requiredFixtureDetails.length - 1
+                ? SPACING.spacing68
+                : 'none'
+            }
           >
             <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

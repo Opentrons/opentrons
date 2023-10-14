@@ -64,11 +64,11 @@ import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
 
+import type { CommandData } from '@opentrons/api-client'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
-import type { CommandData } from '@opentrons/api-client'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 
@@ -139,7 +139,7 @@ function RenderModuleStatus({
   )
   if (conflictedFixture != null && enableDeckConfig) {
     moduleStatus = (
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
         <Chip
           text={t('location_conflict')}
           type="warning"
@@ -244,7 +244,8 @@ function RowModule({
         alignItems={ALIGN_CENTER}
         backgroundColor={
           isModuleReady &&
-          module.attachedModuleMatch?.moduleOffset?.last_modified != null
+          module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
+          conflictedFixture == null
             ? COLORS.green3
             : COLORS.yellow3
         }
