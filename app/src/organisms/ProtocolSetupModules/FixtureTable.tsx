@@ -7,6 +7,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
   TYPOGRAPHY,
@@ -16,8 +18,14 @@ import {
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 // import { parseInitialLoadedFixturesByCutout } from '@opentrons/api-client'
-
+import {
+  CONFIGURED,
+  CONFLICTING,
+  NOT_CONFIGURED,
+  useLoadedFixturesConfigStatus,
+} from '../../resources/deck_configuration/hooks'
 import { StyledText } from '../../atoms/text'
+import { Chip } from '../../atoms/Chip'
 import { useFeatureFlag } from '../../redux/config'
 
 import type {
@@ -32,7 +40,7 @@ interface FixtureTableProps {
 export function FixtureTable({
   mostRecentAnalysis,
 }: FixtureTableProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
     id: 'stubbed_load_fixture',
@@ -55,6 +63,8 @@ export function FixtureTable({
         ]
       : []
 
+  const configurations = useLoadedFixturesConfigStatus(requiredFixtureDetails)
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
@@ -69,39 +79,76 @@ export function FixtureTable({
         <StyledText flex="2 0 0">{t('location')}</StyledText>
         <StyledText flex="3 0 0"> {t('status')}</StyledText>
       </Flex>
-      {/* ToDo (kk:10/10/2023) Add status will be implemented in a following PR */}
-      {requiredFixtureDetails.map(fixture => {
+      {requiredFixtureDetails.map((fixture, index) => {
+        const configurationStatus = configurations.find(
+          configuration => configuration.id === fixture.id
+        )?.configurationStatus
+
+        const statusNotReady =
+          configurationStatus === CONFLICTING ||
+          configurationStatus === NOT_CONFIGURED
+
+        let chipLabel: JSX.Element
+        if (statusNotReady) {
+          chipLabel = (
+            <>
+              <Chip
+                text={
+                  configurationStatus === CONFLICTING
+                    ? i18n.format(t('location_conflict'), 'capitalize')
+                    : i18n.format(t('not_configured'), 'capitalize')
+                }
+                type="warning"
+                background={false}
+                iconName="connection-status"
+              />
+              <Icon name="more" size="3rem" />
+            </>
+          )
+        } else if (configurationStatus === CONFIGURED) {
+          chipLabel = (
+            <Chip
+              text={i18n.format(t('configured'), 'capitalize')}
+              type="success"
+              background={false}
+              iconName="connection-status"
+            />
+          )
+          //  shouldn't run into this case
+        } else {
+          chipLabel = <div>status label unknown</div>
+        }
+
         return (
           <Flex
             flexDirection={DIRECTION_ROW}
             key={fixture.params.fixtureId}
             alignItems={ALIGN_CENTER}
-            backgroundColor={COLORS.green3}
+            backgroundColor={statusNotReady ? COLORS.yellow3 : COLORS.green3}
             borderRadius={BORDERS.borderRadiusSize3}
             gridGap={SPACING.spacing24}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-            onClick={() => {}}
+            onClick={() => console.log('wire this up')}
+            marginBottom={
+              index === requiredFixtureDetails.length - 1
+                ? SPACING.spacing68
+                : 'none'
+            }
           >
             <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
-              <StyledText
-                StyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {getFixtureDisplayName(fixture.params.loadName)}
               </StyledText>
             </Flex>
             <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
               <LocationIcon slotName={fixture.params.location.cutout} />
             </Flex>
-            <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
-              <StyledText
-                StyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {'N/A'}
-              </StyledText>
+            <Flex
+              flex="3 0 0"
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              {chipLabel}
             </Flex>
           </Flex>
         )
