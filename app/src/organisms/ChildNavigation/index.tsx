@@ -64,7 +64,10 @@ export function ChildNavigation({
       backgroundColor={COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
-        <IconButton onClick={onClickBack}>
+        <IconButton
+          onClick={onClickBack}
+          data-testid="ChildNavigation_Back_Button"
+        >
           <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </IconButton>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
