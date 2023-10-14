@@ -38,7 +38,7 @@ describe('ChildNavigation', () => {
   })
 
   it('should call a mock function when tapping the back button', () => {
-    const [{ getByText, getByTestId }] = render(props)
+    const [{ getByTestId }] = render(props)
     getByTestId('ChildNavigation_Back_Button').click()
     expect(mockOnClickBack).toHaveBeenCalled()
   })
