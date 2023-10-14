@@ -64,7 +64,7 @@ const LabwareRow = styled.div`
 interface LabwareListItemProps extends LabwareSetupItem {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
-  isOt3: boolean
+  isFlex: boolean
   commands: RunTimeCommand[]
   nestedLabwareInfo: NestedLabwareInfo | null
 }
@@ -80,7 +80,7 @@ export function LabwareListItem(
     moduleModel,
     moduleLocation,
     extraAttentionModules,
-    isOt3,
+    isFlex,
     commands,
     nestedLabwareInfo,
   } = props
@@ -142,7 +142,7 @@ export function LabwareListItem(
     )
     let moduleSlotName = moduleLocation.slotName
     if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-      moduleSlotName = isOt3 ? TC_MODULE_LOCATION_OT3 : TC_MODULE_LOCATION_OT2
+      moduleSlotName = isFlex ? TC_MODULE_LOCATION_OT3 : TC_MODULE_LOCATION_OT2
     }
     slotInfo = moduleSlotName
     moduleDisplayName = moduleName

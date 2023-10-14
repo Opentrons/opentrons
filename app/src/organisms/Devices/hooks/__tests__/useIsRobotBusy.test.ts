@@ -11,13 +11,13 @@ import {
 } from '../../../EmergencyStop'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
-import { useIsOT3 } from '../useIsOT3'
+import { useIsFlex } from '../useIsFlex'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../useIsOT3')
+jest.mock('../useIsFlex')
 
 const mockEstopStatus = {
   data: {
@@ -36,7 +36,7 @@ const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 describe('useIsRobotBusy', () => {
   beforeEach(() => {
@@ -51,7 +51,7 @@ describe('useIsRobotBusy', () => {
       },
     } as UseQueryResult<Runs, Error>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -117,7 +117,7 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns true when robot is a Flex and Estop status is engaged', () => {
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
     mockUseAllRunsQuery.mockReturnValue({
       data: {
         links: {
@@ -148,7 +148,7 @@ describe('useIsRobotBusy', () => {
     expect(result).toBe(true)
   })
   it('returns false when robot is NOT a Flex and Estop status is engaged', () => {
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
     mockUseAllRunsQuery.mockReturnValue({
       data: {
         links: {

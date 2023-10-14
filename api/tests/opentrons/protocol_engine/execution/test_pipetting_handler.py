@@ -414,20 +414,6 @@ async def test_dispense_in_place_virtual_raises_invalid_dispense(
         )
 
 
-async def test_validate_tip_attached_in_blow_out(
-    mock_state_view: StateView, decoy: Decoy
-) -> None:
-    """Should raise an error that a tip is not attached."""
-    subject = VirtualPipettingHandler(state_view=mock_state_view)
-
-    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
-        None
-    )
-
-    with pytest.raises(TipNotAttachedError):
-        await subject.blow_out_in_place("pipette-id", flow_rate=1)
-
-
 async def test_validate_tip_attached_in_aspirate(
     mock_state_view: StateView, decoy: Decoy
 ) -> None:

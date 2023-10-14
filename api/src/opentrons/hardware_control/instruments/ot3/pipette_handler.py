@@ -674,7 +674,6 @@ class OT3PipetteHandler:
     ) -> LiquidActionSpec:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT, mount)
         speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
         acceleration = self.plunger_acceleration(
             instrument, instrument.flow_acceleration
@@ -880,7 +879,6 @@ class OT3PipetteHandler:
         home_after: bool,
     ) -> Tuple[DropTipSpec, Callable[[], None]]:
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP, mount)
 
         is_96_chan = instrument.channels == 96
 

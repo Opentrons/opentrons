@@ -4,11 +4,9 @@ import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -35,7 +33,7 @@ import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
@@ -45,6 +43,7 @@ import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
+import { useFeatureFlag } from '../../redux/config'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -58,6 +57,7 @@ import {
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
+import { FixtureTable } from './FixtureTable'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -347,6 +347,7 @@ export function ProtocolSetupModules({
     title: t('map_view'),
     hasExitIcon: true,
   }
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <>
@@ -404,28 +405,19 @@ export function ProtocolSetupModules({
           </Modal>
         ) : null}
       </Portal>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <ODDBackButton
-          label={t('modules')}
-          onClick={() => setSetupScreen('prepare to run')}
-        />
-        <SmallButton
-          alignSelf={ALIGN_FLEX_END}
-          buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
-          buttonType="tertiaryLowLight"
-          iconName="information"
-          iconPlacement="startIcon"
-          onClick={() => setShowSetupInstructionsModal(true)}
-        />
-      </Flex>
+      <ChildNavigation
+        header={enableDeckConfig ? t('modules_and_deck') : t('modules')}
+        onClickBack={() => setSetupScreen('prepare to run')}
+        buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
+        buttonType="tertiaryLowLight"
+        iconName="information"
+        iconPlacement="startIcon"
+        onClickButton={() => setShowSetupInstructionsModal(true)}
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginTop={SPACING.spacing32}
+        marginTop="7.75rem"
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
           <InlineNotification
@@ -438,43 +430,48 @@ export function ProtocolSetupModules({
             message={t('module_mismatch_body')}
           />
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <Flex
-            color={COLORS.darkBlack70}
-            fontSize={TYPOGRAPHY.fontSize22}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            gridGap={SPACING.spacing24}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            paddingX={SPACING.spacing24}
-          >
-            <StyledText flex="4 0 0">{'Module Name'}</StyledText>
-            <StyledText flex="2 0 0">{'Location'}</StyledText>
-            <StyledText flex="3 0 0"> {'Status'}</StyledText>
-          </Flex>
-          {attachedProtocolModuleMatches.map(module => {
-            // check for duplicate module model in list of modules for protocol
-            const isDuplicateModuleModel = protocolModulesInfo
-              // filter out current module
-              .filter(otherModule => otherModule.moduleId !== module.moduleId)
-              // check for existence of another module of same model
-              .some(
-                otherModule =>
-                  otherModule.moduleDef.model === module.moduleDef.model
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <Flex
+              color={COLORS.darkBlack70}
+              fontSize={TYPOGRAPHY.fontSize22}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              gridGap={SPACING.spacing24}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+              paddingX={SPACING.spacing24}
+            >
+              <StyledText flex="4 0 0">{t('module')}</StyledText>
+              <StyledText flex="2 0 0">{t('location')}</StyledText>
+              <StyledText flex="3 0 0"> {t('status')}</StyledText>
+            </Flex>
+            {attachedProtocolModuleMatches.map(module => {
+              // check for duplicate module model in list of modules for protocol
+              const isDuplicateModuleModel = protocolModulesInfo
+                // filter out current module
+                .filter(otherModule => otherModule.moduleId !== module.moduleId)
+                // check for existence of another module of same model
+                .some(
+                  otherModule =>
+                    otherModule.moduleDef.model === module.moduleDef.model
+                )
+              return (
+                <RowModule
+                  key={module.moduleId}
+                  module={module}
+                  isDuplicateModuleModel={isDuplicateModuleModel}
+                  setShowMultipleModulesModal={setShowMultipleModulesModal}
+                  calibrationStatus={calibrationStatus}
+                  chainLiveCommands={chainLiveCommands}
+                  isLoading={isCommandMutationLoading}
+                  prepCommandErrorMessage={prepCommandErrorMessage}
+                  setPrepCommandErrorMessage={setPrepCommandErrorMessage}
+                />
               )
-            return (
-              <RowModule
-                key={module.moduleId}
-                module={module}
-                isDuplicateModuleModel={isDuplicateModuleModel}
-                setShowMultipleModulesModal={setShowMultipleModulesModal}
-                calibrationStatus={calibrationStatus}
-                chainLiveCommands={chainLiveCommands}
-                isLoading={isCommandMutationLoading}
-                prepCommandErrorMessage={prepCommandErrorMessage}
-                setPrepCommandErrorMessage={setPrepCommandErrorMessage}
-              />
-            )
-          })}
+            })}
+          </Flex>
+          {enableDeckConfig ? (
+            <FixtureTable mostRecentAnalysis={mostRecentAnalysis} />
+          ) : null}
         </Flex>
       </Flex>
       <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />

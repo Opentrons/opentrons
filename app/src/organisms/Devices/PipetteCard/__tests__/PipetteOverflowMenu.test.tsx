@@ -8,7 +8,7 @@ import {
   mockLeftProtoPipette,
   mockPipetteSettingsFieldsMap,
 } from '../../../../redux/pipettes/__fixtures__'
-import { isOT3Pipette } from '@opentrons/shared-data'
+import { isFlexPipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
 
@@ -17,12 +17,12 @@ jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {
     ...actualSharedData,
-    isOT3Pipette: jest.fn(),
+    isFlexPipette: jest.fn(),
   }
 })
 
-const mockIsOT3Pipette = isOT3Pipette as jest.MockedFunction<
-  typeof isOT3Pipette
+const mockisFlexPipette = isFlexPipette as jest.MockedFunction<
+  typeof isFlexPipette
 >
 
 const render = (props: React.ComponentProps<typeof PipetteOverflowMenu>) => {
@@ -40,6 +40,7 @@ describe('PipetteOverflowMenu', () => {
       pipetteSpecs: mockLeftProtoPipette.modelSpecs,
       pipetteSettings: mockPipetteSettingsFieldsMap,
       mount: LEFT,
+      handleDropTip: jest.fn(),
       handleChangePipette: jest.fn(),
       handleCalibrate: jest.fn(),
       handleAboutSlideout: jest.fn(),
@@ -58,12 +59,15 @@ describe('PipetteOverflowMenu', () => {
     const detach = getByRole('button', { name: 'Detach pipette' })
     const settings = getByRole('button', { name: 'Pipette Settings' })
     const about = getByRole('button', { name: 'About pipette' })
+    const dropTip = getByRole('button', { name: 'Drop tips' })
     fireEvent.click(detach)
     expect(props.handleChangePipette).toHaveBeenCalled()
     fireEvent.click(settings)
     expect(props.handleSettingsSlideout).toHaveBeenCalled()
     fireEvent.click(about)
     expect(props.handleAboutSlideout).toHaveBeenCalled()
+    fireEvent.click(dropTip)
+    expect(props.handleDropTip).toHaveBeenCalled()
   })
   it('renders information with no pipette attached', () => {
     props = {
@@ -75,9 +79,8 @@ describe('PipetteOverflowMenu', () => {
     fireEvent.click(btn)
     expect(props.handleChangePipette).toHaveBeenCalled()
   })
-
   it('renders recalibrate pipette text for OT-3 pipette', () => {
-    mockIsOT3Pipette.mockReturnValue(true)
+    mockisFlexPipette.mockReturnValue(true)
     props = {
       ...props,
       isPipetteCalibrated: true,
@@ -92,7 +95,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('should render recalibrate pipette text for OT-3 pipette', () => {
-    mockIsOT3Pipette.mockReturnValue(true)
+    mockisFlexPipette.mockReturnValue(true)
     props = {
       ...props,
       isPipetteCalibrated: true,
@@ -106,7 +109,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('renders only the about pipette button if FLEX pipette is attached', () => {
-    mockIsOT3Pipette.mockReturnValue(true)
+    mockisFlexPipette.mockReturnValue(true)
 
     const { getByRole, queryByRole } = render(props)
 
@@ -127,7 +130,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('does not render the pipette settings button if the pipette has no settings', () => {
-    mockIsOT3Pipette.mockReturnValue(false)
+    mockisFlexPipette.mockReturnValue(false)
     props = {
       ...props,
       pipetteSettings: null,

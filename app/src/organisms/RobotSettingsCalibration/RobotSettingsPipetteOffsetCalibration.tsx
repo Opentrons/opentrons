@@ -12,7 +12,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import {
   useAttachedPipettesFromInstrumentsQuery,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
 } from '../Devices/hooks'
 import { getShowPipetteCalibrationWarning } from '../Devices/utils'
@@ -34,9 +34,9 @@ export function RobotSettingsPipetteOffsetCalibration({
 }: RobotSettingsPipetteOffsetCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const { data: instrumentsData } = useInstrumentsQuery({
-    enabled: isOT3,
+    enabled: isFlex,
   })
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const attachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery()
@@ -46,10 +46,10 @@ export function RobotSettingsPipetteOffsetCalibration({
     attachedPipettesFromInstrumentsQuery.right?.data?.calibratedOffset ?? null
 
   let showPipetteOffsetCalItems = false
-  if (!isOT3 && pipetteOffsetCalibrations != null) {
+  if (!isFlex && pipetteOffsetCalibrations != null) {
     showPipetteOffsetCalItems = true
   } else if (
-    isOT3 &&
+    isFlex &&
     (ot3AttachedLeftPipetteOffsetCal != null ||
       ot3AttachedRightPipetteOffsetCal != null)
   )
@@ -62,11 +62,11 @@ export function RobotSettingsPipetteOffsetCalibration({
       gridGap={SPACING.spacing8}
     >
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {isOT3
+        {isFlex
           ? t('pipette_calibrations_title')
           : t('pipette_offset_calibrations_title')}
       </StyledText>
-      {isOT3 ? (
+      {isFlex ? (
         <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
       ) : null}
       {getShowPipetteCalibrationWarning(instrumentsData) && (

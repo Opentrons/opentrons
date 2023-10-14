@@ -13,7 +13,7 @@ import {
 
 import { Banner } from '../../atoms/Banner'
 import { Tooltip } from '../../atoms/Tooltip'
-import { useIsOT3 } from '../../organisms/Devices/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 
 interface UpdateBannerProps {
   robotName: string
@@ -62,8 +62,8 @@ export const UpdateBanner = ({
     hyperlinkText = t('update_now')
   }
 
-  const isOT3 = useIsOT3(robotName)
-  if (!isOT3 && updateType === 'calibration') return null
+  const isFlex = useIsFlex(robotName)
+  if (!isFlex && updateType === 'calibration') return null
 
   return (
     <>

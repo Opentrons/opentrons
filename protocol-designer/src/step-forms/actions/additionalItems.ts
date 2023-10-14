@@ -10,14 +10,14 @@ export const toggleIsGripperRequired = (): ToggleIsGripperRequiredAction => ({
 export interface CreateDeckFixtureAction {
   type: 'CREATE_DECK_FIXTURE'
   payload: {
-    name: 'wasteChute'
+    name: 'wasteChute' | 'stagingArea'
     id: string
     location: string
   }
 }
 
 export const createDeckFixture = (
-  name: 'wasteChute',
+  name: 'wasteChute' | 'stagingArea',
   location: string
 ): CreateDeckFixtureAction => ({
   type: 'CREATE_DECK_FIXTURE',

@@ -198,7 +198,7 @@ export function MoveLabwareInterventionContent({
               loadedModules={run.modules}
               loadedLabware={run.labware}
               // TODO(bh, 2023-07-19): read trash slot name from protocol
-              trashSlotName={robotType === 'OT-3 Standard' ? 'A3' : undefined}
+              trashLocation={robotType === 'OT-3 Standard' ? 'A3' : undefined}
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(

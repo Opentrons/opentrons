@@ -6,6 +6,7 @@ import type {
   PipetteName,
   ModuleModel,
   FixtureLoadName,
+  Cutout,
 } from '../../../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -150,7 +151,7 @@ interface LoadLiquidParams {
 interface LoadLiquidResult {
   liquidId: string
 }
-export type Cutout = 'B3' | 'C3' | 'D3'
+
 interface LoadFixtureParams {
   location: { cutout: Cutout }
   loadName: FixtureLoadName

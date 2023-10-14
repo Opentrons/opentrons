@@ -11,45 +11,55 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
+import type { Cutout } from '@opentrons/shared-data'
+
 // TODO: replace stubs with JSON definitions when available
-const wasteChuteDef = {
+const trashBinDef = {
   schemaVersion: 1,
   version: 1,
   namespace: 'opentrons',
   metadata: {
-    displayName: 'Waste chute',
+    displayName: 'Trash bin',
   },
   parameters: {
-    loadName: 'trash_chute',
+    loadName: 'trash_bin',
   },
   boundingBox: {
-    xDimension: 286.5,
+    xDimension: 246.5,
     yDimension: 106.0,
     zDimension: 0,
   },
 }
 
-interface WasteChuteFixtureProps {
-  fixtureLocation: string
-  handleClickRemove?: (fixtureLocation: string) => void
+interface TrashBinConfigFixtureProps {
+  fixtureLocation: Cutout
+  handleClickRemove?: (fixtureLocation: Cutout) => void
 }
 
-export function WasteChuteFixture(props: WasteChuteFixtureProps): JSX.Element {
+export function TrashBinConfigFixture(
+  props: TrashBinConfigFixtureProps
+): JSX.Element {
   const { handleClickRemove, fixtureLocation } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   // TODO: migrate to fixture location for v4
-  const wasteChuteSlot = deckDef.locations.orderedSlots.find(
+  const trashBinSlot = deckDef.locations.orderedSlots.find(
     slot => slot.id === fixtureLocation
   )
-  const [xSlotPosition = 0, ySlotPosition = 0] = wasteChuteSlot?.position ?? []
+  const [xSlotPosition = 0, ySlotPosition = 0] = trashBinSlot?.position ?? []
   // TODO: remove adjustment when reading from fixture position
-  const xAdjustment = -17
+  // adjust x differently for right side/left side
+  const isLeftSideofDeck =
+    fixtureLocation === 'A1' ||
+    fixtureLocation === 'B1' ||
+    fixtureLocation === 'C1' ||
+    fixtureLocation === 'D1'
+  const xAdjustment = isLeftSideofDeck ? -101.5 : -17
   const x = xSlotPosition + xAdjustment
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = wasteChuteDef.boundingBox
+  const { xDimension, yDimension } = trashBinDef.boundingBox
 
   return (
     <RobotCoordsForeignObject
@@ -69,9 +79,8 @@ export function WasteChuteFixture(props: WasteChuteFixtureProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         width="100%"
       >
-        {}
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
-          {wasteChuteDef.metadata.displayName}
+          {trashBinDef.metadata.displayName}
         </Text>
         {handleClickRemove != null ? (
           <Btn

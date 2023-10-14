@@ -8,14 +8,23 @@ import {
 import { i18n } from '../../../../../i18n'
 import { useLoadedFixturesConfigStatus } from '../../../../../resources/deck_configuration/hooks'
 import { SetupFixtureList } from '../SetupFixtureList'
+import { NotConfiguredModal } from '../NotConfiguredModal'
+import { LocationConflictModal } from '../LocationConflictModal'
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
 
 jest.mock('../../../../../resources/deck_configuration/hooks')
+jest.mock('../LocationConflictModal')
+jest.mock('../NotConfiguredModal')
 
 const mockUseLoadedFixturesConfigStatus = useLoadedFixturesConfigStatus as jest.MockedFunction<
   typeof useLoadedFixturesConfigStatus
 >
-
+const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
+  typeof LocationConflictModal
+>
+const mockNotConfiguredModal = NotConfiguredModal as jest.MockedFunction<
+  typeof NotConfiguredModal
+>
 const mockLoadedFixture = {
   id: 'stubbed_load_fixture',
   commandType: 'loadFixture',
@@ -52,6 +61,10 @@ describe('SetupFixtureList', () => {
         configurationStatus: 'configured',
       },
     ])
+    mockLocationConflictModal.mockReturnValue(
+      <div>mock location conflict modal</div>
+    )
+    mockNotConfiguredModal.mockReturnValue(<div>mock not configured modal</div>)
   })
 
   it('should render the headers and a fixture with configured status', () => {
@@ -71,8 +84,10 @@ describe('SetupFixtureList', () => {
         configurationStatus: 'conflicting',
       },
     ])
-    const { getByText } = render(props)[0]
-    getByText('Conflicting')
+    const { getByText, getByRole } = render(props)[0]
+    getByText('Location conflict')
+    getByRole('button', { name: 'Update deck' }).click()
+    getByText('mock location conflict modal')
   })
   it('should render the headers and a fixture with not configured status and button', () => {
     mockUseLoadedFixturesConfigStatus.mockReturnValue([
@@ -84,6 +99,6 @@ describe('SetupFixtureList', () => {
     const { getByText, getByRole } = render(props)[0]
     getByText('Not configured')
     getByRole('button', { name: 'Update deck' }).click()
-    //  TODO(Jr, 10/5/23): add test coverage for button
+    getByText('mock not configured modal')
   })
 })

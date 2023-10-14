@@ -41,7 +41,7 @@ stages:
       strict:
         - json:off
 
-  - name: Wait for the protocol to complete
+  - name: Wait for the run to fail
     max_retries: 10
     delay_after: 0.1
     request:
@@ -54,16 +54,25 @@ stages:
       json:
         data:
           status: failed
+
+  - name: Verify the run contains the expected error
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
           errors:
             - id: !anystr
               createdAt: !anystr
-              errorType: 'UnexpectedTipRemovalError'
-              detail: 'Cannot perform DROPTIP without a tip attached.'
-              errorInfo:
-                mount: 'LEFT'
-                pipette_name: 'p10_single'
               errorCode: '3005'
-              wrappedErrors: []
+              errorType: TipNotAttachedError 
+              detail: Pipette should have a tip attached, but does not.
+              errorInfo: !anydict
+              wrappedErrors: !anylist
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
@@ -85,7 +94,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
-            params: { }
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -114,32 +123,31 @@ stages:
               pipetteId: pipetteId
           - id: !anystr
             key: !anystr
-            commandType: dropTip
+            commandType: aspirate
             createdAt: !anystr
             startedAt: !anystr
             completedAt: !anystr
             status: failed
             error:
               id: !anystr
+              errorType: TipNotAttachedError
               createdAt: !anystr
-              errorType: 'UnexpectedTipRemovalError'
-              detail: 'Cannot perform DROPTIP without a tip attached.'
-              errorInfo:
-                mount: 'LEFT'
-                pipette_name: 'p10_single'
+              detail: Pipette should have a tip attached, but does not.
               errorCode: '3005'
-              wrappedErrors: []
+              errorInfo: !anydict
+              wrappedErrors: !anylist
             params:
               pipetteId: pipetteId
               labwareId: tipRackId
               wellName: A1
               wellLocation:
-                origin: default
+                origin: bottom
                 offset:
                   x: 0
                   y: 0
-                  z: 0
-              alternateDropLocation: false
+                  z: 1
+              flowRate: 3.78
+              volume: 100
           - id: !anystr
             key: !anystr
             commandType: pickUpTip

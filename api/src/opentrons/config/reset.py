@@ -49,6 +49,7 @@ _OT_2_RESET_OPTIONS = [
     ResetOptionId.pipette_offset,
     ResetOptionId.tip_length_calibrations,
     ResetOptionId.runs_history,
+    ResetOptionId.authorized_keys,
 ]
 _FLEX_RESET_OPTIONS = [
     ResetOptionId.boot_scripts,
