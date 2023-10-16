@@ -14,10 +14,7 @@ This update may take longer than usual if you are updating from v6.x. Allow **ap
 
 ### Known Issues
 
-Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
-
-- JSON protocols created or modified with Protocol Designer v6.0.0 or higher.
-- Python protocols specifying an `apiLevel` of 2.14 or higher.
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool.
 
 ---
 
@@ -65,6 +62,7 @@ Python API features
 Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
 
 - JSON protocols created or modified with Protocol Designer v6.0.0 or higher.
+- Python protocols specifying an `apiLevel` of 2.14 or higher.
 
 ---
 

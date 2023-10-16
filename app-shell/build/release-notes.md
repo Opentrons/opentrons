@@ -8,7 +8,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ## Opentrons App Changes in 7.0.1
 
-Welcome to the v7.0.0 release of the Opentrons App! This release builds on the major release that added support for Opentrons Flex.
+Welcome to the v7.0.1 release of the Opentrons App! This release builds on the major release that added support for Opentrons Flex.
 
 ### Improved Features
 
