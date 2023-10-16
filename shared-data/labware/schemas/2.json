@@ -141,7 +141,7 @@
         "format": {
           "description": "Property to determine compatibility with multichannel pipette",
           "type": "string",
-          "enum": ["96Standard", "384Standard", "trough", "irregular", "trash"]
+          "enum": ["96Standard", "384Standard", "trough", "trash"]
         },
         "quirks": {
           "description": "Property to classify a specific behavior this labware should have",
