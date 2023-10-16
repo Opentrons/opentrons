@@ -44,6 +44,7 @@ from opentrons.hardware_control.constants import (
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
+from ..nozzle_manager import NozzleConfigurationType
 from .pipette import Pipette
 from .instrument_calibration import PipetteOffsetByPipetteMount
 
@@ -742,7 +743,11 @@ class OT3PipetteHandler:
                 backup_dist = -press_dist
                 yield (press_dist, backup_dist)
 
-        if instrument.channels == 96:
+        if (
+            instrument.channels == 96
+            and instrument.nozzle_manager.current_configuration.configuration
+            == NozzleConfigurationType.FULL
+        ):
             return (
                 PickUpTipSpec(
                     plunger_prep_pos=instrument.plunger_positions.bottom,
@@ -779,7 +784,7 @@ class OT3PipetteHandler:
                         current={
                             Axis.by_mount(
                                 mount
-                            ): instrument.pick_up_configurations.current
+                            ): instrument.nozzle_manager.get_tip_configuration_current()
                         },
                         speed=pick_up_speed,
                         relative_down=top_types.Point(0, 0, press_dist),

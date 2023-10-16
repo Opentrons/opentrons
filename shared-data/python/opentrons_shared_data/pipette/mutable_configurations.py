@@ -148,9 +148,14 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
     lookup_dict = _MAP_KEY_TO_V2[name]
     nested_name = lookup_dict["nested_name"]
 
-    min_max_dict = _MIN_MAX_LOOKUP[nested_name]
-    type_lookup = _TYPE_LOOKUP[nested_name]
-    units_lookup = _UNITS_LOOKUP[nested_name]
+    if name == "pickUpCurrent":
+        min_max_dict = _MIN_MAX_LOOKUP["current"]
+        type_lookup = _TYPE_LOOKUP["current"]
+        units_lookup = _UNITS_LOOKUP["current"]
+    else:
+        min_max_dict = _MIN_MAX_LOOKUP[nested_name]
+        type_lookup = _TYPE_LOOKUP[nested_name]
+        units_lookup = _UNITS_LOOKUP[nested_name]
     if name == "tipLength":
         # This is only a concern for OT-2 configs and I think we can
         # be less smart about handling multiple tip types. Instead, just
@@ -164,6 +169,9 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
         default_value = configs["liquid_properties"][LIQUID_CLASS][
             lookup_dict["top_level_name"]
         ][tip_list[-1]][nested_name]
+    elif name == "pickUpCurrent":
+        default_value_dict = configs[lookup_dict["top_level_name"]][nested_name]
+        default_value = default_value_dict[configs["channels"].value]
     elif lookup_dict.get("liquid_class"):
         _class = LiquidClasses[lookup_dict["liquid_class"]]
         default_value = configs[lookup_dict["top_level_name"]][_class][nested_name]

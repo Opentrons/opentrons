@@ -1,7 +1,7 @@
 import logging
 import functools
 
-from typing import Any, List, Dict, Optional, Set, Tuple, Union, cast
+from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
 from opentrons.types import Point
 
@@ -165,8 +165,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._tip_overlap_lookup
 
     @property
-    def nozzle_offset(self) -> List[float]:
-        return self._nozzle_offset
+    def nozzle_offset(self) -> Point:
+        return self._nozzle_manager.starting_nozzle_offset
+
+    @property
+    def nozzle_manager(self) -> nozzle_manager.NozzleConfigurationManager:
+        return self._nozzle_manager
 
     @property
     def pipette_offset(self) -> PipetteOffsetByPipetteMount:

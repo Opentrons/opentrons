@@ -104,6 +104,10 @@ class NozzleMap:
         y_rows_length = int(difference[1] // INTERNOZZLE_SPACING)
         return map_store_list[starting_idx + y_rows_length]
 
+    @property
+    def tip_count(self) -> int:
+        return len(self.map_store)
+
     @classmethod
     def build(
         cls,
@@ -200,15 +204,17 @@ class NozzleConfigurationManager:
     def __init__(
         self,
         nozzle_map: NozzleMap,
-        current_scalar: float,
+        pick_up_current_map: Dict[int, float],
     ) -> None:
         self._physical_nozzle_map = nozzle_map
         self._current_nozzle_configuration = nozzle_map
-        self._current_scalar: Final[float] = current_scalar
+        self._pick_up_current_map: Final[Dict[int, float]] = pick_up_current_map
 
     @classmethod
     def build_from_nozzlemap(
-        cls, nozzle_map: Dict[str, List[float]], current_scalar: float
+        cls,
+        nozzle_map: Dict[str, List[float]],
+        pick_up_current_map: Dict[int, float],
     ) -> "NozzleConfigurationManager":
 
         sorted_nozzlemap = list(nozzle_map.keys())
@@ -224,11 +230,15 @@ class NozzleConfigurationManager:
             back_left_nozzle=first_nozzle,
             front_right_nozzle=last_nozzle,
         )
-        return cls(starting_nozzle_config, current_scalar)
+        return cls(starting_nozzle_config, pick_up_current_map)
 
     @property
     def starting_nozzle_offset(self) -> Point:
         return self._current_nozzle_configuration.starting_nozzle_offset
+
+    @property
+    def current_configuration(self) -> NozzleMap:
+        return self._current_nozzle_configuration
 
     def update_nozzle_configuration(
         self,
@@ -256,13 +266,8 @@ class NozzleConfigurationManager:
                 front_right_nozzle=front_right_nozzle,
             )
 
-    def get_current_for_tip_configuration(self) -> float:
-        # TODO While implementing this PR I realized that
-        # the current scalar truly is inefficient for
-        # encapsulating varying currents needed for
-        # pick up tip so we'll need to follow this up
-        # with a lookup table.
-        return self._current_scalar
+    def get_tip_configuration_current(self) -> float:
+        return self._pick_up_current_map[self._current_nozzle_configuration.tip_count]
 
     def critical_point_with_tip_length(
         self,

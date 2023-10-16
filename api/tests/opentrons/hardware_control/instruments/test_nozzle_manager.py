@@ -12,7 +12,7 @@ def build_nozzle_manger(
     nozzle_map: Dict[str, List[float]]
 ) -> nozzle_manager.NozzleConfigurationManager:
     return nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-        nozzle_map, current_scalar=1
+        nozzle_map, pick_up_current_map={1: 0.1}
     )
 
 

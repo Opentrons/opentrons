@@ -145,7 +145,7 @@ def update(
     Recursively update the given dictionary to ensure no data is lost when updating.
     """
     next_key = next(iter_of_configs, None)
-    if next_key and isinstance(dict_to_update[next_key], dict):
+    if next_key and isinstance(dict_to_update.get(next_key), dict):
         dict_to_update[next_key] = update(
             dict_to_update.get(next_key, {}), iter_of_configs, value_to_update
         )

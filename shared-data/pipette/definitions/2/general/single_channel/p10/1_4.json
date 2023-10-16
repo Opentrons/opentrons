@@ -4,7 +4,6 @@
   "model": "p10",
   "displayCategory": "GEN1",
   "pickUpTipConfigurations": {
-    "current": 0.1,
     "speed": 30.0,
     "presses": 3,
     "increment": 1.0,
@@ -34,7 +33,10 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": false,
-    "availableConfigurations": null
+    "availableConfigurations": null,
+    "perTipPickupCurrent": {
+      "1": 0.1
+    }
   },
   "channels": 1,
   "shaftDiameter": 1.0,
