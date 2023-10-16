@@ -15,6 +15,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+const X_ADJUSTMENT_LEFT_SIDE = -101.5
+const X_ADJUSTMENT = -17
+const X_DIMENSION_MIDDLE_SLOTS = 160.3
+const X_DIMENSION_OUTER_SLOTS = 246.5
+const Y_DIMENSION = 106.0
+
 interface FlexSlotMapProps {
   selectedSlots: string[]
 }
@@ -59,7 +65,9 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
           selectedSlot === 'B1' ||
           selectedSlot === 'C1' ||
           selectedSlot === 'D1'
-        const xAdjustment = isLeftSideofDeck ? -101.5 : -17
+        const xAdjustment = isLeftSideofDeck
+          ? X_ADJUSTMENT_LEFT_SIDE
+          : X_ADJUSTMENT
         const x = xSlotPosition + xAdjustment
         const yAdjustment = -10
         const y = ySlotPosition + yAdjustment
@@ -70,8 +78,10 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
           selectedSlot === 'C2' ||
           selectedSlot === 'D2'
 
-        const xDimension = isMiddleOfDeck ? 160.3 : 246.5
-        const yDimension = 106.0
+        const xDimension = isMiddleOfDeck
+          ? X_DIMENSION_MIDDLE_SLOTS
+          : X_DIMENSION_OUTER_SLOTS
+        const yDimension = Y_DIMENSION
 
         return (
           <RobotCoordsForeignObject
