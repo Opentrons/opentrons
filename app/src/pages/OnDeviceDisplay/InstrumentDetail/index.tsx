@@ -53,7 +53,7 @@ export const InstrumentDetail = (): JSX.Element => {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <BackButton>{displayName}</BackButton>
-          {instrument?.ok ? (
+          {instrument?.ok && instrument?.mount !== 'extension' ? (
             <Flex marginTop={`-${SPACING.spacing16}`}>
               <IconButton
                 aria-label="overflow menu button"

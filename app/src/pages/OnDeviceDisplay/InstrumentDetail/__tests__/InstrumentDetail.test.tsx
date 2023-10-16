@@ -72,10 +72,32 @@ describe('InstrumentDetail', () => {
           },
           instrumentName: 'p1000_single_flex',
         },
+        {
+          mount: 'extension',
+          instrumentType: 'gripper',
+          instrumentModel: 'test',
+          serialNumber: 'P1KSV3420230721',
+          subsystem: 'gripper',
+          ok: true,
+          firmwareVersion: '40',
+          data: {
+            jawState: 'test',
+            calibratedOffset: {
+              offset: {
+                x: 0.6796875,
+                y: -0.0703125,
+                z: -0.11325000000002206,
+              },
+              source: 'user',
+              last_modified: '2023-10-11T22:25:44.858359+00:00',
+              reasonability_check_failures: [],
+            },
+          },
+        },
       ],
       meta: {
         cursor: 0,
-        totalLength: 1,
+        totalLength: 2,
       },
     }
     mockUseInstrumentsQuery.mockReturnValue({
@@ -159,7 +181,14 @@ describe('InstrumentDetail', () => {
     getByText('P1KSV3420230721')
   })
 
-  it('renders detach and recalibrate buttons if calibration data exists', () => {
+  it('renders detach and no recalibrate button if calibration data exists for a pipette', () => {
+    const [{ getByText, queryByText }] = render()
+    getByText('detach')
+    expect(queryByText('recalibrate')).not.toBeInTheDocument()
+  })
+
+  it('renders detach and recalibrate button if calibration data exists for a gripper', () => {
+    mockUseParams.mockReturnValue({ mount: 'extension' })
     const [{ getByText }] = render()
     getByText('detach')
     getByText('recalibrate')
