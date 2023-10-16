@@ -59,6 +59,7 @@ import {
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
+import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
 
@@ -224,6 +225,10 @@ function RowModule({
     isNonConnectingModule || module.attachedModuleMatch != null
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [
+    showLocationConflictModal,
+    setShowLocationConflictModal,
+  ] = React.useState<boolean>(false)
 
   return (
     <>
@@ -236,6 +241,14 @@ function RowModule({
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
           }
+        />
+      ) : null}
+      {showLocationConflictModal && conflictedFixture != null ? (
+        <LocationConflictModal
+          onCloseClick={() => setShowLocationConflictModal(false)}
+          cutout={conflictedFixture.fixtureLocation}
+          requiredModule={module.moduleDef.model}
+          isOnDevice={true}
         />
       ) : null}
       <Flex
@@ -284,6 +297,11 @@ function RowModule({
             flex="3 0 0"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            onClick={
+              conflictedFixture != null
+                ? () => setShowLocationConflictModal(true)
+                : undefined
+            }
           >
             <RenderModuleStatus
               isModuleReady={isModuleReady}

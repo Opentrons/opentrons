@@ -144,6 +144,7 @@
   "must_have_labware_and_pip": "Protocol must load labware and a pipette",
   "n_a": "N/A",
   "no_data": "no data",
+  "confirm_removal": "Confirm removal",
   "no_labware_offset_data": "no labware offset data yet",
   "no_modules_or_fixtures": "No modules or fixtures are specified for this protocol.",
   "no_modules_specified": "no modules are specified for this protocol.",

@@ -17,6 +17,8 @@ import {
   JUSTIFY_END,
   ALIGN_CENTER,
   Box,
+  JUSTIFY_SPACE_BETWEEN,
+  BORDERS,
 } from '@opentrons/components'
 import {
   getFixtureDisplayName,
@@ -26,6 +28,8 @@ import {
 import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
+import { Modal } from '../../../../molecules/Modal'
+import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 
 import type {
   Cutout,
@@ -33,7 +37,6 @@ import type {
   FixtureLoadName,
   ModuleModel,
 } from '@opentrons/shared-data'
-import { Modal } from '../../../../molecules/Modal'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
@@ -84,27 +87,92 @@ export const LocationConflictModal = (
       {isOnDevice ? (
         <Modal
           onOutsideClick={onCloseClick}
-          modalSize="large"
+          modalSize="medium"
           header={{
-            title: t('multiple_modules_modal'),
+            title: t('deck_conflict'),
             hasExitIcon: true,
             onClick: onCloseClick,
             iconName: 'ot-alert',
             iconColor: COLORS.warningEnabled,
           }}
         >
-          <Trans
-            t={t}
-            i18nKey="deck_conflict_info"
-            values={{
-              currentFixture: currentFixtureDisplayName,
-              cutout,
-            }}
-            components={{
-              block: <StyledText fontSize={TYPOGRAPHY.fontSizeH4} />,
-              strong: <strong />,
-            }}
-          />
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <Trans
+              t={t}
+              i18nKey="deck_conflict_info"
+              values={{
+                currentFixture: currentFixtureDisplayName,
+                cutout,
+              }}
+              components={{
+                block: <StyledText as="p" />,
+                strong: <strong />,
+              }}
+            />
+            <Flex paddingY={SPACING.spacing32} flexDirection={DIRECTION_COLUMN}>
+              <StyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightBold}
+                paddingBottom={SPACING.spacing8}
+              >
+                {t('slot_location', { slotName: cutout })}
+              </StyledText>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingTop={SPACING.spacing8}
+                gridGap={SPACING.spacing8}
+              >
+                <Flex
+                  padding={SPACING.spacing24}
+                  backgroundColor={COLORS.light1}
+                  flexDirection={DIRECTION_ROW}
+                  alignItems={ALIGN_CENTER}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  borderRadius={BORDERS.borderRadiusSize3}
+                >
+                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                    {t('protocol_specifies')}
+                  </StyledText>
+
+                  <StyledText as="p">
+                    {requiredFixture && getFixtureDisplayName(requiredFixture)}
+                    {requiredModule && getModuleDisplayName(requiredModule)}
+                  </StyledText>
+                </Flex>
+                <Flex
+                  padding={SPACING.spacing24}
+                  backgroundColor={COLORS.light1}
+                  flexDirection={DIRECTION_ROW}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  alignItems={ALIGN_CENTER}
+                  borderRadius={BORDERS.borderRadiusSize3}
+                >
+                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                    {t('currently_configured')}
+                  </StyledText>
+
+                  <StyledText as="p">{currentFixtureDisplayName}</StyledText>
+                </Flex>
+              </Flex>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              gridGap={SPACING.spacing8}
+            >
+              <SmallButton
+                buttonType="secondary"
+                onClick={onCloseClick}
+                buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
+                width="100%"
+              />
+              <SmallButton
+                onClick={handleUpdateDeck}
+                buttonText={i18n.format(t('confirm_removal'), 'capitalize')}
+                width="100%"
+              />
+            </Flex>
+          </Flex>
         </Modal>
       ) : (
         <LegacyModal

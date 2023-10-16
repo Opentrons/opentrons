@@ -56,6 +56,7 @@ export function FixtureTable({
     completedAt: 'fakeTimestamp',
     status: 'succeeded',
   }
+
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,
