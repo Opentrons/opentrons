@@ -30,11 +30,11 @@ def check_health_response(response: Response) -> None:
             "systemTime": "/system/time",
             "serverLog": "/logs/server.log",
         },
-        'robot_serial': 'simulator'
+        "robot_serial": "simulator",
     }
     got = response.json()
 
-    assert got == expected, f'health response failed:\n {got}'
+    assert got == expected, f"health response failed:\n {got}"
 
 
 def check_ot3_health_response(response: Response) -> None:
@@ -61,11 +61,11 @@ def check_ot3_health_response(response: Response) -> None:
             "systemTime": "/system/time",
             "serverLog": "/logs/server.log",
         },
-        'robot_serial': 'simulator'
+        "robot_serial": "simulator",
     }
     got = response.json()
 
-    assert got == expected, f'health response failed:\n {got}'
+    assert got == expected, f"health response failed:\n {got}"
 
 
 def get_module_id(response: Response, module_model: ModuleModel) -> Box:

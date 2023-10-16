@@ -15,7 +15,7 @@ def test_get_health(
     """Test GET /health."""
     hardware.fw_version = "FW111"
     hardware.board_revision = "BR2.1"
-    hardware.get_serial_number.return_value = 'mytestserial'
+    hardware.get_serial_number.return_value = "mytestserial"
     versions.return_value = ComponentVersions(
         api_version="mytestapiversion", system_version="mytestsystemversion"
     )
@@ -37,7 +37,7 @@ def test_get_health(
             "apiSpec": "/openapi.json",
             "systemTime": "/system/time",
         },
-        'robot_serial': 'mytestserial'
+        "robot_serial": "mytestserial",
     }
 
     resp = api_client.get("/health")
