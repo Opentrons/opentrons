@@ -84,7 +84,7 @@ class Health(BaseResponseBody):
     )
     robot_serial: typing.Optional[str] = Field(
         ...,
-        description='The robot serial number. Should be used if not none; if none, use result of /server/update/health.'
+        description="The robot serial number. Should be used if not none; if none, use result of /server/update/health.",
     )
     links: HealthLinks
 
@@ -107,6 +107,6 @@ class Health(BaseResponseBody):
                     "apiSpec": "/openapi.json",
                     "systemTime": "/system/time",
                 },
-                "robot_serial": None
+                "robot_serial": None,
             }
         }

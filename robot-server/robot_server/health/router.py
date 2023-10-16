@@ -159,5 +159,5 @@ async def get_health(
         minimum_protocol_api_version=list(minimum_protocol_api_version),
         robot_model=robot_type,
         links=health_links,
-        robot_serial=(await hardware.get_serial_number())
+        robot_serial=(await hardware.get_serial_number()),
     )
