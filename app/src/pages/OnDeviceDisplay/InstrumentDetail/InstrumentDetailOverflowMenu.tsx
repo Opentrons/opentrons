@@ -93,23 +93,25 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
     return (
       <>
         <MenuList onClick={modal.remove} isOnDevice={true}>
-          <MenuItem key="recalibrate" onClick={handleRecalibrate}>
-            <Flex alignItems={ALIGN_CENTER}>
-              <Icon
-                name="restart"
-                size="2.5rem"
-                color={COLORS.black}
-                aria-label="restart_icon"
-              />
-              <StyledText
-                as="h4"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                marginLeft={SPACING.spacing12}
-              >
-                {t('recalibrate')}
-              </StyledText>
-            </Flex>
-          </MenuItem>
+          {instrument.data.calibratedOffset?.last_modified != null ? (
+            <MenuItem key="recalibrate" onClick={handleRecalibrate}>
+              <Flex alignItems={ALIGN_CENTER}>
+                <Icon
+                  name="restart"
+                  size="2.5rem"
+                  color={COLORS.black}
+                  aria-label="restart_icon"
+                />
+                <StyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  marginLeft={SPACING.spacing12}
+                >
+                  {t('recalibrate')}
+                </StyledText>
+              </Flex>
+            </MenuItem>
+          ) : null}
           {isPipette ? (
             <MenuItem
               key="drop-tips"

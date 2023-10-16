@@ -112,14 +112,13 @@ describe('InstrumentInfo', () => {
     props = {
       instrument: mockPipetteData1Channel,
     }
-    const { getByText, getByRole } = render(props)
+    const { getByText, getByRole, queryByText } = render(props)
     getByText('last calibrated')
     getByText('8/25/20 20:25 UTC')
     getByText('serial number')
     getByText('abc')
     getByRole('button', { name: 'MediumButton_secondary' }).click()
     getByText('mock PipetteWizardFlows')
-    getByRole('button', { name: 'MediumButton_primary' }).click()
-    getByText('mock PipetteWizardFlows')
+    expect(queryByText('Calibrate')).not.toBeInTheDocument()
   })
 })

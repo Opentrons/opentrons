@@ -50,6 +50,22 @@ const MOCK_PIPETTE = {
   instrumentName: 'p1000_single_flex',
 } as PipetteData
 
+const MOCK_PIPETTE_WITHOUT_CALIBRATION = {
+  mount: 'left',
+  instrumentType: 'pipette',
+  instrumentModel: 'p1000_single_v3.4',
+  serialNumber: 'P1KSV3420230721',
+  subsystem: 'pipette_left',
+  ok: true,
+  firmwareVersion: '40',
+  data: {
+    channels: 1,
+    min_volume: 5.0,
+    max_volume: 1000.0,
+  },
+  instrumentName: 'p1000_single_flex',
+} as PipetteData
+
 const MOCK_GRIPPER = {
   mount: 'extension',
   instrumentType: 'gripper',
@@ -108,6 +124,17 @@ describe('UpdateBuildroot', () => {
     fireEvent.click(btn)
 
     getByText('Recalibrate')
+    getByText('Drop tips')
+  })
+
+  it('renders appropriate options when the instrument is a pipette without calibration', () => {
+    const [{ getByTestId, getByText, queryByText }] = render(
+      MOCK_PIPETTE_WITHOUT_CALIBRATION
+    )
+    const btn = getByTestId('testButton')
+    fireEvent.click(btn)
+
+    expect(queryByText('Recalibrate')).not.toBeInTheDocument()
     getByText('Drop tips')
   })
 
