@@ -16,6 +16,7 @@ from typing import (
     cast,
 )
 from typing_extensions import Final
+from pathlib import Path
 
 try:
     import aionotify  # type: ignore[import]
@@ -131,6 +132,12 @@ class Controller:
     @module_controls.setter
     def module_controls(self, module_controls: AttachedModulesControl) -> None:
         self._module_controls = module_controls
+
+    async def get_serial_number(self) -> Optional[str]:
+        try:
+            return Path("/var/serial").read_text().strip()
+        except OSError:
+            return None
 
     def start_gpio_door_watcher(
         self,

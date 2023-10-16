@@ -643,3 +643,30 @@ describe('discovery selectors', () => {
     it(name, () => expect(selector(state as State, ...args)).toEqual(expected))
   })
 })
+
+describe('getRobotSerialNumber', () => {
+  const SPECS: [{ name: string; robot: any; expected: string | null }][] = [
+    {
+      name: 'returns health serial on flex',
+      robot: MOCK_STATE.discovery.robotsByName.fizzbuzz,
+      expected: 'this is a flex serial',
+    },
+    {
+      name: 'getRobotSerial returns health serial on ot2 if available',
+      robot: MOCK_STATE.discovery.robotsByName.baz,
+      expected: 'this is an ot2 serial',
+    },
+    {
+      name: 'getRobotSerial falls back to update server if necessary',
+      robot: MOCK_STATE.discovery.robotsByName.bar,
+      expected: '12345',
+    },
+  ]
+  SPECS.forEach(spec => {
+    it(spec.name, () => {
+      expect(discovery.getRobotSerialNumber(spec.robot as any)).toEqual(
+        spec.expected
+      )
+    })
+  })
+})

@@ -197,8 +197,10 @@ export const getDiscoverableRobotByName: (
   (robots, robotName) => robots.find(r => r.name === robotName) ?? null
 )
 
-export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>
-  (robot.serverHealth && robot.serverHealth.serialNumber) ?? null
+export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null => {
+  console.log(robot)
+  return robot.health?.robot_serial ?? robot.serverHealth?.serialNumber ?? null
+}
 
 export const getRobotApiVersion = (robot: DiscoveredRobot): string | null =>
   (robot.health && semver.valid(robot.health.api_version)) ??

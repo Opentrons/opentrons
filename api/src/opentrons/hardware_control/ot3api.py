@@ -260,6 +260,9 @@ class OT3API(
         )
         await self._backend.update_to_default_current_settings(gantry_load)
 
+    async def get_serial_number(self) -> Optional[str]:
+        return await self._backend.get_serial_number()
+
     async def set_system_constraints_for_calibration(self) -> None:
         self._move_manager.update_constraints(
             get_system_constraints_for_calibration(
