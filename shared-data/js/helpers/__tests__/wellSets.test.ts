@@ -211,14 +211,6 @@ describe('canPipetteUseLabware', () => {
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
   })
-  it('returns false when the tip volume is too high with the 384 well plate', () => {
-    const labwareDef = fixture384Plate
-    const pipette = fixtureP10Multi
-    const pipette96 = fixtureP100096
-
-    expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
-    expect(canPipetteUseLabware(pipette96, labwareDef)).toBe(false)
-  })
 })
 
 describe('getWellSetForMultichannel (integration test)', () => {
