@@ -56,7 +56,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const { pipette, dropTipLocation } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
 
-  // TODO(jr, 10/16/23): plug in missingAdapter() error creator
+  // TODO(jr, 10/16/23): plug in missingAdapter() error creator, need to get current tiprackId
 
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
