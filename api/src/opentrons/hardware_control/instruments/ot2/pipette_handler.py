@@ -802,7 +802,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.pick_up_configurations.current
+                                ): instrument.nozzle_manager.get_tip_configuration_current()
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),

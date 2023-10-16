@@ -39,6 +39,7 @@ from opentrons.hardware_control.constants import (
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
+from ..nozzle_manager import NozzleConfigurationType
 from .pipette import Pipette
 from .instrument_calibration import (
     PipetteOffsetSummary,
@@ -788,7 +789,7 @@ class OT3PipetteHandler:
                         currents={
                             Axis.by_mount(
                                 mount
-                            ): instrument.pick_up_configurations.current
+                            ): instrument.nozzle_manager.get_tip_configuration_current()
                         },
                     )
                 )
