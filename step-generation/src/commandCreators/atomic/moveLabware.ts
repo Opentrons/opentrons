@@ -112,7 +112,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
 
   if (destinationModuleId != null) {
     const destModuleState =
-      prevRobotState.modules[destinationModuleId].moduleState
+      prevRobotState.modules[destinationModuleId]?.moduleState ?? null
     if (destModuleState != null) {
       if (
         destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
