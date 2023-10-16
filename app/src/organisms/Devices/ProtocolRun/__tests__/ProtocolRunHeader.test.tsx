@@ -602,6 +602,28 @@ describe('ProtocolRunHeader', () => {
     getByText('Stop requested')
   })
 
+  it('renders a disabled button and when the robot door is open', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockRunningRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+
+    const [{ getByText, getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Resume run' })
+    expect(button).toBeDisabled()
+    getByText('Close robot door')
+  })
+
   it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
