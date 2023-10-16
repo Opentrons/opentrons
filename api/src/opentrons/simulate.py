@@ -316,6 +316,11 @@ def get_protocol_api(
             extra_labware=extra_labware,
         )
 
+    # Intentional difference from simulate.get_protocol_api():
+    # For the caller's convenience, we home the virtual hardware so they don't get MustHomeErrors.
+    # Since this hardware is virtual, there's no harm in commanding this "movement" implicitly.
+    context.home()
+
     return context
 
 
