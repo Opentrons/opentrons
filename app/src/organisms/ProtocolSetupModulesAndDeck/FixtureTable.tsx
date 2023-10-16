@@ -96,7 +96,7 @@ export function FixtureTable({
           configurationStatus === NOT_CONFIGURED
 
         let chipLabel: JSX.Element
-        let handleClick = () => {}
+        let handleClick
         if (statusNotReady) {
           chipLabel = (
             <>
