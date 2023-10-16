@@ -97,14 +97,17 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const hasCalData =
-    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
+  const hasCalData = React.useRef<boolean | null>(null)
+  if (hasCalData.current == null) {
+    hasCalData.current =
+      attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
+  }
   const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
     selectedPipette,
-    hasCalData,
+    hasCalData: hasCalData.current,
     isGantryEmpty,
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
@@ -328,7 +331,7 @@ export const PipetteWizardFlows = (
         totalStepCount={totalStepCount}
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
-        hasCalData={hasCalData}
+        hasCalData={hasCalData.current}
         requiredPipette={requiredPipette}
       />
     )
