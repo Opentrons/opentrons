@@ -109,7 +109,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     const isSlotBlocked = getSlotIdsBlockedBySpanning(
       initialDeckSetup
     ).includes(selectedSlot)
-    const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot)
+    const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot, true)
     const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, selectedSlot)
     const isLabwareCompatible =
       labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)

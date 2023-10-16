@@ -27,6 +27,7 @@ import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
 import type { ModuleType, RobotType } from '@opentrons/shared-data'
+import { FlexSlotMap } from './FlexSlotMap'
 
 interface Props {
   robotType?: RobotType
@@ -149,15 +150,22 @@ export function ModuleRow(props: Props): JSX.Element {
           {collisionSlots.length > 0 && (
             <Tooltip {...tooltipProps}>{collisionTooltip}</Tooltip>
           )}
-          {slot && (
-            <div {...targetProps}>
-              <SlotMap
-                occupiedSlots={occupiedSlotsForMap}
-                collisionSlots={collisionSlots}
-                robotType={robotType}
+          {slot &&
+            (isFlex ? (
+              <FlexSlotMap
+                selectedSlots={
+                  type === THERMOCYCLER_MODULE_TYPE ? ['A1', 'B1'] : [slot]
+                }
               />
-            </div>
-          )}
+            ) : (
+              <div {...targetProps}>
+                <SlotMap
+                  occupiedSlots={occupiedSlotsForMap}
+                  collisionSlots={collisionSlots}
+                  robotType={robotType}
+                />
+              </div>
+            ))}
         </div>
         <div className={styles.modules_button_group}>
           {moduleOnDeck && (

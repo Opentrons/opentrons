@@ -61,7 +61,10 @@ import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
 import { StagingAreaTile } from './StagingAreaTile'
 
-import type { NormalizedPipette } from '@opentrons/step-generation'
+import {
+  NormalizedPipette,
+  OT_2_TRASH_DEF_URI,
+} from '@opentrons/step-generation'
 import type { FormState } from './types'
 
 type WizardStep =
@@ -195,6 +198,8 @@ export function CreateFileWizard(): JSX.Element | null {
           },
         })
       )
+
+      //  add trash
       if (
         enableDeckModification &&
         values.additionalEquipment.includes('trashBin')
@@ -207,15 +212,39 @@ export function CreateFileWizard(): JSX.Element | null {
           })
         )
       }
-
-      if (!enableDeckModification) {
+      if (
+        !enableDeckModification ||
+        (enableDeckModification && values.fields.robotType === OT2_ROBOT_TYPE)
+      ) {
         dispatch(
           labwareIngredActions.createContainer({
-            labwareDefURI: FLEX_TRASH_DEF_URI,
+            labwareDefURI:
+              values.fields.robotType === FLEX_ROBOT_TYPE
+                ? FLEX_TRASH_DEF_URI
+                : OT_2_TRASH_DEF_URI,
             slot: values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
           })
         )
       }
+
+      // add waste chute
+      if (
+        enableDeckModification &&
+        values.additionalEquipment.includes('wasteChute')
+      ) {
+        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+      }
+      //  add staging areas
+      const stagingAreas = values.additionalEquipment.filter(equipment =>
+        equipment.includes('stagingArea')
+      )
+      if (enableDeckModification && stagingAreas.length > 0) {
+        stagingAreas.forEach(stagingArea => {
+          const [, location] = stagingArea.split('_')
+          dispatch(createDeckFixture('stagingArea', location))
+        })
+      }
+
       // create modules
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
@@ -235,24 +264,6 @@ export function CreateFileWizard(): JSX.Element | null {
           })
         )
       })
-
-      // add waste chute
-      if (
-        enableDeckModification &&
-        values.additionalEquipment.includes('wasteChute')
-      ) {
-        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
-      }
-      //  add staging areas
-      const stagingAreas = values.additionalEquipment.filter(equipment =>
-        equipment.includes('stagingArea')
-      )
-      if (enableDeckModification && stagingAreas.length > 0) {
-        stagingAreas.forEach(stagingArea => {
-          const [, location] = stagingArea.split('_')
-          dispatch(createDeckFixture('stagingArea', location))
-        })
-      }
     }
   }
   const wizardHeader = (
