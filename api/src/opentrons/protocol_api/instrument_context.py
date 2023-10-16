@@ -609,7 +609,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :type volume: float
 
         :param height: The number of millimeters to move above the current Well
-                       to air-gap aspirate. (Default: 5mm above current Well)
+                       to air-gap aspirate. (Default: 5 mm above current Well)
         :type height: float
 
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
