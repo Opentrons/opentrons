@@ -1948,7 +1948,9 @@ class OT3API(
             target_down = target_position_from_relative(
                 mount, top_types.Point(z=press.distance), self._current_position
             )
-            await self._move(target_down, speed=press.speed, expect_stalls=True)
+            # need to have a current per move
+            async with self._backend.motor_current(run_currents=press.currents):
+                await self._move(target_down, speed=press.speed, expect_stalls=True)
             if press.distance < 0:
                 # we expect a stall has happened during a downward movement into the tiprack, so
                 # we want to update the motor estimation
@@ -1957,28 +1959,33 @@ class OT3API(
     async def _tip_motor_action(
         self, mount: OT3Mount, pipette_spec: List[TipActionMoveSpec]
     ) -> None:
-        if not any(self._backend.gear_motor_position):
-            # home gear motor if position not known
-            await self.home_gear_motors()
-        pipette_axis = Axis.of_main_tool_actuator(mount)
-        gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-            pipette_axis
-        ]
-        move_targets = []
-        for move_segment in pipette_spec:
-            move_targets.append(
-                MoveTarget.build(
-                    position={Axis.Q: move_segment.distance},
-                    max_speed=move_segment.speed,
+        # currents should be the same for each move in tip motor pickup
+        assert [move.currents == pipette_spec[0].currents for move in pipette_spec]
+        currents = pipette_spec[0].currents
+        # Move to pickup position
+        async with self._backend.motor_current(run_currents=currents):
+            if not any(self._backend.gear_motor_position):
+                # home gear motor if position not known
+                await self.home_gear_motors()
+            pipette_axis = Axis.of_main_tool_actuator(mount)
+            gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+                pipette_axis
+            ]
+            move_targets = []
+            for move_segment in pipette_spec:
+                move_targets.append(
+                    MoveTarget.build(
+                        position={Axis.Q: move_segment.distance},
+                        max_speed=move_segment.speed,
+                    )
                 )
+
+            _, moves = self._move_manager.plan_motion(
+                origin={Axis.Q: gear_origin_float}, target_list=move_targets
             )
+            await self._backend.tip_action(moves=moves[0])
 
-        _, moves = self._move_manager.plan_motion(
-            origin={Axis.Q: gear_origin_float}, target_list=move_targets
-        )
-        await self._backend.tip_action(moves=moves[0])
-
-        await self.home_gear_motors()
+            await self.home_gear_motors()
 
     async def pick_up_tip(
         self,
@@ -1995,21 +2002,17 @@ class OT3API(
         )
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
-        async with self._backend.motor_current(
-            run_currents={axis: current for axis, current in spec.currents.items()}
-        ):
-            if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                # Move to pickup position
-                if spec.z_distance_to_tiprack:
-                    target_down = target_position_from_relative(
-                        mount,
-                        top_types.Point(spec.z_distance_to_tiprack),
-                        self._current_position,
-                    )
-                    await self._move(target_down)
-                await self._tip_motor_action(realmount, spec.tip_action_moves)
-            else:
-                await self._force_pick_up_tip(realmount, spec)
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            if spec.z_distance_to_tiprack:
+                target_down = target_position_from_relative(
+                    mount,
+                    top_types.Point(spec.z_distance_to_tiprack),
+                    self._current_position,
+                )
+                await self._move(target_down)
+            await self._tip_motor_action(realmount, spec.tip_action_moves)
+        else:
+            await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -2066,19 +2069,18 @@ class OT3API(
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount)
         await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
 
-        async with self._backend.motor_current(run_currents=spec.currents):
-            if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                await self._tip_motor_action(realmount, spec.tip_action_moves)
-            else:
-                for move in spec.tip_action_moves:
-                    target_pos = target_position_from_plunger(
-                        realmount, move.distance, self._current_position
-                    )
-                    await self._move(
-                        target_pos,
-                        speed=move.speed,
-                        home_flagged_axes=False,
-                    )
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            await self._tip_motor_action(realmount, spec.tip_action_moves)
+        else:
+            for move in spec.tip_action_moves:
+                target_pos = target_position_from_plunger(
+                    realmount, move.distance, self._current_position
+                )
+                await self._move(
+                    target_pos,
+                    speed=move.speed,
+                    home_flagged_axes=False,
+                )
 
         for shake in spec.shake_off_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
