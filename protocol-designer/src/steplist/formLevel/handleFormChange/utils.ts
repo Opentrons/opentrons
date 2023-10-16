@@ -7,7 +7,6 @@ import { LabwareDefinition2, PipetteChannels } from '@opentrons/shared-data'
 import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
 import { FormPatch } from '../../actions/types'
 import { FormData, PathOption, StepFieldName } from '../../../form-types'
-
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
   fns: Array<(arg0: FormPatch) => FormPatch>
@@ -146,11 +145,9 @@ export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
   )
     return []
   const labwareDef = labwareEntities[labwareId].def
-
   const pipetteCanUseLabware = canPipetteUseLabware(
     pipetteEntities[pipetteId].spec,
-    labwareDef,
-    pipetteEntities[pipetteId].tiprackLabwareDef
+    labwareDef
   )
   if (!pipetteCanUseLabware) return []
   const isSingleWellLabware =

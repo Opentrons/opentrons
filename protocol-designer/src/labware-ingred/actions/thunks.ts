@@ -105,32 +105,21 @@ export const createContainer: (
   }
 }
 
-interface DuplicateArgs {
-  templateLabwareId: string
-  templateAdapterId?: string
-}
 export const duplicateLabware: (
-  args: DuplicateArgs
-) => ThunkAction<DuplicateLabwareAction> = args => (dispatch, getState) => {
-  const { templateLabwareId, templateAdapterId } = args
+  templateLabwareId: string
+) => ThunkAction<DuplicateLabwareAction> = templateLabwareId => (
+  dispatch,
+  getState
+) => {
   const state = getState()
   const robotType = state.fileData.robotType
   const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
     templateLabwareId
   ].labwareDefURI
-  const tempAdapterEntity =
-    templateAdapterId != null
-      ? stepFormSelectors.getLabwareEntities(state)[templateAdapterId]
-      : null
-  const templateAdapterDefURI = tempAdapterEntity?.labwareDefURI ?? null
-  const templateAdapterDisplayName =
-    tempAdapterEntity?.def.metadata.displayName ?? null
-
   assert(
     templateLabwareDefURI,
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
-
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
@@ -145,37 +134,14 @@ export const duplicateLabware: (
   )
 
   if (templateLabwareDefURI && duplicateSlot) {
-    if (templateAdapterDefURI != null && templateAdapterId != null) {
-      const adapterDuplicateId = uuid() + ':' + templateAdapterDefURI
-      dispatch({
-        type: 'DUPLICATE_LABWARE',
-        payload: {
-          //  you can't set a nick name for adapters
-          duplicateLabwareNickname: templateAdapterDisplayName ?? '',
-          templateLabwareId: templateAdapterId,
-          duplicateLabwareId: adapterDuplicateId,
-          slot: duplicateSlot,
-        },
-      })
-      dispatch({
-        type: 'DUPLICATE_LABWARE',
-        payload: {
-          duplicateLabwareNickname,
-          templateLabwareId,
-          duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
-          slot: adapterDuplicateId,
-        },
-      })
-    } else {
-      dispatch({
-        type: 'DUPLICATE_LABWARE',
-        payload: {
-          duplicateLabwareNickname,
-          templateLabwareId,
-          duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
-          slot: templateLabwareIdIsOffDeck ? 'offDeck' : duplicateSlot,
-        },
-      })
-    }
+    dispatch({
+      type: 'DUPLICATE_LABWARE',
+      payload: {
+        duplicateLabwareNickname,
+        templateLabwareId,
+        duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
+        slot: templateLabwareIdIsOffDeck ? 'offDeck' : duplicateSlot,
+      },
+    })
   }
 }

@@ -512,6 +512,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_LATCH_CLOSED'
   | 'LABWARE_OFF_DECK'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
 
 export interface CommandCreatorError {
   message: string

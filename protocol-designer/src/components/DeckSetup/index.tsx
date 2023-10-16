@@ -280,8 +280,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   />
                 ) : (
                   <LabwareControls
-                    has96Channel={has96Channel}
-                    allLabware={allLabware}
                     slot={labwareInterfaceSlotDef}
                     setHoveredLabware={setHoveredLabware}
                     setDraggedLabware={setDraggedLabware}
@@ -400,8 +398,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 </>
               ) : (
                 <LabwareControls
-                  has96Channel={has96Channel}
-                  allLabware={allLabware}
                   slot={slot}
                   setHoveredLabware={setHoveredLabware}
                   setDraggedLabware={setDraggedLabware}
@@ -450,8 +446,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             />
             <g>
               <LabwareControls
-                has96Channel={has96Channel}
-                allLabware={allLabware}
                 slot={deckDefSlot}
                 setHoveredLabware={setHoveredLabware}
                 setDraggedLabware={setDraggedLabware}

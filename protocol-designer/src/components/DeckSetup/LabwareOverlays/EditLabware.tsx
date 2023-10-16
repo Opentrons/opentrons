@@ -31,7 +31,6 @@ interface OP {
   setHoveredLabware: (val?: LabwareOnDeck | null) => unknown
   setDraggedLabware: (val?: LabwareOnDeck | null) => unknown
   swapBlocked: boolean
-  adapterId?: string
 }
 interface SP {
   isYetUnnamed: boolean
@@ -210,13 +209,7 @@ const mapDispatchToProps = (
 ): DP => ({
   editLiquids: () =>
     dispatch(openIngredientSelector(ownProps.labwareOnDeck.id)),
-  duplicateLabware: () =>
-    dispatch(
-      duplicateLabware({
-        templateLabwareId: ownProps.labwareOnDeck.id,
-        templateAdapterId: ownProps.adapterId,
-      })
-    ),
+  duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareOnDeck.id)),
   deleteLabware: () => {
     window.confirm(
       `Are you sure you want to permanently delete this ${getLabwareDisplayName(

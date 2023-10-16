@@ -133,7 +133,7 @@ export const getLabwareCompatibleWithAdapter = (
   permittedTipracks: string[],
   adapterLoadName?: string
 ): string[] => {
-  if (permittedTipracks.length > 0) {
+  if (permittedTipracks.length > 0 && adapterLoadName === ADAPTER_96_CHANNEL) {
     return permittedTipracks
   } else {
     return adapterLoadName != null

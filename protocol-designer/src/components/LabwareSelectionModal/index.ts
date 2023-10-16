@@ -97,11 +97,6 @@ function mergeProps(
           createContainer({
             slot: stateProps.slot,
             labwareDefURI,
-            adapterUnderLabwareDefURI: stateProps.permittedTipracks.includes(
-              labwareDefURI
-            )
-              ? stateProps.adapterDefUri
-              : undefined,
           })
         )
       }
