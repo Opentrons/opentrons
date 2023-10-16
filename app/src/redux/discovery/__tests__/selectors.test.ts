@@ -645,7 +645,7 @@ describe('discovery selectors', () => {
 })
 
 describe('getRobotSerialNumber', () => {
-  const SPECS: [{ name: string; robot: any; expected: string | null }][] = [
+  const SPECS: Array<{ name: string; robot: any; expected: string | null }> = [
     {
       name: 'returns health serial on flex',
       robot: MOCK_STATE.discovery.robotsByName.fizzbuzz,
