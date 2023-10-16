@@ -24,6 +24,7 @@ import {
   NOT_CONFIGURED,
   useLoadedFixturesConfigStatus,
 } from '../../resources/deck_configuration/hooks'
+import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
 import { useFeatureFlag } from '../../redux/config'
@@ -55,6 +56,11 @@ export function FixtureTable({
     completedAt: 'fakeTimestamp',
     status: 'succeeded',
   }
+  const [
+    showLocationConflictModal,
+    setShowLocationConflictModal,
+  ] = React.useState<boolean>(false)
+
   const requiredFixtureDetails =
     enableDeckConfig && mostRecentAnalysis?.commands != null
       ? [
@@ -89,6 +95,7 @@ export function FixtureTable({
           configurationStatus === NOT_CONFIGURED
 
         let chipLabel: JSX.Element
+        let handleClick = () => {}
         if (statusNotReady) {
           chipLabel = (
             <>
@@ -105,6 +112,7 @@ export function FixtureTable({
               <Icon name="more" size="3rem" />
             </>
           )
+          handleClick = () => setShowLocationConflictModal(true)
         } else if (configurationStatus === CONFIGURED) {
           chipLabel = (
             <Chip
@@ -114,43 +122,54 @@ export function FixtureTable({
               iconName="connection-status"
             />
           )
+
           //  shouldn't run into this case
         } else {
           chipLabel = <div>status label unknown</div>
         }
 
         return (
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            key={fixture.params.fixtureId}
-            alignItems={ALIGN_CENTER}
-            backgroundColor={statusNotReady ? COLORS.yellow3 : COLORS.green3}
-            borderRadius={BORDERS.borderRadiusSize3}
-            gridGap={SPACING.spacing24}
-            padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-            onClick={() => console.log('wire this up')}
-            marginBottom={
-              index === requiredFixtureDetails.length - 1
-                ? SPACING.spacing68
-                : 'none'
-            }
-          >
-            <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {getFixtureDisplayName(fixture.params.loadName)}
-              </StyledText>
-            </Flex>
-            <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-              <LocationIcon slotName={fixture.params.location.cutout} />
-            </Flex>
+          <>
+            {showLocationConflictModal ? (
+              <LocationConflictModal
+                onCloseClick={() => setShowLocationConflictModal(false)}
+                cutout={fixture.params.location.cutout}
+                requiredFixture={fixture.params.loadName}
+                isOnDevice={true}
+              />
+            ) : null}
             <Flex
-              flex="3 0 0"
+              flexDirection={DIRECTION_ROW}
+              key={fixture.params.fixtureId}
               alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              backgroundColor={statusNotReady ? COLORS.yellow3 : COLORS.green3}
+              borderRadius={BORDERS.borderRadiusSize3}
+              gridGap={SPACING.spacing24}
+              padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+              onClick={handleClick}
+              marginBottom={
+                index === requiredFixtureDetails.length - 1
+                  ? SPACING.spacing68
+                  : 'none'
+              }
             >
-              {chipLabel}
+              <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {getFixtureDisplayName(fixture.params.loadName)}
+                </StyledText>
+              </Flex>
+              <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
+                <LocationIcon slotName={fixture.params.location.cutout} />
+              </Flex>
+              <Flex
+                flex="3 0 0"
+                alignItems={ALIGN_CENTER}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+              >
+                {chipLabel}
+              </Flex>
             </Flex>
-          </Flex>
+          </>
         )
       })}
     </Flex>

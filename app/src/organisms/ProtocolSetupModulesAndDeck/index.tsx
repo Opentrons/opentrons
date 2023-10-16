@@ -302,7 +302,7 @@ function RowModule({
   )
 }
 
-interface ProtocolSetupModulesProps {
+interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
 }
@@ -310,10 +310,10 @@ interface ProtocolSetupModulesProps {
 /**
  * an ODD screen on the Protocol Setup page
  */
-export function ProtocolSetupModules({
+export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
-}: ProtocolSetupModulesProps): JSX.Element {
+}: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
