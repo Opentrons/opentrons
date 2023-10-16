@@ -308,6 +308,11 @@ class OT3Controller:
             )
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
+    async def get_serial_number(self) -> Optional[str]:
+        if not self.initialized:
+            return None
+        return self.eeprom_data.serial_number
+
     @property
     def initialized(self) -> bool:
         """True when the hardware controller has initialized and is ready."""

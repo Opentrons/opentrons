@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 from typing_extensions import Protocol
 
 from ..types import SubSystem, SubSystemState
@@ -40,4 +40,8 @@ class HardwareManager(Protocol):
         In general, callers should not use the presence or absence of a specific subsystem to decide
         whether or not the hardware is operating properly.
         """
+        ...
+
+    async def get_serial_number(self) -> Optional[str]:
+        """Get the robot serial number, if provisioned. If not provisioned, will be None."""
         ...
