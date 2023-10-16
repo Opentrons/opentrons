@@ -277,6 +277,17 @@ class TestSimulatePythonLabware:
             simulate.simulate(protocol_file=protocol_filelike, file_name=file_name)
 
 
+def test_get_protocol_api_usable_without_homing(api_version: APIVersion) -> None:
+    """You should be able to move the simulated hardware without having to home explicitly.
+
+    https://opentrons.atlassian.net/browse/RQA-1801
+    """
+    protocol = simulate.get_protocol_api(api_version)
+    pipette = protocol.load_instrument("p300_single_gen2", mount="left")
+    tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+    pipette.pick_up_tip(tip_rack["A1"])  # Should not raise.
+
+
 class TestGetProtocolAPILabware:
     """Tests for making sure get_protocol_api() handles extra labware correctly."""
 
