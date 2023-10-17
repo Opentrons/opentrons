@@ -32,18 +32,16 @@ export const NullDeckState = (): JSX.Element => {
           height="100%"
         >
           {() => (
-            <>
-              <RobotCoordsText
-                x={5}
-                y={375}
-                style={{ textTransform: TEXT_TRANSFORM_UPPERCASE }}
-                fill="#cccccc"
-                fontWeight={FONT_WEIGHT_BOLD}
-                fontSize={FONT_SIZE_BODY_1}
-              >
-                {i18n.t('deck.inactive_deck')}
-              </RobotCoordsText>
-            </>
+            <RobotCoordsText
+              x={5}
+              y={375}
+              style={{ textTransform: TEXT_TRANSFORM_UPPERCASE }}
+              fill="#cccccc"
+              fontWeight={FONT_WEIGHT_BOLD}
+              fontSize={FONT_SIZE_BODY_1}
+            >
+              {i18n.t('deck.inactive_deck')}
+            </RobotCoordsText>
           )}
         </RobotWorkSpace>
       </div>

@@ -27,7 +27,7 @@ export function RobotCoordinateSpaceWithDOMCoords(
   const { children, deckDef, viewBox, ...restProps } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)
   const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
-    if (!wrapperRef.current) return { x: 0, y: 0 }
+    if (wrapperRef.current == null) return { x: 0, y: 0 }
 
     const cursorPoint = wrapperRef.current.createSVGPoint()
 
@@ -38,7 +38,7 @@ export function RobotCoordinateSpaceWithDOMCoords(
       wrapperRef.current.getScreenCTM()?.inverse()
     )
   }
-  if (!deckDef && !viewBox) return null
+  if (deckDef == null && viewBox == null) return null
 
   let wholeDeckViewBox
   let deckSlotsById = {}
