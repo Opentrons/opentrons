@@ -17,7 +17,6 @@ import {
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
-  ModuleType,
   TEMPERATURE_MODULE_TYPE,
   getPipetteNameSpecs,
   PipetteName,
@@ -31,38 +30,36 @@ import {
   getModuleType,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import {
-  FormModulesByType,
-  getIsCrashablePipetteSelected,
-} from '../../../step-forms'
+import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
 import wasteChuteImage from '../../../images/waste_chute.png'
 import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import {
-  CrashInfoBox,
-  ModuleDiagram,
-  isModuleWithCollisionIssue,
-} from '../../modules'
+import { CrashInfoBox, ModuleDiagram } from '../../modules'
 import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 import { GoBack } from './GoBack'
+import {
+  getCrashableModuleSelected,
+  getLastCheckedEquipment,
+  getTrashBinOptionDisabled,
+} from './utils'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
 
-const getCrashableModuleSelected = (
-  modules: FormModulesByType,
-  moduleType: ModuleType
-): boolean => {
-  const formModule = modules[moduleType]
-  const crashableModuleOnDeck =
-    formModule?.onDeck && formModule?.model != null
-      ? isModuleWithCollisionIssue(formModule.model)
-      : false
-
-  return crashableModuleOnDeck
+export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
+  [THERMOCYCLER_MODULE_V2]: 'B1',
+  [HEATERSHAKER_MODULE_V1]: 'D1',
+  [MAGNETIC_BLOCK_V1]: 'D2',
+  [TEMPERATURE_MODULE_V2]: 'C1',
 }
+export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
+  THERMOCYCLER_MODULE_V2,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+  TEMPERATURE_MODULE_V2,
+]
 
 export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   const {
@@ -200,20 +197,6 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     </HandleEnter>
   )
 }
-
-const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
-  THERMOCYCLER_MODULE_V2,
-  HEATERSHAKER_MODULE_V1,
-  MAGNETIC_BLOCK_V1,
-  TEMPERATURE_MODULE_V2,
-]
-const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
-  [THERMOCYCLER_MODULE_V2]: 'B1',
-  [HEATERSHAKER_MODULE_V1]: 'D1',
-  [MAGNETIC_BLOCK_V1]: 'D2',
-  [TEMPERATURE_MODULE_V2]: 'C1',
-}
-
 interface FlexModuleFieldsProps extends WizardTileProps {
   enableDeckModification: boolean
 }
@@ -221,14 +204,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
   const { values, setFieldValue, enableDeckModification } = props
 
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
-  const allStagingAreasInUse =
-    values.additionalEquipment.filter(equipment =>
-      equipment.includes('stagingArea')
-    ).length === 4
-  const allModulesInSideSlotsOnDeck =
-    values.modulesByType.heaterShakerModuleType.onDeck &&
-    values.modulesByType.thermocyclerModuleType.onDeck &&
-    values.modulesByType.temperatureModuleType.onDeck
+  const trashDisabled = getTrashBinOptionDisabled(values)
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
     if (values.additionalEquipment.includes(equipment)) {
@@ -244,17 +220,26 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
     }
   }
 
+  React.useEffect(() => {
+    if (trashDisabled) {
+      setFieldValue(
+        'additionalEquipment',
+        without(values.additionalEquipment, 'trashBin')
+      )
+    }
+  }, [trashDisabled, setFieldValue])
+
   return (
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         return (
           <EquipmentOption
-            //  TODO(jr, 10/10/23): add disabled option here for if the deck is full
             key={moduleModel}
             isSelected={values.modulesByType[moduleType].onDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
+            disabled={getLastCheckedEquipment(values) === moduleType}
             onClick={() => {
               if (values.modulesByType[moduleType].onDeck) {
                 setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
@@ -311,7 +296,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
             }
             text="Trash Bin"
             showCheckbox
-            disabled={allStagingAreasInUse && allModulesInSideSlotsOnDeck}
+            disabled={trashDisabled}
           />
         </>
       ) : null}

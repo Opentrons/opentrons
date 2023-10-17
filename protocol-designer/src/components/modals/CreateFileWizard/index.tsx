@@ -66,6 +66,7 @@ import {
   OT_2_TRASH_DEF_URI,
 } from '@opentrons/step-generation'
 import type { FormState } from './types'
+import { getTrashSlot } from './utils'
 
 type WizardStep =
   | 'robotType'
@@ -201,28 +202,21 @@ export function CreateFileWizard(): JSX.Element | null {
 
       //  add trash
       if (
-        enableDeckModification &&
-        values.additionalEquipment.includes('trashBin')
+        (enableDeckModification &&
+          values.additionalEquipment.includes('trashBin')) ||
+        !enableDeckModification
       ) {
         // defaulting trash to appropriate locations
-        dispatch(
-          labwareIngredActions.createContainer({
-            labwareDefURI: FLEX_TRASH_DEF_URI,
-            slot: 'A3',
-          })
-        )
-      }
-      if (
-        !enableDeckModification ||
-        (enableDeckModification && values.fields.robotType === OT2_ROBOT_TYPE)
-      ) {
         dispatch(
           labwareIngredActions.createContainer({
             labwareDefURI:
               values.fields.robotType === FLEX_ROBOT_TYPE
                 ? FLEX_TRASH_DEF_URI
                 : OT_2_TRASH_DEF_URI,
-            slot: values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
+            slot:
+              values.fields.robotType === FLEX_ROBOT_TYPE
+                ? getTrashSlot(values)
+                : '12',
           })
         )
       }
@@ -347,7 +341,9 @@ const initialFormState: FormState = {
       slot: SPAN7_8_10_11_SLOT,
     },
   },
-  additionalEquipment: [],
+  //  defaulting to selecting trashBin already to avoid user having to
+  //  click to add a trash bin/waste chute. Delete once we support returnTip()
+  additionalEquipment: ['trashBin'],
 }
 
 const pipetteValidationShape = Yup.object().shape({
