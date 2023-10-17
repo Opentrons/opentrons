@@ -123,6 +123,8 @@ export function FixtureTable({
               iconName="connection-status"
             />
           )
+          // TODO(jr, 10/17/23): wire this up
+          // handleClick = () => setShowNotConfiguredModal(true)
 
           //  shouldn't run into this case
         } else {

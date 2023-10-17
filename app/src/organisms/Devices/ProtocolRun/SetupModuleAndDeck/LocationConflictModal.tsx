@@ -54,7 +54,7 @@ export const LocationConflictModal = (
     cutout,
     requiredFixture,
     requiredModule,
-    isOnDevice,
+    isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const deckConfig = useDeckConfigurationQuery().data ?? []
@@ -87,7 +87,6 @@ export const LocationConflictModal = (
       {isOnDevice ? (
         <Modal
           onOutsideClick={onCloseClick}
-          modalSize="medium"
           header={{
             title: t('deck_conflict'),
             hasExitIcon: true,
@@ -96,7 +95,7 @@ export const LocationConflictModal = (
             iconColor: COLORS.warningEnabled,
           }}
         >
-          <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <Trans
               t={t}
               i18nKey="deck_conflict_info"
@@ -109,7 +108,7 @@ export const LocationConflictModal = (
                 strong: <strong />,
               }}
             />
-            <Flex paddingY={SPACING.spacing32} flexDirection={DIRECTION_COLUMN}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightBold}
@@ -135,8 +134,10 @@ export const LocationConflictModal = (
                   </StyledText>
 
                   <StyledText as="p">
-                    {requiredFixture && getFixtureDisplayName(requiredFixture)}
-                    {requiredModule && getModuleDisplayName(requiredModule)}
+                    {requiredFixture != null &&
+                      getFixtureDisplayName(requiredFixture)}
+                    {requiredModule != null &&
+                      getModuleDisplayName(requiredModule)}
                   </StyledText>
                 </Flex>
                 <Flex
@@ -229,8 +230,10 @@ export const LocationConflictModal = (
                     </StyledText>
                   </Box>
                   <StyledText as="label">
-                    {requiredFixture && getFixtureDisplayName(requiredFixture)}
-                    {requiredModule && getModuleDisplayName(requiredModule)}
+                    {requiredFixture != null &&
+                      getFixtureDisplayName(requiredFixture)}
+                    {requiredModule != null &&
+                      getModuleDisplayName(requiredModule)}
                   </StyledText>
                 </Flex>
                 <Flex
