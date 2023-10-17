@@ -42,4 +42,5 @@ class ProtocolAnalyzer:
             pipettes=result.state_summary.pipettes,
             errors=result.state_summary.errors,
             liquids=result.state_summary.liquids,
+            command_annotations=protocol_resource.source.command_annotations,
         )

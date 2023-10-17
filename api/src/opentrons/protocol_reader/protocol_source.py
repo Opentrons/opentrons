@@ -122,3 +122,4 @@ class ProtocolSource:
     metadata: Metadata
     robot_type: RobotType
     config: ProtocolConfig
+    command_annotations: List[Any]
