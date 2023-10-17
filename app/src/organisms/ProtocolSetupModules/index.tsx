@@ -130,10 +130,7 @@ function RenderModuleStatus({
     </>
   )
 
-  if (
-    isModuleReady &&
-    module.attachedModuleMatch?.moduleOffset?.last_modified != null
-  ) {
+  if (isModuleReady) {
     moduleStatus = (
       <>
         <Chip
@@ -147,11 +144,7 @@ function RenderModuleStatus({
         ) : null}
       </>
     )
-  } else if (
-    isModuleReady &&
-    calibrationStatus.complete &&
-    module.attachedModuleMatch?.moduleOffset?.last_modified == null
-  ) {
+  } else if (calibrationStatus.complete) {
     moduleStatus = (
       <SmallButton
         buttonCategory="rounded"
@@ -200,7 +193,8 @@ function RowModule({
     module.moduleDef.moduleType
   )
   const isModuleReady =
-    isNonConnectingModule || module.attachedModuleMatch != null
+    isNonConnectingModule ||
+    module.attachedModuleMatch?.moduleOffset?.last_modified != null
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
 
@@ -219,12 +213,7 @@ function RowModule({
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={
-          isModuleReady &&
-          module.attachedModuleMatch?.moduleOffset?.last_modified != null
-            ? COLORS.green3
-            : COLORS.yellow3
-        }
+        backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
         borderRadius={BORDERS.borderRadiusSize3}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
         gridGap={SPACING.spacing24}
