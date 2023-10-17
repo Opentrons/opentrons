@@ -74,14 +74,36 @@ To prepare the deck before running a protocol, use the labware latch controls in
 Loading Labware
 ===============
 
-Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it.  See the :ref:`load-labware-module` section for an example of how to place labware on a module.
+Use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_adapter` and :py:meth:`~.HeaterShakerContext.load_labware` methods to specify what you will place on the module. For the Heater-Shaker, use one of the thermal adapters listed below and labware that fits on the adapter. See :ref:`labware-on-adapters` for examples of loading labware on modules.
 
-Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured adapter–labware combinations and standalone adapter definitions that help make the Heater-Shaker ready to use right out of the box. See :ref:`labware-on-adapters` for examples of loading labware on modules.
+The `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several standalone adapter definitions and pre-configured adapter–labware combinations that help make the Heater-Shaker ready to use right out of the box.
+
+.. note::
+    If you plan to :ref:`move labware <moving-labware>` onto or off of the Heater-Shaker during your protocol, you must use a standalone adapter definition, not an adapter–labware combination definiton.
+
+Standalone Adapters
+-------------------
+
+You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Heater-Shaker. 
+
+.. list-table::
+   :header-rows: 1
+
+   * - Adapter Type
+     - API Load Name
+   * - Opentrons Universal Flat Adapter
+     - ``opentrons_universal_flat_adapter``
+   * - Opentrons 96 PCR Adapter
+     - ``opentrons_96_pcr_adapter``
+   * - Opentrons 96 Deep Well Adapter
+     - ``opentrons_96_deep_well_adapter``
+   * - Opentrons 96 Flat Bottom Adapter
+     - ``opentrons_96_flat_bottom_adapter``
 
 Pre-configured Combinations
 ---------------------------
 
-The Heater-Shaker supports these thermal adapter and labware combinations by default. These let you load the adapter and labware with a single definition.
+The Heater-Shaker supports these thermal adapter and labware combinations for backwards compatibility. If your protocol specifies an ``apiLevel`` of 2.15 or higher, you should use the standalone adapter definitions instead.
 
 .. list-table::
    :header-rows: 1
@@ -98,25 +120,6 @@ The Heater-Shaker supports these thermal adapter and labware combinations by def
      - ``opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt``
    * - Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µL Flat
      - ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``
-
-Standalone Well-Plate Adapters
-------------------------------
-
-You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Heater-Shaker.
-
-.. list-table::
-   :header-rows: 1
-
-   * - Adapter Type
-     - API Load Name
-   * - Opentrons Universal Flat Adapter
-     - ``opentrons_universal_flat_adapter``
-   * - Opentrons 96 PCR Adapter
-     - ``opentrons_96_pcr_adapter``
-   * - Opentrons 96 Deep Well Adapter
-     - ``opentrons_96_deep_well_adapter``
-   * - Opentrons 96 Flat Bottom Adapter
-     - ``opentrons_96_flat_bottom_adapter``
 
 Custom Flat-Bottom Labware
 --------------------------
