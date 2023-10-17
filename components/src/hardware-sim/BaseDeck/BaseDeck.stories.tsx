@@ -13,7 +13,7 @@ import {
   EXTENDED_DECK_CONFIG_FIXTURE,
   STANDARD_SLOT_DECK_CONFIG_FIXTURE,
 } from './__fixtures__'
-import { BaseDeck as BaseDeckComponent } from './'
+import { BaseDeck as BaseDeckComponent } from './BaseDeck'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type {
