@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { POSITION_AND_BLOWOUT } from './constants'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,16 +12,19 @@ import {
   SecondaryButton,
   SPACING,
   ALIGN_FLEX_START,
+  JUSTIFY_FLEX_END,
   TYPOGRAPHY,
+  COLORS,
 } from '@opentrons/components'
 import { NeedHelpLink } from '../CalibrationPanels'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { Jog, JogControls } from '../../molecules/JogControls'
 import { Portal } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { PipetteModelSpecs } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
 const NEED_HELP_URL = ''
@@ -32,27 +36,124 @@ const Header = styled.h1`
   }
 `
 
+interface ConfirmPositionProps {
+  handleBlowout: () => void
+  handleGoBack: () => void
+  isOnDevice: boolean
+  currentStep: string
+}
+
+const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
+  const { handleBlowout, handleGoBack, isOnDevice, currentStep } = props
+  const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const flowTitle = t('drop_tips')
+
+  return (
+    <SimpleWizardBody
+      iconColor={COLORS.warningEnabled}
+      header={
+        currentStep === POSITION_AND_BLOWOUT
+          ? t('confirm_blowout_location', { flow: flowTitle })
+          : t('confirm_drop_tip_location', { flow: flowTitle })
+      }
+      isSuccess={false}
+    >
+      {isOnDevice ? (
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          gridGap={SPACING.spacing4}
+        >
+          <SmallButton
+            buttonType="alert"
+            buttonText={
+              currentStep === POSITION_AND_BLOWOUT
+                ? i18n.format(t('blowout_liquid'), 'capitalize')
+                : i18n.format(t('drop_tips'), 'capitalize')
+            }
+            onClick={handleBlowout}
+            marginRight={SPACING.spacing4}
+          />
+          <SmallButton
+            buttonText={t('shared:go_back')}
+            onClick={handleGoBack}
+          />
+        </Flex>
+      ) : (
+        <>
+          <SecondaryButton
+            onClick={handleGoBack}
+            marginRight={SPACING.spacing4}
+          >
+            {t('shared:go_back')}
+          </SecondaryButton>
+          <PrimaryButton onClick={handleBlowout}>
+            {currentStep === POSITION_AND_BLOWOUT
+              ? i18n.format(t('blowout_liquid'), 'capitalize')
+              : i18n.format(t('drop_tips'), 'capitalize')}
+          </PrimaryButton>
+        </>
+      )}
+    </SimpleWizardBody>
+  )
+}
+
 interface JogToPositionProps {
-  handleProceed: () => void
   handleGoBack: () => void
   handleJog: Jog
+  handleProceed: () => void
   body: string
+  isRobotMoving: boolean
+  isExiting: boolean
+  chainRunCommands: any
+  currentStep: string
+  createdMaintenanceRunId: string | null
+  pipetteId: string
+  instrumentModelSpecs: PipetteModelSpecs
+  isOnDevice: boolean
 }
 
 export const JogToPosition = (
   props: JogToPositionProps
 ): JSX.Element | null => {
-  const { handleProceed, handleGoBack, handleJog, body } = props
+  const {
+    handleGoBack,
+    handleJog,
+    handleProceed,
+    body,
+    isRobotMoving,
+    isExiting,
+    currentStep,
+    isOnDevice,
+  } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
-  const isOnDevice = useSelector(getIsOnDevice)
   const [showFullJogControls, setShowFullJogControls] = React.useState(false)
+  const [
+    showPositionConfirmation,
+    setShowPositionConfirmation,
+  ] = React.useState(false)
 
-  const handleConfirmPosition = (): void => {
-    console.log('TODO: handle confirm position and show confirm screen')
-    handleProceed()
+  if (showPositionConfirmation) {
+    return (
+      <ConfirmPosition
+        handleBlowout={handleProceed}
+        handleGoBack={() => setShowPositionConfirmation(false)}
+        isOnDevice={isOnDevice}
+        currentStep={currentStep}
+      />
+    )
   }
 
-  return (
+  return isRobotMoving && !isExiting ? (
+    <InProgressModal
+      alternativeSpinner={null}
+      description={
+        currentStep === POSITION_AND_BLOWOUT
+          ? t('stand_back_blowing_out')
+          : t('stand_back_dropping_tips')
+      }
+    />
+  ) : (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -97,7 +198,7 @@ export const JogToPosition = (
             />
             <SmallButton
               buttonText={t('shared:confirm_position')}
-              onClick={handleConfirmPosition}
+              onClick={() => setShowPositionConfirmation(true)}
             />
           </Flex>
           <Portal level="top">
@@ -151,7 +252,7 @@ export const JogToPosition = (
               <SecondaryButton onClick={handleGoBack}>
                 {t('shared:go_back')}
               </SecondaryButton>
-              <PrimaryButton onClick={handleConfirmPosition}>
+              <PrimaryButton onClick={() => setShowPositionConfirmation(true)}>
                 {t('shared:confirm_position')}
               </PrimaryButton>
             </Flex>
