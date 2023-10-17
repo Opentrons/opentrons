@@ -83,8 +83,8 @@ class Health(BaseResponseBody):
         max_items=2,
     )
     robot_serial: typing.Optional[str] = Field(
-        ...,
-        description="The robot serial number. Should be used if not none; if none, use result of /server/update/health.",
+        default=None,
+        description="The robot serial number. Should be used if present; if not present, use result of /server/update/health.",
     )
     links: HealthLinks
 
