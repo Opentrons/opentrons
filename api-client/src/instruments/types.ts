@@ -1,3 +1,5 @@
+import type { PipetteModel } from '@opentrons/shared-data'
+
 export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 
 // pipettes module already exports type `Mount`
@@ -48,7 +50,7 @@ export interface PipetteData {
   }
   firmwareVersion?: string
   instrumentName: string
-  instrumentModel: string
+  instrumentModel: PipetteModel
   instrumentType: 'pipette'
   mount: 'left' | 'right'
   serialNumber: string

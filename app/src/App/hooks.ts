@@ -97,6 +97,7 @@ export function useProtocolReceiptToast(): void {
               {
                 closeButton: true,
                 disableTimeout: true,
+                displayType: 'odd',
               }
             )
           })
