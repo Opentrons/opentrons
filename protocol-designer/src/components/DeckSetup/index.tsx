@@ -110,7 +110,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     robotType,
     trashSlot,
   } = props
-  console.log(deckSlotsById)
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
   // But when swapping labware when at least one is on a module, we need to be aware

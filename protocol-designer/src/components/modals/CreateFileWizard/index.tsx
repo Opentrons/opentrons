@@ -8,6 +8,7 @@ import uniq from 'lodash/uniq'
 import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
+import { OT_2_TRASH_DEF_URI } from '@opentrons/step-generation'
 import {
   ModuleType,
   ModuleModel,
@@ -60,13 +61,10 @@ import { FirstPipetteTipsTile, SecondPipetteTipsTile } from './PipetteTipsTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
 import { StagingAreaTile } from './StagingAreaTile'
-
-import {
-  NormalizedPipette,
-  OT_2_TRASH_DEF_URI,
-} from '@opentrons/step-generation'
-import type { FormState } from './types'
 import { getTrashSlot } from './utils'
+
+import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { FormState } from './types'
 
 type WizardStep =
   | 'robotType'
