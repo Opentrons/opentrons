@@ -11,15 +11,13 @@ const mockOnClickBack = jest.fn()
 const mockOnClickButton = jest.fn()
 const mockOnClickSecondaryButton = jest.fn()
 
-const mockSecondaryButton = (
-  <SmallButton
-    onClick={mockOnClickSecondaryButton}
-    buttonText="Setup Instructions"
-    buttonType="tertiaryLowLight"
-    iconName="information"
-    iconPlacement="startIcon"
-  />
-)
+const mockSecondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
+  onClick: mockOnClickSecondaryButton,
+  buttonText: 'Setup Instructions',
+  buttonType: 'tertiaryLowLight',
+  iconName: 'information',
+  iconPlacement: 'startIcon',
+}
 
 describe('ChildNavigation', () => {
   let props: React.ComponentProps<typeof ChildNavigation>
@@ -62,7 +60,7 @@ describe('ChildNavigation', () => {
       ...props,
       buttonText: 'mock button',
       onClickButton: mockOnClickButton,
-      secondaryButton: mockSecondaryButton,
+      secondaryButtonProps: mockSecondaryButtonProps,
     }
     const [{ getByText, getByTestId }] = render(props)
     getByText('mock header')

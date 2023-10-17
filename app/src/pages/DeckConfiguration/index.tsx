@@ -73,15 +73,13 @@ export function DeckConfiguration(): JSX.Element {
     history.goBack()
   }
 
-  const secondaryButton = (
-    <SmallButton
-      onClick={() => setShowSetupInstructionsModal(true)}
-      buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
-      buttonType="tertiaryLowLight"
-      iconName="information"
-      iconPlacement="startIcon"
-    />
-  )
+  const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
+    onClick: () => setShowSetupInstructionsModal(true),
+    buttonText: i18n.format(t('setup_instructions'), 'titleCase'),
+    buttonType: 'tertiaryLowLight',
+    iconName: 'information',
+    iconPlacement: 'startIcon',
+  }
 
   return (
     <>
@@ -111,7 +109,7 @@ export function DeckConfiguration(): JSX.Element {
           onClickBack={handleClickBack}
           buttonText={t('shared:confirm')}
           onClickButton={handleClickConfirm}
-          secondaryButton={secondaryButton}
+          secondaryButtonProps={secondaryButtonProps}
         />
         <Flex
           marginTop="7.75rem"

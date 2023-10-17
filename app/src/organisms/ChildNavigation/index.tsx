@@ -36,7 +36,7 @@ interface ChildNavigationProps {
   buttonType?: SmallButtonTypes
   iconName?: IconName
   iconPlacement?: IconPlacement
-  secondaryButton?: React.ReactNode
+  secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
 }
 
 export function ChildNavigation({
@@ -48,7 +48,7 @@ export function ChildNavigation({
   buttonType = 'primary',
   iconName,
   iconPlacement,
-  secondaryButton,
+  secondaryButtonProps,
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -76,7 +76,10 @@ export function ChildNavigation({
       </Flex>
       {onClickButton != null && buttonText != null ? (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-          {secondaryButton != null ? secondaryButton : null}
+          {secondaryButtonProps != null ? (
+            <SmallButton {...secondaryButtonProps} />
+          ) : null}
+
           <SmallButton
             buttonType={buttonType}
             buttonCategory={buttonType === 'primary' ? 'rounded' : 'default'}

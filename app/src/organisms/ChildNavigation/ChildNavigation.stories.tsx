@@ -35,18 +35,16 @@ TitleWithLinkButton.args = {
 }
 
 export const TitleWithTwoButtons = Template.bind({})
-const secondaryButton = (
-  <SmallButton
-    onClick={() => {}}
-    buttonText="Setup Instructions"
-    buttonType="tertiaryLowLight"
-    iconName="information"
-    iconPlacement="startIcon"
-  />
-)
+const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
+  onClick: () => {},
+  buttonText: 'Setup Instructions',
+  buttonType: 'tertiaryLowLight',
+  iconName: 'information',
+  iconPlacement: 'startIcon',
+}
 TitleWithTwoButtons.args = {
   header: 'Header',
   buttonText: 'ButtonText',
   onClickButton: () => {},
-  secondaryButton,
+  secondaryButtonProps,
 }
