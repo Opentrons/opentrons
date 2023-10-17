@@ -10,10 +10,9 @@ The Heater-Shaker Module provides on-deck heating and orbital shaking. The modul
 
 The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. For example::
 
-    def run(protocol: protocol_api.ProtocolContext):
-         hs_mod = protocol.load_module(
-          module_name='heaterShakerModuleV1',
-          location="D1")
+    hs_mod = protocol.load_module(
+        module_name="heaterShakerModuleV1", location="D1"
+    )
 
 .. versionadded:: 2.13
 
@@ -100,6 +99,14 @@ You can use these standalone adapter definitions to load Opentrons verified or c
    * - Opentrons 96 Flat Bottom Adapter
      - ``opentrons_96_flat_bottom_adapter``
 
+For example, these commands load a well plate on top of the flat bottom adapter::
+
+    hs_adapter = hs_mod.load_adapter('opentrons_96_flat_bottom_adapter')
+    hs_plate = hs_mod.load_labware('nest_96_wellplate_200ul_flat')
+
+.. versionadded:: 2.15
+
+
 Pre-configured Combinations
 ---------------------------
 
@@ -120,6 +127,14 @@ The Heater-Shaker supports these thermal adapter and labware combinations for ba
      - ``opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt``
    * - Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µL Flat
      - ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``
+
+This command loads the same physical adapter and labware as the example in the previous section, but it is also compatible with API versions 2.13 and 2.14::
+
+    hs_combo = hs_mod.load_labware(
+        "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
+    )
+
+.. versionadded:: 2.13
 
 Custom Flat-Bottom Labware
 --------------------------
