@@ -1,0 +1,58 @@
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
+import {
+  Flex,
+  SPACING,
+  Btn,
+  TYPOGRAPHY,
+  ALIGN_START,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  FONT_WEIGHT_SEMIBOLD,
+} from '@opentrons/components'
+
+import { Banner } from '../../../atoms/Banner'
+import { StyledText } from '../../../atoms/text'
+
+export function ProtocolDropTipBanner(props: {
+  onLaunchWizardClick: (setShowWizard: true) => void
+  onCloseClick: (setShowBanner: false) => void
+}): JSX.Element {
+  const { t } = useTranslation('run_details')
+  const { onLaunchWizardClick, onCloseClick } = props
+
+  return (
+    <Banner
+      type="warning"
+      onCloseClick={() => onCloseClick(false)}
+      marginBottom={SPACING.spacing16}
+      paddingRight={SPACING.spacing16}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText as="p" fontWeight={FONT_WEIGHT_SEMIBOLD}>
+          {t('tips_may_be_attached')}
+        </StyledText>
+
+        <Flex flexDirection={DIRECTION_ROW}>
+          <StyledText as="p" marginRight={SPACING.spacing4}>
+            {t('remove_tips_from_pipette')}
+          </StyledText>
+          <Btn
+            textAlign={ALIGN_START}
+            fontSize={TYPOGRAPHY.fontSizeP}
+            onClick={() => onLaunchWizardClick(true)}
+            aria-label="remove-tips"
+          >
+            <StyledText
+              as="p"
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            >
+              {t('remove_tips')}
+            </StyledText>
+          </Btn>
+        </Flex>
+      </Flex>
+    </Banner>
+  )
+}
