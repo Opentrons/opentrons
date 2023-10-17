@@ -134,7 +134,16 @@ export const JogToPosition = (
   ] = React.useState(false)
 
   if (showPositionConfirmation) {
-    return (
+    return isRobotMoving ? (
+      <InProgressModal
+        alternativeSpinner={null}
+        description={
+          currentStep === POSITION_AND_BLOWOUT
+            ? t('stand_back_blowing_out')
+            : t('stand_back_dropping_tips')
+        }
+      />
+    ) : (
       <ConfirmPosition
         handleBlowout={handleProceed}
         handleGoBack={() => setShowPositionConfirmation(false)}
@@ -143,17 +152,7 @@ export const JogToPosition = (
       />
     )
   }
-
-  return isRobotMoving && !isExiting ? (
-    <InProgressModal
-      alternativeSpinner={null}
-      description={
-        currentStep === POSITION_AND_BLOWOUT
-          ? t('stand_back_blowing_out')
-          : t('stand_back_dropping_tips')
-      }
-    />
-  ) : (
+  return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

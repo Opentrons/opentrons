@@ -68,7 +68,7 @@ export const ChooseLocation = (
         targetX,
         targetY
       )
-      moveToXYCoordinate(targetX, targetY).then(handleProceed)
+      moveToXYCoordinate(targetX, targetY).then(() => handleProceed())
     }
   }
 
