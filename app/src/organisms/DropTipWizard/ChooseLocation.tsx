@@ -13,7 +13,9 @@ import {
 } from '@opentrons/components'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
+import type { CommandData } from '@opentrons/api-client'
 
 // TODO: get help link article URL
 const NEED_HELP_URL = ''
@@ -23,13 +25,21 @@ interface ChooseLocationProps {
   title: string
   body: string | JSX.Element
   robotType: RobotType
-  moveToXYCoordinate: (x: number, y: number) => Promise<void>
+  moveToXYCoordinate: (x: number, y: number) => Promise<void | CommandData[]>
+  isRobotMoving: boolean
 }
 
 export const ChooseLocation = (
   props: ChooseLocationProps
 ): JSX.Element | null => {
-  const { handleProceed, title, body, robotType, moveToXYCoordinate } = props
+  const {
+    handleProceed,
+    title,
+    body,
+    robotType,
+    moveToXYCoordinate,
+    isRobotMoving,
+  } = props
   const { t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
   const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
@@ -61,7 +71,13 @@ export const ChooseLocation = (
       moveToXYCoordinate(targetX, targetY).then(handleProceed)
     }
   }
-  return (
+
+  return isRobotMoving ? (
+    <InProgressModal
+      alternativeSpinner={null}
+      description={t('stand_back_exiting')}
+    />
+  ) : (
     <Flex css={TILE_CONTAINER_STYLE}>
       <TwoUpTileLayout
         title={title}

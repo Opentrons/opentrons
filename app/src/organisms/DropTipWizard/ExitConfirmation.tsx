@@ -37,8 +37,8 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   return (
     <SimpleWizardBody
       iconColor={COLORS.warningEnabled}
-      header={t('progress_will_be_lost', { flow: flowTitle })}
-      subHeader={t('are_you_sure_exit', { flow: flowTitle })}
+      header={t('exit_screen_title', { flow: flowTitle })}
+      subHeader={t('progress_will_be_lost', { flow: flowTitle })}
       isSuccess={false}
     >
       {isOnDevice ? (
