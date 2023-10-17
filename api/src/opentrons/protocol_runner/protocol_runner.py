@@ -26,6 +26,7 @@ from opentrons.util.broker import Broker
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
+from .duration_estimator_plugin import DurationEstimatorPlugin 
 from .legacy_context_plugin import LegacyContextPlugin
 from .legacy_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
@@ -162,6 +163,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             )
             self._hardware_api.should_taskify_movement_execution(taskify=True)
         else:
+            self._protocol_engine.add_plugin(DurationEstimatorPlugin())
             self._hardware_api.should_taskify_movement_execution(taskify=False)
 
         context = self._legacy_context_creator.create(
@@ -222,6 +224,7 @@ class JsonRunner(AbstractRunner):
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._protocol_engine.add_plugin(DurationEstimatorPlugin())
         self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     async def load(self, protocol_source: ProtocolSource) -> None:

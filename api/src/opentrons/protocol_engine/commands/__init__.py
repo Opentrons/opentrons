@@ -231,6 +231,7 @@ from .blow_out import (
     BlowOutCreate,
     BlowOutImplementation,
     BlowOut,
+    BlowOutCommandType,
 )
 
 from .blow_out_in_place import (
@@ -239,6 +240,7 @@ from .blow_out_in_place import (
     BlowOutInPlaceCreate,
     BlowOutInPlaceImplementation,
     BlowOutInPlace,
+    BlowOutInPlaceCommandType,
 )
 
 from .set_status_bar import (
@@ -429,12 +431,14 @@ __all__ = [
     "BlowOutCreate",
     "BlowOutImplementation",
     "BlowOutParams",
+    "BlowOutCommandType",
     "BlowOut",
     # blow out in place command models
     "BlowOutInPlaceParams",
     "BlowOutInPlaceResult",
     "BlowOutInPlaceCreate",
     "BlowOutInPlaceImplementation",
+    "BlowOutInPlaceCommandType",
     "BlowOutInPlace",
     # set status bar command models
     "SetStatusBar",
