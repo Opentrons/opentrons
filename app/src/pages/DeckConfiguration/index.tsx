@@ -13,10 +13,7 @@ import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-import {
-  // getFixtureDisplayName,
-  STANDARD_SLOT_LOAD_NAME,
-} from '@opentrons/shared-data'
+import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'

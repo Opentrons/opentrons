@@ -44,7 +44,7 @@ describe('Touchscreen AddDeckConfigurationModal', () => {
       'Choose a fixture below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     getByText('Staging Area Slot')
-    getByText('Trash')
+    getByText('Trash Bin')
     getByText('Waste Chute')
     expect(getAllByText('Add').length).toBe(3)
   })
