@@ -36,6 +36,7 @@ import {
   getIsCrashablePipetteSelected,
 } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
+import wasteChuteImage from '../../../images/waste_chute.png'
 import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
@@ -289,10 +290,9 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
           <EquipmentOption
             onClick={() => handleSetEquipmentOption('wasteChute')}
             isSelected={values.additionalEquipment.includes('wasteChute')}
-            //  todo(jr, 9/14/23): update the asset
             image={
               <AdditionalItemImage
-                src={gripperImage}
+                src={wasteChuteImage}
                 alt="Opentrons Waste Chute"
               />
             }

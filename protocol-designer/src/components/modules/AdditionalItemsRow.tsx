@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
+import wasteChuteImage from '../../images/waste_chute.png'
 import { Portal } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
@@ -49,6 +50,11 @@ export function AdditionalItemsRow(
     (name === 'trashBin' && isEquipmentAdded && !hasWasteChute) ||
     (name === 'wasteChute' && isEquipmentAdded && trashBinId == null)
 
+  let imageSrc: string = gripperImage
+  if (name === 'wasteChute') {
+    imageSrc = wasteChuteImage
+  }
+
   return (
     <>
       {trashModal && name !== 'gripper' ? (
@@ -67,8 +73,7 @@ export function AdditionalItemsRow(
 
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <AdditionalItemImage
-            //  TODO(jr, 9/13/23): update this image to the waste chute and trash asset
-            src={gripperImage}
+            src={imageSrc}
             alt={i18n.t(`modules.additional_equipment_display_names.${name}`)}
           />
 
