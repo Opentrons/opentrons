@@ -59,6 +59,7 @@ import {
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
+import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
 
@@ -224,6 +225,10 @@ function RowModule({
     isNonConnectingModule || module.attachedModuleMatch != null
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [
+    showLocationConflictModal,
+    setShowLocationConflictModal,
+  ] = React.useState<boolean>(false)
 
   return (
     <>
@@ -236,6 +241,14 @@ function RowModule({
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
           }
+        />
+      ) : null}
+      {showLocationConflictModal && conflictedFixture != null ? (
+        <LocationConflictModal
+          onCloseClick={() => setShowLocationConflictModal(false)}
+          cutout={conflictedFixture.fixtureLocation}
+          requiredModule={module.moduleDef.model}
+          isOnDevice={true}
         />
       ) : null}
       <Flex
@@ -284,6 +297,11 @@ function RowModule({
             flex="3 0 0"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            onClick={
+              conflictedFixture != null
+                ? () => setShowLocationConflictModal(true)
+                : undefined
+            }
           >
             <RenderModuleStatus
               isModuleReady={isModuleReady}
@@ -302,7 +320,7 @@ function RowModule({
   )
 }
 
-interface ProtocolSetupModulesProps {
+interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
 }
@@ -310,10 +328,10 @@ interface ProtocolSetupModulesProps {
 /**
  * an ODD screen on the Protocol Setup page
  */
-export function ProtocolSetupModules({
+export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
-}: ProtocolSetupModulesProps): JSX.Element {
+}: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [

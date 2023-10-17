@@ -49,11 +49,11 @@ import {
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
+import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
+import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   getAreInstrumentsReady,
@@ -701,7 +701,10 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupInstruments runId={runId} setSetupScreen={setSetupScreen} />
     ),
     modules: (
-      <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
+      <ProtocolSetupModulesAndDeck
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+      />
     ),
     labware: (
       <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
