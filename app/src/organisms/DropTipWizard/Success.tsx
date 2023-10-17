@@ -12,7 +12,6 @@ import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SmallButton } from '../../atoms/buttons'
-import { BLOWOUT_SUCCESS } from './constants'
 
 interface SuccessProps {
   message: string
@@ -20,7 +19,6 @@ interface SuccessProps {
   handleProceed: () => void
   isRobotMoving: boolean
   isExiting: boolean
-  currentStep: string
 }
 export const Success = (props: SuccessProps): JSX.Element => {
   const {
@@ -29,7 +27,6 @@ export const Success = (props: SuccessProps): JSX.Element => {
     handleProceed,
     isRobotMoving,
     isExiting,
-    currentStep,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
 

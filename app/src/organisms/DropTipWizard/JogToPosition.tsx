@@ -80,19 +80,28 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
           />
         </Flex>
       ) : (
-        <>
-          <SecondaryButton
-            onClick={handleGoBack}
-            marginRight={SPACING.spacing4}
-          >
-            {t('shared:go_back')}
-          </SecondaryButton>
-          <PrimaryButton onClick={handleBlowout}>
-            {currentStep === POSITION_AND_BLOWOUT
-              ? i18n.format(t('blowout_liquid'), 'capitalize')
-              : i18n.format(t('drop_tips'), 'capitalize')}
-          </PrimaryButton>
-        </>
+        <Flex
+          width="100%"
+          marginTop={SPACING.spacing32}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+          paddingLeft={SPACING.spacing32}
+        >
+          <NeedHelpLink href={NEED_HELP_URL} />
+          <Flex gridGap={SPACING.spacing8}>
+            <SecondaryButton
+              onClick={handleGoBack}
+              marginRight={SPACING.spacing4}
+            >
+              {t('shared:go_back')}
+            </SecondaryButton>
+            <PrimaryButton onClick={handleBlowout}>
+              {currentStep === POSITION_AND_BLOWOUT
+                ? i18n.format(t('blowout_liquid'), 'capitalize')
+                : i18n.format(t('drop_tips'), 'capitalize')}
+            </PrimaryButton>
+          </Flex>
+        </Flex>
       )}
     </SimpleWizardBody>
   )
@@ -104,7 +113,6 @@ interface JogToPositionProps {
   handleProceed: () => void
   body: string
   isRobotMoving: boolean
-  isExiting: boolean
   chainRunCommands: any
   currentStep: string
   createdMaintenanceRunId: string | null
@@ -122,7 +130,6 @@ export const JogToPosition = (
     handleProceed,
     body,
     isRobotMoving,
-    isExiting,
     currentStep,
     isOnDevice,
   } = props
