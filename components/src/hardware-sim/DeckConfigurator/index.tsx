@@ -10,7 +10,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../ui-style-constants'
-import { DeckSlotLocation } from '../DeckSlotLocation'
+import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { EmptyConfigFixture } from './EmptyConfigFixture'
@@ -74,13 +74,14 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
+      {/* TODO(bh, 2023-10-18): migrate to v4 deck def cutouts */}
       {deckDef.locations.orderedSlots.map(slotDef => (
-        <DeckSlotLocation
+        <SingleSlotFixture
           key={slotDef.id}
-          slotName={slotDef.id}
+          cutoutLocation={slotDef.id as Cutout}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
-          slotBaseColor={lightFill}
+          fixtureBaseColor={lightFill}
         />
       ))}
       {stagingAreaFixtures.map(fixture => (

@@ -2,6 +2,7 @@ import {
   checkModuleCompatibility,
   Fixture,
   getDeckDefFromRobotType,
+  getRobotTypeFromLoadedLabware,
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
@@ -9,7 +10,6 @@ import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from './useAttachedModules'
-import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
 
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -28,11 +28,11 @@ export function useModuleRenderInfoForProtocolById(
   robotName: string,
   runId: string
 ): ModuleRenderInfoById {
-  const { robotType } = useProtocolDetailsForRun(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const { data: deckConfig } = useDeckConfigurationQuery()
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const robotType = getRobotTypeFromLoadedLabware(protocolData?.labware ?? [])
   const attachedModules = useAttachedModules()
   if (protocolData == null) return {}
 

@@ -15,6 +15,7 @@ import {
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
+import { ModuleInformation } from '../Module/ModuleInformation'
 import { Module } from '../Module'
 import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
@@ -45,8 +46,13 @@ interface BaseDeckProps {
   moduleLocations: Array<{
     moduleModel: ModuleModel
     moduleLocation: ModuleLocation
-    nestedLabwareDef?: LabwareDefinition2
+    nestedLabwareDef?: LabwareDefinition2 | null
     innerProps?: React.ComponentProps<typeof Module>['innerProps']
+    // props for module info/connection, subject to change as design refines deck map
+    moduleInformation?: Omit<
+      React.ComponentProps<typeof ModuleInformation>,
+      'moduleDef'
+    >
   }>
   deckConfig?: DeckConfiguration
   lightFill?: string
@@ -139,14 +145,21 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         </>
       )}
       {moduleLocations.map(
-        ({ moduleModel, moduleLocation, nestedLabwareDef, innerProps }) => {
+        ({
+          moduleModel,
+          moduleLocation,
+          nestedLabwareDef,
+          innerProps,
+          moduleInformation,
+        }) => {
           const slotDef = deckDef.locations.orderedSlots.find(
             s => s.id === moduleLocation.slotName
           )
+          const moduleDef = getModuleDef2(moduleModel)
           return slotDef != null ? (
             <Module
               key={`${moduleModel} ${slotDef.id}`}
-              def={getModuleDef2(moduleModel)}
+              def={moduleDef}
               x={slotDef.position[0]}
               y={slotDef.position[1]}
               orientation={inferModuleOrientationFromXCoordinate(
@@ -154,6 +167,12 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               )}
               innerProps={innerProps}
             >
+              {moduleInformation != null ? (
+                <ModuleInformation
+                  moduleDef={moduleDef}
+                  {...moduleInformation}
+                />
+              ) : null}
               {nestedLabwareDef != null ? (
                 <LabwareRender definition={nestedLabwareDef} />
               ) : null}
