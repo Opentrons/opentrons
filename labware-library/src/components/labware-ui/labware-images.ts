@@ -265,5 +265,5 @@ export const labwareImages: Record<string, string[]> = {
   ],
   opentrons_96_wellplate_200ul_pcr_full_skirt: [
     require('../../images/opentrons_96_wellplate_200ul_pcr_full_skirt.jpg'),
-  ]
+  ],
 }
