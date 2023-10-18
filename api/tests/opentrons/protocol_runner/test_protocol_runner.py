@@ -278,7 +278,6 @@ async def test_stop_when_run_never_started(
 
     decoy.verify(
         await protocol_engine.finish(
-            drop_tips_after_run=False,
             set_run_status=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         ),

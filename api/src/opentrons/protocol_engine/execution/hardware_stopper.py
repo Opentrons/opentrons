@@ -98,14 +98,9 @@ class HardwareStopper:
         )
 
     async def do_stop_and_recover(
-        self,
-        post_run_hardware_state: PostRunHardwareState,
-        drop_tips_after_run: bool = False,
+        self, post_run_hardware_state: PostRunHardwareState
     ) -> None:
-        """Stop and reset the HardwareAPI, optionally dropping tips and homing."""
-        if drop_tips_after_run:
-            await self._drop_tip()
-
+        """Stop and reset the HardwareAPI, perform homing."""
         home_after_stop = post_run_hardware_state in (
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,

@@ -338,7 +338,6 @@ class ProtocolEngine:
     async def finish(
         self,
         error: Optional[Exception] = None,
-        drop_tips_after_run: bool = True,
         set_run_status: bool = True,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
@@ -365,7 +364,6 @@ class ProtocolEngine:
             # of some hardware interaction that would raise it as an exception. For example, imagine
             # we were paused between two commands, or imagine we were executing a very long run of
             # comment commands.
-            drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
             if error is None:
                 error = EStopActivatedError(message="Estop was activated during a run")
@@ -391,7 +389,6 @@ class ProtocolEngine:
                     root_error=error,
                     code=ErrorCodes.PIPETTE_OVERPRESSURE,
                 ):
-                    drop_tips_after_run = False
                     post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
 
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
@@ -417,7 +414,6 @@ class ProtocolEngine:
             # Cleanup after hardware halt and reset the hardware controller
             self._hardware_stopper.do_stop_and_recover,
             post_run_hardware_state=post_run_hardware_state,
-            drop_tips_after_run=drop_tips_after_run,
         )
         exit_stack.callback(self._door_watcher.stop)
 

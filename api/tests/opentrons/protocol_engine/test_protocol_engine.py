@@ -409,7 +409,6 @@ def test_pause(
     )
 
 
-@pytest.mark.parametrize("drop_tips_after_run", [True, False])
 @pytest.mark.parametrize("set_run_status", [True, False])
 @pytest.mark.parametrize(
     argnames=["post_run_hardware_state", "expected_halt_disengage"],
@@ -427,7 +426,6 @@ async def test_finish(
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
-    drop_tips_after_run: bool,
     set_run_status: bool,
     post_run_hardware_state: PostRunHardwareState,
     expected_halt_disengage: bool,
@@ -442,7 +440,6 @@ async def test_finish(
     decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
 
     await subject.finish(
-        drop_tips_after_run=drop_tips_after_run,
         set_run_status=set_run_status,
         post_run_hardware_state=post_run_hardware_state,
     )
@@ -455,7 +452,6 @@ async def test_finish(
         ),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
-            drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         ),
         await plugin_starter.stop(),
@@ -480,7 +476,6 @@ async def test_finish_with_defaults(
         action_dispatcher.dispatch(FinishAction(set_run_status=True)),
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         await hardware_stopper.do_stop_and_recover(
-            drop_tips_after_run=True,
             post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         ),
     )
@@ -533,7 +528,6 @@ async def test_finish_with_error(
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
-            drop_tips_after_run=expected_drop_tips,
             post_run_hardware_state=expected_end_state,
         ),
         await plugin_starter.stop(),
@@ -585,7 +579,6 @@ async def test_finish_with_estop_error_will_not_drop_tip_and_home(
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
-            drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.DISENGAGE_IN_PLACE,
         ),
         await plugin_starter.stop(),
@@ -632,7 +625,6 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
-            drop_tips_after_run=True,
             post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         ),
         await plugin_starter.stop(),
