@@ -221,7 +221,6 @@ class EngineStore:
 
         if state_view.commands.get_is_okay_to_clear():
             await engine.finish(
-                drop_tips_after_run=False,
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )

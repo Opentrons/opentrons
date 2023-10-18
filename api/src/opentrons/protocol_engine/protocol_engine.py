@@ -353,7 +353,6 @@ class ProtocolEngine:
 
         Arguments:
             error: An error that caused the stop, if applicable.
-            drop_tips_after_run: Whether to drop tips as part of cleanup.
             set_run_status: Whether to calculate a `success` or `failure` run status.
                 If `False`, will set status to `stopped`.
             post_run_hardware_state: The state in which to leave the gantry and motors in
