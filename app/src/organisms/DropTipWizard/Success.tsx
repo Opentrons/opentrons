@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -8,7 +7,6 @@ import {
   JUSTIFY_FLEX_END,
   Flex,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SmallButton } from '../../atoms/buttons'
@@ -19,6 +17,7 @@ interface SuccessProps {
   handleProceed: () => void
   isRobotMoving: boolean
   isExiting: boolean
+  isOnDevice: boolean
 }
 export const Success = (props: SuccessProps): JSX.Element => {
   const {
@@ -27,8 +26,8 @@ export const Success = (props: SuccessProps): JSX.Element => {
     handleProceed,
     isRobotMoving,
     isExiting,
+    isOnDevice,
   } = props
-  const isOnDevice = useSelector(getIsOnDevice)
 
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
 

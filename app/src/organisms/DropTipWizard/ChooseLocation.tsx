@@ -8,14 +8,20 @@ import {
   ALIGN_CENTER,
   RESPONSIVENESS,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
   PrimaryButton,
   useDeckLocationSelect,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
+import { SmallButton } from '../../atoms/buttons'
 
 // TODO: get help link article URL
 const NEED_HELP_URL = ''
@@ -30,6 +36,7 @@ interface ChooseLocationProps {
     y: number
   ) => Promise<void | CommandData[] | undefined>
   isRobotMoving: boolean
+  isOnDevice: boolean
 }
 
 export const ChooseLocation = (
@@ -42,8 +49,9 @@ export const ChooseLocation = (
     robotType,
     moveToXYCoordinate,
     isRobotMoving,
+    isOnDevice,
   } = props
-  const { t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
   const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
     robotType
@@ -75,11 +83,44 @@ export const ChooseLocation = (
     }
   }
 
-  return isRobotMoving ? (
-    <InProgressModal
-      alternativeSpinner={null}
-      description={t('stand_back_exiting')}
-    />
+  if (isRobotMoving) {
+    return (
+      <InProgressModal
+        alternativeSpinner={null}
+        description={t('stand_back_exiting')}
+      />
+    )
+  }
+
+  return isOnDevice ? (
+    <Flex
+      padding={SPACING.spacing32}
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing48} flex="1">
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+          width="100%"
+          flex="1"
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {title}
+          </StyledText>
+          <StyledText as="p">{body}</StyledText>
+        </Flex>
+        <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
+          {DeckLocationSelect}
+        </Flex>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_FLEX_END}>
+        <SmallButton
+          buttonText={i18n.format(t('shared:confirm_position'), 'capitalize')}
+          onClick={handleProceed}
+        />
+      </Flex>
+    </Flex>
   ) : (
     <Flex css={TILE_CONTAINER_STYLE}>
       <TwoUpTileLayout
