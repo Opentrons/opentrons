@@ -66,4 +66,3 @@ async def test_set_disable_tip_motor(mock_can_messenger: AsyncMock) -> None:
             message=md.GearDisableMotorRequest(),
             expected_nodes=[node_id],
         )
-
