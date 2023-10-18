@@ -102,7 +102,7 @@ You can use these standalone adapter definitions to load Opentrons verified or c
 For example, these commands load a well plate on top of the flat bottom adapter::
 
     hs_adapter = hs_mod.load_adapter('opentrons_96_flat_bottom_adapter')
-    hs_plate = hs_mod.load_labware('nest_96_wellplate_200ul_flat')
+    hs_plate = hs_adapter.load_labware('nest_96_wellplate_200ul_flat')
 
 .. versionadded:: 2.15
 
