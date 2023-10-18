@@ -122,12 +122,15 @@ const mockFixture = {
   loadName: STAGING_AREA_LOAD_NAME,
 } as Fixture
 
+const mockSetFixtureLocation = jest.fn()
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
       <ProtocolSetupModulesAndDeck
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
+        setFixtureLocation={mockSetFixtureLocation}
       />
     </MemoryRouter>,
     {

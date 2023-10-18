@@ -591,7 +591,7 @@ export function ProtocolSetup(): JSX.Element {
     ),
     'deck configuration': (
       <ProtocolSetupDeckConfiguration
-        notConfiguredLocation={fixtureLocation}
+        fixtureLocation={fixtureLocation}
         setSetupScreen={setSetupScreen}
       />
     ),
