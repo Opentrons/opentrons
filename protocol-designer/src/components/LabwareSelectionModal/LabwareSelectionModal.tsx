@@ -193,7 +193,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       const smallYDimension = labwareDef.dimensions.yDimension < 85.48
       const irregularSize = smallXDimension && smallYDimension
       const adapter = labwareDef.metadata.displayCategory === 'adapter'
-      const adapter96Channel =
+      const isAdapter96Channel =
         labwareDef.parameters.loadName === ADAPTER_96_CHANNEL
       return (
         (filterRecommended &&
@@ -207,7 +207,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         (adapter &&
           irregularSize &&
           !slot?.includes(HEATERSHAKER_MODULE_TYPE)) ||
-        (adapter96Channel && !has96Channel)
+        (isAdapter96Channel && !has96Channel)
       )
     },
     [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
@@ -424,7 +424,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
             })
           ) : (
             <PDTitledList
-              data-testid="adapterCompatibleLabware"
+              data-testid="LabwareSelectionModal_adapterCompatibleLabware"
               key={adapterCompatibleLabware}
               title="adapter compatible labware"
               collapsed={selectedCategory !== adapterCompatibleLabware}
@@ -432,32 +432,33 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               onClick={makeToggleCategory(adapterCompatibleLabware)}
               inert={false}
             >
-              {getLabwareCompatibleWithAdapter(
-                has96Channel ? permittedTipracks : [],
-                adapterLoadName
-              ).map((adapterDefUri, index) => {
-                const latestDefs = getOnlyLatestDefs()
+              {has96Channel
+                ? permittedTipracks
+                : getLabwareCompatibleWithAdapter(adapterLoadName).map(
+                    (adapterDefUri, index) => {
+                      const latestDefs = getOnlyLatestDefs()
 
-                const URIs = Object.keys(latestDefs)
-                const labwareDefUri = URIs.find(
-                  defUri => defUri === adapterDefUri
-                )
-                const labwareDef = labwareDefUri
-                  ? latestDefs[labwareDefUri]
-                  : null
+                      const URIs = Object.keys(latestDefs)
+                      const labwareDefUri = URIs.find(
+                        defUri => defUri === adapterDefUri
+                      )
+                      const labwareDef = labwareDefUri
+                        ? latestDefs[labwareDefUri]
+                        : null
 
-                return labwareDef != null ? (
-                  <LabwareItem
-                    key={index}
-                    icon="check-decagram"
-                    labwareDef={labwareDef}
-                    selectLabware={selectLabware}
-                    onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                    // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-                    onMouseLeave={() => setPreviewedLabware()}
-                  />
-                ) : null
-              })}
+                      return labwareDef != null ? (
+                        <LabwareItem
+                          key={index}
+                          icon="check-decagram"
+                          labwareDef={labwareDef}
+                          selectLabware={selectLabware}
+                          onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                          // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+                          onMouseLeave={() => setPreviewedLabware()}
+                        />
+                      ) : null
+                    }
+                  )}
             </PDTitledList>
           )}
         </ul>

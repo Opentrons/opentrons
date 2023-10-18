@@ -60,7 +60,6 @@ import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { TerminalItemId } from '../../steplist'
 import { getSelectedTerminalItemId } from '../../ui/steps'
-import { getHas96Channel } from '../../utils'
 import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
 import { SlotWarning } from './SlotWarning'
@@ -111,8 +110,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     robotType,
     trashSlot,
   } = props
-  const pipettes = activeDeckSetup.pipettes
-  const has96Channel = getHas96Channel(pipettes)
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
   // But when swapping labware when at least one is on a module, we need to be aware
@@ -300,7 +297,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             !isAdapter ? (
               //  @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
               <SlotControls
-                has96Channel={has96Channel}
                 key={slot.id}
                 slot={labwareInterfaceSlotDef}
                 selectedTerminalItemId={props.selectedTerminalItemId}
@@ -349,7 +345,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           return (
             // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
             <SlotControls
-              has96Channel={has96Channel}
               key={slot.id}
               slot={slot}
               selectedTerminalItemId={props.selectedTerminalItemId}

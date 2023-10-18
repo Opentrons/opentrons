@@ -61,17 +61,14 @@ describe('LabwareSelectionModal', () => {
       MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
     )
   })
-  it('should display only permitted tipracks if has', () => {
+  it('should display only permitted tipracks if the 96-channel is attached', () => {
     const mockPermittedTipracks = ['mockPermittedTip', 'mockPermittedTip2']
     props.slot = 'A2'
     props.has96Channel = true
     props.adapterLoadName = 'mockLoadName'
     props.permittedTipracks = mockPermittedTipracks
-    const { getByText } = render(props)
+    const { getByText, getAllByRole } = render(props)
     getByText(nestedTextMatcher('adapter compatible labware')).click()
-    expect(mockGetLabwareCompatibleWithAdapter).toHaveBeenCalledWith(
-      mockPermittedTipracks,
-      props.adapterLoadName
-    )
+    expect(getAllByRole('list', { name: '' })).toHaveLength(2)
   })
 })

@@ -130,16 +130,11 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
 }
 
 export const getLabwareCompatibleWithAdapter = (
-  permittedTipracks: string[],
   adapterLoadName?: string
 ): string[] => {
-  if (permittedTipracks.length > 0 && adapterLoadName === ADAPTER_96_CHANNEL) {
-    return permittedTipracks
-  } else {
-    return adapterLoadName != null
-      ? COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterLoadName]
-      : []
-  }
+  return adapterLoadName != null
+    ? COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterLoadName]
+    : []
 }
 export const getLabwareIsCustom = (
   customLabwares: LabwareDefByDefURI,
