@@ -5,7 +5,10 @@ import {
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
-import { getLabwareCompatibleWithAdapter } from '../../../utils/labwareModuleCompatibility'
+import {
+  ADAPTER_96_CHANNEL,
+  getLabwareCompatibleWithAdapter,
+} from '../../../utils/labwareModuleCompatibility'
 import { Portal } from '../../portals/TopPortal'
 import { LabwareSelectionModal } from '../LabwareSelectionModal'
 
@@ -62,13 +65,14 @@ describe('LabwareSelectionModal', () => {
     )
   })
   it('should display only permitted tipracks if the 96-channel is attached', () => {
-    const mockPermittedTipracks = ['mockPermittedTip', 'mockPermittedTip2']
+    const mockTipUri = 'fixture/fixture_tiprack_1000_ul/1'
+    const mockPermittedTipracks = [mockTipUri]
     props.slot = 'A2'
     props.has96Channel = true
-    props.adapterLoadName = 'mockLoadName'
+    props.adapterLoadName = ADAPTER_96_CHANNEL
     props.permittedTipracks = mockPermittedTipracks
-    const { getByText, getAllByRole } = render(props)
+    const { getByText } = render(props)
     getByText(nestedTextMatcher('adapter compatible labware')).click()
-    expect(getAllByRole('list', { name: '' })).toHaveLength(2)
+    getByText('Opentrons GEB 1000uL Tiprack')
   })
 })

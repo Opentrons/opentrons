@@ -234,7 +234,10 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     return `Slot ${slot} Labware`
   }
 
-  const getLabwareAdapterItem = (index: number, labwareDefUri?: string) => {
+  const getLabwareAdapterItem = (
+    index: number,
+    labwareDefUri?: string
+  ): JSX.Element | null => {
     const labwareDef = labwareDefUri != null ? defs[labwareDefUri] : null
     return labwareDef != null ? (
       <LabwareItem
