@@ -52,22 +52,22 @@ def mock_presses_list() -> List[TipActionMoveSpec]:
         TipActionMoveSpec(
             distance=-10.0,
             speed=5.5,
-            currents={Axis.P_L: 1.0},
+            currents={Axis.Z_L: 1.0},
         ),
         TipActionMoveSpec(
             distance=10.0,
             speed=5.5,
-            currents={Axis.P_L: 1.0},
+            currents=None,
         ),
         TipActionMoveSpec(
             distance=-11.0,
             speed=5.5,
-            currents={Axis.P_L: 1.0},
+            currents={Axis.Z_L: 1.0},
         ),
         TipActionMoveSpec(
             distance=11.0,
             speed=5.5,
-            currents={Axis.P_L: 1.0},
+            currents=None,
         ),
     ]
 
@@ -168,9 +168,12 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
             expected_array_length
         )
 
-    spec, _add_tip_to_instrs = subject_ot3.plan_check_pick_up_tip(
-        mount, tip_length, presses, increment
-    )
+    if channels == 96:
+        spec = subject_ot3.plan_ht_pick_up_tip(mount)
+    else:
+        spec = subject_ot3.plan_lt_pick_up_tip(
+            mount, presses, increment
+        )
     assert len(spec.tip_action_moves) == expected_array_length
     assert spec.tip_action_moves == request.getfixturevalue(
         expected_pick_up_motor_actions

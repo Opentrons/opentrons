@@ -1945,11 +1945,10 @@ class OT3API(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
     ) -> None:
         for press in pipette_spec.tip_action_moves:
-            target_down = target_position_from_relative(
-                mount, top_types.Point(z=press.distance), self._current_position
-            )
-            # need to have a current per move
             async with self._backend.motor_current(run_currents=press.currents):
+                target_down = target_position_from_relative(
+                    mount, top_types.Point(z=press.distance), self._current_position
+                )
                 await self._move(target_down, speed=press.speed, expect_stalls=True)
             if press.distance < 0:
                 # we expect a stall has happened during a downward movement into the tiprack, so
@@ -1997,12 +1996,16 @@ class OT3API(
     ) -> None:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
-        spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
-            realmount, tip_length, presses, increment
-        )
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        def add_tip_to_instr() -> None:
+            instrument.add_tip(tip_length=tip_length)
+            instrument.set_current_volume(0)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
+
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            spec = self._pipette_handler.plan_ht_pick_up_tip(realmount)
             if spec.z_distance_to_tiprack:
                 target_down = target_position_from_relative(
                     mount,
@@ -2012,6 +2015,7 @@ class OT3API(
                 await self._move(target_down)
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
+            spec = self._pipette_handler.plan_lt_pick_up_tip(realmount, presses, increment)
             await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
@@ -2036,7 +2040,7 @@ class OT3API(
         ):
             await self._backend.check_for_tip_presence(realmount, TipStateType.PRESENT)
 
-        _add_tip_to_instrs()
+        add_tip_to_instr()
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
@@ -2066,12 +2070,20 @@ class OT3API(
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
-        spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        def _remove_tips() -> None:
+            instrument.set_current_volume(0)
+            instrument.current_tiprack_diameter = 0.0
+            instrument.remove_tip()
+
         await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
 
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            spec = self._pipette_handler.plan_ht_drop_tip(realmount)
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
+            spec = self._pipette_handler.plan_lt_drop_tip(realmount)
             for move in spec.tip_action_moves:
                 await self._backend.set_active_current(move.currents)
                 target_pos = target_position_from_plunger(
@@ -2096,7 +2108,7 @@ class OT3API(
         if home_after:
             await self._home([Axis.by_mount(mount)])
 
-        _remove()
+        _remove_tips()
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
