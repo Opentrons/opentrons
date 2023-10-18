@@ -86,23 +86,6 @@ const WIZARD_STEPS: WizardStep[] = [
   'staging_area',
   'modulesAndOther',
 ]
-// const WIZARD_STEPS_1_PIP: WizardStep[] = [
-//   'robotType',
-//   'metadata',
-//   'first_pipette_type',
-//   'first_pipette_tips',
-//   'second_pipette_type',
-//   'staging_area',
-//   'modulesAndOther',
-// ]
-// const WIZARD_STEPS_96_CHANNEL: WizardStep[] = [
-//   'robotType',
-//   'metadata',
-//   'first_pipette_type',
-//   'first_pipette_tips',
-//   'staging_area',
-//   'modulesAndOther',
-// ]
 const WIZARD_STEPS_OT2: WizardStep[] = [
   'robotType',
   'metadata',
@@ -112,14 +95,6 @@ const WIZARD_STEPS_OT2: WizardStep[] = [
   'second_pipette_tips',
   'modulesAndOther',
 ]
-// const WIZARD_STEPS_OT2_1_PIP: WizardStep[] = [
-//   'robotType',
-//   'metadata',
-//   'first_pipette_type',
-//   'first_pipette_tips',
-//   'second_pipette_type',
-//   'modulesAndOther',
-// ]
 
 export function CreateFileWizard(): JSX.Element | null {
   const { t } = useTranslation()
@@ -455,32 +430,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       setWizardSteps(WIZARD_STEPS)
     }
   }
-  // const handleProceed96Channel = (
-  //   has96Channel: boolean,
-  //   robotType: string
-  // ): void => {
-  //   if (has96Channel) {
-  //     setWizardSteps(WIZARD_STEPS_96_CHANNEL)
-  //   } else if (robotType === OT2_ROBOT_TYPE) {
-  //     setWizardSteps(WIZARD_STEPS_OT2)
-  //   } else {
-  //     setWizardSteps(WIZARD_STEPS)
-  //   }
-  // }
-  // const handleProceed2ndPipette = (
-  //   has2ndPip: boolean,
-  //   robotType: string
-  // ): void => {
-  //   if (robotType === OT2_ROBOT_TYPE && !has2ndPip) {
-  //     setWizardSteps(WIZARD_STEPS_OT2_1_PIP)
-  //   } else if (robotType === FLEX_ROBOT_TYPE && !has2ndPip) {
-  //     setWizardSteps(WIZARD_STEPS_1_PIP)
-  //   } else if (robotType === OT2_ROBOT_TYPE && has2ndPip) {
-  //     setWizardSteps(WIZARD_STEPS_OT2)
-  //   } else {
-  //     setWizardSteps(WIZARD_STEPS)
-  //   }
-  // }
 
   const contentsByWizardStep: {
     [wizardStep in WizardStep]: (
@@ -501,33 +450,13 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       <MetadataTile {...formikProps} proceed={proceed} goBack={goBack} />
     ),
     first_pipette_type: (formikProps: FormikProps<FormState>) => (
-      <FirstPipetteTypeTile
-        {...formikProps}
-        goBack={goBack}
-        proceed={() => {
-          // handleProceed96Channel(
-          //   formikProps.values.pipettesByMount.left.pipetteName === 'p1000_96',
-          //   formikProps.values.fields.robotType
-          // )
-          proceed()
-        }}
-      />
+      <FirstPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
     ),
     first_pipette_tips: (formikProps: FormikProps<FormState>) => (
       <FirstPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
     ),
     second_pipette_type: (formikProps: FormikProps<FormState>) => (
-      <SecondPipetteTypeTile
-        {...formikProps}
-        goBack={goBack}
-        proceed={() => {
-          // handleProceed2ndPipette(
-          //   formikProps.values.pipettesByMount.right.pipetteName == null,
-          //   formikProps.values.fields.robotType
-          // )
-          proceed()
-        }}
-      />
+      <SecondPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
     ),
     second_pipette_tips: (formikProps: FormikProps<FormState>) => (
       <SecondPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />

@@ -116,27 +116,27 @@ describe('CreateFileWizard', () => {
     let next = getByRole('button', { name: 'Next' })
     next.click()
     //  add protocol name
-    getByText('Step 1 / 7')
+    getByText('Step 1 / 6')
     const inputField = getByLabelText('MetadataTile_protocolName')
     fireEvent.change(inputField, { target: { value: 'mockName' } })
     next = getByRole('button', { name: 'Next' })
     next.click()
-    getByText('Step 2 / 7')
+    getByText('Step 2 / 6')
     //  select P20 Single-Channel GEN2
     getByLabelText('EquipmentOption_flex_P20 Single-Channel GEN2').click()
     next = getByRole('button', { name: 'Next' })
     next.click()
-    getByText('Step 3 / 7')
+    getByText('Step 3 / 6')
     //  select 10uL tipracks
     getByLabelText('EquipmentOption_flex_10uL tipracks').click()
     next = getByRole('button', { name: 'Next' })
     next.click()
-    getByText('Step 4 / 7')
+    getByText('Step 4 / 6')
     //  select none for 2nd pipette
     getByLabelText('EquipmentOption_flex_None').click()
     next = getByRole('button', { name: 'Next' })
     next.click()
-    getByText('Step 7 / 7')
+    getByText('Step 6 / 6')
     //  no modules and continue
     getByRole('button', { name: 'Review file details' }).click()
     expect(mockCreateNewProtocol).toHaveBeenCalled()

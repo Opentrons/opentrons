@@ -46,6 +46,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
     >
       {deckDef.locations.orderedSlots.map(slotDef => (
         <DeckSlotLocation
+          key={slotDef.id}
           slotName={slotDef.id}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
