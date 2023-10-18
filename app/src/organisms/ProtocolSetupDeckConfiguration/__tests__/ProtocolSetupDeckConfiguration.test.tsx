@@ -25,6 +25,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
 
   beforeEach(() => {
     props = {
+      fixtureLocation: 'D3',
       setSetupScreen: mockSetSetupScreen,
     }
     mockDeckConfigurator.mockReturnValue(<div>mock DeckConfigurator</div>)
@@ -36,5 +37,9 @@ describe('ProtocolSetupDeckConfiguration', () => {
     getByText('mock DeckConfigurator')
   })
 
-  it('should call a mock function when tapping the back button', () => {})
+  it('should call a mock function when tapping the back button', () => {
+    const [{ getByTestId }] = render(props)
+    getByTestId('ChildNavigation_Back_Button').click()
+    expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
+  })
 })
