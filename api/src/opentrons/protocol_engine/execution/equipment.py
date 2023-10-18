@@ -387,6 +387,43 @@ class EquipmentHandler:
             static_config=static_pipette_config,
         )
 
+    async def configure_nozzle_layout(
+        self,
+        pipette_id: str,
+        volume: float,
+    ) -> LoadedConfigureForVolumeData:
+        """Ensure the requested volume can be configured for the given pipette.
+
+        Args:
+            pipette_id: The identifier for the pipette.
+            volume: The volume to configure the pipette for
+
+        Returns:
+            A LoadedConfiguredVolumeData object.
+        """
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
+
+        if not use_virtual_pipettes:
+            mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
+
+            nozzle_manager = (
+                await self._hardware_api.update_nozzle_configuration_for_mount()
+            )
+            # mount: Union[top_types.Mount, OT3Mount],
+            # back_left_nozzle: str,
+            # front_right_nozzle: str,
+            # starting_nozzle: Optional[str] = None)
+
+        else:
+            model = self._state_store.pipettes.get_model_name(pipette_id)
+            nozzle_manager = (
+                self._virtual_pipette_data_provider.configure_nozzle_manager_for_layout(
+                    pipette_id, volume, model
+                )
+            )
+
+        return nozzle_manager
+
     @overload
     def get_module_hardware_api(
         self,

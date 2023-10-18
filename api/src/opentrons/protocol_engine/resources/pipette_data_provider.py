@@ -12,6 +12,9 @@ from opentrons_shared_data.pipette import (
 
 
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.instruments.nozzle_manager import (
+    NozzleConfigurationManager,
+)
 
 from ..types import FlowRates
 
@@ -40,6 +43,35 @@ class VirtualPipetteDataProvider:
     def __init__(self) -> None:
         """Build a VirtualPipetteDataProvider."""
         self._liquid_class_by_id: Dict[str, pip_types.LiquidClasses] = {}
+        self._nozzle_manager_layout_by_id: Dict[str, NozzleConfigurationManager] = {}
+
+    def configure_virtual_pipette_nozzle_layout(
+        self,
+        pipette_id: str,
+        pipette_model_string: str,
+        back_left_nozzle: str,
+        front_right_nozzle: str,
+        starting_nozzle: str,
+    ) -> None:
+        """Emulate update_nozzle_configuration_for_mount."""
+        if pipette_id not in self._nozzle_manager_layout_by_id:
+            config = self.get_virtual_pipette_static_config_by_model_string(
+                pipette_id, pipette_model_string
+            )
+            new_nozzle_manager = NozzleConfigurationManager.build_from_nozzlemap(
+                config.nozzle_map,
+                config.partial_tip_configurations.per_tip_pickup_current,
+            )
+            new_nozzle_manager.update_nozzle_configuration(
+                back_left_nozzle, front_right_nozzle, starting_nozzle
+            )
+            self._nozzle_manager_layout_by_id[pipette_id] = new_nozzle_manager
+        else:
+            # Need to make sure that we pass all the right nozzles here.
+            self._nozzle_manager_layout_by_id[pipette_id].update_nozzle_layout(
+                back_left_nozzle, front_right_nozzle, starting_nozzle
+            )
+        return self._nozzle_manager_layout_by_id[pipette_id]
 
     def configure_virtual_pipette_for_volume(
         self, pipette_id: str, volume: float, pipette_model_string: str

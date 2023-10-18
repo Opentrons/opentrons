@@ -125,6 +125,14 @@ def test_load_virtual_pipette_by_model_string(
     )
 
 
+def test_load_virtual_pipette_nozzle_layout(
+    subject_instance: VirtualPipetteDataProvider,
+) -> None:
+    """It should return a NozzleMap object."""
+    result = subject_instance.configure_virtual_pipette_nozzle_layout("my-pipette", "p300_multi_v2.1", "A1", "E1", "A1")
+    assert result
+
+
 def test_get_pipette_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:

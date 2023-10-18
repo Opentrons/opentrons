@@ -112,7 +112,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             movement_speed_by_id={},
             static_config_by_id={},
             flow_rates_by_id={},
-            nozzle_configuration_by_id={}
+            nozzle_configuration_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
