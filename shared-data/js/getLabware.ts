@@ -35,6 +35,7 @@ export const LABWAREV2_DO_NOT_LIST = [
   // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
   // (https://opentrons.atlassian.net/browse/RLAB-230):
   'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
   // Special labware that users probably shouldn't know about or load:
   // these all should eventually be given a new namespace like "opentrons-internal"
   // so that they can be filtered out by namespace rather than a block list like this

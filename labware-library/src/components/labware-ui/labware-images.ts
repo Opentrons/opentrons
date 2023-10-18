@@ -244,5 +244,26 @@ export const labwareImages: Record<string, string[]> = {
   ],
   opentrons_flex_96_tiprack_adapter: [
     require('../../images/opentrons_flex_96_tiprack_adapter.jpg'),
+  ],
+  opentrons_flex_96_tiprack_50ul: [
+    require('../../images/opentrons_flex_96_tiprack_50ul.jpg'),
+  ],
+  opentrons_flex_96_tiprack_200ul: [
+    require('../../images/opentrons_flex_96_tiprack_200ul.jpg'),
+  ],
+  opentrons_flex_96_tiprack_1000ul: [
+    require('../../images/opentrons_flex_96_tiprack_1000ul.jpg'),
+  ],
+  opentrons_flex_96_filtertiprack_50ul: [
+    require('../../images/opentrons_flex_96_filtertiprack_50ul.jpg'),
+  ],
+  opentrons_flex_96_filtertiprack_200ul: [
+    require('../../images/opentrons_flex_96_filtertiprack_200ul.jpg'),
+  ],
+  opentrons_flex_96_filtertiprack_1000ul: [
+    require('../../images/opentrons_flex_96_filtertiprack_1000ul.jpg'),
+  ],
+  opentrons_96_wellplate_200ul_pcr_full_skirt: [
+    require('../../images/opentrons_96_wellplate_200ul_pcr_full_skirt.jpg'),
   ]
 }
