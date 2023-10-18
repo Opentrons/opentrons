@@ -73,8 +73,8 @@ class LiquidActionSpec:
 @dataclass(frozen=True)
 class TipActionMoveSpec:
     distance: float
-    speed: float
     currents: Dict[Axis, float]
+    speed: Optional[float]
 
 
 @dataclass(frozen=True)
@@ -840,11 +840,22 @@ class OT3PipetteHandler:
             drop_seq = [
                 TipActionMoveSpec(
                     distance=instrument.plunger_positions.drop_tip,
-                    speed=instrument.drop_configurations.speed,
+                    speed=None,
                     currents={
-                        Axis.P_L: instrument.drop_configurations.current,
+                        Axis.of_main_tool_actuator(
+                            mount
+                        ): instrument.plunger_motor_current.run,
                     },
-                )
+                ),
+                TipActionMoveSpec(
+                    distance=instrument.plunger_positions.bottom,
+                    speed=None,
+                    currents={
+                        Axis.of_main_tool_actuator(
+                            mount
+                        ): instrument.plunger_motor_current.run,
+                    },
+                ),
             ]
 
         def _remove_tips() -> None:

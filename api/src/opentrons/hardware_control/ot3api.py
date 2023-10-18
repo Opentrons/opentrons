@@ -2073,6 +2073,7 @@ class OT3API(
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
             for move in spec.tip_action_moves:
+                await self._backend.set_active_current(move.currents)
                 target_pos = target_position_from_plunger(
                     realmount, move.distance, self._current_position
                 )
