@@ -242,4 +242,7 @@ export const labwareImages: Record<string, string[]> = {
     require('../../images/universal_flat_adapter.jpg'),
     require('../../images/corning_384_wellplate_112ul_flat_photo_three_quarters.jpg'),
   ],
+  opentrons_flex_96_tiprack_adapter: [
+    require('../../images/opentrons_flex_96_tiprack_adapter.jpg'),
+  ]
 }
