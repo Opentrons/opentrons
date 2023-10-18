@@ -78,6 +78,8 @@ from opentrons.hardware_control.estop_state import EstopStateMachine
 from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_enable_motor,
     set_disable_motor,
+    set_enable_tip_motor,
+    set_disable_tip_motor,
 )
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
@@ -1043,13 +1045,19 @@ class OT3Controller:
 
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
-        nodes = {axis_to_node(ax) for ax in axes}
-        await set_disable_motor(self._messenger, nodes)
+        if Axis.Q in axes:
+            await set_disable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
+        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
+        if len(nodes) > 0:
+            await set_disable_motor(self._messenger, nodes)
 
     async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
-        nodes = {axis_to_node(ax) for ax in axes}
-        await set_enable_motor(self._messenger, nodes)
+        if Axis.Q in axes:
+            await set_enable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
+        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
+        if len(nodes) > 0:
+            await set_enable_motor(self._messenger, nodes)
 
     @requires_update
     async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
