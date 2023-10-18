@@ -615,7 +615,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param height: The height, in mm, to move above the current well
                        before aspirating air. The default is 5 mm above current well.
-                       
+
         :type height: float
 
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
