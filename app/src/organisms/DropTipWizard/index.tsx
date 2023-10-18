@@ -41,7 +41,7 @@ import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
-import type { PipetteData } from '@opentrons/api-client'
+import type { PipetteData, CommandData } from '@opentrons/api-client'
 import type {
   Coordinates,
   PipetteModelSpecs,
@@ -49,7 +49,6 @@ import type {
   SavePositionRunTimeCommand,
   CreateCommand,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
 const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MANAGED_PIPETTE_ID = 'managedPipetteId'
@@ -396,6 +395,7 @@ export const DropTipWizardComponent = (
         {...{
           handleCreateAndSetup,
           isCreateLoading,
+          isOnDevice,
         }}
       />
     )
@@ -429,6 +429,7 @@ export const DropTipWizardComponent = (
         }
         moveToXYCoordinate={moveToXYCoordinate}
         isRobotMoving={isRobotMoving}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (
@@ -513,6 +514,7 @@ export const DropTipWizardComponent = (
         }
         isRobotMoving={isRobotMoving}
         isExiting={isExiting}
+        isOnDevice={isOnDevice}
       />
     )
   }
