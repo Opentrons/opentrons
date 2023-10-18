@@ -42,10 +42,15 @@ You can use these standalone adapter definitions to load Opentrons verified or c
      
 For example, these commands load a PCR plate on top of the 96-well block::
 
-    temp_adapter = temp_mod.load_adapter('opentrons_96_well_aluminum_block')
-    temp_plate = temp_adapter.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+    temp_adapter = temp_mod.load_adapter(
+        'opentrons_96_well_aluminum_block'
+    )
+    temp_plate = temp_adapter.load_labware(
+        'nest_96_wellplate_100ul_pcr_full_skirt'
+    )
 
 .. versionadded:: 2.15
+    The ``load_adapter()`` method.
 
 .. note::
     You can also load labware directly onto the Temperature Module. In API version 2.14 and earlier, this was the correct way to load labware on top of the flat bottom plate. In API version 2.15 and later, you should load both the adapter and the labware with separate commands.
