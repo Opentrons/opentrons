@@ -24,12 +24,12 @@ import type { Cutout } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
-  notConfiguredLocation: Cutout | null
+  fixtureLocation: Cutout | null
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
 }
 
 export function ProtocolSetupDeckConfiguration({
-  notConfiguredLocation,
+  fixtureLocation,
   setSetupScreen,
 }: ProtocolSetupDeckConfigurationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing', 'shared'])
@@ -85,12 +85,12 @@ export function ProtocolSetupDeckConfiguration({
           />
         ) : null}
         {showConfigurationModal &&
-        (notConfiguredLocation != null || targetFixtureLocation != null) ? (
+        (fixtureLocation != null || targetFixtureLocation != null) ? (
           <AddFixtureModal
             fixtureLocation={
               targetFixtureLocation != null
                 ? targetFixtureLocation
-                : notConfiguredLocation
+                : fixtureLocation
             }
             setShowAddFixtureModal={setShowConfigurationModal}
             isOnDevice
