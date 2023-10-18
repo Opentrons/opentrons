@@ -45,16 +45,14 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {deckDef.locations.orderedSlots.map(slotDef => (
-        <>
-          <DeckSlotLocation
-            slotName={slotDef.id}
-            deckDefinition={deckDef}
-            slotClipColor={COLORS.transparent}
-            slotBaseColor={COLORS.light1}
-          />
-        </>
+        <DeckSlotLocation
+          slotName={slotDef.id}
+          deckDefinition={deckDef}
+          slotClipColor={COLORS.transparent}
+          slotBaseColor={COLORS.light1}
+        />
       ))}
-      {selectedSlots.map(selectedSlot => {
+      {selectedSlots.map((selectedSlot, index) => {
         const slot = deckDef.locations.orderedSlots.find(
           slot => slot.id === selectedSlot
         )
@@ -85,7 +83,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
 
         return (
           <RobotCoordsForeignObject
-            key={`${selectedSlot}_${slot?.id}`}
+            key={`${selectedSlot}_${slot?.id}_${index}`}
             width={xDimension}
             height={yDimension}
             x={x}
