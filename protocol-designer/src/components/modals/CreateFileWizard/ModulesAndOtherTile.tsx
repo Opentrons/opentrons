@@ -173,10 +173,23 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
               if (!enableDeckModification || robotType === OT2_ROBOT_TYPE) {
                 if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
                   goBack(4)
-                } else if (values.pipettesByMount.right.pipetteName === '') {
+                } else if (
+                  values.pipettesByMount.right.pipetteName === '' &&
+                  robotType === FLEX_ROBOT_TYPE
+                ) {
                   goBack(3)
-                } else {
+                } else if (
+                  values.pipettesByMount.right.pipetteName === '' &&
+                  robotType === OT2_ROBOT_TYPE
+                ) {
                   goBack(2)
+                } else if (
+                  values.pipettesByMount.right.pipetteName !== '' &&
+                  robotType === FLEX_ROBOT_TYPE
+                ) {
+                  goBack(2)
+                } else {
+                  goBack()
                 }
               } else {
                 goBack()
