@@ -204,7 +204,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
   const { values, setFieldValue, enableDeckModification } = props
 
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
-  const trashDisabled = getTrashBinOptionDisabled(values)
+  const trashBinDisabled = getTrashBinOptionDisabled(values)
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
     if (values.additionalEquipment.includes(equipment)) {
@@ -221,13 +221,13 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
   }
 
   React.useEffect(() => {
-    if (trashDisabled) {
+    if (trashBinDisabled) {
       setFieldValue(
         'additionalEquipment',
         without(values.additionalEquipment, 'trashBin')
       )
     }
-  }, [trashDisabled, setFieldValue])
+  }, [trashBinDisabled, setFieldValue])
 
   return (
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
@@ -296,7 +296,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
             }
             text="Trash Bin"
             showCheckbox
-            disabled={trashDisabled}
+            disabled={trashBinDisabled}
           />
         </>
       ) : null}

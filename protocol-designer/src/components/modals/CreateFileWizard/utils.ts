@@ -16,11 +16,16 @@ import type { FormModulesByType } from '../../../step-forms'
 import type { FormState } from './types'
 
 export const FLEX_TRASH_DEFAULT_SLOT = 'A3'
+const ALL_STAGING_AREAS = 4
 
 export const getLastCheckedEquipment = (values: FormState): string | null => {
-  const hasTrash = values.additionalEquipment.includes('trashBin')
+  const hasAllStagingAreas =
+    values.additionalEquipment.filter(equipment =>
+      equipment.includes('stagingArea')
+    ).length === ALL_STAGING_AREAS
+  const hasTrashBin = values.additionalEquipment.includes('trashBin')
 
-  if (!hasTrash) {
+  if (!hasTrashBin || !hasAllStagingAreas) {
     return null
   }
 
@@ -65,7 +70,7 @@ export const getTrashBinOptionDisabled = (values: FormState): boolean => {
   const allStagingAreasInUse =
     values.additionalEquipment.filter(equipment =>
       equipment.includes('stagingArea')
-    ).length === 4
+    ).length === ALL_STAGING_AREAS
 
   const allModulesInSideSlotsOnDeck =
     values.modulesByType.heaterShakerModuleType.onDeck &&
@@ -85,16 +90,19 @@ export const getTrashSlot = (values: FormState): string => {
     return FLEX_TRASH_DEFAULT_SLOT
   }
 
-  const moduleSlots: string[] = []
-  FLEX_SUPPORTED_MODULE_MODELS.map(model => {
-    const moduleType = getModuleType(model)
-    if (values.modulesByType[moduleType].onDeck) {
-      const slot = String(DEFAULT_SLOT_MAP[model])
-      return moduleType === THERMOCYCLER_MODULE_TYPE
-        ? moduleSlots.push('A1', slot)
-        : moduleSlots.push(slot)
-    }
-  })
+  const moduleSlots: string[] = FLEX_SUPPORTED_MODULE_MODELS.reduce(
+    (slots: string[], model) => {
+      const moduleType = getModuleType(model)
+      if (values.modulesByType[moduleType].onDeck) {
+        const slot = String(DEFAULT_SLOT_MAP[model])
+        return moduleType === THERMOCYCLER_MODULE_TYPE
+          ? [...slots, 'A1', slot]
+          : [...slots, slot]
+      }
+      return slots
+    },
+    []
+  )
 
   const unoccupiedSlot = OUTER_SLOTS_FLEX.find(
     slot =>
