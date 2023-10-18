@@ -105,6 +105,7 @@ For example, these commands load a well plate on top of the flat bottom adapter:
     hs_plate = hs_adapter.load_labware('nest_96_wellplate_200ul_flat')
 
 .. versionadded:: 2.15
+    The ``load_adapter()`` method.
 
 
 Pre-configured Combinations
