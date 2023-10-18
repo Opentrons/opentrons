@@ -7,7 +7,7 @@ export const CONFIGURED = 'configured'
 export const CONFLICTING = 'conflicting'
 export const NOT_CONFIGURED = 'not configured'
 
-type LoadedFixtureConfigurationStatus =
+export type LoadedFixtureConfigurationStatus =
   | typeof CONFIGURED
   | typeof CONFLICTING
   | typeof NOT_CONFIGURED

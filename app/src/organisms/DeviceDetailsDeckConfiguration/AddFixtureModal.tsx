@@ -32,18 +32,21 @@ import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
-interface AddDeckConfigurationModalProps {
-  fixtureLocation: Cutout
+interface AddFixtureModalProps {
+  fixtureLocation: Cutout | null
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
   isOnDevice?: boolean
 }
 
-export function AddDeckConfigurationModal({
+export function AddFixtureModal({
   fixtureLocation,
   setShowAddFixtureModal,
   isOnDevice = false,
-}: AddDeckConfigurationModalProps): JSX.Element {
+}: AddFixtureModalProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+
+  if (fixtureLocation == null) return null
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', { slotName: fixtureLocation }),
@@ -58,8 +61,6 @@ export function AddDeckConfigurationModal({
     childrenPadding: SPACING.spacing24,
     width: '23.125rem',
   }
-
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
   if (

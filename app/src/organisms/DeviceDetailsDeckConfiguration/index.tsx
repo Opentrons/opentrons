@@ -27,7 +27,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { AddDeckConfigurationModal } from './AddDeckConfigurationModal'
+import { AddFixtureModal } from './AddFixtureModal'
 
 import type { Cutout } from '@opentrons/shared-data'
 
@@ -74,7 +74,7 @@ export function DeviceDetailsDeckConfiguration({
   return (
     <>
       {showAddFixtureModal && targetFixtureLocation != null ? (
-        <AddDeckConfigurationModal
+        <AddFixtureModal
           fixtureLocation={targetFixtureLocation}
           setShowAddFixtureModal={setShowAddFixtureModal}
         />

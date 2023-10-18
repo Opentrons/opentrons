@@ -31,15 +31,21 @@ import { useFeatureFlag } from '../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
+  Cutout,
   LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface FixtureTableProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
+  setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  setFixtureLocation: (fixtureLocation: Cutout) => void
 }
 
 export function FixtureTable({
   mostRecentAnalysis,
+  setSetupScreen,
+  setFixtureLocation,
 }: FixtureTableProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
@@ -113,7 +119,13 @@ export function FixtureTable({
               <Icon name="more" size="3rem" />
             </>
           )
-          handleClick = () => setShowLocationConflictModal(true)
+          handleClick =
+            configurationStatus === CONFLICTING
+              ? () => setShowLocationConflictModal(true)
+              : () => {
+                  setFixtureLocation(fixture.params.location.cutout)
+                  setSetupScreen('deck configuration')
+                }
         } else if (configurationStatus === CONFIGURED) {
           chipLabel = (
             <Chip

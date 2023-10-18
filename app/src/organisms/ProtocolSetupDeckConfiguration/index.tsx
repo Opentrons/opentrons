@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 
 import {
   DeckConfigurator,
@@ -15,22 +14,26 @@ import {
 } from '@opentrons/react-api-client'
 import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons'
-import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
-import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
-import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
+import { ChildNavigation } from '../ChildNavigation'
+import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
+import { DeckFixtureSetupInstructionsModal } from '../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+import { DeckConfigurationDiscardChangesModal } from '../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { Portal } from '../../App/portal'
 
 import type { Cutout } from '@opentrons/shared-data'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
-export function DeckConfiguration(): JSX.Element {
-  const { t, i18n } = useTranslation([
-    'protocol_setup',
-    'devices_landing',
-    'shared',
-  ])
-  const history = useHistory()
+interface ProtocolSetupDeckConfigurationProps {
+  notConfiguredLocation: Cutout | null
+  setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+}
+
+export function ProtocolSetupDeckConfiguration({
+  notConfiguredLocation,
+  setSetupScreen,
+}: ProtocolSetupDeckConfigurationProps): JSX.Element {
+  const { t } = useTranslation(['protocol_setup', 'devices_landing', 'shared'])
+
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -38,7 +41,7 @@ export function DeckConfiguration(): JSX.Element {
   const [
     showConfigurationModal,
     setShowConfigurationModal,
-  ] = React.useState<boolean>(false)
+  ] = React.useState<boolean>(true)
   const [
     targetFixtureLocation,
     setTargetFixtureLocation,
@@ -64,21 +67,7 @@ export function DeckConfiguration(): JSX.Element {
   }
 
   const handleClickConfirm = (): void => {
-    // ToDo (kk:10/13/2023) add a function for the confirmation
-  }
-
-  const handleClickBack = (): void => {
-    // ToDo If there is any unsaved change, display DeckConfigurationDiscardChangesModal
-    // setShowDiscardChangeModal(true)
-    history.goBack()
-  }
-
-  const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
-    onClick: () => setShowSetupInstructionsModal(true),
-    buttonText: i18n.format(t('setup_instructions'), 'titleCase'),
-    buttonType: 'tertiaryLowLight',
-    iconName: 'information',
-    iconPlacement: 'startIcon',
+    // ToDo (kk:10/17/2023) add a function for the confirmation in a following PR for RAUT-804
   }
 
   return (
@@ -95,9 +84,14 @@ export function DeckConfiguration(): JSX.Element {
             isOnDevice
           />
         ) : null}
-        {showConfigurationModal && targetFixtureLocation != null ? (
+        {showConfigurationModal &&
+        (notConfiguredLocation != null || targetFixtureLocation != null) ? (
           <AddFixtureModal
-            fixtureLocation={targetFixtureLocation}
+            fixtureLocation={
+              targetFixtureLocation != null
+                ? targetFixtureLocation
+                : notConfiguredLocation
+            }
             setShowAddFixtureModal={setShowConfigurationModal}
             isOnDevice
           />
@@ -106,10 +100,9 @@ export function DeckConfiguration(): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}
-          onClickBack={handleClickBack}
+          onClickBack={() => setSetupScreen('modules')}
           buttonText={t('shared:confirm')}
           onClickButton={handleClickConfirm}
-          secondaryButtonProps={secondaryButtonProps}
         />
         <Flex
           marginTop="7.75rem"
