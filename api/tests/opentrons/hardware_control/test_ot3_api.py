@@ -1093,6 +1093,47 @@ async def test_prepare_for_aspirate(
     mock_move_to_plunger_bottom.assert_called_once_with(OT3Mount.LEFT, 1.0)
 
 
+@pytest.mark.parametrize(
+    "asp_vol,disp_vol,push_out,is_ready",
+    (
+        [5, 1, None, True],  # Partial Dispense
+        [5, 5, None, False],  # Full dispense (default push_out)
+        [5, 5, 0.0, True],  # explicit no push out
+        [5, 5, 1.0, False],  # explicit push out
+    ),
+)
+async def test_plunger_ready_to_aspirate_after_dispense(
+    ot3_hardware: ThreadManager[OT3API],
+    asp_vol: float,
+    disp_vol: float,
+    push_out: Optional[float],
+    is_ready: bool,
+):
+    mount = OT3Mount.LEFT
+
+    instr_data = AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 4),
+        ),
+        id="fakepip",
+    )
+
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()]
+
+    await ot3_hardware.add_tip(mount, 100)
+    await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate
+
+    await ot3_hardware.aspirate(OT3Mount.LEFT, asp_vol)
+    await ot3_hardware.dispense(OT3Mount.LEFT, disp_vol, push_out=push_out)
+    assert (
+        ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate == is_ready
+    )
+
+
 async def test_move_to_plunger_bottom(
     ot3_hardware: ThreadManager[OT3API],
     mock_move: AsyncMock,
