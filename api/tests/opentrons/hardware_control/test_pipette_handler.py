@@ -5,7 +5,7 @@ from decoy import Decoy
 from typing import Optional, Tuple, Dict, List
 
 from opentrons import types
-from opentrons.hardware_control.types import OT3Mount
+from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
@@ -52,18 +52,22 @@ def mock_presses_list() -> List[TipActionMoveSpec]:
         TipActionMoveSpec(
             distance=-10.0,
             speed=5.5,
+            currents={Axis.P_L: 1.0},
         ),
         TipActionMoveSpec(
             distance=10.0,
             speed=5.5,
+            currents={Axis.P_L: 1.0},
         ),
         TipActionMoveSpec(
             distance=-11.0,
             speed=5.5,
+            currents={Axis.P_L: 1.0},
         ),
         TipActionMoveSpec(
             distance=11.0,
             speed=5.5,
+            currents={Axis.P_L: 1.0},
         ),
     ]
 
@@ -74,10 +78,12 @@ def mock_pickup_list() -> List[TipActionMoveSpec]:
         TipActionMoveSpec(
             distance=19.0,
             speed=10,
+            currents={Axis.P_L: 1.0, Axis.Q: 1.0},
         ),
         TipActionMoveSpec(
             distance=29,
             speed=5.5,
+            currents={Axis.P_L: 1.0, Axis.Q: 1.0},
         ),
     ]
 
@@ -147,6 +153,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.pick_up_configurations.speed).then_return(5.5)
     decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(10)
     decoy.when(mock_pipette_ot3.pick_up_configurations.current).then_return(1)
+    decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)
     decoy.when(mock_pipette_ot3.pick_up_configurations.prep_move_distance).then_return(

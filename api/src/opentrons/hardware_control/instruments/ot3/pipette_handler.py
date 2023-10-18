@@ -9,7 +9,6 @@ from typing import (
     Any,
     cast,
     List,
-    Iterator,
     TypeVar,
 )
 from typing_extensions import Final

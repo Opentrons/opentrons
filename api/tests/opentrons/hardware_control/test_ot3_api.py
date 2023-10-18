@@ -1400,16 +1400,16 @@ async def test_pick_up_tip_full_tiprack(
         backend._gear_motor_position = {NodeId: 0}
         pipette_handler.plan_check_pick_up_tip.return_value = (
             TipActionSpec(
-                currents={
-                    Axis.of_main_tool_actuator(Mount.LEFT): 0,
-                    Axis.Q: 0,
-                },
                 shake_off_moves=[],
                 tip_action_moves=[
                     TipActionMoveSpec(
                         # Move onto the posts
                         distance=10,
                         speed=0,
+                        currents={
+                            Axis.of_main_tool_actuator(Mount.LEFT): 0,
+                            Axis.Q: 0,
+                        },
                     )
                 ],
             ),
@@ -1463,11 +1463,11 @@ async def test_drop_tip_full_tiprack(
         backend._gear_motor_position = {NodeId.pipette_left: 0}
         pipette_handler.plan_check_drop_tip.return_value = (
             TipActionSpec(
-                currents={Axis.P_L: 1.0},
                 tip_action_moves=[
                     TipActionMoveSpec(
                         distance=10,
                         speed=1,
+                        currents={Axis.P_L: 1.0},
                     ),
                 ],
                 shake_off_moves=[],
