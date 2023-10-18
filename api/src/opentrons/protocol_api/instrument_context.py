@@ -124,7 +124,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def reset_tipracks(self) -> None:
-        """Reload all tips in each tip rack and resets the starting tip."""
+        """Reloads all tips in each tip rack and resets the starting tip."""
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
@@ -264,7 +264,7 @@ class InstrumentContext(publisher.CommandPublisher):
                         If 0 or unspecified, defaults to
                         :py:attr:`current_volume`.
                         If only a volume is passed, the pipette
-                        will dispense from its current position. 
+                        will dispense from its current position.
         :type volume: int or float
 
         :param location: Where to dispense liquid held in the pipette.
@@ -391,7 +391,7 @@ class InstrumentContext(publisher.CommandPublisher):
                          If unspecified, the pipette will mix from
                          its current position.
         :type location: types.Location
-        :param rate: How quickly a pipette aspirates and dispense liquid
+        :param rate: How quickly a pipette aspirates and dispenses liquid
                     while mixing. The aspiration flow rate is calculated as
                     ``rate`` * :py:attr:`flow_rate.aspirate <flow_rate>`.
                     The dispense flow rate is calculated
@@ -457,7 +457,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See also, :ref:`blow-out`.
 
         :param location: The blowout location. If no location is specified,
-                         the pipette will blowout from its current position.
+                         the pipette will blow out from its current position.
         :type location: :py:class:`.Well` or :py:class:`.Location` or None
 
         :raises RuntimeError: If no location is specified and location cache is
@@ -535,7 +535,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :type radius: float
         :param v_offset: The offset in mm from the top of the well to touch tip.
                          A positive offset moves the tip higher above the well.
-                         A negative offset moves it lower into the well.
+                         A negative offset moves the tip lower into the well.
                          Default is -1.0 mm.
         :type v_offset: float
         :param speed: The speed for touch tip motion, in mm/s.
@@ -612,7 +612,7 @@ class InstrumentContext(publisher.CommandPublisher):
                        the entire remaining volume in the pipette.
         :type volume: float
 
-        :param height: The number of millimeters to move above the current well
+        :param height: The height, in mm, to move above the current well
                        before aspirating air. The default is 5 mm above current well.
         :type height: float
 
