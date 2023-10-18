@@ -19,7 +19,7 @@ class _LogBelow:
         return record.levelno < self._log_below_level
 
 
-def _host_config(settings: BaseSettings, level_value: int) -> Dict[str, Any]:
+def _host_config(settings: BaseSettings, log_level: int) -> Dict[str, Any]:
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -34,7 +34,7 @@ def _host_config(settings: BaseSettings, level_value: int) -> Dict[str, Any]:
             "debug": {
                 "class": "logging.StreamHandler",
                 "formatter": "basic",
-                "level": level_value,
+                "level": log_level,
             },
             "serial": {
                 "class": "logging.handlers.RotatingFileHandler",
@@ -56,11 +56,11 @@ def _host_config(settings: BaseSettings, level_value: int) -> Dict[str, Any]:
         "loggers": {
             "opentrons": {
                 "handlers": ["debug", "api"],
-                "level": level_value,
+                "level": log_level,
             },
             "opentrons.deck_calibration": {
                 "handlers": ["debug", "api"],
-                "level": level_value,
+                "level": log_level,
             },
             "opentrons.drivers.asyncio.communication.serial_connection": {
                 "handlers": ["serial"],
@@ -77,13 +77,13 @@ def _host_config(settings: BaseSettings, level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
-            "__main__": {"handlers": ["api"], "level": level_value},
+            "__main__": {"handlers": ["api"], "level": log_level},
         },
     }
 
 
-def _robot_server_config(log_level: int) -> Dict[str, Any]:
-    """Logging configuration for the robot_server."""
+def _robot_config(log_level: int) -> Dict[str, Any]:
+    """Logging configuration for the robot."""
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -116,8 +116,19 @@ def _robot_server_config(log_level: int) -> Dict[str, Any]:
                 "filters": ["records_below_warning"],
                 "SYSLOG_IDENTIFIER": "uvicorn",
             },
+            "opentrons_update": {
+                "class": "systemd.journal.JournalHandler",
+                "level": logging.DEBUG,
+                "formatter": "message_only",
+                "SYSLOG_IDENTIFIER": "opentrons-update",
+            },
         },
         "loggers": {
+            "otupdate": {
+                "handlers": ["opentrons_update"],
+                "level": log_level,
+                "propagate": False,
+            },
             "robot_server": {
                 "handlers": ["syslog_plus_unit"],
                 "level": log_level,
@@ -166,7 +177,6 @@ def _system_server_config(log_level: int) -> Dict[str, Any]:
             "basic": {"format": "%(name)s %(levelname)s %(message)s"},
             "message_only": {"format": "%(message)s"},
         },
-        "filters": {"records_below_warning": {"()": _LogBelow, "level": logging.WARN}},
         "handlers": {
             "journald": {
                 "class": "systemd.journal.JournalHandler",
@@ -187,7 +197,7 @@ def _system_server_config(log_level: int) -> Dict[str, Any]:
                 "propagate": False,
             },
         },
-        "root": {"handlers": ["journald"], "level": level}
+        "root": {"handlers": ["journald"], "level": log_level},
     }
 
 
@@ -220,11 +230,11 @@ def _update_server_config(log_level: int) -> Dict[str, Any]:
                 "propagate": False,
             },
         },
-        "root": {"handlers": ["journald"], "level": level},
+        "root": {"handlers": ["journald"], "level": log_level},
     }
 
 
-def _hardware_server_config(level_value: int) -> Dict[str, Any]:
+def _hardware_server_config(log_level: int) -> Dict[str, Any]:
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -253,11 +263,11 @@ def _hardware_server_config(level_value: int) -> Dict[str, Any]:
             },
             "opentrons": {
                 "handlers": ["api"],
-                "level": level_value,
+                "level": log_level,
             },
             "opentrons_hardware": {
                 "handlers": ["api"],
-                "level": level_value,
+                "level": log_level,
             },
             "opentrons_hardware.drivers.can_bus.can_messenger": {
                 "handlers": ["serial"],
@@ -269,7 +279,7 @@ def _hardware_server_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
-            "__main__": {"handlers": ["api"], "level": level_value},
+            "__main__": {"handlers": ["api"], "level": log_level},
         },
     }
 
@@ -298,24 +308,19 @@ def _ot3usb_config(log_level: int) -> Dict[str, Any]:
                 "propagate": False,
             },
         },
-        "root": {"handlers": ["journald"], "level": level},
+        "root": {"handlers": ["journald"], "level": log_level},
     }
 
 
-def _config(package: PackageName, log_level: int, settings: BaseSettings) -> Dict[str, Any]:
-    settings = settings or BaseSettings()
+def _config(log_level: int, settings: BaseSettings) -> Dict[str, Any]:
+    print(f"YOOOO: {IS_ROBOT}")
     if IS_ROBOT:
-        return {
-            PackageName.ROBOT_SERVER: _robot_server_config,
-            PackageName.SYSTEM_SERVER: _system_server_config,
-            PackageName.UPDATE_SERVER: _update_server_config,
-            PackageName.HARDWARE_SERVER: _hardware_server_config,
-            PackageName.OT3USBBridge: _ot3usb_config,
-        }[package](log_level)
-    return _host_config(settings, log_level)
+        return _robot_config(log_level)
+    else:
+        return _host_config(settings, log_level)
 
 
-def log_init(package: PackageName, level_name: str, settings: Optional[BaseSettings] = None) -> None:
+def log_init(level_name: str, settings: Optional[BaseSettings] = None) -> None:
     """
     Function that sets log levels and format strings. Checks for the
     OT_API_LOG_LEVEL environment variable otherwise defaults to INFO
@@ -329,5 +334,5 @@ def log_init(package: PackageName, level_name: str, settings: Optional[BaseSetti
         )
         ot_log_level = fallback_log_level
     level_value = logging._nameToLevel[ot_log_level]
-    logging_config = _config(package, level_value, settings)
+    logging_config = _config(level_value, settings or BaseSettings())
     dictConfig(logging_config)

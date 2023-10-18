@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 
 from enum import Enum, auto
 from typing import Optional
@@ -16,6 +17,7 @@ IS_ROBOT = bool(
 )
 #: This is the correct thing to check to see if we’re running on a robot
 IS_VIRTUAL = bool(os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"))
+
 
 class SystemArchitecture(Enum):
     HOST = auto()
@@ -52,7 +54,7 @@ if IS_ROBOT:
             OT_SYSTEM_VERSION = contents["buildroot_version"]
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
-            log.exception("Could not find version file in /etc/VERSION.json")
+            pass
 
 
 __all__ = [

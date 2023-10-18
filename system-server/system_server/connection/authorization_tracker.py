@@ -1,10 +1,15 @@
 """Tracks active connections to the server."""
+
+import logging
+
 from datetime import datetime
 from typing import List
 from dataclasses import dataclass
 
 from system_server.jwt import Registrant
 
+
+log = logging.getLogger(__name__)
 
 @dataclass
 class _Authorization:
@@ -44,8 +49,10 @@ class AuthorizationTracker:
         self._connections = [c for c in self._connections if c.expiration > now]
 
     def active_connections(self) -> int:
+        l
         """Get the current number of active connections."""
         self._update_active_connections()
+        log.debug(f"active connections: {len(self._connections)}")
         return len(self._connections)
 
     def get_connected(self) -> List[Registrant]:

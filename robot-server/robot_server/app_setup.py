@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from opentrons import __version__
 
-from server_utils import PackageName, log_init
+from server_utils import log_init
 
 from .errors import exception_handlers
 from .hardware import start_initializing_hardware, clean_up_hardware
@@ -55,8 +55,7 @@ app.include_router(router=router)
 async def on_startup() -> None:
     """Handle app startup."""
     settings = get_settings()
-
-    log_init(PackageName.ROBOT_SERVER, settings.log_level)
+    log_init(settings.log_level)
     initialize_task_runner(app_state=app.state)
     start_initializing_hardware(
         app_state=app.state,
