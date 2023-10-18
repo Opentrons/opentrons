@@ -2,14 +2,12 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -21,8 +19,7 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 
-const SETUP_INSTRUCTION_URL = 'www.opentrons.com/support/fixtures'
-const SETUP_INSTRUCTION_EXTERNAL_URL =
+const SETUP_INSTRUCTION_URL =
   'https://support.opentrons.com/s/article/Deck-configuration-on-Opentrons-Flex'
 const IMG_ALT = 'QRCode for Deck fixture setup instructions page'
 
@@ -41,6 +38,7 @@ export function DeckFixtureSetupInstructionsModal({
     iconName: 'information',
     iconColor: COLORS.darkBlack100,
     hasExitIcon: true,
+    onClick: () => setShowSetupInstructionsModal(false),
   }
 
   const modalProps: LegacyModalProps = {
@@ -59,28 +57,15 @@ export function DeckFixtureSetupInstructionsModal({
           onOutsideClick={() => setShowSetupInstructionsModal(false)}
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing12}
-              >
-                <StyledText as="p">
-                  {t('deck_fixture_setup_modal_top_description')}
-                </StyledText>
-                <StyledText as="p">
-                  {t('deck_fixture_setup_modal_bottom_description')}
-                </StyledText>
-              </Flex>
-              <Flex
-                padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-                backgroundColor={COLORS.light1}
-                borderRadius={BORDERS.borderRadiusSize3}
-              >
-                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                  {SETUP_INSTRUCTION_URL}
-                </StyledText>
-              </Flex>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <StyledText as="p">
+                {t('deck_fixture_setup_modal_top_description')}
+              </StyledText>
+              <StyledText as="p">
+                {t('deck_fixture_setup_modal_bottom_description')}
+              </StyledText>
             </Flex>
+
             <Flex>
               <img src={imgSrc} alt={IMG_ALT} width="178px" height="178px" />
             </Flex>
@@ -96,16 +81,16 @@ export function DeckFixtureSetupInstructionsModal({
               >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing32}
+                  gridGap={SPACING.spacing16}
                 >
                   <StyledText as="p">
                     {t('deck_fixture_setup_modal_top_description')}
                   </StyledText>
                   <StyledText as="p">
-                    {t('deck_fixture_setup_modal_bottom_description')}
+                    {t('deck_fixture_setup_modal_bottom_description_desktop')}
                   </StyledText>
                 </Flex>
-                <ExternalLink href={SETUP_INSTRUCTION_EXTERNAL_URL}>
+                <ExternalLink href={SETUP_INSTRUCTION_URL}>
                   {t('deck_fixture_setup_instructions')}
                 </ExternalLink>
               </Flex>

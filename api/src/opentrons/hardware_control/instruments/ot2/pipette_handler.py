@@ -662,7 +662,6 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT, mount)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )

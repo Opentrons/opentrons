@@ -243,7 +243,8 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
     // that deck setup needs to be aware of
     const filteredAdditionalEquipment = Object.fromEntries(
       Object.entries(additionalEquipmentEntities).filter(
-        ([_, entity]) => entity.name === 'wasteChute'
+        ([_, entity]) =>
+          entity.name === 'wasteChute' || entity.name === 'stagingArea'
       )
     )
     return {

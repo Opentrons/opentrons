@@ -9,7 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_AT_TARGET } from '@opentrons/step-generation'
 import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
-import { getSwapBlocked, SwapBlockedArgs } from '..'
+import { getSwapBlocked, SwapBlockedArgs } from '../utils'
 
 describe('DeckSetup', () => {
   describe('getSwapBlocked', () => {

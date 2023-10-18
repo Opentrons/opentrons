@@ -3,7 +3,10 @@ import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
-import type { LabwareEntities } from '@opentrons/step-generation'
+import type {
+  AdditionalEquipmentEntity,
+  LabwareEntities,
+} from '@opentrons/step-generation'
 
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
@@ -115,4 +118,12 @@ export const getIsAdapter = (
   return (
     labwareEntities[labwareId].def.allowedRoles?.includes('adapter') ?? false
   )
+}
+
+export const getStagingAreaSlots = (
+  stagingAreas?: AdditionalEquipmentEntity[]
+): string[] | null => {
+  if (stagingAreas == null) return null
+  //  we can assume that the location is always a string
+  return stagingAreas.map(area => area.location as string)
 }

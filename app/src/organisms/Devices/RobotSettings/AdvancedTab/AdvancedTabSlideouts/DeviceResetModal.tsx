@@ -27,7 +27,7 @@ import {
   getResetConfigOptions,
   resetConfig,
 } from '../../../../../redux/robot-admin'
-import { useIsOT3 } from '../../../hooks'
+import { useIsFlex } from '../../../hooks'
 
 import type { State } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
@@ -48,7 +48,7 @@ export function DeviceResetModal({
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const resetRequestStatus = useSelector((state: State) => {
     const lastId = last(requestIds)
     return lastId != null ? getRequestById(state, lastId) : null
@@ -60,7 +60,7 @@ export function DeviceResetModal({
 
   const triggerReset = (): void => {
     if (resetOptions != null) {
-      if (isOT3) {
+      if (isFlex) {
         const totalOptionsSelected = Object.values(resetOptions).filter(
           selected => selected === true
         ).length

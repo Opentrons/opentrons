@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,7 +18,6 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   getFixtureDisplayName,
   STAGING_AREA_LOAD_NAME,
-  // STANDARD_SLOT_LOAD_NAME,
   TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
@@ -28,19 +28,16 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
-import type { FixtureLoadName } from '@opentrons/shared-data'
+import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 interface AddDeckConfigurationModalProps {
-  fixtureLocation: string
+  fixtureLocation: Cutout
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
   isOnDevice?: boolean
 }
 
-// ToDo (kk:09/29/2023)
-// update this component when Deck configuration component is ready
-// Need to use getFixtureDisplayName
 export function AddDeckConfigurationModal({
   fixtureLocation,
   setShowAddFixtureModal,
@@ -51,6 +48,7 @@ export function AddDeckConfigurationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', { slotName: fixtureLocation }),
     hasExitIcon: true,
+    onClick: () => setShowAddFixtureModal(false),
   }
 
   const modalProps: LegacyModalProps = {
@@ -86,19 +84,21 @@ export function AddDeckConfigurationModal({
   return (
     <>
       {isOnDevice ? (
-        <Modal header={modalHeader}>
+        <Modal
+          header={modalHeader}
+          onOutsideClick={() => setShowAddFixtureModal(false)}
+        >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {/* ToDo (kk:10/05/2023) I will update this part later */}
-              {/* {availableFixtures.map((fixture, index) => (
-                <React.Fragment key={`fixture_${index}`}>
-                  <AddFixtureButton fixtureLoadName={fixture} />
+              {availableFixtures.map(fixture => (
+                <React.Fragment key={fixture}>
+                  <AddFixtureButton
+                    fixtureLoadName={fixture}
+                    handleClickAdd={handleClickAdd}
+                  />
                 </React.Fragment>
-              ))} */}
-              <AddFixtureButton fixtureLoadName={t('staging_area_slot')} />
-              <AddFixtureButton fixtureLoadName={t('trash')} />
-              <AddFixtureButton fixtureLoadName={t('waste_chute')} />
+              ))}
             </Flex>
           </Flex>
         </Modal>
@@ -108,7 +108,7 @@ export function AddDeckConfigurationModal({
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {availableFixtures.map(fixture => (
-                <React.Fragment key={`${fixture}`}>
+                <React.Fragment key={fixture}>
                   <Flex
                     flexDirection={DIRECTION_ROW}
                     alignItems={ALIGN_CENTER}
@@ -135,34 +135,34 @@ export function AddDeckConfigurationModal({
 }
 
 interface AddFixtureButtonProps {
-  fixtureLoadName: string
+  fixtureLoadName: FixtureLoadName
+  handleClickAdd: (fixtureLoadName: FixtureLoadName) => void
 }
 function AddFixtureButton({
   fixtureLoadName,
+  handleClickAdd,
 }: AddFixtureButtonProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
-  // ToDo (kk:10/02/2023)
-  // Need to update a function for onClick
   return (
     <Btn
-      onClick={() => {}}
+      onClick={() => handleClickAdd(fixtureLoadName)}
       display="flex"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      css={FIXTIRE_BUTTON_STYLE}
+      css={FIXTURE_BUTTON_STYLE}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {fixtureLoadName}
+        {getFixtureDisplayName(fixtureLoadName)}
       </StyledText>
       <StyledText as="p">{t('add')}</StyledText>
     </Btn>
   )
 }
 
-const FIXTIRE_BUTTON_STYLE = css`
+const FIXTURE_BUTTON_STYLE = css`
   background-color: ${COLORS.light1};
   cursor: default;
   border-radius: ${BORDERS.borderRadiusSize3};

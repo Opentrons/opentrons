@@ -36,6 +36,7 @@ import {
   getIsCrashablePipetteSelected,
 } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
+import wasteChuteImage from '../../../images/waste_chute.png'
 import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
@@ -129,7 +130,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   )
 
   return (
-    <HandleEnter onEnter={proceed}>
+    <HandleEnter disabled={!hasATrash} onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -169,14 +170,14 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         >
           <GoBack
             onClick={() => {
-              if (
-                props.values.pipettesByMount.left.pipetteName === 'p1000_96'
-              ) {
-                goBack(3)
-              } else if (
-                props.values.pipettesByMount.right.pipetteName === ''
-              ) {
-                goBack(2)
+              if (!enableDeckModification || robotType === OT2_ROBOT_TYPE) {
+                if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
+                  goBack(4)
+                } else if (values.pipettesByMount.right.pipetteName === '') {
+                  goBack(3)
+                } else {
+                  goBack(2)
+                }
               } else {
                 goBack()
               }
@@ -210,7 +211,7 @@ const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
   [HEATERSHAKER_MODULE_V1]: 'D1',
   [MAGNETIC_BLOCK_V1]: 'D2',
-  [TEMPERATURE_MODULE_V2]: 'D3',
+  [TEMPERATURE_MODULE_V2]: 'C1',
 }
 
 interface FlexModuleFieldsProps extends WizardTileProps {
@@ -220,6 +221,14 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
   const { values, setFieldValue, enableDeckModification } = props
 
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
+  const allStagingAreasInUse =
+    values.additionalEquipment.filter(equipment =>
+      equipment.includes('stagingArea')
+    ).length === 4
+  const allModulesInSideSlotsOnDeck =
+    values.modulesByType.heaterShakerModuleType.onDeck &&
+    values.modulesByType.thermocyclerModuleType.onDeck &&
+    values.modulesByType.temperatureModuleType.onDeck
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
     if (values.additionalEquipment.includes(equipment)) {
@@ -241,6 +250,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
         const moduleType = getModuleType(moduleModel)
         return (
           <EquipmentOption
+            //  TODO(jr, 10/10/23): add disabled option here for if the deck is full
             key={moduleModel}
             isSelected={values.modulesByType[moduleType].onDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
@@ -280,10 +290,9 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
           <EquipmentOption
             onClick={() => handleSetEquipmentOption('wasteChute')}
             isSelected={values.additionalEquipment.includes('wasteChute')}
-            //  todo(jr, 9/14/23): update the asset
             image={
               <AdditionalItemImage
-                src={gripperImage}
+                src={wasteChuteImage}
                 alt="Opentrons Waste Chute"
               />
             }
@@ -302,6 +311,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
             }
             text="Trash Bin"
             showCheckbox
+            disabled={allStagingAreasInUse && allModulesInSideSlotsOnDeck}
           />
         </>
       ) : null}

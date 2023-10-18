@@ -109,7 +109,7 @@ const MAGNETIC_MODULE_INFO = {
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
   protocolLoadOrder: 0,
-  slotName: '1',
+  slotName: 'D1',
 }
 
 const TEMPERATURE_MODULE_INFO = {
@@ -122,12 +122,12 @@ const TEMPERATURE_MODULE_INFO = {
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
   protocolLoadOrder: 0,
-  slotName: '1',
+  slotName: 'D1',
 }
 
 const mockFixture = {
   fixtureId: 'mockId',
-  fixtureLocation: '1',
+  fixtureLocation: 'D1',
   loadName: STAGING_AREA_LOAD_NAME,
 } as Fixture
 

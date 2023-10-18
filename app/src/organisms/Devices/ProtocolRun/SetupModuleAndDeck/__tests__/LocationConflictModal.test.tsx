@@ -79,4 +79,21 @@ describe('LocationConflictModal', () => {
     getByRole('button', { name: 'Update deck' }).click()
     expect(mockUpdate).toHaveBeenCalled()
   })
+  it('should render correct info for a odd', () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByText, getAllByText } = render(props)
+    getByText('Deck location conflict')
+    getByText('Slot B3')
+    getByText('Protocol specifies')
+    getByText('Currently configured')
+    getAllByText('Staging Area Slot')
+    getByText('Trash Bin')
+    getByText('Cancel').click()
+    expect(props.onCloseClick).toHaveBeenCalled()
+    getByText('Confirm removal').click()
+    expect(mockUpdate).toHaveBeenCalled()
+  })
 })

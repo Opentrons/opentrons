@@ -10,7 +10,7 @@ import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from '../hooks'
+import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { GripperCard } from '../../GripperCard'
@@ -73,7 +73,7 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockGetIs96ChannelPipetteAttached = getIs96ChannelPipetteAttached as jest.MockedFunction<
   typeof getIs96ChannelPipetteAttached
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = () => {
   return renderWithProviders(<InstrumentsAndModules robotName="otie" />, {
@@ -97,7 +97,7 @@ describe('InstrumentsAndModules', () => {
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockGripperCard.mockReturnValue(<div>Mock GripperCard</div>)
     mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -142,7 +142,7 @@ describe('InstrumentsAndModules', () => {
     getAllByText('Mock PipetteCard')
   })
   it('renders gripper cards when a robot is Flex', () => {
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({ data: { data: [] } } as any)
     mockUsePipettesQuery.mockReturnValue({

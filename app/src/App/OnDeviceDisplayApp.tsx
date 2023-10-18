@@ -39,6 +39,7 @@ import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashbo
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScreen'
+import { DeckConfiguration } from '../pages/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
@@ -182,6 +183,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Emergency Stop',
     path: '/emergency-stop',
+  },
+  {
+    Component: DeckConfiguration,
+    exact: true,
+    name: 'Deck Configuration',
+    path: '/deck-configuration',
   },
   {
     Component: () => (

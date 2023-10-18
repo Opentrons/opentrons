@@ -5,12 +5,12 @@ import { DeckFromData } from './DeckFromData'
 import { FlexTrash } from './FlexTrash'
 
 import type { DeckFromDataProps } from './DeckFromData'
-import type { TrashSlotName } from './FlexTrash'
+import type { TrashLocation } from './FlexTrash'
 
 interface StyledDeckProps {
   deckFill: string
   trashColor?: string
-  trashSlotName?: TrashSlotName
+  trashLocation?: TrashLocation
 }
 
 // apply fill to .SLOT_BASE class from ot3_standard deck definition
@@ -25,7 +25,7 @@ export function StyledDeck(
 ): JSX.Element {
   const {
     deckFill,
-    trashSlotName,
+    trashLocation,
     trashColor = '#757070',
     ...deckFromDataProps
   } = props
@@ -33,7 +33,7 @@ export function StyledDeck(
   const robotType = deckFromDataProps.def.robot.model ?? 'OT-2 Standard'
 
   const trashSlotClipId =
-    trashSlotName != null ? `SLOT_CLIPS_${trashSlotName}` : null
+    trashLocation != null ? `SLOT_CLIPS_${trashLocation}` : null
 
   const trashLayerBlocklist =
     trashSlotClipId != null
@@ -46,12 +46,12 @@ export function StyledDeck(
         {...deckFromDataProps}
         layerBlocklist={trashLayerBlocklist}
       />
-      {trashSlotName != null ? (
+      {trashLocation != null ? (
         <FlexTrash
           robotType={robotType}
           trashIconColor={deckFill}
           backgroundColor={trashColor}
-          trashSlotName={trashSlotName}
+          trashLocation={trashLocation}
         />
       ) : null}
     </StyledG>

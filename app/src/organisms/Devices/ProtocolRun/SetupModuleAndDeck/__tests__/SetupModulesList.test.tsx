@@ -17,7 +17,7 @@ import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
-  useIsOT3,
+  useIsFlex,
   useModuleRenderInfoForProtocolById,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
@@ -44,7 +44,7 @@ jest.mock('../MultipleModulesModal')
 jest.mock('../../../../../resources/runs/hooks')
 jest.mock('../../../../../redux/config')
 
-const mockUseIsOt3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
@@ -241,7 +241,7 @@ describe('SetupModulesList', () => {
         },
       },
     } as any)
-    mockUseIsOt3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')
@@ -270,7 +270,7 @@ describe('SetupModulesList', () => {
         attachedModuleMatch: mockThermocycler,
       },
     } as any)
-    mockUseIsOt3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
 
     const { getByText, getByRole } = render(props)
     getByText('Thermocycler Module')
@@ -308,7 +308,7 @@ describe('SetupModulesList', () => {
         attachedModuleMatch: mockThermocycler,
       },
     } as any)
-    mockUseIsOt3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
 
     const { getByRole } = render(props)
     expect(getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
@@ -338,7 +338,7 @@ describe('SetupModulesList', () => {
         },
       },
     } as any)
-    mockUseIsOt3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')

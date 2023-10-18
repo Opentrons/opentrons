@@ -28,7 +28,7 @@ import {
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
@@ -54,7 +54,7 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
@@ -100,7 +100,7 @@ describe('CalibrationDataDownload', () => {
         deckCalibrationData: mockDeckCalData,
         isDeckCalibrated: true,
       })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     when(mockUsePipetteOffsetCalibrations)
       .calledWith()
       .mockReturnValue([
@@ -130,13 +130,13 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a title and description for OT2', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     const [{ getByText }] = render()
     getByText('Download Calibration Data')
   })
 
   it('renders an OT-3 title and description - About Calibration', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
@@ -158,7 +158,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a download calibration button for Flex when cal data is present', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [instrumentsResponseFixture.data[0]] },
     } as any)
@@ -169,7 +169,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a See how robot calibration works link', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByRole }] = render()
     const SUPPORT_LINK = 'https://support.opentrons.com'
     expect(
@@ -218,7 +218,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders disabled button for Flex when no instrument is calibrated', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByRole, queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`

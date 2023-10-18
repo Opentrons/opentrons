@@ -30,9 +30,11 @@ import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from './LocationConflictModal'
+import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+import type { Cutout } from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   loadedFixturesBySlot: LoadedFixturesBySlot
@@ -81,7 +83,6 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
       >
         {map(loadedFixturesBySlot, ({ params, id }) => {
           const { loadName, location } = params
-          console.log(id)
           return (
             <FixtureListItem
               key={`SetupFixturesList_${loadName}_slot_${location.cutout}`}
@@ -100,7 +101,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 interface FixtureListItemProps {
   loadedFixtures: LoadFixtureRunTimeCommand[]
   loadName: FixtureLoadName
-  cutout: string
+  cutout: Cutout
   commandId: string
 }
 
@@ -151,9 +152,20 @@ export function FixtureListItem({
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = React.useState<boolean>(false)
+  const [
+    showNotConfiguredModal,
+    setShowNotConfiguredModal,
+  ] = React.useState<boolean>(false)
 
   return (
     <>
+      {showNotConfiguredModal ? (
+        <NotConfiguredModal
+          onCloseClick={() => setShowNotConfiguredModal(false)}
+          cutout={cutout}
+          requiredFixture={loadName}
+        />
+      ) : null}
       {showLocationConflictModal ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
@@ -217,7 +229,7 @@ export function FixtureListItem({
                 onClick={() =>
                   configurationStatus === CONFLICTING
                     ? setShowLocationConflictModal(true)
-                    : console.log('wire this up')
+                    : setShowNotConfiguredModal(true)
                 }
               >
                 <StyledText as="label" cursor="pointer">

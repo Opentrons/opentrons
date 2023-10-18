@@ -10,7 +10,7 @@ import {
 } from '../../../../redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
-  useIsOT3,
+  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
@@ -71,7 +71,7 @@ const mockUpdateRobotStatus = jest.fn()
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
   typeof OverflowMenu
 >
@@ -89,7 +89,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     })
     mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -111,7 +111,7 @@ describe('PipetteOffsetCalibrationItems', () => {
   })
 
   it('should omit tip rack table header for OT-3', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByText, queryByText }] = render(props)
     getByText('Pipette Model and Serial')
     getByText('Mount')
@@ -124,7 +124,7 @@ describe('PipetteOffsetCalibrationItems', () => {
       ...props,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrationsForOt3,
     }
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
     mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,

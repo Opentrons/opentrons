@@ -11,6 +11,8 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
+import type { Cutout } from '@opentrons/shared-data'
+
 // TODO: replace stubs with JSON definitions when available
 const stagingAreaDef = {
   schemaVersion: 1,
@@ -29,13 +31,13 @@ const stagingAreaDef = {
   },
 }
 
-interface StagingAreaFixtureProps {
-  fixtureLocation: string
-  handleClickRemove?: (fixtureLocation: string) => void
+interface StagingAreaConfigFixtureProps {
+  fixtureLocation: Cutout
+  handleClickRemove?: (fixtureLocation: Cutout) => void
 }
 
-export function StagingAreaFixture(
-  props: StagingAreaFixtureProps
+export function StagingAreaConfigFixture(
+  props: StagingAreaConfigFixtureProps
 ): JSX.Element {
   const { handleClickRemove, fixtureLocation } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -71,7 +73,6 @@ export function StagingAreaFixture(
         justifyContent={JUSTIFY_CENTER}
         width="100%"
       >
-        {}
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
           {stagingAreaDef.metadata.displayName}
         </Text>

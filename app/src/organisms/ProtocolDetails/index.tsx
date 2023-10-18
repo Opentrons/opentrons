@@ -39,7 +39,6 @@ import {
   parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
 import {
-  LoadFixtureRunTimeCommand,
   WASTE_CHUTE_LOAD_NAME,
   getGripperDisplayName,
 } from '@opentrons/shared-data'
@@ -57,6 +56,7 @@ import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
 } from '../../redux/protocol-storage'
+import { useFeatureFlag } from '../../redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -66,14 +66,18 @@ import {
 } from '../ProtocolsLanding/utils'
 import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
+import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
-import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
+import type {
+  JsonConfig,
+  LoadFixtureRunTimeCommand,
+  PythonConfig,
+} from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
-import { useFeatureFlag } from '../../redux/config'
 
 const GRID_STYLE = css`
   display: grid;
@@ -191,9 +195,10 @@ export function ProtocolDetails(
   const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
+  const enableProtocolStats = useFeatureFlag('protocolStats')
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids'
+    'robot_config' | 'labware' | 'liquids' | 'stats'
   >('robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -339,6 +344,9 @@ export function ProtocolDetails(
         }
       />
     ),
+    stats: enableProtocolStats ? (
+      <ProtocolStats analysis={mostRecentAnalysis} />
+    ) : null,
   }
 
   const deckThumbnail = (
@@ -399,7 +407,7 @@ export function ProtocolDetails(
         />
         <Flex
           backgroundColor={COLORS.white}
-          border={`1px solid ${String(COLORS.medGreyEnabled)}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
           borderRadius={BORDERS.radiusSoftCorners}
           position={POSITION_RELATIVE}
           flexDirection={DIRECTION_ROW}
@@ -541,10 +549,10 @@ export function ProtocolDetails(
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex
-            flex={`0 0 ${String(SIZE_5)}`}
+            flex={`0 0 ${SIZE_5}`}
             flexDirection={DIRECTION_COLUMN}
             backgroundColor={COLORS.white}
-            border={`1px solid ${String(COLORS.medGreyEnabled)}`}
+            border={`1px solid ${COLORS.medGreyEnabled}`}
             borderRadius={BORDERS.radiusSoftCorners}
             height="100%"
             data-testid="ProtocolDetails_deckMap"
@@ -611,18 +619,27 @@ export function ProtocolDetails(
                   </StyledText>
                 </RoundTab>
               )}
+              {enableProtocolStats && mostRecentAnalysis != null && (
+                <RoundTab
+                  data-testid="ProtocolDetails_stats"
+                  isCurrent={currentTab === 'stats'}
+                  onClick={() => setCurrentTab('stats')}
+                >
+                  <StyledText>
+                    {i18n.format(t('stats'), 'capitalize')}
+                  </StyledText>
+                </RoundTab>
+              )}
             </Flex>
             <Box
               backgroundColor={COLORS.white}
               border={BORDERS.lineBorder}
               // remove left upper corner border radius when first tab is active
               borderRadius={`${
-                currentTab === 'robot_config'
-                  ? '0'
-                  : String(BORDERS.radiusSoftCorners)
-              } ${String(BORDERS.radiusSoftCorners)} ${String(
+                currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners
+              } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
                 BORDERS.radiusSoftCorners
-              )} ${String(BORDERS.radiusSoftCorners)}`}
+              }`}
               padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
             >
               {contentsByTabName[currentTab]}

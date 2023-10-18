@@ -39,7 +39,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import {
   ModuleRenderInfoForProtocol,
-  useIsOT3,
+  useIsFlex,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
@@ -49,7 +49,7 @@ import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { LocationConflictModal } from './LocationConflictModal'
 import { getModuleImage } from './utils'
 
-import type { ModuleModel, Fixture } from '@opentrons/shared-data'
+import type { Cutout, ModuleModel, Fixture } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import type { ProtocolCalibrationStatus } from '../../hooks'
 
@@ -70,7 +70,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     remainingAttachedModules,
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
@@ -184,7 +184,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     ? moduleRenderInfoForProtocolById[moduleId]
                     : null
                 }
-                isOT3={isOT3}
+                isFlex={isFlex}
                 calibrationStatus={calibrationStatus}
                 conflictedFixture={conflictedFixture}
               />
@@ -202,7 +202,7 @@ interface ModulesListItemProps {
   slotName: string
   attachedModuleMatch: AttachedModule | null
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
-  isOT3: boolean
+  isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
   conflictedFixture?: Fixture
 }
@@ -213,7 +213,7 @@ export function ModulesListItem({
   slotName,
   attachedModuleMatch,
   heaterShakerModuleFromProtocol,
-  isOT3,
+  isFlex,
   calibrationStatus,
   conflictedFixture,
 }: ModulesListItemProps): JSX.Element {
@@ -314,7 +314,7 @@ export function ModulesListItem({
   )
 
   if (
-    isOT3 &&
+    isFlex &&
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleOffset?.last_modified == null
   ) {
@@ -351,7 +351,8 @@ export function ModulesListItem({
       {showLocationConflictModal ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          cutout={slotName}
+          // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
+          cutout={slotName as Cutout}
           requiredModule={moduleModel}
         />
       ) : null}
@@ -401,7 +402,7 @@ export function ModulesListItem({
           </Flex>
           <StyledText as="p" width="15%">
             {getModuleType(moduleModel) === 'thermocyclerModuleType'
-              ? isOT3
+              ? isFlex
                 ? TC_MODULE_LOCATION_OT3
                 : TC_MODULE_LOCATION_OT2
               : slotName}
