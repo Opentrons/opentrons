@@ -126,6 +126,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     has96Channel,
   } = props
   const defs = getOnlyLatestDefs()
+  const URIs = Object.keys(defs)
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
@@ -231,6 +232,21 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       }, ${i18n.t(`modules.module_long_names.${moduleType}`)} Labware`
     }
     return `Slot ${slot} Labware`
+  }
+
+  const getLabwareAdapterItem = (index: number, labwareDefUri?: string) => {
+    const labwareDef = labwareDefUri != null ? defs[labwareDefUri] : null
+    return labwareDef != null ? (
+      <LabwareItem
+        key={`${labwareDef.parameters.loadName}_${index}`}
+        icon="check-decagram"
+        labwareDef={labwareDef}
+        selectLabware={selectLabware}
+        onMouseEnter={() => setPreviewedLabware(labwareDef)}
+        // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+        onMouseLeave={() => setPreviewedLabware()}
+      />
+    ) : null
   }
 
   const customLabwareURIs: string[] = React.useMemo(
@@ -347,6 +363,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       moduleCompatibility = 'notCompatible'
     }
   }
+
   return (
     <>
       <Portal>
@@ -432,31 +449,19 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               onClick={makeToggleCategory(adapterCompatibleLabware)}
               inert={false}
             >
-              {has96Channel
-                ? permittedTipracks
+              {has96Channel && adapterLoadName === ADAPTER_96_CHANNEL
+                ? permittedTipracks.map((tiprackDefUri, index) => {
+                    const labwareDefUri = URIs.find(
+                      defUri => defUri === tiprackDefUri
+                    )
+                    return getLabwareAdapterItem(index, labwareDefUri)
+                  })
                 : getLabwareCompatibleWithAdapter(adapterLoadName).map(
                     (adapterDefUri, index) => {
-                      const latestDefs = getOnlyLatestDefs()
-
-                      const URIs = Object.keys(latestDefs)
                       const labwareDefUri = URIs.find(
                         defUri => defUri === adapterDefUri
                       )
-                      const labwareDef = labwareDefUri
-                        ? latestDefs[labwareDefUri]
-                        : null
-
-                      return labwareDef != null ? (
-                        <LabwareItem
-                          key={index}
-                          icon="check-decagram"
-                          labwareDef={labwareDef}
-                          selectLabware={selectLabware}
-                          onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                          // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-                          onMouseLeave={() => setPreviewedLabware()}
-                        />
-                      ) : null
+                      return getLabwareAdapterItem(index, labwareDefUri)
                     }
                   )}
             </PDTitledList>
