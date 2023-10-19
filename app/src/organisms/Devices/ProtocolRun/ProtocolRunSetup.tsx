@@ -308,12 +308,14 @@ export function ProtocolRunSetup({
                       }
                       rightElement={
                         <StepRightElement
-                          {...{ stepKey, runHasStarted, 
+                          {...{
+                            stepKey,
+                            runHasStarted,
 
-                          calibrationStatusRobot,
-                          calibrationStatusModules,
-                          isFlex,
-                            }}
+                            calibrationStatusRobot,
+                            calibrationStatusModules,
+                            isFlex,
+                          }}
                         />
                       }
                     >
@@ -326,7 +328,6 @@ export function ProtocolRunSetup({
                 </Flex>
               )
             })
-
           )}
         </>
       ) : (

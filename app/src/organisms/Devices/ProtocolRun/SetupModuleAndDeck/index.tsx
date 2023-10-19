@@ -11,7 +11,11 @@ import {
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { useFeatureFlag } from '../../../../redux/config'
-import { useRunHasStarted, useUnmatchedModulesForProtocol, useModuleCalibrationStatus } from '../../hooks'
+import {
+  useRunHasStarted,
+  useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
+} from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'

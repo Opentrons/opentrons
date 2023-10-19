@@ -4,7 +4,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import {
-  useIsOT3,
+  useIsFlex,
   useModuleCalibrationStatus,
   useModuleRenderInfoForProtocolById,
 } from '..'
@@ -16,10 +16,10 @@ import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-jest.mock('../useIsOT3')
+jest.mock('../useIsFlex')
 jest.mock('../useModuleRenderInfoForProtocolById')
 
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
@@ -84,7 +84,7 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if OT-2', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith('otie', '1')
       .mockReturnValue({})
@@ -98,7 +98,7 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if no modules needed', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith('otie', '1')
       .mockReturnValue({})
@@ -112,7 +112,7 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if offset date exists', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith('otie', '1')
       .mockReturnValue({
@@ -134,7 +134,7 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration needed if offset date does not exist', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith('otie', '1')
       .mockReturnValue({

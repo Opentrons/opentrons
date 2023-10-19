@@ -286,7 +286,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders calibration ready if robot is Flex and modules are calibrated', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
         .mockReturnValue({ complete: true })
@@ -296,7 +296,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
         .mockReturnValue({ complete: false })
@@ -308,7 +308,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('does not render calibration element if robot is OT-2', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
 
       const { getAllByText } = render()
       expect(getAllByText('Calibration ready').length).toEqual(1)
