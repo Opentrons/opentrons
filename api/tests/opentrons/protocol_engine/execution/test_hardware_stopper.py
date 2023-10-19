@@ -169,7 +169,7 @@ async def test_hardware_stopping_sequence_no_pipette(
     )
 
     decoy.verify(
-        await hardware_api.stop(home_after=True),
+        await hardware_api.stop(home_after=False),
         times=1,
     )
 
@@ -201,5 +201,5 @@ async def test_hardware_stopping_sequence_with_gripper(
     )
 
     decoy.verify(
-        await ot3_hardware_api.stop(home_after=True),
+        await ot3_hardware_api.stop(home_after=False),
     )
