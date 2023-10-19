@@ -17,7 +17,7 @@ import {
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { ModuleInformation } from '../Module/ModuleInformation'
 import { Module } from '../Module'
-import { LabwareRender } from '../Labware'
+import { LabwareInformation, LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromData } from '../Deck/DeckFromData'
 import { SlotLabels } from '../Deck'
@@ -32,7 +32,7 @@ import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 // import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { DeckConfiguration, VectorOffset } from '@opentrons/shared-data'
 import type { TrashLocation } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 import type { WasteChuteLocation } from './WasteChuteFixture'
@@ -42,12 +42,20 @@ interface BaseDeckProps {
   labwareLocations: Array<{
     labwareLocation: LabwareLocation
     definition: LabwareDefinition2
+    topLabwareId: string
+    topLabwareDisplayName: string | null
+    offsetVector?: VectorOffset
   }>
   moduleLocations: Array<{
     moduleModel: ModuleModel
     moduleLocation: ModuleLocation
     nestedLabwareDef?: LabwareDefinition2 | null
     innerProps?: React.ComponentProps<typeof Module>['innerProps']
+    // props for labware information, subject to change as design refines deck map
+    labwareInformation?: Omit<
+      React.ComponentProps<typeof LabwareInformation>,
+      'definition'
+    >
     // props for module info/connection, subject to change as design refines deck map
     moduleInformation?: Omit<
       React.ComponentProps<typeof ModuleInformation>,
@@ -150,6 +158,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           moduleLocation,
           nestedLabwareDef,
           innerProps,
+          labwareInformation,
           moduleInformation,
         }) => {
           const slotDef = deckDef.locations.orderedSlots.find(
@@ -174,28 +183,52 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 />
               ) : null}
               {nestedLabwareDef != null ? (
-                <LabwareRender definition={nestedLabwareDef} />
+                <>
+                  <LabwareRender definition={nestedLabwareDef} />
+                  {labwareInformation?.labwareId != null ? (
+                    <LabwareInformation
+                      definition={nestedLabwareDef}
+                      labwareId={labwareInformation.labwareId}
+                      displayName={labwareInformation.displayName}
+                      offsetVector={labwareInformation.offsetVector}
+                    />
+                  ) : null}
+                </>
               ) : null}
             </Module>
           ) : null
         }
       )}
-      {labwareLocations.map(({ labwareLocation, definition }) => {
-        const slotDef = deckDef.locations.orderedSlots.find(
-          s =>
-            labwareLocation !== 'offDeck' &&
-            'slotName' in labwareLocation &&
-            s.id === labwareLocation.slotName
-        )
-        return slotDef != null ? (
-          <g
-            key={slotDef.id}
-            transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
-          >
-            <LabwareRender definition={definition} />
-          </g>
-        ) : null
-      })}
+      {labwareLocations.map(
+        ({
+          labwareLocation,
+          definition,
+          offsetVector,
+          topLabwareId,
+          topLabwareDisplayName,
+        }) => {
+          const slotDef = deckDef.locations.orderedSlots.find(
+            s =>
+              labwareLocation !== 'offDeck' &&
+              'slotName' in labwareLocation &&
+              s.id === labwareLocation.slotName
+          )
+          return slotDef != null ? (
+            <g
+              key={slotDef.id}
+              transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
+            >
+              <LabwareRender definition={definition} />
+              <LabwareInformation
+                definition={definition}
+                labwareId={topLabwareId}
+                displayName={topLabwareDisplayName}
+                offsetVector={offsetVector}
+              />
+            </g>
+          ) : null
+        }
+      )}
       <SlotLabels robotType={robotType} color={darkFill} />
       {children}
     </RobotCoordinateSpace>

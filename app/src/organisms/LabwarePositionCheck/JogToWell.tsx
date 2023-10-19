@@ -39,9 +39,8 @@ import { JogControls } from '../../molecules/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { Jog } from '../../molecules/JogControls'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2, VectorOffset } from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
-import type { VectorOffset } from '@opentrons/api-client'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =

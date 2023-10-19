@@ -4,6 +4,7 @@ import type {
   LoadedPipette,
   ModuleModel,
   RunTimeCommand,
+  VectorOffset,
 } from '@opentrons/shared-data'
 import type { ResourceLink } from '../types'
 export * from './commands/types'
@@ -47,11 +48,6 @@ export interface RunData {
   labwareOffsets?: LabwareOffset[]
 }
 
-export interface VectorOffset {
-  x: number
-  y: number
-  z: number
-}
 export interface LabwareOffset {
   id: string
   createdAt: string

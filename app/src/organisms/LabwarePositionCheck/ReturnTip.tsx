@@ -20,7 +20,7 @@ import { getDisplayLocation } from './utils/getDisplayLocation'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 
-import type { VectorOffset } from '@opentrons/api-client'
+import type { VectorOffset } from '@opentrons/shared-data'
 import type { ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {
